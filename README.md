@@ -26,6 +26,7 @@ ubuntu-services-3d.sh
 
 The above steps will create the Oracle Enterprise Edition 6.5 LXC oracle-ready containers.
 
+
 Phase 2:  Create the SCST Linux SAN LUNs for Oracle Grid Infrastructure
 
 Create the SCST SAN (optional) using the following steps.
