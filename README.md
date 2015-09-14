@@ -29,9 +29,8 @@ The above steps will create the Oracle Enterprise Edition 6.5 LXC oracle-ready c
 
 Phase 2:  Create the SCST Linux SAN LUNs for Oracle Grid Infrastructure
 
-Create the SCST SAN (optional) using the following steps.
-
 tar -xvf scst-files.tar
+
 cd scst-files
 
 Run the create-scst-*.sh files in the order shown below.
