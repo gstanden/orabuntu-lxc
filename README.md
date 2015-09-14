@@ -16,6 +16,8 @@ Screenshots and additional information can be found at the following Google Site
 
 https://sites.google.com/site/nandydandyoracle/technologies/lxc/oracle-rac-6-node-12c-gns-asm-flex-cluster-ubuntu-15-04-install
 
+UNZIP THE DOWNLOADED ZIP IN THE ~/Downloads DIRECTORY!
+
 Phase 1:  Create the LXC Containers for Oracle 12 RAC ASM Flex Cluster
 
 Run the ubuntu-services-*.sh files in the order shown below.
