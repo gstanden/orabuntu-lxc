@@ -1,0 +1,16 @@
+#!/bin/sh
+#
+# This script will be executed *after* all the other init scripts.
+# You can put your own initialization stuff in here if you don't
+# want to do the full Sys V style init stuff.
+
+# Oracle ASM Storage
+chown grid:asmadmin /dev/mapper/asm*
+chmod 0660 /dev/mapper/asm*
+
+# NTP
+ntpd
+
+touch /var/lock/subsys/local
+exit 0
+
