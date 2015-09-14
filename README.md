@@ -1,10 +1,22 @@
 # orabuntu-lxc
 Oracle Enteprise Edition Software on Ubuntu Linux using LXC Containers.
-This software runs Oracle Enteprise Edition database on Ubuntu 15.04 64-bit Desktop Edition using Oracle Enteprise Linux 6.5 LXC Containers.  Install on a fresh install of 15.04 only.
+This software runs Oracle Enteprise Edition RAC database on Ubuntu 15.04 64-bit Desktop Edition using Oracle Enteprise Linux 6.5 LXC Containers.  Install on a fresh install of 15.04 only.
+
+Technology Platforms:
+
+isc-dhcp-server
+
+bind9
+
+openvswitch
+
+lxc
 
 Screenshots and additional information can be found at the following Google Site:
 
 https://sites.google.com/site/nandydandyoracle/technologies/lxc/oracle-rac-6-node-12c-gns-asm-flex-cluster-ubuntu-15-04-install
+
+UNZIP THE DOWNLOADED ZIP IN THE ~/Downloads DIRECTORY!
 
 Phase 1:  Create the LXC Containers for Oracle 12 RAC ASM Flex Cluster
 
@@ -29,9 +41,8 @@ The above steps will create the Oracle Enterprise Edition 6.5 LXC oracle-ready c
 
 Phase 2:  Create the SCST Linux SAN LUNs for Oracle Grid Infrastructure
 
-Create the SCST SAN (optional) using the following steps.
-
 tar -xvf scst-files.tar
+
 cd scst-files
 
 Run the create-scst-*.sh files in the order shown below.
