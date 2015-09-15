@@ -228,3 +228,18 @@ sudo lxc-ls -f
 # ssh root@lxcora4 usermod --password `perl -e "print crypt('grid','grid');"` grid
 # ssh root@lxcora5 usermod --password `perl -e "print crypt('grid','grid');"` grid
 # ssh root@lxcora6 usermod --password `perl -e "print crypt('grid','grid');"` grid
+
+echo "================================================"
+echo "Stopping the containers in 10 seconds           "
+echo "Next step is to setup storage...                "
+echo "tar -xvf scst-files.tar                         "
+echo "cd scst-files                                   "
+echo "cat README                                      "
+echo "follow the instructions in the README           "
+echo "Builds the SCST Linux SAN.                      "
+echo "================================================"
+
+sleep 10
+
+~/Downloads/stop_containers.sh
+
