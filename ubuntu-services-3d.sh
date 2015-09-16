@@ -213,11 +213,9 @@ done
 echo "================================================"
 echo "Waiting for final container initialization...   " 
 echo "================================================"
-echo ''
 echo "================================================"
 echo "LXC containers for Oracle started.              "
 echo "================================================"
-echo ''
 
 sudo lxc-ls -f
 

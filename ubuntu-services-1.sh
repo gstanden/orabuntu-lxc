@@ -13,14 +13,14 @@ sleep 10
 
 clear
 
-echo "==============================================="
-echo "DHCP service clear, start, and test...         "
-echo "Verify health status...                        "
-echo "==============================================="
-echo ''
+# echo "==============================================="
+# echo "DHCP service clear, start, and test...         "
+# echo "Verify health status...                        "
+# echo "==============================================="
+# echo ''
 
-# sudo rm -rf /var/lib/lxc/lxcora01
-
+if [ -e /var/lib/dhcp/dhcpd.leases ]
+then
 echo ''
 echo "Destroy DHCP Leases?  [ Y | N ]:"
 read input_variable2
@@ -50,13 +50,14 @@ then
 	sudo service isc-dhcp-server status
 
 fi
+fi
 
-echo ''
-echo "==============================================="
-echo "Verify isc-dhcp-server service completed       "
-echo "==============================================="
+# echo ''
+# echo "==============================================="
+# echo "Verify isc-dhcp-server service completed       "
+# echo "==============================================="
 
-sleep 8
+# sleep 5
 
 clear
 
@@ -90,6 +91,15 @@ sleep 5
 
 clear
 
+function CheckLXCExist {
+which lxc-ls | grep -c lxc-ls
+}
+LXCExist=$(CheckLXCExist)
+
+
+if [ $LXCExist -eq 1 ]
+then
+
 echo "==========================================="
 echo "Destruction of Containers (if necessary)   "
 echo "Checking...                                "
@@ -104,14 +114,6 @@ function CheckClonedContainersExistLength {
 sudo ls /var/lib/lxc | more | sed 's/$/ /' | tr -d '\n' | sed 's/  */ /g' | sed 's/^[ \t]*//;s/[ \t]*$//' | wc -c
 }
 ClonedContainersExistLength=$(CheckClonedContainersExistLength)
-
-# echo ''
-# echo "ClonedContainersExist = $ClonedContainersExist"
-# echo ''
-
-# echo ''
-# echo "ClonedContainersExistLength = $ClonedContainersExistLength"
-# echo ''
 
 sleep 5
 
@@ -175,6 +177,8 @@ echo ''
 fi
 done
 fi
+
+
 echo ''
 echo "==========================================="
 echo "Destruction of Containers complete         "
@@ -186,11 +190,14 @@ echo "No Containers to Destroy                   "
 echo "Continuing in 5 seconds...                 "
 echo "==========================================="
 fi
-
+fi
 
 sleep 5
 
 clear
+
+if [ $LXCExist -eq 1 ]
+then
 
 echo "==========================================="
 echo "Show Running Containers...                 "
@@ -206,6 +213,8 @@ echo "Running Container Check completed          "
 echo "==========================================="
 
 sleep 5
+
+fi
 
 clear
 
@@ -387,7 +396,7 @@ sleep 5
 
 clear
 
-sudo cp -p ~/Downloads/create-ovs-sw-files-v2.sh /etc/network/if-up.d/openvswitch/.
+sudo cp -p ~/Downloads/create-ovs-sw-files-v2.sh.bak /etc/network/if-up.d/openvswitch/create-ovs-sw-files-v2.sh
 
 cd /etc/network/if-up.d/openvswitch
 sudo mv lxcora01-asm1-ifup-sw8  lxcora00-asm1-ifup-sw8
