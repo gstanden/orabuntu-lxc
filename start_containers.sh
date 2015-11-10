@@ -1,7 +1,7 @@
 #!/bin/bash
 
 function GetStoppedContainers {
-sudo lxc-ls -f | egrep -v 'lxcora0|lxcora00i|NAME|---' | cut -f1 -d' ' | sed 's/$/ /' | tr -d '\n'
+sudo lxc-ls -f | egrep -v 'lxcora0|lxcora00|NAME|---' | cut -f1 -d' ' | sed 's/$/ /' | tr -d '\n'
 }
 StoppedContainers=$(GetStoppedContainers)
 
