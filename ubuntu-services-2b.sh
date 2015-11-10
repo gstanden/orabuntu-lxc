@@ -149,7 +149,10 @@ sleep 5
 
 clear
 
+if [ -e ~/.ssh/known_hosts ]
+then
 rm ~/.ssh/known_hosts
+fi
 
 echo "============================================"
 echo "Password:  root                             "
