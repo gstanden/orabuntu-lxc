@@ -168,6 +168,7 @@ ssh root@lxcora0 chown oracle:oinstall /home/oracle/.bashrc
 ssh root@lxcora0 chown oracle:oinstall /home/oracle/.kshrc
 ssh root@lxcora0 chown oracle:oinstall /home/oracle/.bash_logout
 ssh root@lxcora0 chown oracle:oinstall /home/oracle/.
+ssh root@lxcora0 sed -i '/ORACLE_SID/d' /home/oracle/.bashrc
 
 echo "================================================"
 echo "Password for grid:  grid (same as username)     "
