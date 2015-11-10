@@ -149,8 +149,10 @@ sudo cp -p /var/lib/lxc/lxcora0/rootfs/home/grid/grid/rpm/cvuqdisk-1.0.9-1.rpm /
 ssh root@lxcora0 rpm -Uvh /home/grid/grid/rpm/cvuqdisk-1.0.9-1.rpm
 
 # sudo tar -P --extract --file=lxc-lxcora01.tar /var/lib/lxc/lxcora0/rootfs/home/grid/.bashrc
-sudo tar -vP --extract --file=lxc-lxcora01.tar /var/lib/lxc/lxcora01/rootfs/home/oracle/.bashrc
-sudo mv /var/lib/lxc/lxcora01/rootfs/home/oracle/.bashrc /var/lib/lxc/lxcora0/rootfs/home/oracle/.bashrc
+# sudo tar -vP --extract --file=lxc-lxcora01.tar /var/lib/lxc/lxcora01/rootfs/home/oracle/.bashrc
+sudo mv ~/Downloads/oracle.bash_profile/var/lib/lxc/lxcora0/rootfs/home/oracle/.bash_profile
+sudo mv ~/Downloads/oracle.bashrc /var/lib/lxc/lxcora0/rootfs/home/oracle/.bashrc
+sudo mv ~/Downloads/oracle.kshrc /var/lib/lxc/lxcora0/rootfs/home/oracle/.kshrc
 
 sudo cp -p ~/Downloads/rc.local /var/lib/lxc/lxcora0/rootfs/etc/rc.local
 ssh root@lxcora0 chown grid:oinstall /home/grid/grid
@@ -159,6 +161,11 @@ scp edit_bashrc root@lxcora0:/home/grid/.
 ssh root@lxcora0 chown grid:oinstall /home/grid/edit_bashrc
 ssh root@lxcora0 chmod 755 /home/grid/edit_bashrc
 ssh root@lxcora0 usermod --password `perl -e "print crypt('grid','grid');"` grid
+ssh root@lxcora0 usermod --password `perl -e "print crypt('oracle','oracle');"` oracle
+ssh root@lxcora0 usermod -g oinstall oracle
+ssh root@lxcora0 chown oracle:oinstall /home/oracle/.bash_profile
+ssh root@lxcora0 chown oracle:oinstall /home/oracle/.bashrc
+ssh root@lxcora0 chown oracle:oinstall /home/oracle/.kshrc
 
 echo "================================================"
 echo "Password for grid:  grid (same as username)     "
