@@ -150,9 +150,9 @@ ssh root@lxcora0 rpm -Uvh /home/grid/grid/rpm/cvuqdisk-1.0.9-1.rpm
 
 # sudo tar -P --extract --file=lxc-lxcora01.tar /var/lib/lxc/lxcora0/rootfs/home/grid/.bashrc
 # sudo tar -vP --extract --file=lxc-lxcora01.tar /var/lib/lxc/lxcora01/rootfs/home/oracle/.bashrc
-sudo mv ~/Downloads/oracle.bash_profile/var/lib/lxc/lxcora0/rootfs/home/oracle/.bash_profile
-sudo mv ~/Downloads/oracle.bashrc /var/lib/lxc/lxcora0/rootfs/home/oracle/.bashrc
-sudo mv ~/Downloads/oracle.kshrc /var/lib/lxc/lxcora0/rootfs/home/oracle/.kshrc
+sudo cp ~/Downloads/oracle.bash_profile /var/lib/lxc/lxcora0/rootfs/home/oracle/.bash_profile
+sudo cp ~/Downloads/oracle.bashrc /var/lib/lxc/lxcora0/rootfs/home/oracle/.bashrc
+sudo cp ~/Downloads/oracle.kshrc /var/lib/lxc/lxcora0/rootfs/home/oracle/.kshrc
 
 sudo cp -p ~/Downloads/rc.local /var/lib/lxc/lxcora0/rootfs/etc/rc.local
 ssh root@lxcora0 chown grid:oinstall /home/grid/grid
