@@ -166,6 +166,8 @@ ssh root@lxcora0 usermod -g oinstall oracle
 ssh root@lxcora0 chown oracle:oinstall /home/oracle/.bash_profile
 ssh root@lxcora0 chown oracle:oinstall /home/oracle/.bashrc
 ssh root@lxcora0 chown oracle:oinstall /home/oracle/.kshrc
+ssh root@lxcora0 chown oracle:oinstall /home/oracle/.bash_logout
+ssh root@lxcora0 chown oracle:oinstall /home/oracle/.
 
 echo "================================================"
 echo "Password for grid:  grid (same as username)     "
