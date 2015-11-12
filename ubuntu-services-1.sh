@@ -249,6 +249,7 @@ sudo apt-get install -y open-iscsi
 sudo apt-get install -y multipath-tools 
 sudo apt-get install -y ntp
 sudo apt-get install -y iotop
+sudo apt-get install -y flashplugin-installer
 
 sudo aa-complain /usr/bin/lxc-start
 
