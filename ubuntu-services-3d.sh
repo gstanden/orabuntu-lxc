@@ -202,11 +202,11 @@ echo "Starting container $j ..."
 # echo "next command will be:   sudo lxc-start -n $j"
 echo ''
 sudo lxc-start -n $j
-sleep 15
-sudo lxc-stop -n $j
-sleep 5
-sudo lxc-start -n $j
 sleep 20
+# sudo lxc-stop -n $j
+# sleep 5
+# sudo lxc-start -n $j
+# sleep 20
 sudo lxc-ls -f | grep lxcora$j
 done
 
