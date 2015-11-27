@@ -87,7 +87,7 @@ fi
 clear
 
 echo "============================================"
-echo "Bringing up public ip on lxcora0...        "
+echo "Bringing up public ip on lxcora0...         "
 echo "============================================"
 echo ''
 
