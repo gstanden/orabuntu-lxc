@@ -229,7 +229,10 @@ sudo apt-get install -y lxc
 sudo apt-get install -y uml-utilities
 sudo apt-get install -y openvswitch-switch
 sudo apt-get install -y openvswitch-common
-sudo apt-get install -y openvswitch-controller
+
+# GLS 20151126 openvswitch-controller package no longer available, no longer needed.
+# sudo apt-get install -y openvswitch-controller
+
 sudo apt-get install -y bind9
 sudo apt-get install -y bind9utils
 sudo apt-get install -y isc-dhcp-server
@@ -320,6 +323,10 @@ sudo tar -P -xvf ubuntu-host.tar
 sudo cp -p ~/Downloads/rc.local.ubuntu.host /etc/rc.local
 sudo chown root:root /etc/rc.local
 sudo sed -i 's/10\.207\.39\.10/10\.207\.39\.9/' /etc/dhcp/dhcpd.conf
+
+# GLS 20151126 Adding enp and wlp to support Ubuntu 15.10 Wily Werewolf Linux 4.2 kernels in OpenvSwitch networking files
+sudo sed -i '/enp/!s/wlan|eth|bnep/enp|wlp|wlan|eth|bnep/' ~/OpenvSwitch/crt_ovs_sw1.sh
+sudo sed -i '/enp/!s/wlan|eth|bnep/enp|wlp|wlan|eth|bnep/' ~/OpenvSwitch/crt_ovs_sx1.sh
 
 echo ''
 echo "==============================================="

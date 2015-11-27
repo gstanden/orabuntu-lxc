@@ -193,12 +193,18 @@ clear
 
 echo "!!! WARNING !!!"
 
-echo "==========================================="
-echo "Destruction of cloned containers ( Y / N ) "
-echo "==========================================="
+echo "===================================================="
+echo "Optional Destruction of cloned containers ( Y / N ) "
+echo "===================================================="
+
+# GLS 20151126 Modified with egrep to exempt containers numbered lower than 10 from destruction detection.
+# GLS This software starts container cloning at lxcora10 and above.  
+# GLS Containers lxcora09 and below can be used for one-off clones as needed.
+# GLS Containers lxcora0 and lxcora01 are "special" congtainers used by the scripting.
+# GLS Container lxcora00 is the Oracle "reference container" which is fully prepped for Oracle and can be used for one-off clones using lxc-clone command.
 
 function CheckClonedContainersExist {
-sudo ls /var/lib/lxc | more | sed 's/$/ /' | tr -d '\n' | sed 's/lxcora0//' | sed 's/  */ /g'
+sudo ls /var/lib/lxc | more | egrep -v 'lxcora0|lxcora00|lxcora01|lxcora02|lxcora03|lxcora04|lxcora05|lxcora06|lxcora07|lxcora08|lxcora09' | sed 's/$/ /' | tr -d '\n' | sed 's/lxcora0//' | sed 's/  */ /g'
 }
 ClonedContainersExist=$(CheckClonedContainersExist)
 
@@ -209,8 +215,10 @@ echo ''
 sleep 10
 
 echo "Existing containers in the set { $ClonedContainersExist } have been found."
-echo "These containers match the names of containers that are about to be created."
-echo "Please answer Y to destroy the existing containers or N to keep them"
+echo "These containers MAY match the names of containers that are about to be created (if any are lxcora10 or higher, such as lxcora11, etc.."
+echo "Please answer Y to destroy the existing containers or N to keep them."
+echo "Note that scripted container creation starts at "lxcora10" therefore containers lxcora09 and lower do NOT need to be destroyed prior to continuing with script.
+echo "Any containers lxcora10 and higher should be destroyed at this point to avoid overwrites or other script anomalies.
 
 echo "!!! WARNING:  ANSWERING Y WILL DESTROY EXISTING CONTAINERS !!!"
 

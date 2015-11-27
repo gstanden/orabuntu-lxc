@@ -145,7 +145,11 @@ sudo cp -p /var/lib/lxc/lxcora0/config /var/lib/lxc/lxcora0/config.original.bak
 OldMacAddr1=$(GetMacAddr11)
 sudo grep hwaddr /var/lib/lxc/lxcora0/config | head -2 | tail -1
 sudo tar -P --extract --file=lxc-config.tar /var/lib/lxc/lxcora01/config
-sudo mv /var/lib/lxc/lxcora01/config /var/lib/lxc/lxcora0/config
+
+# GLS 20151126 Added to support symlinked multipath storage in /dev/mapper, as well as older style device node multipath storage in /dev/mapper
+sudo sed -i '/lxc.mount.entry = \/dev\/mapper \/var\/lib\/lxc\/lxcora01\/rootfs\/dev\/mapper none defaults,bind,create=dir 0 0/a lxc.mount.entry = \/dev \/var\/lib\/lxc\/lxcora01\/rootfs\/dev none defaults,bind,create=dir 0 0' /var/lib/lxc/lxcora01/config
+
+sudo cp /var/lib/lxc/lxcora01/config /var/lib/lxc/lxcora0/config
 NewMacAddr1=$(GetMacAddr12)
 sudo grep hwaddr /var/lib/lxc/lxcora0/config | head -1
 sudo sed -i "s/$NewMacAddr1/$OldMacAddr1/g" /var/lib/lxc/lxcora0/config
