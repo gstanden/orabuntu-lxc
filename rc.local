@@ -11,6 +11,7 @@ chown grid:asmadmin /dev/mapper/asm*
 chmod 0660 /dev/mapper/asm*
 
 # NTP
+sudo service ntpd start
 ntpd
 
 touch /var/lock/subsys/local
