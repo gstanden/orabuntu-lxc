@@ -1,13 +1,14 @@
 #!/bin/bash
 
-echo "============================================"
-echo "Be sure you have UPDATED your Ubuntu 15.04  "
-echo "Only use a FRESH Ubuntu 15.04 install       "
-echo "These scripts overwrite some configurations!"
-echo "Use with customized Ubuntu at your own risk!"
-echo "<CTRL> + C to exit                          "
-echo "Sleeping 10 seconds...                      "
-echo "============================================"
+echo "================================================="
+echo "Tested with Ubuntu 15.04 Vivid Vervet            "
+echo "Tested with Ubuntu 15.10 Wily Werewolf           "
+echo "Only use a FRESH Ubuntu 15.x Install             "
+echo "These scripts overwrite some configurations!     "
+echo "Use with customized Ubuntu at your own risk!     "
+echo "<CTRL> + C to exit                               "
+echo "Sleeping 10 seconds...                           "
+echo "================================================="
 
 sleep 10
 
