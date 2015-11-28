@@ -48,27 +48,32 @@ echo "============================================"
 
 sudo lxc-start -n lxcora0 > /dev/null 2>&1
 
+--- new
+
 echo ''
 echo "============================================"
 echo "Checking status of bind9 DNS...             "
 echo "============================================"
 echo ''
-
 sudo service bind9 status
+echo ''
+echo "============================================"
+echo "DNS Service checks completed.               "
+echo "============================================"
+echo ''
 
 sleep 5
 
-echo ''
+clear
+
 echo "============================================"
 echo "Checking status of isc-dhcp-server DHCP...  "
 echo "============================================"
 echo ''
-
 sudo service isc-dhcp-server status
-
 echo ''
 echo "============================================"
-echo "Services checks completed.                  "
+echo "DHCP Service checks completed.                   "
 echo "============================================"
 
 sleep 5
@@ -87,7 +92,9 @@ echo "End google.com ping test                    "
 echo "============================================"
 echo ''
 
-sleep 3
+sleep 5
+
+clear
 
 function CheckNetworkUp {
 ping -c 1 google.com | grep 'packet loss' | cut -f1 -d'%' | cut -f6 -d' ' | sed 's/^[ \t]*//;s/[ \t]*$//'
