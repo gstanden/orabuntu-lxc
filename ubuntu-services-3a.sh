@@ -19,6 +19,8 @@ sudo service bind9 status | grep Active | cut -f1-6 -d' ' | sed 's/ *//g'
 }
 BindStatus=$(GetBindStatus)
 
+clear
+
 echo ''
 echo "============================================"
 echo "Checking status of bind9 DNS...             "
@@ -73,9 +75,9 @@ echo ''
 
 # GLS 20151127 New test for bind9 status.  Terminates script if bind9 status is not valid.
 
-clear
-
 # GLS 20151127 New DHCP server checks.  Terminates script if DHCP status is invalid.
+
+clear
 
 function GetDHCPStatus {
 sudo service isc-dhcp-server status | grep Active | cut -f1-6 -d' ' | sed 's/ *//g'
@@ -136,9 +138,9 @@ echo ''
 
 # GLS 20151128 New DHCP status check end.
 
-clear
-
 # GLS 20151128 Google ping test start.
+
+clear
 
 echo ''
 echo "============================================"
@@ -254,6 +256,7 @@ PublicIP=$(CheckPublicIP)
 
 clear
 
+echo ''
 echo "============================================"
 echo "Bringing up public ip on lxcora0...        "
 echo "============================================"
@@ -287,6 +290,8 @@ echo "Verify no-password ssh working to lxcora0 "
 echo "==========================================="
 echo ''
 
+sleep 5
+
 ssh root@lxcora0 uname -a
 
 echo ''
@@ -294,10 +299,11 @@ echo "==========================================="
 echo "Verification of no-password ssh completed. "
 echo "==========================================="
 
-sleep 4
+sleep 5
 
 clear
 
+echo ''
 echo "==========================================="
 echo "Stopping lxcora0 container...             "
 echo "==========================================="
@@ -321,6 +327,7 @@ sleep 3
 
 clear
 
+echo ''
 echo "==========================================" 
 echo "Extracting lxcora0 Oracle custom files..." 
 echo "=========================================="
@@ -335,6 +342,7 @@ sudo tar -vP --extract --file=lxc-lxcora01.tar /var/lib/lxc/lxcora01/rootfs/etc/
 
 # GLS 20151126 Comment out NFS mounts which do not exist.  NFS is enabled and can be used but requires customization by user.
 sudo sed -i 's/vmem1\.vmem\.org/# vmem1\.vmem\.org/' /var/lib/lxc/lxcora0/rootfs/etc/fstab
+sudo sed -i 's/vmem1\.vmem\.org/# vmem1\.vmem\.org/' /var/lib/lxc/lxcora01/rootfs/etc/fstab
 
 sudo tar -vP --extract --file=lxc-lxcora01.tar /var/lib/lxc/lxcora01/rootfs/etc/security/limits.conf
 sudo tar -vP --extract --file=lxc-lxcora01.tar /var/lib/lxc/lxcora01/rootfs/root/create_directories.sh

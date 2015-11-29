@@ -19,6 +19,8 @@ sudo service bind9 status | grep Active | cut -f1-6 -d' ' | sed 's/ *//g'
 }
 BindStatus=$(GetBindStatus)
 
+clear
+
 echo ''
 echo "============================================"
 echo "Checking status of bind9 DNS...             "
@@ -73,9 +75,9 @@ echo ''
 
 # GLS 20151127 New test for bind9 status.  Terminates script if bind9 status is not valid.
 
-clear
-
 # GLS 20151127 New DHCP server checks.  Terminates script if DHCP status is invalid.
+
+clear
 
 function GetDHCPStatus {
 sudo service isc-dhcp-server status | grep Active | cut -f1-6 -d' ' | sed 's/ *//g'
@@ -136,9 +138,9 @@ echo ''
 
 # GLS 20151128 New DHCP status check end.
 
-clear
-
 # GLS 20151128 Google ping test start.
+
+clear
 
 echo ''
 echo "============================================"
@@ -278,9 +280,10 @@ echo "==========================================="
 echo "Container Up.                              "
 echo "==========================================="
 
-sleep 5
+sleep 7
 clear
 
+echo ''
 echo "==========================================="
 echo "Verify no-password ssh working to lxcora0 "
 echo "==========================================="
@@ -297,6 +300,7 @@ sleep 5
 
 clear
 
+echo ''
 echo "==========================================="
 echo "Stopping lxcora0 container...             "
 echo "==========================================="
@@ -335,11 +339,14 @@ echo ''
 echo "================================================"
 echo "Check directory is ~/Networking                 "
 echo "Verify crt_links.sh exists and has 755 mode     "
+echo "This step creates pointers to relevant files.   "
+echo "Use links to quickly locate relevant files.     "
 echo "================================================"
 echo ''
 ls -l crt_links.sh
 echo ''
-sleep 15
+
+sleep 5
  
 sudo ./crt_links.sh
 echo ''
@@ -347,10 +354,11 @@ ls -l ~/Networking
 echo ''
 cd ~/Downloads
 pwd
-sleep 10 
+sleep 5
 
 clear
 
+echo ''
 echo "================================================"
 echo "Starting LXC clone containers for Oracle        "
 echo "60 seconds/container for correct DHCP assignment"
@@ -404,7 +412,7 @@ echo "follow the instructions in the README           "
 echo "Builds the SCST Linux SAN.                      "
 echo "================================================"
 
-sleep 10
+sleep 15
 
 ~/Downloads/stop_containers.sh
 

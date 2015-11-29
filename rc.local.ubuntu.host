@@ -11,8 +11,10 @@
 #
 # By default this script does nothing.
 
-  sudo iscsiadm --mode node --targetname iqn.2015-08.org.vmem:w520.san.asm.luns   --portal 10.207.41.1 --login
-  sudo iscsiadm --mode node --targetname iqn.2015-08.org.vmem:w520.san.asm.luns   --portal 10.207.40.1 --login
+# GLS 20151128 Below SAN login and logout have been moved.  See ~/Downloads/scst-files/create-scst-5b.sh for details.
+
+# sudo iscsiadm --mode node --targetname iqn.2015-08.org.vmem:w520.san.asm.luns   --portal 10.207.41.1 --login
+# sudo iscsiadm --mode node --targetname iqn.2015-08.org.vmem:w520.san.asm.luns   --portal 10.207.40.1 --login
 # sudo iscsiadm --mode node --targetname iqn.2015-08.org.vmem:w520.san.asm.luns   --portal 10.207.41.1 --logout
 # sudo iscsiadm --mode node --targetname iqn.2015-08.org.vmem:w520.san.asm.luns   --portal 10.207.40.1 --logout
 # sudo multipath -F

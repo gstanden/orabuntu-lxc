@@ -20,6 +20,8 @@ sudo service bind9 status | grep Active | cut -f1-6 -d' ' | sed 's/ *//g'
 }
 BindStatus=$(GetBindStatus)
 
+clear
+
 echo ''
 echo "============================================"
 echo "Checking status of bind9 DNS...             "
@@ -74,9 +76,9 @@ echo ''
 
 # GLS 20151127 New test for bind9 status.  Terminates script if bind9 status is not valid.
 
-clear
-
 # GLS 20151127 New DHCP server checks.  Terminates script if DHCP status is invalid.
+
+clear
 
 function GetDHCPStatus {
 sudo service isc-dhcp-server status | grep Active | cut -f1-6 -d' ' | sed 's/ *//g'
@@ -137,9 +139,9 @@ echo ''
 
 # GLS 20151128 New DHCP status check end.
 
-clear
-
 # GLS 20151128 Google ping test start.
+
+clear
 
 echo ''
 echo "============================================"
@@ -278,13 +280,17 @@ echo "==========================================="
 echo "Container Up.                              "
 echo "==========================================="
 
-sleep 3
+echo "Sleeping for 10 seconds..."
+sleep 10
 clear
 
+echo ''
 echo "==========================================="
 echo "Verify no-password ssh working to lxcora0 "
 echo "==========================================="
 echo ''
+
+sleep 2
 
 ssh root@lxcora0 uname -a
 
@@ -297,6 +303,7 @@ sleep 4
 
 clear
 
+echo ''
 echo "================================================"
 echo "Logged into LXC container lxcora0              "
 echo "Installing files and packages for Oracle...     "
@@ -348,6 +355,7 @@ sleep 5
 
 clear
 
+echo ''
 echo "================================================"
 echo "Verify .bashrc file has umask 022 entry         "
 echo "================================================"
@@ -390,7 +398,8 @@ echo "==========================================="
 sleep 3
 
 clear
- 
+
+echo '' 
 echo "================================================"
 echo "Now run ubuntu-services-3c.sh X                 "
 echo "Note that ubuntu-services-3c.sh takes an input  "

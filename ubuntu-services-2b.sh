@@ -19,6 +19,8 @@ sudo service bind9 status | grep Active | cut -f1-6 -d' ' | sed 's/ *//g'
 }
 BindStatus=$(GetBindStatus)
 
+clear
+
 echo ''
 echo "============================================"
 echo "Checking status of bind9 DNS...             "
@@ -73,9 +75,9 @@ echo ''
 
 # GLS 20151127 New test for bind9 status.  Terminates script if bind9 status is not valid.
 
-clear
-
 # GLS 20151127 New DHCP server checks.  Terminates script if DHCP status is invalid.
+
+clear
 
 function GetDHCPStatus {
 sudo service isc-dhcp-server status | grep Active | cut -f1-6 -d' ' | sed 's/ *//g'
@@ -136,9 +138,9 @@ echo ''
 
 # GLS 20151128 New DHCP status check end.
 
-clear
-
 # GLS 20151128 Google ping test start.
+
+clear
 
 echo ''
 echo "============================================"
@@ -265,6 +267,7 @@ PublicIP=$(CheckPublicIP)
 
 clear
 
+echo ''
 echo "============================================"
 echo "Bringing up public ip on lxcora0...        "
 echo "============================================"
@@ -294,6 +297,7 @@ sleep 3
 
 clear
 
+echo ''
 echo "============================================"
 echo "Begin lxcora0 ping test...                 "
 echo "============================================"
@@ -316,6 +320,7 @@ then
 rm ~/.ssh/known_hosts
 fi
 
+echo ''
 echo "============================================"
 echo "Password:  root                             "
 echo "============================================"
@@ -333,6 +338,7 @@ clear
 
 sleep 3
 
+echo ''
 echo "============================================"
 echo "Begin no-password host-container setup      "
 echo "Accept defaults on most prompts             "
@@ -352,13 +358,14 @@ sudo cp ~/.ssh/authorized_keys /var/lib/lxc/lxcora0/rootfs/root/.ssh/.
 echo ''
 echo "============================================"
 echo "Key setup in containter completed.          "
-echo "Continuing in 5 seconds...                  "
+echo "Continuing in 10 seconds...                  "
 echo "============================================"
 
-sleep 5
+sleep 10
 
 clear
 
+echo ''
 echo "============================================"
 echo "Testing passwordless-ssh for root user      "
 echo "============================================"
@@ -377,6 +384,7 @@ sleep 5
 
 clear
 
+echo ''
 echo "============================================"
 echo "Begin lxcora0 ping test...                 "
 echo "============================================"
@@ -393,6 +401,7 @@ sleep 5
 
 clear
 
+echo ''
 echo "============================================"
 echo "Stopping lxcora0 container...              "
 echo "============================================"
@@ -418,17 +427,18 @@ sleep 5
 
 clear
 
-  echo "============================================"
-  echo "!!! Host will reboot in 10 seconds !!!      "
-  echo "============================================"
-  echo "                                            "
-  echo "[ To abort reboot, <ctrl>+c ]               "
-  echo "                                            "
-  echo "============================================"
-  echo "Rebooting in 10 seconds...                  "
-  echo "============================================"
-  echo "Next script to run: ubuntu-services-3a.sh   "
-  echo "============================================"
+echo ''
+echo "============================================"
+echo "!!! Host will reboot in 10 seconds !!!      "
+echo "============================================"
+echo "                                            "
+echo "[ To abort reboot, <ctrl>+c ]               "
+echo "                                            "
+echo "============================================"
+echo "Rebooting in 10 seconds...                  "
+echo "============================================"
+echo "Next script to run: ubuntu-services-3a.sh   "
+echo "============================================"
 
 sleep 10
 

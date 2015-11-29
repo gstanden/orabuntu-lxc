@@ -13,14 +13,14 @@ echo "============================================"
 # echo "This script is re-runnable                  "
 # echo "============================================"
 
-clear
-
 # GLS 20151127 New test for bind9 status.  Terminates script if bind9 status is not valid.
 
 function GetBindStatus {
 sudo service bind9 status | grep Active | cut -f1-6 -d' ' | sed 's/ *//g'
 }
 BindStatus=$(GetBindStatus)
+
+clear
 
 echo ''
 echo "============================================"
@@ -76,9 +76,9 @@ echo ''
 
 # GLS 20151127 New test for bind9 status.  Terminates script if bind9 status is not valid.
 
-clear
-
 # GLS 20151127 New DHCP server checks.  Terminates script if DHCP status is invalid.
+
+clear
 
 function GetDHCPStatus {
 sudo service isc-dhcp-server status | grep Active | cut -f1-6 -d' ' | sed 's/ *//g'
@@ -139,9 +139,9 @@ echo ''
 
 # GLS 20151128 New DHCP status check end.
 
-clear
-
 # GLS 20151128 Google ping test start.
+
+clear
 
 echo ''
 echo "============================================"
@@ -233,6 +233,7 @@ sleep 5
 
 clear
 
+echo ''
 echo "=================================================="
 echo "Extracting lxcora0 container-specific files...   "
 echo "=================================================="
@@ -369,6 +370,7 @@ sleep 5
 
 clear
 
+echo ''
 echo "=================================================="
 echo "Legacy script cleanups...                         "
 echo "=================================================="
@@ -390,6 +392,7 @@ sleep 5
 
 clear
 
+echo ''
 echo "==========================================="
 echo "Next run ubuntu-services-2b.sh             "
 echo "Rebooting in 10 seconds...                 "

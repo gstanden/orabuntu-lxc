@@ -14,12 +14,35 @@ echo "NumCon (small integer)                      "
 echo "NumCon defaults to value '2'                "
 echo "============================================"
 
+if [ -z $1 ]
+then
+NumCon=2
+else
+NumCon=$1
+fi
+
+echo ''
+echo "============================================"
+echo "Number of LXC Container RAC Nodes = $NumCon "
+echo "============================================"
+echo ''
+
+echo "============================================"
+echo "If wrong number of desired RAC nodes, then  "
+echo "<ctrl>+c and restart script to set          "
+echo "Sleeping 15 seconds...                      "
+echo "============================================"
+
+sleep 15
+
 # GLS 20151127 New test for bind9 status.  Terminates script if bind9 status is not valid.
 
 function GetBindStatus {
 sudo service bind9 status | grep Active | cut -f1-6 -d' ' | sed 's/ *//g'
 }
 BindStatus=$(GetBindStatus)
+
+clear
 
 echo ''
 echo "============================================"
@@ -75,9 +98,9 @@ echo ''
 
 # GLS 20151127 New test for bind9 status.  Terminates script if bind9 status is not valid.
 
-clear
-
 # GLS 20151127 New DHCP server checks.  Terminates script if DHCP status is invalid.
+
+clear
 
 function GetDHCPStatus {
 sudo service isc-dhcp-server status | grep Active | cut -f1-6 -d' ' | sed 's/ *//g'
@@ -138,9 +161,9 @@ echo ''
 
 # GLS 20151128 New DHCP status check end.
 
-clear
-
 # GLS 20151128 Google ping test start.
+
+clear
 
 echo ''
 echo "============================================"
@@ -237,26 +260,26 @@ clear
 # cd /etc/network/if-down.d/openvswitch
 # sudo rm lxcora07* lxcora08* lxcora09* lxcora010*
 
-if [ -z $1 ]
-then
-NumCon=2
-else
-NumCon=$1
-fi
+# if [ -z $1 ]
+# then
+# NumCon=2
+# else
+# NumCon=$1
+# fi
 
-echo ''
-echo "============================================"
-echo "Number of LXC Container RAC Nodes = $NumCon "
-echo "============================================"
-echo ''
+# echo ''
+# echo "============================================"
+# echo "Number of LXC Container RAC Nodes = $NumCon "
+# echo "============================================"
+# echo ''
 
-echo "============================================"
-echo "If wrong number of desired RAC nodes, then  "
-echo "<ctrl>+c and restart script to set          "
-echo "Sleeping 15 seconds...                      "
-echo "============================================"
+# echo "============================================"
+# echo "If wrong number of desired RAC nodes, then  "
+# echo "<ctrl>+c and restart script to set          "
+# echo "Sleeping 15 seconds...                      "
+# echo "============================================"
 
-sleep 15
+# sleep 15
 
 echo ''
 echo "============================================"
@@ -266,7 +289,7 @@ echo "============================================"
 
 sudo lxc-start -n lxcora0 > /dev/null 2>&1
 
-sleep 5
+sleep 8
 
 function CheckContainerUp {
 sudo lxc-ls -f | grep lxcora0 | sed 's/  */ /g' | grep RUNNING  | cut -f2 -d' '
@@ -298,7 +321,7 @@ do
 PublicIP=$(CheckPublicIP)
 echo "Waiting for lxcora0 Public IP to come up..."
 sudo lxc-ls -f | sed 's/  */ /g' | grep lxcora0 | grep RUNNING | cut -f3 -d' ' | sed 's/,//'
-sleep 1
+sleep 2
 done
 
 echo ''
@@ -311,9 +334,11 @@ echo "==========================================="
 echo "Container Up.                              "
 echo "==========================================="
 
-sleep 3
+sleep 5
+
 clear
 
+echo ''
 echo "==========================================="
 echo "Verify no-password ssh working to lxcora0 "
 echo "==========================================="
@@ -330,6 +355,7 @@ sleep 4
 
 clear
 
+echo ''
 echo "==========================================="
 echo "Stopping lxcora0 container...             "
 echo "==========================================="
@@ -371,17 +397,18 @@ sudo ls /var/lib/lxc | more | egrep -v 'lxcora0|lxcora00|lxcora01|lxcora02|lxcor
 }
 ClonedContainersExist=$(CheckClonedContainersExist)
 
-echo ''
-echo "ClonedContainersExist = $ClonedContainersExist"
-echo ''
+# echo ''
+# echo "ClonedContainersExist = $ClonedContainersExist"
+# echo ''
 
 sleep 10
 
-echo "Existing containers in the set { $ClonedContainersExist } have been found."
-echo "These containers MAY match the names of containers that are about to be created (if any are lxcora10 or higher, such as lxcora11, etc.."
-echo "Please answer Y to destroy the existing containers or N to keep them."
-echo "Note that scripted container creation starts at "lxcora10" therefore containers lxcora09 and lower do NOT need to be destroyed prior to continuing with script.
+echo "===================================================="
+echo "Existing containers,if any, are:  { $ClonedContainersExist }."
+echo "Scripted container creation starts at "lxcora10" => containers lxcora09 and lower do NOT need to be destroyed prior to continuing with script.
 echo "Any containers lxcora10 and higher should be destroyed at this point to avoid overwrites or other script anomalies.
+echo "Please answer Y to destroy the existing containers > lxcora10.
+echo "Please answer N to ABORT container destruction sequence."
 
 echo "!!! WARNING:  ANSWERING Y WILL DESTROY EXISTING CONTAINERS !!!"
 
@@ -403,9 +430,18 @@ echo "<ctrl>+c to exit"
 
 if [ "$input_variable" = 'N' ]
 then
-echo "sudo lxc-destroy -n $j"
+# echo "sudo lxc-destroy -n $j"
 echo ''
-echo "Container NOT destroyed"
+echo "===================================================="
+echo "Attention, Attention:  #20 has returned to the bay. "
+echo "Destruction sequence has been aborted.              "
+echo "Sidereal Base Time: 00:00:07                        "
+echo "https://www.youtube.com/watch?v=29pPZQ77cmI         "
+echo "===================================================="
+echo ''
+echo "===================================================="
+echo "Container NOT destroyed.                            "
+echo "===================================================="
 echo ''
 fi
 
@@ -434,6 +470,7 @@ echo ''
 sleep 3
 
 clear
+echo ''
 echo "==========================================="
 echo "Cloning lxcora0 to $NumCon containers     "
 echo "==========================================="
@@ -475,6 +512,7 @@ sleep 3
 
 clear
 
+echo ''
 echo "==========================================="
 echo "Creating OpenvSwitch files ...             "
 echo "==========================================="
