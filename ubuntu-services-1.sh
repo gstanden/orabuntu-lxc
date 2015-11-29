@@ -445,6 +445,7 @@ sudo cp lxcora00-pub-ifdown-sw1   lxcora0-pub-ifdown-sw1
 
 sudo rm lxcora02* lxcora03* lxcora04* lxcora05* lxcora06* 
 sudo useradd -u 1098 grid
+sudo useradd -u 500 oracle
 
 echo "==============================================="
 echo "Next script to run: ubuntu-services-2a.sh      "
