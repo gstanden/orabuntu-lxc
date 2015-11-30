@@ -407,7 +407,7 @@ echo "===================================================="
 echo "Existing containers,if any, are:  { $ClonedContainersExist }."
 echo "Scripted container creation starts at "lxcora10" => containers lxcora09 and lower do NOT need to be destroyed prior to continuing with script.
 echo "Any containers lxcora10 and higher should be destroyed at this point to avoid overwrites or other script anomalies.
-echo "Please answer Y to destroy the existing containers > lxcora10.
+echo "Please answer Y to destroy the existing containers > lxcora10."
 echo "Please answer N to ABORT container destruction sequence."
 
 echo "!!! WARNING:  ANSWERING Y WILL DESTROY EXISTING CONTAINERS !!!"
