@@ -7,12 +7,14 @@ echo "After this script runs, the Ubuntu host will reboot."
 echo "After reboot, login as the gstanden user and run the orabuntu-lxc scripts."
 echo "==============================="
 echo ''
+echo "Script execution will continue in 15 seconds..."
+echo ''
+sleep 15
 sudo adduser gstanden
 sudo adduser gstanden sudo
 sudo wget -P /home/gstanden/Downloads/ https://github.com/gstanden/orabuntu-lxc/archive/master.zip
 sudo unzip /home/gstanden/Downloads/master.zip -d /home/gstanden/Downloads
 cd /home/gstanden/Downloads/orabuntu-lxc-master/
 sudo cp -pr * ../.
-# sleep 15
-# sudo reboot
+sudo reboot
 
