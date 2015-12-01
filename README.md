@@ -36,7 +36,7 @@ Then start the install with 'ubuntu-services-1.sh'.
 
 !!! ==============================================================
  
-  /home/your-username/Downloads/orabuntu-lxc-master/ubuntu-services-0.sh  
+!  /home/your-username/Downloads/orabuntu-lxc-master/ubuntu-services-0.sh ! 
 
   This creates the 'gstanden' account. 
 
