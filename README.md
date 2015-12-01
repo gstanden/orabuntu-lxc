@@ -1,6 +1,6 @@
 # orabuntu-lxc
 Oracle Enteprise Edition Software on Ubuntu Linux using LXC Containers.
-This software runs Oracle Enteprise Edition RAC database on Ubuntu 15.04 64-bit Desktop Edition using Oracle Enteprise Linux 6.5 LXC Containers.  
+This software runs Oracle Enteprise Edition RAC database on Ubuntu 15.04 or 15.10 64-bit Desktop Edition using Oracle Enteprise Linux 6.5 LXC Containers.  
 
 Install on a FRESH INSTALL of 15.04 or 15.10 ONLY. I have not bulletproofed this for install on a been-running-for-awhile Ubuntu.  It could overwrite stuff. 
 
