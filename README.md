@@ -44,6 +44,10 @@ Therefore, after downloading and unzipping the github archive, you MUST run 'ubu
 
 /wherever-you-downloaded/orabuntu-lxc-master/ubuntu-services-0.sh
 
+for a user 'jsmith' typically this would be:
+
+/home/jsmith/Downloads/orabuntu-lxc-master/ubuntu-services-0.sh
+
 The ubuntu-services-0.sh script will create the 'gstanden' user, grant it 'sudo' privilege, and will put all the orabuntu-lxc scripts into the '/home/gstanden/Downloads' directory and then it will reboot the Ubuntu host.
 
 Log back in after reboot as 'gstanden' user.
@@ -51,6 +55,8 @@ Log back in after reboot as 'gstanden' user.
 Then cd to '/home/gstanden/Downloads'.
 
 Then start the install with 'ubuntu-services-1.sh'.
+
+NOTE:  Some of the scripts reboot the Ubuntu OS.  Be sure to login as the 'gstanden' user after each reboot to run the next script! 
 
 !!! =============================
  
