@@ -30,13 +30,17 @@ Therefore, after downloading and unzipping the github archive, you MUST run 'ubu
 
 The ubuntu-services-0.sh script will create the 'gstanden' user, grant it 'sudo' privilege, and will put all the orabuntu-lxc scripts into the '/home/gstanden/Downloads' directory and then it will reboot the Ubuntu host.
 
-Log back in after reboot as 'gstanden' user, then cd to '/home/gstanden/Downloads' and start the install with 'ubuntu-services-1.sh'
+Log back in after reboot as 'gstanden' user.
+Then cd to '/home/gstanden/Downloads'.
+Then start the install with 'ubuntu-services-1.sh'.
+
+==============================================================
  
-  ubuntu-services-0.sh  (This creates the 'gstanden' account)
+  ubuntu-services-0.sh  (This creates the 'gstanden' account) <-- This is a fix for sloppy hardcoding of 'gstanden' but is NECESSARY for now.
 
 ==============================================================
 
-  ubuntu-services-1.sh  (host will reboot after this script)
+  ubuntu-services-1.sh  (host will reboot after this script)  <-- This is where the software proper begins.
 
   ubuntu-services-2a.sh (host will reboot after this script)
 
