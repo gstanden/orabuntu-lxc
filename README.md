@@ -22,7 +22,7 @@ https://sites.google.com/site/nandydandyoracle/technologies/lxc/oracle-rac-6-nod
 !!! IMPORTANT PLEASE READ !!!
 =============================================================
 
-Due to some hardcoded references to "/home/gstanden" etc. in the scripting, please read the follwoing carefully:
+Due to sloppy some hardcoded references to "/home/gstanden" etc. in the scripting, please read the following carefully:
 
 Due to some script which references the 'gstanden' Ubuntu OS account, this version of the scripts must be run while logged in as the 'gstanden' user and must be run from the /home/gstanden/Downloads directory.
 
