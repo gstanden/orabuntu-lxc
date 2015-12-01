@@ -34,13 +34,15 @@ Log back in after reboot as 'gstanden' user.
 Then cd to '/home/gstanden/Downloads'.
 Then start the install with 'ubuntu-services-1.sh'.
 
-==============================================================
+!!! ==============================================================
  
-  /home/your-username/Downloads/orabuntu-lxc-master/ubuntu-services-0.sh  (This creates the 'gstanden' account) <-- This is a fix for sloppy hardcoding.
+  /home/your-username/Downloads/orabuntu-lxc-master/ubuntu-services-0.sh  (This creates the 'gstanden' account) 
 
-==============================================================
+  This is a fix for sloppy hardcoding.
 
-  /home/gstanden/Downloads/ubuntu-services-1.sh  (host will reboot after this script)                           <-- This is where the software proper begins.
+!!! ==============================================================
+
+  /home/gstanden/Downloads/ubuntu-services-1.sh  (host will reboot after this script)  <-- This is where the software proper begins.
 
   /home/gstanden/Downloads/ubuntu-services-2a.sh (host will reboot after this script)
 
