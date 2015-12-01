@@ -11,7 +11,7 @@ sudo adduser gstanden
 sudo adduser gstanden sudo
 sudo wget -P /home/gstanden/Downloads/ https://github.com/gstanden/orabuntu-lxc/archive/master.zip
 sudo unzip /home/gstanden/Downloads/master.zip -d /home/gstanden/Downloads
-sudo cd /home/gstanden/Downloads/orabuntu-lxc/
+cd /home/gstanden/Downloads/orabuntu-lxc-master/
 sudo cp -pr * ../.
 # sleep 15
 # sudo reboot
