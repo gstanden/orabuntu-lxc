@@ -38,6 +38,8 @@ The second way is to use the 'ubuntu-services-0.sh' file which creates a 'gstand
 
 Whichever way is used, it is required for this release of the software with the hardcoded references problem that you be logged in as 'gstanden' OS user account, and that the scripts be located in '/home/gstanden/Downloads' directory and be run from that location.  Note that simply creating a '/home/gstanden' directory without the 'gstanden' user won't work.  You need both the user 'gstanden' and the '/home/gstanden/Downloads' directory in order for the scripts to install successfully with this release of the scripts.  I am working to remove this problem and remove all the hardcoded references and user dependencies and hope to release those updates very soon so that the 'gstanden' user will not be a requirement to run the scripts.
 
+Note also that whichever workaround is used, the scripts MUST be run from '/home/gstanden/Downloads/' directory.
+
 Therefore, after downloading and unzipping the github archive, you MUST run 'ubuntu-services-0.sh' first from whatever username you are logged in as.  For example, if you were logged in as "jsmith" you would run the ubuntu-services-0.sh file from the path://github.com/gstanden/orabuntu-lxc:
 
 /wherever-you-downloaded/orabuntu-lxc-master/ubuntu-services-0.sh
