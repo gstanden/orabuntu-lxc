@@ -16,5 +16,9 @@ sudo wget -P /home/gstanden/Downloads/ https://github.com/gstanden/orabuntu-lxc/
 sudo unzip /home/gstanden/Downloads/master.zip -d /home/gstanden/Downloads
 cd /home/gstanden/Downloads/orabuntu-lxc-master/
 sudo cp -pr * ../.
+echo ''
+echo "Rebooting in 15 seconds"
+echo "Login as gstanden after reboot and cd to /home/gstanden/Downloads/ and run ubuntu-services-1.sh to begin install."
+sleep 15
 sudo reboot
 
