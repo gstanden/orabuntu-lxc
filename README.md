@@ -44,7 +44,9 @@ Then start the install with 'ubuntu-services-1.sh'.
 
 !!! ==============================================================
 
-  /home/gstanden/Downloads/ubuntu-services-1.sh  (host will reboot after this script)  <-- This is where the software proper begins.
+  This is where the software proper begins.
+
+  /home/gstanden/Downloads/ubuntu-services-1.sh  (host will reboot after this script)
 
   /home/gstanden/Downloads/ubuntu-services-2a.sh (host will reboot after this script)
 
