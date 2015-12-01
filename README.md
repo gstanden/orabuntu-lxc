@@ -2,6 +2,8 @@
 Oracle Enteprise Edition Software on Ubuntu Linux using LXC Containers.
 This software runs Oracle Enteprise Edition RAC database on Ubuntu 15.04 64-bit Desktop Edition using Oracle Enteprise Linux 6.5 LXC Containers.  Install on a fresh install of 15.04 only.
 
+NOTE:  My email is gilstanden@hotmail.com if you hit bugs or issues or have questions!
+
 Technology Platforms:
 
   isc-dhcp-server
@@ -16,23 +18,23 @@ Screenshots and additional information can be found at the following Google Site
 
 https://sites.google.com/site/nandydandyoracle/technologies/lxc/oracle-rac-6-node-12c-gns-asm-flex-cluster-ubuntu-15-04-install
 
-UNZIP THE DOWNLOADED ZIP IN THE ~/Downloads DIRECTORY!  This means that when you download this github zip file it will be here:
+=============================================================
+!!! IMPORTANT PLEASE READ !!!
+=============================================================
 
-  ~/Downloads/orabuntu-lxc-master.zip
+Due to some hardcoded references to "/home/gstanden" etc. in the scripting, please read the follwoing carefully:
 
-when the file is unzipped it will create the following directory:
+Due to some script which references the 'gstanden' Ubuntu OS account, this version of the scripts must be run while logged in as the 'gstanden' user and must be run from the /home/gstanden/Downloads directory.
 
-  /home/oracle/Downloads/orabuntu-lxc-master
+Therefore, after downloading and unzipping the github archive, you MUST run 'ubuntu-services-0.sh' first.
 
-Therefore, because of the way the scripts are designed, you need to do the following:
+The ubuntu-services-0.sh script will create the 'gstanden' user, grant it 'sudo' privilege, and will put all the orabuntu-lxc scripts into the '/home/gstanden/Downloads' directory and then it will reboot the Ubuntu host.
 
-  cd /home/oracle/Downloads/orabuntu-lxc-master
+Log back in after reboot as 'gstanden' user, then cd to '/home/gstanden/Downloads' and start the install with 'ubuntu-services-1.sh'
+ 
+  ubuntu-services-0.sh  (This creates the 'gstanden' account)
 
-  cp -p * ../.
-
-Phase 1:  Create the LXC Containers for Oracle 12 RAC ASM Flex Cluster
-
-Run the ubuntu-services-*.sh files in the order shown below.
+==============================================================
 
   ubuntu-services-1.sh  (host will reboot after this script)
 
@@ -50,6 +52,7 @@ Run the ubuntu-services-*.sh files in the order shown below.
 
 The above steps will create the Oracle Enterprise Edition 6.5 LXC oracle-ready containers.
 
+==============================================================
 
 Phase 2:  Create the SCST Linux SAN LUNs for Oracle Grid Infrastructure
 
@@ -84,4 +87,7 @@ Run the create-scst-*.sh files in the order shown below.
 Once all these scripts have run the SCST SAN and LUNs will be ready for the Oracle Grid Infrastructure 12c install
 
 Follow the instructions at the Google Sites page referenced above.
+
+# NOTE:  I am working to fix the hardcoded 'gstanden' problem and I am also working to remove all the reboot steps and to package this as a .deb package.
+
 
