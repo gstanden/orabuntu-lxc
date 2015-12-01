@@ -26,7 +26,9 @@ Due to sloppy some hardcoded references to "/home/gstanden" etc. in the scriptin
 
 Due to some script which references the 'gstanden' Ubuntu OS account, this version of the scripts must be run while logged in as the 'gstanden' user and must be run from the /home/gstanden/Downloads directory.
 
-Therefore, after downloading and unzipping the github archive, you MUST run 'ubuntu-services-0.sh' first.
+Therefore, after downloading and unzipping the github archive, you MUST run 'ubuntu-services-0.sh' first from whatever username you are logged in as.  For example, if you were logged in as "jsmith" you would run the ubuntu-services-0.sh file from the path://github.com/gstanden/orabuntu-lxc:
+
+/wherever-you-downloaded/orabuntu-lxc-master/ubuntu-services-0.sh
 
 The ubuntu-services-0.sh script will create the 'gstanden' user, grant it 'sudo' privilege, and will put all the orabuntu-lxc scripts into the '/home/gstanden/Downloads' directory and then it will reboot the Ubuntu host.
 
