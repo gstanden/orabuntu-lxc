@@ -40,7 +40,7 @@ Whichever way is used, it is required for this release of the software with the 
 
 Note also that whichever workaround is used, the scripts MUST be run from '/home/gstanden/Downloads/' directory.
 
-Therefore, after downloading and unzipping the github archive, you MUST run 'ubuntu-services-0.sh' first from whatever username you are logged in as.  For example, if you were logged in as "jsmith" you would run the ubuntu-services-0.sh file from the path://github.com/gstanden/orabuntu-lxc:
+Therefore, after downloading and unzipping the github archive, you MUST run 'ubuntu-services-0.sh' first from whatever username you are logged in as.  For example, if you were logged in as "jsmith" you would run the ubuntu-services-0.sh file from the path:
 
 /wherever-you-downloaded/orabuntu-lxc-master/ubuntu-services-0.sh
 
