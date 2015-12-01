@@ -22,9 +22,9 @@ Screenshots and additional information can be found at the following Google Site
 
 https://sites.google.com/site/nandydandyoracle/technologies/lxc/oracle-rac-6-node-12c-gns-asm-flex-cluster-ubuntu-15-04-install
 
-=============================================================
+=============================
 !!! IMPORTANT PLEASE READ !!!
-=============================================================
+=============================
 
 Due to sloppy some hardcoded references to "/home/gstanden" etc. in the scripting, please read the following carefully:
 
@@ -52,7 +52,7 @@ Then cd to '/home/gstanden/Downloads'.
 
 Then start the install with 'ubuntu-services-1.sh'.
 
-!!! ==============================================================
+!!! =============================
  
   /home/your-username/Downloads/orabuntu-lxc-master/ubuntu-services-0.sh 
 
@@ -60,7 +60,7 @@ Then start the install with 'ubuntu-services-1.sh'.
 
   This is a fix for sloppy hardcoding.
 
-!!! ==============================================================
+!!! =============================
 
   This is where the software proper begins.
 
@@ -80,7 +80,7 @@ Then start the install with 'ubuntu-services-1.sh'.
 
 The above steps will create the Oracle Enterprise Edition 6.5 LXC oracle-ready containers.
 
-!!! ==============================================================
+!!! =============================
 
 Phase 2:  Create the SCST Linux SAN LUNs for Oracle Grid Infrastructure
 
