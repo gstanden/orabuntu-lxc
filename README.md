@@ -36,7 +36,7 @@ Then start the install with 'ubuntu-services-1.sh'.
 
 ==============================================================
  
-  ubuntu-services-0.sh  (This creates the 'gstanden' account) <-- This is a fix for sloppy hardcoding of 'gstanden' but is NECESSARY for now.
+  ubuntu-services-0.sh  (This creates the 'gstanden' account) <-- This is a fix for sloppy hardcoding.
 
 ==============================================================
 
