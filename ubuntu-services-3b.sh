@@ -1,14 +1,15 @@
 #!/bin/bash
 
+echo ''
 echo "============================================"
 echo "Script:  ubuntu-services-3b.sh              "
 echo "============================================"
-
+echo ''
 echo "============================================"
 echo "This script extracts customzed files to     "
 echo "the container required for running Oracle   "
 echo "============================================"
-
+echo ''
 echo "============================================"
 echo "This script is re-runnable                  "
 echo "============================================"
@@ -19,6 +20,8 @@ function GetBindStatus {
 sudo service bind9 status | grep Active | cut -f1-6 -d' ' | sed 's/ *//g'
 }
 BindStatus=$(GetBindStatus)
+
+sleep 5
 
 clear
 
@@ -59,24 +62,22 @@ else
 	sudo service bind9 status
 	echo ''
 	echo "============================================"
-	echo "Bind9 DNS status complete.                  "
+	echo "Status check of bind9 DNS completed.        "
 	echo "============================================"
 	sleep 5
-	echo ''
-	echo "============================================"
-	echo "Continuing with script execution.           "
-	echo "============================================"
 fi
 
 echo ''
 echo "============================================"
-echo "Status check of bind9 DNS completed.        "
+echo "Continuing with script execution.           "
 echo "============================================"
 echo ''
 
 # GLS 20151127 New test for bind9 status.  Terminates script if bind9 status is not valid.
 
 # GLS 20151127 New DHCP server checks.  Terminates script if DHCP status is invalid.
+
+sleep 5
 
 clear
 
@@ -125,21 +126,19 @@ else
 	echo "DHCP status complete.                       "
 	echo "============================================"
 	sleep 5
-	echo ''
-	echo "============================================"
-	echo "Continuing with script execution.           "
-	echo "============================================"
 fi
 
 echo ''
 echo "============================================"
-echo "Status check of DHCP completed.        "
+echo "Continuing with script execution.           "
 echo "============================================"
 echo ''
 
 # GLS 20151128 New DHCP status check end.
 
 # GLS 20151128 Google ping test start.
+
+sleep 5 
 
 clear
 
@@ -233,6 +232,7 @@ sleep 5
 
 clear
 
+# sudo sed -i 's/HOSTNAME=lxcora01/HOSTNAME=lxcora0/g' /var/lib/lxc/lxcora0/rootfs/etc/sysconfig/network
 sudo lxc-start -n lxcora0 > /dev/null 2>&1
 
 sleep 5
@@ -255,6 +255,7 @@ PublicIP=$(CheckPublicIP)
 
 clear
 
+echo ''
 echo "============================================"
 echo "Bringing up public ip on lxcora0...        "
 echo "============================================"
@@ -280,26 +281,41 @@ echo "==========================================="
 echo "Container Up.                              "
 echo "==========================================="
 
-echo "Sleeping for 10 seconds..."
 sleep 10
+
 clear
 
 echo ''
 echo "==========================================="
-echo "Verify no-password ssh working to lxcora0 "
+echo "Verify no-password ssh working to lxcora0  "
 echo "==========================================="
+
+function CheckNopassSSH {
+sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@lxcora0 uname -a | cut -f1,2 -d' '
+}
+NopassSSH=$(CheckNopassSSH)
+
+if [ "$NopassSSH" = 'Linux lxcora0' ]
+then
 echo ''
-
-sleep 2
-
-ssh root@lxcora0 uname -a
-
+sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@lxcora0 uname -a
 echo ''
 echo "==========================================="
 echo "Verification of no-password ssh completed. "
 echo "==========================================="
+else
+echo ''
+echo "==========================================="
+echo "No-password ssh failed to lxcora0.         "
+echo "Fix problem and re-run script.             "
+echo "Script exiting.                            "
+echo "==========================================="
+exit
+fi 
 
-sleep 4
+echo ''
+
+sleep 5
 
 clear
 
@@ -310,46 +326,49 @@ echo "Installing files and packages for Oracle...     "
 echo "================================================"
 echo ''
 
-ssh root@lxcora0 /root/packages.sh
-ssh root@lxcora0 /root/create_users.sh
-ssh root@lxcora0 /root/lxc-services.sh
-ssh root@lxcora0 /root/install_grid.sh
+sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@lxcora0 /root/packages.sh
+sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@lxcora0 /root/create_users.sh
+sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@lxcora0 /root/lxc-services.sh
+sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@lxcora0 /root/install_grid.sh
 
 sudo tar -vP --extract --file=lxc-lxcora01.tar /var/lib/lxc/lxcora01/rootfs/home/grid/grid/rpm/cvuqdisk-1.0.9-1.rpm
 sudo mkdir -p /var/lib/lxc/lxcora0/rootfs/home/grid/grid/rpm
 sudo mv /var/lib/lxc/lxcora01/rootfs/home/grid/grid/rpm/cvuqdisk-1.0.9-1.rpm /var/lib/lxc/lxcora0/rootfs/home/grid/grid/rpm/cvuqdisk-1.0.9-1.rpm
 sudo cp -p /var/lib/lxc/lxcora0/rootfs/home/grid/grid/rpm/cvuqdisk-1.0.9-1.rpm /var/lib/lxc/lxcora0/rootfs/root/.
 
-ssh root@lxcora0 rpm -Uvh /home/grid/grid/rpm/cvuqdisk-1.0.9-1.rpm
+sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@lxcora0 rpm -Uvh /home/grid/grid/rpm/cvuqdisk-1.0.9-1.rpm
 
 # sudo tar -P --extract --file=lxc-lxcora01.tar /var/lib/lxc/lxcora0/rootfs/home/grid/.bashrc
 # sudo tar -vP --extract --file=lxc-lxcora01.tar /var/lib/lxc/lxcora01/rootfs/home/oracle/.bashrc
-sudo cp ~/Downloads/oracle.bash_profile /var/lib/lxc/lxcora0/rootfs/home/oracle/.bash_profile
-sudo cp ~/Downloads/oracle.bashrc /var/lib/lxc/lxcora0/rootfs/home/oracle/.bashrc
-sudo cp ~/Downloads/oracle.kshrc /var/lib/lxc/lxcora0/rootfs/home/oracle/.kshrc
+sudo cp ~/Downloads/orabuntu-lxc-master/oracle.bash_profile /var/lib/lxc/lxcora0/rootfs/home/oracle/.bash_profile
+sudo cp ~/Downloads/orabuntu-lxc-master/oracle.bashrc /var/lib/lxc/lxcora0/rootfs/home/oracle/.bashrc
+sudo cp ~/Downloads/orabuntu-lxc-master/oracle.kshrc /var/lib/lxc/lxcora0/rootfs/home/oracle/.kshrc
 
-sudo cp -p ~/Downloads/rc.local /var/lib/lxc/lxcora0/rootfs/etc/rc.local
-ssh root@lxcora0 chown grid:oinstall /home/grid/grid
-ssh root@lxcora0 chown grid:oinstall /home/grid/grid/rpm
-scp edit_bashrc root@lxcora0:/home/grid/.
-ssh root@lxcora0 chown grid:oinstall /home/grid/edit_bashrc
-ssh root@lxcora0 chmod 755 /home/grid/edit_bashrc
-ssh root@lxcora0 usermod --password `perl -e "print crypt('grid','grid');"` grid
-ssh root@lxcora0 usermod --password `perl -e "print crypt('oracle','oracle');"` oracle
-ssh root@lxcora0 usermod -g oinstall oracle
-ssh root@lxcora0 chown oracle:oinstall /home/oracle/.bash_profile
-ssh root@lxcora0 chown oracle:oinstall /home/oracle/.bashrc
-ssh root@lxcora0 chown oracle:oinstall /home/oracle/.kshrc
-ssh root@lxcora0 chown oracle:oinstall /home/oracle/.bash_logout
-ssh root@lxcora0 chown oracle:oinstall /home/oracle/.
-ssh root@lxcora0 sed -i '/ORACLE_SID/d' /home/oracle/.bashrc
+sudo cp -p ~/Downloads/orabuntu-lxc-master/rc.local /var/lib/lxc/lxcora0/rootfs/etc/rc.local
+sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@lxcora0 chown grid:oinstall /home/grid/grid
+sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@lxcora0 chown grid:oinstall /home/grid/grid/rpm
+sshpass -p root scp -o CheckHostIP=no -o StrictHostKeyChecking=no edit_bashrc root@lxcora0:/home/grid/.
+sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@lxcora0 chown grid:oinstall /home/grid/edit_bashrc
+sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@lxcora0 chmod 755 /home/grid/edit_bashrc
+sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@lxcora0 usermod --password `perl -e "print crypt('grid','grid');"` grid
+sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@lxcora0 usermod --password `perl -e "print crypt('oracle','oracle');"` oracle
+sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@lxcora0 usermod -g oinstall oracle
+sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@lxcora0 chown oracle:oinstall /home/oracle/.bash_profile
+sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@lxcora0 chown oracle:oinstall /home/oracle/.bashrc
+sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@lxcora0 chown oracle:oinstall /home/oracle/.kshrc
+sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@lxcora0 chown oracle:oinstall /home/oracle/.bash_logout
+sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@lxcora0 chown oracle:oinstall /home/oracle/.
+sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@lxcora0 sed -i '/ORACLE_SID/d' /home/oracle/.bashrc
 
+sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@lxcora0 usermod --password `perl -e "print crypt('grid','grid');"` grid
+sshpass -p grid ssh -o CheckHostIP=no -o StrictHostKeyChecking=no grid@lxcora0 /home/grid/edit_bashrc
+# ssh grid@lxcora0 /home/grid/edit_bashrc
+
+echo ''
 echo "================================================"
-echo "Password for grid:  grid (same as username)     "
+echo "Installing files and packages for Oracle done.  "
 echo "================================================"
 echo ''
-
-ssh grid@lxcora0 /home/grid/edit_bashrc
 
 sleep 5
 
@@ -360,22 +379,43 @@ echo "================================================"
 echo "Verify .bashrc file has umask 022 entry         "
 echo "================================================"
 echo ''
-echo "================================================"
-echo "Password for grid:  grid (same as username)     "
-echo "================================================"
+
+function CheckBashrcUmask {
+sshpass -p grid ssh -o CheckHostIP=no -o StrictHostKeyChecking=no grid@lxcora0 cat /home/grid/.bashrc | grep -c 'umask 022'
+}
+BashrcUmask=$(CheckBashrcUmask)
+
+if [ "$BashrcUmask" -eq 1 ]
+then
 echo ''
-
-ssh grid@lxcora0 cat .bashrc
-
+sshpass -p grid ssh -o CheckHostIP=no -o StrictHostKeyChecking=no grid@lxcora0 cat /home/grid/.bashrc 
 echo ''
 echo "================================================"
 echo "Verified .bashrc file has umask 022 entry       "
 echo "================================================"
+else
 echo ''
+echo "================================================"
+echo "Non-fatal Warning:                              "
+echo "/home/grid/.bashrc may not have umask 022 set..."
+echo "Set umask 022 before installing Oracle software."
+echo "Continuing with container build scripts...      "
+echo "================================================" 
+fi
+
+# ssh grid@lxcora0 cat .bashrc
+
+# echo ''
+# echo "================================================"
+# echo "Verified .bashrc file has umask 022 entry       "
+# echo "================================================"
+# echo ''
+
 sleep 5
 
 clear
 
+echo ''
 echo "==========================================="
 echo "Stopping lxcora0 container...             "
 echo "==========================================="

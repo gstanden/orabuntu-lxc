@@ -3,11 +3,11 @@
 echo "============================================"
 echo "Script:  ubuntu-services-3c.sh NumCon       "
 echo "============================================"
-
+echo ''
 echo "============================================"
 echo "This script is re-runnable.                 "
 echo "============================================"
-
+echo ''
 echo "============================================"
 echo "NumCon is the number of RAC nodes           "
 echo "NumCon (small integer)                      "
@@ -26,7 +26,6 @@ echo "============================================"
 echo "Number of LXC Container RAC Nodes = $NumCon "
 echo "============================================"
 echo ''
-
 echo "============================================"
 echo "If wrong number of desired RAC nodes, then  "
 echo "<ctrl>+c and restart script to set          "
@@ -340,18 +339,35 @@ clear
 
 echo ''
 echo "==========================================="
-echo "Verify no-password ssh working to lxcora0 "
+echo "Verify no-password ssh working to lxcora0  "
 echo "==========================================="
+
+function CheckNopassSSH {
+sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@lxcora0 uname -a | cut -f1,2 -d' '
+}
+NopassSSH=$(CheckNopassSSH)
+
+if [ "$NopassSSH" = 'Linux lxcora0' ]
+then
 echo ''
-
-ssh root@lxcora0 uname -a
-
+sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@lxcora0 uname -a
 echo ''
 echo "==========================================="
 echo "Verification of no-password ssh completed. "
 echo "==========================================="
+else
+echo ''
+echo "==========================================="
+echo "No-password ssh failed to lxcora0.         "
+echo "Fix problem and re-run script.             "
+echo "Script exiting.                            "
+echo "==========================================="
+exit
+fi
 
-sleep 4
+echo ''
+
+sleep 5
 
 clear
 
@@ -462,6 +478,7 @@ echo ''
 sudo lxc-clone -o lxcora0 -n lxcora00
 sleep 5
 
+echo ''
 echo "=========================================="
 echo "Ref Container lxcora00 clone completed.   " 
 echo "=========================================="
@@ -517,7 +534,7 @@ echo "==========================================="
 echo "Creating OpenvSwitch files ...             "
 echo "==========================================="
 
-sudo cp -p ~/Downloads/create-ovs-sw-files-v2.sh.bak /etc/network/if-up.d/openvswitch/create-ovs-sw-files-v2.sh
+sudo cp -p ~/Downloads/orabuntu-lxc-master/create-ovs-sw-files-v2.sh.bak /etc/network/if-up.d/openvswitch/create-ovs-sw-files-v2.sh
 sudo chmod 755 /etc/network/if-up.d/openvswitch/create-ovs-sw-files-v2.sh
 sudo /etc/network/if-up.d/openvswitch/create-ovs-sw-files-v2.sh lxcora $NumCon
 

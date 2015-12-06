@@ -289,7 +289,8 @@ echo "Verify no-password ssh working to lxcora0 "
 echo "==========================================="
 echo ''
 
-ssh root@lxcora0 uname -a
+sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@lxcora0 uname -a 
+# ssh root@lxcora0 uname -a
 
 echo ''
 echo "==========================================="
@@ -329,7 +330,7 @@ then
 mkdir ~/Networking
 fi
  
-cp -p ~/Downloads/crt_links_v2.sh  ~/Networking/crt_links.sh
+cp -p ~/Downloads/orabuntu-lxc-master/crt_links_v2.sh  ~/Networking/crt_links.sh
 sudo chown root:root ~/Networking/crt_links.sh
 
 cd ~/Networking
@@ -352,7 +353,7 @@ sudo ./crt_links.sh
 echo ''
 ls -l ~/Networking
 echo ''
-cd ~/Downloads
+cd ~/Downloads/orabuntu-lxc-master
 pwd
 sleep 5
 
@@ -361,7 +362,6 @@ clear
 echo ''
 echo "================================================"
 echo "Starting LXC clone containers for Oracle        "
-echo "60 seconds/container for correct DHCP assignment"
 echo "================================================"
 echo ''
 
@@ -414,5 +414,5 @@ echo "================================================"
 
 sleep 15
 
-~/Downloads/stop_containers.sh
+~/Downloads/orabuntu-lxc-master/stop_containers.sh
 

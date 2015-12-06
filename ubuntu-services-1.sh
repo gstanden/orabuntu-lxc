@@ -1,6 +1,10 @@
 #!/bin/bash
 
+echo ''
 echo "================================================="
+echo "                                                 "
+echo "Script:  ubuntu-services-1.sh                    "
+echo "                                                 "
 echo "Tested with Ubuntu 15.04 Vivid Vervet            "
 echo "Tested with Ubuntu 15.10 Wily Werewolf           "
 echo "Only use a FRESH Ubuntu 15.x Install             "
@@ -8,12 +12,14 @@ echo "These scripts overwrite some configurations!     "
 echo "Use with customized Ubuntu at your own risk!     "
 echo "<CTRL> + C to exit                               "
 echo "Sleeping 10 seconds...                           "
+echo "                                                 "
 echo "================================================="
 
 sleep 10
 
 clear
 
+echo ''
 # echo "==============================================="
 # echo "DHCP service clear, start, and test...         "
 # echo "Verify health status...                        "
@@ -58,10 +64,11 @@ fi
 # echo "Verify isc-dhcp-server service completed       "
 # echo "==============================================="
 
-# sleep 5
+sleep 5
 
 clear
 
+echo ''
 echo "============================================" 
 echo "Verify network up....                       "
 echo "============================================"
@@ -101,6 +108,7 @@ LXCExist=$(CheckLXCExist)
 if [ $LXCExist -eq 1 ]
 then
 
+echo ''
 echo "==========================================="
 echo "Destruction of Containers (if necessary)   "
 echo "Checking...                                "
@@ -200,9 +208,10 @@ clear
 if [ $LXCExist -eq 1 ]
 then
 
+echo ''
 echo "==========================================="
 echo "Show Running Containers...                 "
-echo "(no containers lxcora* running)            "
+echo "(no containers lxcora* exist)            "
 echo "==========================================="
 echo ''
 
@@ -219,6 +228,7 @@ fi
 
 clear
 
+echo ''
 echo "==========================================="
 echo "Ubuntu Package Installation...             "
 echo "==========================================="
@@ -240,9 +250,12 @@ sudo apt-get install -y isc-dhcp-server
 sudo apt-get install -y apparmor-utils
 sudo apt-get install -y openssh-server
 sudo apt-get install -y uuid
-sudo apt-get install -y qemu-kvm
-sudo apt-get install -y libvirt-bin
-sudo apt-get install -y virt-manager
+
+# GLS 20151206 Not needed
+# sudo apt-get install -y qemu-kvm
+# sudo apt-get install -y libvirt-bin
+# sudo apt-get install -y virt-manager
+
 sudo apt-get install -y rpm
 sudo apt-get install -y yum
 sudo apt-get install -y hugepages
@@ -254,6 +267,7 @@ sudo apt-get install -y multipath-tools
 sudo apt-get install -y ntp
 sudo apt-get install -y iotop
 sudo apt-get install -y flashplugin-installer
+sudo apt-get install -y sshpass
 
 sudo aa-complain /usr/bin/lxc-start
 
@@ -267,6 +281,7 @@ sleep 5
 
 clear
 
+echo ''
 echo "==========================================="
 echo "Create the LXC oracle container...         "
 echo "==========================================="
@@ -291,7 +306,7 @@ sudo service isc-dhcp-server stop
 sudo service multipath-tools stop
 
 # Backup existing files before untar of updated files.
-~/Downloads/ubuntu-host-backup-1a.sh
+~/Downloads/orabuntu-lxc-master/ubuntu-host-backup-1a.sh
 
 # Check existing file backups to be sure they were made successfully
 echo "==============================================="
@@ -299,7 +314,7 @@ echo "Checking existing file backups before writing  "
 echo "===============================================" 
 echo ''
 
-~/Downloads/ubuntu-host-backup-check-1a.sh
+~/Downloads/orabuntu-lxc-master/ubuntu-host-backup-check-1a.sh
 
 sleep 2 
 
@@ -313,6 +328,7 @@ sleep 5
 clear
 
 # Unpack customized OS host files for Oracle on Ubuntu LXC host server
+echo ''
 echo "==============================================="
 echo "Unpacking custom files for Oracle on Ubuntu... "
 echo "==============================================="
@@ -321,7 +337,7 @@ sleep 5
 
 sudo tar -P -xvf ubuntu-host.tar
 
-sudo cp -p ~/Downloads/rc.local.ubuntu.host /etc/rc.local
+sudo cp -p ~/Downloads/orabuntu-lxc-master/rc.local.ubuntu.host /etc/rc.local
 sudo chown root:root /etc/rc.local
 sudo sed -i 's/10\.207\.39\.10/10\.207\.39\.9/' /etc/dhcp/dhcpd.conf
 
@@ -338,6 +354,7 @@ sleep 5
 
 clear
 
+echo ''
 # echo "==============================================="
 # echo "Restarting Networking on the Ubuntu host...    "
 # echo "Be patient...                                  "
@@ -355,14 +372,16 @@ clear
 
 # clear
 
+echo ''
 echo "==============================================="
 echo "Copying required /etc/resolv.conf file         "
 echo "On reboot it will be auto-generated.           "
 echo "==============================================="
-sudo cp ~/Downloads/resolv.conf.temp /etc/resolv.conf
+sudo cp ~/Downloads/orabuntu-lxc-master/resolv.conf.temp /etc/resolv.conf
 
 sleep 2
 
+echo ''
 echo "==============================================="
 echo "Copying required /etc/resolv.conf complete     "
 echo "==============================================="
@@ -371,6 +390,7 @@ sleep 2
 
 clear
 
+echo ''
 echo "==============================================="
 echo "Starting bind9 service...                      "
 echo "Verify healthy status...                       "
@@ -387,9 +407,27 @@ sleep 5
 
 clear
 
+echo ''
+echo "==============================================="
+echo "Creating OpenvSwitch sw1 ...                   "
+echo "==============================================="
+echo ''
+
+sudo ~/OpenvSwitch/crt_ovs_sw1.sh
+
+echo ''
+echo "==============================================="
+echo "OpenvSwitch sw1 created.                       "
+echo "==============================================="
+echo ''
+
+sleep 5
+
+clear
+
+echo ''
 echo "==============================================="
 echo "Starting DHCP service...                       "
-echo "Verify health status...                        "
 echo "==============================================="
 echo ''
 
@@ -398,14 +436,79 @@ sudo service isc-dhcp-server status
 
 echo ''
 echo "==============================================="
-echo "Verify isc-dhcp-server service completed       "
+echo "DHCP Service Started and Status displayed.     "
 echo "==============================================="
+
+# GLS 20151127 New DHCP server checks.  Terminates script if DHCP status is invalid.
 
 sleep 5
 
 clear
 
-sudo cp -p ~/Downloads/create-ovs-sw-files-v2.sh.bak /etc/network/if-up.d/openvswitch/create-ovs-sw-files-v2.sh
+function GetDHCPStatus {
+sudo service isc-dhcp-server status | grep Active | cut -f1-6 -d' ' | sed 's/ *//g'
+}
+DHCPStatus=$(GetDHCPStatus)
+
+echo ''
+echo "============================================"
+echo "Checking status of DHCP...                  "
+echo "============================================"
+
+if [ $DHCPStatus != 'Active:active(running)' ]
+then
+	echo ''
+	echo "DHCP is NOT RUNNING with correct status of:  Active: active (running)"
+	echo ''
+	echo "============================================"
+	echo "DHCP status ...                             "
+	echo "============================================"
+	echo ''
+	sudo service isc-dhcp-server status
+	echo ''
+	echo "============================================"
+	echo "DHCP status incorrect.                      "
+	echo "============================================"
+	sleep 5
+	echo ''
+	echo "============================================"
+	echo "!! FIX PROBLEM with DHCP and retry script.  "
+	echo "============================================"
+	echo ''
+	exit
+else
+	echo ''
+	echo "DHCP is RUNNING with correct status of:  Active: active (running)"
+	echo ''
+	echo "============================================"
+	echo "DHCP status ...                             "
+	echo "============================================"
+	echo ''
+	sudo service isc-dhcp-server status
+	echo ''
+	echo "============================================"
+	echo "DHCP status complete.                       "
+	echo "============================================"
+	sleep 5
+	echo ''
+	echo "============================================"
+	echo "Continuing with script execution.           "
+	echo "============================================"
+fi
+
+echo ''
+echo "============================================"
+echo "Status check of DHCP completed.        "
+echo "============================================"
+echo ''
+
+# GLS 20151128 New DHCP status check end.
+
+sleep 5
+
+clear
+
+sudo cp -p ~/Downloads/orabuntu-lxc-master/create-ovs-sw-files-v2.sh.bak /etc/network/if-up.d/openvswitch/create-ovs-sw-files-v2.sh
 
 cd /etc/network/if-up.d/openvswitch
 sudo mv lxcora01-asm1-ifup-sw8  lxcora00-asm1-ifup-sw8
@@ -444,13 +547,33 @@ sudo cp lxcora00-priv4-ifdown-sw7 lxcora0-priv4-ifdown-sw7
 sudo cp lxcora00-pub-ifdown-sw1   lxcora0-pub-ifdown-sw1
 
 sudo rm lxcora02* lxcora03* lxcora04* lxcora05* lxcora06* 
-sudo useradd -u 1098 grid
-sudo useradd -u 500 oracle
 
+sudo useradd -u 1098 grid >/dev/null 2>&1
+sudo useradd -u 500 oracle >/dev/null 2>&1
+
+echo ''
 echo "==============================================="
-echo "Next script to run: ubuntu-services-2a.sh      "
-echo "Rebooting in 5 seconds...                      "
+echo "Check existence of Oracle and Grid users...    "
+echo "==============================================="
+echo ''
+
+id grid
+id oracle
+
+echo ''
+echo "==============================================="
+echo "Oracle and Grid users displayed.               "
 echo "==============================================="
 
 sleep 5
-sudo reboot
+
+clear
+
+echo ''
+echo "==============================================="
+echo "Next script to run: ubuntu-services-2a.sh      "
+echo "==============================================="
+
+sleep 5
+
+# sudo reboot

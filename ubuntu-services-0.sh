@@ -12,13 +12,13 @@ echo ''
 sleep 15
 sudo adduser gstanden
 sudo adduser gstanden sudo
-sudo wget -P /home/gstanden/Downloads/ https://github.com/gstanden/orabuntu-lxc/archive/master.zip
-sudo unzip /home/gstanden/Downloads/master.zip -d /home/gstanden/Downloads
-cd /home/gstanden/Downloads/orabuntu-lxc-master/
+sudo wget -P /home/gstanden/Downloads/orabuntu-lxc-master/ https://github.com/gstanden/orabuntu-lxc/archive/master.zip
+sudo unzip /home/gstanden/Downloads/orabuntu-lxc-master/master.zip -d /home/gstanden/Downloads/orabuntu-lxc-master
+cd /home/gstanden/Downloads/orabuntu-lxc-master/orabuntu-lxc-master/
 sudo cp -pr * ../.
 echo ''
 echo "Rebooting in 15 seconds"
-echo "Login as gstanden after reboot and cd to /home/gstanden/Downloads/ and run ubuntu-services-1.sh to begin install."
+echo "Login as gstanden after reboot and cd to /home/gstanden/Downloads/orabuntu-lxc-master/ and run ubuntu-services-1.sh to begin install."
 sleep 15
 sudo reboot
 

@@ -8,10 +8,13 @@ echo "This script installs lxcora0 files          "
 echo "This script creates rsa key for host if one "
 echo "does not already exist                      "
 echo "============================================"
+echo ''
+echo "============================================"
+echo "This script is re-runnable                  "
+echo "============================================"
+echo ''
 
-# echo "============================================"
-# echo "This script is re-runnable                  "
-# echo "============================================"
+sleep 5
 
 # GLS 20151127 New test for bind9 status.  Terminates script if bind9 status is not valid.
 
@@ -246,9 +249,9 @@ sudo mv /var/lib/lxc/lxcora01/rootfs/root/create_users.sh /var/lib/lxc/lxcora0/r
 sudo tar -vP --extract --file=lxc-lxcora01.tar /var/lib/lxc/lxcora01/rootfs/root/lxc-services.sh 
 sudo mv /var/lib/lxc/lxcora01/rootfs/root/lxc-services.sh /var/lib/lxc/lxcora0/rootfs/root/lxc-services.sh
 sudo sed -i 's/yum install/yum -y install/g' /var/lib/lxc/lxcora0/rootfs/root/lxc-services.sh
-sudo cp -p ~/Downloads/install_grid.sh /var/lib/lxc/lxcora0/rootfs/root/install_grid.sh
-sudo cp -p ~/Downloads/lxc-services.sh /var/lib/lxc/lxcora0/rootfs/root/lxc-services.sh
-sudo cp -p ~/Downloads/dhclient.conf /var/lib/lxc/lxcora0/rootfs/etc/dhcp/dhclient.conf
+sudo cp -p ~/Downloads/orabuntu-lxc-master/install_grid.sh /var/lib/lxc/lxcora0/rootfs/root/install_grid.sh
+sudo cp -p ~/Downloads/orabuntu-lxc-master/lxc-services.sh /var/lib/lxc/lxcora0/rootfs/root/lxc-services.sh
+sudo cp -p ~/Downloads/orabuntu-lxc-master/dhclient.conf /var/lib/lxc/lxcora0/rootfs/etc/dhcp/dhclient.conf
 sudo chown root:root /var/lib/lxc/lxcora0/rootfs/root/install_grid.sh
 sudo chmod 755 /var/lib/lxc/lxcora0/rootfs/root/install_grid.sh
 sudo chown root:root /var/lib/lxc/lxcora0/rootfs/root/lxc-services.sh
@@ -267,6 +270,7 @@ clear
 
 # sudo sed -i 's/BOOTPROTO=dhcp/BOOTPROTO=static/g' /var/lib/lxc/lxcora0/rootfs/etc/sysconfig/network-scripts/ifcfg-eth0
 
+echo ''
 echo "============================================"
 echo "Begin MAC Address reset...                  "
 echo "Be patient...                               "
@@ -307,6 +311,7 @@ clear
 
 sudo chmod 644 /var/lib/lxc/lxcora0/config
 
+echo ''
 echo "============================================="
 echo "Create RSA key if it does not already exist  "
 echo "Press <Enter> to accept ssh-keygen defaults  "
@@ -315,7 +320,8 @@ echo ''
 
 if [ ! -e ~/.ssh/id_rsa.pub ]
 then
-ssh-keygen -t rsa
+# ssh-keygen -t rsa
+ssh-keygen -f ~/.ssh/id_rsa -t rsa -N ''
 fi
 
 if [ -e ~/.ssh/known_hosts ]
@@ -395,10 +401,10 @@ clear
 echo ''
 echo "==========================================="
 echo "Next run ubuntu-services-2b.sh             "
-echo "Rebooting in 10 seconds...                 "
-echo "<CTRL> + C to exit                         "
+# echo "Rebooting in 10 seconds...                 "
+# echo "<CTRL> + C to exit                         "
 echo "==========================================="
 
 sleep 10
 
-sudo reboot
+# sudo reboot

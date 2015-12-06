@@ -7,10 +7,12 @@ echo "                                            "
 echo "This script extracts customzed files to     "
 echo "the container required for running Oracle   "
 echo "============================================"
-
+echo ''
 echo "============================================"
 echo "This script is re-runnable                  "
 echo "============================================"
+
+sleep 5
 
 # GLS 20151127 New test for bind9 status.  Terminates script if bind9 status is not valid.
 
@@ -236,8 +238,6 @@ echo ''
 
 sudo lxc-start -n lxcora0 > /dev/null 2>&1
 
-sleep 5
-
 function CheckContainerUp {
 sudo lxc-ls -f | grep lxcora0 | sed 's/  */ /g' | grep RUNNING  | cut -f2 -d' '
 }
@@ -282,17 +282,17 @@ echo "==========================================="
 echo "Container Up.                              "
 echo "==========================================="
 
-sleep 3
+sleep 5
+
 clear
 
+echo ''
 echo "==========================================="
 echo "Verify no-password ssh working to lxcora0 "
 echo "==========================================="
 echo ''
 
-sleep 5
-
-ssh root@lxcora0 uname -a
+sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@lxcora0 uname -a
 
 echo ''
 echo "==========================================="
@@ -350,6 +350,7 @@ sudo tar -vP --extract --file=lxc-lxcora01.tar /var/lib/lxc/lxcora01/rootfs/root
 sudo tar -vP --extract --file=lxc-lxcora01.tar /var/lib/lxc/lxcora01/rootfs/etc/nsswitch.conf
 sudo tar -vP --extract --file=lxc-lxcora01.tar /var/lib/lxc/lxcora01/rootfs/etc/ntp.conf
 sudo tar -vP --extract --file=lxc-lxcora01.tar /var/lib/lxc/lxcora01/rootfs/etc/sysconfig/network
+sudo sed -i 's/HOSTNAME=lxcora01/HOSTNAME=lxcora0/g' /var/lib/lxc/lxcora01/rootfs/etc/sysconfig/network
 sudo tar -vP --extract --file=lxc-lxcora01.tar /var/lib/lxc/lxcora01/rootfs/etc/selinux/config
 
 sudo mv /var/lib/lxc/lxcora01/rootfs/etc/ssh/sshd_config /var/lib/lxc/lxcora0/rootfs/etc/ssh/sshd_config
@@ -364,6 +365,7 @@ sudo mv /var/lib/lxc/lxcora01/rootfs/root/hugepages_setting.sh /var/lib/lxc/lxco
 sudo mv /var/lib/lxc/lxcora01/rootfs/etc/nsswitch.conf /var/lib/lxc/lxcora0/rootfs/etc/nsswitch.conf
 sudo mv /var/lib/lxc/lxcora01/rootfs/etc/ntp.conf /var/lib/lxc/lxcora0/rootfs/etc/ntp.conf
 sudo mv /var/lib/lxc/lxcora01/rootfs/etc/sysconfig/network /var/lib/lxc/lxcora0/rootfs/etc/sysconfig/network
+sudo sed -i 's/HOSTNAME=lxcora01/HOSTNAME=lxcora0/g' /var/lib/lxc/lxcora0/rootfs/etc/sysconfig/network
 sudo mv /var/lib/lxc/lxcora01/rootfs/etc/selinux/config /var/lib/lxc/lxcora0/rootfs/etc/selinux/config
 
 echo ''
@@ -371,16 +373,16 @@ echo "=========================================="
 echo "Extraction completed.                     " 
 echo "=========================================="
 echo ''
+
+clear
+
+echo ''
 echo "=========================================="
 echo "Run script ubuntu-services-3b.sh next...  "
-# echo "(Ubuntu host must reboot before running)  " 
 echo "=========================================="
 echo ''
-# echo "=========================================="
-# echo "Rebooting Ubuntu host in 20 seconds...    "
-# echo "<CTRL> + C to abort reboot                "
-# echo "=========================================="
+
+# sudo reboot
 
 sleep 5
-# sudo reboot
 

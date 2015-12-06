@@ -12,6 +12,12 @@ echo "============================================"
 echo "This script is re-runnable                  "
 echo "============================================"
 
+echo ''
+
+ssh-add > /dev/null 2>&1
+
+sleep 5
+
 # GLS 20151127 New test for bind9 status.  Terminates script if bind9 status is not valid.
 
 function GetBindStatus {
@@ -235,22 +241,19 @@ clear
 echo ''
 echo "============================================"
 echo "Initializing container on OpenvSwitch...    "
-echo "May take a minute or two...be patient...    "
 echo "============================================"
 
 cd /etc/network/if-up.d/openvswitch
 sudo sed -i 's/lxcora01/lxcora0/' /var/lib/lxc/lxcora0/config
 
 sudo lxc-start -n lxcora0 > /dev/null 2>&1
-sleep 10
-sudo lxc-stop -n  lxcora0 > /dev/null 2>&1
-sleep 10
-sudo lxc-start -n lxcora0 > /dev/null 2>&1
-
-sleep 5
+# sleep 10
+# sudo lxc-stop -n  lxcora0 > /dev/null 2>&1
+# sleep 10
+# sudo lxc-start -n lxcora0 > /dev/null 2>&1
 
 function CheckContainerUp {
-sudo lxc-ls -f | grep lxcora0 | sed 's/  */ /g' | grep RUNNING  | cut -f2 -d' '
+sudo lxc-ls -f | grep lxcora0 | sed 's/  */ /g' | egrep 'RUNNING|STOPPED'  | cut -f2 -d' '
 }
 ContainerUp=$(CheckContainerUp)
 
@@ -265,7 +268,7 @@ sudo lxc-ls -f | sed 's/  */ /g' | grep RUNNING | cut -f3 -d' ' | sed 's/,//' | 
 }
 PublicIP=$(CheckPublicIP)
 
-clear
+sleep 5
 
 echo ''
 echo "============================================"
@@ -293,7 +296,7 @@ echo "============================================"
 echo "Container Up.                               "
 echo "============================================"
 
-sleep 3
+sleep 5
 
 clear
 
@@ -307,7 +310,7 @@ ping -c 3 lxcora0
 
 echo ''
 echo "============================================"
-echo "End lxcora0 ping test                      "
+echo "End lxcora0 ping test                       "
 echo "============================================"
 echo ''
 
@@ -315,10 +318,52 @@ sleep 5
 
 clear
 
+echo ''
+echo "============================================"
+echo "Check Authorized Keys File ...              "
+echo "============================================"
+echo ''
+
 if [ -e ~/.ssh/known_hosts ]
 then
 rm ~/.ssh/known_hosts
 fi
+
+function GetPublicKey {
+cat ~/.ssh/id_rsa.pub | cut -f2 -d' '
+}
+PublicKey=$(GetPublicKey)
+echo ''
+echo 'PublicKey = '$PublicKey
+
+function CheckAuthorizedKeys {
+grep -c $PublicKey ~/.ssh/authorized_keys | sed 's/^[ \t]*//;s/[ \t]*$//'
+}
+AuthorizedKeys=$(CheckAuthorizedKeys)
+echo ''
+echo 'AuthorizedKeys = '$AuthorizedKeys
+echo ''
+
+if [ "$AuthorizedKeys" -eq 0 ]
+then
+echo "sudo cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys"
+else
+cat ~/.ssh/authorized_keys
+fi
+
+sudo rm -rf /var/lib/lxc/lxcora0/rootfs/root/.ssh/*
+sudo mkdir -p /var/lib/lxc/lxcora0/rootfs/root/.ssh/
+sudo cp -p ~/.ssh/authorized_keys /var/lib/lxc/lxcora0/rootfs/root/.ssh/.
+
+echo ''
+echo "============================================"
+echo "Check Authorized Keys File completed.       "
+echo "============================================"
+echo ''
+
+sleep 5
+
+clear
 
 echo ''
 echo "============================================"
@@ -328,42 +373,37 @@ echo "============================================"
 echo "Output of 'uname -a' in lxcora0..."
 echo "============================================"
 echo ''
-sudo ssh root@lxcora0 uname -a
+
+sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@lxcora0 uname -a
+
 echo ''
 echo "============================================"
 echo "End ssh test                                "
 echo "============================================"
 
-clear
-
-sleep 3
-
-echo ''
-echo "============================================"
-echo "Begin no-password host-container setup      "
-echo "Accept defaults on most prompts             "
-echo "Overwrite (y/n)? y (answer 'y' if prompted) "
-echo "============================================"
-echo ''
-echo "============================================"
-echo "Password for root login is:  root           "
-echo "============================================"
-echo ''
-
-ssh root@lxcora0 ssh-keygen -t rsa
-
-sudo cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
-sudo cp ~/.ssh/authorized_keys /var/lib/lxc/lxcora0/rootfs/root/.ssh/.
-
-echo ''
-echo "============================================"
-echo "Key setup in containter completed.          "
-echo "Continuing in 10 seconds...                  "
-echo "============================================"
-
-sleep 10
+sleep 5
 
 clear
+
+# echo ''
+# echo "============================================"
+# echo "Begin no-password host-container setup      "
+# echo "Accept defaults on most prompts             "
+# echo "Overwrite (y/n)? y (answer 'y' if prompted) "
+# echo "============================================"
+# echo ''
+# echo "============================================"
+# echo "Password for root login is:  root           "
+# echo "============================================"
+# echo ''
+
+# ssh root@lxcora0 ssh-keygen -f id_rsa -t rsa -N ''
+
+# echo ''
+# echo "============================================"
+# echo "Key setup in containter completed.          "
+# echo "Continuing in 10 seconds...                  "
+# echo "============================================"
 
 echo ''
 echo "============================================"
@@ -373,7 +413,7 @@ echo "Output of 'uname -a' in lxcora0..."
 echo "============================================"
 echo ''
 
-ssh root@lxcora0 uname -a
+sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@lxcora0 uname -a
 
 echo ''
 echo "============================================"
@@ -423,23 +463,24 @@ echo ''
 echo "============================================"
 echo "Container stopped.                          "
 echo "============================================"
+
 sleep 5
 
 clear
 
 echo ''
-echo "============================================"
-echo "!!! Host will reboot in 10 seconds !!!      "
-echo "============================================"
-echo "                                            "
-echo "[ To abort reboot, <ctrl>+c ]               "
-echo "                                            "
-echo "============================================"
-echo "Rebooting in 10 seconds...                  "
+# echo "============================================"
+# echo "!!! Host will reboot in 10 seconds !!!      "
+# echo "============================================"
+# echo "                                            "
+# echo "[ To abort reboot, <ctrl>+c ]               "
+# echo "                                            "
+# echo "============================================"
+# echo "Rebooting in 10 seconds...                  "
 echo "============================================"
 echo "Next script to run: ubuntu-services-3a.sh   "
 echo "============================================"
 
-sleep 10
+# sleep 10
 
-sudo reboot
+# sudo reboot
