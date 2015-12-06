@@ -38,7 +38,7 @@ The second way is to use the 'ubuntu-services-0.sh' file which creates a 'gstand
 
 Whichever way is used, it is required for this release of the software with the hardcoded references problem that you be logged in as 'gstanden' OS user account, and that the scripts be located in '/home/gstanden/Downloads' directory and be run from that location.  Note that simply creating a '/home/gstanden' directory without the 'gstanden' user won't work.  You need both the user 'gstanden' and the '/home/gstanden/Downloads' directory in order for the scripts to install successfully with this release of the scripts.  I am working to remove this problem and remove all the hardcoded references and user dependencies and hope to release those updates very soon so that the 'gstanden' user will not be a requirement to run the scripts.
 
-Note also that whichever workaround is used, the scripts MUST be run from '/home/gstanden/Downloads/' directory.
+Note also that whichever workaround is used, the scripts MUST be run from '/home/gstanden/orabuntu-lxc-master/' directory.  Note that that is an UPDATE 2015-12-06 that the scripts for the container creation are to be run from /home/gstanden/orabuntu-lxc-master directory (previously it was /home/gstanden/Downloads but that has been fixed so that the scripts can now be run from the orabuntu-lxc-master subdirectory of Downloads).
 
 Therefore, after downloading and unzipping the github archive, you MUST run 'ubuntu-services-0.sh' first from whatever username you are logged in as.  For example, if you were logged in as "jsmith" you would run the ubuntu-services-0.sh file from the path:
 
@@ -68,27 +68,35 @@ NOTE:  Some of the scripts reboot the Ubuntu OS.  Be sure to login as the 'gstan
 
 !!! =============================
 
+Update 2015-12-06:  There are no reboots anymore.  You just run all the scripts.  There is a new script too:
+
+  /home/gstanden/Downloads/orabuntu-lxc-master/ubuntu-services.sh
+  
+and this new script is a master script which runs all of the below scripts automatically.  Note that all of the scripts are individually re-runnable, and the whole set of scripts is also re-runnable, so if you have a failure of one script for any reason, just fix the problem, and re-run that script.  If you want to re-run the whole set of scripts, just re-run ubuntu-services.sh again to re-run them all.
+
   This is where the software proper begins.
 
-  /home/gstanden/Downloads/ubuntu-services-1.sh  (host will reboot after this script)
+  /home/gstanden/Downloads/orabuntu-lxc-master/ubuntu-services-1.sh
 
-  /home/gstanden/Downloads/ubuntu-services-2a.sh (host will reboot after this script)
+  /home/gstanden/Downloads/orabuntu-lxc-master/ubuntu-services-2a.sh
 
-  /home/gstanden/Downloads/ubuntu-services-2b.sh (host will reboot after this script)
+  /home/gstanden/Downloads/orabuntu-lxc-master/ubuntu-services-2b.sh
 
-  /home/gstanden/Downloads/ubuntu-services-3a.sh
+  /home/gstanden/Downloads/orabuntu-lxc-master/ubuntu-services-3a.sh
 
-  /home/gstanden/Downloads/ubuntu-services-3b.sh
+  /home/gstanden/Downloads/orabuntu-lxc-master/ubuntu-services-3b.sh
 
-  /home/gstanden/Downloads/ubuntu-services-3c.sh
+  /home/gstanden/Downloads/orabuntu-lxc-master/ubuntu-services-3c.sh
 
-  /home/gstanden/Downloads/ubuntu-services-3d.sh
+  /home/gstanden/Downloads/orabuntu-lxc-master/ubuntu-services-3d.sh
 
 The above steps will create the Oracle Enterprise Edition 6.5 LXC oracle-ready containers.
 
 !!! =============================
 
 Phase 2:  Create the SCST Linux SAN LUNs for Oracle Grid Infrastructure
+
+UPDATE 2015-12-06:  You STILL must run the SCST setup from '/home/gstanden/Downloads/scst-files/' directory.  I'm working to adjust the paths for the SCST setup, but have not gotten to it yet.  But at least you don'd have to move all the scripting into your ~/Downloads directory anymore! Progress!
 
 tar -xvf scst-files.tar
 
@@ -116,7 +124,7 @@ Run the create-scst-*.sh files in the order shown below.
 
   /home/gstanden/Downloads/create-scst-5a.sh
 
-  /home/gstanden/Downloads/create-scst-5b.sh
+  /home/gstanden/Downloads/create-scst-5b.sh (host will reboot after this script).
 
 Once all these scripts have run the SCST SAN and LUNs will be ready for the Oracle Grid Infrastructure 12c install
 
