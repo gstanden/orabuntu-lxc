@@ -150,7 +150,6 @@ sleep 5
 # echo ''
 # echo "============================================"
 # echo "Begin google.com ping test...               "
-# echo "Be patient...                               "
 # echo "============================================"
 # echo ''
 
@@ -190,7 +189,6 @@ sleep 5
 # echo ''
 # echo "============================================"
 # echo "DNS nslookup test...                        "
-# echo "Be patient...sometimes!                     "
 # echo "============================================"
 # echo ''
 

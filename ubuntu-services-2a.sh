@@ -57,7 +57,6 @@ clear
 echo ''
 echo "============================================"
 echo "Begin MAC Address reset...                  "
-echo "Be patient...                               "
 echo "============================================"
 echo ''
 
@@ -98,7 +97,6 @@ sudo chmod 644 /var/lib/lxc/lxcora0/config
 echo ''
 echo "============================================="
 echo "Create RSA key if it does not already exist  "
-echo "Press <Enter> to accept ssh-keygen defaults  "
 echo "============================================="
 echo ''
 

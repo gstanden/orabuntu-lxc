@@ -255,7 +255,6 @@ clear
 echo ''
 # echo "==============================================="
 # echo "Restarting Networking on the Ubuntu host...    "
-# echo "Be patient...                                  "
 # echo "==============================================="
 # echo ''
 

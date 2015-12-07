@@ -9,7 +9,7 @@ clear
 clear
 ~/Downloads/orabuntu-lxc-master/ubuntu-services-3b.sh
 clear
-~/Downloads/orabuntu-lxc-master/ubuntu-services-3c.sh 4
+~/Downloads/orabuntu-lxc-master/ubuntu-services-3c.sh 20
 clear
 ~/Downloads/orabuntu-lxc-master/ubuntu-services-3d.sh
 

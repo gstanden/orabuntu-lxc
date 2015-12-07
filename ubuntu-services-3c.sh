@@ -113,7 +113,6 @@ echo "==========================================="
 echo ''
  
 sudo lxc-clone -o lxcora0 -n lxcora00
-sleep 5
 
 echo ''
 echo "=========================================="
@@ -139,8 +138,6 @@ do
 
 echo "Clone Container Name = lxcora$i"
 sudo lxc-clone -o lxcora0 -n lxcora"$i"
-echo "Sleeping 5 seconds..."
-sleep 5
 
 sudo sed -i "s/lxcora0/lxcora$i/g" /var/lib/lxc/lxcora$i/config
 sudo sed -i "s/\.10/\.$i/g" /var/lib/lxc/lxcora$i/config
