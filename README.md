@@ -69,7 +69,9 @@ The ubuntu-services.sh script is a master script which runs all of the below scr
 
 !!! =============================
 
-UPDATE:  You just run the file '/home/gstanden/Downloads/orabuntu-lxc/ubuntu-services.sh' to do the install.  
+UPDATE:  You just run the file '/home/gstanden/Downloads/orabuntu-lxc/ubuntu-services.sh' to do the install.
+
+!!! =============================
 
   This is where the software proper begins.
 
