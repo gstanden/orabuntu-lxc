@@ -168,6 +168,7 @@ sudo lxc-console -n lxcora10
 sudo lxc-ls -f 
 
 NOTE:  I will be adding the instantclient install to the scripted solution soon.
+
 NOTE:  I am working to fix the hardcoded 'gstanden' problem.
 
 
