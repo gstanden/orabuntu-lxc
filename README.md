@@ -26,39 +26,19 @@ https://sites.google.com/site/nandydandyoracle/technologies/lxc/oracle-rac-6-nod
 !!! IMPORTANT PLEASE READ !!!
 =============================
 
-Due to sloppy hardcoded references to "/home/gstanden" etc. in the scripting, please read the following carefully:
+To install:
 
-Due to some script which references the 'gstanden' Ubuntu OS account, this version of the scripts must be run while logged in as the 'gstanden' user and must be run from the /home/gstanden/Downloads/orabuntu-lxc-master directory.
-
-There are two ways to address this hardcoding references problem.  
-
-The first way is to do a fresh install of Ubuntu 15.04 or 15.10 and create the default user to be 'gstanden' and then just do the install starting from 'ubuntu-services-1.sh' script.
-
-The second way is to use the 'ubuntu-services-0.sh' file which creates a 'gstanden' user for the install.
-
-Whichever way is used, it is required for this release of the software with the hardcoded references problem that you be logged in as 'gstanden' OS user account, and that the scripts be located in '/home/gstanden/Downloads' directory and be run from that location.  Note that simply creating a '/home/gstanden' directory without the 'gstanden' user won't work.  You need both the user 'gstanden' and the '/home/gstanden/Downloads' directory in order for the scripts to install successfully with this release of the scripts.  I am working to remove this problem and remove all the hardcoded references and user dependencies and hope to release those updates very soon so that the 'gstanden' user will not be a requirement to run the scripts.
-
-Note also that whichever workaround is used, the scripts MUST be run from '/home/gstanden/orabuntu-lxc-master/' directory.  Note that that is an UPDATE 2015-12-06 that the scripts for the container creation are to be run from /home/gstanden/orabuntu-lxc-master directory (previously it was /home/gstanden/Downloads but that has been fixed so that the scripts can now be run from the orabuntu-lxc-master subdirectory of Downloads).
-
-Therefore, after downloading and unzipping the github archive, you MUST run 'ubuntu-services-0.sh' first from whatever username you are logged in as.  For example, if you were logged in as "jsmith" you would run the ubuntu-services-0.sh file from the path:
-
-/wherever-you-downloaded/orabuntu-lxc-master/ubuntu-services-0.sh
-
-for a user 'jsmith' typically this would be:
-
-/home/jsmith/Downloads/orabuntu-lxc-master/ubuntu-services-0.sh
-
-The ubuntu-services-0.sh script will create the 'gstanden' user, grant it 'sudo' privilege, and will put all the orabuntu-lxc scripts into the '/home/gstanden/Downloads' directory and then it will reboot the Ubuntu host.
-
-Log back in after reboot as 'gstanden' user.
-
-Then cd to '/home/gstanden/Downloads'.
-
-Then start the install with 'ubuntu-services-1.sh'.
-
-NOTE:  Some of the scripts reboot the Ubuntu OS.  Be sure to login as the 'gstanden' user after each reboot to run the next script! 
+1. Download the zip file from https://github.com/gstanden/orabuntu-lxc to your ~/Downloads directory on Ubuntu 15.x
+2. Unzip the zip file which will create the directory ~/Downloads/orabuntu-lxc-master
+3. Change directory to ~/Downloads/orabuntu-lxc-master
+4. Edit the script ubuntu-services.sh to tell ubuntu-services-3c.sh how many oracle-ready containers you want to create.
+5. Run ONLY on fresh install of Ubuntu 15.04 or 15.10 !
+6. Run as the "gstanden" user (Fix is coming for this problem.  For now, you must create a "gstanden" account for the install)
+6. Run the script ~/Downloads/orabuntu-lxc-master/ubuntu-services.sh (note, it's a fully-automated, non-interactive script).
 
 !!! =============================
+
+About the ubuntu-services-0.sh script
  
   /home/your-username/Downloads/orabuntu-lxc-master/ubuntu-services-0.sh 
 
@@ -68,11 +48,11 @@ NOTE:  Some of the scripts reboot the Ubuntu OS.  Be sure to login as the 'gstan
 
 !!! =============================
 
-Update 2015-12-06:  There are no reboots anymore.  You just run all the scripts.  There is a new script too:
+Update 2015-12-06:  There are no reboots anymore. 
 
   /home/gstanden/Downloads/orabuntu-lxc-master/ubuntu-services.sh
   
-and this new script is a master script which runs all of the below scripts automatically.  Note that all of the scripts are individually re-runnable, and the whole set of scripts is also re-runnable, so if you have a failure of one script for any reason, just fix the problem, and re-run that script.  If you want to re-run the whole set of scripts, just re-run ubuntu-services.sh again to re-run them all.  Note also the ubuntu-services-3d.sh takes a parameter integer that is the number of containers to create.  Edit ubuntu-services.sh to set the parameter for ubuntu-services-3c.sh.
+and this new script is a master script which runs all of the below scripts automatically.  Note that all of the scripts are individually re-runnable, and the whole set of scripts is also re-runnable, so if you have a failure of one script for any reason, just fix the problem, and re-run that script.  If you want to re-run the whole set of scripts, just re-run ubuntu-services.sh again to re-run them all.  Note also the ubuntu-services-3c.sh takes a parameter integer that is the number of containers to create.  Edit ubuntu-services.sh to set the parameter for ubuntu-services-3c.sh.
 
 UPDATE:  You just run the file '/home/gstanden/Downloads/orabuntu-lxc/ubuntu-services.sh' to do the install.  
 
@@ -88,17 +68,17 @@ UPDATE:  You just run the file '/home/gstanden/Downloads/orabuntu-lxc/ubuntu-ser
 
   /home/gstanden/Downloads/orabuntu-lxc-master/ubuntu-services-3b.sh
 
-  /home/gstanden/Downloads/orabuntu-lxc-master/ubuntu-services-3c.sh
+  /home/gstanden/Downloads/orabuntu-lxc-master/ubuntu-services-3c.sh X  {where X is an integer between 1 and 99}
 
   /home/gstanden/Downloads/orabuntu-lxc-master/ubuntu-services-3d.sh
 
-The above steps will create the Oracle Enterprise Edition 6.5 LXC oracle-ready containers.
+The above steps will create the Oracle Enterprise Edition 6.5 LXC Oracle-enterprise-edition RAC-ready containers.
 
 !!! =============================
 
 Phase 2:  Create the SCST Linux SAN LUNs for Oracle Grid Infrastructure
 
-UPDATE 2015-12-06:  You STILL must run the SCST setup from '/home/gstanden/Downloads/scst-files/' directory.  I'm working to adjust the paths for the SCST setup, but have not gotten to it yet.  But at least you don'd have to move all the scripting into your ~/Downloads directory anymore! Progress!
+UPDATE 2015-12-06:  You STILL must run the SCST setup from '/home/gstanden/Downloads/scst-files/' directory.  I'm working to adjust the paths for the SCST setup, but have not gotten to it yet.  But at least you don't have to move all the scripting into your ~/Downloads directory anymore! Progress!
 
 tar -xvf scst-files.tar
 
@@ -132,6 +112,6 @@ Once all these scripts have run the SCST SAN and LUNs will be ready for the Orac
 
 Follow the instructions at the Google Sites page referenced above.
 
-# NOTE:  I am working to fix the hardcoded 'gstanden' problem and I am also working to remove all the reboot steps and to package this as a .deb package.
+# NOTE:  I am working to fix the hardcoded 'gstanden' problem.
 
 
