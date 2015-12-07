@@ -44,7 +44,9 @@ To install:
 
 !!! =============================
 
-About the ubuntu-services-0.sh script
+About the ubuntu-services-0.sh script.
+
+The ubuntu-services-0.sh script is used if you have already installed Ubuntu 15.x and do not have a 'gstanden' user.  The 'gstanden' user is atm necessary for installing this software due to some hardcoded username-dependent poor coding which I am working to fix but is not fixed yet.  Therefore, use the ubuntu-services-0.sh script to get the orabuntu-lxc software and also to create the 'gstanden' user which is used for the install and to grant 'sudo' privilege to the 'gstanden' account which is needed for the install.
  
   /home/your-username/Downloads/orabuntu-lxc-master/ubuntu-services-0.sh 
 
