@@ -23,7 +23,7 @@ Technology Platforms:
 
   openvswitch  ( http://openvswitch.org/ )
 
-  lxc
+  lxc ( https://linuxcontainers.org/ )
 
 Screenshots and additional information can be found at the following Google Site:
 
