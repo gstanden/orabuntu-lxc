@@ -82,6 +82,12 @@ The above steps will create the Oracle Enterprise Edition 6.5 LXC Oracle-enterpr
 
 Phase 2:  Create the SCST Linux SAN LUNs for Oracle Grid Infrastructure
 
+This Phase 2 is OPTIONAL.  You will need storage LUNs for your Oracle Grid Infrastructure (GI) and your Oracle Database so this module creates file-backed LUNs and the SCST custom kernel providing a SAN for the containers.
+
+You can opt to use other solutions for file-backed storage such as Linux TGT.  I will be developing an automated Linux TGT SAN script package to go with this project, but that is on the roadmap only for now.  Linux TGT is much simpler to implement and does not require a custom Linux kernel.  
+
+The main reason for choosing SCST Linux SAN is that SCST supports native 4K format with no 512-byte emulation layer, so SCST is useful for testing both 4K and 512-byte native format storage with various Oracle database softwares.  If you will not need 4K native support, TGT is probably a much simpler choice since it does not require a custom kernel.  Note however that SCST is one of the most feature-rich Linux SAN solutions and is used in versions of commercial products such as some Kaminario all-flash SANs and some Violin Memory all-flash SANs. Because SCST is much more difficult to implement, I created the scripts to automatically build SCST for you, since guides to implement SCST on Ubuntu Linux are hard to find on the internet, while Linux TGT SAN guides are readily available and good.  My scripts are an evolution of the amazingly accurate and awesome guide that Chris Weiss created here:  https://gist.github.com/chrwei/42f8bbb687290b04b598 .  Without the great work by Chris Weiss sharing this method publicly, my scst-files.tar archive for automatically building SCST SAN for Oracle on Ubuntu Linux would simply not exist.  
+
 UPDATE 2015-12-06:  You STILL must run the SCST setup from '/home/gstanden/Downloads/scst-files/' directory.  I'm working to adjust the paths for the SCST setup, but have not gotten to it yet.  But at least you don't have to move all the scripting into your ~/Downloads directory anymore! Progress!
 
 tar -xvf scst-files.tar
