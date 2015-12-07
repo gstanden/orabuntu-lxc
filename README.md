@@ -156,6 +156,7 @@ https://sites.google.com/site/nandydandyoracle/technologies/lxc/docker-11gr2-ee-
 sqlplus sys/password@lxc1-scan.gns1.vmem.org:1521/VMEM1 as sysdba  (for sys connection)
 sqlplus system/password@lxc1-scan.gns1.vmem.org:1521/VMEM1         (for system connection)
 
+# NOTE:  I will be adding the instantclient install to the scripted solution soon.
 # NOTE:  I am working to fix the hardcoded 'gstanden' problem.
 
 
