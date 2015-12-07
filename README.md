@@ -54,7 +54,7 @@ About the ubuntu-services-0.sh script
 
 !!! =============================
 
-Update 2015-12-06:  There are no reboots anymore. All the scripts run one after the other until completion with no reboot. 
+Update 2015-12-06:  There are no reboots anymore. All the scripts run one after the other until completion with no reboot.
 
   /home/gstanden/Downloads/orabuntu-lxc-master/ubuntu-services.sh
   
