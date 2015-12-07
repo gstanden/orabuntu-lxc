@@ -59,6 +59,8 @@ The ubuntu-services-0.sh script is used if you have already installed Ubuntu 15.
 
 !!! =============================
 
+About the ubuntu-services.sh script.
+
 Update 2015-12-06:  There are no reboots anymore. All the scripts run one after the other until completion with no reboot.
 
   /home/gstanden/Downloads/orabuntu-lxc-master/ubuntu-services.sh
