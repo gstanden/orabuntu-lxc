@@ -127,7 +127,7 @@ Run the create-scst-*.sh files in the order shown below.
 
   /home/gstanden/Downloads/orabuntu-lxc-master/create-scst-1d.sh
 
-  /home/gstanden/Downloads/orabuntu-lxc-master/create-scst-2a.sh (host will reboot after this script to boot into new SCST kernel)
+  /home/gstanden/Downloads/orabuntu-lxc-master/create-scst-2a.sh (host will reboot into new SCST kernel at end of script)
 
   /home/gstanden/Downloads/orabuntu-lxc-master/create-scst-2b.sh
 
