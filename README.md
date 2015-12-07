@@ -96,7 +96,7 @@ IMPORTANT:  Whatever storage solution you use, your storage LUNs will appear in 
 
 /dev/mapper/asm_systemdg_00' 
 
-which of course will actually refer to a /dev/dm-* device.  If you are on Ubuntu 15.10, the storage will be a symlink to the /dev/dm-* device and if you are on Ubuntu 15.04 the storage will be a device node (no symlink) in /dev/mapper.
+which of course will actually refer to a /dev/dm- device.  If you are on Ubuntu 15.10, the storage will be a symlink in /dev/mapper to the /dev/dm-* device and if you are on Ubuntu 15.04 the storage will be a device node (no symlink) in /dev/mapper.
 
 UPDATE 2015-12-06:  You STILL must run the SCST setup from '/home/gstanden/Downloads/scst-files/' directory.  I'm working to adjust the paths for the SCST setup, but have not gotten to it yet.  But at least you don't have to move all the scripting into your ~/Downloads directory anymore! Progress!
 
