@@ -20,29 +20,14 @@ sleep 10
 clear
 
 echo ''
-# echo "==============================================="
-# echo "DHCP service clear, start, and test...         "
-# echo "Verify health status...                        "
-# echo "==============================================="
-# echo ''
+echo "==============================================="
+echo "DHCP service clear, start, and test...         "
+echo "Verify health status...                        "
+echo "==============================================="
+echo ''
 
 if [ -e /var/lib/dhcp/dhcpd.leases ]
 then
-echo ''
-echo "Destroy DHCP Leases?  [ Y | N ]:"
-read input_variable2
-echo ''
-echo "You entered: $input_variable2"
-echo ''
-
-if [ $input_variable2 = 'Y' ]
-then
-
-	echo ''
-
-	echo "Clearing DHCP Leases..."
-
-	echo ''
 	sudo service isc-dhcp-server stop
 	if [ -e /var/lib/dhcp/dhcpd.leases~ ]
 		then
@@ -55,14 +40,12 @@ then
 	fi
 	sudo service isc-dhcp-server start
 	sudo service isc-dhcp-server status
-
-fi
 fi
 
-# echo ''
-# echo "==============================================="
-# echo "Verify isc-dhcp-server service completed       "
-# echo "==============================================="
+echo ''
+echo "==============================================="
+echo "Clear DHCP leases and start DHCP complete.     "
+echo "==============================================="
 
 sleep 5
 
@@ -86,7 +69,6 @@ echo "ping google.com must succeed                "
 echo "Address network issues and retry script     "
 echo "============================================"
 echo ''
-exit
 fi
 
 echo ''
@@ -99,119 +81,37 @@ sleep 5
 
 clear
 
-function CheckLXCExist {
-which lxc-ls | grep -c lxc-ls
-}
-LXCExist=$(CheckLXCExist)
-
-
-if [ $LXCExist -eq 1 ]
-then
-
 echo ''
 echo "==========================================="
-echo "Destruction of Containers (if necessary)   "
-echo "Checking...                                "
+echo "Destruction of Containers                  "
 echo "==========================================="
 echo ''
+
 function CheckClonedContainersExist {
 sudo ls /var/lib/lxc | more | sed 's/$/ /' | tr -d '\n' | sed 's/  */ /g'
 }
 ClonedContainersExist=$(CheckClonedContainersExist)
 
-function CheckClonedContainersExistLength {
-sudo ls /var/lib/lxc | more | sed 's/$/ /' | tr -d '\n' | sed 's/  */ /g' | sed 's/^[ \t]*//;s/[ \t]*$//' | wc -c
-}
-ClonedContainersExistLength=$(CheckClonedContainersExistLength)
-
-sleep 5
-
-if [ $ClonedContainersExistLength -gt 0 ]
-then
-
-echo ''
-echo "Existing containers in the set { $ClonedContainersExist} have been found."
-echo "These containers match the names of containers that are about to be created."
-echo "Please answer Y to destroy the existing containers or N to keep them"
-echo ''
-
-echo "!!! WARNING:  ANSWERING Y WILL DESTROY EXISTING CONTAINERS !!!"
-
-echo ''
-echo "Destroy existing containers?  [ Y | N ]:"
-read input_variable
-echo ''
-echo "You entered: $input_variable"
-echo ''
-
-echo "<ctrl>+c to exit program and abort container destruction"
-echo "sleeping for 5 seconds..."
-
-sleep 5
-
-if [ ! -z "$ClonedContainersExist" ]
-then
 for j in $ClonedContainersExist
 do
-echo ''
-echo "Container Name = $j"
-echo "<ctrl>+c to exit"
-echo ''
-
-if [ "$input_variable" = 'N' ]
-then
-echo ''
-echo "sudo lxc-destroy -n $j"
-echo ''
-echo "Container NOT destroyed"
-echo ''
-fi
-
-if [ $input_variable = 'Y' ]
-then
-echo ''
-echo "Destroying container in 5 seconds..."
-echo ''
-sleep 5
-echo "Command running: sudo lxc-destroy -n $j"
-echo ''
 sudo lxc-stop -n $j 
 sleep 2
-sudo lxc-destroy -n $j -f
-echo ''
-echo "Command running: rm -rf /var/lib/lxc/$j"
-echo ''
+sudo lxc-destroy -n $j -f > /dev/null 2>&1
 sudo rm -rf /var/lib/lxc/$j
-echo ''
-fi
 done
-fi
-
 
 echo ''
 echo "==========================================="
 echo "Destruction of Containers complete         "
 echo "==========================================="
-else
-echo ''
-echo "==========================================="
-echo "No Containers to Destroy                   "
-echo "Continuing in 5 seconds...                 "
-echo "==========================================="
-fi
-fi
 
 sleep 5
 
 clear
 
-if [ $LXCExist -eq 1 ]
-then
-
 echo ''
 echo "==========================================="
 echo "Show Running Containers...                 "
-echo "(no containers lxcora* exist)            "
 echo "==========================================="
 echo ''
 
@@ -223,8 +123,6 @@ echo "Running Container Check completed          "
 echo "==========================================="
 
 sleep 5
-
-fi
 
 clear
 
@@ -475,7 +373,6 @@ then
 	echo "!! FIX PROBLEM with DHCP and retry script.  "
 	echo "============================================"
 	echo ''
-	exit
 else
 	echo ''
 	echo "DHCP is RUNNING with correct status of:  Active: active (running)"
