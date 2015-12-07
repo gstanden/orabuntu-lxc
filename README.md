@@ -98,7 +98,7 @@ IMPORTANT:  Whatever storage solution you use, your storage LUNs will appear in 
 
 which of course will actually refer to a /dev/dm- device.  If you are on Ubuntu 15.10, the storage will be a symlink in /dev/mapper to the /dev/dm-* device and if you are on Ubuntu 15.04 the storage will be a device node (no symlink) in /dev/mapper.
 
-UPDATE 2015-12-06:  You STILL must run the SCST setup from '/home/gstanden/Downloads/scst-files/' directory.  I'm working to adjust the paths for the SCST setup, but have not gotten to it yet.  But at least you don't have to move all the scripting into your ~/Downloads directory anymore! Progress!
+UPDATE 2015-12-07:  You can now run the SCST setup scripts from '/home/gstanden/Downloads/orabuntu-lxc-master/scst-files/' directory!  
 
 tar -xvf scst-files.tar
 
@@ -106,27 +106,27 @@ cd scst-files
 
 Run the create-scst-*.sh files in the order shown below.
 
-  /home/gstanden/Downloads/create-scst-1a.sh
+  /home/gstanden/Downloads/orabuntu-lxc-master/create-scst-1a.sh
 
-  /home/gstanden/Downloads/create-scst-1b.sh
+  /home/gstanden/Downloads/orabuntu-lxc-master/create-scst-1b.sh
 
-  /home/gstanden/Downloads/create-scst-1c.sh
+  /home/gstanden/Downloads/orabuntu-lxc-master/create-scst-1c.sh
 
-  /home/gstanden/Downloads/create-scst-1d.sh
+  /home/gstanden/Downloads/orabuntu-lxc-master/create-scst-1d.sh
 
-  /home/gstanden/Downloads/create-scst-2a.sh (host will reboot after this script to boot into new SCST kernel)
+  /home/gstanden/Downloads/orabuntu-lxc-master/create-scst-2a.sh (host will reboot after this script to boot into new SCST kernel)
 
-  /home/gstanden/Downloads/create-scst-2b.sh
+  /home/gstanden/Downloads/orabuntu-lxc-master/create-scst-2b.sh
 
-  /home/gstanden/Downloads/create-scst-3.sh
+  /home/gstanden/Downloads/orabuntu-lxc-master/create-scst-3.sh
 
-  /home/gstanden/Downloads/create-scst-4a.sh
+  /home/gstanden/Downloads/orabuntu-lxc-master/create-scst-4a.sh
 
-  /home/gstanden/Downloads/create-scst-4b.sh
+  /home/gstanden/Downloads/orabuntu-lxc-master/create-scst-4b.sh
 
-  /home/gstanden/Downloads/create-scst-5a.sh
+  /home/gstanden/Downloads/orabuntu-lxc-master/create-scst-5a.sh
 
-  /home/gstanden/Downloads/create-scst-5b.sh (host will reboot after this script).
+  /home/gstanden/Downloads/orabuntu-lxc-master/create-scst-5b.sh (host will reboot after this script).
 
 Once all these scripts have run the SCST SAN and LUNs will be ready for the Oracle Grid Infrastructure 12c install
 
