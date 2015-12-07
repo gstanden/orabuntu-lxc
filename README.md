@@ -133,7 +133,7 @@ Run the create-scst-*.sh files in the order shown below.
 
   /home/gstanden/Downloads/orabuntu-lxc-master/create-scst-3.sh
 
-  /home/gstanden/Downloads/orabuntu-lxc-master/create-scst-4a.sh
+  /home/gstanden/Downloads/orabuntu-lxc-master/create-scst-4a.shsqlplus sys/Violin#1@lxc1-scan.gns1.vmem.org:1521/VMEM1 as sysdbasqlplus sys/Violin#1@lxc1-scan.gns1.vmem.org:1521/VMEM1 as sysdba
 
   /home/gstanden/Downloads/orabuntu-lxc-master/create-scst-4b.sh
 
@@ -144,6 +144,17 @@ Run the create-scst-*.sh files in the order shown below.
 Once all these scripts have run the SCST SAN and LUNs will be ready for the Oracle Grid Infrastructure 12c install
 
 Follow the instructions at the Google Sites page referenced above.
+
+!!!==============================
+
+Phase 3:  Administration of the LXC containers and the Oracle database and ASM
+
+Connect to the containerized Oracle instances from your Ubuntu 15.x OS terminal using the following example strings after first installing Oracle Instantclient to Ubuntu 15.x using the instructions here:
+
+https://sites.google.com/site/nandydandyoracle/technologies/lxc/docker-11gr2-ee-ul (installing instantclient subsection)
+
+sqlplus sys/password@lxc1-scan.gns1.vmem.org:1521/VMEM1 as sysdba  (for sys connection)
+sqlplus system/password@lxc1-scan.gns1.vmem.org:1521/VMEM1         (for system connection)
 
 # NOTE:  I am working to fix the hardcoded 'gstanden' problem.
 
