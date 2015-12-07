@@ -28,7 +28,7 @@ https://sites.google.com/site/nandydandyoracle/technologies/lxc/oracle-rac-6-nod
 
 Due to sloppy hardcoded references to "/home/gstanden" etc. in the scripting, please read the following carefully:
 
-Due to some script which references the 'gstanden' Ubuntu OS account, this version of the scripts must be run while logged in as the 'gstanden' user and must be run from the /home/gstanden/Downloads directory.
+Due to some script which references the 'gstanden' Ubuntu OS account, this version of the scripts must be run while logged in as the 'gstanden' user and must be run from the /home/gstanden/Downloads/orabuntu-lxc-master directory.
 
 There are two ways to address this hardcoding references problem.  
 
