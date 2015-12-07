@@ -8,7 +8,7 @@ The Oracle Enterprise Edition 6.5 LXC Linux containers run at bare metal resourc
 
 Install on a FRESH INSTALL of 15.04 or 15.10 ONLY. I have not bulletproofed this for install on "been-running-for-awhile" deployments of Ubuntu.  It could overwrite stuff so review the scripts VERY carefully first if you are going to put this on an Ubuntu 15.x that you have been using for a long time that is already customized. 
 
-I have NOT tested this yet on Ubuntu 12.x, 13.x, or 14.x (tests and validation coming soon for these versions!)
+I have NOT tested this yet on Ubuntu 12.x, 13.x, or 14.x          (tests and validation coming soon for these versions!)
 
 NOTE:  My email is gilstanden@hotmail.com if you hit bugs or issues or have questions!
 
