@@ -1,10 +1,10 @@
 # orabuntu-lxc
 Oracle Enterprise Edition Software on Ubuntu Linux using LXC Containers.
-This software runs Oracle Enteprise Edition RAC database on Ubuntu 15.04 or 15.10 64-bit Desktop Edition using Oracle Enteprise Linux 6.5 LXC Containers.
+This software runs Oracle Enteprise Edition RAC database on Ubuntu 15.04 or 15.10 64-bit Desktop Edition using Oracle Enteprise Linux 6.5 LXC Containers.  Additional instructions for install an Oracle 12c (12.1.0.2.0) RAC ASM Flex Cluster using GNS are provided at the 'nandydandyoracle' website.
 
 Why Linux Containers ?
 
-The Oracle Enterprise Edition 6.5 LXC Linux containers run at bare metal resource utilization for network, storage, and CPU with NO hypervisor performance penalty.  That is because LXC does NOT use a hypervisor.  Every container access all computer resources at bare-metal utilization.  Also, because there is NO hypervisor, LXC Linux containers achieve 10x the density of hypervisor-based systems per unit compute resource.  Because LXC Linux containers deploy in seconds instead of hours or days, LXC Linux containers also achieve huge improvements in elasticity, because they can be spun up in seconds as needed.  
+The Oracle Enterprise Edition 6.5 LXC Linux containers run at bare metal resource utilization for network, storage, and CPU with NO hypervisor performance penalty.  That is because LXC does NOT use a hypervisor.  Every container accesses all computer resources at bare-metal utilization.  Also, because there is NO hypervisor, LXC Linux containers achieve 10x the density of hypervisor-based systems per unit compute resource.  Because LXC Linux containers deploy in seconds instead of hours or days, LXC Linux containers also achieve huge improvements in elasticity compated to hypervisor-based systems, because they can be spun up in seconds as needed.  
 
 Install on a FRESH INSTALL of 15.04 or 15.10 ONLY. I have not bulletproofed this for install on "been-running-for-awhile" deployments of Ubuntu.  It could overwrite stuff so review the scripts VERY carefully first if you are going to put this on an Ubuntu 15.x that you have been using for a long time that is already customized. 
 
@@ -30,6 +30,8 @@ https://sites.google.com/site/nandydandyoracle/technologies/lxc/oracle-rac-6-nod
 !!! IMPORTANT PLEASE READ !!!
 =============================
 
+Phase 1:  Create the LXC Oracle Enteprise Linux 6.5 containers
+
 To install:
 
 1. Download the zip file from https://github.com/gstanden/orabuntu-lxc to your ~/Downloads directory on Ubuntu 15.x
@@ -52,7 +54,7 @@ About the ubuntu-services-0.sh script
 
 !!! =============================
 
-Update 2015-12-06:  There are no reboots anymore. 
+Update 2015-12-06:  There are no reboots anymore. All the scripts run one after the other until completion with no reboot.
 
   /home/gstanden/Downloads/orabuntu-lxc-master/ubuntu-services.sh
   
