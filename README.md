@@ -30,6 +30,8 @@ https://sites.google.com/site/nandydandyoracle/technologies/lxc/oracle-rac-6-nod
 !!! IMPORTANT PLEASE READ !!!
 =============================
 
+Phase 1:  Create the LXC Oracle Enteprise Linux 6.5 containers
+
 To install:
 
 1. Download the zip file from https://github.com/gstanden/orabuntu-lxc to your ~/Downloads directory on Ubuntu 15.x
