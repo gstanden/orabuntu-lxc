@@ -133,7 +133,7 @@ Run the create-scst-*.sh files in the order shown below.
 
   /home/gstanden/Downloads/orabuntu-lxc-master/create-scst-3.sh
 
-  /home/gstanden/Downloads/orabuntu-lxc-master/create-scst-4a.shsqlplus sys/Violin#1@lxc1-scan.gns1.vmem.org:1521/VMEM1 as sysdbasqlplus sys/Violin#1@lxc1-scan.gns1.vmem.org:1521/VMEM1 as sysdba
+  /home/gstanden/Downloads/orabuntu-lxc-master/create-scst-4a.sh
 
   /home/gstanden/Downloads/orabuntu-lxc-master/create-scst-4b.sh
 
