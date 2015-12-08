@@ -127,29 +127,31 @@ cd scst-files
 
 Run the create-scst-*.sh files in the order shown below.
 
-  /home/gstanden/Downloads/orabuntu-lxc-master/create-scst-1a.sh
+  /home/gstanden/Downloads/orabuntu-lxc-master/scst-files/create-scst-1a.sh
 
-  /home/gstanden/Downloads/orabuntu-lxc-master/create-scst-1b.sh
+  /home/gstanden/Downloads/orabuntu-lxc-master/scst-files/create-scst-1b.sh
 
-  /home/gstanden/Downloads/orabuntu-lxc-master/create-scst-1c.sh
+  /home/gstanden/Downloads/orabuntu-lxc-master/scst-files/create-scst-1c.sh
 
-  /home/gstanden/Downloads/orabuntu-lxc-master/create-scst-1d.sh
+  /home/gstanden/Downloads/orabuntu-lxc-master/scst-files/create-scst-1d.sh
 
-  /home/gstanden/Downloads/orabuntu-lxc-master/create-scst-2a.sh (host will reboot into new SCST kernel at end of script)
+  /home/gstanden/Downloads/orabuntu-lxc-master/scst-files/create-scst-2a.sh (host reboots into SCST kernel at script end)
 
-  /home/gstanden/Downloads/orabuntu-lxc-master/create-scst-2b.sh
+  /home/gstanden/Downloads/orabuntu-lxc-master/scst-files/create-scst-2b.sh
 
-  /home/gstanden/Downloads/orabuntu-lxc-master/create-scst-3.sh
+  /home/gstanden/Downloads/orabuntu-lxc-master/scst-files/create-scst-3.sh
 
-  /home/gstanden/Downloads/orabuntu-lxc-master/create-scst-4a.sh
+  /home/gstanden/Downloads/orabuntu-lxc-master/scst-files/create-scst-4a.sh
 
-  /home/gstanden/Downloads/orabuntu-lxc-master/create-scst-4b.sh
+  /home/gstanden/Downloads/orabuntu-lxc-master/scst-files/create-scst-4b.sh
 
-  /home/gstanden/Downloads/orabuntu-lxc-master/create-scst-5a.sh
+  /home/gstanden/Downloads/orabuntu-lxc-master/scst-files/create-scst-5a.sh
 
-  /home/gstanden/Downloads/orabuntu-lxc-master/create-scst-5b.sh (host will reboot after this script).
+  /home/gstanden/Downloads/orabuntu-lxc-master/scst-files/create-scst-5b.sh (host reboots at script end)
 
-Once all these scripts have run the SCST SAN and LUNs will be ready for the Oracle Grid Infrastructure 12c install
+Once all these scripts have run the SCST SAN and LUNs will be ready for the Oracle Grid Infrastructure 12c install.
+
+NOTE:  If you are going to create an Oracle RAC database, then you will need to login to the LXC container as the 'grid' user and run 'asmca' in the usual way and create the '+DATA' and '+FRA' diskgroups for the database before doing the Oracle database install.
 
 Follow the instructions at the Google Sites page referenced above.
 
