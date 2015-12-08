@@ -113,8 +113,6 @@ which of course will actually refer to a /dev/dm- device.  If you are on Ubuntu 
 
 gstanden@W1504:~$ ls -l /dev/mapper
 
-total 0
-
 brw-rw---- 1 grid asmadmin 252,   2 Dec  8 11:29 asm_fra1_01
 
 lrwxrwxrwx 1 grid asmadmin        7 Dec  8 11:07 asm_fra1_02 -> ../dm-5
