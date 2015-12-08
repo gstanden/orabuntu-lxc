@@ -111,17 +111,17 @@ IMPORTANT:  Whatever storage solution you use, your storage LUNs will appear in 
 
 which of course will actually refer to a /dev/dm- device.  If you are on Ubuntu 15.10, the storage will be a symlink in /dev/mapper to the /dev/dm-* device, or, if you are on Ubuntu 15.04 the storage will 'usually' be a device node (no symlink) in /dev/mapper but note that in Ubuntu 15.04 the disposition of multipath storage in /dev/mapper can sometimes be a mix of device nodes and symlinks as shown for example below:
 
-gstanden@W1504:~$ ls -l /dev/mapper
-total 0
-brw-rw---- 1 grid asmadmin 252,   1 Dec  8 11:29 asm_data1_00
-brw-rw---- 1 grid asmadmin 252,   7 Dec  8 11:29 asm_data1_01
-brw-rw---- 1 grid asmadmin 252,   8 Dec  8 11:29 asm_data1_02
-brw-rw---- 1 grid asmadmin 252,   6 Dec  8 11:29 asm_fra1_00
-brw-rw---- 1 grid asmadmin 252,   2 Dec  8 11:29 asm_fra1_01
-lrwxrwxrwx 1 grid asmadmin        7 Dec  8 11:07 asm_fra1_02 -> ../dm-5
-brw-rw---- 1 grid asmadmin 252,   3 Dec  8 11:29 asm_systemdg_00
-brw-rw---- 1 grid asmadmin 252,   0 Dec  8 11:29 asm_systemdg_01
-brw-rw---- 1 grid asmadmin 252,   4 Dec  8 11:29 asm_systemdg_02
+> gstanden@W1504:~$ ls -l /dev/mapper
+> total 0
+> brw-rw---- 1 grid asmadmin 252,   1 Dec  8 11:29 asm_data1_00
+> brw-rw---- 1 grid asmadmin 252,   7 Dec  8 11:29 asm_data1_01
+> brw-rw---- 1 grid asmadmin 252,   8 Dec  8 11:29 asm_data1_02
+> brw-rw---- 1 grid asmadmin 252,   6 Dec  8 11:29 asm_fra1_00
+> brw-rw---- 1 grid asmadmin 252,   2 Dec  8 11:29 asm_fra1_01
+> lrwxrwxrwx 1 grid asmadmin        7 Dec  8 11:07 asm_fra1_02 -> ../dm-5
+> brw-rw---- 1 grid asmadmin 252,   3 Dec  8 11:29 asm_systemdg_00
+> brw-rw---- 1 grid asmadmin 252,   0 Dec  8 11:29 asm_systemdg_01
+> brw-rw---- 1 grid asmadmin 252,   4 Dec  8 11:29 asm_systemdg_02
 
 NOTE:  The orabuntu-lxc software can handle both (a) actual device nodes in /dev/mapper and (b) symlinks in /dev/mapper and so mixtures of both device nodes and symlinks is fine.  The only requirement for my scripting is that the storage for Oracle in /dev/mapper have the 'asm*' prefix.
 
