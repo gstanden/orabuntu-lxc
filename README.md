@@ -115,25 +115,11 @@ gstanden@W1504:~$ ls -l /dev/mapper
 
 total 0
 
-brw-rw---- 1 grid asmadmin 252,   1 Dec  8 11:29 asm_data1_00
-
-brw-rw---- 1 grid asmadmin 252,   7 Dec  8 11:29 asm_data1_01
-
-brw-rw---- 1 grid asmadmin 252,   8 Dec  8 11:29 asm_data1_02
-
-brw-rw---- 1 grid asmadmin 252,   6 Dec  8 11:29 asm_fra1_00
-
 brw-rw---- 1 grid asmadmin 252,   2 Dec  8 11:29 asm_fra1_01
 
 lrwxrwxrwx 1 grid asmadmin        7 Dec  8 11:07 asm_fra1_02 -> ../dm-5
 
-brw-rw---- 1 grid asmadmin 252,   3 Dec  8 11:29 asm_systemdg_00
-
-brw-rw---- 1 grid asmadmin 252,   0 Dec  8 11:29 asm_systemdg_01
-
-brw-rw---- 1 grid asmadmin 252,   4 Dec  8 11:29 asm_systemdg_02
-
-NOTE:  The orabuntu-lxc software can handle both (a) actual device nodes in /dev/mapper and (b) symlinks in /dev/mapper and so mixtures of both device nodes and symlinks is fine.  The only requirement for my scripting is that the storage for Oracle in /dev/mapper have the 'asm*' prefix.
+NOTE:  The orabuntu-lxc software can handle both (a) actual device nodes in /dev/mapper and (b) symlinks in /dev/mapper and so mixtures of both device nodes and symlinks is fine.  The only requirement for my scripting is that the storage for Oracle in /dev/mapper have the 'asm*' prefix.  Both of the above forms of storage presentation in /dev/mapper (symlink or device node or mixtures of both) are fine no problems.
 
 UPDATE 2015-12-07:  You can now run the SCST setup scripts from '/home/gstanden/Downloads/orabuntu-lxc-master/scst-files/' directory!  
 
