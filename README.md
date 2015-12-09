@@ -49,47 +49,35 @@ To install:
 
 !!! =============================
 
-About the ubuntu-services-0.sh script.
-
-The ubuntu-services-0.sh script is used if you have already installed Ubuntu 15.x and do not have a 'gstanden' user.  The 'gstanden' user is atm necessary for installing this software due to some hardcoded username-dependent poor coding which I am working to fix but is not fixed yet.  Therefore, use the ubuntu-services-0.sh script to get the orabuntu-lxc software and also to create the 'gstanden' user which is used for the install and to grant 'sudo' privilege to the 'gstanden' account which is needed for the install.
- 
-  /home/your-username/Downloads/orabuntu-lxc-master/ubuntu-services-0.sh 
-
-  This creates the 'gstanden' account. 
-
-  This is a fix for sloppy hardcoding.
-
-!!! =============================
-
 About the ubuntu-services.sh script.
 
 Update 2015-12-06:  There are no reboots anymore. All the scripts run one after the other until completion with no reboot.
 
-  /home/gstanden/Downloads/orabuntu-lxc-master/ubuntu-services.sh
+  ~/Downloads/orabuntu-lxc-master/ubuntu-services.sh
   
 The ubuntu-services.sh script is a master script which runs all of the below scripts automatically.  Note that all of the scripts are individually re-runnable, and the whole set of scripts is also re-runnable, so if you have a failure of one script for any reason, just fix the problem, and re-run that script.  If you want to re-run the whole set of scripts, just re-run ubuntu-services.sh again to re-run them all.  Note also the ubuntu-services-3c.sh takes a parameter integer that is the number of containers to create.  Edit ubuntu-services.sh to set the parameter for ubuntu-services-3c.sh.
 
 !!! =============================
 
-UPDATE:  You just run the file '/home/gstanden/Downloads/orabuntu-lxc-master/ubuntu-services.sh' to do the install.
+UPDATE:  You just run the file '~/Downloads/orabuntu-lxc-master/ubuntu-services.sh' to do the install.
 
 !!! =============================
 
   This is where the software proper begins.
 
-  /home/gstanden/Downloads/orabuntu-lxc-master/ubuntu-services-1.sh
+  ~/Downloads/orabuntu-lxc-master/ubuntu-services-1.sh
 
-  /home/gstanden/Downloads/orabuntu-lxc-master/ubuntu-services-2a.sh
+  ~/Downloads/orabuntu-lxc-master/ubuntu-services-2a.sh
 
-  /home/gstanden/Downloads/orabuntu-lxc-master/ubuntu-services-2b.sh
+  ~/Downloads/orabuntu-lxc-master/ubuntu-services-2b.sh
 
-  /home/gstanden/Downloads/orabuntu-lxc-master/ubuntu-services-3a.sh
+  ~/Downloads/orabuntu-lxc-master/ubuntu-services-3a.sh
 
-  /home/gstanden/Downloads/orabuntu-lxc-master/ubuntu-services-3b.sh
+  ~/Downloads/orabuntu-lxc-master/ubuntu-services-3b.sh
 
-  /home/gstanden/Downloads/orabuntu-lxc-master/ubuntu-services-3c.sh X  {where X is an integer between 1 and 99}
+  ~/Downloads/orabuntu-lxc-master/ubuntu-services-3c.sh X  {where X is an integer between 1 and 99}
 
-  /home/gstanden/Downloads/orabuntu-lxc-master/ubuntu-services-3d.sh
+  ~/Downloads/orabuntu-lxc-master/ubuntu-services-3d.sh
 
 The above steps will create the Oracle Enterprise Edition 6.5 LXC Oracle-enterprise-edition RAC-ready containers.
 
@@ -121,7 +109,7 @@ lrwxrwxrwx 1 grid asmadmin        7 Dec  8 11:07 asm_fra1_02 -> ../dm-5
 
 NOTE:  The orabuntu-lxc software can handle both (a) actual device nodes in /dev/mapper and (b) symlinks in /dev/mapper and so mixtures of both device nodes and symlinks is fine.  The only requirement for my scripting is that the storage for Oracle in /dev/mapper have the 'asm*' prefix.  Both of the above forms of storage presentation in /dev/mapper (symlink or device node or mixtures of both) are fine no problems.
 
-UPDATE 2015-12-07:  You can now run the SCST setup scripts from '/home/gstanden/Downloads/orabuntu-lxc-master/scst-files/' directory!  
+UPDATE 2015-12-07:  You can now run the SCST setup scripts from '~/Downloads/orabuntu-lxc-master/scst-files/' directory!  
 
 tar -xvf scst-files.tar
 
@@ -129,27 +117,27 @@ cd scst-files
 
 Run the create-scst-*.sh files in the order shown below.
 
-  /home/gstanden/Downloads/orabuntu-lxc-master/scst-files/create-scst-1a.sh
+  ~/Downloads/orabuntu-lxc-master/scst-files/create-scst-1a.sh
 
-  /home/gstanden/Downloads/orabuntu-lxc-master/scst-files/create-scst-1b.sh
+  ~/Downloads/orabuntu-lxc-master/scst-files/create-scst-1b.sh
 
-  /home/gstanden/Downloads/orabuntu-lxc-master/scst-files/create-scst-1c.sh
+  ~/Downloads/orabuntu-lxc-master/scst-files/create-scst-1c.sh
 
-  /home/gstanden/Downloads/orabuntu-lxc-master/scst-files/create-scst-1d.sh
+  ~/Downloads/orabuntu-lxc-master/scst-files/create-scst-1d.sh
 
-  /home/gstanden/Downloads/orabuntu-lxc-master/scst-files/create-scst-2a.sh (host reboots into SCST kernel at script end)
+  ~/Downloads/orabuntu-lxc-master/scst-files/create-scst-2a.sh (host reboots into SCST kernel at script end)
 
-  /home/gstanden/Downloads/orabuntu-lxc-master/scst-files/create-scst-2b.sh
+  ~/Downloads/orabuntu-lxc-master/scst-files/create-scst-2b.sh
 
-  /home/gstanden/Downloads/orabuntu-lxc-master/scst-files/create-scst-3.sh
+  ~/Downloads/orabuntu-lxc-master/scst-files/create-scst-3.sh
 
-  /home/gstanden/Downloads/orabuntu-lxc-master/scst-files/create-scst-4a.sh
+  ~/Downloads/orabuntu-lxc-master/scst-files/create-scst-4a.sh
 
-  /home/gstanden/Downloads/orabuntu-lxc-master/scst-files/create-scst-4b.sh
+  ~/Downloads/orabuntu-lxc-master/scst-files/create-scst-4b.sh
 
-  /home/gstanden/Downloads/orabuntu-lxc-master/scst-files/create-scst-5a.sh
+  ~/Downloads/orabuntu-lxc-master/scst-files/create-scst-5a.sh
 
-  /home/gstanden/Downloads/orabuntu-lxc-master/scst-files/create-scst-5b.sh (host reboots at script end)
+  ~/Downloads/orabuntu-lxc-master/scst-files/create-scst-5b.sh (host reboots at script end)
 
 Once all these scripts have run the SCST SAN and LUNs will be ready for the Oracle Grid Infrastructure 12c install.
 
@@ -182,5 +170,7 @@ sudo lxc-ls -f
 NOTE:  I will be adding the instantclient install to the scripted solution soon.
 
 NOTE:  I am working to fix the hardcoded 'gstanden' problem.
+
+UPDATE: 20151208 hardcoded 'gstanden' problem FIXED! yay.  You can now install the orabuntu-lxc from any Ubuntu user account that has the 'sudo' privilege which is to say any install user account created when the Ubuntu OS was installed. 
 
 
