@@ -27,7 +27,6 @@ ls "$ContainerBaseName"00* | more | grep "$1" | sed 's/$/ /' | tr -d '\n'
 FileNames=$(GetFileNames)
 OffsetContainerCount=$((ContainerCount+10))
 echo $OffsetContainerCount
-sleep 1
 
 let n=10
 	for i in $FileNames
@@ -35,7 +34,6 @@ let n=10
 		while [ $n -le $OffsetContainerCount ]
 		do
 		echo $i
-		sleep 1
 		function NewFileNames {
 		echo $i | sed "s/$ContainerBaseName/$ContainerBaseName$n/" | sed 's/00//'
 		}

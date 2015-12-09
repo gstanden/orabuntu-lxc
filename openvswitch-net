@@ -1,0 +1,22 @@
+#!/bin/sh
+# openvswitch-net - Start OpenvSwitch
+#
+
+# description	"Start OpenvSwitch Switches"
+
+# start on net-device-up
+
+# task
+
+# script
+~/OpenvSwitch/crt_ovs_sx1.sh 2>&1 > ~/OpenvSwitch/crt_ovs_sx1.log
+~/OpenvSwitch/crt_ovs_sw1.sh 2>&1 > ~/OpenvSwitch/crt_ovs_sw1.log
+~/OpenvSwitch/crt_ovs_sw2.sh 2>&1 > ~/OpenvSwitch/crt_ovs_sw2.log
+~/OpenvSwitch/crt_ovs_sw3.sh 2>&1 > ~/OpenvSwitch/crt_ovs_sw3.log
+~/OpenvSwitch/crt_ovs_sw4.sh 2>&1 > ~/OpenvSwitch/crt_ovs_sw4.log
+~/OpenvSwitch/crt_ovs_sw5.sh 2>&1 > ~/OpenvSwitch/crt_ovs_sw5.log
+~/OpenvSwitch/crt_ovs_sw6.sh 2>&1 > ~/OpenvSwitch/crt_ovs_sw6.log
+~/OpenvSwitch/crt_ovs_sw7.sh 2>&1 > ~/OpenvSwitch/crt_ovs_sw7.log
+~/OpenvSwitch/crt_ovs_sw8.sh 2>&1 > ~/OpenvSwitch/crt_ovs_sw8.log
+~/OpenvSwitch/crt_ovs_sw9.sh 2>&1 > ~/OpenvSwitch/crt_ovs_sw9.log
+# end script

@@ -13,225 +13,31 @@ echo "This script is re-runnable                  "
 echo "============================================"
 echo ''
 
-# ssh-add > /dev/null 2>&1
+sleep 5
+
+sudo ovs-vsctl del-br sw1 >/dev/null 2>&1
+sudo ovs-vsctl del-br sw2 >/dev/null 2>&1
+sudo ovs-vsctl del-br sw3 >/dev/null 2>&1
+sudo ovs-vsctl del-br sw4 >/dev/null 2>&1
+sudo ovs-vsctl del-br sw5 >/dev/null 2>&1
+sudo ovs-vsctl del-br sw6 >/dev/null 2>&1
+sudo ovs-vsctl del-br sw7 >/dev/null 2>&1
+sudo ovs-vsctl del-br sw8 >/dev/null 2>&1
+sudo ovs-vsctl del-br sw9 >/dev/null 2>&1
+sudo ovs-vsctl del-br sx1 >/dev/null 2>&1
+
+sudo /etc/network/if-up.d/openvswitch-net
+
+sudo service bind9 stop
+sudo service bind9 start
+
+sudo service isc-dhcp-server stop
 
 sleep 5
 
-# GLS 20151127 New test for bind9 status.  Terminates script if bind9 status is not valid.
+sudo service isc-dhcp-server start
 
-# function GetBindStatus {
-# sudo service bind9 status | grep Active | cut -f1-6 -d' ' | sed 's/ *//g'
-# }
-# BindStatus=$(GetBindStatus)
-
-# clear
-
-# echo ''
-# echo "============================================"
-# echo "Checking status of bind9 DNS...             "
-# echo "============================================"
-
-# if [ $BindStatus != 'Active:active(running)' ]
-# then
-# 	echo ''
-# 	echo "Bind9 is NOT RUNNING with correct status of:  Active: active (running)"
-# 	echo ''
-# 	echo "============================================"
-# 	echo "Bind9 DNS status ...                        "
-# 	echo "============================================"
-# 	echo ''
-# 	sudo service bind9 status
-# 	echo ''
-# 	echo "============================================"
-# 	echo "Bind9 DNS status incorrect.                  "
-# 	echo "============================================"
-# 	sleep 5
-# 	echo ''
-# 	echo "============================================"
-# 	echo "!! FIX PROBLEM with bind9 and retry script. "
-# 	echo "============================================"
-# 	echo ''
-# 	exit
-# else
-# 	echo ''
-# 	echo "Bind9 is RUNNING with correct status of:  Active: active (running)"
-# 	echo ''
-# 	echo "============================================"
-# 	echo "Bind9 DNS status ...                        "
-# 	echo "============================================"
-# 	echo ''
-# 	sudo service bind9 status
-# 	echo ''
-# 	echo "============================================"
-# 	echo "Bind9 DNS status complete.                  "
-# 	echo "============================================"
-# 	sleep 5
-# 	echo ''
-# 	echo "============================================"
-# 	echo "Continuing with script execution.           "
-# 	echo "============================================"
-# fi
-
-# echo ''
-# echo "============================================"
-# echo "Status check of bind9 DNS completed.        "
-# echo "============================================"
-# echo ''
-
-# GLS 20151127 New test for bind9 status.  Terminates script if bind9 status is not valid.
-
-# GLS 20151127 New DHCP server checks.  Terminates script if DHCP status is invalid.
-
-# clear
-
-# function GetDHCPStatus {
-# sudo service isc-dhcp-server status | grep Active | cut -f1-6 -d' ' | sed 's/ *//g'
-# }
-# DHCPStatus=$(GetDHCPStatus)
-
-# echo ''
-# echo "============================================"
-# echo "Checking status of DHCP...                  "
-# echo "============================================"
-
-# if [ $DHCPStatus != 'Active:active(running)' ]
-# then
-# 	echo ''
-# 	echo "DHCP is NOT RUNNING with correct status of:  Active: active (running)"
-# 	echo ''
-# 	echo "============================================"
-# 	echo "DHCP status ...                             "
-# 	echo "============================================"
-# 	echo ''
-# 	sudo service isc-dhcp-server status
-# 	echo ''
-# 	echo "============================================"
-##  	echo "DHCP status incorrect.                      "
-# 	echo "============================================"
-# 	sleep 5
-# 	echo ''
-# 	echo "============================================"
-# 	echo "!! FIX PROBLEM with DHCP and retry script.  "
-# 	echo "============================================"
-# 	echo ''
-# 	exit
-# else
-# 	echo ''
-# 	echo "DHCP is RUNNING with correct status of:  Active: active (running)"
-# 	echo ''
-# 	echo "============================================"
-# 	echo "DHCP status ...                             "
-# 	echo "============================================"
-# 	echo ''
-# 	sudo service isc-dhcp-server status
-# 	echo ''
-# 	echo "============================================"
-# 	echo "DHCP status complete.                       "
-# 	echo "============================================"
-# 	sleep 5
-# 	echo ''
-# 	echo "============================================"
-# 	echo "Continuing with script execution.           "
-# 	echo "============================================"
-# fi
-
-# echo ''
-# echo "============================================"
-# echo "Status check of DHCP completed.        "
-# echo "============================================"
-# echo ''
-
-# GLS 20151128 New DHCP status check end.
-
-# GLS 20151128 Google ping test start.
-
-# clear
-
-# echo ''
-# echo "============================================"
-# echo "Begin google.com ping test...               "
-# echo "============================================"
-# echo ''
-
-# ping -c 3 google.com
-
-# echo ''
-# echo "============================================"
-# echo "End google.com ping test                    "
-# echo "============================================"
-# echo ''
-
-# sleep 3
-
-# clear
-
-# function CheckNetworkUp {
-# ping -c 1 google.com | grep 'packet loss' | cut -f1 -d'%' | cut -f6 -d' ' | sed 's/^[ \t]*//;s/[ \t]*$//'
-# }
-# NetworkUp=$(CheckNetworkUp)
-
-# echo $NetworkUp
-
-# if [ "$NetworkUp" -ne 0 ]
-# then
-# echo ''
-# echo "============================================"
-# echo "Destination google.com is not pingable      "
-# echo "Address network issues and retry script     "
-# echo "Script exiting                              "
-# echo "============================================"
-# echo ''
-# exit
-# fi
-
-# clear
-
-# echo ''
-# echo "============================================"
-# echo "DNS nslookup test...                        "
-# echo "============================================"
-# echo ''
-
-# function GetLookup {
-# nslookup vmem1 | grep 10.207.39.1 | sed 's/\.//g' | sed 's/: //g'
-# }
-# Lookup=$(GetLookup)
-
-# if [ $Lookup != 'Address10207391' ]
-# then
-# 	echo ''
-# 	echo "DNS Lookups NOT working."
-# 	echo ''
-# 	echo "============================================"
-# 	echo "DNS lookups status ...                             "
-# 	echo "============================================"
-# 	nslookup vmem1
-# 	echo ''
-# 	echo "============================================"
-# 	echo "!! FIX PROBLEM with DNS and retry script.  "
-# 	echo "============================================"
-# 	exit
-# else
-# 	echo ''
-# 	echo "DNS Lookups are working properly."
-# 	echo ''
-# 	echo "============================================"
-# 	echo "DNS Lookup ...                             "
-# 	echo "============================================"
-# 	nslookup vmem1
-# 	echo ''
-# 	echo "============================================"
-##  	echo "Continuing with script execution.           "
-# 	echo "============================================"
-# fi
-
-# echo ''
-# echo "============================================"
-# echo "Status check of DNS Lookups completed.      "
-# echo "============================================"
-# echo ''
-
-sleep 5
+sudo lxc-start -n lxcora0
 
 clear
 
@@ -244,10 +50,10 @@ cd /etc/network/if-up.d/openvswitch
 sudo sed -i 's/lxcora01/lxcora0/' /var/lib/lxc/lxcora0/config
 
 sudo lxc-start -n lxcora0 > /dev/null 2>&1
-# sleep 10
-# sudo lxc-stop -n  lxcora0 > /dev/null 2>&1
-# sleep 10
-# sudo lxc-start -n lxcora0 > /dev/null 2>&1
+sleep 10
+sudo lxc-stop -n  lxcora0 > /dev/null 2>&1
+sleep 10
+sudo lxc-start -n lxcora0 > /dev/null 2>&1
 
 function CheckContainerUp {
 sudo lxc-ls -f | grep lxcora0 | sed 's/  */ /g' | egrep 'RUNNING|STOPPED'  | cut -f2 -d' '

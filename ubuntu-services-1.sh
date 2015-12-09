@@ -166,6 +166,7 @@ sudo apt-get install -y ntp
 sudo apt-get install -y iotop
 sudo apt-get install -y flashplugin-installer
 sudo apt-get install -y sshpass
+sudo apt-get install -y gawk
 
 sudo aa-complain /usr/bin/lxc-start
 
@@ -234,6 +235,24 @@ echo "==============================================="
 sleep 5
 
 sudo tar -P -xvf ubuntu-host.tar
+
+# sudo tar -vP --extract --file=ubuntu-host.tar /home/gstanden/OpenvSwitch/crt_ovs_sw1.sh
+# sudo tar -vP --extract --file=ubuntu-host.tar /home/gstanden/OpenvSwitch/crt_ovs_sw2.sh
+# sudo tar -vP --extract --file=ubuntu-host.tar /home/gstanden/OpenvSwitch/crt_ovs_sw3.sh
+# sudo tar -vP --extract --file=ubuntu-host.tar /home/gstanden/OpenvSwitch/crt_ovs_sw4.sh
+# sudo tar -vP --extract --file=ubuntu-host.tar /home/gstanden/OpenvSwitch/crt_ovs_sw5.sh
+# sudo tar -vP --extract --file=ubuntu-host.tar /home/gstanden/OpenvSwitch/crt_ovs_sw6.sh
+# sudo tar -vP --extract --file=ubuntu-host.tar /home/gstanden/OpenvSwitch/crt_ovs_sw7.sh
+# sudo tar -vP --extract --file=ubuntu-host.tar /home/gstanden/OpenvSwitch/crt_ovs_sw8.sh
+# sudo tar -vP --extract --file=ubuntu-host.tar /home/gstanden/OpenvSwitch/crt_ovs_sw9.sh
+# sudo tar -vP --extract --file=ubuntu-host.tar /home/gstanden/OpenvSwitch/crt_ovs_sx1.sh
+
+sudo mv /home/gstanden/OpenvSwitch/* ~/OpenvSwitch/.
+
+sudo rm -rf /home/gstanden
+
+sudo cp -p ~/Downloads/orabuntu-lxc-master/openvswitch-net /etc/network/if-up.d/.
+sudo chown root:root /etc/network/if-up.d/openvswitch-net
 
 sudo cp -p ~/Downloads/orabuntu-lxc-master/rc.local.ubuntu.host /etc/rc.local
 sudo chown root:root /etc/rc.local
