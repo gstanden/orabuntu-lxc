@@ -44,7 +44,6 @@ To install:
 3. Change directory to ~/Downloads/orabuntu-lxc-master
 4. Edit the script ubuntu-services.sh to tell ubuntu-services-3c.sh how many oracle-ready containers you want to create.
 5. Run ONLY on fresh install of Ubuntu 15.04 or 15.10 !
-6. Run as the "gstanden" user (Fix is coming for this problem.  For now, you must create a "gstanden" account for the install)
 6. Run the script ~/Downloads/orabuntu-lxc-master/ubuntu-services.sh (note, it's a fully-automated, non-interactive script).
 
 !!! =============================
