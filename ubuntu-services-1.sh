@@ -166,7 +166,6 @@ sudo apt-get install -y ntp
 sudo apt-get install -y iotop
 sudo apt-get install -y flashplugin-installer
 sudo apt-get install -y sshpass
-sudo apt-get install -y gawk
 
 sudo aa-complain /usr/bin/lxc-start
 
@@ -208,6 +207,8 @@ sudo service multipath-tools stop
 ~/Downloads/orabuntu-lxc-master/ubuntu-host-backup-1a.sh
 
 # Check existing file backups to be sure they were made successfully
+
+echo ''
 echo "==============================================="
 echo "Checking existing file backups before writing  "
 echo "===============================================" 
@@ -247,7 +248,9 @@ sudo tar -P -xvf ubuntu-host.tar
 # sudo tar -vP --extract --file=ubuntu-host.tar /home/gstanden/OpenvSwitch/crt_ovs_sw9.sh
 # sudo tar -vP --extract --file=ubuntu-host.tar /home/gstanden/OpenvSwitch/crt_ovs_sx1.sh
 
-sudo mv /home/gstanden/OpenvSwitch/* ~/OpenvSwitch/.
+sudo mkdir -p /etc/network/openvswitch
+
+sudo mv /home/gstanden/OpenvSwitch/* ~/etc/network/openvswitch/.
 
 sudo rm -rf /home/gstanden
 
