@@ -170,6 +170,6 @@ NOTE:  I will be adding the instantclient install to the scripted solution soon.
 
 NOTE:  I am working to fix the hardcoded 'gstanden' problem.
 
-UPDATE: 20151208 hardcoded 'gstanden' problem FIXED! yay.  You can now install the orabuntu-lxc from any Ubuntu user account that has the 'sudo' privilege which is to say any install user account created when the Ubuntu OS was installed. 
+UPDATE: 20151208 hardcoded 'gstanden' problem FIXED! yay.  You can now install the orabuntu-lxc from any Ubuntu user account that has the 'sudo' privilege which is to say any install user account created when the Ubuntu OS was installed, or from any new account that you create as long as it has been granted the sudo privilege. 
 
 
