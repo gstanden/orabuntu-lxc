@@ -5,7 +5,7 @@ Any Oracle on Any Linux at bare-metal resource utilization with density and elas
 Oracle Enterprise Edition Software on Ubuntu Linux using LXC Containers.
 This software runs Oracle Enteprise Edition RAC database on Ubuntu 15.04 or 15.10 64-bit Desktop Edition using Oracle Enteprise Linux 6.5 LXC Containers.  Additional instructions for an install of Oracle 12c (12.1.0.2.0) RAC ASM Flex Cluster using GNS are provided at the 'nandydandyoracle' website ( https://sites.google.com/site/nandydandyoracle ).
 
-Think of orabuntu-lxc as, among other things, a sort of Oracle Enterprise Linux 'emulation layer' for Ubuntu Linux.
+One can think of orabuntu-lxc as a sort of Oracle Enterprise Linux 'emulation layer' for Ubuntu Linux, although it is much more than just that.
 
 Why Linux Containers ?
 
@@ -44,7 +44,6 @@ To install:
 3. Change directory to ~/Downloads/orabuntu-lxc-master
 4. Edit the script ubuntu-services.sh to tell ubuntu-services-3c.sh how many oracle-ready containers you want to create.
 5. Run ONLY on fresh install of Ubuntu 15.04 or 15.10 !
-6. Run as the "gstanden" user (Fix is coming for this problem.  For now, you must create a "gstanden" account for the install)
 6. Run the script ~/Downloads/orabuntu-lxc-master/ubuntu-services.sh (note, it's a fully-automated, non-interactive script).
 
 !!! =============================
@@ -55,7 +54,7 @@ Update 2015-12-06:  There are no reboots anymore. All the scripts run one after 
 
   ~/Downloads/orabuntu-lxc-master/ubuntu-services.sh
   
-The ubuntu-services.sh script is a master script which runs all of the below scripts automatically.  Note that all of the scripts are individually re-runnable, and the whole set of scripts is also re-runnable, so if you have a failure of one script for any reason, just fix the problem, and re-run that script.  If you want to re-run the whole set of scripts, just re-run ubuntu-services.sh again to re-run them all.  Note also the ubuntu-services-3c.sh takes a parameter integer that is the number of containers to create.  Edit ubuntu-services.sh to set the parameter for ubuntu-services-3c.sh.
+The ubuntu-services.sh script is a master script which runs all of the below scripts automatically.  Note that all of the scripts are individually re-runnable, and the whole set of scripts is also re-runnable, so if you have a failure of one script for any reason, just fix the problem, and re-run that script.  If the re-run encounters some hiccups, reboot the Ubuntu host and then re-run that script and that should do it.  If you want to re-run the whole set of scripts, just re-run ubuntu-services.sh again to re-run them all.  Note also the ubuntu-services-3c.sh takes a parameter integer that is the number of containers to create.  Edit ubuntu-services.sh to set the parameter for ubuntu-services-3c.sh.
 
 !!! =============================
 
@@ -171,6 +170,6 @@ NOTE:  I will be adding the instantclient install to the scripted solution soon.
 
 NOTE:  I am working to fix the hardcoded 'gstanden' problem.
 
-UPDATE: 20151208 hardcoded 'gstanden' problem FIXED! yay.  You can now install the orabuntu-lxc from any Ubuntu user account that has the 'sudo' privilege which is to say any install user account created when the Ubuntu OS was installed. 
+UPDATE: 20151208 hardcoded 'gstanden' problem FIXED! yay.  You can now install the orabuntu-lxc from any Ubuntu user account that has the 'sudo' privilege which is to say any install user account created when the Ubuntu OS was installed, or from any new account that you create as long as it has been granted the sudo privilege. 
 
 
