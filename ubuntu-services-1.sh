@@ -87,6 +87,8 @@ echo "Destruction of Containers                  "
 echo "==========================================="
 echo ''
 
+sudo apt-get install -y lxc
+echo ''
 function CheckClonedContainersExist {
 sudo ls /var/lib/lxc | more | sed 's/$/ /' | tr -d '\n' | sed 's/  */ /g'
 }
@@ -134,7 +136,6 @@ echo ''
 
 sudo apt-get install -y synaptic
 sudo apt-get install -y cpu-checker
-sudo apt-get install -y lxc
 sudo apt-get install -y uml-utilities
 sudo apt-get install -y openvswitch-switch
 sudo apt-get install -y openvswitch-common
@@ -166,6 +167,7 @@ sudo apt-get install -y ntp
 sudo apt-get install -y iotop
 sudo apt-get install -y flashplugin-installer
 sudo apt-get install -y sshpass
+sudo apt-get install -y gawk
 
 sudo aa-complain /usr/bin/lxc-start
 
@@ -250,9 +252,7 @@ sudo tar -P -xvf ubuntu-host.tar
 
 sudo mkdir -p /etc/network/openvswitch
 
-sudo mv /home/gstanden/OpenvSwitch/* ~/etc/network/openvswitch/.
-
-sudo rm -rf /home/gstanden
+sudo mv /home/gstanden/OpenvSwitch/* /etc/network/openvswitch/.
 
 sudo cp -p ~/Downloads/orabuntu-lxc-master/openvswitch-net /etc/network/if-up.d/.
 sudo chown root:root /etc/network/if-up.d/openvswitch-net
@@ -262,8 +262,8 @@ sudo chown root:root /etc/rc.local
 sudo sed -i 's/10\.207\.39\.10/10\.207\.39\.9/' /etc/dhcp/dhcpd.conf
 
 # GLS 20151126 Adding enp and wlp to support Ubuntu 15.10 Wily Werewolf Linux 4.2 kernels in OpenvSwitch networking files
-sudo sed -i '/enp/!s/wlan|eth|bnep/enp|wlp|wlan|eth|bnep/' ~/OpenvSwitch/crt_ovs_sw1.sh
-sudo sed -i '/enp/!s/wlan|eth|bnep/enp|wlp|wlan|eth|bnep/' ~/OpenvSwitch/crt_ovs_sx1.sh
+sudo sed -i '/enp/!s/wlan|eth|bnep/enp|wlp|wlan|eth|bnep/' /etc/network/openvswitch/crt_ovs_sw1.sh
+sudo sed -i '/enp/!s/wlan|eth|bnep/enp|wlp|wlan|eth|bnep/' /etc/network/openvswitch/crt_ovs_sx1.sh
 
 echo ''
 echo "==============================================="
@@ -332,7 +332,7 @@ echo "Creating OpenvSwitch sw1 ...                   "
 echo "==============================================="
 echo ''
 
-sudo ~/OpenvSwitch/crt_ovs_sw1.sh
+sudo /etc/network/openvswitch/crt_ovs_sw1.sh
 
 echo ''
 echo "==============================================="

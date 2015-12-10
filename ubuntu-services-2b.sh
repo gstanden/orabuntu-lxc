@@ -15,29 +15,29 @@ echo ''
 
 sleep 5
 
- sudo ovs-vsctl del-br sw1 >/dev/null 2>&1
- sudo ovs-vsctl del-br sw2 >/dev/null 2>&1
- sudo ovs-vsctl del-br sw3 >/dev/null 2>&1
- sudo ovs-vsctl del-br sw4 >/dev/null 2>&1
- sudo ovs-vsctl del-br sw5 >/dev/null 2>&1
- sudo ovs-vsctl del-br sw6 >/dev/null 2>&1
- sudo ovs-vsctl del-br sw7 >/dev/null 2>&1
- sudo ovs-vsctl del-br sw8 >/dev/null 2>&1
- sudo ovs-vsctl del-br sw9 >/dev/null 2>&1
- sudo ovs-vsctl del-br sx1 >/dev/null 2>&1
+# sudo ovs-vsctl del-br sw1 >/dev/null 2>&1
+# sudo ovs-vsctl del-br sw2 >/dev/null 2>&1
+# sudo ovs-vsctl del-br sw3 >/dev/null 2>&1
+# sudo ovs-vsctl del-br sw4 >/dev/null 2>&1
+# sudo ovs-vsctl del-br sw5 >/dev/null 2>&1
+# sudo ovs-vsctl del-br sw6 >/dev/null 2>&1
+# sudo ovs-vsctl del-br sw7 >/dev/null 2>&1
+# sudo ovs-vsctl del-br sw8 >/dev/null 2>&1
+# sudo ovs-vsctl del-br sw9 >/dev/null 2>&1
+# sudo ovs-vsctl del-br sx1 >/dev/null 2>&1
 
- sudo /etc/network/if-up.d/openvswitch-net
+# sudo /etc/network/if-up.d/openvswitch-net
 
- sudo service bind9 stop
- sudo service bind9 start
+# sudo service bind9 stop
+# sudo service bind9 start
 
- sudo service isc-dhcp-server stop
+# sudo service isc-dhcp-server stop
 
- sleep 5
+# sleep 5
 
- sudo service isc-dhcp-server start
+# sudo service isc-dhcp-server start
 
- sudo lxc-start -n lxcora0
+sudo lxc-start -n lxcora0
 
 clear
 
