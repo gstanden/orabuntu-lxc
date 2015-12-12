@@ -105,7 +105,7 @@ sudo tar -vP --extract --file=lxc-lxcora01.tar /var/lib/lxc/lxcora01/rootfs/etc/
 sudo sed -i 's/vmem1\.vmem\.org/# vmem1\.vmem\.org/' /var/lib/lxc/lxcora0/rootfs/etc/fstab
 sudo sed -i 's/vmem1\.vmem\.org/# vmem1\.vmem\.org/' /var/lib/lxc/lxcora01/rootfs/etc/fstab
 
-sudo tar -vP --extract --file=lxc-lxcora01.tar /var/lib/lxc/lxcora01/rootfs/etc/security/limits.conf
+# sudo tar -vP --extract --file=lxc-lxcora01.tar /var/lib/lxc/lxcora01/rootfs/etc/security/limits.conf
 sudo tar -vP --extract --file=lxc-lxcora01.tar /var/lib/lxc/lxcora01/rootfs/root/create_directories.sh
 sudo tar -vP --extract --file=lxc-lxcora01.tar /var/lib/lxc/lxcora01/rootfs/root/hugepages_setting.sh
 sudo tar -vP --extract --file=lxc-lxcora01.tar /var/lib/lxc/lxcora01/rootfs/etc/nsswitch.conf
@@ -119,7 +119,7 @@ sudo mv /var/lib/lxc/lxcora01/rootfs/root/.bashrc /var/lib/lxc/lxcora0/rootfs/ro
 sudo mv /var/lib/lxc/lxcora01/rootfs/etc/rc.local /var/lib/lxc/lxcora0/rootfs/etc/rc.local
 sudo mv /var/lib/lxc/lxcora01/rootfs/etc/sysconfig/ntpd /var/lib/lxc/lxcora0/rootfs/etc/sysconfig/ntpd
 sudo mv /var/lib/lxc/lxcora01/rootfs/etc/fstab /var/lib/lxc/lxcora0/rootfs/etc/fstab
-sudo mv /var/lib/lxc/lxcora01/rootfs/etc/security/limits.conf /var/lib/lxc/lxcora0/rootfs/etc/security/limits.conf
+# sudo mv /var/lib/lxc/lxcora01/rootfs/etc/security/limits.conf /var/lib/lxc/lxcora0/rootfs/etc/security/limits.conf
 sudo mv /var/lib/lxc/lxcora01/rootfs/root/create_directories.sh /var/lib/lxc/lxcora0/rootfs/root/create_directories.sh
 sudo mv /var/lib/lxc/lxcora01/rootfs/root/hugepages_setting.sh /var/lib/lxc/lxcora0/rootfs/root/hugepages_setting.sh
 sudo mv /var/lib/lxc/lxcora01/rootfs/etc/nsswitch.conf /var/lib/lxc/lxcora0/rootfs/etc/nsswitch.conf
