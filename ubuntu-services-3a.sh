@@ -13,7 +13,59 @@ echo "This script is re-runnable                  "
 echo "============================================"
 echo ''
 
-sudo lxc-start -n lxcora0 > /dev/null 2>&1
+sleep 5
+
+clear
+
+echo ''
+echo "============================================"
+echo "Verifying container up...                   "
+echo "============================================"
+echo ''
+
+function CheckContainerUp {
+sudo lxc-ls -f | grep lxcora0 | sed 's/  */ /g' | egrep 'RUNNING|STOPPED'  | cut -f2 -d' '
+}
+ContainerUp=$(CheckContainerUp)
+
+if [ $ContainerUp != 'RUNNING' ]
+then
+sudo lxc-start -n lxcora0
+fi
+
+function CheckPublicIP {
+sudo lxc-ls -f | sed 's/  */ /g' | grep RUNNING | cut -f3 -d' ' | sed 's/,//' | cut -f1-3 -d'.' | sed 's/\.//g'
+}
+PublicIP=$(CheckPublicIP)
+
+sleep 5
+
+echo ''
+echo "============================================"
+echo "Bringing up public ip on lxcora0...         "
+echo "============================================"
+echo ''
+
+sleep 5
+
+while [ "$PublicIP" -ne 1020739 ]
+do
+PublicIP=$(CheckPublicIP)
+echo "Waiting for lxcora0 Public IP to come up..."
+sudo lxc-ls -f | sed 's/  */ /g' | grep RUNNING | cut -f3 -d' ' | sed 's/,//'
+sleep 1
+done
+
+echo ''
+echo "============================================"
+echo "Public IP is up on lxcora0                 "
+echo ''
+sudo lxc-ls -f
+echo ''
+echo "============================================"
+echo "Container Up.                               "
+echo "============================================"
+echo ''
 
 sleep 5
 
@@ -31,8 +83,6 @@ echo ''
 echo "==========================================="
 echo "Verification of no-password ssh completed. "
 echo "==========================================="
-
-sudo lxc-stop -n lxcora0
 
 sleep 5
 
@@ -83,7 +133,7 @@ echo "=========================================="
 echo "Extraction completed.                     " 
 echo "=========================================="
 
-sudo lxc-start -n lxcora0
+# sudo lxc-start -n lxcora0
 
 sleep 5
 

@@ -50,10 +50,6 @@ cd /etc/network/if-up.d/openvswitch
 sudo sed -i 's/lxcora01/lxcora0/' /var/lib/lxc/lxcora0/config
 
 sudo lxc-start -n lxcora0 > /dev/null 2>&1
-# sleep 10
-# sudo lxc-stop -n  lxcora0 > /dev/null 2>&1
-# sleep 10
-# sudo lxc-start -n lxcora0 > /dev/null 2>&1
 
 function CheckContainerUp {
 sudo lxc-ls -f | grep lxcora0 | sed 's/  */ /g' | egrep 'RUNNING|STOPPED'  | cut -f2 -d' '
@@ -62,7 +58,6 @@ ContainerUp=$(CheckContainerUp)
 
 if [ $ContainerUp != 'RUNNING' ]
 then
-sudo lxc-stop  -n lxcora0
 sudo lxc-start -n lxcora0
 fi
 
@@ -177,6 +172,8 @@ echo "Output of 'uname -a' in lxcora0..."
 echo "============================================"
 echo ''
 
+ssh-add
+
 sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@lxcora0 uname -a
 
 echo ''
@@ -244,35 +241,35 @@ sleep 5
 
 clear
 
-echo ''
-echo "============================================"
-echo "Stopping lxcora0 container...              "
-echo "============================================"
-echo ''
-sleep 2
-sudo lxc-stop -n lxcora0
-echo ''
+# echo ''
+# echo "============================================"
+# echo "Stopping lxcora0 container...              "
+# echo "============================================"
+# echo ''
+# sleep 2
+# sudo lxc-stop -n lxcora0
+# echo ''
 
-while [ "$ContainerUp" = 'RUNNING' ]
-do
-sleep 1
-sudo lxc-ls -f
-ContainerUp=$(CheckContainerUp)
-echo ''
-echo $ContainerUp
-echo ''
-done
+# while [ "$ContainerUp" = 'RUNNING' ]
+# do
+# sleep 1
+# sudo lxc-ls -f
+# ContainerUp=$(CheckContainerUp)
+# echo ''
+# echo $ContainerUp
+# echo ''
+# done
 
-sudo lxc-ls -f
+# sudo lxc-ls -f
 
-echo ''
-echo "============================================"
-echo "Container stopped.                          "
-echo "============================================"
+# echo ''
+# echo "============================================"
+# echo "Container stopped.                          "
+# echo "============================================"
 
-sleep 5
+# sleep 5
 
-clear
+# clear
 
 echo ''
 echo "==============================================="

@@ -187,7 +187,13 @@ echo "Create the LXC oracle container...         "
 echo "==========================================="
 echo ''
 
-sudo lxc-create -t oracle -n lxcora0
+# Examples of setting the Oracle Enterprise Linux version
+# Uncomment if you want a different version and rememember to comment out the 6.5 create command if you do.
+
+# sudo lxc-create -n lxcora0 -t oracle -- --release=6.latest
+# sudo lxc-create -n lxcora0 -t oracle -- --release=7.latest
+
+sudo lxc-create -n lxcora0 -t oracle -- --release=6.5
 
 echo ''
 echo "==========================================="
