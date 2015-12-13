@@ -7,28 +7,34 @@ echo "Script:  ubuntu-services-1.sh                    "
 echo "                                                 "
 echo "Tested with Ubuntu 15.04 Vivid Vervet            "
 echo "Tested with Ubuntu 15.10 Wily Werewolf           "
-echo "Only use a FRESH Ubuntu 15.x Install             "
+echo "                                                 "
+echo "  !! Only use a FRESH Ubuntu 15.x Install !!     "
+echo "                                                 "
 echo "These scripts overwrite some configurations!     "
+echo "These scripts will destroy lxcora* containers!   "
+echo "These scripts will terminate DHCP leases!        "
 echo "Use with customized Ubuntu at your own risk!     "
-echo "<CTRL> + C to exit                               "
-echo "Sleeping 10 seconds...                           "
+echo "                                                 "
+echo "If any doubts, <CTRL>+c NOW to exit and          " 
+echo "review scripts first before running!             "
+echo "                                                 "
+echo "Sleeping 25 seconds to give you time to think... "
 echo "                                                 "
 echo "================================================="
 
-sleep 10
+sleep 25
 
 clear
 
 echo ''
-echo "==============================================="
-echo "DHCP service clear, start, and test...         "
-echo "Verify health status...                        "
-echo "==============================================="
+echo "================================================"
+echo "Clear DHCP leases...                         "
+echo "================================================"
 echo ''
 
 if [ -e /var/lib/dhcp/dhcpd.leases ]
 then
-	sudo service isc-dhcp-server stop
+	sudo service isc-dhcp-server stop >/dev/null 2>&1
 	if [ -e /var/lib/dhcp/dhcpd.leases~ ]
 		then
 		sudo rm /var/lib/dhcp/dhcpd.leases~
@@ -38,13 +44,11 @@ then
 	then
 		sudo rm /var/lib/dhcp/dhcpd.leases
 	fi
-	sudo service isc-dhcp-server start
-	sudo service isc-dhcp-server status
+	sudo service isc-dhcp-server start >/dev/null 2>&1
 fi
 
-echo ''
 echo "==============================================="
-echo "Clear DHCP leases and start DHCP complete.     "
+echo "Clear DHCP leases complete.                    "
 echo "==============================================="
 
 sleep 5
@@ -52,86 +56,123 @@ sleep 5
 clear
 
 echo ''
-echo "============================================" 
-echo "Verify network up....                       "
-echo "============================================"
+echo "===============================================" 
+echo "Verify network up....                          "
+echo "==============================================="
 echo ''
-
-sleep 2
 
 ping -c 3 google.com
-if [ $? -ne 0 ]
+
+function CheckNetworkUp {
+ping -c 3 google.com | grep packet | cut -f3 -d',' | sed 's/ //g'
+}
+NetworkUp=$(CheckNetworkUp)
+while [ "$NetworkUp" !=  "0%packetloss" ] && [ "$n" -lt 5 ]
+do
+NetworkUp=$(CheckNetworkUp)
+let n=$n+1
+done
+
+if [ "$NetworkUp" != '0%packetloss' ]
 then
 echo ''
-echo "============================================"
-echo "Network is not up.  Script exiting.         "
-echo "ping google.com must succeed                "
-echo "Address network issues and retry script     "
-echo "============================================"
+echo "=============================================="
+echo "WAN is not up or is hiccuping badly.          "
+echo "Script exiting.                               "
+echo "ping google.com test must succeed             "
+echo "Address network issues/hiccups & rerun script."
+echo "=============================================="
+exit
+else
+echo ''
+echo "=============================================="
+echo "Network ping test verification complete.      "
+echo "WAN is up.                                    "
+echo "=============================================="
 echo ''
 fi
-
-echo ''
-echo "============================================"
-echo "Network verification complete               "
-echo "============================================"
-echo ''
 
 sleep 5
 
 clear
 
 echo ''
-echo "==========================================="
-echo "Destruction of Containers                  "
-echo "==========================================="
+echo "=============================================="
+echo "          Destruction of Containers           "
+echo "                                              "
+echo "                !!WARNING!!                   "
+echo "                                              "
+echo "  This step destroys all existing containers  "
+echo "    with the name lxcora* (e.g. lxcora11)     "
+echo "                                              "
+echo "   If any doubts, <CTRL>+c NOW to exit and    " 
+echo "    review scripts first before running!      "
+echo "                                              "
+echo "    Sleeping 25 seconds to give you time      "
+echo "              to think...                     "
+echo "                                              "
+echo "=============================================="
+echo ''
+
+sleep 25
+
+echo ''
+echo "=============================================="
+echo "Installing LXC package...                     "
+echo "=============================================="
 echo ''
 
 sudo apt-get install -y lxc
+
 echo ''
+echo "=============================================="
+echo "Installing LXC package complete.              "
+echo "=============================================="
+echo ''
+
 function CheckClonedContainersExist {
-sudo ls /var/lib/lxc | more | sed 's/$/ /' | tr -d '\n' | sed 's/  */ /g'
+sudo ls /var/lib/lxc | more | grep lxcora | sed 's/$/ /' | tr -d '\n' | sed 's/  */ /g'
 }
 ClonedContainersExist=$(CheckClonedContainersExist)
 
 for j in $ClonedContainersExist
 do
-sudo lxc-stop -n $j 
+sudo lxc-stop -n $j > /dev/null 2>&1
 sleep 2
 sudo lxc-destroy -n $j -f > /dev/null 2>&1
 sudo rm -rf /var/lib/lxc/$j
 done
 
-echo ''
-echo "==========================================="
-echo "Destruction of Containers complete         "
-echo "==========================================="
+echo "=============================================="
+echo "Destruction of Containers complete            "
+echo "=============================================="
 
 sleep 5
 
 clear
 
 echo ''
-echo "==========================================="
-echo "Show Running Containers...                 "
-echo "==========================================="
+echo "=============================================="
+echo "         Show Running Containers...           "
+echo "  (NO containers names lxcora* should exist!) "
+echo "=============================================="
 echo ''
 
 sudo lxc-ls -f
 
 echo ''
-echo "==========================================="
-echo "Running Container Check completed          "
-echo "==========================================="
+echo "=============================================="
+echo "Running Container Check completed             "
+echo "=============================================="
 
 sleep 5
 
 clear
 
 echo ''
-echo "==========================================="
-echo "Ubuntu Package Installation...             "
-echo "==========================================="
+echo "=============================================="
+echo "Ubuntu Package Installation...                "
+echo "=============================================="
 echo ''
 
 sudo apt-get install -y synaptic
@@ -167,14 +208,17 @@ sudo apt-get install -y ntp
 sudo apt-get install -y iotop
 sudo apt-get install -y flashplugin-installer
 sudo apt-get install -y sshpass
+
+# GLS 20151213 gawk needed for scst custom kernel build on linux 4.x kernels.
+# GLS 20151213 gawk optional for just the container build.
 sudo apt-get install -y gawk
 
 sudo aa-complain /usr/bin/lxc-start
 
 echo ''
-echo "==========================================="
-echo "Ubuntu Package Installation complete       "
-echo "==========================================="
+echo "=============================================="
+echo "Ubuntu Package Installation complete          "
+echo "=============================================="
 echo ''
 
 sleep 5
@@ -182,25 +226,24 @@ sleep 5
 clear
 
 echo ''
-echo "==========================================="
-echo "Create the LXC oracle container...         "
-echo "==========================================="
+echo "=============================================="
+echo "Create the LXC oracle container...            "
+echo "=============================================="
 echo ''
 
 # Examples of setting the Oracle Enterprise Linux version
-# Uncomment if you want a different version and rememember to comment out the 6.5 create command if you do.
-
 # sudo lxc-create -n lxcora0 -t oracle -- --release=6.latest
 # sudo lxc-create -n lxcora0 -t oracle -- --release=7.latest
+# Uncomment if you want a different version and rememember to comment out the 6.5 create command if you do.
 
 sudo lxc-create -n lxcora0 -t oracle -- --release=6.5
 
 echo ''
-echo "==========================================="
-echo "Create the LXC oracle container complete   "
-echo "(Passwords are the same as the usernames)  "
-echo "Sleeping 15 seconds...                     "
-echo "==========================================="
+echo "=============================================="
+echo "Create the LXC oracle container complete      "
+echo "(Passwords are the same as the usernames)     "
+echo "Sleeping 15 seconds...                        "
+echo "=============================================="
 echo ''
 
 sleep 15
@@ -217,9 +260,9 @@ sudo service multipath-tools stop
 # Check existing file backups to be sure they were made successfully
 
 echo ''
-echo "==============================================="
-echo "Checking existing file backups before writing  "
-echo "===============================================" 
+echo "=============================================="
+echo "Checking existing file backup before writing  "
+echo "==============================================" 
 echo ''
 
 ~/Downloads/orabuntu-lxc-master/ubuntu-host-backup-check-1a.sh
@@ -227,44 +270,34 @@ echo ''
 sleep 2 
 
 echo ''
-echo "==============================================="
-echo "Existing file backups check complete           "
-echo "===============================================" 
+echo "=============================================="
+echo "Existing file backups check complete          "
+echo "==============================================" 
 
 sleep 5
 
 clear
 
 # Unpack customized OS host files for Oracle on Ubuntu LXC host server
+
 echo ''
-echo "==============================================="
-echo "Unpacking custom files for Oracle on Ubuntu... "
-echo "==============================================="
+echo "=============================================="
+echo "Unpacking custom files for Oracle on Ubuntu..."
+echo "=============================================="
 
 sleep 5
 
 sudo tar -P -xvf ubuntu-host.tar
 
-# sudo tar -vP --extract --file=ubuntu-host.tar /home/gstanden/OpenvSwitch/crt_ovs_sw1.sh
-# sudo tar -vP --extract --file=ubuntu-host.tar /home/gstanden/OpenvSwitch/crt_ovs_sw2.sh
-# sudo tar -vP --extract --file=ubuntu-host.tar /home/gstanden/OpenvSwitch/crt_ovs_sw3.sh
-# sudo tar -vP --extract --file=ubuntu-host.tar /home/gstanden/OpenvSwitch/crt_ovs_sw4.sh
-# sudo tar -vP --extract --file=ubuntu-host.tar /home/gstanden/OpenvSwitch/crt_ovs_sw5.sh
-# sudo tar -vP --extract --file=ubuntu-host.tar /home/gstanden/OpenvSwitch/crt_ovs_sw6.sh
-# sudo tar -vP --extract --file=ubuntu-host.tar /home/gstanden/OpenvSwitch/crt_ovs_sw7.sh
-# sudo tar -vP --extract --file=ubuntu-host.tar /home/gstanden/OpenvSwitch/crt_ovs_sw8.sh
-# sudo tar -vP --extract --file=ubuntu-host.tar /home/gstanden/OpenvSwitch/crt_ovs_sw9.sh
-# sudo tar -vP --extract --file=ubuntu-host.tar /home/gstanden/OpenvSwitch/crt_ovs_sx1.sh
-
 sudo mkdir -p /etc/network/openvswitch
-
-sudo mv /home/gstanden/OpenvSwitch/* /etc/network/openvswitch/.
 
 sudo cp -p ~/Downloads/orabuntu-lxc-master/openvswitch-net /etc/network/if-up.d/.
 sudo chown root:root /etc/network/if-up.d/openvswitch-net
 
 sudo cp -p ~/Downloads/orabuntu-lxc-master/rc.local.ubuntu.host /etc/rc.local
 sudo chown root:root /etc/rc.local
+
+# GLS 20151213 So that network IPs match up with container names.
 sudo sed -i 's/10\.207\.39\.10/10\.207\.39\.9/' /etc/dhcp/dhcpd.conf
 
 # GLS 20151126 Adding enp and wlp to support Ubuntu 15.10 Wily Werewolf Linux 4.2 kernels in OpenvSwitch networking files
@@ -272,78 +305,45 @@ sudo sed -i '/enp/!s/wlan|eth|bnep/enp|wlp|wlan|eth|bnep/' /etc/network/openvswi
 sudo sed -i '/enp/!s/wlan|eth|bnep/enp|wlp|wlan|eth|bnep/' /etc/network/openvswitch/crt_ovs_sx1.sh
 
 echo ''
-echo "==============================================="
-echo "Custom files for Ubuntu unpack complete        "
-echo "==============================================="
+echo "============================================="
+echo "Custom files for Ubuntu unpack complete      "
+echo "============================================="
 
 sleep 5
 
 clear
 
 echo ''
-# echo "==============================================="
-# echo "Restarting Networking on the Ubuntu host...    "
-# echo "==============================================="
-# echo ''
+echo "============================================="
+echo "Copying required /etc/resolv.conf file       "
+echo "On reboot it will be auto-generated.         "
+echo "============================================="
 
-# sudo /etc/init.d/networking restart
-
-# echo ''
-# echo "==============================================="
-# echo "Restarting Network complete.                   "
-# echo "==============================================="
-
-# sleep 2
-
-# clear
-
-echo ''
-echo "==============================================="
-echo "Copying required /etc/resolv.conf file         "
-echo "On reboot it will be auto-generated.           "
-echo "==============================================="
 sudo cp ~/Downloads/orabuntu-lxc-master/resolv.conf.temp /etc/resolv.conf
 
-sleep 2
-
-echo ''
-echo "==============================================="
-echo "Copying required /etc/resolv.conf complete     "
-echo "==============================================="
-
-sleep 2
-
-clear
-
-echo ''
-echo "==============================================="
-echo "Starting bind9 service...                      "
-echo "Verify healthy status...                       "
-echo "==============================================="
-echo ''
-sudo service bind9 start
-sudo service bind9 status
-echo ''
-echo "==============================================="
-echo "Verify bind9 service completed                 "
-echo "==============================================="
-
 sleep 5
 
+echo ''
+echo "============================================="
+echo "Copying required /etc/resolv.conf complete   "
+echo "============================================="
+
+sleep 2
+
 clear
 
 echo ''
-echo "==============================================="
-echo "Creating OpenvSwitch sw1 ...                   "
-echo "==============================================="
+echo "============================================="
+echo "Creating OpenvSwitch sw1 ...                 "
+echo "============================================="
 echo ''
 
 sudo /etc/network/openvswitch/crt_ovs_sw1.sh
 
 echo ''
-echo "==============================================="
-echo "OpenvSwitch sw1 created.                       "
-echo "==============================================="
+echo "============================================="
+echo "OpenvSwitch sw1 created.                     "
+echo "============================================="
 echo ''
 
 sleep 5
@@ -351,34 +351,18 @@ sleep 5
 clear
 
 echo ''
-echo "==============================================="
-echo "Starting DHCP service...                       "
-echo "==============================================="
-echo ''
+echo "============================================"
+echo "Starting and checking status of DHCP...     "
+echo "============================================"
 
 sudo service isc-dhcp-server start
-sudo service isc-dhcp-server status
-
-echo ''
-echo "==============================================="
-echo "DHCP Service Started and Status displayed.     "
-echo "==============================================="
-
-# GLS 20151127 New DHCP server checks.  Terminates script if DHCP status is invalid.
 
 sleep 5
-
-clear
 
 function GetDHCPStatus {
 sudo service isc-dhcp-server status | grep Active | cut -f1-6 -d' ' | sed 's/ *//g'
 }
 DHCPStatus=$(GetDHCPStatus)
-
-echo ''
-echo "============================================"
-echo "Checking status of DHCP...                  "
-echo "============================================"
 
 if [ $DHCPStatus != 'Active:active(running)' ]
 then
@@ -400,6 +384,7 @@ then
 	echo "!! FIX PROBLEM with DHCP and retry script.  "
 	echo "============================================"
 	echo ''
+	exit
 else
 	echo ''
 	echo "DHCP is RUNNING with correct status of:  Active: active (running)"
@@ -421,9 +406,9 @@ else
 fi
 
 echo ''
-echo "============================================"
-echo "Status check of DHCP completed.        "
-echo "============================================"
+echo "============================================="
+echo "Status check of DHCP completed.              "
+echo "============================================="
 echo ''
 
 # GLS 20151128 New DHCP status check end.
@@ -432,16 +417,78 @@ sleep 5
 
 clear
 
+# GLS 20151127 New bind9 server checks.  Terminates script if bind9 status is invalid.
+
+echo ''
+echo "============================================="
+echo "Starting and checking status of bind9...     "
+echo "============================================="
+
+sudo service bind9 start
+
+sleep 5
+
+function GetNamedStatus {
+sudo service bind9 status | grep Active | cut -f1-6 -d' ' | sed 's/ *//g'
+}
+NamedStatus=$(GetNamedStatus)
+
+if [ $NamedStatus != 'Active:active(running)' ]
+then
+	echo ''
+	echo "bind9 is NOT RUNNING with correct status of:  Active: active (running)"
+	echo ''
+	echo "============================================"
+	echo "bind9 status ...                             "
+	echo "============================================"
+	echo ''
+	sudo service bind9 status
+	echo ''
+	echo "============================================"
+	echo "bind9 status incorrect.                      "
+	echo "============================================"
+	sleep 5
+	echo ''
+	echo "============================================"
+	echo "!! FIX PROBLEM with bind9 and retry script.  "
+	echo "============================================"
+	echo ''
+	exit
+else
+	echo ''
+	echo "bind9 is RUNNING with correct status of:  Active: active (running)"
+	echo ''
+	echo "============================================"
+	echo "bind9 status ...                             "
+	echo "============================================"
+	echo ''
+	sudo service bind9 status
+	echo ''
+	echo "============================================"
+	echo "bind9 status complete.                       "
+	echo "============================================"
+	sleep 5
+	echo ''
+	echo "============================================"
+	echo "Continuing with script execution.           "
+	echo "============================================"
+	echo ''
+fi
+
+echo "============================================"
+echo "Status check of bind9 completed.            "
+echo "============================================"
+echo ''
+
+# GLS 20151128 New bind9 status check end.
+
+sleep 5
+
+clear
+
 sudo cp -p ~/Downloads/orabuntu-lxc-master/create-ovs-sw-files-v2.sh.bak /etc/network/if-up.d/openvswitch/create-ovs-sw-files-v2.sh
 
 cd /etc/network/if-up.d/openvswitch
-sudo mv lxcora01-asm1-ifup-sw8  lxcora00-asm1-ifup-sw8
-sudo mv lxcora01-asm2-ifup-sw9  lxcora00-asm2-ifup-sw9
-sudo mv lxcora01-priv1-ifup-sw4 lxcora00-priv1-ifup-sw4
-sudo mv lxcora01-priv2-ifup-sw5 lxcora00-priv2-ifup-sw5
-sudo mv lxcora01-priv3-ifup-sw6 lxcora00-priv3-ifup-sw6 
-sudo mv lxcora01-priv4-ifup-sw7 lxcora00-priv4-ifup-sw7
-sudo mv lxcora01-pub-ifup-sw1   lxcora00-pub-ifup-sw1
 
 sudo cp lxcora00-asm1-ifup-sw8  lxcora0-asm1-ifup-sw8
 sudo cp lxcora00-asm2-ifup-sw9  lxcora0-asm2-ifup-sw9
@@ -451,16 +498,7 @@ sudo cp lxcora00-priv3-ifup-sw6 lxcora0-priv3-ifup-sw6
 sudo cp lxcora00-priv4-ifup-sw7 lxcora0-priv4-ifup-sw7
 sudo cp lxcora00-pub-ifup-sw1   lxcora0-pub-ifup-sw1
 
-sudo rm lxcora02* lxcora03* lxcora04* lxcora05* lxcora06* 
-
 cd /etc/network/if-down.d/openvswitch
-sudo mv lxcora01-asm1-ifdown-sw8  lxcora00-asm1-ifdown-sw8
-sudo mv lxcora01-asm2-ifdown-sw9  lxcora00-asm2-ifdown-sw9
-sudo mv lxcora01-priv1-ifdown-sw4 lxcora00-priv1-ifdown-sw4
-sudo mv lxcora01-priv2-ifdown-sw5 lxcora00-priv2-ifdown-sw5
-sudo mv lxcora01-priv3-ifdown-sw6 lxcora00-priv3-ifdown-sw6
-sudo mv lxcora01-priv4-ifdown-sw7 lxcora00-priv4-ifdown-sw7
-sudo mv lxcora01-pub-ifdown-sw1   lxcora00-pub-ifdown-sw1
 
 sudo cp lxcora00-asm1-ifdown-sw8  lxcora0-asm1-ifdown-sw8
 sudo cp lxcora00-asm2-ifdown-sw9  lxcora0-asm2-ifdown-sw9
@@ -470,34 +508,31 @@ sudo cp lxcora00-priv3-ifdown-sw6 lxcora0-priv3-ifdown-sw6
 sudo cp lxcora00-priv4-ifdown-sw7 lxcora0-priv4-ifdown-sw7
 sudo cp lxcora00-pub-ifdown-sw1   lxcora0-pub-ifdown-sw1
 
-sudo rm lxcora02* lxcora03* lxcora04* lxcora05* lxcora06* 
-
 sudo useradd -u 1098 grid >/dev/null 2>&1
 sudo useradd -u 500 oracle >/dev/null 2>&1
 
 echo ''
-echo "==============================================="
-echo "Check existence of Oracle and Grid users...    "
-echo "==============================================="
+echo "============================================"
+echo "Check existence of Oracle and Grid users... "
+echo "============================================"
 echo ''
 
 id grid
 id oracle
 
 echo ''
-echo "==============================================="
-echo "Oracle and Grid users displayed.               "
-echo "==============================================="
+echo "============================================"
+echo "Oracle and Grid users displayed.            "
+echo "============================================"
 
 sleep 5
 
 clear
 
 echo ''
-echo "==============================================="
-echo "Next script to run: ubuntu-services-2a.sh      "
-echo "==============================================="
+echo "============================================"
+echo "Next script to run: ubuntu-services-2a.sh   "
+echo "============================================"
 
 sleep 5
 
-# sudo reboot

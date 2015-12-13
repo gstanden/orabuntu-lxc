@@ -45,17 +45,29 @@ sleep 5
 clear
 
 echo ''
-echo "==========================================="
-echo "Verify no-password ssh working to lxcora0  "
-echo "==========================================="
+echo "============================================"
+echo "Testing passwordless-ssh for root user      "
+echo "============================================"
+echo "Output of 'uname -a' in lxcora0..."
+echo "============================================"
 echo ''
 
-sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@lxcora0 uname -a 
-
+sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@lxcora0 uname -a
+if [ $? -ne 0 ]
+then
 echo ''
-echo "==========================================="
-echo "Verification of no-password ssh completed. "
-echo "==========================================="
+echo "============================================"
+echo "No-password ssh to lxcora0 has issue(s).    "
+echo "No-password ssh to lxcora0 must succeed.    "
+echo "Fix issues retry script.                    "
+echo "Script exiting.                             "
+echo "============================================"
+exit
+fi
+echo ''
+echo "============================================"
+echo "No-password ssh test to lxcora0 successful. "
+echo "============================================"
 
 sleep 5
 
@@ -161,7 +173,7 @@ echo "==========================================="
 echo "LXC and MAC address setups completed.      "
 echo "==========================================="
 
-sleep 3
+sleep 5
 
 clear
 
@@ -169,6 +181,8 @@ echo ''
 echo "==========================================="
 echo "Creating OpenvSwitch files ...             "
 echo "==========================================="
+
+sleep 5
 
 sudo cp -p ~/Downloads/orabuntu-lxc-master/create-ovs-sw-files-v2.sh.bak /etc/network/if-up.d/openvswitch/create-ovs-sw-files-v2.sh
 sudo chmod 755 /etc/network/if-up.d/openvswitch/create-ovs-sw-files-v2.sh

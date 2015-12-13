@@ -72,17 +72,29 @@ sleep 5
 clear
 
 echo ''
-echo "==========================================="
-echo "Verify no-password ssh working to lxcora0 "
-echo "==========================================="
+echo "============================================"
+echo "Testing passwordless-ssh for root user      "
+echo "============================================"
+echo "Output of 'uname -a' in lxcora0..."
+echo "============================================"
 echo ''
 
 sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@lxcora0 uname -a
-
+if [ $? -ne 0 ]
+then
 echo ''
-echo "==========================================="
-echo "Verification of no-password ssh completed. "
-echo "==========================================="
+echo "============================================"
+echo "No-password ssh to lxcora0 has issue(s).    "
+echo "No-password ssh to lxcora0 must succeed.    "
+echo "Fix issues retry script.                    "
+echo "Script exiting.                             "
+echo "============================================"
+exit
+fi
+echo ''
+echo "============================================"
+echo "No-password ssh test to lxcora0 successful. "
+echo "============================================"
 
 sleep 5
 
@@ -105,7 +117,11 @@ sudo tar -vP --extract --file=lxc-lxcora01.tar /var/lib/lxc/lxcora01/rootfs/etc/
 sudo sed -i 's/vmem1\.vmem\.org/# vmem1\.vmem\.org/' /var/lib/lxc/lxcora0/rootfs/etc/fstab
 sudo sed -i 's/vmem1\.vmem\.org/# vmem1\.vmem\.org/' /var/lib/lxc/lxcora01/rootfs/etc/fstab
 
+# GLS 20151213 Copy revised /etc/security/limits.conf to container
 # sudo tar -vP --extract --file=lxc-lxcora01.tar /var/lib/lxc/lxcora01/rootfs/etc/security/limits.conf
+sudo mkdir -p /var/lib/lxc/lxcora01/rootfs/etc/security
+sudo cp -p ~/Downloads/orabuntu-lxc-master/limits.conf /var/lib/lxc/lxcora01/rootfs/etc/security/limits.conf
+
 sudo tar -vP --extract --file=lxc-lxcora01.tar /var/lib/lxc/lxcora01/rootfs/root/create_directories.sh
 sudo tar -vP --extract --file=lxc-lxcora01.tar /var/lib/lxc/lxcora01/rootfs/root/hugepages_setting.sh
 sudo tar -vP --extract --file=lxc-lxcora01.tar /var/lib/lxc/lxcora01/rootfs/etc/nsswitch.conf
@@ -119,7 +135,7 @@ sudo mv /var/lib/lxc/lxcora01/rootfs/root/.bashrc /var/lib/lxc/lxcora0/rootfs/ro
 sudo mv /var/lib/lxc/lxcora01/rootfs/etc/rc.local /var/lib/lxc/lxcora0/rootfs/etc/rc.local
 sudo mv /var/lib/lxc/lxcora01/rootfs/etc/sysconfig/ntpd /var/lib/lxc/lxcora0/rootfs/etc/sysconfig/ntpd
 sudo mv /var/lib/lxc/lxcora01/rootfs/etc/fstab /var/lib/lxc/lxcora0/rootfs/etc/fstab
-# sudo mv /var/lib/lxc/lxcora01/rootfs/etc/security/limits.conf /var/lib/lxc/lxcora0/rootfs/etc/security/limits.conf
+sudo mv /var/lib/lxc/lxcora01/rootfs/etc/security/limits.conf /var/lib/lxc/lxcora0/rootfs/etc/security/limits.conf
 sudo mv /var/lib/lxc/lxcora01/rootfs/root/create_directories.sh /var/lib/lxc/lxcora0/rootfs/root/create_directories.sh
 sudo mv /var/lib/lxc/lxcora01/rootfs/root/hugepages_setting.sh /var/lib/lxc/lxcora0/rootfs/root/hugepages_setting.sh
 sudo mv /var/lib/lxc/lxcora01/rootfs/etc/nsswitch.conf /var/lib/lxc/lxcora0/rootfs/etc/nsswitch.conf
@@ -132,8 +148,6 @@ echo ''
 echo "==========================================" 
 echo "Extraction completed.                     " 
 echo "=========================================="
-
-# sudo lxc-start -n lxcora0
 
 sleep 5
 

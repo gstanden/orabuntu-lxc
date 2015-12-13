@@ -4,11 +4,11 @@ echo ''
 echo "============================================"
 echo "Script: ubuntu-services-3d.sh              "
 echo "============================================"
-
+echo ''
 echo "============================================"
 echo "This script is re-runnable.                 "
 echo "============================================"
-
+echo ''
 echo "============================================"
 echo "This script starts lxc clones "
 echo "============================================"
@@ -21,44 +21,41 @@ clear
 
 echo ''
 echo "============================================"
-echo "Verify no-password ssh...                   "
+echo "Testing passwordless-ssh for root user      "
+echo "============================================"
+echo "Output of 'uname -a' in lxcora0..."
 echo "============================================"
 echo ''
 
-sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@lxcora0 uname -a 
-
+sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@lxcora0 uname -a
+if [ $? -ne 0 ]
+then
 echo ''
-echo "==========================================="
-echo "Verification of no-password ssh completed. "
-echo "==========================================="
+echo "============================================"
+echo "No-password ssh to lxcora0 has issue(s).    "
+echo "No-password ssh to lxcora0 must succeed.    "
+echo "Fix issues retry script.                    "
+echo "Script exiting.                             "
+echo "============================================"
+exit
+fi
+echo ''
+echo "============================================"
+echo "No-password ssh test to lxcora0 successful. "
+echo "============================================"
 
-# sleep 5
-
-# clear
-
-# echo ''
-# echo "==========================================="
-# echo "Stopping lxcora0 container...             "
-# echo "==========================================="
-# echo ''
-# sudo lxc-stop -n lxcora0
-
-# while [ "$ContainerUp" = 'RUNNING' ]
-# do
-# sleep 1
-# sudo lxc-ls -f
-# ContainerUp=$(CheckContainerUp)
-# echo ''
-# echo $ContainerUp
-# done
-# echo ''
-# echo "==========================================="
-# echo "Container stopped.                         "
-# echo "==========================================="
- 
 sleep 5
 
 clear
+
+echo ''
+echo "============================================"
+echo "Check directory is ~/Networking             "
+echo "Verify crt_links.sh exists and has 755 mode "
+echo "Step creates pointers to relevant files.    "
+echo "Use links to quickly locate relevant files. "
+echo "============================================"
+echo ''
 
 if [ ! -e ~/Networking ]
 then
@@ -70,34 +67,27 @@ sudo chown root:root ~/Networking/crt_links.sh
 
 cd ~/Networking
 
-sleep 5
-echo ''
-echo "================================================"
-echo "Check directory is ~/Networking                 "
-echo "Verify crt_links.sh exists and has 755 mode     "
-echo "This step creates pointers to relevant files.   "
-echo "Use links to quickly locate relevant files.     "
-echo "================================================"
-echo ''
-ls -l crt_links.sh
-echo ''
+# ls -l crt_links.sh
 
-sleep 5
- 
 sudo ./crt_links.sh
 echo ''
 ls -l ~/Networking
 echo ''
 cd ~/Downloads/orabuntu-lxc-master
-pwd
-sleep 5
+
+echo ''
+echo "============================================"
+echo "Management links directory created.         "
+echo "============================================"
+
+sleep 10
 
 clear
 
 echo ''
-echo "================================================"
-echo "Starting LXC clone containers for Oracle        "
-echo "================================================"
+echo "==========================================="
+echo "Starting LXC clone containers for Oracle   "
+echo "==========================================="
 echo ''
 
 function CheckClonedContainersExist {
@@ -116,31 +106,39 @@ sleep 20
 sudo lxc-ls -f | grep lxcora$j
 done
 
-sudo lxc-stop -n lxcora0
+echo ''
+echo "==========================================="
+echo "LXC clone containers for Oracle started.   "
+echo "==========================================="
+echo ''
+echo "==========================================="
+echo "Waiting for final container initialization." 
+echo "==========================================="
+
+sleep 5
 
 clear
 
 echo ''
-echo "================================================"
-echo "Waiting for final container initialization...   " 
-echo "================================================"
-echo "================================================"
-echo "LXC containers for Oracle started.              "
-echo "================================================"
+echo "==========================================="
+echo "LXC containers for Oracle started.         "
+echo "==========================================="
+echo ''
 
 sudo lxc-ls -f
 
-echo "================================================"
-echo "Stopping the containers in 10 seconds           "
-echo "Next step is to setup storage...                "
-echo "tar -xvf scst-files.tar                         "
-echo "cd scst-files                                   "
-echo "cat README                                      "
-echo "follow the instructions in the README           "
-echo "Builds the SCST Linux SAN.                      "
-echo "================================================"
+echo ''
+echo "==========================================="
+echo "Stopping the containers in 10 seconds      "
+echo "Next step is to setup storage...           "
+echo "tar -xvf scst-files.tar                    "
+echo "cd scst-files                              "
+echo "cat README                                 "
+echo "follow the instructions in the README      "
+echo "Builds the SCST Linux SAN.                 "
+echo "==========================================="
 
-sleep 5
+sudo lxc-stop -n lxcora0
 
 ~/Downloads/orabuntu-lxc-master/stop_containers.sh
 

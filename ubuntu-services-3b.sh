@@ -16,6 +16,8 @@ echo "============================================"
 
 sleep 5
 
+clear
+
 echo ''
 echo "============================================"
 echo "Verifying container up...                   "
@@ -64,24 +66,35 @@ echo ''
 echo "============================================"
 echo "Container Up.                               "
 echo "============================================"
-echo ''
 
 sleep 5
 
 clear
 
 echo ''
-echo "==========================================="
-echo "Verify no-password ssh working to lxcora0  "
-echo "==========================================="
+echo "============================================"
+echo "Testing passwordless-ssh for root user      "
+echo "============================================"
+echo "Output of 'uname -a' in lxcora0..."
+echo "============================================"
 echo ''
 
 sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@lxcora0 uname -a
-
+if [ $? -ne 0 ]
+then
 echo ''
-echo "==========================================="
-echo "Verification done.                         "
-echo "==========================================="
+echo "============================================"
+echo "No-password ssh to lxcora0 has issue(s).    "
+echo "No-password ssh to lxcora0 must succeed.    "
+echo "Fix issues retry script.                    "
+echo "Script exiting.                             "
+echo "============================================"
+exit
+fi
+echo ''
+echo "============================================"
+echo "No-password ssh test to lxcora0 successful. "
+echo "============================================"
 
 sleep 5
 
