@@ -136,6 +136,11 @@ echo "cd scst-files                              "
 echo "cat README                                 "
 echo "follow the instructions in the README      "
 echo "Builds the SCST Linux SAN.                 "
+echo "                                           "
+echo "Note that deployment management links are  "
+echo "in ~/Networking to learn more about what   "
+echo "files and configurations are used for the  "
+echo "orabuntu-lxc project.                      "
 echo "==========================================="
 
 sudo lxc-stop -n lxcora0
