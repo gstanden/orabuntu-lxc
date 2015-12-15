@@ -45,6 +45,8 @@ To install:
 4. Edit the script ubuntu-services.sh to tell ubuntu-services-3c.sh how many oracle-ready containers you want to create.
 5. Run ONLY on fresh install of Ubuntu 15.04 or 15.10 !
 6. Run the script ~/Downloads/orabuntu-lxc-master/ubuntu-services.sh (note, it's a fully-automated, non-interactive script).
+7. For now, only Oracle Enterprise Linux 6.x containers are supported.  
+8. Support for Oracle Enterprise Linux 7.x on roadmap but not yet available.
 
 !!! =============================
 
