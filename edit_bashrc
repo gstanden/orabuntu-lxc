@@ -1,6 +1,0 @@
-echo 'umask 022' >> .bashrc
-echo '' >> .bashrc
-echo 'export ORACLE_BASE=/u00/app/12.1.0/grid' >> .bashrc
-echo 'export ORACLE_HOME=/u00/app/grid/product/12.1.0/grid' >> .bashrc
-echo 'export PATH=$PATH:$ORACLE_HOME/bin' >> .bashrc
-

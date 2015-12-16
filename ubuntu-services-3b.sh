@@ -119,18 +119,25 @@ sudo cp -p /var/lib/lxc/lxcora0/rootfs/home/grid/grid/rpm/cvuqdisk-1.0.9-1.rpm /
 
 sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@lxcora0 rpm -Uvh /home/grid/grid/rpm/cvuqdisk-1.0.9-1.rpm
 
-# sudo tar -P --extract --file=lxc-lxcora01.tar /var/lib/lxc/lxcora0/rootfs/home/grid/.bashrc
-# sudo tar -vP --extract --file=lxc-lxcora01.tar /var/lib/lxc/lxcora01/rootfs/home/oracle/.bashrc
-sudo cp ~/Downloads/orabuntu-lxc-master/oracle.bash_profile /var/lib/lxc/lxcora0/rootfs/home/oracle/.bash_profile
-sudo cp ~/Downloads/orabuntu-lxc-master/oracle.bashrc /var/lib/lxc/lxcora0/rootfs/home/oracle/.bashrc
-sudo cp ~/Downloads/orabuntu-lxc-master/oracle.kshrc /var/lib/lxc/lxcora0/rootfs/home/oracle/.kshrc
+sudo tar -vP --extract --file=lxc-lxcora01.tar /var/lib/lxc/lxcora01/rootfs/home/grid/.bashrc
+mv /var/lib/lxc/lxcora01/rootfs/home/grid/.bashrc /var/lib/lxc/lxcora0/rootfs/home/grid/.bashrc
 
-sudo cp -p ~/Downloads/orabuntu-lxc-master/rc.local /var/lib/lxc/lxcora0/rootfs/etc/rc.local
+sudo tar -vP --extract --file=lxc-lxcora01.tar /var/lib/lxc/lxcora01/rootfs/home/oracle/.bashrc
+mv /var/lib/lxc/lxcora01/rootfs/home/oracle/.bashrc /var/lib/lxc/lxcora0/rootfs/home/oracle/.bashrc
+
+sudo tar -vP --extract --file=lxc-lxcora01.tar /var/lib/lxc/lxcora01/rootfs/home/oracle/.bash_logout
+mv /var/lib/lxc/lxcora01/rootfs/home/oracle/.bash_logout /var/lib/lxc/lxcora0/rootfs/home/oracle/.bash_logout
+
+sudo tar -vP --extract --file=lxc-lxcora01.tar /var/lib/lxc/lxcora01/rootfs/home/oracle/.bash_profile
+mv /var/lib/lxc/lxcora01/rootfs/home/oracle/.bash_profile /var/lib/lxc/lxcora0/rootfs/home/oracle/.bash_profile
+
+sudo tar -vP --extract --file=lxc-lxcora01.tar /var/lib/lxc/lxcora01/rootfs/home/oracle/.kshrc
+mv /var/lib/lxc/lxcora01/rootfs/home/oracle/.kshrc /var/lib/lxc/lxcora0/rootfs/home/oracle/.kshrc
+
 sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@lxcora0 chown grid:oinstall /home/grid/grid
 sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@lxcora0 chown grid:oinstall /home/grid/grid/rpm
-sshpass -p root scp -o CheckHostIP=no -o StrictHostKeyChecking=no edit_bashrc root@lxcora0:/home/grid/.
-sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@lxcora0 chown grid:oinstall /home/grid/edit_bashrc
-sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@lxcora0 chmod 755 /home/grid/edit_bashrc
+sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@lxcora0 chown grid:oinstall /home/grid/.bashrc
+sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@lxcora0 chmod 755 /home/grid/.bashrc
 sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@lxcora0 usermod --password `perl -e "print crypt('grid','grid');"` grid
 sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@lxcora0 usermod --password `perl -e "print crypt('oracle','oracle');"` oracle
 sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@lxcora0 usermod -g oinstall oracle
@@ -139,9 +146,6 @@ sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@lxcora0 c
 sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@lxcora0 chown oracle:oinstall /home/oracle/.kshrc
 sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@lxcora0 chown oracle:oinstall /home/oracle/.bash_logout
 sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@lxcora0 chown oracle:oinstall /home/oracle/.
-sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@lxcora0 sed -i '/ORACLE_SID/d' /home/oracle/.bashrc
-sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@lxcora0 usermod --password `perl -e "print crypt('grid','grid');"` grid
-sshpass -p grid ssh -o CheckHostIP=no -o StrictHostKeyChecking=no grid@lxcora0 /home/grid/edit_bashrc
 
 echo ''
 echo "================================================"

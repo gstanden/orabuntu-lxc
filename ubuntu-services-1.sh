@@ -289,13 +289,16 @@ sleep 5
 
 sudo tar -P -xvf ubuntu-host.tar
 
-sudo mkdir -p /etc/network/openvswitch
+# GLS 20151215 This directory is created automatically during unpack of ubuntu-host.tar. 
+# sudo mkdir -p /etc/network/openvswitch
 
-sudo cp -p ~/Downloads/orabuntu-lxc-master/openvswitch-net /etc/network/if-up.d/.
-sudo chown root:root /etc/network/if-up.d/openvswitch-net
+# GLS 20151215 /etc/network/if-up.d/openvswitch-net has been added to the ubuntu-host.tar archive
+# sudo cp -p ~/Downloads/orabuntu-lxc-master/openvswitch-net /etc/network/if-up.d/.
+# sudo chown root:root /etc/network/if-up.d/openvswitch-net
 
-sudo cp -p ~/Downloads/orabuntu-lxc-master/rc.local.ubuntu.host /etc/rc.local
-sudo chown root:root /etc/rc.local
+# GLS 20151215 There are no non-default commands in /etc/rc.local anymore.
+# sudo cp -p ~/Downloads/orabuntu-lxc-master/rc.local.ubuntu.host /etc/rc.local
+# sudo chown root:root /etc/rc.local
 
 # GLS 20151213 So that network IPs match up with container names.
 sudo sed -i 's/10\.207\.39\.10/10\.207\.39\.9/' /etc/dhcp/dhcpd.conf

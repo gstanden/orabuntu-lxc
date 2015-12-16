@@ -118,10 +118,9 @@ sudo sed -i 's/vmem1\.vmem\.org/# vmem1\.vmem\.org/' /var/lib/lxc/lxcora0/rootfs
 sudo sed -i 's/vmem1\.vmem\.org/# vmem1\.vmem\.org/' /var/lib/lxc/lxcora01/rootfs/etc/fstab
 
 # GLS 20151213 Copy revised /etc/security/limits.conf to container
-# sudo tar -vP --extract --file=lxc-lxcora01.tar /var/lib/lxc/lxcora01/rootfs/etc/security/limits.conf
-sudo mkdir -p /var/lib/lxc/lxcora01/rootfs/etc/security
-sudo cp -p ~/Downloads/orabuntu-lxc-master/limits.conf /var/lib/lxc/lxcora01/rootfs/etc/security/limits.conf
-
+# GLS 20151215 Revised /etc/security/limits.conf updated in lxc-lxcora01.tar
+# GLS 20151215 Revised /root/hugepages_setting.sh updated in lxc-lxcora01.tar
+sudo tar -vP --extract --file=lxc-lxcora01.tar /var/lib/lxc/lxcora01/rootfs/etc/security/limits.conf
 sudo tar -vP --extract --file=lxc-lxcora01.tar /var/lib/lxc/lxcora01/rootfs/root/create_directories.sh
 sudo tar -vP --extract --file=lxc-lxcora01.tar /var/lib/lxc/lxcora01/rootfs/root/hugepages_setting.sh
 sudo tar -vP --extract --file=lxc-lxcora01.tar /var/lib/lxc/lxcora01/rootfs/etc/nsswitch.conf
