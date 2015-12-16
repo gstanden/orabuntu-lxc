@@ -120,19 +120,19 @@ sudo cp -p /var/lib/lxc/lxcora0/rootfs/home/grid/grid/rpm/cvuqdisk-1.0.9-1.rpm /
 sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@lxcora0 rpm -Uvh /home/grid/grid/rpm/cvuqdisk-1.0.9-1.rpm
 
 sudo tar -vP --extract --file=lxc-lxcora01.tar /var/lib/lxc/lxcora01/rootfs/home/grid/.bashrc
-mv /var/lib/lxc/lxcora01/rootfs/home/grid/.bashrc /var/lib/lxc/lxcora0/rootfs/home/grid/.bashrc
+sudo mv /var/lib/lxc/lxcora01/rootfs/home/grid/.bashrc /var/lib/lxc/lxcora0/rootfs/home/grid/.bashrc
 
 sudo tar -vP --extract --file=lxc-lxcora01.tar /var/lib/lxc/lxcora01/rootfs/home/oracle/.bashrc
-mv /var/lib/lxc/lxcora01/rootfs/home/oracle/.bashrc /var/lib/lxc/lxcora0/rootfs/home/oracle/.bashrc
+sudo mv /var/lib/lxc/lxcora01/rootfs/home/oracle/.bashrc /var/lib/lxc/lxcora0/rootfs/home/oracle/.bashrc
 
 sudo tar -vP --extract --file=lxc-lxcora01.tar /var/lib/lxc/lxcora01/rootfs/home/oracle/.bash_logout
-mv /var/lib/lxc/lxcora01/rootfs/home/oracle/.bash_logout /var/lib/lxc/lxcora0/rootfs/home/oracle/.bash_logout
+sudo mv /var/lib/lxc/lxcora01/rootfs/home/oracle/.bash_logout /var/lib/lxc/lxcora0/rootfs/home/oracle/.bash_logout
 
 sudo tar -vP --extract --file=lxc-lxcora01.tar /var/lib/lxc/lxcora01/rootfs/home/oracle/.bash_profile
-mv /var/lib/lxc/lxcora01/rootfs/home/oracle/.bash_profile /var/lib/lxc/lxcora0/rootfs/home/oracle/.bash_profile
+sudo mv /var/lib/lxc/lxcora01/rootfs/home/oracle/.bash_profile /var/lib/lxc/lxcora0/rootfs/home/oracle/.bash_profile
 
 sudo tar -vP --extract --file=lxc-lxcora01.tar /var/lib/lxc/lxcora01/rootfs/home/oracle/.kshrc
-mv /var/lib/lxc/lxcora01/rootfs/home/oracle/.kshrc /var/lib/lxc/lxcora0/rootfs/home/oracle/.kshrc
+sudo mv /var/lib/lxc/lxcora01/rootfs/home/oracle/.kshrc /var/lib/lxc/lxcora0/rootfs/home/oracle/.kshrc
 
 sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@lxcora0 chown grid:oinstall /home/grid/grid
 sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@lxcora0 chown grid:oinstall /home/grid/grid/rpm
