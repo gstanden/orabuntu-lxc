@@ -42,7 +42,7 @@ To install:
 1. Download the zip file from https://github.com/gstanden/orabuntu-lxc to your ~/Downloads directory on Ubuntu 15.x
 2. Unzip the zip file which will create the directory ~/Downloads/orabuntu-lxc-master
 3. Change directory to ~/Downloads/orabuntu-lxc-master
-4. Edit the script ubuntu-services.sh to tell ubuntu-services-4.sh how many oracle-ready containers you want to create.
+4. Edit the script ubuntu-services.sh with your desired parameters (see usage notes below).
 5. Run ONLY on fresh install of Ubuntu 15.04 or 15.10 !
 6. Run the script ~/Downloads/orabuntu-lxc-master/ubuntu-services.sh (note, it's a fully-automated, non-interactive script).
 
@@ -73,6 +73,8 @@ Typical values would by "6 5" (for OEL 6.5) or "5 9" (for OEL 5.9).  Choose the 
 "stlns01" is the name of your nameserver for your domain.  Choosed the name that you want. This server name will get the "10.207.39.1" IP address and it will have the nslookup name "stlns01.yourdomain.com".
 
 "lxcora" is the LXC container name prefix.  For the parameters shown below, the script will create 4 LXC containers with the names {lxcora10, lxcora11, lxcora12, lxcora13}.
+
+The "4" before the "lxcora" for script ubuntu-services-4.sh is the number of containers desired to be created.  So the parameters on ubuntu-services-4.sh say "create quantity 4 OEL 6.7 containers with names {lxcora10, lxcora11, lxcora12, lxcora13}.
 
 clear
 ~/Downloads/orabuntu-lxc-master/ubuntu-services-1.sh 6 7 orabuntu-lxc\.com stlns01
