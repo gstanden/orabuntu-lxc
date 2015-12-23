@@ -42,11 +42,11 @@ To install:
 1. Download the zip file from https://github.com/gstanden/orabuntu-lxc to your ~/Downloads directory on Ubuntu 15.x
 2. Unzip the zip file which will create the directory ~/Downloads/orabuntu-lxc-master
 3. Change directory to ~/Downloads/orabuntu-lxc-master
-4. Edit the script ubuntu-services.sh to tell ubuntu-services-3c.sh how many oracle-ready containers you want to create.
+4. Edit the script ubuntu-services.sh to tell ubuntu-services-4.sh how many oracle-ready containers you want to create.
 5. Run ONLY on fresh install of Ubuntu 15.04 or 15.10 !
 6. Run the script ~/Downloads/orabuntu-lxc-master/ubuntu-services.sh (note, it's a fully-automated, non-interactive script).
 
-Note 1: For now, only Oracle Enterprise Linux 6.x containers are supported.  
+Note 1: For now, only Oracle Enterprise Linux (OEL) 5.x and 6.x containers are supported.  
 Note 2: Support for Oracle Enterprise Linux 7.x on roadmap but not yet available.
 
 !!! =============================
@@ -63,25 +63,28 @@ The ubuntu-services.sh script is a master script which runs all of the below scr
 
 UPDATE:  You just run the file '~/Downloads/orabuntu-lxc-master/ubuntu-services.sh' to do the install.
 
-!!! =============================
+Here is what ubuntu-services.sh looks like.  You should edit it for your desired settings.
 
-  This is where the software proper begins.
+"6 7" is the major and minor release version of the OEL Linux that you wish to use for building your LXC containers.
+Typical values would by "6 5" (for OEL 6.5) or "5 9" (for OEL 5.9).  Choose the OEL 6.x or OEL 5.x release that you want.
 
-  ~/Downloads/orabuntu-lxc-master/ubuntu-services-1.sh
+"orabuntu-lxc\.com" is the name of the domain for your container network.  Choose the domain that you want. It can be of the form "somedomain\.com" or "somedomain\.net" etc., and it can also be of the form "corp\.somedomain\.com" but just be sure to put the backslash in front of any "." characters because the domain gets post-processed by sed and the "." needs to be escaped in the passed-in domain parameter.
 
-  ~/Downloads/orabuntu-lxc-master/ubuntu-services-2a.sh
+"stlns01" is the name of your nameserver for your domain.  Choosed the name that you want. This server name will get the "10.207.39.1" IP address and it will have the nslookup name "stlns01.yourdomain.com".
 
-  ~/Downloads/orabuntu-lxc-master/ubuntu-services-2b.sh
+"lxcora" is the LXC container name prefix.  For the parameters shown below, the script will create 4 LXC containers with the names {lxcora10, lxcora11, lxcora12, lxcora13}.
 
-  ~/Downloads/orabuntu-lxc-master/ubuntu-services-3a.sh
+clear
+~/Downloads/orabuntu-lxc-master/ubuntu-services-1.sh 6 7 orabuntu-lxc\.com stlns01
+clear
+~/Downloads/orabuntu-lxc-master/ubuntu-services-2.sh 6 7
+clear
+~/Downloads/orabuntu-lxc-master/ubuntu-services-3.sh 6 7
+clear
+~/Downloads/orabuntu-lxc-master/ubuntu-services-4.sh 6 7 4 lxcora
+clear
+~/Downloads/orabuntu-lxc-master/ubuntu-services-5.sh 6 7
 
-  ~/Downloads/orabuntu-lxc-master/ubuntu-services-3b.sh
-
-  ~/Downloads/orabuntu-lxc-master/ubuntu-services-3c.sh X  {where X is an integer between 1 and 99}
-
-  ~/Downloads/orabuntu-lxc-master/ubuntu-services-3d.sh
-
-The above steps will create the Oracle Enterprise Edition 6.5 LXC Oracle-enterprise-edition RAC-ready containers.
 
 !!! =============================
 
