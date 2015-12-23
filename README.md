@@ -77,16 +77,34 @@ Typical values would by "6 5" (for OEL 6.5) or "5 9" (for OEL 5.9).  Choose the 
 The "4" before the "lxcora" for script ubuntu-services-4.sh is the number of containers desired to be created.  So the parameters on ubuntu-services-4.sh say "create quantity 4 OEL 6.7 containers with names {lxcora10, lxcora11, lxcora12, lxcora13}.
 
 clear
+
 ~/Downloads/orabuntu-lxc-master/ubuntu-services-1.sh 6 7 orabuntu-lxc\.com stlns01
+
 clear
+
 ~/Downloads/orabuntu-lxc-master/ubuntu-services-2.sh 6 7
+
 clear
+
 ~/Downloads/orabuntu-lxc-master/ubuntu-services-3.sh 6 7
+
 clear
+
 ~/Downloads/orabuntu-lxc-master/ubuntu-services-4.sh 6 7 4 lxcora
+
 clear
+
 ~/Downloads/orabuntu-lxc-master/ubuntu-services-5.sh 6 7
 
+NOTE 1: Creating additional containers after the initial run with different OEL version:  You can rerun the ubuntu-services.sh script with a new version paramters (e.g. "6 5") and with a new container prefix name (e.g. "knylxc" instead of "lxcora") to create additional containers with a different OS version and different names.
+
+NOTE 2:  If you do a second run of ubuntu-services.sh to create additional containers of a different OS version, be aware that the software looks for the file "/etc/orabuntu-release" and if found, it skips some of the setup steps (such as package installs and the unpack of ubuntu-host.tar) since those steps were already done on the first pass, and it proceeds pretty much directly to the creation of the new seed container.
+
+NOTE 3:  Note that the seed containers (oel67, oel65, oel59, ...) get created on the 10.207.29.x network, while the cloned containers to be used for actual projects get created on the 10.207.39.x network.  Do not install Oracle Enterprise softwares into the oelxx containers, because these are your fully-configured, oracle-ready SEED containers which you can clone later to make more oracle-ready containers of that specific OEL version if you need more.
+
+NOTE 4:  When re-running the software, you are prompted early on to delete DHCP leases (Y/N) and to delete existing containers (Y/N).  If running the software a second time as mentioned above to create another set of containers of a different OS version, answer "N" to all the questions so that your first run of containers is not destroyed, nor the first SEED container.
+
+NOTE 5:  The DHCP lease delete steps and the container delete steps are useful if you run the whole set of scripts for the first time, and you run into some problem and want to start completely over.  In that case, answer "Y" to deleting DHCP leases, answer "Y" to delete containers, and answer "N" to "delete only the oelxx SEED container" so that the result will be ALL DHCP leases deleted, and ALL containers deleted, so that you are starting from scratch again.  Also, be sure before re-running "from scratch again" to DELETE the file "/etc/orabuntu-release" using "sudo rm /etc/orabuntu-release" so that the software executes ALL OS configuration steps again on the re-run of the first install.
 
 !!! =============================
 
