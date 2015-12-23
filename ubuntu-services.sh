@@ -1,15 +1,11 @@
 clear
-~/Downloads/orabuntu-lxc-master/ubuntu-services-1.sh
+~/Downloads/orabuntu-lxc-master/ubuntu-services-1.sh 6 7 corp\.charter\.com kstlldhcp01
 clear
-~/Downloads/orabuntu-lxc-master/ubuntu-services-2a.sh
+~/Downloads/orabuntu-lxc-master/ubuntu-services-2.sh 6 7
 clear
-~/Downloads/orabuntu-lxc-master/ubuntu-services-2b.sh
+~/Downloads/orabuntu-lxc-master/ubuntu-services-3.sh 6 7
 clear
-~/Downloads/orabuntu-lxc-master/ubuntu-services-3a.sh
+~/Downloads/orabuntu-lxc-master/ubuntu-services-4.sh 6 7 4 lxcora
 clear
-~/Downloads/orabuntu-lxc-master/ubuntu-services-3b.sh
-clear
-~/Downloads/orabuntu-lxc-master/ubuntu-services-3c.sh 3
-clear
-~/Downloads/orabuntu-lxc-master/ubuntu-services-3d.sh
+~/Downloads/orabuntu-lxc-master/ubuntu-services-5.sh 6 7
 
