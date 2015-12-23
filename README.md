@@ -96,6 +96,8 @@ clear
 
 ~/Downloads/orabuntu-lxc-master/ubuntu-services-5.sh 6 7
 
+KEEP IN MIND WHEN READING THE USAGE NOTES BELOW THAT IT IS STRONGLY ADVISED IN THE STERNEST TERMS TO ONLY INSTALL THIS SOFTWARE ON A FRESH INSTALL OF UBUNTU 15.10 OR 15.04 AND NOT TO INSTALL THIS ON A HIGHLY-CONFIGURED UBUNTU DESKTOP OR SERVER THAT HAS BEEN RUNNING FOR A LONG TIME WITH MANY CUSTOM-CONFIGURATIONS ALREADY IMPLEMENTED.  DOING SO IS AT YOUR OWN RISK.  THIS SOFTWARE MAKES CHANGES TO DHCP AND BIND9 (NAMED) CONFIGURATIONS SO IT COULD DISRUPT LOOKUPS AND NAME RESOLUTIONS ON AN ALREADY-BEEN-RUNNING-FOR-AWHILE UBUNTU HOST!
+
 NOTE 1: Creating additional containers after the initial run with different OEL version:  You can rerun the ubuntu-services.sh script with a new version paramters (e.g. "6 5") and with a new container prefix name (e.g. "knylxc" instead of "lxcora") to create additional containers with a different OS version and different names.  The indexes of the add-on second run of container creation will start from the next highest index, so if you ran "6 5 2 knylxc" as your ubuntu-services-4.sh parameters, you would get 2 OEL 6.5 containers in the set {knylxc15, knylxc16}
 
 NOTE 2:  If you do a second run of ubuntu-services.sh to create additional containers of a different OS version, be aware that the software looks for the file "/etc/orabuntu-release" and if found, it skips some of the setup steps (such as package installs and the unpack of ubuntu-host.tar) since those steps were already done on the first pass, and it proceeds pretty much directly to the creation of the new seed container.
