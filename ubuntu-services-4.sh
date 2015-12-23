@@ -125,7 +125,7 @@ then
 HighestContainerIndex=10
 i=$HighestContainerIndex
 else
-i=$((HighestContainerIndex))
+i=$((HighestContainerIndex+1))
 fi
 
 NewHighestContainerIndex=$((NumCon+HighestContainerIndex))
