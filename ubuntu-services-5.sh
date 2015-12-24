@@ -49,25 +49,10 @@ do
 		if [ $i -eq 5 ]
 		then
 		sudo lxc-stop -n $j
-		sleep 5
-		function GetVethCleanupsIterative {
-		sudo ip link show | grep $j | cut -f2 -d':' | sed 's/ //g' | cut -f1 -d'@' | sed 's/^/sudo ip link del "/' | sed 's/$/";/' > ~/veth_cleanups_$j.sh
-		}
-		if [ -e ~/veth_cleanups_$j.sh ]
-		then
-		sudo rm ~/veth_cleanups_$j.sh 
-		fi
-		$(GetVethCleanupsIterative)
+		sleep 2
 		echo ''
-		sudo ls -l ~/veth_cleanups_$j.sh
-		echo ''
-		sudo cat ~/veth_cleanups_$j.sh
-		echo ''
-		sudo chown root:root ~/veth_cleanups_$j.sh
-		sudo chmod 755 ~/veth_cleanups_$j.sh
-		sudo mv ~/veth_cleanups_$j.sh /etc/network/openvswitch/.
-		sleep 5
-		sudo /etc/network/openvswitch/veth_cleanups_$j.sh
+		sudo /etc/network/openvswitch/veth_cleanups.sh $j
+		sleep 2
 		sudo lxc-start -n $j
 		fi
 	sleep 1
@@ -114,7 +99,7 @@ mkdir ~/Networking
 fi
 
 cd ~/Networking
-sudo chmod 755 /etc/script/crt_links.sh 
+sudo chmod 755 /etc/scripts/crt_links.sh 
 sudo /etc/scripts/crt_links.sh
 
 echo ''

@@ -104,23 +104,6 @@ clear
 
 echo ''
 echo "=============================================="
-echo "Verify iptables rules are set correctly...    "
-echo "=============================================="
-echo ''
-
-sudo iptables -S
-
-echo ''
-echo "=============================================="
-echo "Verification of iptables rules complete.      "
-echo "=============================================="
-
-sleep 5
-
-clear
-
-echo ''
-echo "=============================================="
 echo "Normally accept the default "Y" to terminate  "
 echo "leases on a new install.                      "
 echo "If there are existing containers, then the    "
@@ -231,7 +214,7 @@ SeedContainersExist=$(CheckSeedContainersExist)
 
 echo ''
 echo "=============================================="
-read -e -p "Delete Only Container oel$OracleRelease? [Y/N]    " -i "Y" DestroySeedContainerOnly
+read -e -p "Delete Only Container oel$OracleRelease? [Y/N]    " -i "N" DestroySeedContainerOnly
 echo "=============================================="
 echo ''
 
@@ -244,7 +227,7 @@ fi
 
 for j in $DestroyContainers
 do
-sudo lxc-stop -n $j 
+sudo lxc-stop -n $j -k
 sleep 2
 sudo lxc-destroy -n $j -f 
 sudo rm -rf /var/lib/lxc/$j
@@ -425,54 +408,49 @@ fi
 
 if [ ! -e /etc/orabuntu-release ]
 then
-	echo ''
-	echo "============================================="
-	echo "Creating OpenvSwitch sw1 ...                 "
-	echo "============================================="
 
-	function CheckSwitchUpSw1 {
-	ifconfig sw1 | grep 'inet addr' | cut -f2 -d':' | cut -f1 -d' ' | sed 's/\.//g'
-	}
-	SwitchUpSw1=$(CheckSwitchUpSw1)
+echo ''
+echo "=============================================="
+echo "Starting required openvswitches...            "
+echo "=============================================="
+echo ''
 
-	function CheckSwitchUpSx1 {
-	ifconfig sx1 | grep 'inet addr' | cut -f2 -d':' | cut -f1 -d' ' | sed 's/\.//g'
-	}
-	SwitchUpSx1=$(CheckSwitchUpSx1)
+	sudo /etc/network/openvswitch/crt_ovs_sw1.sh >/dev/null 2>&1
+	echo ''
+	sudo /etc/network/openvswitch/crt_ovs_sx1.sh >/dev/null 2>&1
+	echo ''
+	sudo ifconfig sw1
+	echo ''
+	sudo ifconfig sx1
 
-	if [ $SwitchUpSw1 -eq 10207391 ]
-	then
-	echo ''
-	echo "============================================="
-	echo "Openvswitch sw1 is already up."
-	echo "============================================="
-	else
-	sudo /etc/network/openvswitch/crt_ovs_sw1.sh
-	fi
+echo ''
+echo "=============================================="
+echo "Required openvswitches started.               "
+echo "=============================================="
+echo ''
 
-	echo ''
-	echo "============================================="
-	echo "OpenvSwitch sw1 created.                     "
-	echo "============================================="
-
-	if [ $SwitchUpSx1 -eq 10207291 ]
-	then
-	echo ''
-	echo "============================================="
-	echo "Openvswitch sx1 is already up."
-	echo "============================================="
-	else
-	sudo /etc/network/openvswitch/crt_ovs_sx1.sh
-	fi
-
-	echo ''
-	echo "============================================="
-	echo "OpenvSwitch sw1 created.                     "
-	echo "============================================="
-	echo ''
-	sleep 5
-	clear
 fi
+
+sleep 5
+
+clear
+
+echo ''
+echo "=============================================="
+echo "Verify iptables rules are set correctly...    "
+echo "=============================================="
+echo ''
+
+sudo iptables -S
+
+echo ''
+echo "=============================================="
+echo "Verification of iptables rules complete.      "
+echo "=============================================="
+
+sleep 5
+
+clear
 
 echo ''
 echo "============================================"
@@ -667,13 +645,11 @@ echo ''
 echo "=============================================="
 echo "Create the LXC oracle container complete      "
 echo "(Passwords are the same as the usernames)     "
-echo "Sleeping 5 seconds...                        "
+echo "Sleeping 5 seconds...                         "
 echo "=============================================="
 echo ''
 
 sleep 5
-
-fi
 
 clear
 

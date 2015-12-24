@@ -79,35 +79,6 @@ sudo lxc-ls -f | sed 's/  */ /g' | grep oel$OracleRelease | cut -f3 -d' ' | sed 
 }
 PublicIP=$(CheckPublicIP)
 
-# GLS 20151217 Veth Pair Cleanups Module Begin 
-
-function GetVethCleanups {
-sudo ip link show | grep oel$OracleRelease | cut -f2 -d':' | sed 's/ //g' | cut -f1 -d'@' | sed 's/^/sudo ip link del "/' | sed 's/$/";/' > ~/Networking/veth_cleanups_oel$OracleRelease.sh
-}
-$(GetVethCleanups)
-
-if [ -s ~/Networking/veth_cleanups_oel$OracleRelease.sh ]
-then
-	sudo cp -p ~/Networking/veth_cleanups_oel$OracleRelease.sh /etc/network/openvswitch/.
-	sudo chown root:root /etc/network/openvswitch/veth_cleanups_oel$OracleRelease.sh
-	sudo chmod 755 /etc/network/openvswitch/veth_cleanups_oel$OracleRelease.sh
-	sudo rm ~/Networking/veth_cleanups_oel$OracleRelease.sh
-else
-	echo "sudo ip link del "oel$OracleRelease""       >  ~/Networking/veth_cleanups_oel$OracleRelease.sh
-	echo "sudo ip link del "oel$OracleRelease-priv1"" >> ~/Networking/veth_cleanups_oel$OracleRelease.sh
-	echo "sudo ip link del "oel$OracleRelease-priv2"" >> ~/Networking/veth_cleanups_oel$OracleRelease.sh
-	echo "sudo ip link del "oel$OracleRelease-priv3"" >> ~/Networking/veth_cleanups_oel$OracleRelease.sh
-	echo "sudo ip link del "oel$OracleRelease-priv4"" >> ~/Networking/veth_cleanups_oel$OracleRelease.sh
-	echo "sudo ip link del "oel$OracleRelease-asm1""  >> ~/Networking/veth_cleanups_oel$OracleRelease.sh
-	echo "sudo ip link del "oel$OracleRelease-asm2""  >> ~/Networking/veth_cleanups_oel$OracleRelease.sh
-	sudo cp -p ~/Networking/veth_cleanups_oel$OracleRelease.sh /etc/network/openvswitch/.
-	sudo chown root:root /etc/network/openvswitch/veth_cleanups_oel$OracleRelease.sh
-	sudo chmod 755 /etc/network/openvswitch/veth_cleanups_oel$OracleRelease.sh
-	sudo rm ~/Networking/veth_cleanups_oel$OracleRelease.sh
-fi
-
-# GLS 20151217 Veth Pair Cleanups Module End
-
 echo ''
 echo "=============================================="
 echo "Starting LXC Seed Container for Oracle        "
@@ -140,7 +111,7 @@ then
 			if [ $i -eq 5 ]
 			then
 			sudo lxc-stop -n $j > /dev/null 2>&1
-			sudo /etc/network/openvswitch/veth_cleanups_$j.sh > /dev/null 2>&1
+			sudo /etc/network/openvswitch/veth_cleanups.sh oel$OracleRelease
 			sudo lxc-start -n $j > /dev/null 2>&1
 			fi
 		sleep 1
