@@ -16,6 +16,7 @@ echo "This script is re-runnable                    "
 echo "=============================================="
 echo ''
 
+OracleMajor=$1
 OracleRelease=$1$2
 OracleVersion=$1.$2
 
@@ -68,7 +69,7 @@ sudo cat /var/lib/lxc/oel$OracleRelease/config | grep hwaddr | tail -1 | sed 's/
 OriginalHwaddr=$(GetOriginalHwaddr)
 echo $OriginalHwaddr | sed 's/\\//g'
 
-sudo cp -p /var/lib/lxc/oel$OracleRelease/config.oracle.bak /var/lib/lxc/oel$OracleRelease/config.oracle
+sudo cp -p /var/lib/lxc/oel$OracleRelease/config.oracle.bak.oel$OracleMajor /var/lib/lxc/oel$OracleRelease/config.oracle
 
 sudo sed -i "s/lxc\.network\.hwaddr.*/$OriginalHwaddr/" /var/lib/lxc/oel$OracleRelease/config.oracle
 sudo cp -p /var/lib/lxc/oel$OracleRelease/config.oracle /var/lib/lxc/oel$OracleRelease/config
@@ -221,7 +222,7 @@ echo "Initialize LXC Seed Container on OpenvSwitch.."
 echo "=============================================="
 
 cd /etc/network/if-up.d/openvswitch
-sudo sed -i "s/ContainerName/oel$OracleRelease/" /var/lib/lxc/oel$OracleRelease/config
+sudo sed -i "s/ContainerName/oel$OracleRelease/g" /var/lib/lxc/oel$OracleRelease/config
 
 function CheckContainerUp {
 sudo lxc-ls -f | grep oel$OracleRelease | sed 's/  */ /g' | egrep 'RUNNING|STOPPED'  | cut -f2 -d' '

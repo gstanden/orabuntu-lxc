@@ -90,7 +90,7 @@ read -e -p "Add ASM Private Networks and RAC Private Networks ? [Y/N]   " -i "Y"
 
 if [ $AddPrivateNetworks = 'y' ] || [ $AddPrivateNetworks = 'Y' ]
 then
-	sudo sed -i "s/ContainerName/oel$OracleRelease/" /var/lib/lxc/oel$OracleRelease/config.asm.flex.cluster
+	sudo sed -i "s/ContainerName/oel$OracleRelease/g" /var/lib/lxc/oel$OracleRelease/config.asm.flex.cluster
 	sudo bash -c "cat /var/lib/lxc/oel$OracleRelease/config /var/lib/lxc/oel$OracleRelease/config.asm.flex.cluster > /var/lib/lxc/oel$OracleRelease/config.asm.flex"
 	sudo mv /var/lib/lxc/oel$OracleRelease/config.asm.flex /var/lib/lxc/oel$OracleRelease/config
 fi
