@@ -1,6 +1,9 @@
 #!/bin/bash
 
-# v2.1
+clear
+
+# v2.4 GLS 20151224
+
 echo ''
 sudo date
 echo ''

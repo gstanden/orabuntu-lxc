@@ -1,5 +1,9 @@
 #!/bin/bash
 
+clear
+
+# v2.4 GLS 20151224
+
 echo ''
 echo "=============================================="
 echo "Script: ubuntu-services-5.sh                  "
@@ -27,7 +31,7 @@ echo "=============================================="
 echo ''
 
 function CheckClonedContainersExist {
-sudo ls /var/lib/lxc | grep -v oel | sort -V | sed 's/$/ /' | tr -d '\n' 
+sudo ls /var/lib/lxc | egrep "oel$OracleRelease|ora$OracleRelease" | sort -V | sed 's/$/ /' | tr -d '\n' 
 }
 ClonedContainersExist=$(CheckClonedContainersExist)
 
@@ -35,13 +39,19 @@ for j in $ClonedContainersExist
 do
 	echo "Starting container $j ..."
 	function CheckPublicIPIterative {
-	sudo lxc-ls -f | sed 's/  */ /g' | grep $j | grep RUNNING | cut -f3 -d' ' | sed 's/,//' | cut -f1-3 -d'.' | sed 's/\.//g'
+	sudo lxc-ls -f | sed 's/  */ /g' | grep $j | grep RUNNING | cut -f3 -d' ' | sed 's/,//' | cut -f1-2 -d'.' | sed 's/\.//g'
 	}
 	PublicIPIterative=$(CheckPublicIPIterative)
+	echo $j | grep oel
+	if [ $? -eq 0 ]
+	then
+	sudo sed -i "s/\.39/\.$OracleRelease/g" /var/lib/lxc/oel$OracleRelease/config
+	sudo sed -i "s/\.40/\.$OracleRelease/g" /var/lib/lxc/oel$OracleRelease/config
+	fi
 	sudo lxc-start -n $j > /dev/null 2>&1
 	sleep 5
 	i=1
-	while [ "$PublicIPIterative" != 1020739 ] && [ "$i" -le 10 ]
+	while [ "$PublicIPIterative" != 10207 ] && [ "$i" -le 10 ]
 	do
 		echo "Waiting for $j Public IP to come up..."
 		sleep 5

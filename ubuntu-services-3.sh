@@ -1,5 +1,9 @@
 #!/bin/bash
 
+clear
+
+# v2.4 GLS 20151224
+
 echo ''
 echo "=============================================="
 echo "Script:  ubuntu-services-3.sh                 "
