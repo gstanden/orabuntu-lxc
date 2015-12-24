@@ -1,6 +1,5 @@
 #!/bin/bash
 
-# v2.1
 echo ''
 sudo date
 echo ''
@@ -412,7 +411,7 @@ then
 
 echo ''
 echo "=============================================="
-echo "Starting required openvswitches...be patient! "
+echo "Starting required openvswitches...            "
 echo "=============================================="
 
 	sudo /etc/network/openvswitch/crt_ovs_sw1.sh >/dev/null 2>&1
@@ -645,6 +644,7 @@ echo "Create the LXC oracle container complete      "
 echo "(Passwords are the same as the usernames)     "
 echo "Sleeping 5 seconds...                         "
 echo "=============================================="
+echo ''
 
 sleep 5
 
@@ -652,8 +652,8 @@ clear
 
 echo ''
 echo "=============================================="
-echo "Set /etc/resolv.conf nameserver 127.0.0.1...  "
-echo "This will be set automatically on reboot.     "
+echo "Check nameserver set to 127.0.0.1...          "
+echo "(This will be set automatically on reboot).   "
 echo "=============================================="
 echo ''
 
@@ -663,7 +663,7 @@ sudo cat /etc/resolv.conf
 
 echo ''
 echo "=============================================="
-echo "Nameserver 127.0.0.1 set in /etc/resolv.conf  "
+echo "Nameserver 127.0.0.1 set.                     "
 echo "=============================================="
 echo ''
 
@@ -671,17 +671,6 @@ sleep 5
 
 clear
 
-echo "============================================"
-echo "Next script to run: ubuntu-services-2.sh    "
-echo "============================================"
-
-
-
-sleep 5
-
-clear
-
-echo ''
 echo "============================================"
 echo "Next script to run: ubuntu-services-2.sh    "
 echo "============================================"
