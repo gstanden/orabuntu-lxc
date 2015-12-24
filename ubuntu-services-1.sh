@@ -643,7 +643,37 @@ echo "Create the LXC oracle container complete      "
 echo "(Passwords are the same as the usernames)     "
 echo "Sleeping 5 seconds...                         "
 echo "=============================================="
+
+sleep 5
+
+clear
+
 echo ''
+echo "=============================================="
+echo "Set /etc/resolv.conf nameserver 127.0.0.1...  "
+echo "This will be set automatically on reboot.     "
+echo "=============================================="
+echo ''
+
+sudo sed -i "/127\.0\.1\.1/s/127\.0\.1\.1/127\.0\.0\.1/" /run/resolvconf/resolv.conf
+
+sudo cat /etc/resolv.conf
+
+echo ''
+echo "=============================================="
+echo "Nameserver 127.0.0.1 set in /etc/resolv.conf  "
+echo "=============================================="
+echo ''
+
+sleep 5
+
+clear
+
+echo "============================================"
+echo "Next script to run: ubuntu-services-2.sh    "
+echo "============================================"
+
+
 
 sleep 5
 
