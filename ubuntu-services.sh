@@ -14,6 +14,9 @@ sleep 10
 
 echo 'Controlling script for orabuntu-lxc'
 echo 'by Gilbert Standen 20151224'
+echo ''
+
+sleep 5
 
 # Usage:
 
