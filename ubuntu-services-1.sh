@@ -413,17 +413,13 @@ echo ''
 echo "=============================================="
 echo "Starting required openvswitches...            "
 echo "=============================================="
-echo ''
 
 	sudo /etc/network/openvswitch/crt_ovs_sw1.sh >/dev/null 2>&1
-	echo ''
-	sudo /etc/network/openvswitch/crt_ovs_sx1.sh >/dev/null 2>&1
 	echo ''
 	sudo ifconfig sw1
 	echo ''
 	sudo ifconfig sx1
 
-echo ''
 echo "=============================================="
 echo "Required openvswitches started.               "
 echo "=============================================="
