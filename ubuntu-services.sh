@@ -2,8 +2,18 @@
 
 # v2.4 GLS 20151224
 
-# Controlling script for orabuntu-lxc
-# Gilbert Standen 20151224
+echo ''
+echo '++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
+echo '"We have just folded space from Ix. Many machines on Ix. New machines. Better than those on Richesse."'
+echo '                                                                                                      '
+echo '                         -- Third Stage Navigator, from DUNE by Frank Herbert                         '
+echo '++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
+echo ''
+
+sleep 10
+
+echo 'Controlling script for orabuntu-lxc'
+echo 'by Gilbert Standen 20151224'
 
 # Usage:
 
