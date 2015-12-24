@@ -245,7 +245,7 @@ clear
 
 echo ''
 echo "=============================================="
-echo "         Show Running Containers...           "
+echo "         Show Defined Containers...           "
 echo "=============================================="
 echo ''
 
@@ -253,7 +253,7 @@ sudo lxc-ls -f
 
 echo ''
 echo "=============================================="
-echo "Running Container Check completed             "
+echo "         Container Check completed.           "
 echo "=============================================="
 
 sleep 5
