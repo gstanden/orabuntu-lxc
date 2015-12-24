@@ -411,11 +411,12 @@ then
 
 echo ''
 echo "=============================================="
-echo "Starting required openvswitches...            "
+echo "Starting required openvswitches...be patient! "
 echo "=============================================="
 
 	sudo /etc/network/openvswitch/crt_ovs_sw1.sh >/dev/null 2>&1
 	echo ''
+	sleep 25
 	sudo ifconfig sw1
 	echo ''
 	sudo ifconfig sx1
