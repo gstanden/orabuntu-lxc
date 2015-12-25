@@ -102,8 +102,10 @@ ora67c10
 ora67c11
 ora67c12
 ora67c13
+ora67c14
+ora67c15
 ```
-assuming that you created the OEL 6.7 containers on the first run (numbering always starts at "10" so as not to run afoul of a bug in 12.1.0.2.0 that affects server names that do not have the same number of character counts (ora67c1 vs ora67c10).
+assuming that you created the OEL 6.7 containers on the first run (numbering always starts at "10" so as not to run afoul of a bug in 12.1.0.2.0 that affects server names that do not have the same number of character counts (ora67c1 vs ora67c10).  Also, as mentioned previously, due to the iteration index bug, you get 6 containers on the first run of orabuntu-lxc instead of 5.  Note also that the iteration index issue does not apply to subsequent re-runs of orabuntu-lxc.  If you run orabuntu-lxc again to add other versions of OEL to your mix, such as OEL 7.1, WYSIWG you specify "n" containers and you get "n" containers.
 
 So inside the ubuntu-services.sh script we have:
 ```
