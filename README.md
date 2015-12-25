@@ -11,6 +11,25 @@ One can think of orabuntu-lxc as a sort of Oracle Enterprise Linux 'emulation la
 
 The Oracle Enterprise Edition 6.5 LXC Linux containers run at bare metal resource utilization for network, storage, and CPU with NO hypervisor performance penalty.  That is because LXC does NOT use a hypervisor.  Every container accesses all compute resources at bare-metal utilization and speed.  Also, because there is NO hypervisor, LXC Linux containers achieve 10x the density of hypervisor-based systems per unit compute resource.  Because LXC Linux containers deploy in seconds instead of hours or days, LXC Linux containers also achieve huge improvements in elasticity compared to hypervisor-based systems, because they can be spun up in seconds as needed.  
 
+#### Why orabuntu-lxc ?
+
+Orabuntu-lxc was designed to be minimally invasive to an existing Ubuntu desktop or server and had the following design goals, all of which are satisfied as listed below.
+```
+* No changes to Ubuntu dnsmasq-base default network, i.e is a pure add-on networking overlay;
+* Does not require any changes to Ubuntu NetworkManager or to default Ubuntu networking;
+*Does not require any removal of Linux Bridge software;
+* No physical interfaces directly connected to the OpenvSwitch (iptables/NAT are used for external address resolution);
+* Allows external interface switching while LXC containers are running with NO loss of www DNS resolution;
+* Automatic internet-connected interface (eth0, wlan0, bnep0) detection and connection to OpenvSwitch;
+* Uses OpenvSwitch as the networking solution for LXC, KVM and VirtualBox DEUs;
+* Uses OpenvSwitch, a production-ready, multilayer virtual switch licensed under the open source Apache 2.0 license
+* Uses bind9 for OpenvSwitch DNS and isc-dhcp-server for DHCP services
+* Uses openvswitch tags for VLAN'g and is flexible to add as many additional networks as you wish
+* Integrates DNS and DHCP to update DNS automatically when new DEUs are added (DEU: "Density Elasticty Unit", i.e. "VMs")
+* Uses the built-in Ubuntu dnsmasq-base for Ubuntu default networking and makes no change to default desktop networking.
+* LXC openvswitch network is a pure add-on to default Ubuntu network, not a replacement
+* Because it's LXC, VT-d and VT-x are NOT needed so older laptops and desktops without VT-d/x should be able to run LXC
+```
 Install on a FRESH INSTALL of 15.04 or 15.10 ONLY. I have not bulletproofed this for install on "been-running-for-awhile" deployments of Ubuntu.  It could overwrite stuff so review the scripts VERY carefully first if you are going to put this on an Ubuntu 15.x that you have been using for a long time that is already customized. 
 
 I have NOT tested this yet on Ubuntu 12.x, 13.x, or 14.x          (tests and validation coming soon for these versions!)
@@ -58,7 +77,7 @@ Run ~/Downloads/orabuntu-lxc-master/ubuntu-services.sh script first.
 
 Usage is shown below:
 ```
->~/Downloads/orabuntu-lxc-master/ubuntu-services-1.sh 6 7 5 orabuntu-lxc\\.com stlns01
+~/Downloads/orabuntu-lxc-master/ubuntu-services-1.sh 6 7 5 orabuntu-lxc\\.com stlns01
 ```
 "6 7" is the major and minor release version of the OEL Linux that you wish to use for building your LXC containers.
 Typical values would by "6 5" (for OEL 6.5) or "5 9" (for OEL 5.9).  Choose the OEL 5.x, 6.x, 7.x release that you want.
@@ -73,47 +92,47 @@ Typical values would by "6 5" (for OEL 6.5) or "5 9" (for OEL 5.9).  Choose the 
 
 So inside the ubuntu-services.sh script we have:
 ```
->clear
->~/Downloads/orabuntu-lxc-master/ubuntu-services-1.sh $1 $2 $4 $5
->clear
->~/Downloads/orabuntu-lxc-master/ubuntu-services-2.sh $1 $2
->clear
->~/Downloads/orabuntu-lxc-master/ubuntu-services-3.sh $1 $2
->clear
->~/Downloads/orabuntu-lxc-master/ubuntu-services-4.sh $1 $2 $3 ora$1$2c
->clear
->~/Downloads/orabuntu-lxc-master/ubuntu-services-5.sh $1 $2
+clear
+~/Downloads/orabuntu-lxc-master/ubuntu-services-1.sh $1 $2 $4 $5
+clear
+~/Downloads/orabuntu-lxc-master/ubuntu-services-2.sh $1 $2
+clear
+~/Downloads/orabuntu-lxc-master/ubuntu-services-3.sh $1 $2
+clear
+~/Downloads/orabuntu-lxc-master/ubuntu-services-4.sh $1 $2 $3 ora$1$2c
+clear
+~/Downloads/orabuntu-lxc-master/ubuntu-services-5.sh $1 $2
 ```
 KEEP IN MIND WHEN READING THE USAGE NOTES BELOW THAT IT IS STRONGLY ADVISED IN THE STERNEST TERMS TO ONLY INSTALL THIS SOFTWARE ON A FRESH INSTALL OF UBUNTU 15.10 OR 15.04 AND NOT TO INSTALL THIS ON A HIGHLY-CONFIGURED UBUNTU DESKTOP OR SERVER THAT HAS BEEN RUNNING FOR A LONG TIME WITH MANY CUSTOM-CONFIGURATIONS ALREADY IMPLEMENTED.  DOING SO IS AT YOUR OWN RISK.  THIS SOFTWARE MAKES CHANGES TO DHCP AND BIND9 (NAMED) CONFIGURATIONS SO IT COULD DISRUPT LOOKUPS AND NAME RESOLUTIONS ON AN ALREADY-BEEN-RUNNING-FOR-AWHILE UBUNTU HOST!
 
 That being said, note that by default, Ubuntu desktop uses dnsmasq for name resolution.  Since desktop version of ubuntu don't use bind9 (aka "named") or isc-dhcp-server (DHCP) normally you can install orabuntu-lxc onto your desktop version with no fear of breaking anything with regard to name resolution.  This software is designed to play nice with dnsmasq, and orabuntu-lxc does not delete any bridges or make any changes to the default dnsmasq name resolution of Ubuntu 15 except for the following:
 ```
->jsteed@A1510:~/Networking$ cat local
+jsteed@A1510:~/Networking$ cat local
 
->server=/yourdomain.com/10.207.39.1
->server=/39.207.10.in-addr.arpa/10.207.39.1
->server=/consultingcommandos.us/10.207.29.1
->server=/29.207.10.in-addr.arpa/10.207.29.1
+server=/yourdomain.com/10.207.39.1
+server=/39.207.10.in-addr.arpa/10.207.39.1
+server=/consultingcommandos.us/10.207.29.1
+server=/29.207.10.in-addr.arpa/10.207.29.1
 
->jsteed@A1510:~/Networking$ ls -lrt local
+jsteed@A1510:~/Networking$ ls -lrt local
 
->lrwxrwxrwx 1 root root 35 Dec 24 19:32 local -> /etc/NetworkManager/dnsmasq.d/local
+lrwxrwxrwx 1 root root 35 Dec 24 19:32 local -> /etc/NetworkManager/dnsmasq.d/local
 
->jsteed@A1510:~/Networking$ 
+jsteed@A1510:~/Networking$ 
 ```
 
 NOTE 1: Creating additional containers after the initial run with different OEL version:  You can rerun the ubuntu-services.sh script with a new version paramters (e.g. "7 1") The indexes of the add-on second run of container creation will start from the next highest index, so if you ran "6 7 5 orabuntu-lxc\\.com stlns01" as your first run ubuntu-services.sh parameters, and then ran "7 1 2 orabuntu-lxc\\.com stlns01" as your second run parameters, you would get the following list of containers:
 ```
->oel67
->oel71
->ora67c10
->ora67c11
->ora67c12
->ora67c13
->ora67c14
->ora67c15
->ora71c16
->ora71c17
+oel67
+oel71
+ora67c10
+ora67c11
+ora67c12
+ora67c13
+ora67c14
+ora67c15
+ora71c16
+ora71c17
 ```
 NOTE 1: The first run produces n+1 containers (one more than requested) due to a bug I will fix soon.  Workaround is just to request n-1 when you really want n for the first run.
 
@@ -147,9 +166,9 @@ IMPORTANT:  Whatever storage solution you use, your storage LUNs will appear in 
 
 which of course will actually refer to a /dev/dm- device.  If you are on Ubuntu 15.10, the storage will be a symlink in /dev/mapper to the /dev/dm-* device, or, if you are on Ubuntu 15.04 the storage will 'usually' be a device node (no symlink) in /dev/mapper but note that in Ubuntu 15.04 the disposition of multipath storage in /dev/mapper can sometimes be a mix of device nodes and symlinks as shown for example below:
 ```
->gstanden@W1504:~$ ls -l /dev/mapper
->brw-rw---- 1 grid asmadmin 252,   2 Dec  8 11:29 asm_fra1_01
->lrwxrwxrwx 1 grid asmadmin        7 Dec  8 11:07 asm_fra1_02 -> ../dm-5
+gstanden@W1504:~$ ls -l /dev/mapper
+brw-rw---- 1 grid asmadmin 252,   2 Dec  8 11:29 asm_fra1_01
+lrwxrwxrwx 1 grid asmadmin        7 Dec  8 11:07 asm_fra1_02 -> ../dm-5
 ```
 NOTE:  The orabuntu-lxc software can handle both (a) actual device nodes in /dev/mapper and (b) symlinks in /dev/mapper and so mixtures of both device nodes and symlinks is fine.  The only requirement for my scripting is that the storage for Oracle in /dev/mapper have the 'asm*' prefix.  Both of the above forms of storage presentation in /dev/mapper (symlink or device node or mixtures of both) are fine no problems.
 
@@ -161,17 +180,17 @@ cd scst-files
 
 Run the create-scst-*.sh files in the order shown below.
 ```
->  ~/Downloads/orabuntu-lxc-master/scst-files/create-scst-1a.sh
->  ~/Downloads/orabuntu-lxc-master/scst-files/create-scst-1b.sh
->  ~/Downloads/orabuntu-lxc-master/scst-files/create-scst-1c.sh
->  ~/Downloads/orabuntu-lxc-master/scst-files/create-scst-1d.sh
->  ~/Downloads/orabuntu-lxc-master/scst-files/create-scst-2a.sh (host reboots into SCST kernel at script end)
->  ~/Downloads/orabuntu-lxc-master/scst-files/create-scst-2b.sh
->  ~/Downloads/orabuntu-lxc-master/scst-files/create-scst-3.sh
->  ~/Downloads/orabuntu-lxc-master/scst-files/create-scst-4a.sh
->  ~/Downloads/orabuntu-lxc-master/scst-files/create-scst-4b.sh
->  ~/Downloads/orabuntu-lxc-master/scst-files/create-scst-5a.sh
->  ~/Downloads/orabuntu-lxc-master/scst-files/create-scst-5b.sh (host reboots at script end)
+  ~/Downloads/orabuntu-lxc-master/scst-files/create-scst-1a.sh
+  ~/Downloads/orabuntu-lxc-master/scst-files/create-scst-1b.sh
+  ~/Downloads/orabuntu-lxc-master/scst-files/create-scst-1c.sh
+  ~/Downloads/orabuntu-lxc-master/scst-files/create-scst-1d.sh
+  ~/Downloads/orabuntu-lxc-master/scst-files/create-scst-2a.sh (host reboots into SCST kernel at script end)
+  ~/Downloads/orabuntu-lxc-master/scst-files/create-scst-2b.sh
+  ~/Downloads/orabuntu-lxc-master/scst-files/create-scst-3.sh
+  ~/Downloads/orabuntu-lxc-master/scst-files/create-scst-4a.sh
+  ~/Downloads/orabuntu-lxc-master/scst-files/create-scst-4b.sh
+  ~/Downloads/orabuntu-lxc-master/scst-files/create-scst-5a.sh
+  ~/Downloads/orabuntu-lxc-master/scst-files/create-scst-5b.sh (host reboots at script end)
 ```
 Once all these scripts have run the SCST SAN and LUNs will be ready for the Oracle Grid Infrastructure 12c install.
 
@@ -187,15 +206,15 @@ Connect to the containerized Oracle instances from your Ubuntu 15.x OS terminal 
 
 https://sites.google.com/site/nandydandyoracle/technologies/lxc/docker-11gr2-ee-ul (installing instantclient subsection)
 ```
->sqlplus sys/password@lxc1-scan.gns1.vmem.org:1521/VMEM1 as sysdba  (for sys connection)
->sqlplus system/password@lxc1-scan.gns1.vmem.org:1521/VMEM1         (for system connection)
+sqlplus sys/password@lxc1-scan.gns1.vmem.org:1521/VMEM1 as sysdba  (for sys connection)
+sqlplus system/password@lxc1-scan.gns1.vmem.org:1521/VMEM1         (for system connection)
 ```
 To manage the LXC containers from the Ubuntu host command line:
 ```
->sudo lxc-stop -n oel71c15
->sudo lxc-start -n oel59c10
->sudo lxc-console -n oel67c21 
->sudo lxc-ls -f 
+sudo lxc-stop -n oel71c15
+sudo lxc-start -n oel59c10
+sudo lxc-console -n oel67c21 
+sudo lxc-ls -f 
 ```
 NOTE:  I will be adding the instantclient install to the scripted solution soon.
 
