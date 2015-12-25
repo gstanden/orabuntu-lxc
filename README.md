@@ -86,7 +86,7 @@ is the name of the domain for your container network.  Choose the domain that yo
 ```
 "stlns01"
 ```
-is the name of your nameserver for your domain.  Choosed the name that you want. This server name will get the "10.207.39.1" IP address and it will have the nslookup name "stlns01.yourdomain.com".  Note that this is not an existing nameserver in your network, but rather an arbitrary name that will be copied to /var/lib/bind/fwd.yourdomain and /var/lib/bind/rev.yourdomain that will be assigned the IP address 10.207.39.1 which also happens to be the IP address assigned to openvswitch sw1.  This server name will be the nameserver for your LXC container network and anything else that you put on the openvswitch sw1 network 10.207.39.x. (for example you could add in some KVM VM's if you wanted to onto that same openvswitch network if you had some legacy VM's also).
+is the name of your nameserver for your domain.  Choose the name that you want. This server name will get the "10.207.39.1" IP address and it will have the nslookup name "stlns01.yourdomain.com".  Note that this is not an existing nameserver in your network, but rather an arbitrary name that will be copied to /var/lib/bind/fwd.yourdomain and /var/lib/bind/rev.yourdomain that will be assigned the IP address 10.207.39.1 which also happens to be the IP address assigned to openvswitch sw1.  This server name will be the nameserver for your LXC container network and anything else that you put on the openvswitch sw1 network 10.207.39.x. (for example you could add in some KVM VM's if you wanted to onto that same openvswitch network if you had some legacy VM's also).
 
 ```
 "ora$1$2c" 
