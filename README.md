@@ -68,6 +68,7 @@ Usage is shown below:
 ```
 ~/Downloads/orabuntu-lxc-master/ubuntu-services.sh 6 7 5 orabuntu-lxc\\.com stlns01
 ```
+Explanations of the example passed-in parameters are as shown below.
 ```
 "6 7" 
 ```
