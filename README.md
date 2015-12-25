@@ -76,34 +76,25 @@ Typical values would by "6 5" (for OEL 6.5) or "5 9" (for OEL 5.9).  Choose the 
 "ora$1$2c" is the LXC container name prefix.  For the parameters shown above, the script will create 4 LXC containers with the names {ora67c10, ora67c11, ora67c12, ora67c13} assuming that you created the OEL 6.7 containers on the first run (numbering always starts at "10" so as not to run afoul of a bug in 12.1.0.2.0 that affects server names that do not have the same number of character counts (ora67c1 vs ora67c10).
 
 So inside the ubuntu-services.sh script we have:
-
-clear
-
-~/Downloads/orabuntu-lxc-master/ubuntu-services-1.sh $1 $2 $4 $5
-
-clear
-
-~/Downloads/orabuntu-lxc-master/ubuntu-services-2.sh $1 $2
-
-clear
-
-~/Downloads/orabuntu-lxc-master/ubuntu-services-3.sh $1 $2
-
-clear
-
-~/Downloads/orabuntu-lxc-master/ubuntu-services-4.sh $1 $2 $3 ora$1$2c
-
-clear
-
-~/Downloads/orabuntu-lxc-master/ubuntu-services-5.sh $1 $2
-
+```
+>clear
+>~/Downloads/orabuntu-lxc-master/ubuntu-services-1.sh $1 $2 $4 $5
+>clear
+>~/Downloads/orabuntu-lxc-master/ubuntu-services-2.sh $1 $2
+>clear
+>~/Downloads/orabuntu-lxc-master/ubuntu-services-3.sh $1 $2
+>clear
+>~/Downloads/orabuntu-lxc-master/ubuntu-services-4.sh $1 $2 $3 ora$1$2c
+>clear
+>~/Downloads/orabuntu-lxc-master/ubuntu-services-5.sh $1 $2
+```
 KEEP IN MIND WHEN READING THE USAGE NOTES BELOW THAT IT IS STRONGLY ADVISED IN THE STERNEST TERMS TO ONLY INSTALL THIS SOFTWARE ON A FRESH INSTALL OF UBUNTU 15.10 OR 15.04 AND NOT TO INSTALL THIS ON A HIGHLY-CONFIGURED UBUNTU DESKTOP OR SERVER THAT HAS BEEN RUNNING FOR A LONG TIME WITH MANY CUSTOM-CONFIGURATIONS ALREADY IMPLEMENTED.  DOING SO IS AT YOUR OWN RISK.  THIS SOFTWARE MAKES CHANGES TO DHCP AND BIND9 (NAMED) CONFIGURATIONS SO IT COULD DISRUPT LOOKUPS AND NAME RESOLUTIONS ON AN ALREADY-BEEN-RUNNING-FOR-AWHILE UBUNTU HOST!
 
 That being said, note that by default, Ubuntu desktop uses dnsmasq for name resolution.  Since desktop version of ubuntu don't use bind9 (aka "named") or isc-dhcp-server (DHCP) normally you can install orabuntu-lxc onto your desktop version with no fear of breaking anything with regard to name resolution.  This software is designed to play nice with dnsmasq, and orabuntu-lxc does not delete any bridges or make any changes to the default dnsmasq name resolution of Ubuntu 15 except for the following:
 ```
 >jsteed@A1510:~/Networking$ cat local
 
->server=/corp.charter.com/10.207.39.1
+>server=/yourdomain.com/10.207.39.1
 >server=/39.207.10.in-addr.arpa/10.207.39.1
 >server=/consultingcommandos.us/10.207.29.1
 >server=/29.207.10.in-addr.arpa/10.207.29.1
