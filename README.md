@@ -96,7 +96,14 @@ is the name of your nameserver for your domain.  Choose the name that you want. 
 ```
 "ora$1$2c" 
 ```
-is the LXC container name prefix.  For the parameters shown above, the script will create 4 LXC containers with the names {ora67c10, ora67c11, ora67c12, ora67c13} assuming that you created the OEL 6.7 containers on the first run (numbering always starts at "10" so as not to run afoul of a bug in 12.1.0.2.0 that affects server names that do not have the same number of character counts (ora67c1 vs ora67c10).
+is the LXC container name prefix.  For the parameters shown above, the script will create 4 LXC containers with the names
+```
+ora67c10
+ora67c11
+ora67c12
+ora67c13
+```
+assuming that you created the OEL 6.7 containers on the first run (numbering always starts at "10" so as not to run afoul of a bug in 12.1.0.2.0 that affects server names that do not have the same number of character counts (ora67c1 vs ora67c10).
 
 So inside the ubuntu-services.sh script we have:
 ```
