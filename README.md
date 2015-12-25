@@ -211,18 +211,15 @@ sqlplus system/password@lxc1-scan.gns1.vmem.org:1521/VMEM1         (for system c
 
 To manage the LXC containers from the Ubuntu host command line:
 
-sudo lxc-stop -n lxcora10 
+sudo lxc-stop -n oel71c15
 
-sudo lxc-start -n lxcora10
+sudo lxc-start -n oel59c10
 
-sudo lxc-console -n lxcora10 
+sudo lxc-console -n oel67c21 
 
 sudo lxc-ls -f 
 
 NOTE:  I will be adding the instantclient install to the scripted solution soon.
 
-NOTE:  I am working to fix the hardcoded 'gstanden' problem.
-
-UPDATE: 20151208 hardcoded 'gstanden' problem FIXED! yay.  You can now install the orabuntu-lxc from any Ubuntu user account that has the 'sudo' privilege which is to say any install user account created when the Ubuntu OS was installed, or from any new account that you create as long as it has been granted the sudo privilege. 
 
 
