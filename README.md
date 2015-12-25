@@ -69,7 +69,7 @@ Typical values would by "6 5" (for OEL 6.5) or "5 9" (for OEL 5.9).  Choose the 
 
 "5" is the number of cloned containers of that release of OEL to be created from the fully oracle-ready configured seed container.
 
-"orabuntu-lxc\\.com" is the name of the domain for your container network.  Choose the domain that you want. It can be of the form "somedomain\\.com" or "somedomain\.net" etc., and it can also be of the form "corp\.somedomain\.com" but just be sure to put the backslash in front of any "." characters because the domain gets post-processed by sed and the "." needs to be escaped in the passed-in domain parameter.
+"orabuntu-lxc\\.com" is the name of the domain for your container network.  Choose the domain that you want. It can be of the form "somedomain\\.com" or "somedomain\\.net" etc., and it can also be of the form "corp\\.somedomain\\.com" but just be sure to put the backslash in front of any "." characters because the domain gets post-processed by sed and the "." needs to be escaped in the passed-in domain parameter.
 
 "stlns01" is the name of your nameserver for your domain.  Choosed the name that you want. This server name will get the "10.207.39.1" IP address and it will have the nslookup name "stlns01.yourdomain.com".
 
