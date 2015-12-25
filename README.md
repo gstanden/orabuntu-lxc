@@ -35,7 +35,7 @@ https://sites.google.com/site/nandydandyoracle/technologies/lxc/oracle-rac-6-nod
 !!! IMPORTANT PLEASE READ !!!
 =============================
 
-Phase 1:  Create the LXC Oracle Enteprise Linux (OEL 5.x or OEL 6.x) containers
+Phase 1:  Create the LXC Oracle Enteprise Linux (OEL 5.x, OEL 6.x, or OEL 7.x) containers
 
 To install:
 
