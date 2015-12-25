@@ -16,7 +16,7 @@ The Oracle Enterprise Edition 6.5 LXC Linux containers run at bare metal resourc
 Orabuntu-lxc was designed to be minimally invasive to an existing Ubuntu desktop or server and had the following design goals, all of which are satisfied as listed below.
 ```
 * Does not require any changes to Ubuntu NetworkManager or to default Ubuntu networking;
-* Uses OpenvSwitch, a production-ready, multilayer virtual switch licensed under the open source Apache 2.0 license
+* Uses OpenvSwitch, a production-ready, multilayer virtual switch licensed opensource Apache 2.0 license
 * Uses bind9 integrated with DNS for automatic DHCP services
 ```
 Install on a FRESH INSTALL of 15.04 or 15.10 ONLY. I have not bulletproofed this for install on "been-running-for-awhile" deployments of Ubuntu.  It could overwrite stuff so review the scripts VERY carefully first if you are going to put this on an Ubuntu 15.x that you have been using for a long time that is already customized. 
