@@ -100,7 +100,7 @@ clear
 KEEP IN MIND WHEN READING THE USAGE NOTES BELOW THAT IT IS STRONGLY ADVISED IN THE STERNEST TERMS TO ONLY INSTALL THIS SOFTWARE ON A FRESH INSTALL OF UBUNTU 15.10 OR 15.04 AND NOT TO INSTALL THIS ON A HIGHLY-CONFIGURED UBUNTU DESKTOP OR SERVER THAT HAS BEEN RUNNING FOR A LONG TIME WITH MANY CUSTOM-CONFIGURATIONS ALREADY IMPLEMENTED.  DOING SO IS AT YOUR OWN RISK.  THIS SOFTWARE MAKES CHANGES TO DHCP AND BIND9 (NAMED) CONFIGURATIONS SO IT COULD DISRUPT LOOKUPS AND NAME RESOLUTIONS ON AN ALREADY-BEEN-RUNNING-FOR-AWHILE UBUNTU HOST!
 
 That being said, note that by default, Ubuntu desktop uses dnsmasq for name resolution.  Since desktop version of ubuntu don't use bind9 (aka "named") or isc-dhcp-server (DHCP) normally you can install orabuntu-lxc onto your desktop version with no fear of breaking anything with regard to name resolution.  This software is designed to play nice with dnsmasq, and orabuntu-lxc does not delete any bridges or make any changes to the default dnsmasq name resolution of Ubuntu 15 except for the following:
-
+```
 >jsteed@A1510:~/Networking$ cat local
 >server=/corp.charter.com/10.207.39.1
 >server=/39.207.10.in-addr.arpa/10.207.39.1
@@ -109,7 +109,7 @@ That being said, note that by default, Ubuntu desktop uses dnsmasq for name reso
 >jsteed@A1510:~/Networking$ ls -lrt local
 >lrwxrwxrwx 1 root root 35 Dec 24 19:32 local -> /etc/NetworkManager/dnsmasq.d/local
 >jsteed@A1510:~/Networking$ 
-
+```
 
 NOTE 1: Creating additional containers after the initial run with different OEL version:  You can rerun the ubuntu-services.sh script with a new version paramters (e.g. "7 1") The indexes of the add-on second run of container creation will start from the next highest index, so if you ran "6 7 5 orabuntu-lxc\\.com stlns01" as your first run ubuntu-services.sh parameters, and then ran "7 1 2 orabuntu-lxc\\.com stlns01" as your second run parameters, you would get the following list of containers:
 
