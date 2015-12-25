@@ -46,7 +46,7 @@ To install:
 5. Run ONLY on fresh install of Ubuntu 15.04 or 15.10 !
 6. Run the script ~/Downloads/orabuntu-lxc-master/ubuntu-services.sh (note, it's a fully-automated, slightly-interactive)
 
-Note 1: Oracle Enterprise Linux (OEL) OEL5, OEL6 and OEL7 are supported
+Note 1: Oracle Enterprise Linux (OEL) OEL5, OEL6 and OEL7 LXC Linux Containers are supported.
 
 !!! =============================
 
