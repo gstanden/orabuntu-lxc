@@ -68,17 +68,30 @@ Usage is shown below:
 ```
 ~/Downloads/orabuntu-lxc-master/ubuntu-services.sh 6 7 5 orabuntu-lxc\\.com stlns01
 ```
-
-"6 7" is the major and minor release version of the OEL Linux that you wish to use for building your LXC containers.
+```
+"6 7" 
+```
+is the major and minor release version of the OEL Linux that you wish to use for building your LXC containers.
 Typical values would by "6 5" (for OEL 6.5) or "5 9" (for OEL 5.9).  Choose the OEL 5.x, 6.x, 7.x release that you want.
+```
+"5" 
+```
+is the number of cloned containers of that release of OEL to be created from the fully oracle-ready configured seed container.
 
-"5" is the number of cloned containers of that release of OEL to be created from the fully oracle-ready configured seed container.
+```
+"orabuntu-lxc\\.com" 
+```
+is the name of the domain for your container network.  Choose the domain that you want. It can be of the form "somedomain\\.com" or "somedomain\\.net" etc., and it can also be of the form "corp\\.somedomain\\.com" but just be sure to put the backslash in front of any "." characters because the domain gets post-processed by sed and the "." needs to be escaped in the passed-in domain parameter.
 
-"orabuntu-lxc\\.com" is the name of the domain for your container network.  Choose the domain that you want. It can be of the form "somedomain\\.com" or "somedomain\\.net" etc., and it can also be of the form "corp\\.somedomain\\.com" but just be sure to put the backslash in front of any "." characters because the domain gets post-processed by sed and the "." needs to be escaped in the passed-in domain parameter.
+```
+"stlns01"
+```
+is the name of your nameserver for your domain.  Choosed the name that you want. This server name will get the "10.207.39.1" IP address and it will have the nslookup name "stlns01.yourdomain.com".  Note that this is not an existing nameserver in your network, but rather an arbitrary name that will be copied to /var/lib/bind/fwd.yourdomain and /var/lib/bind/rev.yourdomain that will be assigned the IP address 10.207.39.1 which also happens to be the IP address assigned to openvswitch sw1.  This server name will be the nameserver for your LXC container network and anything else that you put on the openvswitch sw1 network 10.207.39.x. (for example you could add in some KVM VM's if you wanted to onto that same openvswitch network if you had some legacy VM's also).
 
-"stlns01" is the name of your nameserver for your domain.  Choosed the name that you want. This server name will get the "10.207.39.1" IP address and it will have the nslookup name "stlns01.yourdomain.com".  Note that this is not an existing nameserver in your network, but rather an arbitrary name that will be copied to /var/lib/bind/fwd.yourdomain and /var/lib/bind/rev.yourdomain that will be assigned the IP address 10.207.39.1 which also happens to be the IP address assigned to openvswitch sw1.  This server name will be the nameserver for your LXC container network and anything else that you put on the openvswitch sw1 network 10.207.39.x. (for example you could add in some KVM VM's if you wanted to onto that same openvswitch network if you had some legacy VM's also).
-
-"ora$1$2c" is the LXC container name prefix.  For the parameters shown above, the script will create 4 LXC containers with the names {ora67c10, ora67c11, ora67c12, ora67c13} assuming that you created the OEL 6.7 containers on the first run (numbering always starts at "10" so as not to run afoul of a bug in 12.1.0.2.0 that affects server names that do not have the same number of character counts (ora67c1 vs ora67c10).
+```
+"ora$1$2c" 
+```
+is the LXC container name prefix.  For the parameters shown above, the script will create 4 LXC containers with the names {ora67c10, ora67c11, ora67c12, ora67c13} assuming that you created the OEL 6.7 containers on the first run (numbering always starts at "10" so as not to run afoul of a bug in 12.1.0.2.0 that affects server names that do not have the same number of character counts (ora67c1 vs ora67c10).
 
 So inside the ubuntu-services.sh script we have:
 ```
