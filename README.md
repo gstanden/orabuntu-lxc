@@ -73,7 +73,9 @@ Explanations of the example passed-in parameters are as shown below.
 "6 7" 
 ```
 is the major and minor release version of the OEL Linux that you wish to use for building your LXC containers.
-Typical values would by "6 5" (for OEL 6.5) or "5 9" (for OEL 5.9).  Choose the OEL 5.x, 6.x, 7.x release that you want NOTE: orabuntu-lxc does not currently support the LXC template feature of "7.latest" or "6.latest" etc.  Numeric values only.
+Typical values would by "6 5" (for OEL 6.5) or "5 9" (for OEL 5.9).  Choose the OEL 5.x, 6.x, 7.x release that you want 
+
+NOTE: orabuntu-lxc does not currently support the LXC template feature of "7.latest" or "6.latest" etc.  Numeric values only.
 ```
 "5" 
 ```
