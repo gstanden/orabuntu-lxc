@@ -114,6 +114,24 @@ ubuntu-services-1.sh
 ```
 ##### SCRIPT, SO STUDY THAT SCRIPT CAREFULLY FIRST TO EVALUATE ANY IMPACTS IF YOU PLAN TO INSTALL ON AN ESTABLISHED UBUNTU OS DEPLOYMENT THAT HAS BEEN RUNNING FOR AWHILE AND IS ALREADY CUSTOMIZED FOR OTHER THINGS.  THIS SOFTWARE MAKES CHANGES TO DHCP AND BIND9 (NAMED) CONFIGURATIONS SO IT COULD DISRUPT LOOKUPS AND NAME RESOLUTIONS ON AN ALREADY-BEEN-RUNNING-FOR-AWHILE UBUNTU HOST!
 
+During the initial install run of orabuntu-lxc the following critical configuration files are first backed up before being overwritten so note that there is a way back to restore all these original configurations if installing orabuntu-lxc breaks something that was previously conigured/customized.
+```
+sudo cp -p /etc/iscsi/initiatorname.iscsi /etc/iscsi/initiatorname.iscsi.lxc.oracle.bak.$DATEXT
+sudo cp -p /etc/dhcp/dhcpd.conf /etc/dhcp/dhcpd.conf.lxc.oracle.bak.$DATEXT
+sudo cp -p /etc/dhcp/dhclient.conf /etc/dhcp/dhclient.conf.lxc.oracle.bak.$DATEXT
+sudo cp -p /etc/bind/rndc.key /etc/bind/rndc.key.lxc.oracle.bak.$DATEXT
+sudo cp -p /etc/default/isc-dhcp-server /etc/default/isc-dhcp-server.lxc.oracle.bak.$DATEXT
+sudo cp -p /etc/bind/named.conf.options /etc/bind/named.conf.options.lxc.oracle.bak.$DATEXT
+sudo cp -p /etc/bind/named.conf.local /etc/bind/named.conf.local.lxc.oracle.bak.$DATEXT
+sudo cp -p /etc/default/bind9 /etc/default/bind9.lxc.oracle.bak.$DATEXT
+sudo cp -p /etc/network/interfaces /etc/network/interfaces.lxc.oracle.bak.$DATEXT
+sudo cp -p /etc/apparmor.d/lxc/lxc-default /etc/apparmor.d/lxc/lxc-default.lxc.oracle.bak.$DATEXT
+sudo cp -p /etc/security/limits.conf /etc/security/limits.conf.lxc.oracle.bak.$DATEXT
+sudo cp -p /etc/sysctl.conf /etc/sysctl.conf.lxc.oracle.bak.$DATEXT
+sudo cp -p /etc/exports /etc/exports.lxc.oracle.bak.$DATEXT
+sudo cp -p /etc/resolv.conf /etc/resolv.conf.lxc.oracle.bak.$DATEXT
+```
+
 That being said, note that by default, Ubuntu desktop uses dnsmasq for name resolution.  Since desktop version of ubuntu don't use bind9 (aka "named") or isc-dhcp-server (DHCP) normally you can install orabuntu-lxc onto your desktop version with no fear of breaking anything with regard to name resolution.  This software is designed to play nice with dnsmasq, and orabuntu-lxc does not delete any bridges or make any changes to the default dnsmasq name resolution of Ubuntu 15 except for the following:
 ```
 jsteed@A1510:~/Networking$ cat local
