@@ -17,11 +17,11 @@ I have NOT tested this yet on Ubuntu 12.x, 13.x, or 14.x          (tests and val
 
 NOTE:  My email is gilstanden@hotmail.com if you hit bugs or issues or have questions!
 ```
->Technology Platforms:
->  isc-dhcp-server
->  bind9
->  openvswitch  ( http://openvswitch.org/ )
->  lxc ( https://linuxcontainers.org/ )
+Technology Platforms:
+  isc-dhcp-server
+  bind9
+  openvswitch  ( http://openvswitch.org/ )
+  lxc ( https://linuxcontainers.org/ )
 ```
 Screenshots and additional information can be found at the following Google Site:
 
