@@ -78,14 +78,23 @@ Typical values would by "6 5" (for OEL 6.5) or "5 9" (for OEL 5.9).  Choose the 
 So inside the ubuntu-services.sh script we have:
 
 clear
+
 ~/Downloads/orabuntu-lxc-master/ubuntu-services-1.sh $1 $2 $4 $5
+
 clear
+
 ~/Downloads/orabuntu-lxc-master/ubuntu-services-2.sh $1 $2
+
 clear
+
 ~/Downloads/orabuntu-lxc-master/ubuntu-services-3.sh $1 $2
+
 clear
+
 ~/Downloads/orabuntu-lxc-master/ubuntu-services-4.sh $1 $2 $3 ora$1$2c
+
 clear
+
 ~/Downloads/orabuntu-lxc-master/ubuntu-services-5.sh $1 $2
 
 KEEP IN MIND WHEN READING THE USAGE NOTES BELOW THAT IT IS STRONGLY ADVISED IN THE STERNEST TERMS TO ONLY INSTALL THIS SOFTWARE ON A FRESH INSTALL OF UBUNTU 15.10 OR 15.04 AND NOT TO INSTALL THIS ON A HIGHLY-CONFIGURED UBUNTU DESKTOP OR SERVER THAT HAS BEEN RUNNING FOR A LONG TIME WITH MANY CUSTOM-CONFIGURATIONS ALREADY IMPLEMENTED.  DOING SO IS AT YOUR OWN RISK.  THIS SOFTWARE MAKES CHANGES TO DHCP AND BIND9 (NAMED) CONFIGURATIONS SO IT COULD DISRUPT LOOKUPS AND NAME RESOLUTIONS ON AN ALREADY-BEEN-RUNNING-FOR-AWHILE UBUNTU HOST!
