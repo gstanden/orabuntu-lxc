@@ -46,65 +46,70 @@ To install:
 5. Run ONLY on fresh install of Ubuntu 15.04 or 15.10 !
 6. Run the script ~/Downloads/orabuntu-lxc-master/ubuntu-services.sh (note, it's a fully-automated, non-interactive script).
 
-Note 1: For now, only Oracle Enterprise Linux (OEL) 5.x and 6.x containers are supported.  
-Note 2: Support for Oracle Enterprise Linux 7.x on roadmap but not yet available.
+Note 1: Oracle Enterprise Linux (OEL) OEL5, OEL6 and OEL7 are supported
 
 !!! =============================
 
 About the ubuntu-services.sh script.
 
-Update 2015-12-06:  There are no reboots anymore. All the scripts run one after the other until completion with no reboot.
+The ubuntu-services.sh script is a master script which runs all of the below scripts automatically.  
 
-  ~/Downloads/orabuntu-lxc-master/ubuntu-services.sh
-  
-The ubuntu-services.sh script is a master script which runs all of the below scripts automatically.  Note that all of the scripts are individually re-runnable, and the whole set of scripts is also re-runnable, so if you have a failure of one script for any reason, just fix the problem, and re-run that script.  If the re-run encounters some hiccups, reboot the Ubuntu host and then re-run that script and that should do it.  If you want to re-run the whole set of scripts, just re-run ubuntu-services.sh again to re-run them all.  Note also the ubuntu-services-3c.sh takes a parameter integer that is the number of containers to create.  Edit ubuntu-services.sh to set the parameter for ubuntu-services-3c.sh.
+When you run the scripts the first time, just accept the default answers to the prompts about terminating DHCP leases and destroying containers.  The defaults, in order, are "Y", "Y", "N" and the questions are "Terminate Leases ?", "Destroy Existing Containers?", and "Destroy only a specific container ?" respectively.  Just take the defaults on all 3 questions when installing the software for the first time.
 
 !!! =============================
 
-UPDATE:  You just run the file '~/Downloads/orabuntu-lxc-master/ubuntu-services.sh' to do the install.
+Run ~/Downloads/orabuntu-lxc-master/ubuntu-services.sh script first.  
 
-Here is what ubuntu-services.sh looks like.  You should edit it for your desired settings.
+Usage is shown below:
+
+~/Downloads/orabuntu-lxc-master/ubuntu-services-1.sh 6 7 5 orabuntu-lxc\.com stlns01
 
 "6 7" is the major and minor release version of the OEL Linux that you wish to use for building your LXC containers.
 Typical values would by "6 5" (for OEL 6.5) or "5 9" (for OEL 5.9).  Choose the OEL 6.x or OEL 5.x release that you want.
+
+"5" is the number of cloned containers of that release of OEL to be created from the fully oracle-ready configured seed container.
 
 "orabuntu-lxc\.com" is the name of the domain for your container network.  Choose the domain that you want. It can be of the form "somedomain\.com" or "somedomain\.net" etc., and it can also be of the form "corp\.somedomain\.com" but just be sure to put the backslash in front of any "." characters because the domain gets post-processed by sed and the "." needs to be escaped in the passed-in domain parameter.
 
 "stlns01" is the name of your nameserver for your domain.  Choosed the name that you want. This server name will get the "10.207.39.1" IP address and it will have the nslookup name "stlns01.yourdomain.com".
 
-"lxcora" is the LXC container name prefix.  For the parameters shown below, the script will create 4 LXC containers with the names {lxcora10, lxcora11, lxcora12, lxcora13}.
+"ora$1$2c" is the LXC container name prefix.  For the parameters shown above, the script will create 4 LXC containers with the names {ora67c10, ora67c11, ora67c12, ora67c13} assuming that you created the OEL 6.7 containers on the first run (numbering always starts at "10" so as not to run afoul of a bug in 12.1.0.2.0 that affects server names that do not have the same number of character counts (ora67c1 vs ora67c10).
 
-The "4" before the "lxcora" for script ubuntu-services-4.sh is the number of containers desired to be created.  So the parameters on ubuntu-services-4.sh say "create quantity 4 OEL 6.7 containers with names {lxcora10, lxcora11, lxcora12, lxcora13}.
-
-clear
-
-~/Downloads/orabuntu-lxc-master/ubuntu-services-1.sh 6 7 orabuntu-lxc\.com stlns01
+So inside the ubuntu-services.sh script we have:
 
 clear
-
-~/Downloads/orabuntu-lxc-master/ubuntu-services-2.sh 6 7
-
+~/Downloads/orabuntu-lxc-master/ubuntu-services-1.sh $1 $2 $4 $5
 clear
-
-~/Downloads/orabuntu-lxc-master/ubuntu-services-3.sh 6 7
-
+~/Downloads/orabuntu-lxc-master/ubuntu-services-2.sh $1 $2
 clear
-
-~/Downloads/orabuntu-lxc-master/ubuntu-services-4.sh 6 7 4 lxcora
-
+~/Downloads/orabuntu-lxc-master/ubuntu-services-3.sh $1 $2
 clear
-
-~/Downloads/orabuntu-lxc-master/ubuntu-services-5.sh 6 7
+~/Downloads/orabuntu-lxc-master/ubuntu-services-4.sh $1 $2 $3 ora$1$2c
+clear
+~/Downloads/orabuntu-lxc-master/ubuntu-services-5.sh $1 $2
 
 KEEP IN MIND WHEN READING THE USAGE NOTES BELOW THAT IT IS STRONGLY ADVISED IN THE STERNEST TERMS TO ONLY INSTALL THIS SOFTWARE ON A FRESH INSTALL OF UBUNTU 15.10 OR 15.04 AND NOT TO INSTALL THIS ON A HIGHLY-CONFIGURED UBUNTU DESKTOP OR SERVER THAT HAS BEEN RUNNING FOR A LONG TIME WITH MANY CUSTOM-CONFIGURATIONS ALREADY IMPLEMENTED.  DOING SO IS AT YOUR OWN RISK.  THIS SOFTWARE MAKES CHANGES TO DHCP AND BIND9 (NAMED) CONFIGURATIONS SO IT COULD DISRUPT LOOKUPS AND NAME RESOLUTIONS ON AN ALREADY-BEEN-RUNNING-FOR-AWHILE UBUNTU HOST!
 
-NOTE 1: Creating additional containers after the initial run with different OEL version:  You can rerun the ubuntu-services.sh script with a new version paramters (e.g. "6 5") and with a new container prefix name (e.g. "knylxc" instead of "lxcora") to create additional containers with a different OS version and different names.  The indexes of the add-on second run of container creation will start from the next highest index, so if you ran "6 5 2 knylxc" as your ubuntu-services-4.sh parameters, you would get 2 OEL 6.5 containers in the set {knylxc15, knylxc16}
+NOTE 1: Creating additional containers after the initial run with different OEL version:  You can rerun the ubuntu-services.sh script with a new version paramters (e.g. "7 1") The indexes of the add-on second run of container creation will start from the next highest index, so if you ran "6 7 5 orabuntu-lxc\.com stlns01" as your first run ubuntu-services.sh parameters, and then ran "7 1 2 orabuntu-lxc\.com stlns01" as your second run parameters, you would get the following list of containers:
 
-NOTE 2:  If you do a second run of ubuntu-services.sh to create additional containers of a different OS version, be aware that the software looks for the file "/etc/orabuntu-release" and if found, it skips some of the setup steps (such as package installs and the unpack of ubuntu-host.tar) since those steps were already done on the first pass, and it proceeds pretty much directly to the creation of the new seed container.
+oel67
+oel71
+ora67c10
+ora67c11
+ora67c12
+ora67c13
+ora67c14
+ora67c15
+ora71c16
+ora71c17
+
+NOTE 1: The first run produces n+1 containers (one more than requested) due to a bug I will fix soon.  Workaround is just to request n-1 when you really want n for the first run.
+
+NOTE 2:  If you do a second run of ubuntu-services.sh to create additional containers of a different OS version, be aware that the software looks for the file "/etc/orabuntu-release" and if found, it skips some of the setup steps (such as package installs and the unpack of ubuntu-host.tar) since those steps were already done on the first pass, and it proceeds pretty much directly to the creation of the new seed container.  Be sure on second, third, fourth runs to be sure to answer "N", "N" to "Terminate Leases" and "Destroy Containers" because these are the answers which will preserve your existing containers, and simply add the new containers to the deployment without destroying any existing containers.
 
 NOTE 3:  Note that the seed containers (oel67, oel65, oel59, ...) get created on the 10.207.29.x network, while the cloned containers to be used for actual projects get created on the 10.207.39.x network.  Do not install Oracle Enterprise softwares into the oelxx containers, because these are your fully-configured, oracle-ready SEED containers which you can clone later to make more oracle-ready containers of that specific OEL version if you need more.  Support for user-settable subnets is coming soon!
 
-NOTE 4:  When re-running the software, you are prompted early on to delete DHCP leases (Y/N) and to delete existing containers (Y/N).  If running the software a second time as mentioned above to create another set of containers of a different OS version, answer "N" to all the questions so that your first run of containers is not destroyed, nor the first SEED container.
+NOTE 4:  When re-running the software, you are prompted early on to delete DHCP leases (Y/N) and to delete existing containers (Y/N).  If running the software a second time as mentioned above to create another set of containers of a different OS version, answer "N" to the questions about terminating leases and deleting containers so that your first run of containers is not destroyed, nor the first SEED container.
 
 NOTE 5:  The DHCP lease delete steps and the container delete steps are useful if you run the whole set of scripts for the first time, and you run into some problem and want to start completely over.  In that case, answer "Y" to deleting DHCP leases, answer "Y" to delete containers, and answer "N" to "delete only the oelxx SEED container" so that the result will be ALL DHCP leases deleted, and ALL containers deleted, so that you are starting from scratch again.  Also, be sure before re-running "from scratch again" to DELETE the file "/etc/orabuntu-release" using "sudo rm /etc/orabuntu-release" so that the software executes ALL OS configuration steps again on the re-run of the first install.
 
