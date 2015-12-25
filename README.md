@@ -102,14 +102,23 @@ KEEP IN MIND WHEN READING THE USAGE NOTES BELOW THAT IT IS STRONGLY ADVISED IN T
 NOTE 1: Creating additional containers after the initial run with different OEL version:  You can rerun the ubuntu-services.sh script with a new version paramters (e.g. "7 1") The indexes of the add-on second run of container creation will start from the next highest index, so if you ran "6 7 5 orabuntu-lxc\.com stlns01" as your first run ubuntu-services.sh parameters, and then ran "7 1 2 orabuntu-lxc\.com stlns01" as your second run parameters, you would get the following list of containers:
 
 oel67
+
 oel71
+
 ora67c10
+
 ora67c11
+
 ora67c12
+
 ora67c13
+
 ora67c14
+
 ora67c15
+
 ora71c16
+
 ora71c17
 
 NOTE 1: The first run produces n+1 containers (one more than requested) due to a bug I will fix soon.  Workaround is just to request n-1 when you really want n for the first run.
