@@ -79,7 +79,9 @@ Typical values would by "6 5" (for OEL 6.5) or "5 9" (for OEL 5.9).  Choose the 
 ```
 "5" 
 ```
-is the number of cloned containers of that release of OEL to be created from the fully oracle-ready configured seed container.
+is the number of cloned containers of that release of OEL to be created from the fully oracle-ready configured seed container. In this example 5 containers are specified.
+
+* *NOTE: on the first run of orabuntu-lxc, due to a bug, you get n+1 containers, so set the value to "4" if you actually want "5" containers created.  This bug will be fixed shortly.*
 
 ```
 "orabuntu-lxc\\.com" 
