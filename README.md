@@ -66,7 +66,7 @@ Run ~/Downloads/orabuntu-lxc-master/ubuntu-services.sh script first.
 
 Usage is shown below:
 ```
-~/Downloads/orabuntu-lxc-master/ubuntu-services-1.sh 6 7 5 orabuntu-lxc\\.com stlns01
+~/Downloads/orabuntu-lxc-master/ubuntu-services.sh 6 7 5 orabuntu-lxc\\.com stlns01
 ```
 "6 7" is the major and minor release version of the OEL Linux that you wish to use for building your LXC containers.
 Typical values would by "6 5" (for OEL 6.5) or "5 9" (for OEL 5.9).  Choose the OEL 5.x, 6.x, 7.x release that you want.
