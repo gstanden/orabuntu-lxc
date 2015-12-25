@@ -102,12 +102,16 @@ KEEP IN MIND WHEN READING THE USAGE NOTES BELOW THAT IT IS STRONGLY ADVISED IN T
 That being said, note that by default, Ubuntu desktop uses dnsmasq for name resolution.  Since desktop version of ubuntu don't use bind9 (aka "named") or isc-dhcp-server (DHCP) normally you can install orabuntu-lxc onto your desktop version with no fear of breaking anything with regard to name resolution.  This software is designed to play nice with dnsmasq, and orabuntu-lxc does not delete any bridges or make any changes to the default dnsmasq name resolution of Ubuntu 15 except for the following:
 ```
 >jsteed@A1510:~/Networking$ cat local
+
 >server=/corp.charter.com/10.207.39.1
 >server=/39.207.10.in-addr.arpa/10.207.39.1
 >server=/consultingcommandos.us/10.207.29.1
 >server=/29.207.10.in-addr.arpa/10.207.29.1
+
 >jsteed@A1510:~/Networking$ ls -lrt local
+
 >lrwxrwxrwx 1 root root 35 Dec 24 19:32 local -> /etc/NetworkManager/dnsmasq.d/local
+
 >jsteed@A1510:~/Networking$ 
 ```
 
