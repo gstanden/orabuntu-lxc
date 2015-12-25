@@ -15,20 +15,20 @@ The Oracle Enterprise Edition 6.5 LXC Linux containers run at bare metal resourc
 
 Orabuntu-lxc was designed to be minimally invasive to an existing Ubuntu desktop or server and had the following design goals, all of which are satisfied as listed below.
 ```
-* No changes to Ubuntu dnsmasq-base default network, i.e is a pure add-on networking overlay;
-* Does not require any changes to Ubuntu NetworkManager or to default Ubuntu networking;
-*Does not require any removal of Linux Bridge software;
-* No physical interfaces directly connected to the OpenvSwitch (iptables/NAT are used for external address resolution);
-* Allows external interface switching while LXC containers are running with NO loss of www DNS resolution;
-* Automatic internet-connected interface (eth0, wlan0, bnep0) detection and connection to OpenvSwitch;
-* Uses OpenvSwitch as the networking solution for LXC, KVM and VirtualBox DEUs;
-* Uses OpenvSwitch, a production-ready, multilayer virtual switch licensed under the open source Apache 2.0 license
-* Uses bind9 for OpenvSwitch DNS and isc-dhcp-server for DHCP services
-* Uses openvswitch tags for VLAN'g and is flexible to add as many additional networks as you wish
-* Integrates DNS and DHCP to update DNS automatically when new DEUs are added (DEU: "Density Elasticty Unit", i.e. "VMs")
-* Uses the built-in Ubuntu dnsmasq-base for Ubuntu default networking and makes no change to default desktop networking.
-* LXC openvswitch network is a pure add-on to default Ubuntu network, not a replacement
-* Because it's LXC, VT-d and VT-x are NOT needed so older laptops and desktops without VT-d/x should be able to run LXC
+1.  No changes to Ubuntu dnsmasq-base default network, i.e is a pure add-on networking overlay;
+2.  Does not require any changes to Ubuntu NetworkManager or to default Ubuntu networking;
+3.  Does not require any removal of Linux Bridge software;
+4.  No physical interfaces directly connected to the OpenvSwitch (iptables/NAT are used for external address resolution);
+5.  Allows external interface switching while LXC containers are running with NO loss of www DNS resolution;
+6.  Automatic internet-connected interface (eth0, wlan0, bnep0) detection and connection to OpenvSwitch;
+7.  Uses OpenvSwitch as the networking solution for LXC, KVM and VirtualBox DEUs;
+8.  Uses OpenvSwitch, a production-ready, multilayer virtual switch licensed under the open source Apache 2.0 license
+9.  Uses bind9 for OpenvSwitch DNS and isc-dhcp-server for DHCP services
+10. Uses openvswitch tags for VLAN'g and is flexible to add as many additional networks as you wish
+11. Integrates DNS and DHCP to update DNS automatically when new DEUs are added (DEU: "Density Elasticty Unit", i.e. "VMs")
+12. Uses the built-in Ubuntu dnsmasq-base for Ubuntu default networking and makes no change to default desktop networking.
+13. LXC openvswitch network is a pure add-on to default Ubuntu network, not a replacement
+14. Because it's LXC, VT-d and VT-x are NOT needed so older laptops and desktops without VT-d/x should be able to run LXC
 ```
 Install on a FRESH INSTALL of 15.04 or 15.10 ONLY. I have not bulletproofed this for install on "been-running-for-awhile" deployments of Ubuntu.  It could overwrite stuff so review the scripts VERY carefully first if you are going to put this on an Ubuntu 15.x that you have been using for a long time that is already customized. 
 
