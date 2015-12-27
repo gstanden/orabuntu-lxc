@@ -91,8 +91,10 @@ echo ''
 echo "=============================================="
 echo "WAN is not up or is hiccuping badly.          "
 echo "ping google.com test must succeed             "
+echo "<ctrl>+c to exit script NOW!                  "
 echo "Address network issues/hiccups & rerun script."
 echo "=============================================="
+sleep 15
 else
 echo ''
 echo "=============================================="
@@ -231,7 +233,7 @@ fi
 
 for j in $DestroyContainers
 do
-sudo lxc-stop -n $j -k
+sudo lxc-stop -n $j
 sleep 2
 sudo lxc-destroy -n $j -f 
 sudo rm -rf /var/lib/lxc/$j
@@ -415,7 +417,7 @@ then
 
 echo ''
 echo "=============================================="
-echo "Starting required openvswitches...            "
+echo "Starting required openvswitches...patience... "
 echo "=============================================="
 
 	sudo /etc/network/openvswitch/crt_ovs_sw1.sh >/dev/null 2>&1
@@ -492,7 +494,7 @@ else
 	echo "DHCP is RUNNING with correct status of:  Active: active (running)"
 	echo ''
 	echo "============================================"
-	echo "DHCP status ... (ignore PID message)        "
+	echo "DHCP status ... (ignore PID warning message)"
 	echo "============================================"
 	echo ''
 	sudo service isc-dhcp-server status
@@ -638,7 +640,7 @@ echo "Create the LXC oracle container...            "
 echo "=============================================="
 echo ''
 
-# Examples of setting the Oracle Enterprise Linux version
+sleep 5
 
 sudo lxc-create -n oel$OracleRelease -t oracle -- --release=$OracleVersion
 

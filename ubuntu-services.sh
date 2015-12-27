@@ -2,6 +2,8 @@
 
 # v2.4 GLS 20151224
 
+clear
+
 echo ''
 echo '++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
 echo '"We have just folded space from Ix. Many machines on Ix. New machines. Better than those on Richesse."'
@@ -12,11 +14,52 @@ echo ''
 
 sleep 10
 
-echo 'Controlling script for orabuntu-lxc'
-echo 'by Gilbert Standen 20151224'
+clear
+
+echo ''
+echo "=============================================="
+echo "References:  orabuntu-lxc                     "
+echo "=============================================="
+echo ''
+echo 'Gilbert Standen' 
+echo 'gilstanden@hotmail.com'
+echo ''
+echo 'The online publications of many authors and bloggers helped to make orabuntu-lxc possible.'
+echo 'Links may go stale.  I will try to keep them up to date if possible.'
+echo ''
+echo "1. 'The Unknown Posters' (i.e. StackExchangers, Stackoverflow, Unix Stack Exchange, etc.)"
+echo "2. 'VirtualBox' Jean Jacques Sarton https://www.virtualbox.org/wiki/Advanced_Networking_Linux"
+echo "3. 'The New Stack' Venu Murthy http://thenewstack.io/solving-a-common-beginners-problem-when-pinging-from-an-openstack-instance/"
+echo "4. 'Big Dino' Lee Hutchinson https://blog.bigdinosaur.org/running-bind9-and-isc-dhcp/"
+echo "5. 'Techie in IT' Sokratis Galiatsis https://sokratisg.net/2012/03/31/ubuntu-precise-dnsmasq/"
+echo ''
+echo 'Progress is a collaborative effort.  Please share your discoveries by publishing on the internet your insights and achievements.'
+echo ''
+
+sleep 15
+
+clear
+
+echo ''
+echo "=============================================="
+echo "Establish sudo privileges ...                 "
+echo "=============================================="
+echo ''
+
+sudo date
+
+echo ''
+echo "=============================================="
+echo "Establish sudo privileges successful.         "
+echo "=============================================="
 echo ''
 
 sleep 5
+
+clear
+
+# Controlling script for orabuntu-lxc
+# Gilbert Standen 20151224 gilstanden@hotmail.com
 
 # Usage:
 
@@ -34,8 +77,6 @@ sleep 5
 # Define the nameserver for the "orabuntu-lxc.com" domain to be "stlns01" (FQDN:  "stlns01.orabuntu-lxc.com").
 
 # Oracle Enteprise Linux OS versions OEL5, OEL6, and OEL7 are currently supported.
-
-# The clone container prefix "ora$1$1c" can be changed, but DO NOT USE "oel" in the clone names (bug).  The "oel" prefix is a "reserved" word so to speak.
 
 clear
 ~/Downloads/orabuntu-lxc-master/ubuntu-services-1.sh $1 $2 $4 $5

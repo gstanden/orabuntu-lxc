@@ -281,6 +281,7 @@ then
 			then
 			sudo lxc-stop -n $j > /dev/null 2>&1
 			sudo /etc/network/openvswitch/veth_cleanups.sh oel$OracleRelease
+			echo ''
 			sudo lxc-start -n $j > /dev/null 2>&1
 			fi
 		sleep 1

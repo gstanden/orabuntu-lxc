@@ -21,6 +21,7 @@ echo "=============================================="
 
 OracleRelease=$1$2
 OracleVersion=$1.$2
+OR=$OracleRelease
 
 if [ -z $3 ]
 then
@@ -29,7 +30,7 @@ else
 NumCon=$3
 fi
 
-ContainerPrefix=$4
+ContainerPrefix=ora$1$2c
 
 echo ''
 echo "=============================================="
@@ -90,9 +91,14 @@ read -e -p "Add ASM Private Networks and RAC Private Networks ? [Y/N]   " -i "Y"
 
 if [ $AddPrivateNetworks = 'y' ] || [ $AddPrivateNetworks = 'Y' ]
 then
-	sudo sed -i "s/ContainerName/oel$OracleRelease/g" /var/lib/lxc/oel$OracleRelease/config.asm.flex.cluster
-	sudo bash -c "cat /var/lib/lxc/oel$OracleRelease/config /var/lib/lxc/oel$OracleRelease/config.asm.flex.cluster > /var/lib/lxc/oel$OracleRelease/config.asm.flex"
-	sudo mv /var/lib/lxc/oel$OracleRelease/config.asm.flex /var/lib/lxc/oel$OracleRelease/config
+	sudo bash -c "cat /var/lib/lxc/oel$OR/config.oracle /var/lib/lxc/oel$OR/config.asm.flex.cluster > /var/lib/lxc/oel$OR/config"
+	sudo sed -i "s/ContainerName/oel$OR/g" /var/lib/lxc/oel$OR/config
+fi
+
+if [ $AddPrivateNetworks = 'n' ] || [ $AddPrivateNetworks = 'N' ]
+then
+	sudo cp -p /var/lib/lxc/oel$OracleRelease/config.oracle /var/lib/lxc/oel$OracleRelease/config
+	sudo sed -i "s/ContainerName/oel$OracleRelease/g" /var/lib/lxc/oel$OracleRelease/config
 fi
 
 echo ''
@@ -113,7 +119,7 @@ echo ''
 sudo sed -i 's/yum install/yum -y install/g' /var/lib/lxc/oel$OracleRelease/rootfs/root/lxc-services.sh
 
 function GetHighestContainerIndex {
-sudo ls /var/lib/lxc | more | grep -v oel | sort | tail -1 | cut -c7-9
+sudo ls /var/lib/lxc | more | grep ora | cut -c7-9 | sort -n | tail -1
 }
 HighestContainerIndex=$(GetHighestContainerIndex)
 
@@ -124,13 +130,17 @@ fi
 
 if [ $HighestContainerIndex -lt 10 ]
 then
-HighestContainerIndex=10
-i=$HighestContainerIndex
-else
-i=$((HighestContainerIndex+1))
+let i=10
+let NewHighestContainerIndex=$i+$NumCon-1
 fi
 
-NewHighestContainerIndex=$((NumCon+HighestContainerIndex))
+if [ $HighestContainerIndex -ge 10 ]
+then
+let i=$HighestContainerIndex+1
+let NewHighestContainerIndex=$i+$NumCon-1
+fi
+
+sleep 5
 
 while [ $i -le "$NewHighestContainerIndex" ]
 do
@@ -170,6 +180,32 @@ sudo /etc/network/openvswitch/create-ovs-sw-files-v2.sh $ContainerPrefix $NumCon
 echo ''
 echo "=============================================="
 echo "Creating OpenvSwitch files complete.          "
+echo "=============================================="
+
+sleep 5
+
+clear
+
+echo ''
+echo "=============================================="
+echo "      Reset config file for oel$OracleRelease."
+echo "Removes ASM and RAC private network interfaces"
+echo "      from seed container oel$OracleRelease   "
+echo "(cloned containers are not affected by reset) "
+echo "=============================================="
+echo ''
+
+read -e -p "Reset Seed Container oel$OracleRelease to single DHCP interface ? [Y/N]   " -i "Y" ResetSingleDHCPInterface
+
+if [ $ResetSingleDHCPInterface = 'y' ] || [ $ResetSingleDHCPInterface = 'Y' ]
+then
+sudo cp -p /var/lib/lxc/oel$OracleRelease/config.oracle /var/lib/lxc/oel$OracleRelease/config
+sudo sed -i "s/ContainerName/oel$OracleRelease/g" /var/lib/lxc/oel$OracleRelease/config
+fi
+
+echo ''
+echo "=============================================="
+echo "Config file reset successful.                 "
 echo "=============================================="
 
 sleep 5

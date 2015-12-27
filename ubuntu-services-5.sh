@@ -19,6 +19,8 @@ echo "=============================================="
 
 OracleRelease=$1$2
 OracleVersion=$1.$2
+OR=$OracleRelease
+Config=/var/lib/lxc/oel$OracleRelease/config
 
 sleep 5
 
@@ -45,8 +47,9 @@ do
 	echo $j | grep oel
 	if [ $? -eq 0 ]
 	then
-	sudo sed -i "s/\.39/\.$OracleRelease/g" /var/lib/lxc/oel$OracleRelease/config
-	sudo sed -i "s/\.40/\.$OracleRelease/g" /var/lib/lxc/oel$OracleRelease/config
+	sudo bash -c "cat $Config|grep ipv4|cut -f2 -d'='|sed 's/^[ \t]*//;s/[ \t]*$//'|cut -f4 -d'.'|sed 's/^/\./'|xargs -I '{}' sed -i "/ipv4/s/\{}/\.1$OR/g" $Config"
+#	sudo sed -i "s/\.39/\.$OracleRelease/g" /var/lib/lxc/oel$OracleRelease/config
+#	sudo sed -i "s/\.40/\.$OracleRelease/g" /var/lib/lxc/oel$OracleRelease/config
 	fi
 	sudo lxc-start -n $j > /dev/null 2>&1
 	sleep 5
@@ -62,6 +65,7 @@ do
 		sleep 2
 		echo ''
 		sudo /etc/network/openvswitch/veth_cleanups.sh $j
+		echo ''
 		sleep 2
 		sudo lxc-start -n $j
 		fi
@@ -123,6 +127,11 @@ echo "Management links directory created.           "
 echo "=============================================="
 echo ''
 
+sleep 5
+
+clear
+
+echo ''
 echo "=============================================="
 echo "Next step is to setup storage...              "
 echo "tar -xvf scst-files.tar                       "
