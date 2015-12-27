@@ -34,6 +34,16 @@ Screenshots and additional information can be found at the following Google Site
 https://sites.google.com/site/nandydandyoracle/technologies/lxc/oracle-rac-6-node-12c-gns-asm-flex-cluster-ubuntu-15-04-install
 
 =============================
+Why Orabuntu-lxc             
+=============================
+
+```
+Orabuntu-lxc includes built-in DNS and DHCP configuration for Oracle Grid Naming Service (GNS)
+Orabuntu-lxc is a non-disruptive add-on to Ubuntu default dnsmasq-based networking. 
+Orabuntu-lxc does not affect default NetworkManager operation.  Orabuntu-lxc is an add-on not a replacement.
+```
+
+=============================
 New Feature Version 2.5
 =============================
 
