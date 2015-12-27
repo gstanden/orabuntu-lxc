@@ -510,9 +510,9 @@ else
 fi
 
 echo ''
-echo "============================================="
-echo "Status check of DHCP completed.              "
-echo "============================================="
+echo "============================================"
+echo "Status check of DHCP completed.             "
+echo "============================================"
 echo ''
 
 # GLS 20151128 New DHCP status check end.

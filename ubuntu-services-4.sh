@@ -54,7 +54,9 @@ clear
 
 echo ''
 echo "=============================================="
-echo "Stopping oel$OracleRelease container...                 "
+echo "Stopping oel$OracleRelease container...       "
+echo "(OEL 5 shutdown can take awhile...patience)   "
+echo "(OEL 6 and OEL 7 are relatively fast shutdown)"
 echo "=============================================="
 echo ''
 
