@@ -51,7 +51,7 @@ You can now add in the ASM private network interfaces and RAC private network in
 Installation
 =============================
 
-Phase 1:  Create the LXC Oracle Enteprise Linux (OEL 5.x or OEL 6.x) containers
+Phase 1:  Create the LXC Oracle Enteprise Linux (OEL 5.x, OEL 6.x or OEL 7.x) containers
 
 To install:
 
