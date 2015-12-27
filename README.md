@@ -105,49 +105,34 @@ https://gist.github.com/chrwei/42f8bbb687290b04b598
 Without the great work by Chris Weiss sharing this method publicly, my scst-files.tar archive for automatically building SCST SAN for Oracle on Ubuntu Linux would simply not exist.  If you run into bugs or script failures on your hardware for my scripts, please send me the error information to gilstanden@hotmail.com .  My scripts create the SCST custom kernel, create the SCST target and LUNs, and also build the /etc/multipath.conf file and install it automatically.  It's likely that some issues might be encountered on various hardware at the /etc/multipath.conf creation step, so if you hit issues with that step, I'd like to know about it if you have time to send details.
 
 IMPORTANT:  Whatever storage solution you use, your storage LUNs will appear in '/dev/mapper/' directory with multipath friendly names that have 'asm*' as the prefix of the friendly name, because multipath "friendly names" with the "asm" prefix is how my scripts prepare storage for presentation to Oracle.  So if you are using an actual SAN solution such as Tegile, Violin Memory, Dell, IBM, etc. my SCST install scripts will get the wwid of your LUNs and assign multipath friendly names to them with an 'asm' prefix, such as for exmaple:
-
+```
 /dev/mapper/asm_systemdg_00' 
-
+```
 which of course will actually refer to a /dev/dm- device.  If you are on Ubuntu 15.10, the storage will be a symlink in /dev/mapper to the /dev/dm-* device, or, if you are on Ubuntu 15.04 the storage will 'usually' be a device node (no symlink) in /dev/mapper but note that in Ubuntu 15.04 the disposition of multipath storage in /dev/mapper can sometimes be a mix of device nodes and symlinks as shown for example below:
-
+```
 gstanden@W1504:~$ ls -l /dev/mapper
-
 brw-rw---- 1 grid asmadmin 252,   2 Dec  8 11:29 asm_fra1_01
-
 lrwxrwxrwx 1 grid asmadmin        7 Dec  8 11:07 asm_fra1_02 -> ../dm-5
-
+```
 NOTE:  The orabuntu-lxc software can handle both (a) actual device nodes in /dev/mapper and (b) symlinks in /dev/mapper and so mixtures of both device nodes and symlinks is fine.  The only requirement for my scripting is that the storage for Oracle in /dev/mapper have the 'asm*' prefix.  Both of the above forms of storage presentation in /dev/mapper (symlink or device node or mixtures of both) are fine no problems.
 
 UPDATE 2015-12-07:  You can now run the SCST setup scripts from '~/Downloads/orabuntu-lxc-master/scst-files/' directory!  
-
+```
 tar -xvf scst-files.tar
-
 cd scst-files
-
 Run the create-scst-*.sh files in the order shown below.
-
   ~/Downloads/orabuntu-lxc-master/scst-files/create-scst-1a.sh
-
   ~/Downloads/orabuntu-lxc-master/scst-files/create-scst-1b.sh
-
   ~/Downloads/orabuntu-lxc-master/scst-files/create-scst-1c.sh
-
   ~/Downloads/orabuntu-lxc-master/scst-files/create-scst-1d.sh
-
   ~/Downloads/orabuntu-lxc-master/scst-files/create-scst-2a.sh (host reboots into SCST kernel at script end)
-
   ~/Downloads/orabuntu-lxc-master/scst-files/create-scst-2b.sh
-
   ~/Downloads/orabuntu-lxc-master/scst-files/create-scst-3.sh
-
   ~/Downloads/orabuntu-lxc-master/scst-files/create-scst-4a.sh
-
   ~/Downloads/orabuntu-lxc-master/scst-files/create-scst-4b.sh
-
   ~/Downloads/orabuntu-lxc-master/scst-files/create-scst-5a.sh
-
   ~/Downloads/orabuntu-lxc-master/scst-files/create-scst-5b.sh (host reboots at script end)
-
+```
 Once all these scripts have run the SCST SAN and LUNs will be ready for the Oracle Grid Infrastructure 12c install.
 
 NOTE:  If you are going to create an Oracle RAC database, then you will need to login to the LXC container as the 'grid' user and run 'asmca' in the usual way and create the '+DATA' and '+FRA' diskgroups for the database before doing the Oracle database install.
@@ -160,26 +145,25 @@ Phase 3:  Administration of the LXC containers and the Oracle database and ASM
 
 Connect to the containerized Oracle instances from your Ubuntu 15.x OS terminal using the following example strings after first installing Oracle Instantclient to Ubuntu 15.x using the instructions here:
 
-https://sites.google.com/site/nandydandyoracle/technologies/lxc/docker-11gr2-ee-ul (installing instantclient subsection)
+https://sites.google.com/site/nandydandyoracle/technologies/lxc/docker-11gr2-ee-ul (installing instantclient subsection
 
-sqlplus sys/password@lxc1-scan.gns1.vmem.org:1521/VMEM1 as sysdba  (for sys connection)
+(In what follows below the ORACLE_SID=VMEM1 for the database)
 
-sqlplus system/password@lxc1-scan.gns1.vmem.org:1521/VMEM1         (for system connection)
+sqlplus sys/password@lxc1-scan.gns1.orabuntu-lxc.com:1521/VMEM1 as sysdba  (for sys connection)
+
+sqlplus system/password@lxc1-scan.gns1.orabuntu-lxc:1521/VMEM1             (for system connection)
 
 To manage the LXC containers from the Ubuntu host command line:
 
-sudo lxc-stop -n lxcora10 
+sudo lxc-stop -n ora67c10
 
-sudo lxc-start -n lxcora10
+sudo lxc-start -n ora67c10
 
-sudo lxc-console -n lxcora10 
+sudo lxc-console -n ora67c10 
 
 sudo lxc-ls -f 
 
 NOTE:  I will be adding the instantclient install to the scripted solution soon.
 
-NOTE:  I am working to fix the hardcoded 'gstanden' problem.
-
-UPDATE: 20151208 hardcoded 'gstanden' problem FIXED! yay.  You can now install the orabuntu-lxc from any Ubuntu user account that has the 'sudo' privilege which is to say any install user account created when the Ubuntu OS was installed, or from any new account that you create as long as it has been granted the sudo privilege. 
 
 
