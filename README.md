@@ -92,7 +92,11 @@ NOTE 3:  When re-running the software, you are prompted early on to delete DHCP 
 
 NOTE 4:  The DHCP lease delete steps and the container delete steps are useful if you run the whole set of scripts for the first time, and you run into some problem and want to start completely over.  In that case, answer "Y" to deleting DHCP leases, answer "Y" to delete containers, and answer "N" to "delete only the oelxx SEED container" so that the result will be ALL DHCP leases deleted, and ALL containers deleted, so that you are starting from scratch again.  Also, be sure before re-running "from scratch again" to DELETE the file "/etc/orabuntu-release" using "sudo rm /etc/orabuntu-release" so that the software executes ALL OS configuration steps again on the re-run of the first install.  Also, you may want to delete the /var/lib/bind/*.jnl files.  It is also recommended to do a reboot of the Ubuntu host if doing a complete re-run from scratch after the cleanup steps.
 
-!!! =============================
+=============================
+Why SCST ?
+=============================
+
+SCST supports native 4K controller block format as well as 512-byte.  It's also used in production in selected models of all-flash storage systems from Violin Memory and Kaminario, as well as others. 
 
 Phase 2:  Create the SCST Linux SAN LUNs for Oracle Grid Infrastructure
 
