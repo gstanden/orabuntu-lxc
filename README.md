@@ -41,7 +41,7 @@ The ubuntu-clone.sh script can be used to add additional clone containers for OE
 
 ubuntu-clone.sh 6 7 3
 
-will create 3 more OEL 6.7 cloned containers in addition to any already created.  It will number the index of the cloned containers at the n+1th index.  For example, if ora67c14 is the highest-indexed clone of oel67, then the ubuntu-clone.sh will create the clone containers {ora67c15, ora67c16, ora67c17}.
+will create 3 more OEL 6.7 cloned containers in addition to any already created.  It will number the index of the cloned containers at the n+1th index.  For example, if ora67c14 is the highest-indexed clone of oel67, then the ubuntu-clone.sh will create the clone containers {ora67c15, ora67c16, ora67c17}. As another example, if the highest indexed container is ora59c14, then the new ora67 containers will still be the same set starting at c15.  The highest current index is evaulated across all oelXX versions.
 
 Feature 2
 
