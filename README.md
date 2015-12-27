@@ -48,7 +48,7 @@ Feature 2
 You can now add in the ASM private network interfaces and RAC private network interfaces to the container clones as an option, and also remove them from the seed container once the clone is done so that the seed oelXX container continues to have only a single DHCP interface.
 
 =============================
-!!! IMPORTANT PLEASE READ !!!
+Installation
 =============================
 
 Phase 1:  Create the LXC Oracle Enteprise Linux (OEL 5.x or OEL 6.x) containers
