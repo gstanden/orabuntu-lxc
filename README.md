@@ -42,7 +42,7 @@ Orabuntu-lxc includes built-in DNS and DHCP configuration for Oracle Grid Naming
 Orabuntu-lxc GNS inclusion means that DNS and DHCP are Oracle-ready for LXC Oracle 12c RAC ASM Flex Cluster deployments
 Orabuntu-lxc is a non-disruptive add-on to Ubuntu default dnsmasq-based networking. 
 Orabuntu-lxc does not affect default NetworkManager operation.  Orabuntu-lxc is an add-on not a replacement.
-Orabuntu-lxc used with SCST support 4K native LUNs for Oracle (useful for testing Oracle 4K native LUN support)
+Orabuntu-lxc used with SCST supports 4K native LUNs for Oracle (useful for testing Oracle 4K native LUN support)
 ```
 
 =============================
