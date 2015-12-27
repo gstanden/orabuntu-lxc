@@ -148,21 +148,17 @@ Connect to the containerized Oracle instances from your Ubuntu 15.x OS terminal 
 https://sites.google.com/site/nandydandyoracle/technologies/lxc/docker-11gr2-ee-ul (installing instantclient subsection
 
 (In what follows below the ORACLE_SID=VMEM1 for the database)
-
+```
 sqlplus sys/password@lxc1-scan.gns1.orabuntu-lxc.com:1521/VMEM1 as sysdba  (for sys connection)
-
 sqlplus system/password@lxc1-scan.gns1.orabuntu-lxc:1521/VMEM1             (for system connection)
-
+```
 To manage the LXC containers from the Ubuntu host command line:
-
+```
 sudo lxc-stop -n ora67c10
-
 sudo lxc-start -n ora67c10
-
 sudo lxc-console -n ora67c10 
-
 sudo lxc-ls -f 
-
+```
 NOTE:  I will be adding the instantclient install to the scripted solution soon.
 
 
