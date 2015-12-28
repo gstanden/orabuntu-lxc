@@ -66,8 +66,8 @@ clear
 # ~/Downloads/ubuntu-services.sh MajorRelease MinorRelease NumCon corp\.yourdomain\.com nameserver
 
 # Example
-# ~/Downloads/ubuntu-services-sh $1 $2 $3 $4                $5
-# ~/Downloads/ubuntu-services.sh 6  7  4  orabuntu-lxc\.com stlns01
+# ~/Downloads/orabuntu-lxc-master/ubuntu-services-sh $1 $2 $3 $4                $5
+# ~/Downloads/orabuntu-lxc-master/ubuntu-services.sh 6  7  4  orabuntu-lxc\.com stlns01
 
 # Example explanation:
 

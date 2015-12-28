@@ -97,6 +97,7 @@ echo ''
 echo "=============================================="
 echo "Create RSA key if it does not already exist   "
 echo "=============================================="
+echo ''
 
 if [ ! -e ~/.ssh/id_rsa.pub ]
 then
