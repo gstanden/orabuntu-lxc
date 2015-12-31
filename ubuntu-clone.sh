@@ -9,12 +9,12 @@ clear
 
 # Usage:
 
-# ~/Downloads/ubuntu-clone.sh MajorRelease MinorRelease NumCon
+# ~/Downloads/orabuntu-lxc-master/ubuntu-clone.sh MajorRelease MinorRelease NumCon
 
 # Example
 
-# ~/Downloads/ubuntu-services-sh $1 $2 $3 
-# ~/Downloads/ubuntu-services.sh 6  7  4
+# ~/Downloads/orabuntu-lxc-master/ubuntu-services-sh $1 $2 $3 
+# ~/Downloads/orabuntu-lxc-master/ubuntu-services.sh 6  7  4
 
 # Example explanation:
 
@@ -30,7 +30,7 @@ clear
 # ora67c13  RUNNING  10.207.39.13, 172.230.40.13, 172.231.40.13, 192.220.39.13, 192.221.39.13, 192.222.39.13, 192.223.39.13        -     -       NO         
 
 # Running the command:
-# 	~/Downloads/ubuntu-services.sh 6  7  4
+# ~/Downloads/orabuntu-lxc-master/ubuntu-clone.sh 6 7 4
 # will result in the following containers being created: {ora67c14
 
 
