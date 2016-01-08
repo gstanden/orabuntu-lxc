@@ -60,10 +60,10 @@ To install:
 1. Download the zip file from https://github.com/gstanden/orabuntu-lxc to your ~/Downloads directory on Ubuntu 15.x
 2. Unzip the zip file which will create the directory ~/Downloads/orabuntu-lxc-master
 3. Change directory to ~/Downloads/orabuntu-lxc-master
-3a.Optionally you can run the pre-check script ubuntu-services-0.sh as a standalone utility to help you evaluate the impacts of orabuntu-lxc install on your system.
-4. Run the script ubuntu-services.sh with your desired parameters (see usage notes below).
-5. Run ONLY on fresh install of Ubuntu 15.04 or 15.10 !
-6. Run the script ~/Downloads/orabuntu-lxc-master/ubuntu-services.sh (note, it's a fully-automated, 99% non-interactive script). Accept defaults on first run.
+4. (Optional) run ubuntu-services-0.sh as a standalone pre-check utility to evaluate orabuntu-lxc install impacts.
+5. Run the script ubuntu-services.sh with your desired parameters (see usage notes below).
+6. Run ONLY on fresh install of Ubuntu 15.04 or 15.10 !
+7. Run the script ~/Downloads/orabuntu-lxc-master/ubuntu-services.sh (note, it's a fully-automated, 99% non-interactive script). Accept defaults on first run.
 
 Note:  OEL5 OEL6 OEL7 LXC Containers are supported.
 
@@ -83,7 +83,11 @@ Define the domain for cloned containers as "orabuntu-lxc.com".  Be sure to inclu
 Define the nameserver for the "orabuntu-lxc.com" domain to be "stlns01" (FQDN:  "stlns01.orabuntu-lxc.com").
 ```
 
-KEEP IN MIND WHEN READING THE USAGE NOTES BELOW THAT IT IS STRONGLY ADVISED IN THE STERNEST TERMS TO ONLY INSTALL THIS SOFTWARE ON A FRESH INSTALL OF UBUNTU 15.10 OR 15.04 AND NOT TO INSTALL THIS ON A HIGHLY-CONFIGURED UBUNTU DESKTOP OR SERVER THAT HAS BEEN RUNNING FOR A LONG TIME WITH MANY CUSTOM-CONFIGURATIONS ALREADY IMPLEMENTED.  DOING SO IS AT YOUR OWN RISK.  THIS SOFTWARE MAKES CHANGES TO DHCP AND BIND9 (NAMED) CONFIGURATIONS SO IT COULD DISRUPT LOOKUPS AND NAME RESOLUTIONS ON AN ALREADY-BEEN-RUNNING-FOR-AWHILE UBUNTU HOST!
+KEEP IN MIND WHEN READING THE USAGE NOTES BELOW THAT IT IS STRONGLY ADVISED TO ONLY INSTALL THIS SOFTWARE ON A FRESH INSTALL OF UBUNTU 15.10 OR 15.04 AND NOT TO INSTALL THIS ON A HIGHLY-CONFIGURED UBUNTU DESKTOP OR SERVER THAT HAS BEEN RUNNING FOR A LONG TIME WITH MANY CUSTOM-CONFIGURATIONS ALREADY IMPLEMENTED.  
+
+THIS SOFTWARE MAKES CHANGES TO DHCP AND BIND9 (NAMED) CONFIGURATIONS SO IT COULD DISRUPT LOOKUPS AND NAME RESOLUTIONS ON AN ALREADY-BEEN-RUNNING-FOR-AWHILE UBUNTU HOST!
+
+That being said, if you do want to install it on an existing Ubuntu deployment that is customized and has been running for awhile, use the ubuntu-services-0.sh pre-check script to evaluate effects of the orabuntu-lxc install.  This script will show all configuration files that will be overwritten or updated by orabuntu-lxc install.
 
 NOTE 1:  If you do a second run of ubuntu-services.sh to create additional containers of a different OS version, be aware that the software looks for the file "/etc/orabuntu-release" and if found, it skips some of the setup steps such as Ubuntu host OS package installs (unpack of ubuntu-host.tar) since those steps were already done on the first pass, and proceeds directly to the creation of the new seed container.
 
