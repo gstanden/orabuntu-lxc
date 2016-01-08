@@ -1,3 +1,21 @@
+#    Copyright 2015-2016 Gilbert Standen
+#    This file is part of orabuntu-lxc.
+
+#    Orabuntu-lxc is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+
+#    Orabuntu-lxc is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+
+#    You should have received a copy of the GNU General Public License
+#    along with orabuntu-lxc.  If not, see <http://www.gnu.org/licenses/>.
+
+#    v2.8 GLS 20151231
+
 #!/bin/bash
 
 clear
@@ -5,11 +23,11 @@ clear
 # v2.4 GLS 20151224
 
 echo ''
-sudo date
-echo ''
 echo "=============================================="
 echo "Orabuntu-lxc automation running ...           "
 echo "=============================================="
+echo ''
+sudo date
 echo ''
 echo "=============================================="
 echo "                                              "
@@ -62,6 +80,31 @@ echo "Results may be unpredictable.                 "
 echo "Please use a supported Ubuntu OS version.     "
 echo "=============================================="
 fi
+
+sleep 5
+
+clear
+
+echo ''
+echo "=============================================="
+echo "Check required packages status...             "
+echo "=============================================="
+echo ''
+
+function CheckPackageInstalled {
+echo 'lxc uml-utilities openvswitch-switch openvswitch-common bind9 bind9utils isc-dhcp-server apparmor-utils openssh-server uuid rpm yum hugepages ntp iotop flashplugin-installer sshpass db5.1-util'
+}
+PackageInstalled=$(CheckPackageInstalled)
+for i in $PackageInstalled
+do
+sudo dpkg -l $i | cut -f3 -d' ' | tail -1 | sed 's/^/Installed:/'
+done
+
+echo ''
+echo "=============================================="
+echo "Check required packages status completed.     "
+echo "=============================================="
+echo ''
 
 sleep 5
 
@@ -274,9 +317,14 @@ then
 	echo "=============================================="
 	echo ''
 
+	apt-cache policy bind9 | grep Installed | cut -f1 -d':' | sed 's/^[ \t]*//;s/[ \t]*$//'
+
 	sudo apt-get install -y lxc
-	sudo apt-get install -y synaptic
-	sudo apt-get install -y cpu-checker
+
+	# GLS 20160103 synaptic and cpu-checker packages not necessary.
+	# sudo apt-get install -y synaptic
+	# sudo apt-get install -y cpu-checker
+
 	sudo apt-get install -y uml-utilities
 	sudo apt-get install -y openvswitch-switch
 	sudo apt-get install -y openvswitch-common
@@ -300,19 +348,22 @@ then
 	sudo apt-get install -y rpm
 	sudo apt-get install -y yum
 	sudo apt-get install -y hugepages
-	sudo apt-get install -y nfs-kernel-server
-	sudo apt-get install -y nfs-common portmap
-	sudo apt-get install -y multipath-tools
-	sudo apt-get install -y open-iscsi 
-	sudo apt-get install -y multipath-tools 
+
+	# GLS 20160103 nfs-kernel-server and nfs-common-portmap not needed
+	# sudo apt-get install -y nfs-kernel-server
+	# sudo apt-get install -y nfs-common portmap
+	# GLS 20160103 multipath-tools and open-iscsi install moved to ~/Downloads/orabuntu-lxc-master/scst-files/create-scst-1a.sh
+	# sudo apt-get install -y multipath-tools
+	# sudo apt-get install -y open-iscsi 
+
 	sudo apt-get install -y ntp
 	sudo apt-get install -y iotop
 	sudo apt-get install -y flashplugin-installer
 	sudo apt-get install -y sshpass
 
 	# GLS 20151213 gawk needed for scst custom kernel build on linux 4.x kernels.
-	# GLS 20151213 gawk optional for just the container build.
-	sudo apt-get install -y gawk
+	# GLS 20160103 gawk install moved to ~/Downloads/orabuntu-lxc-master/scst-files/create-scst-1a.sh
+	# sudo apt-get install -y gawk
 
 	# GLS 20151221 Added to support Oracle Enterprise Linux 5.x LXC containers
 	sudo apt-get install db5.1-util
@@ -379,6 +430,38 @@ then
 	sudo sed -i '/enp/!s/wlan|eth|bnep/enp|wlp|wlan|eth|bnep/' /etc/network/openvswitch/crt_ovs_sw1.sh
 	sudo sed -i '/enp/!s/wlan|eth|bnep/enp|wlp|wlan|eth|bnep/' /etc/network/openvswitch/crt_ovs_sx1.sh
 
+	# GLS 20160107 Enhancements to OpenvSwitch startup to prevent hangs on some systems.
+	sudo chmod +x /etc/init.d/rc.local
+	sudo chmod +x /etc/rc.local.startup
+	sudo chmod +x /etc/rc.local.shutdown
+	sudo /usr/sbin/update-rc.d -f rc.local remove
+	sudo /usr/sbin/update-rc.d rc.local defaults
+	sudo mv /etc/rcS.d/S02rc.local /etc/rcS.d/S15rc.local
+
+	echo ''
+	echo "=============================================="
+	echo "Modifying the design of rc.local scripting... "
+	echo "=============================================="
+	echo ''
+	echo "=============================================="
+	echo "Output should be 3 lines that match these 3..."
+	echo "=============================================="
+	echo ''
+	echo 'This stanza of 3 lines should match the next stanza of 3 lines.'
+	echo ''
+	echo '/etc/rc0.d/K01rc.local'
+	echo '/etc/rc6.d/K01rc.local'
+	echo '/etc/rcS.d/S15rc.local'
+	echo ''
+	sudo find /etc/rc?.d -iname '*local'
+	echo ''
+	echo "=============================================="
+	echo "Re-design of rc.local scripting completd.     "
+	echo "=============================================="
+	echo ''
+
+	sleep 5
+
 	if [ -n $NameServer ]
 	then
 	# GLS 20151223 Settable Nameserver feature added
@@ -422,11 +505,14 @@ echo "=============================================="
 
 	sudo /etc/network/openvswitch/crt_ovs_sw1.sh >/dev/null 2>&1
 	echo ''
-	sleep 25
+	sleep 10
+	echo ''
 	sudo ifconfig sw1
 	echo ''
+	sleep 10
 	sudo ifconfig sx1
 
+echo ''
 echo "=============================================="
 echo "Required openvswitches started.               "
 echo "=============================================="

@@ -60,9 +60,10 @@ To install:
 1. Download the zip file from https://github.com/gstanden/orabuntu-lxc to your ~/Downloads directory on Ubuntu 15.x
 2. Unzip the zip file which will create the directory ~/Downloads/orabuntu-lxc-master
 3. Change directory to ~/Downloads/orabuntu-lxc-master
+3a.Optionally you can run the pre-check script ubuntu-services-0.sh as a standalone utility to help you evaluate the impacts of orabuntu-lxc install on your system.
 4. Run the script ubuntu-services.sh with your desired parameters (see usage notes below).
 5. Run ONLY on fresh install of Ubuntu 15.04 or 15.10 !
-6. Run the script ~/Downloads/orabuntu-lxc-master/ubuntu-services.sh (note, it's a fully-automated, non-interactive script).
+6. Run the script ~/Downloads/orabuntu-lxc-master/ubuntu-services.sh (note, it's a fully-automated, 99% non-interactive script). Accept defaults on first run.
 
 Note:  OEL5 OEL6 OEL7 LXC Containers are supported.
 
@@ -71,8 +72,8 @@ Note:  OEL5 OEL6 OEL7 LXC Containers are supported.
 ~/Downloads/ubuntu-services.sh MajorRelease MinorRelease NumCon corp\.yourdomain\.com nameserver
 
 Example
-~/Downloads/ubuntu-services-sh $1 $2 $3 $4                $5
-~/Downloads/ubuntu-services.sh 6  7  4  orabuntu-lxc\.com stlns01
+~/Downloads/orabuntu-lxc-master/ubuntu-services-sh $1 $2 $3 $4                $5
+~/Downloads/orabuntu-lxc-master/ubuntu-services.sh 6  7  4  orabuntu-lxc\.com stlns01
 
 Example explanation:
 

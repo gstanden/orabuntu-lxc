@@ -1,3 +1,21 @@
+#    Copyright 2015-2016 Gilbert Standen
+#    This file is part of orabuntu-lxc.
+
+#    Orabuntu-lxc is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+
+#    Orabuntu-lxc is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+
+#    You should have received a copy of the GNU General Public License
+#    along with orabuntu-lxc.  If not, see <http://www.gnu.org/licenses/>.
+
+#    v2.8 GLS 20151231
+
 #!/bin/bash
 
 clear
@@ -21,6 +39,7 @@ echo ''
 OracleMajor=$1
 OracleRelease=$1$2
 OracleVersion=$1.$2
+Domain=$3
 
 sleep 5
 
@@ -47,6 +66,7 @@ sudo chmod 755 /var/lib/lxc/oel$OracleRelease/rootfs/root/create_users.sh
 sudo chown root:root /var/lib/lxc/oel$OracleRelease/rootfs/etc/dhcp/dhclient.conf
 sudo chmod 644 /var/lib/lxc/oel$OracleRelease/rootfs/etc/dhcp/dhclient.conf
 sudo sed -i "s/HOSTNAME=ContainerName/HOSTNAME=oel$OracleRelease/g" /var/lib/lxc/oel$OracleRelease/rootfs/etc/sysconfig/network
+sudo sed -i "s/yourdomain\.com/$Domain/" /var/lib/lxc/oel$OracleRelease/rootfs/etc/dhcp/dhclient.conf
 
 echo ''
 echo "=============================================="
@@ -308,30 +328,31 @@ echo "=============================================="
 echo "Container Up.                                 "
 echo "=============================================="
 
-sleep 5
+# sleep 5
 
-clear
+# clear
 
-echo ''
-echo "=============================================="
-echo "Add Private Key to Authentication Agent...    "
-echo "=============================================="
-echo ''
+# GLS 20160107 Not needed as sshpass is being used for the setups now.
+# echo ''
+# echo "=============================================="
+# echo "Add Private Key to Authentication Agent...    "
+# echo "=============================================="
+# echo ''
 
-ssh-add
-if [ $? -eq 0 ]
-then
-echo ''
-echo "=============================================="
-echo "Private Key Added to Authentication Agent     "
-echo "=============================================="
-else
-echo ''
-echo "=============================================="
-echo "Unexpected Private Key Result...continuing... "
-echo "=============================================="
-echo ''
-fi
+# ssh-add
+# if [ $? -eq 0 ]
+# then
+# echo ''
+# echo "=============================================="
+# echo "Private Key Added to Authentication Agent     "
+# echo "=============================================="
+# else
+# echo ''
+# echo "=============================================="
+# echo "Unexpected Private Key Result...continuing... "
+# echo "=============================================="
+# echo ''
+# fi
 
 sleep 5
 
