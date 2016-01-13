@@ -5,7 +5,7 @@ Any Oracle on Any Linux at bare-metal resource utilization with density and elas
 Oracle Enterprise Edition Software on Ubuntu Linux using LXC Containers.
 This software runs Oracle Enteprise Edition RAC database on Ubuntu 15.04 or 15.10 64-bit Desktop Edition using Oracle Enteprise Linux 6.5 LXC Containers.  Additional instructions for an install of Oracle 12c (12.1.0.2.0) RAC ASM Flex Cluster using GNS are provided at the 'nandydandyoracle' website ( https://sites.google.com/site/nandydandyoracle ).
 
-One can think of orabuntu-lxc as a sort of Oracle Enterprise Linux 'emulation layer' for Ubuntu Linux, although it is much more than just that. Orabuntu-lxc is an automation layer for LXC that will create 10's or 100's of oracle-ready LXC containers (i.e. 'servers') of any OEL5, OEL6, or OEL7 version in just minutes, fully networked and ready for Oracle Enterprise software install.  Just add a downloaded Oracle install media, mix, and voila!  Oracle Enterprise is built!
+One can think of orabuntu-lxc as a sort of Oracle Linux 'emulation layer' for Ubuntu Linux, although it is much more than just that. Orabuntu-lxc is an automation layer for LXC that will create 10's or 100's of oracle-ready LXC containers (i.e. 'servers') of any OL5, OL6, or OL7 version in just minutes, fully networked and ready for Oracle Enterprise software install.  Just add a downloaded Oracle install media, mix, and voila!  Oracle Enterprise is built!
 
 ======================
 Why Linux Containers ?
@@ -39,21 +39,21 @@ New Feature Version 2.5
 
 Feature 1
 
-The ubuntu-clone.sh script can be used to add additional clone containers for OEL releases for which you already have an oelXX container and for which clones have already previously been created.  
+The ubuntu-clone.sh script can be used to add additional clone containers for OL releases for which you already have an olXX container and for which clones have already previously been created.  
 
 ubuntu-clone.sh 6 7 3
 
-will create 3 more OEL 6.7 cloned containers in addition to any already created.  It will number the index of the cloned containers at the n+1th index.  For example, if ora67c14 is the highest-indexed clone of oel67, then the ubuntu-clone.sh will create the clone containers {ora67c15, ora67c16, ora67c17}. As another example, if the highest indexed container is ora59c14, then the new ora67 containers will still be the same set starting at c15.  The highest current index is evaulated across all oelXX versions.
+will create 3 more OL 6.7 cloned containers in addition to any already created.  It will number the index of the cloned containers at the n+1th index.  For example, if ora67c14 is the highest-indexed clone of ol67, then the ubuntu-clone.sh will create the clone containers {ora67c15, ora67c16, ora67c17}. As another example, if the highest indexed container is ora59c14, then the new ora67 containers will still be the same set starting at c15.  The highest current index is evaulated across all olXX versions.
 
 Feature 2
 
-You can now add in the ASM private network interfaces and RAC private network interfaces to the container clones as an option, and also remove them from the seed container once the clone is done so that the seed oelXX container continues to have only a single DHCP interface.
+You can now add in the ASM private network interfaces and RAC private network interfaces to the container clones as an option, and also remove them from the seed container once the clone is done so that the seed olXX container continues to have only a single DHCP interface.
 
 =============================
 Installation
 =============================
 
-Phase 1:  Create the LXC Oracle Enteprise Linux (OEL 5.x, OEL 6.x or OEL 7.x) containers
+Phase 1:  Create the LXC Oracle Linux (OL 5.x, OL 6.x or OL 7.x) containers
 
 To install:
 
@@ -65,7 +65,7 @@ To install:
 6. Run ONLY on fresh install of Ubuntu 15.04 or 15.10 !
 7. Run the script ~/Downloads/orabuntu-lxc-master/ubuntu-services.sh (note, it's a fully-automated, 99% non-interactive script). Accept defaults on first run.
 
-Note:  OEL5 OEL6 OEL7 LXC Containers are supported.
+Note:  OL5 OL6 OL7 LXC Containers are supported.
 
 !!! =============================
 ```
@@ -77,8 +77,8 @@ Example
 
 Example explanation:
 
-Create containers with Oracle Enterprise Linux 6.7 OS version.
-Create four clones of the seed (oel67) container.  The clones will be named {ora67c10, ora67c11, ora67c12, ora67c13}.
+Create containers with Oracle Linux 6.7 OS version.
+Create four clones of the seed (ol67) container.  The clones will be named {ora67c10, ora67c11, ora67c12, ora67c13}.
 Define the domain for cloned containers as "orabuntu-lxc.com".  Be sure to include backslash before any "." dots.
 Define the nameserver for the "orabuntu-lxc.com" domain to be "stlns01" (FQDN:  "stlns01.orabuntu-lxc.com").
 ```
@@ -91,11 +91,11 @@ That being said, if you do want to install it on an existing Ubuntu deployment t
 
 NOTE 1:  If you do a second run of ubuntu-services.sh to create additional containers of a different OS version, be aware that the software looks for the file "/etc/orabuntu-release" and if found, it skips some of the setup steps such as Ubuntu host OS package installs (unpack of ubuntu-host.tar) since those steps were already done on the first pass, and proceeds directly to the creation of the new seed container.
 
-NOTE 2:  Note that the seed containers (oel67, oel65, oel59, ...) get created on the 10.207.29.x network, while the cloned containers to be used for actual projects get created on the 10.207.39.x network.  Do not install Oracle Enterprise softwares into the oelxx containers, because these are your fully-configured, oracle-ready SEED containers which you can clone later to make more oracle-ready containers of that specific OEL version if you need more (use the ubuntu-clone.sh script for that).
+NOTE 2:  Note that the seed containers (ol67, ol65, ol59, ...) get created on the 10.207.29.x network, while the cloned containers to be used for actual projects get created on the 10.207.39.x network.  Do not install Oracle Enterprise softwares into the olxx containers, because these are your fully-configured, oracle-ready SEED containers which you can clone later to make more oracle-ready containers of that specific OL version if you need more (use the ubuntu-clone.sh script for that).
 
-NOTE 3:  When re-running the software, you are prompted early on to delete DHCP leases (Y/N) and to delete existing containers (Y/N).  If running the software a second time as mentioned above to create another set of containers of a different OEL version, answer "N" to all the questions so that your first run of containers is not destroyed, nor the first SEED container.
+NOTE 3:  When re-running the software, you are prompted early on to delete DHCP leases (Y/N) and to delete existing containers (Y/N).  If running the software a second time as mentioned above to create another set of containers of a different OL version, answer "N" to all the questions so that your first run of containers is not destroyed, nor the first SEED container.
 
-NOTE 4:  The DHCP lease delete steps and the container delete steps are useful if you run the whole set of scripts for the first time, and you run into some problem and want to start completely over.  In that case, answer "Y" to deleting DHCP leases, answer "Y" to delete containers, and answer "N" to "delete only the oelxx SEED container" so that the result will be ALL DHCP leases deleted, and ALL containers deleted, so that you are starting from scratch again.  Also, be sure before re-running "from scratch again" to DELETE the file "/etc/orabuntu-release" using "sudo rm /etc/orabuntu-release" so that the software executes ALL OS configuration steps again on the re-run of the first install.  Also, you may want to delete the /var/lib/bind/*.jnl files.  It is also recommended to do a reboot of the Ubuntu host if doing a complete re-run from scratch after the cleanup steps.
+NOTE 4:  The DHCP lease delete steps and the container delete steps are useful if you run the whole set of scripts for the first time, and you run into some problem and want to start completely over.  In that case, answer "Y" to deleting DHCP leases, answer "Y" to delete containers, and answer "N" to "delete only the olxx SEED container" so that the result will be ALL DHCP leases deleted, and ALL containers deleted, so that you are starting from scratch again.  Also, be sure before re-running "from scratch again" to DELETE the file "/etc/orabuntu-release" using "sudo rm /etc/orabuntu-release" so that the software executes ALL OS configuration steps again on the re-run of the first install.  Also, you may want to delete the /var/lib/bind/*.jnl files.  It is also recommended to do a reboot of the Ubuntu host if doing a complete re-run from scratch after the cleanup steps.
 
 =============================
 Why SCST ?

@@ -38,7 +38,7 @@ echo "=============================================="
 OracleRelease=$1$2
 OracleVersion=$1.$2
 OR=$OracleRelease
-Config=/var/lib/lxc/oel$OracleRelease/config
+Config=/var/lib/lxc/ol$OracleRelease/config
 
 sleep 5
 
@@ -51,7 +51,7 @@ echo "=============================================="
 echo ''
 
 function CheckClonedContainersExist {
-sudo ls /var/lib/lxc | egrep "oel$OracleRelease|ora$OracleRelease" | sort -V | sed 's/$/ /' | tr -d '\n' 
+sudo ls /var/lib/lxc | egrep "ol$OracleRelease|ora$OracleRelease" | sort -V | sed 's/$/ /' | tr -d '\n' 
 }
 ClonedContainersExist=$(CheckClonedContainersExist)
 
@@ -62,12 +62,12 @@ do
 	sudo lxc-ls -f | sed 's/  */ /g' | grep $j | grep RUNNING | cut -f3 -d' ' | sed 's/,//' | cut -f1-2 -d'.' | sed 's/\.//g'
 	}
 	PublicIPIterative=$(CheckPublicIPIterative)
-	echo $j | grep oel
+	echo $j | grep ol
 	if [ $? -eq 0 ]
 	then
 	sudo bash -c "cat $Config|grep ipv4|cut -f2 -d'='|sed 's/^[ \t]*//;s/[ \t]*$//'|cut -f4 -d'.'|sed 's/^/\./'|xargs -I '{}' sed -i "/ipv4/s/\{}/\.1$OR/g" $Config"
-#	sudo sed -i "s/\.39/\.$OracleRelease/g" /var/lib/lxc/oel$OracleRelease/config
-#	sudo sed -i "s/\.40/\.$OracleRelease/g" /var/lib/lxc/oel$OracleRelease/config
+#	sudo sed -i "s/\.39/\.$OracleRelease/g" /var/lib/lxc/ol$OracleRelease/config
+#	sudo sed -i "s/\.40/\.$OracleRelease/g" /var/lib/lxc/ol$OracleRelease/config
 	fi
 	sudo lxc-start -n $j > /dev/null 2>&1
 	sleep 5

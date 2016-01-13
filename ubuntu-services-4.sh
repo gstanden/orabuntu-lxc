@@ -72,17 +72,17 @@ clear
 
 echo ''
 echo "=============================================="
-echo "Stopping oel$OracleRelease container...       "
-echo "(OEL 5 shutdown can take awhile...patience)   "
-echo "(OEL 6 and OEL 7 are relatively fast shutdown)"
+echo "Stopping ol$OracleRelease container...       "
+echo "(OL 5 shutdown can take awhile...patience)   "
+echo "(OL 6 and OL 7 are relatively fast shutdown)"
 echo "=============================================="
 echo ''
 
 function CheckContainerUp {
-sudo lxc-ls -f | grep oel$OracleRelease | sed 's/  */ /g' | egrep 'RUNNING|STOPPED'  | cut -f2 -d' '
+sudo lxc-ls -f | grep ol$OracleRelease | sed 's/  */ /g' | egrep 'RUNNING|STOPPED'  | cut -f2 -d' '
 }
 ContainerUp=$(CheckContainerUp)
-sudo lxc-stop -n oel$OracleRelease > /dev/null 2>&1
+sudo lxc-stop -n ol$OracleRelease > /dev/null 2>&1
 
 while [ "$ContainerUp" = 'RUNNING' ]
 do
@@ -111,14 +111,14 @@ read -e -p "Add ASM Private Networks and RAC Private Networks ? [Y/N]   " -i "Y"
 
 if [ $AddPrivateNetworks = 'y' ] || [ $AddPrivateNetworks = 'Y' ]
 then
-	sudo bash -c "cat /var/lib/lxc/oel$OR/config.oracle /var/lib/lxc/oel$OR/config.asm.flex.cluster > /var/lib/lxc/oel$OR/config"
-	sudo sed -i "s/ContainerName/oel$OR/g" /var/lib/lxc/oel$OR/config
+	sudo bash -c "cat /var/lib/lxc/ol$OR/config.oracle /var/lib/lxc/ol$OR/config.asm.flex.cluster > /var/lib/lxc/ol$OR/config"
+	sudo sed -i "s/ContainerName/ol$OR/g" /var/lib/lxc/ol$OR/config
 fi
 
 if [ $AddPrivateNetworks = 'n' ] || [ $AddPrivateNetworks = 'N' ]
 then
-	sudo cp -p /var/lib/lxc/oel$OracleRelease/config.oracle /var/lib/lxc/oel$OracleRelease/config
-	sudo sed -i "s/ContainerName/oel$OracleRelease/g" /var/lib/lxc/oel$OracleRelease/config
+	sudo cp -p /var/lib/lxc/ol$OracleRelease/config.oracle /var/lib/lxc/ol$OracleRelease/config
+	sudo sed -i "s/ContainerName/ol$OracleRelease/g" /var/lib/lxc/ol$OracleRelease/config
 fi
 
 echo ''
@@ -132,11 +132,11 @@ clear
 
 echo ''
 echo "=============================================="
-echo "Cloning oel$OracleRelease to $NumCon containers         "
+echo "Cloning ol$OracleRelease to $NumCon containers         "
 echo "=============================================="
 echo ''
 
-sudo sed -i 's/yum install/yum -y install/g' /var/lib/lxc/oel$OracleRelease/rootfs/root/lxc-services.sh
+sudo sed -i 's/yum install/yum -y install/g' /var/lib/lxc/ol$OracleRelease/rootfs/root/lxc-services.sh
 
 function GetHighestContainerIndex {
 sudo ls /var/lib/lxc | more | grep ora | cut -c7-9 | sort -n | tail -1
@@ -165,8 +165,8 @@ sleep 5
 while [ $i -le "$NewHighestContainerIndex" ]
 do
 echo "Clone Container Name = $ContainerPrefix$i"
-sudo lxc-clone -o oel$OracleRelease -n $ContainerPrefix$i
-sudo sed -i "s/oel$OracleRelease/$ContainerPrefix$i/g" /var/lib/lxc/$ContainerPrefix$i/config
+sudo lxc-clone -o ol$OracleRelease -n $ContainerPrefix$i
+sudo sed -i "s/ol$OracleRelease/$ContainerPrefix$i/g" /var/lib/lxc/$ContainerPrefix$i/config
 sudo sed -i "s/\.10/\.$i/g" /var/lib/lxc/$ContainerPrefix$i/config
 sudo sed -i 's/sx1/sw1/g' /var/lib/lxc/$ContainerPrefix$i/config
 function GetHostName (){ echo $ContainerPrefix$i\1; }
@@ -208,19 +208,19 @@ clear
 
 echo ''
 echo "=============================================="
-echo "      Reset config file for oel$OracleRelease."
+echo "      Reset config file for ol$OracleRelease."
 echo "Removes ASM and RAC private network interfaces"
-echo "      from seed container oel$OracleRelease   "
+echo "      from seed container ol$OracleRelease   "
 echo "(cloned containers are not affected by reset) "
 echo "=============================================="
 echo ''
 
-read -e -p "Reset Seed Container oel$OracleRelease to single DHCP interface ? [Y/N]   " -i "Y" ResetSingleDHCPInterface
+read -e -p "Reset Seed Container ol$OracleRelease to single DHCP interface ? [Y/N]   " -i "Y" ResetSingleDHCPInterface
 
 if [ $ResetSingleDHCPInterface = 'y' ] || [ $ResetSingleDHCPInterface = 'Y' ]
 then
-sudo cp -p /var/lib/lxc/oel$OracleRelease/config.oracle /var/lib/lxc/oel$OracleRelease/config
-sudo sed -i "s/ContainerName/oel$OracleRelease/g" /var/lib/lxc/oel$OracleRelease/config
+sudo cp -p /var/lib/lxc/ol$OracleRelease/config.oracle /var/lib/lxc/ol$OracleRelease/config
+sudo sed -i "s/ContainerName/ol$OracleRelease/g" /var/lib/lxc/ol$OracleRelease/config
 fi
 
 echo ''

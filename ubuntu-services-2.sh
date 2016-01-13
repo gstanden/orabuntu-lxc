@@ -51,22 +51,22 @@ echo "Extracting oracle-specific files to container."
 echo "=============================================="
 echo ''
 
-sudo tar -xvf ~/Downloads/orabuntu-lxc-master/lxc-oracle-files.tar -C /var/lib/lxc/oel$OracleRelease
+sudo tar -xvf ~/Downloads/orabuntu-lxc-master/lxc-oracle-files.tar -C /var/lib/lxc/ol$OracleRelease
 
-sudo chown root:root /var/lib/lxc/oel$OracleRelease/rootfs/root/hugepages_setting.sh
-sudo chmod 755 /var/lib/lxc/oel$OracleRelease/rootfs/root/hugepages_setting.sh
-sudo chown root:root /var/lib/lxc/oel$OracleRelease/rootfs/root/packages.sh
-sudo chmod 755 /var/lib/lxc/oel$OracleRelease/rootfs/root/packages.sh
-sudo chown root:root /var/lib/lxc/oel$OracleRelease/rootfs/root/create_directories.sh
-sudo chmod 755 /var/lib/lxc/oel$OracleRelease/rootfs/root/create_directories.sh
-sudo chown root:root /var/lib/lxc/oel$OracleRelease/rootfs/root/lxc-services.sh
-sudo chmod 755 /var/lib/lxc/oel$OracleRelease/rootfs/root/lxc-services.sh
-sudo chown root:root /var/lib/lxc/oel$OracleRelease/rootfs/root/create_users.sh
-sudo chmod 755 /var/lib/lxc/oel$OracleRelease/rootfs/root/create_users.sh
-sudo chown root:root /var/lib/lxc/oel$OracleRelease/rootfs/etc/dhcp/dhclient.conf
-sudo chmod 644 /var/lib/lxc/oel$OracleRelease/rootfs/etc/dhcp/dhclient.conf
-sudo sed -i "s/HOSTNAME=ContainerName/HOSTNAME=oel$OracleRelease/g" /var/lib/lxc/oel$OracleRelease/rootfs/etc/sysconfig/network
-sudo sed -i "s/yourdomain\.com/$Domain/" /var/lib/lxc/oel$OracleRelease/rootfs/etc/dhcp/dhclient.conf
+sudo chown root:root /var/lib/lxc/ol$OracleRelease/rootfs/root/hugepages_setting.sh
+sudo chmod 755 /var/lib/lxc/ol$OracleRelease/rootfs/root/hugepages_setting.sh
+sudo chown root:root /var/lib/lxc/ol$OracleRelease/rootfs/root/packages.sh
+sudo chmod 755 /var/lib/lxc/ol$OracleRelease/rootfs/root/packages.sh
+sudo chown root:root /var/lib/lxc/ol$OracleRelease/rootfs/root/create_directories.sh
+sudo chmod 755 /var/lib/lxc/ol$OracleRelease/rootfs/root/create_directories.sh
+sudo chown root:root /var/lib/lxc/ol$OracleRelease/rootfs/root/lxc-services.sh
+sudo chmod 755 /var/lib/lxc/ol$OracleRelease/rootfs/root/lxc-services.sh
+sudo chown root:root /var/lib/lxc/ol$OracleRelease/rootfs/root/create_users.sh
+sudo chmod 755 /var/lib/lxc/ol$OracleRelease/rootfs/root/create_users.sh
+sudo chown root:root /var/lib/lxc/ol$OracleRelease/rootfs/etc/dhcp/dhclient.conf
+sudo chmod 644 /var/lib/lxc/ol$OracleRelease/rootfs/etc/dhcp/dhclient.conf
+sudo sed -i "s/HOSTNAME=ContainerName/HOSTNAME=ol$OracleRelease/g" /var/lib/lxc/ol$OracleRelease/rootfs/etc/sysconfig/network
+sudo sed -i "s/yourdomain\.com/$Domain/" /var/lib/lxc/ol$OracleRelease/rootfs/etc/dhcp/dhclient.conf
 
 echo ''
 echo "=============================================="
@@ -83,26 +83,26 @@ echo "Begin MAC Address reset...                    "
 echo "=============================================="
 echo ''
 
-sudo cp /var/lib/lxc/oel$OracleRelease/config /var/lib/lxc/oel$OracleRelease/config.original.bak
+sudo cp /var/lib/lxc/ol$OracleRelease/config /var/lib/lxc/ol$OracleRelease/config.original.bak
 
 function GetOriginalHwaddr {
-sudo cat /var/lib/lxc/oel$OracleRelease/config | grep hwaddr | tail -1 | sed 's/\./\\\./g'
+sudo cat /var/lib/lxc/ol$OracleRelease/config | grep hwaddr | tail -1 | sed 's/\./\\\./g'
 }
 OriginalHwaddr=$(GetOriginalHwaddr)
 echo $OriginalHwaddr | sed 's/\\//g'
 
-sudo cp -p /var/lib/lxc/oel$OracleRelease/config.oracle.bak.oel$OracleMajor /var/lib/lxc/oel$OracleRelease/config.oracle
+sudo cp -p /var/lib/lxc/ol$OracleRelease/config.oracle.bak.ol$OracleMajor /var/lib/lxc/ol$OracleRelease/config.oracle
 
-sudo sed -i "s/lxc\.network\.hwaddr.*/$OriginalHwaddr/" /var/lib/lxc/oel$OracleRelease/config.oracle
-sudo cp -p /var/lib/lxc/oel$OracleRelease/config.oracle /var/lib/lxc/oel$OracleRelease/config
+sudo sed -i "s/lxc\.network\.hwaddr.*/$OriginalHwaddr/" /var/lib/lxc/ol$OracleRelease/config.oracle
+sudo cp -p /var/lib/lxc/ol$OracleRelease/config.oracle /var/lib/lxc/ol$OracleRelease/config
 
 echo ''
 echo "These should match..."
 echo ''
-sudo grep hwaddr /var/lib/lxc/oel$OracleRelease/config.original.bak | tail -1
-sudo grep hwaddr /var/lib/lxc/oel$OracleRelease/config.oracle
+sudo grep hwaddr /var/lib/lxc/ol$OracleRelease/config.original.bak | tail -1
+sudo grep hwaddr /var/lib/lxc/ol$OracleRelease/config.oracle
 
-sudo chmod 644 /var/lib/lxc/oel$OracleRelease/config
+sudo chmod 644 /var/lib/lxc/ol$OracleRelease/config
 
 echo ''
 echo "=============================================="
@@ -183,13 +183,13 @@ echo "Legacy script cleanups...                     "
 echo "=============================================="
 echo ''
 
-sudo cp -p /etc/network/if-up.d/openvswitch/lxcora00-pub-ifup-sw1 /etc/network/if-up.d/openvswitch/oel$OracleRelease-pub-ifup-sx1
-sudo cp -p /etc/network/if-down.d/openvswitch/lxcora00-pub-ifdown-sw1 /etc/network/if-down.d/openvswitch/oel$OracleRelease-pub-ifdown-sx1
+sudo cp -p /etc/network/if-up.d/openvswitch/lxcora00-pub-ifup-sw1 /etc/network/if-up.d/openvswitch/ol$OracleRelease-pub-ifup-sx1
+sudo cp -p /etc/network/if-down.d/openvswitch/lxcora00-pub-ifdown-sw1 /etc/network/if-down.d/openvswitch/ol$OracleRelease-pub-ifdown-sx1
 
-sudo sed -i 's/-sw1/-sx1/g' /var/lib/lxc/oel$OracleRelease/config
+sudo sed -i 's/-sw1/-sx1/g' /var/lib/lxc/ol$OracleRelease/config
 
-sudo ls -l /etc/network/if-up.d/openvswitch/oel$OracleRelease*
-sudo ls -l /etc/network/if-down.d/openvswitch/oel$OracleRelease*
+sudo ls -l /etc/network/if-up.d/openvswitch/ol$OracleRelease*
+sudo ls -l /etc/network/if-down.d/openvswitch/ol$OracleRelease*
 
 echo ''
 echo "=============================================="
@@ -245,15 +245,15 @@ echo "Initialize LXC Seed Container on OpenvSwitch.."
 echo "=============================================="
 
 cd /etc/network/if-up.d/openvswitch
-sudo sed -i "s/ContainerName/oel$OracleRelease/g" /var/lib/lxc/oel$OracleRelease/config
+sudo sed -i "s/ContainerName/ol$OracleRelease/g" /var/lib/lxc/ol$OracleRelease/config
 
 function CheckContainerUp {
-sudo lxc-ls -f | grep oel$OracleRelease | sed 's/  */ /g' | egrep 'RUNNING|STOPPED'  | cut -f2 -d' '
+sudo lxc-ls -f | grep ol$OracleRelease | sed 's/  */ /g' | egrep 'RUNNING|STOPPED'  | cut -f2 -d' '
 }
 ContainerUp=$(CheckContainerUp)
 
 function CheckPublicIP {
-sudo lxc-ls -f | sed 's/  */ /g' | grep oel$OracleRelease | cut -f3 -d' ' | sed 's/,//' | cut -f1-3 -d'.' | sed 's/\.//g'
+sudo lxc-ls -f | sed 's/  */ /g' | grep ol$OracleRelease | cut -f3 -d' ' | sed 's/,//' | cut -f1-3 -d'.' | sed 's/\.//g'
 }
 PublicIP=$(CheckPublicIP)
 
@@ -270,15 +270,15 @@ echo "Starting LXC Seed Container for Oracle        "
 echo "=============================================="
 echo ''
 
-sudo sed -i 's/sw1/sx1/' /etc/network/if-up.d/openvswitch/oel$OracleRelease*
-sudo sed -i 's/sw1/sx1/' /etc/network/if-down.d/openvswitch/oel$OracleRelease*
-sudo sed -i 's/tag=10/tag=11/' /etc/network/if-up.d/openvswitch/oel$OracleRelease*
-sudo sed -i 's/tag=10/tag=11/' /etc/network/if-down.d/openvswitch/oel$OracleRelease*
+sudo sed -i 's/sw1/sx1/' /etc/network/if-up.d/openvswitch/ol$OracleRelease*
+sudo sed -i 's/sw1/sx1/' /etc/network/if-down.d/openvswitch/ol$OracleRelease*
+sudo sed -i 's/tag=10/tag=11/' /etc/network/if-up.d/openvswitch/ol$OracleRelease*
+sudo sed -i 's/tag=10/tag=11/' /etc/network/if-down.d/openvswitch/ol$OracleRelease*
 
 if [ $ContainerUp != 'RUNNING' ] || [ $PublicIP != 1020729 ]
 then
 	function CheckContainersExist {
-	sudo ls /var/lib/lxc | grep oel$OracleRelease | sort -V | sed 's/$/ /' | tr -d '\n' | sed 's/^[ \t]*//;s/[ \t]*$//'
+	sudo ls /var/lib/lxc | grep ol$OracleRelease | sort -V | sed 's/$/ /' | tr -d '\n' | sed 's/^[ \t]*//;s/[ \t]*$//'
 	}
 	ContainersExist=$(CheckContainersExist)
 	sleep 5
@@ -301,7 +301,7 @@ then
 			if [ $i -eq 5 ]
 			then
 			sudo lxc-stop -n $j > /dev/null 2>&1
-			sudo /etc/network/openvswitch/veth_cleanups.sh oel$OracleRelease
+			sudo /etc/network/openvswitch/veth_cleanups.sh ol$OracleRelease
 			echo ''
 			sudo lxc-start -n $j > /dev/null 2>&1
 			fi
@@ -320,7 +320,7 @@ fi
 
 echo ''
 echo "==============================================" 
-echo "Public IP is up on oel$OracleRelease                    "
+echo "Public IP is up on ol$OracleRelease                    "
 echo ''
 sudo lxc-ls -f
 echo ''
@@ -360,14 +360,14 @@ clear
 
 echo ''
 echo "=============================================="
-echo "Container oel$OracleRelease ping test...                "
+echo "Container ol$OracleRelease ping test...                "
 echo "=============================================="
 echo ''
 
-ping -c 3 oel$OracleRelease
+ping -c 3 ol$OracleRelease
 
 function CheckNetworkUp {
-ping -c 3 oel$OracleRelease | grep packet | cut -f3 -d',' | sed 's/ //g'
+ping -c 3 ol$OracleRelease | grep packet | cut -f3 -d',' | sed 's/ //g'
 }
 NetworkUp=$(CheckNetworkUp)
 n=1
@@ -381,14 +381,14 @@ if [ "$NetworkUp" != '0%packetloss' ]
 then
 echo ''
 echo "=============================================="
-echo "Container oel$OracleRelease not reliably pingable.      "
+echo "Container ol$OracleRelease not reliably pingable.      "
 echo "Script exiting.                               "
 echo "=============================================="
 exit
 else
 echo ''
 echo "=============================================="
-echo "Container oel$OracleRelease is pingable.                "
+echo "Container ol$OracleRelease is pingable.                "
 echo "=============================================="
 echo ''
 fi
@@ -402,17 +402,17 @@ echo ''
 echo "=============================================="
 echo "Testing passwordless-ssh for root user        "
 echo "=============================================="
-echo "Output of 'uname -a' in oel$OracleRelease...            "
+echo "Output of 'uname -a' in ol$OracleRelease...            "
 echo "=============================================="
 echo ''
 
-sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@oel$OracleRelease uname -a
+sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@ol$OracleRelease uname -a
 if [ $? -ne 0 ]
 then
 echo ''
 echo "=============================================="
-echo "No-password ssh to oel$OracleRelease has issue(s).      "
-echo "No-password ssh to oel$OracleRelease must succeed.      "
+echo "No-password ssh to ol$OracleRelease has issue(s).      "
+echo "No-password ssh to ol$OracleRelease must succeed.      "
 echo "Fix issues retry script.                      "
 echo "Script exiting.                               "
 echo "=============================================="
@@ -420,7 +420,7 @@ exit
 fi
 echo ''
 echo "=============================================="
-echo "No-password ssh test to oel$OracleRelease successful.   "
+echo "No-password ssh test to ol$OracleRelease successful.   "
 echo "=============================================="
 
 sleep 5

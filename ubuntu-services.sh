@@ -93,11 +93,11 @@ clear
 # Example explanation:
 
 # Create containers with Oracle Enterprise Linux 6.7 OS version.
-# Create four clones of the seed (oel67) container.  The clones will be named {ora67c10, ora67c11, ora67c12, ora67c13}.
+# Create four clones of the seed (ol67) container.  The clones will be named {ora67c10, ora67c11, ora67c12, ora67c13}.
 # Define the domain for cloned containers as "orabuntu-lxc.com".  Be sure to include backslash before any "." dots.
 # Define the nameserver for the "orabuntu-lxc.com" domain to be "stlns01" (FQDN:  "stlns01.orabuntu-lxc.com").
 
-# Oracle Enteprise Linux OS versions OEL5, OEL6, and OEL7 are currently supported.
+# Oracle Enteprise Linux OS versions OL5, OL6, and OL7 are currently supported.
 
 clear
 ~/Downloads/orabuntu-lxc-master/ubuntu-services-0.sh
