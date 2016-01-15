@@ -89,15 +89,15 @@ echo "=============================================="
 cd /etc/network/if-up.d/openvswitch
 
 # GLS 20151222 I don't think this step does anything anymore.  Commenting for now, removal pending.
-#sudo sed -i "s/lxcora01/oel$OracleRelease/" /var/lib/lxc/oel$OracleRelease/config
+#sudo sed -i "s/lxcora01/ol$OracleRelease/" /var/lib/lxc/ol$OracleRelease/config
 
 function CheckContainerUp {
-sudo lxc-ls -f | grep oel$OracleRelease | sed 's/  */ /g' | egrep 'RUNNING|STOPPED'  | cut -f2 -d' '
+sudo lxc-ls -f | grep ol$OracleRelease | sed 's/  */ /g' | egrep 'RUNNING|STOPPED'  | cut -f2 -d' '
 }
 ContainerUp=$(CheckContainerUp)
 
 function CheckPublicIP {
-sudo lxc-ls -f | sed 's/  */ /g' | grep oel$OracleRelease | cut -f3 -d' ' | sed 's/,//' | cut -f1-3 -d'.' | sed 's/\.//g'
+sudo lxc-ls -f | sed 's/  */ /g' | grep ol$OracleRelease | cut -f3 -d' ' | sed 's/,//' | cut -f1-3 -d'.' | sed 's/\.//g'
 }
 PublicIP=$(CheckPublicIP)
 
@@ -110,7 +110,7 @@ echo ''
 if [ $ContainerUp != 'RUNNING' ] || [ $PublicIP != 1020729 ]
 then
 	function CheckContainersExist {
-	sudo ls /var/lib/lxc | grep oel$OracleRelease | sort -V | sed 's/$/ /' | tr -d '\n' | sed 's/^[ \t]*//;s/[ \t]*$//'
+	sudo ls /var/lib/lxc | grep ol$OracleRelease | sort -V | sed 's/$/ /' | tr -d '\n' | sed 's/^[ \t]*//;s/[ \t]*$//'
 	}
 	ContainersExist=$(CheckContainersExist)
 	sleep 5
@@ -133,7 +133,7 @@ then
 			if [ $i -eq 5 ]
 			then
 			sudo lxc-stop -n $j > /dev/null 2>&1
-			sudo /etc/network/openvswitch/veth_cleanups.sh oel$OracleRelease
+			sudo /etc/network/openvswitch/veth_cleanups.sh ol$OracleRelease
 			sudo lxc-start -n $j > /dev/null 2>&1
 			fi
 		sleep 1
@@ -151,7 +151,7 @@ fi
 
 echo ''
 echo "==============================================" 
-echo "Public IP is up on oel$OracleRelease          "
+echo "Public IP is up on ol$OracleRelease          "
 echo ''
 sudo lxc-ls -f
 echo ''
@@ -165,14 +165,14 @@ clear
 
 echo ''
 echo "=============================================="
-echo "Container oel$OracleRelease ping test...      "
+echo "Container ol$OracleRelease ping test...      "
 echo "=============================================="
 echo ''
 
-ping -c 3 oel$OracleRelease
+ping -c 3 ol$OracleRelease
 
 function CheckNetworkUp {
-ping -c 3 oel$OracleRelease | grep packet | cut -f3 -d',' | sed 's/ //g'
+ping -c 3 ol$OracleRelease | grep packet | cut -f3 -d',' | sed 's/ //g'
 }
 NetworkUp=$(CheckNetworkUp)
 n=1
@@ -186,14 +186,14 @@ if [ "$NetworkUp" != '0%packetloss' ]
 then
 echo ''
 echo "=============================================="
-echo "Container oel$OracleRelease not pingable.     "
+echo "Container ol$OracleRelease not pingable.     "
 echo "Script exiting.                               "
 echo "=============================================="
 exit
 else
 echo ''
 echo "=============================================="
-echo "Container oel$OracleRelease is pingable.      "
+echo "Container ol$OracleRelease is pingable.      "
 echo "=============================================="
 echo ''
 fi
@@ -206,17 +206,17 @@ echo ''
 echo "=============================================="
 echo "Testing passwordless-ssh for root user        "
 echo "=============================================="
-echo "Output of 'uname -a' in oel$OracleRelease...  "
+echo "Output of 'uname -a' in ol$OracleRelease...  "
 echo "=============================================="
 echo ''
 
-sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@oel$OracleRelease uname -a
+sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@ol$OracleRelease uname -a
 if [ $? -ne 0 ]
 then
 echo ''
 echo "=============================================="
-echo "No-password oel$OracleRelease ssh has issue. "
-echo "No-password oel$OracleRelease must succeed.   "
+echo "No-password ol$OracleRelease ssh has issue. "
+echo "No-password ol$OracleRelease must succeed.   "
 echo "Fix issues retry script.                      "
 echo "Script exiting.                               "
 echo "=============================================="
@@ -224,7 +224,7 @@ exit
 fi
 echo ''
 echo "=============================================="
-echo "No-password oel$OracleRelease ssh successful. "
+echo "No-password ol$OracleRelease ssh successful. "
 echo "=============================================="
 
 sleep 5
@@ -233,32 +233,32 @@ clear
 
 echo ''
 echo "=============================================="
-echo "Logged into LXC container oel$OracleRelease   "
+echo "Logged into LXC container ol$OracleRelease   "
 echo "Setting owner and modes...                    "
 echo "=============================================="
 echo ''
 
 sudo mkdir -p /home/grid/grid/rpm
 
-sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@oel$OracleRelease /root/packages.sh
-sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@oel$OracleRelease /root/create_users.sh
-sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@oel$OracleRelease /root/lxc-services.sh
-sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@oel$OracleRelease rpm -Uvh /home/grid/grid/rpm/cvuqdisk-1.0.9-1.rpm
-sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@oel$OracleRelease usermod --password `perl -e "print crypt('grid','grid');"` grid
-sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@oel$OracleRelease usermod --password `perl -e "print crypt('oracle','oracle');"` oracle
-sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@oel$OracleRelease usermod -g oinstall oracle
-sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@oel$OracleRelease chown oracle:oinstall /home/oracle/.bash_profile
-sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@oel$OracleRelease chown oracle:oinstall /home/oracle/.bashrc
-sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@oel$OracleRelease chown oracle:oinstall /home/oracle/.kshrc
-sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@oel$OracleRelease chown oracle:oinstall /home/oracle/.bash_logout
-sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@oel$OracleRelease chown oracle:oinstall /home/oracle/.
-sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@oel$OracleRelease chown grid:oinstall /home/grid/grid
-sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@oel$OracleRelease chown grid:oinstall /home/grid/grid/rpm
-sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@oel$OracleRelease chown grid:oinstall /home/grid/.bash_profile
-sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@oel$OracleRelease chown grid:oinstall /home/grid/.bashrc
-sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@oel$OracleRelease chown grid:oinstall /home/grid/.kshrc
-sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@oel$OracleRelease chown grid:oinstall /home/grid/.bash_logout
-sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@oel$OracleRelease chown grid:oinstall /home/grid/.
+sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@ol$OracleRelease /root/packages.sh
+sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@ol$OracleRelease /root/create_users.sh
+sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@ol$OracleRelease /root/lxc-services.sh
+sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@ol$OracleRelease rpm -Uvh /home/grid/grid/rpm/cvuqdisk-1.0.9-1.rpm
+sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@ol$OracleRelease usermod --password `perl -e "print crypt('grid','grid');"` grid
+sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@ol$OracleRelease usermod --password `perl -e "print crypt('oracle','oracle');"` oracle
+sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@ol$OracleRelease usermod -g oinstall oracle
+sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@ol$OracleRelease chown oracle:oinstall /home/oracle/.bash_profile
+sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@ol$OracleRelease chown oracle:oinstall /home/oracle/.bashrc
+sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@ol$OracleRelease chown oracle:oinstall /home/oracle/.kshrc
+sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@ol$OracleRelease chown oracle:oinstall /home/oracle/.bash_logout
+sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@ol$OracleRelease chown oracle:oinstall /home/oracle/.
+sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@ol$OracleRelease chown grid:oinstall /home/grid/grid
+sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@ol$OracleRelease chown grid:oinstall /home/grid/grid/rpm
+sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@ol$OracleRelease chown grid:oinstall /home/grid/.bash_profile
+sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@ol$OracleRelease chown grid:oinstall /home/grid/.bashrc
+sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@ol$OracleRelease chown grid:oinstall /home/grid/.kshrc
+sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@ol$OracleRelease chown grid:oinstall /home/grid/.bash_logout
+sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@ol$OracleRelease chown grid:oinstall /home/grid/.
 
 echo ''  
 echo "=============================================="

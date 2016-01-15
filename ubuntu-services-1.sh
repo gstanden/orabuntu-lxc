@@ -257,13 +257,13 @@ sudo ls /var/lib/lxc | more | sed 's/$/ /' | tr -d '\n' | sed 's/  */ /g'
 ContainersExist=$(CheckContainersExist)
 
 function CheckSeedContainersExist {
-sudo ls /var/lib/lxc | more | grep oel | sed 's/$/ /' | tr -d '\n' | sed 's/  */ /g'
+sudo ls /var/lib/lxc | more | grep ol | sed 's/$/ /' | tr -d '\n' | sed 's/  */ /g'
 }
 SeedContainersExist=$(CheckSeedContainersExist)
 
 echo ''
 echo "=============================================="
-read -e -p "Delete Only Container oel$OracleRelease? [Y/N]    " -i "N" DestroySeedContainerOnly
+read -e -p "Delete Only Container ol$OracleRelease? [Y/N]    " -i "N" DestroySeedContainerOnly
 echo "=============================================="
 echo ''
 
@@ -678,23 +678,23 @@ clear
 if [ ! -e /etc/orabuntu-release ] || [ ! -e /etc/network/if-up.d/lxcora00-pub-ifup-sw1 ] || [ ! -e /etc/network/if-down.d/lxcora00-pub-ifdown-sw1 ]
 then
 	cd /etc/network/if-up.d/openvswitch
-	sudo cp lxcora00-asm1-ifup-sw8  oel$OracleRelease-asm1-ifup-sw8
-	sudo cp lxcora00-asm2-ifup-sw9  oel$OracleRelease-asm2-ifup-sw9
-	sudo cp lxcora00-priv1-ifup-sw4 oel$OracleRelease-priv1-ifup-sw4
-	sudo cp lxcora00-priv2-ifup-sw5 oel$OracleRelease-priv2-ifup-sw5
-	sudo cp lxcora00-priv3-ifup-sw6 oel$OracleRelease-priv3-ifup-sw6 
-	sudo cp lxcora00-priv4-ifup-sw7 oel$OracleRelease-priv4-ifup-sw7
-	sudo cp lxcora00-pub-ifup-sw1   oel$OracleRelease-pub-ifup-sw1
+	sudo cp lxcora00-asm1-ifup-sw8  ol$OracleRelease-asm1-ifup-sw8
+	sudo cp lxcora00-asm2-ifup-sw9  ol$OracleRelease-asm2-ifup-sw9
+	sudo cp lxcora00-priv1-ifup-sw4 ol$OracleRelease-priv1-ifup-sw4
+	sudo cp lxcora00-priv2-ifup-sw5 ol$OracleRelease-priv2-ifup-sw5
+	sudo cp lxcora00-priv3-ifup-sw6 ol$OracleRelease-priv3-ifup-sw6 
+	sudo cp lxcora00-priv4-ifup-sw7 ol$OracleRelease-priv4-ifup-sw7
+	sudo cp lxcora00-pub-ifup-sw1   ol$OracleRelease-pub-ifup-sw1
 
 	cd /etc/network/if-down.d/openvswitch
 
-	sudo cp lxcora00-asm1-ifdown-sw8  oel$OracleRelease-asm1-ifdown-sw8
-	sudo cp lxcora00-asm2-ifdown-sw9  oel$OracleRelease-asm2-ifdown-sw9
-	sudo cp lxcora00-priv1-ifdown-sw4 oel$OracleRelease-priv1-ifdown-sw4
-	sudo cp lxcora00-priv2-ifdown-sw5 oel$OracleRelease-priv2-ifdown-sw5
-	sudo cp lxcora00-priv3-ifdown-sw6 oel$OracleRelease-priv3-ifdown-sw6
-	sudo cp lxcora00-priv4-ifdown-sw7 oel$OracleRelease-priv4-ifdown-sw7
-	sudo cp lxcora00-pub-ifdown-sw1   oel$OracleRelease-pub-ifdown-sw1
+	sudo cp lxcora00-asm1-ifdown-sw8  ol$OracleRelease-asm1-ifdown-sw8
+	sudo cp lxcora00-asm2-ifdown-sw9  ol$OracleRelease-asm2-ifdown-sw9
+	sudo cp lxcora00-priv1-ifdown-sw4 ol$OracleRelease-priv1-ifdown-sw4
+	sudo cp lxcora00-priv2-ifdown-sw5 ol$OracleRelease-priv2-ifdown-sw5
+	sudo cp lxcora00-priv3-ifdown-sw6 ol$OracleRelease-priv3-ifdown-sw6
+	sudo cp lxcora00-priv4-ifdown-sw7 ol$OracleRelease-priv4-ifdown-sw7
+	sudo cp lxcora00-pub-ifdown-sw1   ol$OracleRelease-pub-ifdown-sw1
 
 	sudo useradd -u 1098 grid >/dev/null 2>&1
 	sudo useradd -u 500 oracle >/dev/null 2>&1
@@ -728,7 +728,7 @@ echo ''
 
 sleep 5
 
-sudo lxc-create -n oel$OracleRelease -t oracle -- --release=$OracleVersion
+sudo lxc-create -n ol$OracleRelease -t oracle -- --release=$OracleVersion
 
 echo ''
 echo "=============================================="
