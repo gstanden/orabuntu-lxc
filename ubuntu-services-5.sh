@@ -50,15 +50,15 @@ echo "Make sure all openvswitch interfaces are up   "
 echo "=============================================="
 echo ''
 
-sudo /etc/network/openvswitch/crt_ovs_sw2.sh
-sudo /etc/network/openvswitch/crt_ovs_sw3.sh
-sudo /etc/network/openvswitch/crt_ovs_sw4.sh
-sudo /etc/network/openvswitch/crt_ovs_sw5.sh
-sudo /etc/network/openvswitch/crt_ovs_sw6.sh
-sudo /etc/network/openvswitch/crt_ovs_sw7.sh
-sudo /etc/network/openvswitch/crt_ovs_sw6.sh
-sudo /etc/network/openvswitch/crt_ovs_sw8.sh
-sudo /etc/network/openvswitch/crt_ovs_sw9.sh
+sudo /etc/network/openvswitch/crt_ovs_sw2.sh >/dev/null 2>&1
+sudo /etc/network/openvswitch/crt_ovs_sw3.sh >/dev/null 2>&1
+sudo /etc/network/openvswitch/crt_ovs_sw4.sh >/dev/null 2>&1
+sudo /etc/network/openvswitch/crt_ovs_sw5.sh >/dev/null 2>&1
+sudo /etc/network/openvswitch/crt_ovs_sw6.sh >/dev/null 2>&1
+sudo /etc/network/openvswitch/crt_ovs_sw7.sh >/dev/null 2>&1
+sudo /etc/network/openvswitch/crt_ovs_sw6.sh >/dev/null 2>&1
+sudo /etc/network/openvswitch/crt_ovs_sw8.sh >/dev/null 2>&1
+sudo /etc/network/openvswitch/crt_ovs_sw9.sh >/dev/null 2>&1
 
 echo ''
 echo "=============================================="

@@ -21,6 +21,7 @@
 echo ''
 echo "============================================"
 echo "Check required packages status...           "
+echo "Ubuntu 16.04 db5.1-util notfound is normal. "
 echo "============================================"
 echo ''
 

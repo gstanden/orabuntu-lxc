@@ -104,6 +104,7 @@ PublicIP=$(CheckPublicIP)
 echo ''
 echo "=============================================="
 echo "Starting LXC Seed Container for Oracle        "
+echo "'cannot find...' messages are normal...       "
 echo "=============================================="
 echo ''
 
@@ -114,11 +115,27 @@ then
 	}
 	ContainersExist=$(CheckContainersExist)
 	sleep 5
-	for j in $ContainersExist
-	do
-		function CheckPublicIPIterative {
-		sudo lxc-ls -f | sed 's/  */ /g' | grep $j | grep RUNNING | cut -f3 -d' ' | sed 's/,//' | cut -f1-3 -d'.' | sed 's/\.//g'
-		}
+        for j in $ContainersExist
+        do
+                # GLS 20160707 updated to use lxc-copy instead of lxc-clone for Ubuntu 16.04
+                # GLS 20160707 continues to use lxc-clone for Ubuntu 15.04 and 15.10
+                function GetUbuntuVersion {
+                cat /etc/lsb-release | grep DISTRIB_RELEASE | cut -f2 -d'='
+                }
+                UbuntuVersion=$(GetUbuntuVersion)
+                # GLS 20160707
+                if [ $UbuntuVersion = 15.04 ] || [ $UbuntuVersion = 15.10 ]
+                then
+                function CheckPublicIPIterative {
+                sudo lxc-ls -f | sed 's/  */ /g' | grep $j | grep RUNNING | cut -f3 -d' ' | sed 's/,//' | cut -f1-2 -d'.' | sed 's/\.//g'
+                }
+                fi
+                if [ $UbuntuVersion = 16.04 ]
+                then
+                function CheckPublicIPIterative {
+                sudo lxc-ls -f | sed 's/  */ /g' | grep $j | grep RUNNING | cut -f5 -d' ' | sed 's/,//' | cut -f1-2 -d'.' | sed 's/\.//g'
+                }
+                fi
 		PublicIPIterative=$(CheckPublicIPIterative)
 		echo "Starting container $j ..."
 		echo ''
@@ -132,8 +149,10 @@ then
 			PublicIPIterative=$(CheckPublicIPIterative)
 			if [ $i -eq 5 ]
 			then
+			echo ''
 			sudo lxc-stop -n $j > /dev/null 2>&1
 			sudo /etc/network/openvswitch/veth_cleanups.sh oel$OracleRelease
+			echo ''
 			sudo lxc-start -n $j > /dev/null 2>&1
 			fi
 		sleep 1

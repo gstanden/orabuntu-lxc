@@ -88,6 +88,7 @@ clear
 echo ''
 echo "=============================================="
 echo "Check required packages status...             "
+echo "Ubuntu 16.04 db5.1-util notfound is normal.   "
 echo "=============================================="
 echo ''
 
@@ -371,8 +372,17 @@ then
 	# sudo apt-get install -y gawk
 
 	# GLS 20151221 Added to support Oracle Enterprise Linux 5.x LXC containers
-	sudo apt-get install db5.1-util
+	# GLs 20160708 Package apparently is not available by default in Ubuntu 16.04
+	# GLS 20160708 For now the db5.1-util install will be turned off for Ubuntu 16.04
 
+	function GetUbuntuVersion {
+	cat /etc/lsb-release | grep DISTRIB_RELEASE | cut -f2 -d'='
+	}
+	UbuntuVersion=$(GetUbuntuVersion)
+	if [ $UbuntuVersion = '15.04' ] || [ $UbuntuVersion = '15.10' ]
+	then
+	sudo apt-get install db5.1-util
+	fi
 	sudo aa-complain /usr/bin/lxc-start
 
 	echo ''
@@ -386,7 +396,7 @@ fi
 
 sudo service bind9 stop
 sudo service isc-dhcp-server stop
-sudo service multipath-tools stop
+sudo service multipath-tools stop > /dev/null 2>&1
 
 # Check existing file backups to be sure they were made successfully
 
