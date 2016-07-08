@@ -62,7 +62,9 @@ sudo /etc/network/openvswitch/crt_ovs_sw9.sh
 
 echo ''
 echo "=============================================="
-echo "Starting LXC cloned containers for Oracle     "
+echo "Starting LXC cloned containers for Oracle...  "
+echo "May require mutiple tries ... patience...     "
+echo "'Cannot find ...' messages are normal.        "
 echo "=============================================="
 echo ''
 
@@ -73,10 +75,27 @@ ClonedContainersExist=$(CheckClonedContainersExist)
 
 for j in $ClonedContainersExist
 do
+	# GLS 20160707 updated to use lxc-copy instead of lxc-clone for Ubuntu 16.04
+	# GLS 20160707 continues to use lxc-clone for Ubuntu 15.04 and 15.10
+	function GetUbuntuVersion {
+	cat /etc/lsb-release | grep DISTRIB_RELEASE | cut -f2 -d'='
+	}
+	UbuntuVersion=$(GetUbuntuVersion)
+	# GLS 20160707
+
 	echo "Starting container $j ..."
+	if [ $UbuntuVersion = 15.04 ] || [ $UbuntuVersion = 15.10 ]
+	then
 	function CheckPublicIPIterative {
 	sudo lxc-ls -f | sed 's/  */ /g' | grep $j | grep RUNNING | cut -f3 -d' ' | sed 's/,//' | cut -f1-2 -d'.' | sed 's/\.//g'
 	}
+	fi
+	if [ $UbuntuVersion = 16.04 ]
+	then
+	function CheckPublicIPIterative {
+	sudo lxc-ls -f | sed 's/  */ /g' | grep $j | grep RUNNING | cut -f5 -d' ' | sed 's/,//' | cut -f1-2 -d'.' | sed 's/\.//g'
+	}
+	fi
 	PublicIPIterative=$(CheckPublicIPIterative)
 	echo $j | grep oel
 	if [ $? -eq 0 ]

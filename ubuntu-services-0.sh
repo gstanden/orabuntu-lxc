@@ -46,6 +46,9 @@ clear
 echo ''
 echo "============================================"
 echo "Check existing files status...              "
+echo "initiatorname.iscsi may not be found on run1"
+echo "rndc.key may not be found on run1           "
+echo "named.conf.options may not be found on run1 "
 echo "============================================"
 echo ''
 

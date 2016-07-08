@@ -35,12 +35,12 @@ echo "Script:  ubuntu-services-1.sh                 "
 echo "                                              "
 echo "Tested with Ubuntu 15.04 Vivid Vervet         "
 echo "Tested with Ubuntu 15.10 Wily Werewolf        "
-echo "                                              "
-echo "  !! Only use a FRESH Ubuntu 15.x Install !!  "
+echo "Tested with Ubuntu 16.04 Xenial Xerus         "
+echo "!! Only use a FRESH Ubuntu 15.x/16.x Install!!"
 echo "                                              "
 echo "These scripts overwrite some configurations!  "
 echo "These scripts (optionally) destroy containers!"
-echo "These scripts will terminate DHCP leases!     "
+echo "These scripts (optionally) term DHCP leases!  "
 echo "Use with customized Ubuntu at your own risk!  "
 echo "                                              "
 echo "If any doubts, <CTRL>+c NOW to exit and       " 
@@ -66,7 +66,7 @@ cat /etc/lsb-release | grep DISTRIB_RELEASE | cut -f2 -d'='
 }
 UbuntuVersion=$(GetUbuntuVersion)
 
-if [ $UbuntuVersion = '15.10' ] || [ $UbuntuVersion = '15.04' ]
+if [ $UbuntuVersion = '15.10' ] || [ $UbuntuVersion = '15.04' ] || [ $UbuntuVersion = '16.04' ]
 then
 echo ''
 echo "=============================================="
@@ -298,7 +298,12 @@ echo "         Show Defined Containers...           "
 echo "=============================================="
 echo ''
 
+which lxc-ls
+echo $?
+if [ $? -eq 0 ]
+then
 sudo lxc-ls -f
+fi
 
 echo ''
 echo "=============================================="
@@ -508,9 +513,9 @@ echo "=============================================="
 	sleep 10
 	echo ''
 	sudo ifconfig sw1
-	echo ''
-	sleep 10
-	sudo ifconfig sx1
+#	echo ''
+	sleep 5
+#	sudo ifconfig sx1
 
 echo ''
 echo "=============================================="
@@ -545,6 +550,24 @@ echo ''
 echo "============================================"
 echo "Starting and checking status of DHCP...     "
 echo "============================================"
+
+echo ''
+echo "=============================================="
+echo "Ensure sw1 and sx1 openvswitches are up...    "
+echo "=============================================="
+echo ''
+
+sudo /etc/network/openvswitch/crt_ovs_sx1.sh >/dev/null 2>&1
+
+sleep 5
+
+sudo ifconfig sx1
+
+echo ''
+
+sudo ifconfig sw1
+
+echo ''
 
 sudo service isc-dhcp-server start
 
@@ -724,19 +747,6 @@ echo ''
 echo "=============================================="
 echo "Create the LXC oracle container...            "
 echo "=============================================="
-echo ''
-
-sleep 5
-
-echo ''
-echo "=============================================="
-echo "Ensure sw1 and sx1 openvswitches are up...    "
-echo "=============================================="
-echo ''
-
-sudo /etc/network/openvswitch/crt_ovs_sx1.sh
-# sudo /etc/network/openvswitch/crt_ovs_sw1.sh
-
 echo ''
 
 sleep 5
