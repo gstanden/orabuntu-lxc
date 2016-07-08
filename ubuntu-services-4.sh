@@ -165,7 +165,24 @@ sleep 5
 while [ $i -le "$NewHighestContainerIndex" ]
 do
 echo "Clone Container Name = $ContainerPrefix$i"
+
+# GLS 20160707 updated to use lxc-copy instead of lxc-clone for Ubuntu 16.04
+# GLS 20160707 continues to use lxc-clone for Ubuntu 15.04 and 15.10
+function GetUbuntuVersion {
+cat /etc/lsb-release | grep DISTRIB_RELEASE | cut -f2 -d'='
+}
+UbuntuVersion=$(GetUbuntuVersion)
+# GLS 20160707
+
+if [ $UbuntuVersion = '15.10' ] || [ $UbuntuVersion = '15.04' ]
+then
 sudo lxc-clone -o oel$OracleRelease -n $ContainerPrefix$i
+fi
+if [ $UbuntuVersion = '16.04' ]
+then
+sudo lxc-copy -n oel$OracleRelease -N $ContainerPrefix$i
+fi
+
 sudo sed -i "s/oel$OracleRelease/$ContainerPrefix$i/g" /var/lib/lxc/$ContainerPrefix$i/config
 sudo sed -i "s/\.10/\.$i/g" /var/lib/lxc/$ContainerPrefix$i/config
 sudo sed -i 's/sx1/sw1/g' /var/lib/lxc/$ContainerPrefix$i/config

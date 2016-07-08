@@ -46,6 +46,22 @@ clear
 
 echo ''
 echo "=============================================="
+echo "Make sure all openvswitch interfaces are up   "
+echo "=============================================="
+echo ''
+
+sudo /etc/network/openvswitch/crt_ovs_sw2.sh
+sudo /etc/network/openvswitch/crt_ovs_sw3.sh
+sudo /etc/network/openvswitch/crt_ovs_sw4.sh
+sudo /etc/network/openvswitch/crt_ovs_sw5.sh
+sudo /etc/network/openvswitch/crt_ovs_sw6.sh
+sudo /etc/network/openvswitch/crt_ovs_sw7.sh
+sudo /etc/network/openvswitch/crt_ovs_sw6.sh
+sudo /etc/network/openvswitch/crt_ovs_sw8.sh
+sudo /etc/network/openvswitch/crt_ovs_sw9.sh
+
+echo ''
+echo "=============================================="
 echo "Starting LXC cloned containers for Oracle     "
 echo "=============================================="
 echo ''

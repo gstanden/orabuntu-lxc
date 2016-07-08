@@ -728,6 +728,21 @@ echo ''
 
 sleep 5
 
+echo ''
+echo "=============================================="
+echo "Ensure sw1 and sx1 openvswitches are up...    "
+echo "=============================================="
+echo ''
+
+sudo /etc/network/openvswitch/crt_ovs_sx1.sh
+# sudo /etc/network/openvswitch/crt_ovs_sw1.sh
+
+echo ''
+
+sleep 5
+
+clear
+
 sudo lxc-create -n oel$OracleRelease -t oracle -- --release=$OracleVersion
 
 echo ''
