@@ -5,13 +5,13 @@ Any Oracle on Any Linux at bare-metal resource utilization with density and elas
 Oracle Enterprise Edition Software on Ubuntu Linux using LXC Containers.
 This software runs Oracle Enteprise Edition RAC database on Ubuntu 15.04 or 15.10 or 16.04 64-bit Desktop Edition using Oracle Linux LXC Containers.  Additional instructions for an install of Oracle 12c (12.1.0.2.0) RAC ASM Flex Cluster using GNS are provided at the 'nandydandyoracle' website ( https://sites.google.com/site/nandydandyoracle ).
 
-One can think of orabuntu-lxc as a sort of Oracle Enterprise Linux 'emulation layer' for Ubuntu Linux, although it is much more than just that. Orabuntu-lxc is an automation layer for LXC that will create 10's or 100's of oracle-ready LXC containers (i.e. 'servers') of any OEL5, OEL6, or OEL7 version in just minutes, fully networked and ready for Oracle Enterprise software install.  Just add a downloaded Oracle install media, mix, and voila!  Oracle Enterprise is built!
+One can think of orabuntu-lxc as a sort of Oracle Enterprise Linux 'emulation layer' for Ubuntu Linux, although it is much more than just that. Orabuntu-lxc is an automation layer for LXC that will create 10's or 100's of oracle-ready LXC containers (i.e. 'servers') of any OEL5, OEL6, or OEL7 version in just minutes, fully networked on OpenvSwitch SDN and ready for Oracle Enterprise software install.  Just add a downloaded Oracle install media, mix, and voila!  Oracle Enterprise is built!
 
 ======================
 Why Linux Containers ?
 ======================
 
-The Oracle Enterprise Edition 6.5 LXC Linux containers run at bare metal resource utilization for network, storage, and CPU with NO hypervisor performance penalty.  That is because LXC does NOT use a hypervisor.  Every container accesses all compute resources at bare-metal utilization and speed.  Also, because there is NO hypervisor, LXC Linux containers achieve 10x the density of hypervisor-based systems per unit compute resource.  Because LXC Linux containers deploy in seconds instead of hours or days, LXC Linux containers also achieve huge improvements in elasticity compared to hypervisor-based systems, because they can be spun up in seconds as needed.  
+The Oracle Linux LXC containers run at bare metal resource utilization for network, storage, and CPU with NO hypervisor performance penalty.  That is because LXC does NOT use a hypervisor.  Every container accesses all compute resources at bare-metal utilization and speed.  Also, because there is NO hypervisor, LXC Linux containers achieve 10x the density of hypervisor-based systems per unit compute resource.  Because LXC Linux containers deploy in seconds instead of hours or days, LXC Linux containers also achieve huge improvements in elasticity compared to hypervisor-based systems, because they can be spun up in seconds as needed.  
 
 Install on a FRESH INSTALL of 15.04 or 15.10 or 16.04 ONLY. I have not bulletproofed this for install on "been-running-for-awhile" deployments of Ubuntu.  It could overwrite stuff so review the scripts VERY carefully first if you are going to put this on an Ubuntu 15.x that you have been using for a long time that is already customized. 
 
@@ -99,7 +99,7 @@ NOTE 4:  The DHCP lease delete steps and the container delete steps are useful i
 Why SCST ?
 =============================
 
-SCST supports native 4K controller block format as well as 512-byte.  It's also used in production in selected models of all-flash storage systems from Violin Memory and Kaminario, as well as others. 
+SCST supports native 4K controller block format as well as 512-byte.  It's also used in production in selected models of all-flash storage systems from Violin Memory and Kaminario, as well as others. Use of SCST with Orabuntu-LXC allows use of native 4K storage format so that working with all-flash storage that uses 4K format storage can be simulated effectively.
 
 Phase 2:  Create the SCST Linux SAN LUNs for Oracle Grid Infrastructure
 
