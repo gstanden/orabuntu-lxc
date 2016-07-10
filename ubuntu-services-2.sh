@@ -14,13 +14,13 @@
 #    You should have received a copy of the GNU General Public License
 #    along with orabuntu-lxc.  If not, see <http://www.gnu.org/licenses/>.
 
+#    v2.4 GLS 20151224
 #    v2.8 GLS 20151231
+#    v3.0 GLS 20160710 Updates for Ubuntu 16.04
 
 #!/bin/bash
 
 clear
-
-# v2.4 GLS 20151224
 
 echo ''
 echo "=============================================="

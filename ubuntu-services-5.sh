@@ -14,13 +14,14 @@
 #    You should have received a copy of the GNU General Public License
 #    along with orabuntu-lxc.  If not, see <http://www.gnu.org/licenses/>.
 
+#    v2.4 GLS 20151224
 #    v2.8 GLS 20151231
+#    v3.0 GLS 20160710 Updates for Ubuntu 16.04
 
 #!/bin/bash
 
 clear
 
-# v2.4 GLS 20151224
 
 echo ''
 echo "=============================================="
@@ -59,6 +60,18 @@ sudo /etc/network/openvswitch/crt_ovs_sw7.sh >/dev/null 2>&1
 sudo /etc/network/openvswitch/crt_ovs_sw6.sh >/dev/null 2>&1
 sudo /etc/network/openvswitch/crt_ovs_sw8.sh >/dev/null 2>&1
 sudo /etc/network/openvswitch/crt_ovs_sw9.sh >/dev/null 2>&1
+
+ifconfig | egrep -A1 'sw|sx'
+
+sleep 5
+
+echo ''
+echo "=============================================="
+echo "Openvswitch interfaces are up.                "
+echo "=============================================="
+echo ''
+
+clear
 
 echo ''
 echo "=============================================="

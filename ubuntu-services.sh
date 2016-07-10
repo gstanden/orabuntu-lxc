@@ -19,6 +19,7 @@
 #!/bin/bash
 
 # v2.4 GLS 20151224
+# v3.0 GLS 20160710 Updates for Ubuntu 16.04
 
 clear
 
