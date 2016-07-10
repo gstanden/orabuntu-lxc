@@ -18,17 +18,35 @@
 
 #!/bin/bash
 
+export DATEXT=`date +"%Y%m%d%H%M"`
+
 echo ''
 echo "============================================"
 echo "Check required packages status...           "
-echo "Ubuntu 16.04 db5.1-util notfound is normal. "
 echo "============================================"
 echo ''
 
+function GetUbuntuVersion {
+cat /etc/lsb-release | grep DISTRIB_RELEASE | cut -f2 -d'='
+}
+UbuntuVersion=$(GetUbuntuVersion)
+
+if [ $UbuntuVersion = '15.10' ] || [ $UbuntuVersion = '15.04' ]
+then
 function CheckPackageInstalled {
 echo 'lxc uml-utilities openvswitch-switch openvswitch-common bind9 bind9utils isc-dhcp-server apparmor-utils openssh-server uuid rpm yum hugepages ntp iotop flashplugin-installer sshpass db5.1-util'
 }
+fi
+
+if [ $UbuntuVersion = '16.04' ]
+then
+function CheckPackageInstalled {
+echo 'lxc uml-utilities openvswitch-switch openvswitch-common bind9 bind9utils isc-dhcp-server apparmor-utils openssh-server uuid rpm yum hugepages ntp iotop flashplugin-installer sshpass db5.3-util'
+}
+fi
+
 PackageInstalled=$(CheckPackageInstalled)
+
 for i in $PackageInstalled
 do
 sudo dpkg -l $i | cut -f3 -d' ' | tail -1 | sed 's/^/Installed:/'
@@ -59,7 +77,7 @@ rm backup-copies.txt
 fi
 
 function CheckFilesExist {
-echo "/etc/iscsi/initiatorname.iscsi /etc/bind/rndc.key /etc/bind/named.conf.options /etc/apparmor.d/lxc/lxc-default /etc/sysctl.conf /etc/security/limits.conf /etc/network/if-down.d/scst-net /etc/default/bind9 /etc/network/openvswitch/del-bridges.sh /etc/default/isc-dhcp-server /etc/NetworkManager/dnsmasq.d/local /etc/bind/named.conf.local /etc/dhcp/dhcpd.conf /etc/dhcp/dhclient.conf /run/resolvconf/resolv.conf /etc/multipath.conf /etc/multipath.conf.example /etc/init/openvswitch-switch.conf /etc/default/openvswitch-switch /etc/init.d/rc.local" 
+echo "/etc/iscsi/initiatorname.iscsi /etc/bind/rndc.key /etc/bind/named.conf.options /etc/apparmor.d/lxc/lxc-default /etc/sysctl.conf /etc/security/limits.conf /etc/network/if-down.d/scst-net /etc/default/bind9 /etc/network/openvswitch/del-bridges.sh /etc/default/isc-dhcp-server /etc/NetworkManager/dnsmasq.d/local /etc/bind/named.conf.local /etc/dhcp/dhcpd.conf /etc/dhcp/dhclient.conf /run/resolvconf/resolv.conf /etc/multipath.conf /etc/multipath.conf.example /etc/init/openvswitch-switch.conf /etc/default/openvswitch-switch" 
 }
 
 FilesExist=$(CheckFilesExist)
@@ -69,9 +87,9 @@ do
 if [ -e $i ]
 then
 sudo ls $i
-sudo cp -p $i $i.original.bak
-sudo ls $i.original.bak
-sudo ls $i.original.bak >> backup-copies.txt
+sudo cp -p $i $i.original.bak.$DATEXT
+sudo ls $i.original.bak.$DATEXT
+sudo ls $i.original.bak.$DATEXT >> backup-copies.txt
 echo ''
 fi
 done

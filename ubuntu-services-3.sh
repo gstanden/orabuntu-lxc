@@ -104,7 +104,6 @@ PublicIP=$(CheckPublicIP)
 echo ''
 echo "=============================================="
 echo "Starting LXC Seed Container for Oracle        "
-echo "'cannot find...' messages are normal...       "
 echo "=============================================="
 echo ''
 
@@ -141,7 +140,7 @@ then
 		echo ''
 		sudo lxc-start -n $j > /dev/null 2>&1
 		i=1
-		while [ "$PublicIPIterative" != 1020729 ] && [ "$i" -le 10 ]
+		while [ "$PublicIPIterative" != 10207 ] && [ "$i" -le 10 ]
 		do
 			echo "Waiting for $j Public IP to come up..."
 			echo ''

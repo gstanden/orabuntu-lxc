@@ -38,7 +38,7 @@ then
 
 	echo ''
 	echo "=============================================="
-	echo "References:  orabuntu-lxc                     "
+	echo "References: start  orabuntu-lxc               "
 	echo "=============================================="
 	echo ''
 	echo 'Gilbert Standen' 
@@ -56,6 +56,10 @@ then
 	echo "7. 'Howto run local scripts on systemstartup and/or shutdown' xaos52 (The Good Doctor) http://crunchbang.org/forums/viewtopic.php?id=14453"
 	echo ''
 	echo 'Progress is a collaborative effort.  Please share your discoveries by publishing on the internet your insights and achievements.'
+	echo ''
+	echo "=============================================="
+	echo "References: end orabuntu-lxc                  "
+	echo "=============================================="
 	echo ''
 	sleep 15
 	clear

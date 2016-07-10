@@ -36,11 +36,13 @@ echo "                                              "
 echo "Tested with Ubuntu 15.04 Vivid Vervet         "
 echo "Tested with Ubuntu 15.10 Wily Werewolf        "
 echo "Tested with Ubuntu 16.04 Xenial Xerus         "
+echo "                                              "
 echo "!! Only use a FRESH Ubuntu 15.x/16.x Install!!"
 echo "                                              "
 echo "These scripts overwrite some configurations!  "
 echo "These scripts (optionally) destroy containers!"
 echo "These scripts (optionally) term DHCP leases!  "
+echo "                                              "
 echo "Use with customized Ubuntu at your own risk!  "
 echo "                                              "
 echo "If any doubts, <CTRL>+c NOW to exit and       " 
@@ -88,14 +90,30 @@ clear
 echo ''
 echo "=============================================="
 echo "Check required packages status...             "
-echo "Ubuntu 16.04 db5.1-util notfound is normal.   "
 echo "=============================================="
 echo ''
 
+function GetUbuntuVersion {
+cat /etc/lsb-release | grep DISTRIB_RELEASE | cut -f2 -d'='
+}
+UbuntuVersion=$(GetUbuntuVersion)
+
+if [ $UbuntuVersion = '15.10' ] || [ $UbuntuVersion = '15.04' ]
+then
 function CheckPackageInstalled {
 echo 'lxc uml-utilities openvswitch-switch openvswitch-common bind9 bind9utils isc-dhcp-server apparmor-utils openssh-server uuid rpm yum hugepages ntp iotop flashplugin-installer sshpass db5.1-util'
 }
+fi
+
+if [ $UbuntuVersion = '16.04' ]
+then
+function CheckPackageInstalled {
+echo 'lxc uml-utilities openvswitch-switch openvswitch-common bind9 bind9utils isc-dhcp-server apparmor-utils openssh-server uuid rpm yum hugepages ntp iotop flashplugin-installer sshpass db5.3-util'
+}
+fi
+
 PackageInstalled=$(CheckPackageInstalled)
+
 for i in $PackageInstalled
 do
 sudo dpkg -l $i | cut -f3 -d' ' | tail -1 | sed 's/^/Installed:/'
@@ -299,8 +317,7 @@ echo "         Show Defined Containers...           "
 echo "=============================================="
 echo ''
 
-which lxc-ls
-echo $?
+which lxc-ls > /dev/null 2>&1
 if [ $? -eq 0 ]
 then
 sudo lxc-ls -f
@@ -371,18 +388,21 @@ then
 	# GLS 20160103 gawk install moved to ~/Downloads/orabuntu-lxc-master/scst-files/create-scst-1a.sh
 	# sudo apt-get install -y gawk
 
-	# GLS 20151221 Added to support Oracle Enterprise Linux 5.x LXC containers
-	# GLs 20160708 Package apparently is not available by default in Ubuntu 16.04
-	# GLS 20160708 For now the db5.1-util install will be turned off for Ubuntu 16.04
-
 	function GetUbuntuVersion {
 	cat /etc/lsb-release | grep DISTRIB_RELEASE | cut -f2 -d'='
 	}
 	UbuntuVersion=$(GetUbuntuVersion)
+	
 	if [ $UbuntuVersion = '15.04' ] || [ $UbuntuVersion = '15.10' ]
 	then
 	sudo apt-get install db5.1-util
 	fi
+
+	if [ $UbuntuVersion = '16.04' ]
+	then
+	sudo apt-get install db5.3-util
+	fi
+
 	sudo aa-complain /usr/bin/lxc-start
 
 	echo ''
