@@ -114,11 +114,7 @@ Oracle ASM Storage Options (SCST or TGT)
 Why SCST ?
 =============================
 
-SCST supports native 4K controller block format as well as 512-byte.  It's also used in production in selected models of all-flash storage systems from Violin Memory and Kaminario, as well as others. Use of SCST with Orabuntu-LXC allows use of native 4K storage format so that working with all-flash storage that uses 4K format storage can be simulated effectively.
-
-Phase 2:  Create the SCST Linux SAN LUNs for Oracle Grid Infrastructure
-
-This Phase 2 is OPTIONAL.  You will need storage LUNs for your Oracle Grid Infrastructure (GI) and your Oracle Database so this module creates file-backed LUNs and the SCST custom kernel providing a SAN for the containers.
+SCST supports native 4K controller block format as well as 512-byte.  It's also used in production in selected models of all-flash storage systems from Violin Memory and Kaminario, as well as others. Use of SCST with Orabuntu-LXC allows use of native 4K storage format so that working with all-flash storage that uses 4K format storage can be simulated effectively. Create the SCST Linux SAN LUNs for ASM if you are going to use ASM with your Oracle deployments. You will need storage LUNs for yourOracle Database so this module creates file-backed LUNs and the SCST custom kernel providing a SAN for the containers.
 
 ============================= 
 Why TGT ?
