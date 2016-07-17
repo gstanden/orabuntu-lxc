@@ -1,4 +1,4 @@
-# orabuntu-lxc
+# Orabuntu-LXC
 
 Any Oracle on Any Linux at bare-metal resource utilization with density and elasticity 10X+ hypervisor-based systems.
 
