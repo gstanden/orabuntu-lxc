@@ -120,7 +120,7 @@ Phase 2:  Create the SCST Linux SAN LUNs for Oracle Grid Infrastructure
 
 This Phase 2 is OPTIONAL.  You will need storage LUNs for your Oracle Grid Infrastructure (GI) and your Oracle Database so this module creates file-backed LUNs and the SCST custom kernel providing a SAN for the containers.
 
-=============================
+============================= 
 Why TGT ?
 =============================
 
