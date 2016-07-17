@@ -50,6 +50,12 @@ Feature 2
 You can now add in the ASM private network interfaces and RAC private network interfaces to the container clones as an option, and also remove them from the seed container once the clone is done so that the seed oelXX container continues to have only a single DHCP interface.
 
 =============================
+New Feature Version 3.0
+=============================
+
+The tgt-files.tar file introduces in version 3.0 the option to use TGT Linux file-backed SAN instead of SCST.  The TGT SAN is much simpler to implement and does not require a custom SCST linux kernel.  If you do not need any of the more advanced features of SCST Linux SAN (such as 4K sector format LUNs) then you may want to use Linux TGT to create your file-backed LUNs for Oracle.  In version 3.0 of orabuntu-lxc, you can choose to use SCST or TGT.  Using both at the same time is not recommended due to the default ports for both solutions is port 3260.  The current release of scst-files.tar and tgt-files.tar does not support non-default ports for SCST or TGT and therefore the two solutions should not be used together or mixed.
+
+=============================
 Installation
 =============================
 
@@ -94,6 +100,9 @@ NOTE 2:  Note that the seed containers (oel67, oel65, oel59, ...) get created on
 NOTE 3:  When re-running the software, you are prompted early on to delete DHCP leases (Y/N) and to delete existing containers (Y/N).  If running the software a second time as mentioned above to create another set of containers of a different OEL version, answer "N" to all the questions so that your first run of containers is not destroyed, nor the first SEED container.
 
 NOTE 4:  The DHCP lease delete steps and the container delete steps are useful if you run the whole set of scripts for the first time, and you run into some problem and want to start completely over.  In that case, answer "Y" to deleting DHCP leases, answer "Y" to delete containers, and answer "N" to "delete only the oelxx SEED container" so that the result will be ALL DHCP leases deleted, and ALL containers deleted, so that you are starting from scratch again.  Also, be sure before re-running "from scratch again" to DELETE the file "/etc/orabuntu-release" using "sudo rm /etc/orabuntu-release" so that the software executes ALL OS configuration steps again on the re-run of the first install.  Also, you may want to delete the /var/lib/bind/*.jnl files.  It is also recommended to do a reboot of the Ubuntu host if doing a complete re-run from scratch after the cleanup steps.
+========================================
+Oracle ASM Storage Options (SCST or TGT)
+========================================
 
 =============================
 Why SCST ?
@@ -105,7 +114,11 @@ Phase 2:  Create the SCST Linux SAN LUNs for Oracle Grid Infrastructure
 
 This Phase 2 is OPTIONAL.  You will need storage LUNs for your Oracle Grid Infrastructure (GI) and your Oracle Database so this module creates file-backed LUNs and the SCST custom kernel providing a SAN for the containers.
 
-You can opt to use other solutions for file-backed storage such as Linux TGT.  I will be developing an automated Linux TGT SAN script package to go with this project, but that is on the roadmap only for now.  Linux TGT is much simpler to implement and does not require a custom Linux kernel.  
+=============================
+Why TGT ?
+=============================
+
+You can opt to use other solutions for file-backed storage such as Linux TGT.  I have develped an automated Linux TGT SAN script package to go with this project, which is now released for use with version 3.0 of orabuntu-lxc.  Linux TGT is much simpler to implement and does not require a custom Linux kernel.  
 
 The main reason for choosing SCST Linux SAN is that SCST supports native 4K format with no 512-byte emulation layer, so SCST is useful for testing both 4K and 512-byte native format storage with various Oracle database softwares.  If you will not need 4K native support, TGT is probably a much simpler choice since it does not require a custom kernel.  Note however that SCST is one of the most feature-rich Linux SAN solutions and is used in versions of commercial products such as some Kaminario all-flash SANs and some Violin Memory all-flash SANs. Because SCST is much more difficult to implement, I created the scripts to automatically build SCST for you, since guides to implement SCST on Ubuntu Linux are hard to find on the internet, while Linux TGT SAN guides are readily available and good.  My scripts are a scripted automation of the manual steps of the amazingly accurate and awesome guide that Chris Weiss created here:  
 
