@@ -71,7 +71,8 @@ To install:
 2. Unzip the zip file which will create the directory ~/Downloads/orabuntu-lxc-master
 3. Change directory to ~/Downloads/orabuntu-lxc-master
 4. (Optional) run ubuntu-services-0.sh as a standalone pre-check utility to evaluate orabuntu-lxc install impacts.
-5. Run the script ~/Downloads/orabuntu-lxc-master/ubuntu-services.sh (note, it's a fully-automated, 99% non-interactive script). Accept defaults on first run.
+5. Run the script ~/Downloads/orabuntu-lxc-master/ubuntu-services.sh (with appropriate parameters as discussed below).
+6. You can accept defaults on all prompts the first time through the install.
 
 Note:  OEL5 OEL6 OEL7 LXC Containers are supported.  
 
