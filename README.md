@@ -110,7 +110,7 @@ NOTE 4:  The DHCP lease delete steps and the container delete steps are useful i
 Oracle ASM Storage Options (SCST or TGT)
 ========================================
 
-Orabuntu-LXC is for creating Oracle-ready LXC containers running on an Ubuntu Linux 3.x or 4.x kernel.  You can connect these containers to any file-backed or external SAN as long as you can present that storage to the Ubuntu Linux host such that the storage LUNs are in /dev/mapper director by default.
+Orabuntu-LXC is for creating Oracle-ready LXC containers running on an Ubuntu Linux 3.x or 4.x kernel.  You can connect these containers to any file-backed or external SAN as long as you can present that storage to the Ubuntu Linux host such that the storage LUNs are in the /dev/mapper directory (because /dev/mapper is where Orabuntu-LXC is designed to look for the LUNs).  The /dev/mapper directory and /dev/ directory are shared with all the containers, which is how the containers get access to the storage at the host OS level.
 
 However, if you are using Orabuntu-LXC to develop Oracle solutions or pilot a deployment on a desktop, you may want to create file-backed LUNs right on the same desktop.  Therefore, Orabuntu-LXC comes with automated scripted deployment bundles for two of the more well known Linux file-backed SAN solutions, namely SCST (http://scst.sourceforge.net/) and TGT (http://stgt.sourceforge.net/).  Which solution one might choose for an Orabuntu-LXC deployment is discussed below.
 
