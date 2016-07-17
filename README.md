@@ -2,6 +2,8 @@
 
 Any Oracle on Any Linux at bare-metal resource utilization with density and elasticity 10X+ hypervisor-based systems.
 
+Orabuntu-LXC is for running any Oracle Enteprise software directly on an Ubuntu 15.x or 16.x kernel (linux 3.x or 4.x, respectively) using Oracle Linux LXC containers.  The solution method of running Oracle Linux containers on any flavor of Linux should generally work on any flavor of Linux, so devs are invited to port orabuntu-lxc over to other Linux distros,such as Gentoo Linux, for example.  Orabuntu-LXC is specifically for Ubuntu Linux so that you can run Oracle enteprise software in LXC containers at bare metal compute, storage, and network utilizations, and with a very short elastic spin-up time.  Orabuntu-LXC does all the heavy lifting for you.  No more installing VirtualBox or VMWare for Linux, no more loading virtual CD's, and installing an virtualized OS; with Orabuntu-LXC you run the scripts and within about 15 minutes you have as many LXC Oracle Linux oracle-ready containers as you want.  Each containers has it's own network and address space, so it looks and feels just like a VM, but it boots up much faster and performs much better.
+
 Oracle Enterprise Edition Software on Ubuntu Linux using LXC Containers.
 This software runs Oracle Enteprise Edition RAC database on Ubuntu 15.04 or 15.10 or 16.04 64-bit Desktop Edition using Oracle Linux LXC Containers.  Additional instructions for an install of Oracle 12c (12.1.0.2.0) RAC ASM Flex Cluster using GNS are provided at the 'nandydandyoracle' website ( https://sites.google.com/site/nandydandyoracle ).
 
