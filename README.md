@@ -54,10 +54,14 @@ Feature 2
 You can now add in the ASM private network interfaces and RAC private network interfaces to the container clones as an option, and also remove them from the seed container once the clone is done so that the seed oelXX container continues to have only a single DHCP interface.
 
 =============================
-New Feature Version 3.0
+New Feature Version 3.1
 =============================
 
-The tgt-files.tar file introduces in version 3.0 the option to use TGT Linux file-backed SAN instead of SCST.  The TGT SAN is much simpler to implement and does not require a custom SCST linux kernel.  If you do not need any of the more advanced features of SCST Linux SAN (such as 4K sector format LUNs) then you may want to use Linux TGT to create your file-backed LUNs for Oracle.  In version 3.0 of orabuntu-lxc, you can choose to use SCST or TGT.  Using both at the same time is not recommended due to the default ports for both solutions is port 3260.  The current release of scst-files.tar and tgt-files.tar does not support non-default ports for SCST or TGT and therefore the two solutions should not be used together or mixed.
+The SCST SAN option NO LONGER REQUIRES A CUSTOM KERNEL!  Yay!  Orabuntu-LXC scst-files.tar now uses SCST branch 3.1.x which does not require compiling a custom kernel anymore for Linux kernels >= 2.6.30.  Just unpack the scst-files.tar and run the scripts according to the README.  The scripts will install SCST, configure an SCST SAN, and also automatically build the required /etc/multipath.conf file for the SAN. 
+
+An experimental tgt-files.tar file introduces in version 3.0 the option to use TGT Linux file-backed SAN instead of SCST.  However, now that SCST no longer requires a custom kernel build, SCST is strongly recommended due to its superior and rich feature set. 
+
+In version 3.0 of orabuntu-lxc, you can choose to use SCST or TGT.  Using both at the same time is not recommended due to the default ports for both solutions is port 3260.  The current release of scst-files.tar and tgt-files.tar does not support non-default ports for SCST or TGT and therefore the two solutions should not be used together or mixed.
 
 Note that 4K sector size format LUNs currently CANNOT be used with Oracle databases in LXC on Ubuntu hosts because there is no ASMLib currently available for Ubuntu Linux. Orabuntu-LXC is hoping to port ASMLib over to Ubuntu but this is currently a long-term goal.  IN the meantime, if one wants to work with Oracle database on 4K format LUNs then Oracle DB can be built in a conventional VM such as VMWare or KVM alongside LXC containers all on the same host.  Inside of RedHat-based VM's ASMLib can be configured and the SCST iscsi LUNs can be passed through to the VM for a true 4K system for testing with Oracle database.  Therefore, there is still a use case where SCST is preferred if the need is to test 4K sector size format LUNs with Oracle, because TGT cannot provide that, while SCST CAN.
 
