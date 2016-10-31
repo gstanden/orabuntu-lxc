@@ -1,4 +1,6 @@
-#    Copyright 2015-2016 Gilbert Standen
+#!/bin/bash
+
+#    Copyright 2015-2017 Gilbert Standen
 #    This file is part of orabuntu-lxc.
 
 #    Orabuntu-lxc is free software: you can redistribute it and/or modify
@@ -14,16 +16,14 @@
 #    You should have received a copy of the GNU General Public License
 #    along with orabuntu-lxc.  If not, see <http://www.gnu.org/licenses/>.
 
-#    v2.8 GLS 20151231
-
-#!/bin/bash
-
 # v2.4 GLS 20151224
+# v2.8 GLS 20151231
 # v3.0 GLS 20160710 Updates for Ubuntu 16.04
+# v4.0 GLS 20161025 DNS DHCP services moved into an LXC container
 
 clear
 
-if [ ! -e /etc/orabuntu-release ]
+if [ ! -f /etc/orabuntu-lxc-release ]
 then
 	echo ''
 	echo '++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
@@ -33,17 +33,22 @@ then
 	echo '++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
 	echo ''
 
-	sleep 10
+	sleep 5
 
 	clear
 
 	echo ''
 	echo "=============================================="
-	echo "References: start  orabuntu-lxc               "
+	echo "References and Acknowledgements orabuntu-lxc  "
 	echo "=============================================="
 	echo ''
 	echo 'Gilbert Standen' 
 	echo 'gilstanden@hotmail.com'
+	echo ''
+	echo "=============================================="
+	echo "The Orabuntu-LXC Github Project:              "
+	echo "https://github.com/gstanden/orabuntu-lxc      " 
+	echo "=============================================="
 	echo ''
 	echo 'The online publications of many authors and bloggers helped to make orabuntu-lxc possible.'
 	echo 'Links may go stale.  I will try to keep them up to date if possible.'
@@ -56,13 +61,20 @@ then
 	echo "6. 'OpenvSwitch Examples' Jaret Pfluger https://github.com/jpfluger/examples/blob/master/ubuntu-14.04/openvswitch.md"
 	echo "7. 'Howto run local scripts on systemstartup and/or shutdown' xaos52 (The Good Doctor) http://crunchbang.org/forums/viewtopic.php?id=14453"
 	echo ''
-	echo 'Progress is a collaborative effort.  Please share your discoveries by publishing on the internet your insights and achievements.'
+	echo "Acknowledgements"
+	echo ''
+	echo "1.  Mary Standen (mother)"
+	echo "2.  Yelena Belyaeva-Standen (spouse)"
+	echo ''
+	echo "For their patience and support during the long hours worked in the past and the long hours to be worked in the future for Orabuntu-LXC."
 	echo ''
 	echo "=============================================="
-	echo "References: end orabuntu-lxc                  "
+	echo "References and Acknowledgements End           "
 	echo "=============================================="
 	echo ''
-	sleep 15
+
+	sleep 10
+
 	clear
 fi
 
@@ -89,11 +101,11 @@ clear
 
 # Usage:
 
-# ~/Downloads/orabuntu-lxc-master/ubuntu-services.sh MajorRelease MinorRelease NumCon corp\.yourdomain\.com nameserver
+# ~/Downloads/orabuntu-lxc-master/ubuntu-services.sh MajorRelease MinorRelease NumCon yourdomain1.com yourdomain2.com YourNewNameserver LinuxOSMemoryReservation(Kb)
 
 # Example
-# ~/Downloads/orabuntu-lxc-master/ubuntu-services-sh $1 $2 $3 $4                $5
-# ~/Downloads/orabuntu-lxc-master/ubuntu-services.sh 6  7  4  orabuntu-lxc\.com stlns01
+# ~/Downloads/orabuntu-lxc-master/ubuntu-services-sh $1 $2 $3  $4                $5              $6      $7
+# ~/Downloads/orabuntu-lxc-master/ubuntu-services.sh  6  7  4  bostonlox.com realcrumpets.info p70ns01 1024
 
 # Example explanation:
 
@@ -104,16 +116,73 @@ clear
 
 # Oracle Enteprise Linux OS versions OEL5, OEL6, and OEL7 are currently supported.
 
+echo ''
+echo "=============================================="
+echo "Display Installation Parameters ...           "
+echo "=============================================="
+echo ''
+
+if [ -z $1 ]
+then
+MajorRelease=7
+fi
+echo 'Oracle Linux MajorRelease = '$MajorRelease
+
+if [ -z $2 ]
+then
+PointRelease=2
+fi
+echo 'Oracle Linux PointRelease = '$PointRelease
+
+if [ -z $3 ]
+then
+NumCon=4
+fi
+echo '# of Oracle Containers    = '$NumCon
+
+if [ -z $4 ]
+then
+Domain1=bostonlox.com
+fi
+echo 'Domain1                   = '$Domain1
+
+if [ -z $5 ]
+then
+Domain2=realcrumpets.info
+fi
+echo 'Domain2                   = '$Domain2
+
+if [ -z $6 ]
+then
+NameServer=bosns
+fi
+echo 'NameServer                = '$NameServer
+
+if [ -z $7 ]
+then
+LinuxOSMemoryReservation=1024
+fi
+echo 'LinuxOSMemoryReservation  = '$LinuxOSMemoryReservation 
+
+echo ''
+echo "=============================================="
+echo "Display Installation Parameters complete.     "
+echo "=============================================="
+
+sleep 5
+
 clear
-~/Downloads/orabuntu-lxc-master/ubuntu-services-0.sh
+
+/bin/bash ~/Downloads/orabuntu-lxc-master/ubuntu-services-0.sh
 clear
-~/Downloads/orabuntu-lxc-master/ubuntu-services-1.sh $1 $2 $4 $5
+/bin/bash ~/Downloads/orabuntu-lxc-master/ubuntu-services-1.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $LinuxOSMemoryReservation
 clear
-~/Downloads/orabuntu-lxc-master/ubuntu-services-2.sh $1 $2 $4
+/bin/bash ~/Downloads/orabuntu-lxc-master/ubuntu-services-2.sh $MajorRelease $PointRelease $Domain1
 clear
-~/Downloads/orabuntu-lxc-master/ubuntu-services-3.sh $1 $2
+/bin/bash ~/Downloads/orabuntu-lxc-master/ubuntu-services-3.sh $MajorRelease $PointRelease
 clear
-~/Downloads/orabuntu-lxc-master/ubuntu-services-4.sh $1 $2 $3 ora$1$2c
+/bin/bash ~/Downloads/orabuntu-lxc-master/ubuntu-services-4.sh $MajorRelease $PointRelease $NumCon ora$MajorRelease$PointRelease
 clear
-~/Downloads/orabuntu-lxc-master/ubuntu-services-5.sh $1 $2
+/bin/bash ~/Downloads/orabuntu-lxc-master/ubuntu-services-5.sh $MajorRelease $PointRelease
+
 

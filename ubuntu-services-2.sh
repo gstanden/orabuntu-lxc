@@ -1,4 +1,4 @@
-#    Copyright 2015-2016 Gilbert Standen
+#    Copyright 2015-2017 Gilbert Standen
 #    This file is part of orabuntu-lxc.
 
 #    Orabuntu-lxc is free software: you can redistribute it and/or modify
@@ -17,6 +17,7 @@
 #    v2.4 GLS 20151224
 #    v2.8 GLS 20151231
 #    v3.0 GLS 20160710 Updates for Ubuntu 16.04
+#    v4.0 GLS 20161025 DNS DHCP services moved into an LXC container
 
 #!/bin/bash
 
@@ -79,7 +80,7 @@ clear
 
 echo ''
 echo "=============================================="
-echo "Begin MAC Address reset...                    "
+echo "Begin LXC container MAC address reset...      "
 echo "=============================================="
 echo ''
 
@@ -106,7 +107,7 @@ sudo chmod 644 /var/lib/lxc/oel$OracleRelease/config
 
 echo ''
 echo "=============================================="
-echo "MAC Address reset complete                    "
+echo "LXC container MAC address reset complete.     "
 echo "=============================================="
 
 sleep 5
@@ -202,7 +203,7 @@ clear
 
 echo ''
 echo "=============================================="
-echo "WAN google.com ping test...                   "
+echo "Ping test  google.com...                   "
 echo "=============================================="
 echo ''
 
@@ -223,14 +224,14 @@ if [ "$NetworkUp" != '0%packetloss' ]
 then
 echo ''
 echo "=============================================="
-echo "WAN google.com not reliably pingable.         "
+echo "Ping google.com not reliably pingable.        "
 echo "Script exiting.                               "
 echo "=============================================="
 exit
 else
 echo ''
 echo "=============================================="
-echo "WAN google.com is reliably pingable.          "
+echo "Ping google.com reliable.                     "
 echo "=============================================="
 echo ''
 fi
@@ -344,33 +345,7 @@ echo "=============================================="
 echo "Container Up.                                 "
 echo "=============================================="
 
-# sleep 5
-
-# clear
-
-# GLS 20160107 Not needed as sshpass is being used for the setups now.
-# echo ''
-# echo "=============================================="
-# echo "Add Private Key to Authentication Agent...    "
-# echo "=============================================="
-# echo ''
-
-# ssh-add
-# if [ $? -eq 0 ]
-# then
-# echo ''
-# echo "=============================================="
-# echo "Private Key Added to Authentication Agent     "
-# echo "=============================================="
-# else
-# echo ''
-# echo "=============================================="
-# echo "Unexpected Private Key Result...continuing... "
-# echo "=============================================="
-# echo ''
-# fi
-
-sleep 5
+sleep 10
 
 clear
 
@@ -379,8 +354,6 @@ echo "=============================================="
 echo "Container oel$OracleRelease ping test...                "
 echo "=============================================="
 echo ''
-
-ping -c 3 oel$OracleRelease
 
 function CheckNetworkUp {
 ping -c 3 oel$OracleRelease | grep packet | cut -f3 -d',' | sed 's/ //g'
@@ -393,22 +366,21 @@ NetworkUp=$(CheckNetworkUp)
 n=$((n+1))
 done
 
+ping -c 3 oel$OracleRelease
+
 if [ "$NetworkUp" != '0%packetloss' ]
 then
 echo ''
 echo "=============================================="
-echo "Container oel$OracleRelease not reliably pingable.      "
-echo "Script exiting.                               "
+echo "Container oel$OracleRelease not pinging.      "
 echo "=============================================="
-exit
 else
 echo ''
 echo "=============================================="
-echo "Container oel$OracleRelease is pingable.                "
+echo "Container oel$OracleRelease is pingable.      "
 echo "=============================================="
 echo ''
 fi
-
 
 sleep 5
 
@@ -416,13 +388,13 @@ clear
 
 echo ''
 echo "=============================================="
-echo "Testing passwordless-ssh for root user        "
+echo "Testing connectivity to oel$OracleRelease...  "
 echo "=============================================="
-echo "Output of 'uname -a' in oel$OracleRelease...            "
+echo "Output of 'uname -a' in oel$OracleRelease...  "
 echo "=============================================="
 echo ''
 
-sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@oel$OracleRelease uname -a
+sudo lxc-attach -n oel$OracleRelease -- uname -a
 if [ $? -ne 0 ]
 then
 echo ''
@@ -445,7 +417,7 @@ clear
 
 echo ''
 echo "==============================================" 
-echo "Next script to run: ubuntu-services-3.sh     "
+echo "Next script to run: ubuntu-services-3.sh      "
 echo "=============================================="
 
 sleep 5

@@ -1,4 +1,4 @@
-#    Copyright 2015-2016 Gilbert Standen
+#    Copyright 2015-2017 Gilbert Standen
 #    This file is part of orabuntu-lxc.
 
 #    Orabuntu-lxc is free software: you can redistribute it and/or modify
@@ -17,6 +17,7 @@
 #    v2.4 GLS 20151224
 #    v2.8 GLS 20151231
 #    v3.0 GLS 20160710 Updates for Ubuntu 16.04
+#    v4.0 GLS 20161025 DNS DHCP services moved into an LXC container
 
 #!/bin/bash
 
@@ -61,7 +62,7 @@ sudo /etc/network/openvswitch/crt_ovs_sw6.sh >/dev/null 2>&1
 sudo /etc/network/openvswitch/crt_ovs_sw8.sh >/dev/null 2>&1
 sudo /etc/network/openvswitch/crt_ovs_sw9.sh >/dev/null 2>&1
 
-ifconfig | egrep -A1 'sw|sx'
+ifconfig | grep -v 'ns' | egrep -A1 'sw|sx'
 
 sleep 5
 
@@ -76,8 +77,6 @@ clear
 echo ''
 echo "=============================================="
 echo "Starting LXC cloned containers for Oracle...  "
-echo "May require mutiple tries ... patience...     "
-echo "'Cannot find ...' messages are normal.        "
 echo "=============================================="
 echo ''
 
@@ -167,23 +166,24 @@ clear
 
 echo ''
 echo "=============================================="
-echo "Check directory is ~/Networking               "
-echo "Step creates pointers to relevant files.      "
-echo "Use links to quickly locate config files.     "
+echo "Management links directory creation...        "
+echo "Location is:  ~/Manage-Orabuntu-LXC           "
+echo "Step creates pointers to relevant files for   "
+echo "quickly locating Orabuntu-LXC config files.   "
 echo "=============================================="
 echo ''
 
-if [ ! -e ~/Networking ]
+if [ ! -e ~/Manage-Orabuntu-LXC ]
 then
-mkdir ~/Networking
+mkdir ~/Manage-Orabuntu-LXC
 fi
 
-cd ~/Networking
-sudo chmod 755 /etc/scripts/crt_links.sh 
-sudo /etc/scripts/crt_links.sh
+cd ~/Manage-Orabuntu-LXC
+sudo chmod 755 /etc/orabuntu-lxc-scripts/crt_links.sh 
+sudo /etc/orabuntu-lxc-scripts/crt_links.sh
 
 echo ''
-ls -l ~/Networking
+ls -l ~/Manage-Orabuntu-LXC
 echo ''
 cd ~/Downloads/orabuntu-lxc-master
 
@@ -193,7 +193,7 @@ echo "Management links directory created.           "
 echo "=============================================="
 echo ''
 
-sleep 5
+sleep 15
 
 clear
 
@@ -207,7 +207,7 @@ echo "follow the instructions in the README         "
 echo "Builds the SCST Linux SAN.                    "
 echo "                                              "
 echo "Note that deployment management links are     "
-echo "in ~/Networking to learn more about what      "
-echo "files and configurations are used for the     "
+echo "in ~/Manage-Orabuntu-LXC to learn more about  "
+echo "what files and configurations are used for the"
 echo "orabuntu-lxc project.                         "
 echo "=============================================="

@@ -1,4 +1,4 @@
-#    Copyright 2015-2016 Gilbert Standen
+#    Copyright 2015-2017 Gilbert Standen
 #    This file is part of orabuntu-lxc.
 
 #    Orabuntu-lxc is free software: you can redistribute it and/or modify
@@ -16,6 +16,7 @@
 
 #    v2.8 GLS 20151231
 #    v3.0 GLS 20160710 Updates for Ubuntu 16.04
+#    v4.0 GLS 20161025 DNS DHCP services moved into an LXC container
 
 #!/bin/bash
 
@@ -67,7 +68,7 @@ echo "This script creates oracle-ready lxc clones   "
 echo "for oracle-ready RAC container nodes          "
 echo "=============================================="
 
-sleep 5
+sleep 10
 
 clear
 
@@ -114,6 +115,11 @@ if [ $AddPrivateNetworks = 'y' ] || [ $AddPrivateNetworks = 'Y' ]
 then
 	sudo bash -c "cat /var/lib/lxc/oel$OR/config.oracle /var/lib/lxc/oel$OR/config.asm.flex.cluster > /var/lib/lxc/oel$OR/config"
 	sudo sed -i "s/ContainerName/oel$OR/g" /var/lib/lxc/oel$OR/config
+	OracleNonPublicNetworks='sw2 sw3 sw4 sw5 sw6 sw7 sw8 sw9'
+	for j in $OracleNonPublicNetworks
+	do
+	sudo sed -i "/$j/s/^# //g" /etc/network/if-up.d/orabuntu-lxc-net
+	done
 fi
 
 if [ $AddPrivateNetworks = 'n' ] || [ $AddPrivateNetworks = 'N' ]

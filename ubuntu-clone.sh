@@ -1,4 +1,4 @@
-#    Copyright 2015-2016 Gilbert Standen
+#    Copyright 2015-2017 Gilbert Standen
 #    This file is part of orabuntu-lxc.
 
 #    Orabuntu-lxc is free software: you can redistribute it and/or modify
@@ -16,6 +16,7 @@
 
 #    v2.8 GLS 20151231
 #    v3.0 GLS 20160710 Updates for Ubuntu 16.04
+#    v4.0 GLS 20161025 DNS DHCP services moved into an LXC container
 
 #!/bin/bash
 

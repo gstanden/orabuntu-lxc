@@ -1,4 +1,4 @@
-#    Copyright 2015-2016 Gilbert Standen
+#    Copyright 2015-2017 Gilbert Standen
 #    This file is part of orabuntu-lxc.
 
 #    Orabuntu-lxc is free software: you can redistribute it and/or modify
@@ -16,6 +16,7 @@
 
 #    v2.8 GLS 20151231
 #    v3.0 GLS 20160710 Updates for Ubuntu 16.04
+#    v4.0 GLS 20161025 DNS DHCP services moved into an LXC container
 
 #!/bin/bash
 
@@ -27,8 +28,8 @@ echo ''
 echo "=============================================="
 echo "Script:  ubuntu-services-3.sh                 "
 echo "                                              "
-echo "This script extracts customzed files to       "
-echo "the container required for running Oracle     "
+echo "This script installs packages into the Oracle "
+echo "Linux container required for running Oracle.  "
 echo "=============================================="
 echo ''
 echo "=============================================="
@@ -45,7 +46,7 @@ clear
 
 echo ''
 echo "=============================================="
-echo "WAN google.com ping test...                   "
+echo "Ping google.com test...                       "
 echo "=============================================="
 echo ''
 
@@ -66,14 +67,14 @@ if [ "$NetworkUp" != '0%packetloss' ]
 then
 echo ''
 echo "=============================================="
-echo "WAN google.com not reliably pingable.         "
+echo "Ping google.com not reliable.                 "
 echo "Script exiting.                               "
 echo "=============================================="
 exit
 else
 echo ''
 echo "=============================================="
-echo "WAN google.com is reliably pingable.          "
+echo "Ping google.com is reliable.                  "
 echo "=============================================="
 echo ''
 fi
@@ -223,13 +224,13 @@ clear
 
 echo ''
 echo "=============================================="
-echo "Testing passwordless-ssh for root user        "
+echo "Testing connectivity to oel$OracloeRelease... "
 echo "=============================================="
 echo "Output of 'uname -a' in oel$OracleRelease...  "
 echo "=============================================="
 echo ''
 
-sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@oel$OracleRelease uname -a
+sudo lxc-attach -n oel$OracleRelease -- uname -a
 if [ $? -ne 0 ]
 then
 echo ''
@@ -252,36 +253,35 @@ clear
 
 echo ''
 echo "=============================================="
-echo "Logged into LXC container oel$OracleRelease   "
-echo "Setting owner and modes...                    "
+echo "Configuring oel$OracleRelease for Oracle...   "
 echo "=============================================="
 echo ''
 
 sudo mkdir -p /home/grid/grid/rpm
 
-sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@oel$OracleRelease /root/packages.sh
-sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@oel$OracleRelease /root/create_users.sh
-sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@oel$OracleRelease /root/lxc-services.sh
-sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@oel$OracleRelease rpm -Uvh /home/grid/grid/rpm/cvuqdisk-1.0.9-1.rpm
-sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@oel$OracleRelease usermod --password `perl -e "print crypt('grid','grid');"` grid
-sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@oel$OracleRelease usermod --password `perl -e "print crypt('oracle','oracle');"` oracle
-sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@oel$OracleRelease usermod -g oinstall oracle
-sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@oel$OracleRelease chown oracle:oinstall /home/oracle/.bash_profile
-sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@oel$OracleRelease chown oracle:oinstall /home/oracle/.bashrc
-sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@oel$OracleRelease chown oracle:oinstall /home/oracle/.kshrc
-sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@oel$OracleRelease chown oracle:oinstall /home/oracle/.bash_logout
-sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@oel$OracleRelease chown oracle:oinstall /home/oracle/.
-sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@oel$OracleRelease chown grid:oinstall /home/grid/grid
-sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@oel$OracleRelease chown grid:oinstall /home/grid/grid/rpm
-sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@oel$OracleRelease chown grid:oinstall /home/grid/.bash_profile
-sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@oel$OracleRelease chown grid:oinstall /home/grid/.bashrc
-sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@oel$OracleRelease chown grid:oinstall /home/grid/.kshrc
-sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@oel$OracleRelease chown grid:oinstall /home/grid/.bash_logout
-sshpass -p root ssh -o CheckHostIP=no -o StrictHostKeyChecking=no root@oel$OracleRelease chown grid:oinstall /home/grid/.
+sudo lxc-attach -n oel$OracleRelease -- /root/packages.sh
+sudo lxc-attach -n oel$OracleRelease -- /root/create_users.sh
+sudo lxc-attach -n oel$OracleRelease -- /root/lxc-services.sh
+sudo lxc-attach -n oel$OracleRelease -- rpm -Uvh /home/grid/grid/rpm/cvuqdisk-1.0.9-1.rpm
+sudo lxc-attach -n oel$OracleRelease -- usermod --password `perl -e "print crypt('grid','grid');"` grid
+sudo lxc-attach -n oel$OracleRelease -- usermod --password `perl -e "print crypt('oracle','oracle');"` oracle
+sudo lxc-attach -n oel$OracleRelease -- usermod -g oinstall oracle
+sudo lxc-attach -n oel$OracleRelease -- chown oracle:oinstall /home/oracle/.bash_profile
+sudo lxc-attach -n oel$OracleRelease -- chown oracle:oinstall /home/oracle/.bashrc
+sudo lxc-attach -n oel$OracleRelease -- chown oracle:oinstall /home/oracle/.kshrc
+sudo lxc-attach -n oel$OracleRelease -- chown oracle:oinstall /home/oracle/.bash_logout
+sudo lxc-attach -n oel$OracleRelease -- chown oracle:oinstall /home/oracle/.
+sudo lxc-attach -n oel$OracleRelease -- chown grid:oinstall /home/grid/grid
+sudo lxc-attach -n oel$OracleRelease -- chown grid:oinstall /home/grid/grid/rpm
+sudo lxc-attach -n oel$OracleRelease -- chown grid:oinstall /home/grid/.bash_profile
+sudo lxc-attach -n oel$OracleRelease -- chown grid:oinstall /home/grid/.bashrc
+sudo lxc-attach -n oel$OracleRelease -- chown grid:oinstall /home/grid/.kshrc
+sudo lxc-attach -n oel$OracleRelease -- chown grid:oinstall /home/grid/.bash_logout
+sudo lxc-attach -n oel$OracleRelease -- chown grid:oinstall /home/grid/.
 
 echo ''  
 echo "=============================================="
-echo "Installing files and packages for Oracle done."
+echo "oel$OracleRelease configured for Oracle.      "
 echo "=============================================="
 echo ''
 
