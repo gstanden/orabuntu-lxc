@@ -8,7 +8,7 @@ To install the software:
 
 If running on Ubuntu 16.04 similar procedure but the steps to grant root wheel privileges to the "ubuntu" user might be slightly different.  When I was developing I simply created my VM with the install user chosen as "ubuntu" so it got "wheel" automatically, but of course it's very straightforward to just created an ubuntu user and grant it admin sudo privs.  The software is designed to be installed under the "ubuntu" user on either distro Ubuntu or Oracle Linux.  That's just the way I designed it (for good reasons).
 
-(3) Now move the distribution to the /home/ubuntu/Downloads and chmod -R ubuntu:ubuntu the distribution.
+(3) Now move the distribution directory from wherever you unzipped it to the /home/ubuntu/Downloads and chmod -R ubuntu:ubuntu the distribution.
 
 (4) To run the software:  /home/ubuntu/Downloads/anylinux/anylinux-services.sh
 
