@@ -12,7 +12,7 @@ If running on Ubuntu 16.04 similar procedure but the steps to grant root wheel p
 
 (4) To run the software:  /home/ubuntu/Downloads/anylinux/anylinux-services.sh
 
-(5) If you want to set the installation parameters you can pass them in at the command line, or, you can edit the anylinux-services.sh script (recommended method) near the end of the script where default values are set.  You can set two domain names, the name of the DNS DHCP nameserver that is created, etc.
+(5) If you want to set the installation parameters you can pass them in at the command line, or, you can edit the anylinux-services.sh script (recommended method) near the end of the script where default values are set.  You can set two domain names, the name of the DNS DHCP nameserver that is created, number of container "clones" to be created, Major Oracle Linux release version (for the containers, e.g "7") and Minor Release (for the containers, e.g. "3") which would result in Oracle Linux 7.3 containers.
 
 That's it.  The scripts will run and when done you will have however many containers you specified in the parameters of whatever Oracle Linux release specified (supports Oracle Linux 5, 6 and 7) and you will have them running on an OpenvSwith network and will also have a container which is the dynamic DNS DHCP provider for the containers.
 
@@ -22,6 +22,6 @@ The software creates Oracle Linux containers on either Oracle Linux 7 (UEK3, UEK
 
 You can easily put VM's on your OpenvSwitch network as well simply by choosing bridged mode for example in the VirtualBox GUI and choosing one of the "s1" ports from the dropdown.  
 
-The system is actually highly configurable and I will be creating extensive documentation in the coming weeks.
+The system is actually highly configurable and I will be creating extensive documentation in the coming weeks.  If I do say so myself this software has alot of mighty engineering, I think you will like using it.  Of course, you can build things besides Oracle projects in these containers; the software is powerful in that it builds you a complete working environment for containers - DNS/DHCP dynamic services and an OpenvSwitch network - and all containers have full WAN resolution designed in - so you can download whatever packages you want and build whatever you want in these Oracle Linux containers - not just Oracle software projects.  But the system is designed to promulgate Oracle Linux containers only.  The exception is that the DNS DHCP utility container is an Ubuntu Xenial 16.04 container.  But in general this software is Oracle Linux centric as far as the containers go:  Oracle Corporation is the flagship provider of an enterprise grade RedHat family distribution and so this product is built for deploying Oracle Linux containers - but what you build in those containers is completely open and limited only by your imagination and skill.
 
 If you have any questions or want to request enhancements, reach me at "gilstanden@hotmail.com"
