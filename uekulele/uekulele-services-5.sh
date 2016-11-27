@@ -347,6 +347,8 @@ then
 	sudo semodule -i my-chpasswd.pp
 	sudo ausearch -c 'colord' --raw | audit2allow -M my-colord
 	sudo semodule -i my-colord.pp
+	sudo ausearch -c 'ntpd' --raw | audit2allow -M my-ntpd
+	sudo semodule -i my-ntpd.pp
 else
 	sudo setenforce 0
 	echo ''

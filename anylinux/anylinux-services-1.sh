@@ -258,10 +258,11 @@ then
 			echo "=============================================="
 			echo ''
 			echo "=============================================="
-			echo "                                              "
-			echo "Tested with Oracle Linux 7 UEK4 (VM)          "
-			echo "Tested with Ubuntu Linux  16.04 (VM)          "
-			echo "                                              "
+			echo "Tested: Oracle Linux 7 UEK4 (VM)              "
+			echo "Tested: Oracle Linux 7 UEK4 (baremetal)       "
+			echo "Tested: Oracle Linux 7 RedHat 7 (VM)          "
+			echo "Tested: Oracle Linux 7 RedHat 7 (baremetal)   "
+			echo "Tested: Ubuntu Linux 16.04 (VM)               "
 			echo "=============================================="
 			echo ''
 			echo "=============================================="
@@ -613,10 +614,11 @@ then
 			echo "=============================================="
 			echo ''
 			echo "=============================================="
-			echo "                                              "
-			echo "Tested with Oracle Linux 7 UEK4 (VM)          "
-			echo "Tested with Ubuntu Linux  16.04 (VM)          "
-			echo "                                              "
+			echo "Tested: Oracle Linux 7 UEK4 (VM)              "
+			echo "Tested: Oracle Linux 7 UEK4 (baremetal)       "
+			echo "Tested: Oracle Linux 7 RedHat 7 (VM)          "
+			echo "Tested: Oracle Linux 7 RedHat 7 (baremetal)   "
+			echo "Tested: Ubuntu Linux 16.04 (VM)               "
 			echo "=============================================="
 			echo ''
 			echo "=============================================="

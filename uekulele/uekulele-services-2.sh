@@ -262,6 +262,20 @@ then
 	sleep 5
 
 	clear
+	
+	echo ''
+	echo "=============================================="
+	echo "Set NTP '-x' option in ntpd file...           "
+	echo "=============================================="
+	echo ''
+
+	sudo sed -i -e '/OPTIONS/{ s/.*/OPTIONS="-g -x"/ }' /etc/sysconfig/ntpd
+	sudo sed -i -e '/OPTIONS/{ s/.*/OPTIONS="-g -x"/ }' /var/lib/lxc/oel$OracleRelease/rootfs/etc/sysconfig/ntpd
+	
+	echo ''
+	echo "=============================================="
+	echo "Set NTP '-x' option in ntpd.                  "
+	echo "=============================================="
 fi
 
 echo ''
