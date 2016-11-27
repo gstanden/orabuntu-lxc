@@ -26,4 +26,6 @@ The system is actually highly configurable and I will be creating extensive docu
 
 As of now, the IP subnets are hardcoded at 10.207.39.0/24 and 10.207.39.0/24 but user-settable subnets are coming and are a high-priority on the roadmap.  Since this is just an exercise in a bunch of sed and possibly awk commands this feature should not be too far away and then that feature will be in the anylinux-services.sh file as well.  Since this is open source you can fork it and add that feature yourself of course too.
 
+Once kinda fun thing you can do with this software is build a 4-node 12c GNS ASM RAC Flex cluster in a single Oracle Linux 7 or Ubuntu 16.04 VM because the software comes with a bundled optional SCST Linux SAN deployer (scst-files.tar).  You'll likely need a laptop or desktop that supports at least 8Gb of RAM for that and 16Gb or more would be better.
+
 If you have any questions or want to request enhancements, reach me at "gilstanden@hotmail.com"
