@@ -10,7 +10,7 @@ If running on Ubuntu 16.04 similar procedure but the steps to grant root wheel p
 
 (3) Now move the distribution directory from wherever you unzipped it to the /home/ubuntu/Downloads and chmod -R ubuntu:ubuntu the distribution.
 
-(4) To run the software:  /home/ubuntu/Downloads/anylinux/anylinux-services.sh
+(4) To run the software:  /home/ubuntu/Downloads/anylinux/anylinux-services.sh The software will detect what OS you have and automatically apply the required scripts to build the system and deploy the LXC containers for you.
 
 (5) If you want to set the installation parameters you can pass them in at the command line, or, you can edit the anylinux-services.sh script (recommended method) near the end of the script where default values are set.  You can set two domain names, the name of the DNS DHCP nameserver that is created, number of container "clones" to be created, Major Oracle Linux release version (for the containers, e.g "7") and Minor Release (for the containers, e.g. "3") which would result in Oracle Linux 7.3 containers.
 
