@@ -6,6 +6,8 @@ To install the software:
 
 (2) If running on Oracle Linux 7:  Navigate to orabuntu-lxc-master/uekulele/uekulele-services-0.sh and run that script to create the "ubuntu" user on Oracle Linux 7.  Note that the "ubuntu" user is an administrative user with wheel privilege via "sudo".  The uekulele-services-0.sh script must be run as root.
 
+If running on Ubuntu 16.04 similar procedure but the steps to grant root wheel privileges to the "ubuntu" user might be slightly different.  When I was developing I simply created my VM with the install user chosen as "ubuntu" so it got "wheel" automatically, but of course it's very straightforward to just created an ubuntu user and grant it admin sudo privs.  The software is designed to be installed under the "ubuntu" user on either distro Ubuntu or Oracle Linux.  That's just the way I designed it (for good reasons).
+
 (3) Now move the distribution to the /home/ubuntu/Downloads and chmod -R ubuntu:ubuntu the distribution.
 
 (4) To run the software:  /home/ubuntu/Downloads/anylinux/anylinux-services.sh
@@ -22,4 +24,4 @@ You can easily put VM's on your OpenvSwitch network as well simply by choosing b
 
 The system is actually highly configurable and I will be creating extensive documentation in the coming weeks.
 
-Enjoy.
+If you have any questions or want to request enhancements, reach me at "gilstanden@hotmail.com"
