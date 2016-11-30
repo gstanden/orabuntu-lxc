@@ -1,0 +1,80 @@
+#    Copyright 2015-2016 Gilbert Standen
+#    This file is part of orabuntu-lxc.
+
+#    Orabuntu-lxc is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+
+#    Orabuntu-lxc is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+
+#    You should have received a copy of the GNU General Public License
+#    along with orabuntu-lxc.  If not, see <http://www.gnu.org/licenses/>.
+
+#    v2.8 GLS 20151231
+#    v3.0 GLS 20160710
+#    v3.1 GLS 20160924
+
+#!/bin/bash
+function GetRunningKernelVersion () {
+    uname -r | cut -f1 -d'-'
+}
+RunningKernelVersion=$(GetRunningKernelVersion)
+vercomp () {
+    if [[ $1 == $2 ]]
+    then
+        return 0
+    fi
+    local IFS=.
+    local i ver1=($1) ver2=($2)
+    # fill empty fields in ver1 with zeros
+    for ((i=${#ver1[@]}; i<${#ver2[@]}; i++))
+    do
+        ver1[i]=0
+    done
+    for ((i=0; i<${#ver1[@]}; i++))
+    do
+        if [[ -z ${ver2[i]} ]]
+        then
+            # fill empty fields in ver2 with zeros
+            ver2[i]=0
+        fi
+        if ((10#${ver1[i]} > 10#${ver2[i]}))
+        then
+            return 1
+        fi
+        if ((10#${ver1[i]} < 10#${ver2[i]}))
+        then
+            return 2
+        fi
+    done
+    return 0
+}
+
+testvercomp () {
+    vercomp $1 $2
+    case $? in
+        0) op='=';;
+        1) op='>';;
+        2) op='<';;
+    esac
+    if [[ $op != $3 ]]
+    then
+        echo "Fail: Expected '$3', Actual '$op', Arg1 '$1', Arg2 '$2'"
+    else
+        echo "Pass: '$1 $op $2'"
+    fi
+}
+
+# Run tests
+# argument table format:
+# testarg1   testarg2     expected_relationship
+while read -r test
+do
+    testvercomp $test
+done << EOF
+$RunningKernelVersion 	2.6.30	     >
+EOF
