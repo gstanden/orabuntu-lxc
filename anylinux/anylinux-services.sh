@@ -90,6 +90,7 @@ then
 	echo "5. 'Techie in IT' Sokratis Galiatsis https://sokratisg.net/2012/03/31/ubuntu-precise-dnsmasq/"
 	echo "6. 'OpenvSwitch Examples' Jaret Pfluger https://github.com/jpfluger/examples/blob/master/ubuntu-14.04/openvswitch.md"
 	echo "7. 'Howto run local scripts on systemstartup and/or shutdown' xaos52 (The Good Doctor) http://crunchbang.org/forums/viewtopic.php?id=14453"
+	echo "8. 'Enable LXC neworking in Debian Jessie, Fedora 21 and others' Flockport https://www.flockport.com/enable-lxc-networking-in-debian-jessie-fedora-and-others/"
 	echo ''
 	echo "Acknowledgements"
 	echo ''
@@ -133,21 +134,21 @@ echo 'Oracle Linux PointRelease = '$PointRelease
 NumCon=$3
 if [ -z $3 ]
 then
-NumCon=8
+NumCon=4
 fi
 echo 'Oracle Container Count    = '$NumCon
 
 Domain1=$4
 if [ -z $4 ]
 then
-Domain1=popeye.com
+Domain1=urdomain1.com
 fi
 echo 'Domain1                   = '$Domain1
 
 Domain2=$5
 if [ -z $5 ]
 then
-Domain2=brutus.com
+Domain2=urdomain2.com
 fi
 echo 'Domain2                   = '$Domain2
 
