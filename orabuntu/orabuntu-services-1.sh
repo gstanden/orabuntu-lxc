@@ -908,11 +908,13 @@ cat /etc/lsb-release | grep DISTRIB_RELEASE | cut -f2 -d'='
 UbuntuDistribRelease=$(GetUbuntuDistribRelease)
 if [ $UbuntuDistribRelease = '16.04' ]
 then
-	sudo sed -i '/nameserver 127\.0\.1\.1/s/nameserver 127\.0\.1\.1/nameserver 10\.207\.39\.2/' /etc/resolv.conf
-	sudo sed -i '/nameserver 10\.207\.39\.2/a nameserver 10\.207\.29\.2' /etc/resolv.conf
-	sudo sed -i '/nameserver 10\.207\.29\.2/a nameserver 127\.0\.1\.1' /etc/resolv.conf
+	sudo sed -i '/nameserver/d' /etc/resolv.conf
+	sudo sed -i '/search/d'     /etc/resolv.conf
+	sudo sed -i '/domain/d'     /etc/resolv.conf
+	sudo sh -c "echo 'nameserver 10.207.39.2' >> /etc/resolv.conf"
+	sudo sh -c "echo 'nameserver 10.207.29.2' >> /etc/resolv.conf"
+	sudo sh -c "echo 'nameserver 127.0.0.1'   >> /etc/resolv.conf"
 fi
-	sudo sed -i '/search/d' /etc/resolv.conf
 	sudo sh -c "echo 'search orabuntu-lxc.com consultingcommandos.us gns1.orabuntu-lxc.com' >> /etc/resolv.conf"
 
 if [ -n $NameServer ]

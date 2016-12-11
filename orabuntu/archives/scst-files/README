@@ -1,0 +1,74 @@
+#    Copyright 2015-2016 Gilbert Standen
+#    This file is part of orabuntu-lxc.
+
+#    Orabuntu-lxc is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+
+#    Orabuntu-lxc is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+
+#    You should have received a copy of the GNU General Public License
+#    along with orabuntu-lxc.  If not, see <http://www.gnu.org/licenses/>.
+
+#    v2.8 GLS 20151231
+#    v3.0 GLS 20160710
+#    v3.1 GLS 20160925
+#
+#	0.	Run these scripts on Ubuntu as the Ubuntu admin install non-root (i.e. the user with 'sudo' privilege);  On CentOS run the scripts as the 'root' user.
+#	1.	This SCST Linux SAN for Orabuntu-LXC is installed using the create-scst.sh script which runs the other SCST scripts.
+#	2.	The create-scst-oracle.sh script can be run with parameters which you can set in the create-scst.sh file (see below). If you just want SCST and are not going to use
+		SCST for an Oracle database, you can edit the create-scst-oracle.sh script to suit your own purposes.
+#	3.	If you don't set the parameters for the create-scst-oracle.sh script it is run with default parameters.
+#		Those default parameters are as shown below:
+#
+#	User:     Run this program as root if on RedHat/CentOS/Oracle Linux or similar; Run this program as the install admin user (user with 'sudo' privilege) if on Ubuntu or similar.
+#	Usage:    create-scst-oracle.sh com.yourdomain ScstGroupName AsmRedundancy Sysd1SizeGb Data1SizeGb Reco1SizeGb LogicalBlkSiz 
+#	Example:  create-scst-oracle.sh com.orabuntu-lxc lxc1 external 10G 30G 30G
+#
+#	Note1:    If you do not pass in a "com.yourdomain" parameter it will be set to default value of com.orabuntu-lxc
+#	Note2:    If you do not pass in a "ScstGroupName"  parameter it will be set to default value of lxc1
+#	Note3:    If you do not pass in a "AsmRedundancy"  parameter it will be set to default value of external
+#	Note4:    If you do not pass in a "Sysd1SizeGb"    parameter it will be set to default value of 1Gb
+#	Note5:    If you do not pass in a "Data1SizeGb"    parameter it will be set to default value of 1Gb 
+#	Note6:    If you do not pass in a "Reco1SizeGb"    parameter it will be set to default value of 1Gb 
+#	Note7:    If you do not pass in a "LogicalBlkSiz"  parameter it will be set to default value of 512 bytes
+#
+#	4.	You can create the LUNs with 4K logical sector size if desired. The default is 512-byte logical sector size.
+#		For the sysd1 sector size for Oracle, 512-byte is the required logical sector size.
+#		For the data1 and reco1 the sector size can be 4096-byte (4K) optionally but be aware there are known caveats
+#		so be sure you understand these before selecting 4096-byte logical sector sizes.
+#	5.	On Ubuntu you may get a mix of actual devices mixed with symlinks in /dev/mapper after reboot.  This is due to some unknown issue in Ubuntu.
+#		You can get them all to be symlinks by stopping and starting multipath-tools and flushing the multipaths.  You might have to do this more than once but 1 or 2 cycles is usually 
+#		enough to get them all over to symlinks (see example below).
+#
+#		gstanden@ubuntu1604:~$ ls -l /dev/mapper
+#			total 0
+#			brw-rw---- 1 root disk 252,   3 Sep 25 14:28 asm_data1_00
+#			lrwxrwxrwx 1 root root        7 Sep 25 14:28 asm_reco1_00 -> ../dm-2
+#			brw-rw---- 1 root disk 252,   4 Sep 25 14:28 asm_sysd1_00
+#			crw------- 1 root root  10, 236 Sep 25 14:28 control
+#			lrwxrwxrwx 1 root root        7 Sep 25 14:28 ubuntu--vg-root -> ../dm-0
+#			lrwxrwxrwx 1 root root        7 Sep 25 14:28 ubuntu--vg-swap_1 -> ../dm-1
+#		gstanden@ubuntu1604:~$ sudo service multipath-tools stop
+#			Warning: Stopping multipath-tools.service, but it can still be activated by:
+#			  multipathd.socket
+#		gstanden@ubuntu1604:~$ sudo multipath -F
+#		gstanden@ubuntu1604:~$ ls -l /dev/mapper
+#			total 0
+#			crw------- 1 root root 10, 236 Sep 25 14:28 control
+#			lrwxrwxrwx 1 root root       7 Sep 25 14:28 ubuntu--vg-root -> ../dm-0
+#			lrwxrwxrwx 1 root root       7 Sep 25 14:28 ubuntu--vg-swap_1 -> ../dm-1
+#		gstanden@ubuntu1604:~$ sudo service multipath-tools start
+#		gstanden@ubuntu1604:~$ ls -l /dev/mapper
+#			total 0
+#			lrwxrwxrwx 1 root root       7 Sep 25 14:29 asm_data1_00 -> ../dm-3
+#			lrwxrwxrwx 1 root root       7 Sep 25 14:29 asm_reco1_00 -> ../dm-4
+#			lrwxrwxrwx 1 root root       7 Sep 25 14:29 asm_sysd1_00 -> ../dm-2
+#			crw------- 1 root root 10, 236 Sep 25 14:28 control
+#			lrwxrwxrwx 1 root root       7 Sep 25 14:28 ubuntu--vg-root -> ../dm-0
+#			lrwxrwxrwx 1 root root       7 Sep 25 14:28 ubuntu--vg-swap_1 -> ../dm-1
+

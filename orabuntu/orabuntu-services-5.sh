@@ -294,42 +294,42 @@ then
 
 	clear
 
-	echo "=============================================="
-	echo "If you reboot now the following lines will be "
-	echo "automatically commented out for you before    "
-	echo "reboot in the /etc/resolv.conf file:          "
-	echo "                                              "
-	echo "# nameserver 10.207.39.2                      "
-	echo "# nameserver 10.207.29.2                      "
-	echo "                                              "
-	echo "and when the server comes back up the file    "
-	echo "/etc/NetworkManager/dnsmasq.d/local will take "
-	echo "over DNS resolution for those networks.       "
-	echo "                                              "
-	echo "If you do not choose to reboot now you can    "
-	echo "manually comment out those nameservers later  "
-	echo "and then reboot to switch DNS to              "
-	echo "/etc/NetworkManager/dnsmasq.d/local           "
-	echo "                                              "
-	echo "Note that correct resolution of the Oracle GNS"
-	echo "SCAN IP's on the Orabuntu-LXC host (this host)"
-	echo "requires that the DNS be resolving via the    "
-	echo "/etc/NetworkManager/dnsmasq.d/local file      "
-	echo "=============================================="
-	echo "                                              "
-	echo "=============================================="
-	echo "                                              "
-	read -e -p "Reboot Now? [Y/N]                       " -i "Y" ReBoot 
-	echo "                                              "
-	echo "=============================================="
-	echo ''
+#	echo "=============================================="
+#	echo "If you reboot now the following lines will be "
+#	echo "automatically commented out for you before    "
+#	echo "reboot in the /etc/resolv.conf file:          "
+#	echo "                                              "
+#	echo "# nameserver 10.207.39.2                      "
+#	echo "# nameserver 10.207.29.2                      "
+#	echo "                                              "
+#	echo "and when the server comes back up the file    "
+#	echo "/etc/NetworkManager/dnsmasq.d/local will take "
+#	echo "over DNS resolution for those networks.       "
+#	echo "                                              "
+#	echo "If you do not choose to reboot now you can    "
+#	echo "manually comment out those nameservers later  "
+#	echo "and then reboot to switch DNS to              "
+#	echo "/etc/NetworkManager/dnsmasq.d/local           "
+#	echo "                                              "
+#	echo "Note that correct resolution of the Oracle GNS"
+#	echo "SCAN IP's on the Orabuntu-LXC host (this host)"
+#	echo "requires that the DNS be resolving via the    "
+#	echo "/etc/NetworkManager/dnsmasq.d/local file      "
+#	echo "=============================================="
+#	echo "                                              "
+#	echo "=============================================="
+#	echo "                                              "
+#	read -e -p "Reboot Now? [Y/N]                       " -i "Y" ReBoot 
+#	echo "                                              "
+#	echo "=============================================="
+#	echo ''
 
-	if [ $ReBoot = 'y' ] || [ $ReBoot = 'Y' ] 
-	then
-		sudo sed -i "/nameserver 10\.207\.39\.2/s/nameserver 10\.207\.39\.2/# nameserver 10\.207\.39\.2/" /etc/resolv.conf
-		sudo sed -i "/nameserver 10\.207\.29\.2/s/nameserver 10\.207\.29\.2/# nameserver 10\.207\.39\.2/" /etc/resolv.conf
-		sudo reboot
-	fi
+#	if [ $ReBoot = 'y' ] || [ $ReBoot = 'Y' ] 
+#	then
+#		sudo sed -i "/nameserver 10\.207\.39\.2/s/nameserver 10\.207\.39\.2/# nameserver 10\.207\.39\.2/" /etc/resolv.conf
+#		sudo sed -i "/nameserver 10\.207\.29\.2/s/nameserver 10\.207\.29\.2/# nameserver 10\.207\.39\.2/" /etc/resolv.conf
+#		sudo reboot
+#	fi
 
 	if [ ! -f /etc/orabuntu-lxc-release ]
 	then
@@ -340,7 +340,7 @@ then
 		echo ''
 
 		sudo touch /etc/orabuntu-lxc-release
-		sudo sh -c "echo 'Orabuntu-LXC v4.3' > /etc/orabuntu-lxc-release"
+		sudo sh -c "echo 'Orabuntu-LXC v4.1' > /etc/orabuntu-lxc-release"
 		sudo ls -l /etc/orabuntu-lxc-release
 		echo ''
 		sudo cat /etc/orabuntu-lxc-release
