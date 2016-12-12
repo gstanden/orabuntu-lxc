@@ -1326,9 +1326,9 @@ sleep 5
 clear
 
 sudo lxc-info -n nsa
-if [ $? -ne 0 ]
+if [ $? -ne 0 ] && [ $RedHatVersion -eq 6 ]
 then
-	echo 'sudo reboot'
+	sudo reboot
 fi
 
 function CheckNameServerExists {
