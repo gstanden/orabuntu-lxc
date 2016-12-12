@@ -187,7 +187,7 @@ do
 	}
 	RedHatVersion=$(GetRedHatVersion)
 
-	if [ $RedHatVersion = '7' ]
+	if [ $RedHatVersion = '7' ] || [ $RedHatVersion = '6' ]
 	then
        		sudo lxc-copy -n oel$OracleRelease -N $ContainerPrefix$i
 	fi

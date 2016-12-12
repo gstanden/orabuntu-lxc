@@ -329,7 +329,7 @@ then
 		cat /etc/redhat-release  | cut -f7 -d' ' | cut -f1 -d'.'
 		}
 		RedHatVersion=$(GetRedHatVersion)
-        	if [ $RedHatVersion = 7 ]
+        	if [ $RedHatVersion = '7' ] || [ $RedHatVersion = '6' ]
         	then
         	function CheckPublicIPIterative {
 		sudo lxc-ls -f | sed 's/  */ /g' | grep $j | grep RUNNING | cut -f2 -d'-' | sed 's/^[ \t]*//;s/[ \t]*$//' | cut -f1 -d' ' | cut -f1-2 -d'.' | sed 's/\.//g'

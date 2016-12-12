@@ -62,6 +62,11 @@ sleep 5
 
 clear
 
+function GetRedHatVersion {
+sudo cat /etc/redhat-release  | cut -f7 -d' ' | cut -f1 -d'.'
+}
+RedHatVersion=$(GetRedHatVersion)
+
 if [ -f /etc/orabuntu-lxc-release ]
 then
 	which lxc-ls > /dev/null 2>&1
@@ -76,9 +81,16 @@ then
 		sudo yum -y install wget tar gzip
  		mkdir -p /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/epel
   		cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/epel
-  		wget https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
-  		sudo rpm -ivh epel-release-latest-7.noarch.rpm 
- 		sudo yum provides lxc | sed '/^\s*$/d' | grep Repo | sort -u
+		if [ $RedHatVersion = 7 ]
+		then
+  			wget https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+  			sudo rpm -ivh epel-release-latest-7.noarch.rpm 
+ 		elif [ $RedHatVersion = 6 ]
+		then
+  			wget https://dl.fedoraproject.org/pub/epel/epel-release-latest-6.noarch.rpm
+  			sudo rpm -ivh epel-release-latest-6.noarch.rpm 
+		fi
+		sudo yum provides lxc | sed '/^\s*$/d' | grep Repo | sort -u
 		cd /home/ubuntu/Downloads/orabuntu-lxc-master
 		sudo yum -y install debootstrap perl libvirt
 		sudo yum -y install lxc libcap-devel libcgroup wget bridge-utils
@@ -99,11 +111,14 @@ then
 		echo "=============================================="
 		echo ''
 
-		sudo systemctl start lxc.service
-		sudo systemctl status lxc.service
-		echo ''
-		sudo systemctl start libvirtd 
-		sudo systemctl status libvirtd
+		if [ $RedHatVersion = 7 ]
+		then
+			sudo systemctl start lxc.service
+			sudo systemctl status lxc.service
+			echo ''
+			sudo systemctl start libvirtd 
+			sudo systemctl status libvirtd
+		fi
 
 		echo ''
 		echo "=============================================="
@@ -154,6 +169,69 @@ then
 
 		clear
 	fi
+
+#	ifconfig lxcbr0 > /dev/null 2>&1
+#	if [ $? -ne 0 ]
+#	then
+#		echo ''
+#		echo "=============================================="
+#		echo "Create lxcbr0 bridge...                       "
+#		echo "=============================================="
+#		echo ''
+
+#		sudo brctl addbr lxcbr0
+#		sudo ip address add 10.0.3.1/24 dev lxcbr0
+#		sudo ip link set lxcbr0 up
+#		sudo dnsmasq \
+#		--dhcp-leasefile=/var/run/lxc-dnsmasq.leases \
+#		--user=nobody \
+#		--group=nobody \
+#		--keep-in-foreground \
+#		--listen-address=10.0.3.1 \
+#		--except-interface=lo \
+#		--bind-interfaces \
+#		--dhcp-range=10.0.3.2,10.0.3.254
+
+#		sudo mkdir -p /etc/network/openvswitch
+#		sudo touch /etc/network/openvswitch/lxc-net
+ 
+#		sudo sh -c "echo 'iptables -I INPUT -i lxcbr0 -p udp --dport 67 -j ACCEPT'						>  /etc/network/openvswitch/lxc-net"
+#		sudo sh -c "echo 'iptables -I INPUT -i lxcbr0 -p tcp --dport 67 -j ACCEPT'						>> /etc/network/openvswitch/lxc-net"
+#		sudo sh -c "echo 'iptables -I INPUT -i lxcbr0 -p tcp --dport 53 -j ACCEPT'						>> /etc/network/openvswitch/lxc-net"
+#		sudo sh -c "echo 'iptables -I INPUT -i lxcbr0 -p udp --dport 53 -j ACCEPT'						>> /etc/network/openvswitch/lxc-net"
+#		sudo sh -c "echo 'iptables -I FORWARD -i lxcbr0 -j ACCEPT'								>> /etc/network/openvswitch/lxc-net"
+#		sudo sh -c "echo 'iptables -I FORWARD -o lxcbr0 -j ACCEPT'								>> /etc/network/openvswitch/lxc-net"
+#		sudo sh -c "echo 'iptables -t nat -A POSTROUTING -s 10.0.3.0/24 ! -d 10.0.3.0/24 -j MASQUERADE'				>> /etc/network/openvswitch/lxc-net"
+#		sudo sh -c "echo 'iptables -t mangle -A POSTROUTING -o lxcbr0 -p udp -m udp --dport 68 -j CHECKSUM --checksum-fill'	>> /etc/network/openvswitch/lxc-net"
+
+#		sudo service iptables save
+#		sudo service iptables restart
+		
+#		echo ''
+#		echo "=============================================="
+#		echo "Created lxcbr0 bridge.                        "
+#		echo "=============================================="
+
+#		sleep 5
+#
+#		clear
+
+#		echo ''
+#		echo "=============================================="
+#		echo "Check lxcbr0 bridge...                        "
+#		echo "=============================================="
+#		echo ''
+
+#		sudo ifconfig lxcbr0
+
+#		echo "=============================================="
+#		echo "Checked lxcbr0 bridge.                        "
+#		echo "=============================================="
+
+#		sleep 5
+ 
+#		clear
+#	fi
 
 	function GetLxcVersion {
 	lxc-create --version | sed 's/\.//g'
@@ -229,47 +307,101 @@ then
 			rpm -qa | grep -c lxc
 		}
 		LXCPackageCount=$(GetLXCPackageCount)
-		while [ $LXCPackageCount -lt 5 ]
-		do	
-			echo ''
-			echo "=============================================="
-			echo "Untar source code and build LXC RPM...        "
-			echo "=============================================="
-			echo ''
 
-			sleep 5
+		if [ $RedHatVersion = 7 ]
+		then
+			while [ $LXCPackageCount -lt 5 ]
+			do	
+				echo ''
+				echo "=============================================="
+				echo "Untar source code and build LXC RPM...        "
+				echo "=============================================="
+				echo ''
 
-			sudo yum -y install rpm-build wget openssl-devel gcc make docbook2X xmlto docbook automake graphviz
-			mkdir -p /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc
-			cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc
-			wget https://linuxcontainers.org/downloads/lxc/lxc-2.0.5.tar.gz
-			mkdir -p /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc/rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
-			cp -p lxc-2.0.5.tar.gz /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc/rpmbuild/SOURCES/.
-			tar -zxvf lxc-2.0.5.tar.gz
-			cp -p lxc-2.0.5/lxc.spec /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc/.
-			cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc
+				sleep 5
+
+				sudo yum -y install rpm-build wget openssl-devel gcc make docbook2X xmlto docbook automake graphviz
+				mkdir -p /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc
+				cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc
+				wget https://linuxcontainers.org/downloads/lxc/lxc-2.0.5.tar.gz
+				mkdir -p /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc/rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
+				cp -p lxc-2.0.5.tar.gz /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc/rpmbuild/SOURCES/.
+				tar -zxvf lxc-2.0.5.tar.gz
+				cp -p lxc-2.0.5/lxc.spec /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc/.
+				cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc
 	
-			function CheckMacrosFile {
-				cat /etc/rpm/macros | grep _unpackaged_files_terminate_build | sort -u | grep -c 0
-			}
-			MacrosFile=$(CheckMacrosFile)
+				function CheckMacrosFile {
+					cat /etc/rpm/macros | grep _unpackaged_files_terminate_build | sort -u | grep -c 0
+				}
+				MacrosFile=$(CheckMacrosFile)
 
-			if [ $MacrosFile -eq 0 ]
-			then
-				sudo sh -c "echo '%_unpackaged_files_terminate_build 0' >> /etc/rpm/macros"
-			fi
-			rpmbuild --define '_topdir /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc/rpmbuild' -ba lxc.spec
-			cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc/rpmbuild/RPMS/x86_64
-			sudo yum -y localinstall lxc* > /dev/null 2>&1
-			LXCPackageCount=$(GetLXCPackageCount)
-			cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc
-		done
+				if [ $MacrosFile -eq 0 ]
+				then
+					sudo sh -c "echo '%_unpackaged_files_terminate_build 0' >> /etc/rpm/macros"
+				fi
+				rpmbuild --define '_topdir /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc/rpmbuild' -ba lxc.spec
+				cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc/rpmbuild/RPMS/x86_64
+				sudo yum -y localinstall lxc* > /dev/null 2>&1
+				LXCPackageCount=$(GetLXCPackageCount)
+				cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc
+			done
+		fi
+		if [ $RedHatVersion = 6 ]
+		then
+			while [ $LXCPackageCount -lt 4 ]
+			do	
+				echo ''
+				echo "=============================================="
+				echo "Untar source code and build LXC RPM...        "
+				echo "=============================================="
+				echo ''
+
+				sleep 5
+
+				sudo yum -y install rpm-build wget openssl-devel gcc make docbook2X xmlto docbook automake graphviz
+				mkdir -p /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc
+				cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc
+				wget https://linuxcontainers.org/downloads/lxc/lxc-2.0.5.tar.gz
+				mkdir -p /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc/rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
+				cp -p lxc-2.0.5.tar.gz /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc/rpmbuild/SOURCES/.
+				tar -zxvf lxc-2.0.5.tar.gz
+				cp -p lxc-2.0.5/lxc.spec /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc/.
+				cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc
+	
+				function CheckMacrosFile {
+					cat /etc/rpm/macros | grep _unpackaged_files_terminate_build | sort -u | grep -c 0
+				}
+				MacrosFile=$(CheckMacrosFile)
+
+				if [ $MacrosFile -eq 0 ]
+				then
+					sudo sh -c "echo '%_unpackaged_files_terminate_build 0' >> /etc/rpm/macros"
+				fi
+				rpmbuild --define '_topdir /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc/rpmbuild' -ba lxc.spec
+				cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc/rpmbuild/RPMS/x86_64
+				sudo yum -y localinstall lxc* > /dev/null 2>&1
+				LXCPackageCount=$(GetLXCPackageCount)
+				cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc
+			done
+		fi
 		
-		if [ $LXCPackageCount -eq 5 ]
+		if [ $LXCPackageCount -eq 5 ] && [ $RedHatVersion = 7 ]
 		then
 			echo ''
 			echo "=============================================="
-			echo "LXC RPMs built.                               "
+			echo "LXC RPMs built on $LinuxFlavor $RedHatVersion "
+			echo "=============================================="
+		fi
+
+		sleep 5
+
+		clear
+
+		if [ $LXCPackageCount -eq 4 ] && [ $RedHatVersion = 6 ]
+		then
+			echo ''
+			echo "=============================================="
+			echo "LXC RPMs built on $LinuxFlavor $RedHatVersion "
 			echo "=============================================="
 		fi
 
@@ -587,17 +719,24 @@ if [ $? -ne 0 ]
 then
 	echo ''
 	echo "=============================================="
-	echo "Install LXC & prerequisite packages...        "
+	echo "Install LXC and prerequisite packages...      "
 	echo "=============================================="
 	echo ''
 
-	sleep 5
-
 	sudo yum -y install wget tar gzip
-	mkdir -p /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/epel
-	cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/epel
-	wget https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
-	sudo rpm -ivh epel-release-latest-7.noarch.rpm 
+ 	mkdir -p /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/epel
+  	cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/epel
+	if [ $RedHatVersion = 7 ]
+	then
+  		wget https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+  		sudo rpm -ivh epel-release-latest-7.noarch.rpm 
+ 	elif [ $RedHatVersion = 6 ]
+	then
+  		wget https://dl.fedoraproject.org/pub/epel/epel-release-latest-6.noarch.rpm
+  		sudo rpm -ivh epel-release-latest-6.noarch.rpm 
+	fi
+	sudo yum provides lxc | sed '/^\s*$/d' | grep Repo | sort -u
+	cd /home/ubuntu/Downloads/orabuntu-lxc-master
 	sudo yum -y install debootstrap perl libvirt
 	sudo yum -y install lxc libcap-devel libcgroup wget bridge-utils
 
@@ -605,6 +744,7 @@ then
 	echo "=============================================="
 	echo "LXC and prerequisite packages completed.      "
 	echo "=============================================="
+	echo ''
 
 	sleep 5
 
@@ -616,16 +756,20 @@ then
 	echo "=============================================="
 	echo ''
 
-	sudo systemctl start lxc.service
-	sudo systemctl status lxc.service
-	echo ''
-	sudo systemctl start libvirtd 
-	sudo systemctl status libvirtd
+	if [ $RedHatVersion = 7 ]
+	then
+		sudo systemctl start lxc.service
+		sudo systemctl status lxc.service
+		echo ''
+		sudo systemctl start libvirtd 
+		sudo systemctl status libvirtd
+	fi
 
 	echo ''
 	echo "=============================================="
 	echo "LXC and related services started.             "
 	echo "=============================================="
+	echo ''
 
 	sleep 5
 
@@ -645,16 +789,26 @@ then
 	echo "=============================================="
 	echo "LXC Checkconfig completed.                    "
 	echo "=============================================="
-
+	echo ''
+		
 	sleep 5
 
 	clear
 
 	echo ''
 	echo "=============================================="
-	echo "Install LXC complete.                         "
+	echo "Display LXC Version...                        "
 	echo "=============================================="
+	echo ''
 
+	sudo lxc-create --version
+
+	echo ''
+	echo "=============================================="
+	echo "LXC version displayed.                        "
+	echo "=============================================="
+	echo ''
+	
 	sleep 5
 
 	clear
@@ -667,6 +821,20 @@ LxcVersion=$(GetLxcVersion)
 
 if [ $LxcVersion -lt 205 ]	
 then
+	echo ''
+	echo "=============================================="
+	echo "Install LXC complete.                         "
+	echo "=============================================="
+	echo ''
+	echo "=============================================="
+	echo "Installing required LXC package complete.     "
+	echo "=============================================="
+	echo ''
+
+	sleep 5
+
+	clear
+
 	echo ''
 	echo "=============================================="
 	echo "Upgrade LXC from Source on Oracle Linux...    "
@@ -683,7 +851,7 @@ then
 	echo ''
 
 	sleep 5
-
+		
 	sudo touch /etc/rpm/macros
 	function CheckMacrosFile {
 		cat /etc/rpm/macros | grep _unpackaged_files_terminate_build | sort -u | grep -c 0
@@ -695,6 +863,7 @@ then
 		sudo sh -c "echo '%_unpackaged_files_terminate_build 0' >> /etc/rpm/macros"
 	fi
 
+	rpmbuild --define '_topdir /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc/rpmbuild' -ba lxc.spec
 	sudo yum -y install rpm-build wget openssl-devel gcc make docbook2X xmlto docbook automake graphviz
 	mkdir -p /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc
 	cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc
@@ -720,48 +889,100 @@ then
 	}
 	LXCPackageCount=$(GetLXCPackageCount)
 
-	while [ $LXCPackageCount -lt 5 ]
-	do	
-		echo ''
-		echo "=============================================="
-		echo "Untar source code and build LXC RPM...        "
-		echo "=============================================="
-		echo ''
+	if [ $RedHatVersion = 7 ]
+	then
+		while [ $LXCPackageCount -lt 5 ]
+		do	
+			echo ''
+			echo "=============================================="
+			echo "Untar source code and build LXC RPM...        "
+			echo "=============================================="
+			echo ''
 
-		sleep 5
+			sleep 5
 
-		sudo yum -y install rpm-build wget openssl-devel gcc make docbook2X xmlto docbook automake graphviz
-		mkdir -p /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc
-		cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc
-		wget https://linuxcontainers.org/downloads/lxc/lxc-2.0.5.tar.gz
-		mkdir -p /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc/rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
-		cp -p lxc-2.0.5.tar.gz /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc/rpmbuild/SOURCES/.
-		tar -zxvf lxc-2.0.5.tar.gz
-		cp -p lxc-2.0.5/lxc.spec /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc/.
-		cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc
+			sudo yum -y install rpm-build wget openssl-devel gcc make docbook2X xmlto docbook automake graphviz
+			mkdir -p /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc
+			cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc
+			wget https://linuxcontainers.org/downloads/lxc/lxc-2.0.5.tar.gz
+			mkdir -p /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc/rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
+			cp -p lxc-2.0.5.tar.gz /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc/rpmbuild/SOURCES/.
+			tar -zxvf lxc-2.0.5.tar.gz
+			cp -p lxc-2.0.5/lxc.spec /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc/.
+			cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc
 	
-		function CheckMacrosFile {
-			cat /etc/rpm/macros | grep _unpackaged_files_terminate_build | sort -u | grep -c 0
-		}
-		MacrosFile=$(CheckMacrosFile)
+			function CheckMacrosFile {
+				cat /etc/rpm/macros | grep _unpackaged_files_terminate_build | sort -u | grep -c 0
+			}
+			MacrosFile=$(CheckMacrosFile)
 
-		if [ $MacrosFile -eq 0 ]
-		then
-			sudo sh -c "echo '%_unpackaged_files_terminate_build 0' >> /etc/rpm/macros"
-		fi
+			if [ $MacrosFile -eq 0 ]
+			then
+				sudo sh -c "echo '%_unpackaged_files_terminate_build 0' >> /etc/rpm/macros"
+			fi
+			rpmbuild --define '_topdir /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc/rpmbuild' -ba lxc.spec
+			cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc/rpmbuild/RPMS/x86_64
+			sudo yum -y localinstall lxc* > /dev/null 2>&1
+			LXCPackageCount=$(GetLXCPackageCount)
+			cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc
+		done
+	fi
+	if [ $RedHatVersion = 6 ]
+	then
+		while [ $LXCPackageCount -lt 4 ]
+		do	
+			echo ''
+			echo "=============================================="
+			echo "Untar source code and build LXC RPM...        "
+			echo "=============================================="
+			echo ''
+
+			sleep 5
+
+			sudo yum -y install rpm-build wget openssl-devel gcc make docbook2X xmlto docbook automake graphviz
+			mkdir -p /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc
+			cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc
+			wget https://linuxcontainers.org/downloads/lxc/lxc-2.0.5.tar.gz
+			mkdir -p /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc/rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
+			cp -p lxc-2.0.5.tar.gz /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc/rpmbuild/SOURCES/.
+			tar -zxvf lxc-2.0.5.tar.gz
+			cp -p lxc-2.0.5/lxc.spec /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc/.
+			cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc
 	
-		rpmbuild --define '_topdir /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc/rpmbuild' -ba lxc.spec
-		cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc/rpmbuild/RPMS/x86_64
-		sudo yum -y localinstall lxc* > /dev/null 2>&1
-		LXCPackageCount=$(GetLXCPackageCount)
-		cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc
-	done
+			function CheckMacrosFile {
+				cat /etc/rpm/macros | grep _unpackaged_files_terminate_build | sort -u | grep -c 0
+			}
+			MacrosFile=$(CheckMacrosFile)
+
+			if [ $MacrosFile -eq 0 ]
+			then
+				sudo sh -c "echo '%_unpackaged_files_terminate_build 0' >> /etc/rpm/macros"
+			fi
+			rpmbuild --define '_topdir /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc/rpmbuild' -ba lxc.spec
+			cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc/rpmbuild/RPMS/x86_64
+			sudo yum -y localinstall lxc* > /dev/null 2>&1
+			LXCPackageCount=$(GetLXCPackageCount)
+			cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc
+		done
+	fi
 		
-	if [ $LXCPackageCount -eq 5 ]
+	if [ $LXCPackageCount -eq 5 ] && [ $RedHatVersion = 7 ]
 	then
 		echo ''
 		echo "=============================================="
-		echo "LXC RPMs built.                               "
+		echo "LXC RPMs built on $LinuxFlavor $RedHatVersion "
+		echo "=============================================="
+	fi
+
+	sleep 5
+
+	clear
+
+	if [ $LXCPackageCount -eq 4 ] && [ $RedHatVersion = 6 ]
+	then
+		echo ''
+		echo "=============================================="
+		echo "LXC RPMs built on $LinuxFlavor $RedHatVersion "
 		echo "=============================================="
 	fi
 
@@ -808,23 +1029,6 @@ then
 
 	echo ''
 	echo "=============================================="
-	echo "Show LXC version...                           "
-	echo "=============================================="
-	echo ''
-
-	sudo lxc-create --version
-
-	echo ''
-	echo "=============================================="
-	echo "LXC version should be 2.0.5                   "
-	echo "=============================================="
-	
-	sleep 5
-
-	clear
-
-	echo ''
-	echo "=============================================="
 	echo "Upgrade LXC from Source complete.             "
 	echo "=============================================="
 
@@ -863,13 +1067,33 @@ then
 		echo ''
 
 		sleep 5
+		
+		if    [ $RedHatVersion -eq 6 ]
+		then
+			sudo yum install -y autoconf automake gcc libtool rpm-build
+			sudo yum install -y openssl-devel python-devel kernel-uek-debug-devel kernel-devel 
+			sudo yum install -y kernel-uek-devel-`uname -r` redhat-rpm-config kabi-whitelists
+			sudo rm /lib/modules/`uname -r`/build
+			sudo ln -s /usr/src/kernels/`uname -r` /lib/modules/`uname -r`/build
+			sudo sed -i -e '/\[public_ol6_software_collections\]/,/^\[/s/enabled=0/enabled=1/' /etc/yum.repos.d/public-yum-ol6.repo
+			sudo yum -y install python27
+			source /opt/rh/python27/enable
+			python -V
+			sudo sed -i -e '/\[public_ol6_software_collections\]/,/^\[/s/enabled=1/enabled=0/' /etc/yum.repos.d/public-yum-ol6.repo
+			sleep 5
+			wget http://openvswitch.org/releases/openvswitch-2.5.1.tar.gz
+			mkdir -p /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/openvswitch/rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
+			cp -p openvswitch-2.5.1.tar.gz /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/openvswitch/rpmbuild/SOURCES/.
 
-		sudo yum -y install rpm-build wget openssl-devel gcc make
-		mkdir -p /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/openvswitch
-		cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/openvswitch
-		wget http://openvswitch.org/releases/openvswitch-2.5.1.tar.gz
-		mkdir -p /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/openvswitch/rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
-		cp -p openvswitch-2.5.1.tar.gz /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/openvswitch/rpmbuild/SOURCES/.
+		elif [ $RedHatVersion -eq 7 ]
+		then
+			sudo yum -y install rpm-build wget openssl-devel gcc make
+			mkdir -p /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/openvswitch
+			cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/openvswitch
+			wget http://openvswitch.org/releases/openvswitch-2.5.1.tar.gz
+			mkdir -p /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/openvswitch/rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
+			cp -p openvswitch-2.5.1.tar.gz /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/openvswitch/rpmbuild/SOURCES/.
+		fi
 
 		echo ''
 		echo "=============================================="
@@ -888,18 +1112,35 @@ then
 
 		sleep 5
 
-		tar -zxvf openvswitch-2.5.1.tar.gz
-		cp -p openvswitch-2.5.1/rhel/*.spec /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/openvswitch/.
-		cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/openvswitch
-		rpmbuild --define '_topdir /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/openvswitch/rpmbuild' -ba openvswitch.spec
+		if    [ $RedHatVersion -eq 6 ]
+		then
+			cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/openvswitch/rpmbuild/SOURCES
+			tar -xzvf openvswitch-2.5.1.tar.gz
+			cd openvswitch-2.5.1
+			sudo sed -i '/python >= 2\.7/s/python >= 2\.7/python27/g' /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/openvswitch/rpmbuild/SOURCES/openvswitch-2.5.1/rhel/openvswitch.spec
+			sleep 5
+			sudo sed -i '/python >= 2\.7/s/python >= 2\.7/python27/' openvswitch.spec
+			rpmbuild --define '_topdir /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/openvswitch/rpmbuild' -bb rhel/openvswitch.spec
+			cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/openvswitch/rpmbuild/RPMS/x86_64
+			sudo yum -y localinstall openvswitch* > /dev/null 2>&1
+			OVSPackageCount=$(GetOVSPackageCount)
+			cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/openvswitch
 
-		cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/openvswitch/rpmbuild/RPMS/x86_64
-		sudo yum -y localinstall openvswitch* > /dev/null 2>&1
-		OVSPackageCount=$(GetOVSPackageCount)
-		cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/openvswitch
+		elif [ $RedHatVersion -eq 7 ]
+		then
+			cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/openvswitch/rpmbuild/SOURCES
+			tar -zxvf openvswitch-2.5.1.tar.gz
+			cp -p openvswitch-2.5.1/rhel/*.spec /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/openvswitch/.
+			cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/openvswitch
+			rpmbuild --define '_topdir /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/openvswitch/rpmbuild' -ba openvswitch.spec
+			cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/openvswitch/rpmbuild/RPMS/x86_64
+			sudo yum -y localinstall openvswitch* > /dev/null 2>&1
+			OVSPackageCount=$(GetOVSPackageCount)
+			cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/openvswitch
+		fi
 	done
 
-	if [ $OVSPackageCount -eq 2 ]
+	if [ $OVSPackageCount -ge 2 ]
 	then
 		echo ''
 		echo "=============================================="
@@ -958,7 +1199,14 @@ then
 	cd /usr/local/etc
 	sudo mkdir openvswitch
 	sudo ovsdb-tool create /usr/local/etc/openvswitch/conf.db
-	sudo systemctl start openvswitch.service
+	if   [ $RedHatVersion -eq 7 ]
+	then
+		sudo systemctl start openvswitch.service
+	elif [ $RedHatVersion -eq 6 ]
+	then
+		sudo service openvswitch start
+	fi
+
 	sudo ls -l /usr/local/etc/openvswitch/conf.db
 
 	echo ''
@@ -1030,12 +1278,7 @@ echo "Verify required packages status...            "
 echo "=============================================="
 echo ''
 
-function GetRedHatVersion {
-sudo cat /etc/redhat-release  | cut -f7 -d' ' | cut -f1 -d'.'
-}
-RedHatVersion=$(GetRedHatVersion)
-
-if [ $RedHatVersion = '7' ]
+if [ $RedHatVersion = '7' ] || [ $RedHatVersion = '6' ]
 then
 function CheckPackageInstalled {
 echo 'automake bind-utils bridge-utils curl debootstrap docbook docbook2X facter gawk gcc graphviz gzip iotop iptables libcap-devel libcgroup libvirt libvirt-daemon-driver-lxc lxc-2 lxc-debug lxc-devel lxc-libs make net-tools ntp openssh-server openssl-devel openvswitch-2 openvswitch-debug perl rpm rpm-build ruby tar uuid wget which xmlto yum'
@@ -1081,6 +1324,12 @@ echo "=============================================="
 sleep 5
 
 clear
+
+sudo lxc-info -n nsa
+if [ $? -ne 0 ]
+then
+	echo 'sudo reboot'
+fi
 
 function CheckNameServerExists {
 	sudo lxc-ls -f | grep -c "$NameServer"
@@ -1562,20 +1811,22 @@ clear
 
 sudo chmod 755 /etc/network/openvswitch/*.sh
 
-SwitchList='sw1 sx1'
-for k in $SwitchList
-do
-	echo ''
-	echo "=============================================="
-	echo "Installing OpenvSwitch $k...                  "
-	echo "=============================================="
-	echo ''
+if   [ $RedHatVersion -eq 7 ]
+then
+	SwitchList='sw1 sx1'
+	for k in $SwitchList
+	do
+		echo ''
+		echo "=============================================="
+		echo "Installing OpenvSwitch $k...                  "
+		echo "=============================================="
+		echo ''
 
-        if [ ! -f /etc/systemd/system/$k.service ]
-        then
-                	sudo sh -c "echo '[Unit]'						 > /etc/systemd/system/$k.service"
-                	sudo sh -c "echo 'Description=$k Service'				>> /etc/systemd/system/$k.service"
-
+       		 if [ ! -f /etc/systemd/system/$k.service ]
+       		 then
+       	         	sudo sh -c "echo '[Unit]'						 > /etc/systemd/system/$k.service"
+       	         	sudo sh -c "echo 'Description=$k Service'				>> /etc/systemd/system/$k.service"
+		
 		if [ $k = 'sw1' ]
 		then
                 	sudo sh -c "echo 'Wants=network-online.target'				>> /etc/systemd/system/$k.service"
@@ -1616,7 +1867,7 @@ do
 			sleep 5
 
 			clear
-	else
+		else
 			echo ''
 			echo "=============================================="
 			echo "OpenvSwitch $k previously installed.          "
@@ -1626,17 +1877,98 @@ do
 			sleep 5
 
 			clear
-        fi
+        	fi
 
+		echo ''
+		echo "=============================================="
+		echo "Installed OpenvSwitch $k.                     "
+		echo "=============================================="
+
+		sleep 5
+
+		clear
+	done
+
+elif [ $RedHatVersion -eq 6 ]
+then
 	echo ''
 	echo "=============================================="
-	echo "Installed OpenvSwitch $k.                     "
+	echo "Starting OpenvSwitch sw1 ...                  "
 	echo "=============================================="
+
+	sudo chmod 755 /etc/network/openvswitch/crt_ovs_sw1.sh
+	sudo /etc/network/openvswitch/crt_ovs_sw1.sh >/dev/null 2>&1
+	echo ''
+	sleep 3
+	sudo ifconfig sw1
+	sudo sed -i '/sw1/s/^# //g' /etc/network/if-up.d/orabuntu-lxc-net
+
+	echo "=============================================="
+	echo "OpenvSwitch sw1 started.                      "
+	echo "=============================================="
+	echo ''
 
 	sleep 5
 
 	clear
-done
+
+	echo ''
+	echo "=============================================="
+	echo "Starting OpenvSwitch sx1 ...                  "
+	echo "=============================================="
+
+	sudo chmod 755 /etc/network/openvswitch/crt_ovs_sx1.sh
+	sudo /etc/network/openvswitch/crt_ovs_sx1.sh >/dev/null 2>&1
+	echo ''
+	sleep 3
+	sudo ifconfig sx1
+	sudo sed -i '/sx1/s/^# //g' /etc/network/if-up.d/orabuntu-lxc-net
+
+	echo "=============================================="
+	echo "OpenvSwitch sx1 started.                      "
+	echo "=============================================="
+	echo ''
+
+	sleep 5
+
+	clear
+
+	echo ''
+	echo "=============================================="
+	echo "Verify iptables rules are set correctly...    "
+	echo "=============================================="
+	echo ''
+
+	sudo iptables -S | egrep 'sx1|sw1'
+
+	echo ''
+	echo "=============================================="
+	echo "Verification of iptables rules complete.      "
+	echo "=============================================="
+	echo ''
+
+	sleep 5
+
+	clear
+
+	echo ''
+	echo "=============================================="
+	echo "Ensure 10.207.39.0/24 & 10.207.29.0/24 up...  "
+	echo "=============================================="
+	echo ''
+
+	sudo ifconfig sw1
+	sudo ifconfig sx1
+
+	echo "=============================================="
+	echo "Networks are up.                              "
+	echo "=============================================="
+	echo ''
+
+	sleep 5
+
+	clear
+fi
 
 echo ''
 echo "=============================================="

@@ -551,11 +551,11 @@ then
 	fi
 	if [ $LinuxFlavor = 'Red' ] 
 	then
-		function GetCentOSVersion {
+		function GetRedHatVersion {
 		cat /etc/redhat-release  | cut -f7 -d' ' | cut -f1 -d'.'
 		}
-		CentOSVersion=$(GetCentOSVersion)
-		if [ $CentOSVersion = '7' ]
+		RedHatVersion=$(GetRedHatVersion)
+		if [ $RedHatVersion = '7' ] || [ $RedHatVersion = '6' ] 
 		then
  			echo ''
 			echo "=============================================="
