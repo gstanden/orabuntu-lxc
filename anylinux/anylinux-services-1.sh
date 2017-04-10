@@ -238,6 +238,7 @@ then
 			echo "Tested: Oracle Linux 7 RedHat 7 (VM)          "
 			echo "Tested: Oracle Linux 7 RedHat 7 (baremetal)   "
 			echo "Tested: Ubuntu Linux 16.04 (VM)               "
+			echo "Tested: Ubuntu Linux 16.04 (baremetal)        "
 			echo "=============================================="
 			echo ''
 			echo "=============================================="
@@ -600,6 +601,7 @@ then
 			echo "Tested: Oracle Linux 7 RedHat 7 (VM)          "
 			echo "Tested: Oracle Linux 7 RedHat 7 (baremetal)   "
 			echo "Tested: Ubuntu Linux 16.04 (VM)               "
+			echo "Tested: Ubuntu Linux 16.04 (baremetal)        "
 			echo "=============================================="
 			echo ''
 			echo "=============================================="
@@ -956,6 +958,7 @@ then
 			echo "Tested: Oracle Linux 7 RedHat 7 (VM)          "
 			echo "Tested: Oracle Linux 7 RedHat 7 (baremetal)   "
 			echo "Tested: Ubuntu Linux 16.04 (VM)               "
+			echo "Tested: Ubuntu Linux 16.04 (baremetal)        "
 			echo "=============================================="
 			echo ''
 			echo "=============================================="
