@@ -69,7 +69,7 @@ echo "This script creates oracle-ready lxc clones   "
 echo "for oracle-ready RAC container nodes          "
 echo "=============================================="
 
-sleep 10
+sleep 5
 
 clear
 
@@ -138,12 +138,6 @@ sleep 5
 
 clear
 
-echo ''
-echo "=============================================="
-echo "Cloning oel$OracleRelease $NumCon containers  "
-echo "=============================================="
-echo ''
-
 sudo sed -i 's/yum install/yum -y install/g' /var/lib/lxc/oel$OracleRelease/rootfs/root/lxc-services.sh
 
 function GetHighestContainerIndex {
@@ -172,6 +166,12 @@ sleep 5
 
 while [ $i -le "$NewHighestContainerIndex" ]
 do
+	echo ''
+	echo "=============================================="
+	echo "Cloning oel$OracleRelease $NumCon containers  "
+	echo "=============================================="
+	echo ''
+
 	echo "Clone Container Name = $ContainerPrefix$i"
 
 	# GLS 20160707 updated to use lxc-copy instead of lxc-clone for Ubuntu 16.04
@@ -198,8 +198,6 @@ do
 	function GetHostName (){ echo $ContainerPrefix$i\1; }
 	HostName=$(GetHostName)
 	sudo sed -i "s/$HostName/$ContainerPrefix$i/" /var/lib/lxc/$ContainerPrefix$i/rootfs/etc/sysconfig/network
-
-## New Start
 
         echo ''
         echo "=============================================="
@@ -287,6 +285,10 @@ echo ''
 echo "=============================================="
 echo "Container cloning completed.                  "
 echo "=============================================="
+
+sleep 5
+
+clear
 
 echo "=============================================="
 echo "LXC and MAC address setups completed.         "

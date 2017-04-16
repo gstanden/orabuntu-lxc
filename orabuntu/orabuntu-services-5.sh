@@ -48,6 +48,7 @@ clear
 
 ## New Start
 
+echo ''
 echo "=============================================="
 echo "This script starts lxc clones                 "
 echo "=============================================="
@@ -82,6 +83,8 @@ do
                 sudo sh -c "echo 'WantedBy=multi-user.target'				>> /etc/systemd/system/$k.service"
         fi
 done
+
+sudo ls -l /etc/systemd/system/sw*.service
 
 echo ''
 echo "=============================================="

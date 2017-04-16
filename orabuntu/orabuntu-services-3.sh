@@ -226,6 +226,8 @@ echo ''
 echo "=============================================="
 echo "Testing connectivity to oel$OracloeRelease... "
 echo "=============================================="
+echo ''
+echo "=============================================="
 echo "Output of 'uname -a' in oel$OracleRelease...  "
 echo "=============================================="
 echo ''

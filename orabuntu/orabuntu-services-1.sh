@@ -552,6 +552,10 @@ echo "Install openssh-server complete.              "
 echo "=============================================="
 echo ''
 
+sleep 5
+
+clear
+
 echo ''
 echo "=============================================="
 echo "DNS DHCP installed in LXC container.          "
@@ -569,6 +573,7 @@ echo "=============================================="
 echo ''
 
 sudo lxc-stop -n nsa
+sudo lxc-ls -f
 
 echo "=============================================="
 echo "DNS DHCP LXC container stopped.               "
@@ -696,7 +701,7 @@ echo ''
 echo "=============================================="
 echo "Display /etc/sysctl.d/60-oracle.conf"
 echo "=============================================="
-echo ''
+
 sudo sysctl -p /etc/sysctl.d/60-oracle.conf
 sudo sed -i '/sysctl/s/^# //' /etc/network/if-up.d/orabuntu-lxc-net
 
@@ -736,7 +741,6 @@ sudo systemctl enable 60-oracle
 echo ''
 fi
 
-echo ''
 echo "=============================================="
 echo "Created 60-oracle.service in systemd.         "
 echo "=============================================="
@@ -794,11 +798,10 @@ sudo cat /etc/security/limits.d/70-oracle.conf
 echo ''
 echo "=============================================="
 echo "Created /etc/security/limits.d/70-oracle.conf "
-echo "Sleeping 10 seconds for settings review ...   "
 echo "=============================================="
 echo ''
 
-sleep 10
+sleep 5
 
 clear
 
@@ -1018,6 +1021,11 @@ then
 	sudo mv /var/lib/lxc/$NameServer/rootfs/var/lib/bind/rev.consultingcommandos.us /var/lib/lxc/$NameServer/rootfs/var/lib/bind/rev.$Domain2
 fi
 
+echo ''
+echo "=============================================="
+echo "Customize nameserver & domains completed.     "
+echo "=============================================="
+
 sleep 5
 
 clear
@@ -1041,15 +1049,6 @@ sleep 5
 
 clear
 
-echo ''
-echo "=============================================="
-echo "Customize nameserver & domains completed.     "
-echo "=============================================="
-
-sleep 5
-
-clear
-
 if [ $UbuntuVersion = '17.04' ]
 then
 	SwitchList='sw1 sx1'
@@ -1057,7 +1056,7 @@ then
 	do
 		echo ''
 		echo "=============================================="
-		echo "Installing OpenvSwitch $k...HERE NOW          "
+		echo "Installing OpenvSwitch $k...                  "
 		echo "=============================================="
 		echo ''
 
@@ -1423,10 +1422,16 @@ sudo sh -c "echo 'sudo ln -sf /etc/multipath.conf .' 								>> /etc/orabuntu-lx
 sudo sh -c "echo 'sudo ln -sf /etc/multipath.conf.example .' 							>> /etc/orabuntu-lxc-scripts/crt_links.sh"
 sudo sh -c "echo 'sudo ln -sf /etc/network/if-down.d/scst-net .' 						>> /etc/orabuntu-lxc-scripts/crt_links.sh"
 
+echo ''
+echo "=============================================="
+echo "Script crt_links.sh created.                  "
+echo "=============================================="
+
 sleep 5
 
 clear
 
+echo ''
 echo "============================================"
 echo "Next script to run: orabuntu-services-2.sh  "
 echo "============================================"

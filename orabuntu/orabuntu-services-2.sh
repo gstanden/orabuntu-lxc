@@ -43,6 +43,10 @@ OracleVersion=$1.$2
 Domain1=$3
 Domain2=$4
 
+sleep 5
+
+clear
+
 echo ''
 echo "=============================================="
 echo "Establish sudo privileges ...                 "
@@ -369,7 +373,7 @@ echo "=============================================="
 echo "Container Up.                                 "
 echo "=============================================="
 
-sleep 10
+sleep 5
 
 clear
 
