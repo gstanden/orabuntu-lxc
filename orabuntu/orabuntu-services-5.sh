@@ -421,28 +421,29 @@ then
 #		sudo reboot
 #	fi
 
-	if [ ! -f /etc/orabuntu-lxc-release ]
-	then
-		echo ''
-		echo "=============================================="
-		echo "Create /etc/orabuntu-lxc-release file...          "
-		echo "=============================================="
-		echo ''
+fi
 
-		sudo touch /etc/orabuntu-lxc-release
-		sudo sh -c "echo 'Orabuntu-LXC v4.4' > /etc/orabuntu-lxc-release"
-		sudo ls -l /etc/orabuntu-lxc-release
-		echo ''
-		sudo cat /etc/orabuntu-lxc-release
+if [ $RebootNeeded = 'physical' ] && [ ! -f /etc/orabuntu-lxc-release ] 
+then
+	echo ''
+	echo "=============================================="
+	echo "Create /etc/orabuntu-lxc-release file...          "
+	echo "=============================================="
+	echo ''
 
-		echo ''
-		echo "=============================================="
-		echo "Create /etc/orabuntu-lxc-release file complete.   "
-		echo "=============================================="
+	sudo touch /etc/orabuntu-lxc-release
+	sudo sh -c "echo 'Orabuntu-LXC v4.4' > /etc/orabuntu-lxc-release"
+	sudo ls -l /etc/orabuntu-lxc-release
+	echo ''
+	sudo cat /etc/orabuntu-lxc-release
 
-		sleep 5
+	echo ''
+	echo "=============================================="
+	echo "Create /etc/orabuntu-lxc-release file complete.   "
+	echo "=============================================="
 
-		clear
-	fi
+	sleep 5
+
+	clear
 fi
 
