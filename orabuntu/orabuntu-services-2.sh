@@ -322,7 +322,7 @@ then
         	sudo lxc-ls -f | sed 's/  */ /g' | grep $j | grep RUNNING | cut -f3 -d' ' | sed 's/,//' | cut -f1-2 -d'.' | sed 's/\.//g'
         	}
         	fi
-        	if [ $UbuntuVersion = 16.04 ]
+        	if [ $UbuntuVersion = 16.04 ] || [ $UbuntuVersion = 17.04 ]
         	then
         	function CheckPublicIPIterative {
         	sudo lxc-ls -f | sed 's/  */ /g' | grep $j | grep RUNNING | cut -f5 -d' ' | sed 's/,//' | cut -f1-2 -d'.' | sed 's/\.//g'

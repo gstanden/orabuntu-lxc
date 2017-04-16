@@ -25,6 +25,7 @@ OracleRelease=$1$2
 OracleVersion=$1.$2
 OR=$OracleRelease
 NumCon=$3
+NameServer=$4
 
 clear
 
@@ -139,7 +140,7 @@ clear
 
 echo ''
 echo "=============================================="
-echo "Cloning oel$OracleRelease to $NumCon containers         "
+echo "Cloning oel$OracleRelease $NumCon containers  "
 echo "=============================================="
 echo ''
 
@@ -186,7 +187,7 @@ do
 		sudo lxc-clone -o oel$OracleRelease -n $ContainerPrefix$i
 	fi
 
-	if [ $UbuntuVersion = '16.04' ]
+	if [ $UbuntuVersion = '16.04' ] || [ $UbuntuVersion = '17.04' ]
 	then
 		sudo lxc-copy -n oel$OracleRelease -N $ContainerPrefix$i
 	fi
@@ -198,27 +199,87 @@ do
 	HostName=$(GetHostName)
 	sudo sed -i "s/$HostName/$ContainerPrefix$i/" /var/lib/lxc/$ContainerPrefix$i/rootfs/etc/sysconfig/network
 
-	sudo sh -c "echo '#!/bin/bash'						>  /etc/network/openvswitch/strt_$ContainerPrefix$i.sh"
-	sudo sh -c "echo '# Start lxc container after required networks are up'	>> /etc/network/openvswitch/strt_$ContainerPrefix$i.sh"
-	sudo sh -c "echo 'switches='sw1''					>> /etc/network/openvswitch/strt_$ContainerPrefix$i.sh"
-	sudo sh -c "echo 'm=0'							>> /etc/network/openvswitch/strt_$ContainerPrefix$i.sh"
-	sudo sh -c "echo 'for i in \$switches'					>> /etc/network/openvswitch/strt_$ContainerPrefix$i.sh"
-	sudo sh -c "echo 'do'							>> /etc/network/openvswitch/strt_$ContainerPrefix$i.sh"
-	sudo sh -c "echo '	sudo ip link | grep $i >/dev/null 2>&1'		>> /etc/network/openvswitch/strt_$ContainerPrefix$i.sh"
-	sudo sh -c "echo '	while [ $? -ne 0 ]'				>> /etc/network/openvswitch/strt_$ContainerPrefix$i.sh"
-	sudo sh -c "echo '	do'						>> /etc/network/openvswitch/strt_$ContainerPrefix$i.sh"
-	sudo sh -c "echo '		m=$((m+1))'				>> /etc/network/openvswitch/strt_$ContainerPrefix$i.sh"
-	sudo sh -c "echo '		if [ $m -eq 1000 ]'			>> /etc/network/openvswitch/strt_$ContainerPrefix$i.sh"
-	sudo sh -c "echo '		then'					>> /etc/network/openvswitch/strt_$ContainerPrefix$i.sh"
-	sudo sh -c "echo '			exit'				>> /etc/network/openvswitch/strt_$ContainerPrefix$i.sh"
-	sudo sh -c "echo '		fi'					>> /etc/network/openvswitch/strt_$ContainerPrefix$i.sh"
-	sudo sh -c "echo '		sudo ip link | grep $i >/dev/null 2>&1'	>> /etc/network/openvswitch/strt_$ContainerPrefix$i.sh"
-	sudo sh -c "echo '	done'						>> /etc/network/openvswitch/strt_$ContainerPrefix$i.sh"
-	sudo sh -c "echo 'done'							>> /etc/network/openvswitch/strt_$ContainerPrefix$i.sh"
-	sudo sh -c "echo 'sudo lxc-start -n $ContainerPrefix$i >/dev/null 2>&1'	>> /etc/network/openvswitch/strt_$ContainerPrefix$i.sh"
-	sudo chmod +x /etc/network/openvswitch/strt_$ContainerPrefix$i.sh
-	sudo sed -i "s/sw1/'sw1'/" /etc/network/openvswitch/strt_$ContainerPrefix$i.sh
-	sudo sh -c "echo '/etc/network/openvswitch/strt_$ContainerPrefix$i.sh 2>&1 > /etc/network/openvswitch/strt_$ContainerPrefix$i.log' >> /etc/network/if-up.d/orabuntu-lxc-net"
+## New Start
+
+        echo ''
+        echo "=============================================="
+        echo "Create $ContainerPrefix$i Onboot Service...   "
+        echo "=============================================="
+
+        sudo sh -c "echo '#!/bin/bash'                                                          			>  /etc/network/openvswitch/strt_$ContainerPrefix$i.sh"
+        sudo sh -c "echo '#'                                                                    			>> /etc/network/openvswitch/strt_$ContainerPrefix$i.sh"
+        sudo sh -c "echo '# Manage the Oracle RAC LXC containers'                               			>> /etc/network/openvswitch/strt_$ContainerPrefix$i.sh"
+        sudo sh -c "echo '#'                                                                    			>> /etc/network/openvswitch/strt_$ContainerPrefix$i.sh"
+        sudo sh -c "echo 'start() {'                                                            			>> /etc/network/openvswitch/strt_$ContainerPrefix$i.sh"
+        sudo sh -c "echo '  exec lxc-start -n $ContainerPrefix$i > /dev/null 2>&1'              			>> /etc/network/openvswitch/strt_$ContainerPrefix$i.sh"
+        sudo sh -c "echo '}'                                                                    			>> /etc/network/openvswitch/strt_$ContainerPrefix$i.sh"
+        sudo sh -c "echo ''                                                                     			>> /etc/network/openvswitch/strt_$ContainerPrefix$i.sh"
+        sudo sh -c "echo 'stop() {'                                                             			>> /etc/network/openvswitch/strt_$ContainerPrefix$i.sh"
+        sudo sh -c "echo '  exec lxc-stop -n $ContainerPrefix$i > /dev/null 2>&1'               			>> /etc/network/openvswitch/strt_$ContainerPrefix$i.sh"
+        sudo sh -c "echo '}'                                                                    			>> /etc/network/openvswitch/strt_$ContainerPrefix$i.sh"
+        sudo sh -c "echo ''                                                                     			>> /etc/network/openvswitch/strt_$ContainerPrefix$i.sh"
+        sudo sh -c "echo 'case \$1 in'                                                          			>> /etc/network/openvswitch/strt_$ContainerPrefix$i.sh"
+        sudo sh -c "echo '  start|stop) \"\$1\" ;;'                                             			>> /etc/network/openvswitch/strt_$ContainerPrefix$i.sh"
+        sudo sh -c "echo 'esac'                                                                 			>> /etc/network/openvswitch/strt_$ContainerPrefix$i.sh"
+
+        sudo chmod +x /etc/network/openvswitch/strt_$ContainerPrefix$i.sh
+
+        sudo sh -c "echo '[Unit]'                                                               			>  /etc/systemd/system/$ContainerPrefix$i.service"
+        sudo sh -c "echo 'Description=$ContainerPrefix$i Service'                               			>> /etc/systemd/system/$ContainerPrefix$i.service"
+        sudo sh -c "echo 'Wants=network-online.target sw1.service $NameServer.service'          			>> /etc/systemd/system/$ContainerPrefix$i.service"
+        sudo sh -c "echo 'After=network-online.target sw1.service $NameServer.service'          			>> /etc/systemd/system/$ContainerPrefix$i.service"
+        sudo sh -c "echo ''                                                                     			>> /etc/systemd/system/$ContainerPrefix$i.service"
+        sudo sh -c "echo '[Service]'                                                            			>> /etc/systemd/system/$ContainerPrefix$i.service"
+        sudo sh -c "echo 'Type=oneshot'                                                         			>> /etc/systemd/system/$ContainerPrefix$i.service"
+        sudo sh -c "echo 'User=root'                                                            			>> /etc/systemd/system/$ContainerPrefix$i.service"
+        sudo sh -c "echo 'RemainAfterExit=yes'                                                  			>> /etc/systemd/system/$ContainerPrefix$i.service"
+        sudo sh -c "echo 'ExecStart=/etc/network/openvswitch/strt_$ContainerPrefix$i.sh start'  			>> /etc/systemd/system/$ContainerPrefix$i.service"
+        sudo sh -c "echo 'ExecStop=/etc/network/openvswitch/strt_$ContainerPrefix$i.sh stop'    			>> /etc/systemd/system/$ContainerPrefix$i.service"
+        sudo sh -c "echo ''                                                                     			>> /etc/systemd/system/$ContainerPrefix$i.service"
+        sudo sh -c "echo '[Install]'                                                            			>> /etc/systemd/system/$ContainerPrefix$i.service"
+        sudo sh -c "echo 'WantedBy=multi-user.target'                                           			>> /etc/systemd/system/$ContainerPrefix$i.service"
+
+        sudo chmod 644 /etc/systemd/system/$ContainerPrefix$i.service
+
+        echo ''
+        sudo cat /etc/systemd/system/$ContainerPrefix$i.service
+        echo ''
+        sudo systemctl enable $ContainerPrefix$i
+
+        echo ''
+        echo "=============================================="
+        echo "Created $ContainerPrefix$i Onboot Service.   "
+        echo "=============================================="
+        echo ''
+
+        sleep 5
+
+        clear
+
+## New End
+
+#	sudo sh -c "echo '#!/bin/bash'						>  /etc/network/openvswitch/strt_$ContainerPrefix$i.sh"
+#	sudo sh -c "echo '# Start lxc container after required networks are up'	>> /etc/network/openvswitch/strt_$ContainerPrefix$i.sh"
+#	sudo sh -c "echo 'switches='sw1''					>> /etc/network/openvswitch/strt_$ContainerPrefix$i.sh"
+#	sudo sh -c "echo 'm=0'							>> /etc/network/openvswitch/strt_$ContainerPrefix$i.sh"
+#	sudo sh -c "echo 'for i in \$switches'					>> /etc/network/openvswitch/strt_$ContainerPrefix$i.sh"
+#	sudo sh -c "echo 'do'							>> /etc/network/openvswitch/strt_$ContainerPrefix$i.sh"
+#	sudo sh -c "echo '	sudo ip link | grep $i >/dev/null 2>&1'		>> /etc/network/openvswitch/strt_$ContainerPrefix$i.sh"
+#	sudo sh -c "echo '	while [ $? -ne 0 ]'				>> /etc/network/openvswitch/strt_$ContainerPrefix$i.sh"
+#	sudo sh -c "echo '	do'						>> /etc/network/openvswitch/strt_$ContainerPrefix$i.sh"
+#	sudo sh -c "echo '		m=$((m+1))'				>> /etc/network/openvswitch/strt_$ContainerPrefix$i.sh"
+#	sudo sh -c "echo '		if [ $m -eq 1000 ]'			>> /etc/network/openvswitch/strt_$ContainerPrefix$i.sh"
+#	sudo sh -c "echo '		then'					>> /etc/network/openvswitch/strt_$ContainerPrefix$i.sh"
+#	sudo sh -c "echo '			exit'				>> /etc/network/openvswitch/strt_$ContainerPrefix$i.sh"
+#	sudo sh -c "echo '		fi'					>> /etc/network/openvswitch/strt_$ContainerPrefix$i.sh"
+#	sudo sh -c "echo '		sudo ip link | grep $i >/dev/null 2>&1'	>> /etc/network/openvswitch/strt_$ContainerPrefix$i.sh"
+#	sudo sh -c "echo '	done'						>> /etc/network/openvswitch/strt_$ContainerPrefix$i.sh"
+#	sudo sh -c "echo 'done'							>> /etc/network/openvswitch/strt_$ContainerPrefix$i.sh"
+#	sudo sh -c "echo 'sudo lxc-start -n $ContainerPrefix$i >/dev/null 2>&1'	>> /etc/network/openvswitch/strt_$ContainerPrefix$i.sh"
+#	sudo chmod +x /etc/network/openvswitch/strt_$ContainerPrefix$i.sh
+#	sudo sed -i "s/sw1/'sw1'/" /etc/network/openvswitch/strt_$ContainerPrefix$i.sh
+#	sudo sh -c "echo '/etc/network/openvswitch/strt_$ContainerPrefix$i.sh 2>&1 > /etc/network/openvswitch/strt_$ContainerPrefix$i.log' >> /etc/network/if-up.d/orabuntu-lxc-net"
+
 i=$((i+1))
 done
 

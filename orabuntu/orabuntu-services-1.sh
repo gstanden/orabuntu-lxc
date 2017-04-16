@@ -378,7 +378,7 @@ then
 	sudo apt-get -y install db5.1 db5.1-util
 fi
 
-if [ $UbuntuVersion = '16.04' ]
+if [ $UbuntuVersion = '16.04' ] || [ $UbuntuVersion = '17.04' ]
 then
 	sudo apt-get -y install db5.3 db5.3-util
 	sudo ln -s /usr/bin/db5.3_dump /usr/bin/db5.1_dump
@@ -414,7 +414,7 @@ echo 'facter lxc uml-utilities openvswitch-switch openvswitch-common bind9utils 
 }
 fi
 
-if [ $UbuntuVersion = '16.04' ]
+if [ $UbuntuVersion = '16.04' ] || [ $UbuntuVersion = '17.04' ]
 then
 function CheckPackageInstalled {
 echo 'facter lxc uml-utilities openvswitch-switch openvswitch-common bind9utils dnsutils apparmor-utils openssh-server uuid rpm yum hugepages ntp iotop flashplugin-installer sshpass db5.3-util'
@@ -472,7 +472,15 @@ echo "Create Ubuntu LXC DNS DHCP container...       "
 echo "=============================================="
 echo ''
 
+if [ $UbuntuVersion = '16.04' ]
+then
 sudo lxc-create -t download -n nsa -- -d ubuntu -r xenial -a amd64
+fi
+
+if [ $UbuntuVersion = '17.04' ]
+then
+sudo lxc-create -n nsa -t ubuntu
+fi
 
 echo ''
 echo "=============================================="
@@ -529,13 +537,14 @@ echo ''
 
 sudo lxc-attach -n nsa -- apt-get update
 sudo lxc-attach -n nsa -- apt-get install -y bind9 isc-dhcp-server bind9utils dnsutils openssh-server
- 	sudo lxc-attach -n nsa -- sudo apt-get -y install bind9 isc-dhcp-server bind9utils dnsutils
+sudo lxc-attach -n nsa -- sudo apt-get -y install bind9 isc-dhcp-server bind9utils dnsutils
 
 sudo sleep 2
 sudo lxc-attach -n nsa -- service bind9 start
 sudo lxc-attach -n nsa -- service isc-dhcp-server start
-	sudo lxc-attach -n nsa -- sudo service bind9 start
-	sudo lxc-attach -n nsa -- sudo service isc-dhcp-server start
+sudo lxc-attach -n nsa -- sudo service bind9 start
+sudo lxc-attach -n nsa -- sudo service isc-dhcp-server start
+
 echo ''
 echo "=============================================="
 echo "Install bind9 & isc-dhcp-server complete.     "
@@ -693,12 +702,46 @@ sudo sed -i '/sysctl/s/^# //' /etc/network/if-up.d/orabuntu-lxc-net
 
 echo ''
 echo "=============================================="
-echo "Created /etc/sysctl.d/60-oracle.conf          "
-echo "Sleeping 10 seconds for settings review ...   "
+echo "Displayed /etc/sysctl.d/60-oracle.conf file.  "
+echo "=============================================="
+
+sleep 5
+
+clear
+
+echo ''
+echo "=============================================="
+echo "Create 60-oracle.service in systemd...        "
 echo "=============================================="
 echo ''
 
-sleep 10
+if [ ! -f /etc/systemd/system/60-oracle.service ]
+then
+sudo sh -c "echo '[Unit]'                                    			 > /etc/systemd/system/60-oracle.service"
+sudo sh -c "echo 'Description=60-oracle Service'            			>> /etc/systemd/system/60-oracle.service"
+sudo sh -c "echo 'After=network.target'                     			>> /etc/systemd/system/60-oracle.service"
+sudo sh -c "echo ''                                         			>> /etc/systemd/system/60-oracle.service"
+sudo sh -c "echo '[Service]'                                			>> /etc/systemd/system/60-oracle.service"
+sudo sh -c "echo 'Type=oneshot'                             			>> /etc/systemd/system/60-oracle.service"
+sudo sh -c "echo 'User=root'                                			>> /etc/systemd/system/60-oracle.service"
+sudo sh -c "echo 'RemainAfterExit=yes'                      			>> /etc/systemd/system/60-oracle.service"
+sudo sh -c "echo 'ExecStart=/usr/sbin/sysctl -p /etc/sysctl.d/60-oracle.conf'	>> /etc/systemd/system/60-oracle.service"
+sudo sh -c "echo ''                                         			>> /etc/systemd/system/60-oracle.service"
+sudo sh -c "echo '[Install]'                                			>> /etc/systemd/system/60-oracle.service"
+sudo sh -c "echo 'WantedBy=multi-user.target'               			>> /etc/systemd/system/60-oracle.service"
+
+sudo chmod 644 /etc/systemd/system/60-oracle.service
+echo ''
+sudo systemctl enable 60-oracle
+echo ''
+fi
+
+echo ''
+echo "=============================================="
+echo "Created 60-oracle.service in systemd.         "
+echo "=============================================="
+
+sleep 5
 
 clear
 
@@ -906,7 +949,7 @@ function GetUbuntuDistribRelease {
 cat /etc/lsb-release | grep DISTRIB_RELEASE | cut -f2 -d'='
 }
 UbuntuDistribRelease=$(GetUbuntuDistribRelease)
-if [ $UbuntuDistribRelease = '16.04' ]
+if [ $UbuntuDistribRelease = '16.04' ] || [ $UbuntuDistribRelease = '17.04' ]
 then
 	sudo sed -i '/nameserver/d' /etc/resolv.conf
 	sudo sed -i '/search/d'     /etc/resolv.conf
@@ -1006,6 +1049,127 @@ echo "=============================================="
 sleep 5
 
 clear
+
+if [ $UbuntuVersion = '17.04' ]
+then
+	SwitchList='sw1 sx1'
+	for k in $SwitchList
+	do
+		echo ''
+		echo "=============================================="
+		echo "Installing OpenvSwitch $k...HERE NOW          "
+		echo "=============================================="
+		echo ''
+
+       		 if [ ! -f /etc/systemd/system/$k.service ]
+       		 then
+       	         	sudo sh -c "echo '[Unit]'						 > /etc/systemd/system/$k.service"
+       	         	sudo sh -c "echo 'Description=$k Service'				>> /etc/systemd/system/$k.service"
+		
+		if [ $k = 'sw1' ]
+		then
+                	sudo sh -c "echo 'Wants=network-online.target'				>> /etc/systemd/system/$k.service"
+                	sudo sh -c "echo 'After=network-online.target'				>> /etc/systemd/system/$k.service"
+		fi
+		if [ $k = 'sx1' ]
+		then
+                	sudo sh -c "echo 'Wants=network-online.target'				>> /etc/systemd/system/$k.service"
+                	sudo sh -c "echo 'After=network-online.target sw1.service'		>> /etc/systemd/system/$k.service"
+		fi
+                	sudo sh -c "echo ''							>> /etc/systemd/system/$k.service"
+                	sudo sh -c "echo '[Service]'						>> /etc/systemd/system/$k.service"
+                	sudo sh -c "echo 'Type=oneshot'						>> /etc/systemd/system/$k.service"
+                	sudo sh -c "echo 'User=root'						>> /etc/systemd/system/$k.service"
+                	sudo sh -c "echo 'RemainAfterExit=yes'					>> /etc/systemd/system/$k.service"
+                	sudo sh -c "echo 'ExecStart=/etc/network/openvswitch/crt_ovs_$k.sh' 	>> /etc/systemd/system/$k.service"
+                	sudo sh -c "echo 'ExecStop=/usr/bin/ovs-vsctl del-br $k' 		>> /etc/systemd/system/$k.service"
+                	sudo sh -c "echo ''							>> /etc/systemd/system/$k.service"
+                	sudo sh -c "echo '[Install]'						>> /etc/systemd/system/$k.service"
+                	sudo sh -c "echo 'WantedBy=multi-user.target'				>> /etc/systemd/system/$k.service"
+		
+			echo ''
+			echo "=============================================="
+			echo "Starting OpenvSwitch $k ...                   "
+			echo "=============================================="
+			echo ''
+	
+       			sudo chmod 644 /etc/systemd/system/$k.service
+			sudo systemctl daemon-reload
+       			sudo systemctl enable $k.service
+#			sudo service $k start
+#			sudo service $k status
+
+			echo ''
+			echo "=============================================="
+			echo "Started OpenvSwitch $k.                       "
+			echo "=============================================="
+
+			sleep 5
+
+			clear
+		else
+			echo ''
+			echo "=============================================="
+			echo "OpenvSwitch $k previously installed.          "
+			echo "=============================================="
+			echo ''
+		
+			sleep 5
+
+			clear
+        	fi
+
+		echo ''
+		echo "=============================================="
+		echo "Installed OpenvSwitch $k.                     "
+		echo "=============================================="
+
+		sleep 5
+
+		clear
+	done
+fi
+
+sleep 5
+
+clear
+
+if [ ! -f /etc/systemd/system/$NameServer.service ]
+then
+	echo ''
+	echo "=============================================="
+	echo "Create $NameServer Onboot Service...          "
+	echo "=============================================="
+	echo ''
+
+	sudo sh -c "echo '[Unit]'             	         				 > /etc/systemd/system/$NameServer.service"
+	sudo sh -c "echo 'Description=$NameServer Service'  				>> /etc/systemd/system/$NameServer.service"
+	sudo sh -c "echo 'Wants=network-online.target sw1.service sx1.service'		>> /etc/systemd/system/$NameServer.service"
+	sudo sh -c "echo 'After=network-online.target sw1.service sx1.service'		>> /etc/systemd/system/$NameServer.service"
+	sudo sh -c "echo ''                                 				>> /etc/systemd/system/$NameServer.service"
+	sudo sh -c "echo '[Service]'                        				>> /etc/systemd/system/$NameServer.service"
+	sudo sh -c "echo 'Type=oneshot'                     				>> /etc/systemd/system/$NameServer.service"
+	sudo sh -c "echo 'User=root'                        				>> /etc/systemd/system/$NameServer.service"
+	sudo sh -c "echo 'RemainAfterExit=yes'              				>> /etc/systemd/system/$NameServer.service"
+	sudo sh -c "echo 'ExecStart=/etc/network/openvswitch/strt_$NameServer.sh start'	>> /etc/systemd/system/$NameServer.service"
+	sudo sh -c "echo 'ExecStop=/etc/network/openvswitch/strt_$NameServer.sh stop'	>> /etc/systemd/system/$NameServer.service"
+	sudo sh -c "echo ''                                 				>> /etc/systemd/system/$NameServer.service"
+	sudo sh -c "echo '[Install]'                        				>> /etc/systemd/system/$NameServer.service"
+	sudo sh -c "echo 'WantedBy=multi-user.target'       				>> /etc/systemd/system/$NameServer.service"
+	sudo chmod 644 /etc/systemd/system/$NameServer.service
+	sudo systemctl enable $NameServer
+
+	echo ''
+	echo "=============================================="
+	echo "Created $NameServer Onboot Service.           "
+	echo "=============================================="
+fi
+
+sleep 5
+
+clear
+
+## New End
 
 echo ''
 echo "=============================================="

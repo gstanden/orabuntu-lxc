@@ -134,7 +134,7 @@ echo 'Oracle Linux PointRelease = '$PointRelease
 NumCon=$3
 if [ -z $3 ]
 then
-NumCon=1
+NumCon=4
 fi
 echo 'Oracle Container Count    = '$NumCon
 

@@ -46,25 +46,112 @@ sleep 5
 
 clear
 
-echo ''
-echo "=============================================="
-echo "Make sure all openvswitch interfaces are up   "
-echo "=============================================="
-echo ''
+## New Start
 
-sudo /etc/network/openvswitch/crt_ovs_sw2.sh >/dev/null 2>&1
-sudo /etc/network/openvswitch/crt_ovs_sw3.sh >/dev/null 2>&1
-sudo /etc/network/openvswitch/crt_ovs_sw4.sh >/dev/null 2>&1
-sudo /etc/network/openvswitch/crt_ovs_sw5.sh >/dev/null 2>&1
-sudo /etc/network/openvswitch/crt_ovs_sw6.sh >/dev/null 2>&1
-sudo /etc/network/openvswitch/crt_ovs_sw7.sh >/dev/null 2>&1
-sudo /etc/network/openvswitch/crt_ovs_sw6.sh >/dev/null 2>&1
-sudo /etc/network/openvswitch/crt_ovs_sw8.sh >/dev/null 2>&1
-sudo /etc/network/openvswitch/crt_ovs_sw9.sh >/dev/null 2>&1
-
-ifconfig | grep -v 'ns' | egrep -A1 'sw|sx'
+echo "=============================================="
+echo "This script starts lxc clones                 "
+echo "=============================================="
 
 sleep 5
+
+clear
+
+echo ''
+echo "=============================================="
+echo "Create Priv/ASM OpenvSwitch Onboot Services..."
+echo "=============================================="
+echo ''
+
+SwitchList='sw2 sw3 sw4 sw5 sw6 sw7 sw8 sw9'
+for k in $SwitchList
+do
+        if [ ! -f /etc/systemd/system/$k.service ]
+        then
+                sudo sh -c "echo '[Unit]'						 > /etc/systemd/system/$k.service"
+                sudo sh -c "echo 'Description=$k Service'				>> /etc/systemd/system/$k.service"
+                sudo sh -c "echo 'After=network-online.target'				>> /etc/systemd/system/$k.service"
+                sudo sh -c "echo ''							>> /etc/systemd/system/$k.service"
+                sudo sh -c "echo '[Service]'						>> /etc/systemd/system/$k.service"
+                sudo sh -c "echo 'Type=oneshot'						>> /etc/systemd/system/$k.service"
+                sudo sh -c "echo 'User=root'						>> /etc/systemd/system/$k.service"
+                sudo sh -c "echo 'RemainAfterExit=yes'					>> /etc/systemd/system/$k.service"
+                sudo sh -c "echo 'ExecStart=/etc/network/openvswitch/crt_ovs_$k.sh' 	>> /etc/systemd/system/$k.service"
+                sudo sh -c "echo 'ExecStop=/usr/bin/ovs-vsctl del-br $k' 		>> /etc/systemd/system/$k.service"
+                sudo sh -c "echo ''							>> /etc/systemd/system/$k.service"
+                sudo sh -c "echo '[Install]'						>> /etc/systemd/system/$k.service"
+                sudo sh -c "echo 'WantedBy=multi-user.target'				>> /etc/systemd/system/$k.service"
+        fi
+done
+
+echo ''
+echo "=============================================="
+echo "OpenvSwitch Priv/ASM Onboot Services Created. "
+echo "=============================================="
+
+sleep 5
+
+clear
+
+for k in $SwitchList
+do
+	echo ''
+	echo "=============================================="
+	echo "Start OpenvSwitch $k ...            "
+	echo "=============================================="
+	echo ''
+
+        sudo chmod 644 /etc/systemd/system/$k.service
+        sudo systemctl enable $k.service
+	sudo service $k start
+	sudo service $k status
+
+	echo ''
+	echo "=============================================="
+	echo "OpenvSwitch $k is up.                         "
+	echo "=============================================="
+	
+	sleep 3
+
+	clear
+done
+
+echo ''
+echo "=============================================="
+echo "Openvswitch interfaces installed & configured."
+echo "=============================================="
+echo ''
+
+sleep 5
+
+clear
+
+echo ''
+echo "=============================================="
+echo "Starting LXC cloned containers for Oracle...  "
+echo "=============================================="
+
+
+## New End
+
+# echo ''
+# echo "=============================================="
+# echo "Make sure all openvswitch interfaces are up   "
+# echo "=============================================="
+# echo ''
+
+# sudo /etc/network/openvswitch/crt_ovs_sw2.sh >/dev/null 2>&1
+# sudo /etc/network/openvswitch/crt_ovs_sw3.sh >/dev/null 2>&1
+# sudo /etc/network/openvswitch/crt_ovs_sw4.sh >/dev/null 2>&1
+# sudo /etc/network/openvswitch/crt_ovs_sw5.sh >/dev/null 2>&1
+# sudo /etc/network/openvswitch/crt_ovs_sw6.sh >/dev/null 2>&1
+# sudo /etc/network/openvswitch/crt_ovs_sw7.sh >/dev/null 2>&1
+# sudo /etc/network/openvswitch/crt_ovs_sw6.sh >/dev/null 2>&1
+# sudo /etc/network/openvswitch/crt_ovs_sw8.sh >/dev/null 2>&1
+# sudo /etc/network/openvswitch/crt_ovs_sw9.sh >/dev/null 2>&1
+
+# ifconfig | grep -v 'ns' | egrep -A1 'sw|sx'
+
+# sleep 5
 
 echo ''
 echo "=============================================="
@@ -99,13 +186,13 @@ do
 	echo ''
 	echo "Starting container $j ..."
 	echo ''
-	if [ $UbuntuVersion = 15.04 ] || [ $UbuntuVersion = 15.10 ]
+	if [ $UbuntuVersion = '15.04' ] || [ $UbuntuVersion = '15.10' ]
 	then
 	function CheckPublicIPIterative {
 	sudo lxc-ls -f | sed 's/  */ /g' | grep $j | grep RUNNING | cut -f3 -d' ' | sed 's/,//' | cut -f1-2 -d'.' | sed 's/\.//g'
 	}
 	fi
-	if [ $UbuntuVersion = 16.04 ]
+	if [ $UbuntuVersion = '16.04' ] || [ $UbuntuVersion = '17.04' ]
 	then
 	function CheckPublicIPIterative {
 	sudo lxc-ls -f | sed 's/  */ /g' | grep $j | grep RUNNING | cut -f5 -d' ' | sed 's/,//' | cut -f1-2 -d'.' | sed 's/\.//g'
@@ -238,7 +325,7 @@ then
 	echo ''
 
 	sudo touch /etc/orabuntu-lxc-release
-	sudo sh -c "echo 'Orabuntu-LXC v4.3' > /etc/orabuntu-lxc-release"
+	sudo sh -c "echo 'Orabuntu-LXC v4.4' > /etc/orabuntu-lxc-release"
 	sudo ls -l /etc/orabuntu-lxc-release
 	echo ''
 	sudo cat /etc/orabuntu-lxc-release
@@ -340,7 +427,7 @@ then
 		echo ''
 
 		sudo touch /etc/orabuntu-lxc-release
-		sudo sh -c "echo 'Orabuntu-LXC v4.1' > /etc/orabuntu-lxc-release"
+		sudo sh -c "echo 'Orabuntu-LXC v4.4' > /etc/orabuntu-lxc-release"
 		sudo ls -l /etc/orabuntu-lxc-release
 		echo ''
 		sudo cat /etc/orabuntu-lxc-release
