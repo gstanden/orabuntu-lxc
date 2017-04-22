@@ -48,7 +48,6 @@ clear
 
 ## New Start
 
-echo ''
 echo "=============================================="
 echo "This script starts lxc clones                 "
 echo "=============================================="
@@ -83,8 +82,6 @@ do
                 sudo sh -c "echo 'WantedBy=multi-user.target'				>> /etc/systemd/system/$k.service"
         fi
 done
-
-sudo ls -l /etc/systemd/system/sw*.service
 
 echo ''
 echo "=============================================="
@@ -421,29 +418,28 @@ then
 #		sudo reboot
 #	fi
 
-fi
+	if [ ! -f /etc/orabuntu-lxc-release ]
+	then
+		echo ''
+		echo "=============================================="
+		echo "Create /etc/orabuntu-lxc-release file...          "
+		echo "=============================================="
+		echo ''
 
-if [ $RebootNeeded = 'physical' ] && [ ! -f /etc/orabuntu-lxc-release ] 
-then
-	echo ''
-	echo "=============================================="
-	echo "Create /etc/orabuntu-lxc-release file...          "
-	echo "=============================================="
-	echo ''
+		sudo touch /etc/orabuntu-lxc-release
+		sudo sh -c "echo 'Orabuntu-LXC v4.4' > /etc/orabuntu-lxc-release"
+		sudo ls -l /etc/orabuntu-lxc-release
+		echo ''
+		sudo cat /etc/orabuntu-lxc-release
 
-	sudo touch /etc/orabuntu-lxc-release
-	sudo sh -c "echo 'Orabuntu-LXC v4.4' > /etc/orabuntu-lxc-release"
-	sudo ls -l /etc/orabuntu-lxc-release
-	echo ''
-	sudo cat /etc/orabuntu-lxc-release
+		echo ''
+		echo "=============================================="
+		echo "Create /etc/orabuntu-lxc-release file complete.   "
+		echo "=============================================="
 
-	echo ''
-	echo "=============================================="
-	echo "Create /etc/orabuntu-lxc-release file complete.   "
-	echo "=============================================="
+		sleep 5
 
-	sleep 5
-
-	clear
+		clear
+	fi
 fi
 
