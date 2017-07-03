@@ -130,6 +130,8 @@ sleep 5
 
 clear
 
+exit
+
 echo ''
 echo "=============================================="
 echo "Begin LXC container MAC address reset...      "
@@ -156,6 +158,9 @@ sudo grep hwaddr /var/lib/lxc/oel$OracleRelease/config.original.bak | tail -1
 sudo grep hwaddr /var/lib/lxc/oel$OracleRelease/config.oracle
 
 sudo chmod 644 /var/lib/lxc/oel$OracleRelease/config
+
+sudo mv /etc/network/if-up.d/openvswitch/oel$OracleRelease-pub-ifup-sw1  /etc/network/if-up.d/openvswitch/oel$OracleRelease-pub-ifup-sx1
+sudo mv /etc/network/if-down.d/openvswitch/oel$OracleRelease-pub-ifdown-sw1 /etc/network/if-down.d/openvswitch/oel$OracleRelease-pub-ifup-sx1
 
 echo ''
 echo "=============================================="
