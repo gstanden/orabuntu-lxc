@@ -161,6 +161,9 @@ sudo chmod 644 /var/lib/lxc/oel$OracleRelease/config
 
 sudo mv /etc/network/if-up.d/openvswitch/oel$OracleRelease-pub-ifup-sw1  /etc/network/if-up.d/openvswitch/oel$OracleRelease-pub-ifup-sx1
 sudo mv /etc/network/if-down.d/openvswitch/oel$OracleRelease-pub-ifdown-sw1 /etc/network/if-down.d/openvswitch/oel$OracleRelease-pub-ifup-sx1
+sudo sed -i "s/sw1/sx1/g" /etc/network/openvswitch/if-up.d/oel$OracleRelease-pub-ifup-sx1
+sudo sed -i "s/sw1/sx1/g" /etc/network/openvswitch/if-down.d/oel$OracleRelease-pub-ifdown-sx1
+
 
 echo ''
 echo "=============================================="
