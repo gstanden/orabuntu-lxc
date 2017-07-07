@@ -130,15 +130,14 @@ sleep 5
 
 clear
 
-exit
-
 echo ''
 echo "=============================================="
 echo "Begin LXC container MAC address reset...      "
 echo "=============================================="
 echo ''
 
-sudo cp /var/lib/lxc/oel$OracleRelease/config /var/lib/lxc/oel$OracleRelease/config.original.bak
+sudo cp -p /var/lib/lxc/oel$OracleRelease/config /var/lib/lxc/oel$OracleRelease/config.original.bak
+# sudo ls -l /var/lib/lxc/oel$OracleRelease/config.original.bak
 
 function GetOriginalHwaddr {
 sudo cat /var/lib/lxc/oel$OracleRelease/config | grep hwaddr | tail -1 | sed 's/\./\\\./g'
@@ -146,10 +145,19 @@ sudo cat /var/lib/lxc/oel$OracleRelease/config | grep hwaddr | tail -1 | sed 's/
 OriginalHwaddr=$(GetOriginalHwaddr)
 echo $OriginalHwaddr | sed 's/\\//g'
 
-sudo cp -p /var/lib/lxc/oel$OracleRelease/config.oracle.bak.oel$MajorRelease /var/lib/lxc/oel$OracleRelease/config.oracle
+sudo cp -p /var/lib/lxc/oel$OracleRelease/config.oracle.bak.oel$MajorRelease 	   /var/lib/lxc/oel$OracleRelease/config.oracle
+sudo sed -i "s/lxc\.network\.hwaddr.*/$OriginalHwaddr/"                      	   /var/lib/lxc/oel$OracleRelease/config.oracle
 
-sudo sed -i "s/lxc\.network\.hwaddr.*/$OriginalHwaddr/" /var/lib/lxc/oel$OracleRelease/config.oracle
-sudo cp -p /var/lib/lxc/oel$OracleRelease/config.oracle /var/lib/lxc/oel$OracleRelease/config
+# GLS 20170707 Set workarounds for lxc 2.0.8+
+# GLS 20170707 See https://github.com/lxc/lxc/issues/1552 for more information
+
+sudo sh -c "echo 'lxc.console = none' 						>> /var/lib/lxc/oel$OracleRelease/config.oracle"
+sudo sh -c "echo 'lxc.tty = 0' 							>> /var/lib/lxc/oel$OracleRelease/config.oracle"
+sudo sh -c "echo 'lxc.pts = 0' 							>> /var/lib/lxc/oel$OracleRelease/config.oracle"
+
+sudo cp -p /var/lib/lxc/oel$OracleRelease/config.oracle                      	   /var/lib/lxc/oel$OracleRelease/config
+# sudo ls -l /var/lib/lxc/oel$OracleRelease/config.oracle
+# sudo ls -l /var/lib/lxc/oel$OracleRelease/config
 
 echo ''
 echo "These should match..."
@@ -158,12 +166,6 @@ sudo grep hwaddr /var/lib/lxc/oel$OracleRelease/config.original.bak | tail -1
 sudo grep hwaddr /var/lib/lxc/oel$OracleRelease/config.oracle
 
 sudo chmod 644 /var/lib/lxc/oel$OracleRelease/config
-
-sudo mv /etc/network/if-up.d/openvswitch/oel$OracleRelease-pub-ifup-sw1  /etc/network/if-up.d/openvswitch/oel$OracleRelease-pub-ifup-sx1
-sudo mv /etc/network/if-down.d/openvswitch/oel$OracleRelease-pub-ifdown-sw1 /etc/network/if-down.d/openvswitch/oel$OracleRelease-pub-ifup-sx1
-sudo sed -i "s/sw1/sx1/g" /etc/network/openvswitch/if-up.d/oel$OracleRelease-pub-ifup-sx1
-sudo sed -i "s/sw1/sx1/g" /etc/network/openvswitch/if-down.d/oel$OracleRelease-pub-ifdown-sx1
-
 
 echo ''
 echo "=============================================="
@@ -180,10 +182,12 @@ echo "Legacy script cleanups...                     "
 echo "=============================================="
 echo ''
 
-sudo cp -p /etc/network/if-up.d/openvswitch/lxcora00-pub-ifup-sw1 /etc/network/if-up.d/openvswitch/oel$OracleRelease-pub-ifup-sx1
+sudo cp -p /etc/network/if-up.d/openvswitch/lxcora00-pub-ifup-sw1     /etc/network/if-up.d/openvswitch/oel$OracleRelease-pub-ifup-sx1
 sudo cp -p /etc/network/if-down.d/openvswitch/lxcora00-pub-ifdown-sw1 /etc/network/if-down.d/openvswitch/oel$OracleRelease-pub-ifdown-sx1
 
-sudo sed -i 's/-sw1/-sx1/g' /var/lib/lxc/oel$OracleRelease/config
+sudo sed -i 's/sw1/sx1/g'   		/etc/network/if-up.d/openvswitch/oel$OracleRelease-pub-ifup-sx1
+sudo sed -i 's/tag=10/tag=11/g'     	/etc/network/if-up.d/openvswitch/oel$OracleRelease-pub-ifup-sx1
+sudo sed -i 's/sw1/sx1/g'   		/etc/network/if-down.d/openvswitch/oel$OracleRelease-pub-ifdown-sx1
 
 sudo ls -l /etc/network/if-up.d/openvswitch/oel$OracleRelease*
 sudo ls -l /etc/network/if-down.d/openvswitch/oel$OracleRelease*
@@ -282,7 +286,8 @@ echo "Initialize LXC Seed Container on OpenvSwitch.."
 echo "=============================================="
 
 cd /etc/network/if-up.d/openvswitch
-sudo sed -i "s/ContainerName/oel$OracleRelease/g" /var/lib/lxc/oel$OracleRelease/config
+
+sudo sed -i "s/ContainerName/oel$OracleRelease/g"  /var/lib/lxc/oel$OracleRelease/config
 
 function CheckContainerUp {
 sudo lxc-ls -f | grep oel$OracleRelease | sed 's/  */ /g' | egrep 'RUNNING|STOPPED'  | cut -f2 -d' '

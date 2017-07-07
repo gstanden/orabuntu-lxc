@@ -472,15 +472,12 @@ echo "Create Ubuntu LXC DNS DHCP container...       "
 echo "=============================================="
 echo ''
 
-if [ $UbuntuVersion = '16.04' ]
-then
-sudo lxc-create -t download -n nsa -- -d ubuntu -r xenial -a amd64
-fi
+# GLS 20170707 Try both methods.
+# GLS 20170707 Second method will just say 'nsa already exists' if first method succeeds.
 
-if [ $UbuntuVersion = '17.04' ]
-then
+sudo lxc-create -t download -n nsa -- -d ubuntu -r xenial -a amd64
+echo ''
 sudo lxc-create -n nsa -t ubuntu
-fi
 
 echo ''
 echo "=============================================="
@@ -1218,6 +1215,7 @@ then
 	sudo cp lxcora00-priv3-ifup-sw6 oel$OracleRelease-priv3-ifup-sw6 
 	sudo cp lxcora00-priv4-ifup-sw7 oel$OracleRelease-priv4-ifup-sw7
 	sudo cp lxcora00-pub-ifup-sw1   oel$OracleRelease-pub-ifup-sw1
+	sudo cp lxcora00-pub-ifup-sw1   oel$OracleRelease-pub-ifup-sx1
 
 	cd /etc/network/if-down.d/openvswitch
 
@@ -1228,7 +1226,8 @@ then
 	sudo cp lxcora00-priv3-ifdown-sw6 oel$OracleRelease-priv3-ifdown-sw6
 	sudo cp lxcora00-priv4-ifdown-sw7 oel$OracleRelease-priv4-ifdown-sw7
 	sudo cp lxcora00-pub-ifdown-sw1   oel$OracleRelease-pub-ifdown-sw1
-
+	sudo cp lxcora00-pub-ifdown-sw1   oel$OracleRelease-pub-ifdown-sx1
+	
 	sudo useradd -u 1098 grid 		>/dev/null 2>&1
 	sudo useradd -u 500 oracle 		>/dev/null 2>&1
 	sudo groupadd -g 1100 asmadmin		>/dev/null 2>&1
