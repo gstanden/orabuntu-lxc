@@ -349,17 +349,21 @@ then
 		echo "Starting container $j ..."
 		echo ''
 		sudo lxc-start -n $j > /dev/null 2>&1
+		sleep 10
+		sudo lxc-stop -n $j > /dev/null 2>&1
+		sleep 10
+		sudo lxc-start -n $j > /dev/null 2>&1
 		i=1
 		while [ "$PublicIPIterative" != 10207 ] && [ "$i" -le 10 ]
 		do
 			echo "Waiting for $j Public IP to come up..."
 			echo ''
-			sleep 12
+			sleep 20
 			PublicIPIterative=$(CheckPublicIPIterative)
-			if [ $i -eq 5 ]
+			if [ $i -eq 2 ]
 			then
 			sudo lxc-stop -n $j > /dev/null 2>&1
-			sudo /etc/network/openvswitch/veth_cleanups.sh oel$OracleRelease
+			sudo /etc/network/openvswitch/veth_cleanups.sh oel$OracleRelease >/dev/null 2>&1
 			echo ''
 			sudo lxc-start -n $j > /dev/null 2>&1
 			fi

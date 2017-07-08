@@ -207,7 +207,10 @@ do
 #	sudo sed -i "s/\.40/\.$OracleRelease/g" /var/lib/lxc/oel$OracleRelease/config
 	fi
 	sudo lxc-start -n $j > /dev/null 2>&1
-	sleep 5
+	sleep 10
+	sudo lxc-stop -n $j > /dev/null 2>&1
+	sleep 10
+	sudo lxc-start -n $j >/dev/null 2>&1
 	i=1
 	while [ "$PublicIPIterative" != 10207 ] && [ "$i" -le 10 ]
 	do
@@ -219,7 +222,7 @@ do
 			sudo lxc-stop -n $j
 			sleep 2
 			echo ''
-			sudo /etc/network/openvswitch/veth_cleanups.sh $j
+			sudo /etc/network/openvswitch/veth_cleanups.sh $j > /dev/null 2>&1
 			echo ''
 			sleep 2
 			sudo lxc-start -n $j
@@ -299,7 +302,7 @@ echo "(optional) e.g. for a DB e.g. Oracle RAC      "
 echo "The scst-files.tar is in the 'archives' subdir"
 echo "of this distribution:                         "
 echo "                                              "
-echo "tar -xvf .orabuntu/archives/scst-files.tar    "
+echo "tar -xvf ./orabuntu/archives/scst-files.tar   "
 echo "                                              "
 echo "cd ./orabuntu/archives/scst-files             "
 echo "cat README                                    "
