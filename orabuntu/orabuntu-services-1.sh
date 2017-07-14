@@ -76,6 +76,10 @@ echo $LinuxFlavors | sed 's/^[ \t]//;s/[ \t]$//'
 }
 LinuxFlavor=$(TrimLinuxFlavors)
 
+sleep 5
+
+clear
+
 echo ''
 echo "=============================================="
 echo "Linux Flavor.                                 "
