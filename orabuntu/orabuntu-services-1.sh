@@ -322,7 +322,16 @@ echo "Ubuntu Package Installation...                "
 echo "=============================================="
 echo ''
 
-# apt-cache policy bind9 | grep Installed | cut -f1 -d':' | sed 's/^[ \t]*//;s/[ \t]*$//'
+function CheckAptGetRunning {
+	ps -ef | grep apt-get | sed 's/  */ /g' | wc -l
+}
+AptGetRunning=$(CheckAptGetRunning)
+
+if [ $AptGetRunning -gt 1 ]
+then
+	echo "Another apt-get process is already running...please kill it and rerun anylinux-services.sh"
+	exit
+fi
 
 sudo apt-get install -y lxc
 
@@ -492,12 +501,16 @@ echo ''
 echo "=============================================="
 echo "Installing DNS DHCP in LXC container...       "
 echo "=============================================="
-
 echo ''
 sudo sed -i '0,/.*nameserver.*/s/.*nameserver.*/nameserver 8.8.8.8\n&/' /var/lib/lxc/nsa/rootfs/etc/resolv.conf
 sudo lxc-start -n nsa
 echo ''
 
+sleep 5
+
+clear
+
+echo ''
 echo "=============================================="
 echo "Testing lxc-attach for ubuntu user...         "
 echo "=============================================="
@@ -572,6 +585,7 @@ echo ''
 sudo lxc-stop -n nsa
 sudo lxc-ls -f
 
+echo ''
 echo "=============================================="
 echo "DNS DHCP LXC container stopped.               "
 echo "=============================================="
@@ -692,8 +706,13 @@ sudo sh -c "echo 'net.core.rmem_default = 262144'            >> /etc/sysctl.d/60
 sudo sh -c "echo 'net.core.rmem_max = 4194304'               >> /etc/sysctl.d/60-oracle.conf"
 sudo sh -c "echo 'net.core.wmem_default = 262144'            >> /etc/sysctl.d/60-oracle.conf"
 sudo sh -c "echo 'net.core.wmem_max = 1048576'               >> /etc/sysctl.d/60-oracle.conf"
-sudo sh -c "echo 'vm.nr_hugepages = 3500'                    >> /etc/sysctl.d/60-oracle.conf"
 sudo sh -c "echo 'kernel.panic_on_oops = 1'                  >> /etc/sysctl.d/60-oracle.conf"
+echo ''
+
+sleep 5
+
+clear
+
 echo ''
 echo "=============================================="
 echo "Display /etc/sysctl.d/60-oracle.conf"
@@ -733,7 +752,6 @@ sudo sh -c "echo '[Install]'                                			>> /etc/systemd/s
 sudo sh -c "echo 'WantedBy=multi-user.target'               			>> /etc/systemd/system/60-oracle.service"
 
 sudo chmod 644 /etc/systemd/system/60-oracle.service
-echo ''
 sudo systemctl enable 60-oracle
 echo ''
 fi
@@ -808,6 +826,8 @@ echo "Starting OpenvSwitch sw1 ...                  "
 echo "=============================================="
 
 sudo chmod 755 /etc/network/openvswitch/crt_ovs_sw1.sh
+sudo sed -i "s/orabuntu-lxc\.com/$Domain1/g" 		/etc/network/openvswitch/crt_ovs_sw1.sh
+sudo sed -i "s/consultingcommandos\.us/$Domain2/g" 	/etc/network/openvswitch/crt_ovs_sw1.sh
 sudo /etc/network/openvswitch/crt_ovs_sw1.sh >/dev/null 2>&1
 echo ''
 sleep 3
@@ -1018,11 +1038,6 @@ then
 	sudo mv /var/lib/lxc/$NameServer/rootfs/var/lib/bind/rev.consultingcommandos.us /var/lib/lxc/$NameServer/rootfs/var/lib/bind/rev.$Domain2
 fi
 
-echo ''
-echo "=============================================="
-echo "Customize nameserver & domains completed.     "
-echo "=============================================="
-
 sleep 5
 
 clear
@@ -1082,6 +1097,10 @@ then
                 	sudo sh -c "echo ''							>> /etc/systemd/system/$k.service"
                 	sudo sh -c "echo '[Install]'						>> /etc/systemd/system/$k.service"
                 	sudo sh -c "echo 'WantedBy=multi-user.target'				>> /etc/systemd/system/$k.service"
+
+			sleep 5
+
+			clear
 		
 			echo ''
 			echo "=============================================="
@@ -1115,14 +1134,14 @@ then
 			clear
         	fi
 
-		echo ''
-		echo "=============================================="
-		echo "Installed OpenvSwitch $k.                     "
-		echo "=============================================="
+#		echo ''
+#		echo "=============================================="
+#		echo "Installed OpenvSwitch $k.                     "
+#		echo "=============================================="
 
-		sleep 5
+# 		sleep 5
 
-		clear
+# 		clear
 	done
 fi
 

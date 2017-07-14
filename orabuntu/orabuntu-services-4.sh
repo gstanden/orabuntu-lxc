@@ -290,14 +290,6 @@ sleep 5
 
 clear
 
-echo "=============================================="
-echo "LXC and MAC address setups completed.         "
-echo "=============================================="
-
-sleep 5
-
-clear
-
 echo ''
 echo "=============================================="
 echo "Creating OpenvSwitch files ...                "

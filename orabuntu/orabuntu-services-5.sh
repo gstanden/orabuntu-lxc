@@ -37,10 +37,6 @@ echo ''
 echo "=============================================="
 echo "This script is re-runnable.                   "
 echo "=============================================="
-echo ''
-echo "=============================================="
-echo "This script starts lxc clones                 "
-echo "=============================================="
 
 sleep 5
 
@@ -48,6 +44,7 @@ clear
 
 ## New Start
 
+echo ''
 echo "=============================================="
 echo "This script starts lxc clones                 "
 echo "=============================================="
@@ -83,15 +80,6 @@ do
         fi
 done
 
-echo ''
-echo "=============================================="
-echo "OpenvSwitch Priv/ASM Onboot Services Created. "
-echo "=============================================="
-
-sleep 5
-
-clear
-
 for k in $SwitchList
 do
 	echo ''
@@ -114,6 +102,10 @@ do
 
 	clear
 done
+
+sleep 5
+
+clear
 
 echo ''
 echo "=============================================="
