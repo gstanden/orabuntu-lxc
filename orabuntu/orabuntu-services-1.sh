@@ -92,6 +92,10 @@ echo "Linux Flavor.                                 "
 echo "=============================================="
 echo ''
 
+sleep 5
+
+clear
+
 if [ -f /etc/orabuntu-lxc-release ]
 then
 	echo ''
