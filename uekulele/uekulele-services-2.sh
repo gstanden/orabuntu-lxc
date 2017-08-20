@@ -128,13 +128,15 @@ sleep 5
 
 clear
 
+### new start ###
+
 echo ''
 echo "=============================================="
 echo "Begin LXC container MAC address reset...      "
 echo "=============================================="
 echo ''
 
-sudo cp /var/lib/lxc/oel$OracleRelease/config /var/lib/lxc/oel$OracleRelease/config.original.bak
+sudo cp -p /var/lib/lxc/oel$OracleRelease/config /var/lib/lxc/oel$OracleRelease/config.original.bak
 
 function GetOriginalHwaddr {
 sudo cat /var/lib/lxc/oel$OracleRelease/config | grep hwaddr | tail -1 | sed 's/\./\\\./g'
@@ -142,10 +144,25 @@ sudo cat /var/lib/lxc/oel$OracleRelease/config | grep hwaddr | tail -1 | sed 's/
 OriginalHwaddr=$(GetOriginalHwaddr)
 echo $OriginalHwaddr | sed 's/\\//g'
 
-sudo cp -p /var/lib/lxc/oel$OracleRelease/config.oracle.bak.oel$MajorRelease /var/lib/lxc/oel$OracleRelease/config.oracle
+sudo cp -p /var/lib/lxc/oel$OracleRelease/config.oracle.bak.oel$MajorRelease       /var/lib/lxc/oel$OracleRelease/config.oracle
+sudo sed -i "s/lxc\.network\.hwaddr.*/$OriginalHwaddr/"                            /var/lib/lxc/oel$OracleRelease/config.oracle
 
-sudo sed -i "s/lxc\.network\.hwaddr.*/$OriginalHwaddr/" /var/lib/lxc/oel$OracleRelease/config.oracle
-sudo cp -p /var/lib/lxc/oel$OracleRelease/config.oracle /var/lib/lxc/oel$OracleRelease/config
+#####################################################
+# GLS 20170707 Set workarounds for lxc 2.0.8+
+# GLS 20170820 'lxc.console = none' and 'lxc.pts = 0' were causing error: 'PTY allocation request failed on channel 0' when ssh'g to container
+# GLS 20170820 Found through trial and error that only 'lxc.tty = 0' is needed to ensure startup of containers.
+# GLS 20170707 See https://github.com/lxc/lxc/issues/1552 for more information
+# GLS 20170820 DO NOT comment the following 3 commands out it can cause big problems with allocating a terminal session both in the containers and the LXC host!
+
+  sudo sh -c "echo 'lxc.console = none'                                         >> /var/lib/lxc/oel$OracleRelease/config.oracle"
+  sudo sh -c "echo 'lxc.tty = 0'                                                >> /var/lib/lxc/oel$OracleRelease/config.oracle"
+  sudo sh -c "echo 'lxc.pts = 0'                                                >> /var/lib/lxc/oel$OracleRelease/config.oracle"
+#####################################################
+
+sudo cp -p /var/lib/lxc/oel$OracleRelease/config.oracle                            /var/lib/lxc/oel$OracleRelease/config
+
+# sudo ls -l /var/lib/lxc/oel$OracleRelease/config.oracle
+# sudo ls -l /var/lib/lxc/oel$OracleRelease/config
 
 echo ''
 echo "These should match..."
@@ -159,6 +176,44 @@ echo ''
 echo "=============================================="
 echo "LXC container MAC address reset complete.     "
 echo "=============================================="
+ 
+### new end ###
+
+### old begin ###
+
+# echo ''
+# echo "=============================================="
+# echo "Begin LXC container MAC address reset...      "
+# echo "=============================================="
+# echo ''
+
+# sudo cp /var/lib/lxc/oel$OracleRelease/config /var/lib/lxc/oel$OracleRelease/config.original.bak
+
+# function GetOriginalHwaddr {
+# sudo cat /var/lib/lxc/oel$OracleRelease/config | grep hwaddr | tail -1 | sed 's/\./\\\./g'
+# }
+# OriginalHwaddr=$(GetOriginalHwaddr)
+# echo $OriginalHwaddr | sed 's/\\//g'
+
+# sudo cp -p /var/lib/lxc/oel$OracleRelease/config.oracle.bak.oel$MajorRelease /var/lib/lxc/oel$OracleRelease/config.oracle
+
+# sudo sed -i "s/lxc\.network\.hwaddr.*/$OriginalHwaddr/" 			/var/lib/lxc/oel$OracleRelease/config.oracle
+# sudo cp -p /var/lib/lxc/oel$OracleRelease/config.oracle 			/var/lib/lxc/oel$OracleRelease/config
+
+# echo ''
+# echo "These should match..."
+# echo ''
+# sudo grep hwaddr /var/lib/lxc/oel$OracleRelease/config.original.bak | tail -1
+# sudo grep hwaddr /var/lib/lxc/oel$OracleRelease/config.oracle
+
+# sudo chmod 644 /var/lib/lxc/oel$OracleRelease/config
+
+# echo ''
+# echo "=============================================="
+# echo "LXC container MAC address reset complete.     "
+# echo "=============================================="
+
+### old end ###
 
 sleep 5
 
