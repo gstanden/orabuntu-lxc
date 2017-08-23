@@ -367,8 +367,8 @@ then
                 	sudo sed -i '/\[main\]/{p;s/.*/1/;H;g;/^\(\n1\)\{1\}$/s//dns=dnsmasq/p;d}' /etc/NetworkManager/NetworkManager.conf
                 	sudo sed -i '/hosts:/s/files/dns files/g' /etc/nsswitch.conf
         	fi
-        	sudo sh -c "echo 'DNS=127.0.1.1'                > /etc/systemd/resolved.conf"
-        	sudo sh -c "echo 'FallbackDNS=127.0.1.1'        > /etc/systemd/resolved.conf"
+        	sudo sh -c "echo 'DNS=127.0.1.1'                >> /etc/systemd/resolved.conf"
+        	sudo sh -c "echo 'FallbackDNS=127.0.1.1'        >> /etc/systemd/resolved.conf"
 	fi
 	### New Code End 2017-08-22 GLS ###
 
