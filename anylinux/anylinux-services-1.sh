@@ -1168,13 +1168,13 @@ then
 					~/Downloads/orabuntu-lxc-master/orabuntu/orabuntu-services-2.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $LinuxOSMemoryReservation
 					~/Downloads/orabuntu-lxc-master/orabuntu/orabuntu-services-3.sh $MajorRelease $PointRelease $Domain1 $Domain2
 					~/Downloads/orabuntu-lxc-master/orabuntu/orabuntu-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer
-					~/Downloads/orabuntu-lxc-master/orabuntu/orabuntu-services-5.sh $MajorRelease $PointRelease
+					~/Downloads/orabuntu-lxc-master/orabuntu/orabuntu-services-5.sh $MajorRelease $PointRelease $Domain1 $Domain2
 				else
 					~/Downloads/orabuntu-lxc-master/orabuntu/orabuntu-services-1.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $LinuxOSMemoryReservation
 					~/Downloads/orabuntu-lxc-master/orabuntu/orabuntu-services-2.sh $MajorRelease $PointRelease $Domain1 $Domain2
 					~/Downloads/orabuntu-lxc-master/orabuntu/orabuntu-services-3.sh $MajorRelease $PointRelease
 					~/Downloads/orabuntu-lxc-master/orabuntu/orabuntu-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer
-					~/Downloads/orabuntu-lxc-master/orabuntu/orabuntu-services-5.sh $MajorRelease $PointRelease
+					~/Downloads/orabuntu-lxc-master/orabuntu/orabuntu-services-5.sh $MajorRelease $PointRelease $Domain1 $Domain2
 				fi
 			fi
 
@@ -1184,7 +1184,7 @@ then
 				~/Downloads/orabuntu-lxc-master/orabuntu/orabuntu-services-2.sh $MajorRelease $PointRelease $Domain1 $Domain2
 				~/Downloads/orabuntu-lxc-master/orabuntu/orabuntu-services-3.sh $MajorRelease $PointRelease
 				~/Downloads/orabuntu-lxc-master/orabuntu/orabuntu-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer
-				~/Downloads/orabuntu-lxc-master/orabuntu/orabuntu-services-5.sh $MajorRelease $PointRelease
+				~/Downloads/orabuntu-lxc-master/orabuntu/orabuntu-services-5.sh $MajorRelease $PointRelease $Domain1 $Domain2
 			fi
 
  			echo ''
@@ -1228,7 +1228,7 @@ then
 					~/Downloads/orabuntu-lxc-master/orabuntu/orabuntu-services-2.sh $MajorRelease $PointRelease $Domain1 $Domain2
 					~/Downloads/orabuntu-lxc-master/orabuntu/orabuntu-services-3.sh $MajorRelease $PointRelease
 					~/Downloads/orabuntu-lxc-master/orabuntu/orabuntu-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer
-					~/Downloads/orabuntu-lxc-master/orabuntu/orabuntu-services-5.sh $MajorRelease $PointRelease 
+					~/Downloads/orabuntu-lxc-master/orabuntu/orabuntu-services-5.sh $MajorRelease $PointRelease $Domain1 $Domain2
 				fi
 			fi
 		
@@ -1238,7 +1238,7 @@ then
 				~/Downloads/orabuntu-lxc-master/orabuntu/orabuntu-services-2.sh $MajorRelease $PointRelease $Domain1 $Domain2
 				~/Downloads/orabuntu-lxc-master/orabuntu/orabuntu-services-3.sh $MajorRelease $PointRelease
 				~/Downloads/orabuntu-lxc-master/orabuntu/orabuntu-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer
-				~/Downloads/orabuntu-lxc-master/orabuntu/orabuntu-services-5.sh $MajorRelease $PointRelease 
+				~/Downloads/orabuntu-lxc-master/orabuntu/orabuntu-services-5.sh $MajorRelease $PointRelease $Domain1 $Domain2
 			fi
 
 			sleep 5
