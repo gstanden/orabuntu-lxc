@@ -28,6 +28,8 @@ OracleRelease=$1$2
 OracleVersion=$1.$2
 OR=$OracleRelease
 Config=/var/lib/lxc/oel$OracleRelease/config
+Domain1=$3
+Domain2=$4
 
 echo ''
 echo "=============================================="
@@ -357,6 +359,8 @@ then
 		cd ~/Downloads/orabuntu-lxc-master/orabuntu/archives
 		sudo tar -P -xvf dns-dhcp-final.tar
 		sudo chmod 775 /etc/network/openvswitch/crt_ovs_sw1.sh
+		sudo sed -i "s/orabuntu-lxc\.com/$Domain1/g"            /etc/network/openvswitch/crt_ovs_sw1.sh
+		sudo sed -i "s/consultingcommandos\.us/$Domain2/g"      /etc/network/openvswitch/crt_ovs_sw1.sh
         	sudo apt-get install dnsmasq
         	function CheckDnsmasqSet {
                		grep 'dns=dnsmasq' /etc/NetworkManager/NetworkManager.conf | wc -l
