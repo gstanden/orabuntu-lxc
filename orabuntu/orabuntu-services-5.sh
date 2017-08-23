@@ -355,6 +355,7 @@ then
 	if [ $UbuntuVersion = '16.10' ] || [ $UbuntuVersion = '17.04' ]
 	then
 		sudo tar -xvf ~/Downloads/orabuntu-lxc-master/orabuntu/archives/dns-dhcp-final.tar
+		sudo chmod 775 /etc/network/openvswitch/crt_ovs_sw1.sh
         	sudo apt-get install dnsmasq
         	function CheckDnsmasqSet {
                		grep 'dns=dnsmasq' /etc/NetworkManager/NetworkManager.conf | wc -l
