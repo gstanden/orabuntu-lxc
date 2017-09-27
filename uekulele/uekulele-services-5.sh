@@ -27,7 +27,12 @@ MajorRelease=$1
 OracleRelease=$1$2
 OracleVersion=$1.$2
 OR=$OracleRelease
-Config=/var/lib/lxc/oel$OracleRelease/config
+Config=/var/lib/lxc/$SeedContainerName/config
+
+function GetSeedContainerName {
+        sudo lxc-ls -f | grep oel$OracleRelease | cut -f1 -d' '
+}
+SeedContainerName=$(GetSeedContainerName)
 
 echo ''
 echo "=============================================="
@@ -46,15 +51,25 @@ sleep 5
 
 clear
 
-echo ''
+
+
+eco "=============================================="
+echo "Create additonal OpenvSwitch networks...      "
 echo "=============================================="
-echo "Create Priv/ASM OpenvSwitch Onboot Services..."
-echo "=============================================="
 echo ''
+
+sleep 5
+
+clear
 
 SwitchList='sw2 sw3 sw4 sw5 sw6 sw7 sw8 sw9'
 for k in $SwitchList
 do
+	echo ''
+	echo "=============================================="
+	echo "Create systemd OpenvSwitch $k service...      "
+	echo "=============================================="
+
         if [ ! -f /etc/systemd/system/$k.service ]
         then
                 sudo sh -c "echo '[Unit]'						 > /etc/systemd/system/$k.service"
@@ -69,20 +84,8 @@ do
                 sudo sh -c "echo ''							>> /etc/systemd/system/$k.service"
                 sudo sh -c "echo '[Install]'						>> /etc/systemd/system/$k.service"
                 sudo sh -c "echo 'WantedBy=multi-user.target'				>> /etc/systemd/system/$k.service"
-        fi
-done
-
-echo ''
-echo "=============================================="
-echo "OpenvSwitch Priv/ASM Onboot Services Created. "
-echo "=============================================="
-
-sleep 5
-
-clear
-
-for k in $SwitchList
-do
+	fi
+	
 	echo ''
 	echo "=============================================="
 	echo "Start OpenvSwitch $k ...            "
@@ -106,7 +109,7 @@ done
 
 echo ''
 echo "=============================================="
-echo "Openvswitch interfaces installed & configured."
+echo "Openvswitch networks installed & configured.  "
 echo "=============================================="
 echo ''
 
@@ -150,8 +153,8 @@ do
 	if [ $? -eq 0 ]
 	then
 	sudo bash -c "cat $Config|grep ipv4|cut -f2 -d'='|sed 's/^[ \t]*//;s/[ \t]*$//'|cut -f4 -d'.'|sed 's/^/\./'|xargs -I '{}' sed -i "/ipv4/s/\{}/\.1$OR/g" $Config"
-#	sudo sed -i "s/\.39/\.$OracleRelease/g" /var/lib/lxc/oel$OracleRelease/config
-#	sudo sed -i "s/\.40/\.$OracleRelease/g" /var/lib/lxc/oel$OracleRelease/config
+#	sudo sed -i "s/\.39/\.$OracleRelease/g" /var/lib/lxc/$SeedContainerName/config
+#	sudo sed -i "s/\.40/\.$OracleRelease/g" /var/lib/lxc/$SeedContainerName/config
 	fi
 	sudo lxc-start -n $j > /dev/null 2>&1
 	sleep 5
@@ -249,6 +252,7 @@ echo ''
 mkdir -p /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/selinux
 touch /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/selinux/selinux-lxc.sh
 ls -l /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/selinux/selinux-lxc.sh
+sudo chmod 775 /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/selinux/selinux-lxc.sh
 echo ''
 cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/selinux
 
@@ -317,38 +321,38 @@ then
 		echo ''
 		sudo sed -i '/\([^T][^Y][^P][^E]\)\|\([^#]\)/ s/enforcing/permissive/' /etc/sysconfig/selinux
 	fi
-	sudo ausearch -c 'lxcattach' --raw | audit2allow -M my-lxcattach
-	sudo semodule -i my-lxcattach.pp
-	sudo ausearch -c 'dhclient' --raw | audit2allow -M my-dhclient
-	sudo semodule -i my-dhclient.pp
-	sudo ausearch -c 'passwd' --raw | audit2allow -M my-passwd
-	sudo semodule -i my-passwd.pp
-	sudo ausearch -c 'sedispatch' --raw | audit2allow -M my-sedispatch
-	sudo semodule -i my-sedispatch.pp
-	sudo ausearch -c 'systemd-sysctl' --raw | audit2allow -M my-systemdsysctl
-	sudo semodule -i my-systemdsysctl.pp
-	sudo ausearch -c 'ovs-vsctl' --raw | audit2allow -M my-ovsvsctl
-	sudo semodule -i my-ovsvsctl.pp
-	sudo ausearch -c 'sshd' --raw | audit2allow -M my-sshd
-	sudo semodule -i my-sshd.pp
-	sudo ausearch -c 'gdm-session-wor' --raw | audit2allow -M my-gdmsessionwor
-	sudo semodule -i my-gdmsessionwor.pp
-	sudo ausearch -c 'pickup' --raw | audit2allow -M my-pickup
-	sudo semodule -i my-pickup.pp
-	sudo ausearch -c 'sedispatch' --raw | audit2allow -M my-sedispatch
-	sudo semodule -i my-sedispatch.pp
-	sudo ausearch -c 'iscsid' --raw | audit2allow -M my-iscsid
-	sudo semodule -i my-iscsid.pp
-	sudo ausearch -c 'dhclient' --raw | audit2allow -M my-dhclient
-	sudo semodule -i my-dhclient.pp
-	sudo ausearch -c 'ovs-vsctl' --raw | audit2allow -M my-ovsvsctl
-	sudo semodule -i my-ovsvsctl.pp
-	sudo ausearch -c 'chpasswd' --raw | audit2allow -M my-chpasswd
-	sudo semodule -i my-chpasswd.pp
-	sudo ausearch -c 'colord' --raw | audit2allow -M my-colord
-	sudo semodule -i my-colord.pp
-	sudo ausearch -c 'ntpd' --raw | audit2allow -M my-ntpd
-	sudo semodule -i my-ntpd.pp
+	sudo ausearch -c 'lxcattach' --raw | audit2allow -M my-lxcattach > /dev/null 2>&1
+	sudo semodule -i my-lxcattach.pp > /dev/null 2>&1
+	sudo ausearch -c 'dhclient' --raw | audit2allow -M my-dhclient > /dev/null 2>&1
+	sudo semodule -i my-dhclient.pp > /dev/null 2>&1
+	sudo ausearch -c 'passwd' --raw | audit2allow -M my-passwd > /dev/null 2>&1
+	sudo semodule -i my-passwd.pp > /dev/null 2>&1
+	sudo ausearch -c 'sedispatch' --raw | audit2allow -M my-sedispatch > /dev/null 2>&1
+	sudo semodule -i my-sedispatch.pp > /dev/null 2>&1
+	sudo ausearch -c 'systemd-sysctl' --raw | audit2allow -M my-systemdsysctl > /dev/null 2>&1
+	sudo semodule -i my-systemdsysctl.pp > /dev/null 2>&1
+	sudo ausearch -c 'ovs-vsctl' --raw | audit2allow -M my-ovsvsctl > /dev/null 2>&1
+	sudo semodule -i my-ovsvsctl.pp > /dev/null 2>&1
+	sudo ausearch -c 'sshd' --raw | audit2allow -M my-sshd > /dev/null 2>&1
+	sudo semodule -i my-sshd.pp > /dev/null 2>&1
+	sudo ausearch -c 'gdm-session-wor' --raw | audit2allow -M my-gdmsessionwor > /dev/null 2>&1
+	sudo semodule -i my-gdmsessionwor.pp > /dev/null 2>&1
+	sudo ausearch -c 'pickup' --raw | audit2allow -M my-pickup > /dev/null 2>&1
+	sudo semodule -i my-pickup.pp > /dev/null 2>&1
+	sudo ausearch -c 'sedispatch' --raw | audit2allow -M my-sedispatch > /dev/null 2>&1
+	sudo semodule -i my-sedispatch.pp > /dev/null 2>&1
+	sudo ausearch -c 'iscsid' --raw | audit2allow -M my-iscsid > /dev/null 2>&1
+	sudo semodule -i my-iscsid.pp > /dev/null 2>&1
+	sudo ausearch -c 'dhclient' --raw | audit2allow -M my-dhclient > /dev/null 2>&1
+	sudo semodule -i my-dhclient.pp > /dev/null 2>&1
+	sudo ausearch -c 'ovs-vsctl' --raw | audit2allow -M my-ovsvsctl > /dev/null 2>&1
+	sudo semodule -i my-ovsvsctl.pp > /dev/null 2>&1
+	sudo ausearch -c 'chpasswd' --raw | audit2allow -M my-chpasswd > /dev/null 2>&1
+	sudo semodule -i my-chpasswd.pp > /dev/null 2>&1
+	sudo ausearch -c 'colord' --raw | audit2allow -M my-colord > /dev/null 2>&1
+	sudo semodule -i my-colord.pp > /dev/null 2>&1
+	sudo ausearch -c 'ntpd' --raw | audit2allow -M my-ntpd > /dev/null 2>&1
+	sudo semodule -i my-ntpd.pp > /dev/null 2>&1
 else
 	sudo setenforce 0
 	echo ''
@@ -363,10 +367,10 @@ else
 		echo ''
 		sudo sed -i '/\([^T][^Y][^P][^E]\)\|\([^#]\)/ s/enforcing/permissive/' /etc/sysconfig/selinux
 	fi
-	sudo ausearch -c 'passwd' --raw | audit2allow -M my-passwd
-	sudo semodule -i my-passwd.pp
-	sudo ausearch -c 'chpasswd' --raw | audit2allow -M my-chpasswd
-	sudo semodule -i my-chpasswd.pp
+	sudo ausearch -c 'passwd' --raw | audit2allow -M my-passwd > /dev/null 2>&1
+	sudo semodule -i my-passwd.pp > /dev/null 2>&1
+	sudo ausearch -c 'chpasswd' --raw | audit2allow -M my-chpasswd > /dev/null 2>&1
+	sudo semodule -i my-chpasswd.pp > /dev/null 2>&1
 fi
 
 echo ''
@@ -384,8 +388,11 @@ echo "Create /etc/orabuntu-lxc-release file...          "
 echo "=============================================="
 echo ''
 
-sudo touch /etc/orabuntu-lxc-release
-sudo sh -c "echo 'Orabuntu-LXC v4.0' > /etc/orabuntu-lxc-release"
+if [ ! -f /etc/orabuntu-lxc-release ]
+then
+	sudo touch /etc/orabuntu-lxc-release
+	sudo sh -c "echo 'Orabuntu-LXC v4.0' > /etc/orabuntu-lxc-release"
+fi
 sudo ls -l /etc/orabuntu-lxc-release
 
 echo ''
@@ -413,3 +420,29 @@ echo "where you can learn more about what files and "
 echo "configurations are used for the Orabuntu-LXC  "
 echo "project.                                      "
 echo "=============================================="
+
+sleep 5 
+
+clear
+
+echo ''
+echo "=============================================="
+echo " A reboot is recommended (but not required!)  "
+echo "=============================================="
+
+echo ''
+echo "=============================================="
+echo "                                              "
+read -e -p "Reboot Now ? [Y/N]                      " -i "Y" Reboot
+echo "                                              "
+echo "=============================================="
+echo ''
+
+if [ $Reboot = 'y' ] || [ $Reboot = 'Y' ]
+then
+	sudo reboot
+fi
+
+sleep 5
+
+clear

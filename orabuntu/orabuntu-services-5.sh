@@ -27,9 +27,17 @@ MajorRelease=$1
 OracleRelease=$1$2
 OracleVersion=$1.$2
 OR=$OracleRelease
-Config=/var/lib/lxc/oel$OracleRelease/config
-Domain1=$3
-Domain2=$4
+Config=/var/lib/lxc/$SeedContainerName/config
+
+function GetSeedContainerName {
+        sudo lxc-ls -f | grep oel$OracleRelease | cut -f1 -d' '
+}
+SeedContainerName=$(GetSeedContainerName)
+
+function CheckSystemdResolvedInstalled {
+	sudo netstat -ulnp | grep 53 | sed 's/  */ /g' | rev | cut -f1 -d'/' | rev | sort -u | grep systemd- | wc -l
+}
+SystemdResolvedInstalled=$(CheckSystemdResolvedInstalled)
 
 echo ''
 echo "=============================================="
@@ -39,13 +47,6 @@ echo ''
 echo "=============================================="
 echo "This script is re-runnable.                   "
 echo "=============================================="
-
-sleep 5
-
-clear
-
-## New Start
-
 echo ''
 echo "=============================================="
 echo "This script starts lxc clones                 "
@@ -57,13 +58,22 @@ clear
 
 echo ''
 echo "=============================================="
-echo "Create Priv/ASM OpenvSwitch Onboot Services..."
+echo "Create additonal OpenvSwitch networks...      "
 echo "=============================================="
 echo ''
+
+sleep 5
+
+clear
 
 SwitchList='sw2 sw3 sw4 sw5 sw6 sw7 sw8 sw9'
 for k in $SwitchList
 do
+	echo ''
+	echo "=============================================="
+	echo "Create systemd OpenvSwitch $k service...      "
+	echo "=============================================="
+
         if [ ! -f /etc/systemd/system/$k.service ]
         then
                 sudo sh -c "echo '[Unit]'						 > /etc/systemd/system/$k.service"
@@ -75,15 +85,11 @@ do
                 sudo sh -c "echo 'User=root'						>> /etc/systemd/system/$k.service"
                 sudo sh -c "echo 'RemainAfterExit=yes'					>> /etc/systemd/system/$k.service"
                 sudo sh -c "echo 'ExecStart=/etc/network/openvswitch/crt_ovs_$k.sh' 	>> /etc/systemd/system/$k.service"
-                sudo sh -c "echo 'ExecStop=/usr/bin/ovs-vsctl del-br $k' 		>> /etc/systemd/system/$k.service"
                 sudo sh -c "echo ''							>> /etc/systemd/system/$k.service"
                 sudo sh -c "echo '[Install]'						>> /etc/systemd/system/$k.service"
                 sudo sh -c "echo 'WantedBy=multi-user.target'				>> /etc/systemd/system/$k.service"
-        fi
-done
-
-for k in $SwitchList
-do
+	fi
+	
 	echo ''
 	echo "=============================================="
 	echo "Start OpenvSwitch $k ...            "
@@ -105,55 +111,13 @@ do
 	clear
 done
 
-sleep 5
-
-clear
-
 echo ''
 echo "=============================================="
-echo "Openvswitch interfaces installed & configured."
+echo "Openvswitch networks installed & configured.  "
 echo "=============================================="
 echo ''
 
 sleep 5
-
-clear
-
-echo ''
-echo "=============================================="
-echo "Starting LXC cloned containers for Oracle...  "
-echo "=============================================="
-
-
-## New End
-
-# echo ''
-# echo "=============================================="
-# echo "Make sure all openvswitch interfaces are up   "
-# echo "=============================================="
-# echo ''
-
-# sudo /etc/network/openvswitch/crt_ovs_sw2.sh >/dev/null 2>&1
-# sudo /etc/network/openvswitch/crt_ovs_sw3.sh >/dev/null 2>&1
-# sudo /etc/network/openvswitch/crt_ovs_sw4.sh >/dev/null 2>&1
-# sudo /etc/network/openvswitch/crt_ovs_sw5.sh >/dev/null 2>&1
-# sudo /etc/network/openvswitch/crt_ovs_sw6.sh >/dev/null 2>&1
-# sudo /etc/network/openvswitch/crt_ovs_sw7.sh >/dev/null 2>&1
-# sudo /etc/network/openvswitch/crt_ovs_sw6.sh >/dev/null 2>&1
-# sudo /etc/network/openvswitch/crt_ovs_sw8.sh >/dev/null 2>&1
-# sudo /etc/network/openvswitch/crt_ovs_sw9.sh >/dev/null 2>&1
-
-# ifconfig | grep -v 'ns' | egrep -A1 'sw|sx'
-
-# sleep 5
-
-echo ''
-echo "=============================================="
-echo "Openvswitch interfaces are up.                "
-echo "=============================================="
-echo ''
-
-sleep 5 
 
 clear
 
@@ -171,40 +135,33 @@ for j in $ClonedContainersExist
 do
 	# GLS 20160707 updated to use lxc-copy instead of lxc-clone for Ubuntu 16.04
 	# GLS 20160707 continues to use lxc-clone for Ubuntu 15.04 and 15.10
+
+	sudo /etc/network/openvswitch/veth_cleanups.sh $j > /dev/null 2>&1
+
 	function GetUbuntuVersion {
-	cat /etc/lsb-release | grep DISTRIB_RELEASE | cut -f2 -d'='
+		cat /etc/lsb-release | grep DISTRIB_RELEASE | cut -f2 -d'='
 	}
 	UbuntuVersion=$(GetUbuntuVersion)
-	# GLS 20160707
 
 	echo ''
 	echo "Starting container $j ..."
 	echo ''
-	if [ $UbuntuVersion = '15.04' ] || [ $UbuntuVersion = '15.10' ]
+	if [ $UbuntuVersion = '16.04' ] || [ $UbuntuVersion = '16.10' ] || [ $UbuntuVersion = '17.04' ] || [ $UbuntuVersion = '17.10' ]
 	then
-	function CheckPublicIPIterative {
-	sudo lxc-ls -f | sed 's/  */ /g' | grep $j | grep RUNNING | cut -f3 -d' ' | sed 's/,//' | cut -f1-2 -d'.' | sed 's/\.//g'
-	}
-	fi
-	if [ $UbuntuVersion = '16.04' ] || [ $UbuntuVersion = '17.04' ]
-	then
-	function CheckPublicIPIterative {
-	sudo lxc-ls -f | sed 's/  */ /g' | grep $j | grep RUNNING | cut -f5 -d' ' | sed 's/,//' | cut -f1-2 -d'.' | sed 's/\.//g'
-	}
-	fi
-	PublicIPIterative=$(CheckPublicIPIterative)
-	echo $j | grep oel > /dev/null
-	if [ $? -eq 0 ]
-	then
-	sudo bash -c "cat $Config|grep ipv4|cut -f2 -d'='|sed 's/^[ \t]*//;s/[ \t]*$//'|cut -f4 -d'.'|sed 's/^/\./'|xargs -I '{}' sed -i "/ipv4/s/\{}/\.1$OR/g" $Config"
-#	sudo sed -i "s/\.39/\.$OracleRelease/g" /var/lib/lxc/oel$OracleRelease/config
-#	sudo sed -i "s/\.40/\.$OracleRelease/g" /var/lib/lxc/oel$OracleRelease/config
+		function CheckPublicIPIterative {
+		sudo lxc-ls -f | sed 's/  */ /g' | grep $j | grep RUNNING | cut -f2 -d'-' | sed 's/^[ \t]*//;s/[ \t]*$//' | cut -f1 -d' ' | cut -f1-2 -d'.' | sed 's/\.//g'
+		}
+		fi
+		PublicIPIterative=$(CheckPublicIPIterative)
+		echo $j | grep oel > /dev/null 2>&1
+		if [ $? -eq 0 ]
+		then
+		sudo bash -c "cat $Config|grep ipv4|cut -f2 -d'='|sed 's/^[ \t]*//;s/[ \t]*$//'|cut -f4 -d'.'|sed 's/^/\./'|xargs -I '{}' sed -i "/ipv4/s/\{}/\.1$OR/g" $Config"
+#		sudo sed -i "s/\.39/\.$OracleRelease/g" /var/lib/lxc/$SeedContainerName/config
+#		sudo sed -i "s/\.40/\.$OracleRelease/g" /var/lib/lxc/$SeedContainerName/config
 	fi
 	sudo lxc-start -n $j > /dev/null 2>&1
-	sleep 10
-	sudo lxc-stop -n $j > /dev/null 2>&1
-	sleep 10
-	sudo lxc-start -n $j >/dev/null 2>&1
+	sleep 5
 	i=1
 	while [ "$PublicIPIterative" != 10207 ] && [ "$i" -le 10 ]
 	do
@@ -216,10 +173,11 @@ do
 			sudo lxc-stop -n $j
 			sleep 2
 			echo ''
-			sudo /etc/network/openvswitch/veth_cleanups.sh $j > /dev/null 2>&1
+			sudo /etc/network/openvswitch/veth_cleanups.sh $j
 			echo ''
 			sleep 2
 			sudo lxc-start -n $j
+			sleep 5
 			if [ $MajorRelease -eq 6 ] || [ $MajorRelease -eq 5 ]
 			then
 				sudo lxc-attach -n $j -- ntpd -x
@@ -258,32 +216,32 @@ clear
 echo ''
 echo "=============================================="
 echo "Management links directory creation...        "
-echo "Location is:  ~/Manage-Orabuntu-LXC           "
+echo "Location is:  /home/ubuntu/Manage-Orabuntu    "
 echo "Step creates pointers to relevant files for   "
 echo "quickly locating Orabuntu-LXC config files.   "
 echo "=============================================="
 echo ''
 
-sleep 10
+sleep 5
 
-if [ ! -e ~/Manage-Orabuntu ]
+if [ ! -e /home/ubuntu/Manage-Orabuntu ]
 then
-mkdir ~/Manage-Orabuntu
+mkdir /home/ubuntu/Manage-Orabuntu
 fi
 
-cd ~/Manage-Orabuntu
+cd /home/ubuntu/Manage-Orabuntu
 sudo chmod 755 /etc/orabuntu-lxc-scripts/crt_links.sh 
 sudo /etc/orabuntu-lxc-scripts/crt_links.sh
 
 echo ''
-ls -l ~/Manage-Orabuntu
+sudo ls -l /home/ubuntu/Manage-Orabuntu
 echo ''
-cd ~/Manage-Orabuntu
 
 echo ''
 echo "=============================================="
 echo "Management links directory created.           "
 echo "=============================================="
+echo ''
 
 sleep 10
 
@@ -291,177 +249,69 @@ clear
 
 echo ''
 echo "=============================================="
-echo "Next step would be to setup some block storage"
-echo "(optional) e.g. for a DB e.g. Oracle RAC      "
-echo "The scst-files.tar is in the 'archives' subdir"
-echo "of this distribution:                         "
-echo "                                              "
-echo "tar -xvf ./orabuntu/archives/scst-files.tar   "
-echo "                                              "
-echo "cd ./orabuntu/archives/scst-files             "
-echo "cat README                                    "
-echo "follow the instructions in the README         "
-echo "Builds the SCST Linux SAN.                    "
+echo "Create /etc/orabuntu-lxc-release file...          "
+echo "=============================================="
+echo ''
+
+if [ ! -f /etc/orabuntu-lxc-release ]
+then
+	sudo touch /etc/orabuntu-lxc-release
+	sudo sh -c "echo 'Orabuntu-LXC v4.0' > /etc/orabuntu-lxc-release"
+fi
+sudo ls -l /etc/orabuntu-lxc-release
+
+echo ''
+echo "=============================================="
+echo "Create /etc/orabuntu-lxc-release file complete.   "
 echo "=============================================="
 
-sleep 10
+sleep 5
 
 clear
 
-function CheckRebootNeeded {
-facter virtual
-}
-RebootNeeded=$(CheckRebootNeeded)
+echo ''
+echo "=============================================="
+echo "Next step is to setup storage e.g. for a DB   "
+echo "That step is optional and is done as follows: "
+echo "tar -xvf scst-files.tar                       "
+echo "cd scst-files                                 "
+echo "cat README                                    "
+echo "follow the instructions in the README         "
+echo "Builds the SCST Linux SAN.                    "
+echo "                                              "
+echo "Note that deployment management links are     "
+echo "in /home/ubuntu/Manage-Orabuntu               "
+echo "where you can learn more about what files and "
+echo "configurations are used for the Orabuntu-LXC  "
+echo "project.                                      "
+echo "=============================================="
 
-if [ $RebootNeeded != 'physical' ] && [ ! -f /etc/orabuntu-lxc-release ] 
+sleep 5 
+
+clear
+
+echo ''
+echo "=============================================="
+echo " A reboot is recommended (but not required!)  "
+echo "=============================================="
+
+echo ''
+echo "=============================================="
+echo "                                              "
+read -e -p "Reboot Now ? [Y/N]                      " -i "Y" Reboot
+echo "                                              "
+echo "=============================================="
+echo ''
+
+sleep 5
+
+if [ $SystemdResolvedInstalled -eq 1 ]
 then
-	echo ''
-	echo "=============================================="
-	echo "Create /etc/orabuntu-lxc-release file...          "
-	echo "=============================================="
-	echo ''
+	sudo service systemd-resolved restart
+fi
 
-	sudo touch /etc/orabuntu-lxc-release
-	sudo sh -c "echo 'Orabuntu-LXC v4.4' > /etc/orabuntu-lxc-release"
-	sudo ls -l /etc/orabuntu-lxc-release
-	echo ''
-	sudo cat /etc/orabuntu-lxc-release
-
-	echo ''
-	echo "=============================================="
-	echo "Create /etc/orabuntu-lxc-release file complete.   "
-	echo "=============================================="
-
-	sleep 5
-
-	clear
-
-	echo ''
-	echo "=============================================="
-	echo " Facter detects that this server is virtual.  "
-	echo " A reboot now is recommended so that DNS      " 
-	echo " for Orabuntu-LXC networks  will switch to    "
-	echo " /etc/NetworkManager/dnsmasq.d/local          " 
-	echo "=============================================="
-	echo ''
-	echo "=============================================="
-	echo "Display /etc/NetworkManager/dnsmasq.d/local   "
-	echo "=============================================="
-	echo ''
-
-	sudo cat /etc/NetworkManager/dnsmasq.d/local
-	echo ''
-	### New Code Begin 2017-08-22 GLS ###
-	# 2017-08-22 GLS Adds back dnsmasq so that /etc/NetworkManager/dnsmasq.d/local file is used for LXC container network resolution.
-
-	if [ $UbuntuVersion = '16.10' ] || [ $UbuntuVersion = '17.04' ]
-	then
-		cd ~/Downloads/orabuntu-lxc-master/orabuntu/archives
-		sudo tar -P -xvf dns-dhcp-final.tar
-		sudo chmod 775 /etc/network/openvswitch/crt_ovs_sw1.sh
-		sudo sed -i "s/orabuntu-lxc\.com/$Domain1/g"            /etc/network/openvswitch/crt_ovs_sw1.sh
-		sudo sed -i "s/consultingcommandos\.us/$Domain2/g"      /etc/network/openvswitch/crt_ovs_sw1.sh
-        	sudo apt-get install dnsmasq
-        	function CheckDnsmasqSet {
-               		grep 'dns=dnsmasq' /etc/NetworkManager/NetworkManager.conf | wc -l
-        	}
-        	DnsmasqSet=$(CheckDnsmasqSet)
-        	if [ $DnsmasqSet -eq 0 ]
-        	then
-                	sudo sed -i '/\[main\]/{p;s/.*/1/;H;g;/^\(\n1\)\{1\}$/s//dns=dnsmasq/p;d}' /etc/NetworkManager/NetworkManager.conf
-                	sudo sed -i '/hosts:/s/files/dns files/g' /etc/nsswitch.conf
-        	fi
-        	sudo sh -c "echo 'DNS=127.0.1.1'                >> /etc/systemd/resolved.conf"
-        	sudo sh -c "echo 'FallbackDNS=127.0.1.1'        >> /etc/systemd/resolved.conf"
-	fi
-	### New Code End 2017-08-22 GLS ###
-
-	echo ''
-	echo "=============================================="
-	echo "Displayed /etc/NetworkManager/dnsmasq.d/local "
-	echo "=============================================="
-	echo ''
-	echo "=============================================="
-	echo "Currently resolution of Orabuntu-LXC DNS      "
-	echo "is being handled by the nameservers listed in "
-	echo "the /etc/resolv.conf file.                    "
-	echo "=============================================="
-	echo ''
-	echo "=============================================="
-	echo "Display current /etc/resolv.conf file...      "
-	echo "=============================================="
-	echo ''
-
-	sudo cat /etc/resolv.conf
-
-	echo ''
-	echo "=============================================="
-	echo "Displayed /etc/resolv.conf file.              "
-	echo "=============================================="
-	
-	sleep 5
-
-	clear
-
-#	echo "=============================================="
-#	echo "If you reboot now the following lines will be "
-#	echo "automatically commented out for you before    "
-#	echo "reboot in the /etc/resolv.conf file:          "
-#	echo "                                              "
-#	echo "# nameserver 10.207.39.2                      "
-#	echo "# nameserver 10.207.29.2                      "
-#	echo "                                              "
-#	echo "and when the server comes back up the file    "
-#	echo "/etc/NetworkManager/dnsmasq.d/local will take "
-#	echo "over DNS resolution for those networks.       "
-#	echo "                                              "
-#	echo "If you do not choose to reboot now you can    "
-#	echo "manually comment out those nameservers later  "
-#	echo "and then reboot to switch DNS to              "
-#	echo "/etc/NetworkManager/dnsmasq.d/local           "
-#	echo "                                              "
-#	echo "Note that correct resolution of the Oracle GNS"
-#	echo "SCAN IP's on the Orabuntu-LXC host (this host)"
-#	echo "requires that the DNS be resolving via the    "
-#	echo "/etc/NetworkManager/dnsmasq.d/local file      "
-#	echo "=============================================="
-#	echo "                                              "
-#	echo "=============================================="
-#	echo "                                              "
-#	read -e -p "Reboot Now? [Y/N]                       " -i "Y" ReBoot 
-#	echo "                                              "
-#	echo "=============================================="
-#	echo ''
-
-#	if [ $ReBoot = 'y' ] || [ $ReBoot = 'Y' ] 
-#	then
-#		sudo sed -i "/nameserver 10\.207\.39\.2/s/nameserver 10\.207\.39\.2/# nameserver 10\.207\.39\.2/" /etc/resolv.conf
-#		sudo sed -i "/nameserver 10\.207\.29\.2/s/nameserver 10\.207\.29\.2/# nameserver 10\.207\.39\.2/" /etc/resolv.conf
-#		sudo reboot
-#	fi
-
-	if [ ! -f /etc/orabuntu-lxc-release ]
-	then
-		echo ''
-		echo "=============================================="
-		echo "Create /etc/orabuntu-lxc-release file...          "
-		echo "=============================================="
-		echo ''
-
-		sudo touch /etc/orabuntu-lxc-release
-		sudo sh -c "echo 'Orabuntu-LXC v4.4' > /etc/orabuntu-lxc-release"
-		sudo ls -l /etc/orabuntu-lxc-release
-		echo ''
-		sudo cat /etc/orabuntu-lxc-release
-
-		echo ''
-		echo "=============================================="
-		echo "Create /etc/orabuntu-lxc-release file complete.   "
-		echo "=============================================="
-
-		sleep 5
-
-		clear
-	fi
+if [ $Reboot = 'y' ] || [ $Reboot = 'Y' ]
+then
+	sudo reboot
 fi
 

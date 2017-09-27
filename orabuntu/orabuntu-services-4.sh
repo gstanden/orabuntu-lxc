@@ -1,3 +1,4 @@
+#!/bin/bash
 #    Copyright 2015-2017 Gilbert Standen
 #    This file is part of orabuntu-lxc.
 
@@ -18,16 +19,19 @@
 #    v3.0 GLS 20160710 Updates for Ubuntu 16.04
 #    v4.0 GLS 20161025 DNS DHCP services moved into an LXC container
 
-#!/bin/bash
+clear
 
 MajorRelease=$1
 OracleRelease=$1$2
 OracleVersion=$1.$2
-OR=$OracleRelease
 NumCon=$3
 NameServer=$4
+MultiHost=$5
 
-clear
+function GetMultiHostVar7 {
+        echo $MultiHost | cut -f7 -d':'
+}
+MultiHostVar7=$(GetMultiHostVar7)
 
 echo ''
 echo "=============================================="
@@ -36,6 +40,7 @@ echo "=============================================="
 echo ''
 echo "=============================================="
 echo "This script is re-runnable.                   "
+echo "This script clones additional containers.     "
 echo "=============================================="
 echo ''
 echo "=============================================="
@@ -46,12 +51,18 @@ echo "=============================================="
 
 if [ -z $3 ]
 then
-NumCon=2
+	NumCon=2
 else
-NumCon=$3
+	NumCon=$3
 fi
 
 ContainerPrefix=ora$1$2c
+CP=$ContainerPrefix
+
+function GetSeedContainerName {
+	sudo lxc-ls -f | grep oel$OracleRelease | cut -f1 -d' '
+}
+SeedContainerName=$(GetSeedContainerName)
 
 echo ''
 echo "=============================================="
@@ -69,35 +80,35 @@ echo "This script creates oracle-ready lxc clones   "
 echo "for oracle-ready RAC container nodes          "
 echo "=============================================="
 
-sleep 5
+sleep 10
 
 clear
 
 echo ''
 echo "=============================================="
-echo "Stopping oel$OracleRelease container...       "
+echo "Stopping $SeedContainerName seed container...  "
 echo "(OEL 5 shutdown can take awhile...patience)   "
 echo "(OEL 6 and OEL 7 are relatively fast shutdown)"
 echo "=============================================="
 echo ''
 
 function CheckContainerUp {
-sudo lxc-ls -f | grep oel$OracleRelease | sed 's/  */ /g' | egrep 'RUNNING|STOPPED'  | cut -f2 -d' '
+sudo lxc-ls -f | grep $SeedContainerName | sed 's/  */ /g' | egrep 'RUNNING|STOPPED'  | cut -f2 -d' '
 }
 ContainerUp=$(CheckContainerUp)
-sudo lxc-stop -n oel$OracleRelease > /dev/null 2>&1
+sudo lxc-stop -n $SeedContainerName > /dev/null 2>&1
 
 while [ "$ContainerUp" = 'RUNNING' ]
 do
-sleep 1
-ContainerUp=$(CheckContainerUp)
+	sleep 1
+	ContainerUp=$(CheckContainerUp)
 done
 
 sudo lxc-ls -f
 
 echo ''
 echo "=============================================="
-echo "Container stopped.                            "
+echo "Seed container stopped.                       "
 echo "=============================================="
 
 sleep 5
@@ -106,179 +117,163 @@ clear
 
 echo ''
 echo "=============================================="
-echo "Configure 12c ASM Flex Cluster (optional)     "
+echo "Configure Extra Networks (optional e.g. RAC)  "
 echo "=============================================="
 echo ''
 
-read -e -p "Add ASM Private Networks and RAC Private Networks ? [Y/N]   " -i "Y" AddPrivateNetworks
+read -e -p "Add Extra Private Networks (e.g for Oracle RAC ASM Flex Cluster) [Y/N]   " -i "Y" AddPrivateNetworks
 
 if [ $AddPrivateNetworks = 'y' ] || [ $AddPrivateNetworks = 'Y' ]
 then
-	sudo bash -c "cat /var/lib/lxc/oel$OR/config.oracle /var/lib/lxc/oel$OR/config.asm.flex.cluster > /var/lib/lxc/oel$OR/config"
-	sudo sed -i "s/ContainerName/oel$OR/g" /var/lib/lxc/oel$OR/config
+	sudo bash -c "cat /var/lib/lxc/$SeedContainerName/config.oracle /var/lib/lxc/$SeedContainerName/config.asm.flex.cluster > /var/lib/lxc/$SeedContainerName/config"
+	sudo sed -i "s/ContainerName/$SeedContainerName/g" /var/lib/lxc/$SeedContainerName/config
 	OracleNonPublicNetworks='sw2 sw3 sw4 sw5 sw6 sw7 sw8 sw9'
 	for j in $OracleNonPublicNetworks
 	do
-	sudo sed -i "/$j/s/^# //g" /etc/network/if-up.d/orabuntu-lxc-net
+		echo 'nothing' > /dev/null 2>&1	
 	done
 fi
 
 if [ $AddPrivateNetworks = 'n' ] || [ $AddPrivateNetworks = 'N' ]
 then
-	sudo cp -p /var/lib/lxc/oel$OracleRelease/config.oracle /var/lib/lxc/oel$OracleRelease/config
-	sudo sed -i "s/ContainerName/oel$OracleRelease/g" /var/lib/lxc/oel$OracleRelease/config
+	sudo cp -p /var/lib/lxc/$SeedContainerName/config.oracle /var/lib/lxc/$SeedContainerName/config
+	sudo sed -i "s/ContainerName/$SeedContainerName/g" /var/lib/lxc/$SeedContainerName/config
 fi
 
 echo ''
 echo "=============================================="
-echo "Configure 12c ASM Flex Cluster completed.     "
+echo "Configure extra private networks completed.   "
 echo "=============================================="
 
 sleep 5
 
 clear
 
-sudo sed -i 's/yum install/yum -y install/g' /var/lib/lxc/oel$OracleRelease/rootfs/root/lxc-services.sh
-
-function GetHighestContainerIndex {
-sudo ls /var/lib/lxc | more | grep ora | cut -c7-9 | sort -n | tail -1
-}
-HighestContainerIndex=$(GetHighestContainerIndex)
-
-if [ -z $HighestContainerIndex ]
-then
-HighestContainerIndex=0
-fi
-
-if [ $HighestContainerIndex -lt 10 ]
-then
-let i=10
-let NewHighestContainerIndex=$i+$NumCon-1
-fi
-
-if [ $HighestContainerIndex -ge 10 ]
-then
-let i=$HighestContainerIndex+1
-let NewHighestContainerIndex=$i+$NumCon-1
-fi
+echo ''
+echo "=============================================="
+echo "Clone $SeedContainerName to $NumCon containers"
+echo "=============================================="
+echo ''
 
 sleep 5
 
-while [ $i -le "$NewHighestContainerIndex" ]
+clear
+
+sudo sed -i 's/yum install/yum -y install/g' /var/lib/lxc/$SeedContainerName/rootfs/root/lxc-services.sh
+
+let CloneIndex=10
+let CopyCompleted=0
+
+while [ $CopyCompleted -lt $NumCon ]
 do
-	echo ''
-	echo "=============================================="
-	echo "Cloning oel$OracleRelease $NumCon containers  "
-	echo "=============================================="
-	echo ''
-
-	echo "Clone Container Name = $ContainerPrefix$i"
-
 	# GLS 20160707 updated to use lxc-copy instead of lxc-clone for Ubuntu 16.04
 	# GLS 20160707 continues to use lxc-clone for Ubuntu 15.04 and 15.10
 	function GetUbuntuVersion {
-	cat /etc/lsb-release | grep DISTRIB_RELEASE | cut -f2 -d'='
+		cat /etc/lsb-release | grep DISTRIB_RELEASE | cut -f2 -d'='
 	}
 	UbuntuVersion=$(GetUbuntuVersion)
-	# GLS 20160707
 
-	if [ $UbuntuVersion = '15.10' ] || [ $UbuntuVersion = '15.04' ]
+	function CheckSystemdResolvedInstalled {
+		sudo netstat -ulnp | grep 53 | sed 's/  */ /g' | rev | cut -f1 -d'/' | rev | sort -u | grep systemd- | wc -l
+	}
+	SystemdResolvedInstalled=$(CheckSystemdResolvedInstalled)
+
+	function CheckDNSLookup {
+		nslookup 10.207.39.$CloneIndex | grep 'name =' | cut -f2 -d'=' | sed 's/^[ \t]*//;s/[ \t]*$//' | wc -l
+	}
+	DNSLookup=$(CheckDNSLookup)
+
+	if [ $UbuntuVersion = '16.04' ] || [ $UbuntuVersion = '16.10' ] || [ $UbuntuVersion = '17.04' ] || [ $UbuntuVersion = '17.10' ]
 	then
-		sudo lxc-clone -o oel$OracleRelease -n $ContainerPrefix$i
+		while [ $DNSLookup -eq 1 ]
+		do
+			CloneIndex=$((CloneIndex+1))
+			DNSLookup=$(CheckDNSLookup)
+		done
+		if [ $DNSLookup -eq 0 ]
+		then
+			echo ''
+			echo "=============================================="
+			echo "Clone $SeedContainerName to $CP$CloneIndex    "
+			echo "=============================================="
+			echo ''
+
+			echo "Clone Container Name = $ContainerPrefix$CloneIndex"
+
+      			sudo lxc-copy -n $SeedContainerName -N $ContainerPrefix$CloneIndex
+		fi
 	fi
 
-	if [ $UbuntuVersion = '16.04' ] || [ $UbuntuVersion = '17.04' ]
-	then
-		sudo lxc-copy -n oel$OracleRelease -N $ContainerPrefix$i
-	fi
+	sudo sed -i "s/$SeedContainerName/$ContainerPrefix$CloneIndex/g" /var/lib/lxc/$ContainerPrefix$CloneIndex/config
+	sudo sed -i "s/\.10/\.$CloneIndex/g" /var/lib/lxc/$ContainerPrefix$CloneIndex/config
+	sudo sed -i 's/sx1/sw1/g' /var/lib/lxc/$ContainerPrefix$CloneIndex/config
+	sudo sed -i "s/mtu = 1500/mtu = $MultiHostVar7/g" /var/lib/lxc/$ContainerPrefix$CloneIndex/config
+#	sudo sed -i "s/lxc\.mount\.entry = \/dev\/lxc_luns/#lxc\.mount\.entry = \/dev\/lxc_luns/g" /var/lib/lxc/$ContainerPrefix$CloneIndex/config
+#	sudo sed -i "/domain-name-servers/s/10.207.29.2/10.207.39.2/g" /var/lib/lxc/$ContainerPrefix$CloneIndex/rootfs/etc/dhcp/dhclient.conf
 
-	sudo sed -i "s/oel$OracleRelease/$ContainerPrefix$i/g" /var/lib/lxc/$ContainerPrefix$i/config
-	sudo sed -i "s/\.10/\.$i/g" /var/lib/lxc/$ContainerPrefix$i/config
-	sudo sed -i 's/sx1/sw1/g' /var/lib/lxc/$ContainerPrefix$i/config
-	function GetHostName (){ echo $ContainerPrefix$i\1; }
+	function GetHostName (){ echo $ContainerPrefix$CloneIndex\1; }
 	HostName=$(GetHostName)
-	sudo sed -i "s/$HostName/$ContainerPrefix$i/" /var/lib/lxc/$ContainerPrefix$i/rootfs/etc/sysconfig/network
 
-        echo ''
-        echo "=============================================="
-        echo "Create $ContainerPrefix$i Onboot Service...   "
-        echo "=============================================="
+	sudo sed -i "s/$HostName/$ContainerPrefix$CloneIndex/" /var/lib/lxc/$ContainerPrefix$CloneIndex/rootfs/etc/sysconfig/network
 
-        sudo sh -c "echo '#!/bin/bash'                                                          			>  /etc/network/openvswitch/strt_$ContainerPrefix$i.sh"
-        sudo sh -c "echo '#'                                                                    			>> /etc/network/openvswitch/strt_$ContainerPrefix$i.sh"
-        sudo sh -c "echo '# Manage the Oracle RAC LXC containers'                               			>> /etc/network/openvswitch/strt_$ContainerPrefix$i.sh"
-        sudo sh -c "echo '#'                                                                    			>> /etc/network/openvswitch/strt_$ContainerPrefix$i.sh"
-        sudo sh -c "echo 'start() {'                                                            			>> /etc/network/openvswitch/strt_$ContainerPrefix$i.sh"
-        sudo sh -c "echo '  exec lxc-start -n $ContainerPrefix$i > /dev/null 2>&1'              			>> /etc/network/openvswitch/strt_$ContainerPrefix$i.sh"
-        sudo sh -c "echo '}'                                                                    			>> /etc/network/openvswitch/strt_$ContainerPrefix$i.sh"
-        sudo sh -c "echo ''                                                                     			>> /etc/network/openvswitch/strt_$ContainerPrefix$i.sh"
-        sudo sh -c "echo 'stop() {'                                                             			>> /etc/network/openvswitch/strt_$ContainerPrefix$i.sh"
-        sudo sh -c "echo '  exec lxc-stop -n $ContainerPrefix$i > /dev/null 2>&1'               			>> /etc/network/openvswitch/strt_$ContainerPrefix$i.sh"
-        sudo sh -c "echo '}'                                                                    			>> /etc/network/openvswitch/strt_$ContainerPrefix$i.sh"
-        sudo sh -c "echo ''                                                                     			>> /etc/network/openvswitch/strt_$ContainerPrefix$i.sh"
-        sudo sh -c "echo 'case \$1 in'                                                          			>> /etc/network/openvswitch/strt_$ContainerPrefix$i.sh"
-        sudo sh -c "echo '  start|stop) \"\$1\" ;;'                                             			>> /etc/network/openvswitch/strt_$ContainerPrefix$i.sh"
-        sudo sh -c "echo 'esac'                                                                 			>> /etc/network/openvswitch/strt_$ContainerPrefix$i.sh"
+	echo ''
+	echo "=============================================="
+	echo "Create $CP$CloneIndex Onboot Service...       "
+	echo "=============================================="
 
-        sudo chmod +x /etc/network/openvswitch/strt_$ContainerPrefix$i.sh
+	sudo sh -c "echo '#!/bin/bash'										>  /etc/network/openvswitch/strt_$ContainerPrefix$CloneIndex.sh"
+	sudo sh -c "echo '#'											>> /etc/network/openvswitch/strt_$ContainerPrefix$CloneIndex.sh"
+	sudo sh -c "echo '# Manage the Oracle RAC LXC containers'						>> /etc/network/openvswitch/strt_$ContainerPrefix$CloneIndex.sh"
+	sudo sh -c "echo '#'											>> /etc/network/openvswitch/strt_$ContainerPrefix$CloneIndex.sh"
+	sudo sh -c "echo 'start() {'										>> /etc/network/openvswitch/strt_$ContainerPrefix$CloneIndex.sh"
+	sudo sh -c "echo '  exec lxc-start -n $ContainerPrefix$CloneIndex > /dev/null 2>&1'			>> /etc/network/openvswitch/strt_$ContainerPrefix$CloneIndex.sh"
+	sudo sh -c "echo '}'											>> /etc/network/openvswitch/strt_$ContainerPrefix$CloneIndex.sh"
+	sudo sh -c "echo ''											>> /etc/network/openvswitch/strt_$ContainerPrefix$CloneIndex.sh"
+	sudo sh -c "echo 'stop() {'										>> /etc/network/openvswitch/strt_$ContainerPrefix$CloneIndex.sh"
+	sudo sh -c "echo '  exec lxc-stop -n $ContainerPrefix$CloneIndex > /dev/null 2>&1'			>> /etc/network/openvswitch/strt_$ContainerPrefix$CloneIndex.sh"
+	sudo sh -c "echo '}'											>> /etc/network/openvswitch/strt_$ContainerPrefix$CloneIndex.sh"
+	sudo sh -c "echo ''											>> /etc/network/openvswitch/strt_$ContainerPrefix$CloneIndex.sh"
+	sudo sh -c "echo 'case \$1 in'										>> /etc/network/openvswitch/strt_$ContainerPrefix$CloneIndex.sh"
+	sudo sh -c "echo '  start|stop) \"\$1\" ;;'								>> /etc/network/openvswitch/strt_$ContainerPrefix$CloneIndex.sh"
+	sudo sh -c "echo 'esac'											>> /etc/network/openvswitch/strt_$ContainerPrefix$CloneIndex.sh"
 
-        sudo sh -c "echo '[Unit]'                                                               			>  /etc/systemd/system/$ContainerPrefix$i.service"
-        sudo sh -c "echo 'Description=$ContainerPrefix$i Service'                               			>> /etc/systemd/system/$ContainerPrefix$i.service"
-        sudo sh -c "echo 'Wants=network-online.target sw1.service $NameServer.service'          			>> /etc/systemd/system/$ContainerPrefix$i.service"
-        sudo sh -c "echo 'After=network-online.target sw1.service $NameServer.service'          			>> /etc/systemd/system/$ContainerPrefix$i.service"
-        sudo sh -c "echo ''                                                                     			>> /etc/systemd/system/$ContainerPrefix$i.service"
-        sudo sh -c "echo '[Service]'                                                            			>> /etc/systemd/system/$ContainerPrefix$i.service"
-        sudo sh -c "echo 'Type=oneshot'                                                         			>> /etc/systemd/system/$ContainerPrefix$i.service"
-        sudo sh -c "echo 'User=root'                                                            			>> /etc/systemd/system/$ContainerPrefix$i.service"
-        sudo sh -c "echo 'RemainAfterExit=yes'                                                  			>> /etc/systemd/system/$ContainerPrefix$i.service"
-        sudo sh -c "echo 'ExecStart=/etc/network/openvswitch/strt_$ContainerPrefix$i.sh start'  			>> /etc/systemd/system/$ContainerPrefix$i.service"
-        sudo sh -c "echo 'ExecStop=/etc/network/openvswitch/strt_$ContainerPrefix$i.sh stop'    			>> /etc/systemd/system/$ContainerPrefix$i.service"
-        sudo sh -c "echo ''                                                                     			>> /etc/systemd/system/$ContainerPrefix$i.service"
-        sudo sh -c "echo '[Install]'                                                            			>> /etc/systemd/system/$ContainerPrefix$i.service"
-        sudo sh -c "echo 'WantedBy=multi-user.target'                                           			>> /etc/systemd/system/$ContainerPrefix$i.service"
+	sudo chmod +x /etc/network/openvswitch/strt_$ContainerPrefix$CloneIndex.sh
+	
+	sudo sh -c "echo '[Unit]'                                                        			>  /etc/systemd/system/$ContainerPrefix$CloneIndex.service"
+	sudo sh -c "echo 'Description=$ContainerPrefix$CloneIndex Service'                               	>> /etc/systemd/system/$ContainerPrefix$CloneIndex.service"
+	sudo sh -c "echo 'Wants=network-online.target sw1.service $NameServer.service'          		>> /etc/systemd/system/$ContainerPrefix$CloneIndex.service"
+	sudo sh -c "echo 'After=network-online.target sw1.service $NameServer.service'          		>> /etc/systemd/system/$ContainerPrefix$CloneIndex.service"
+	sudo sh -c "echo ''                                                             			>> /etc/systemd/system/$ContainerPrefix$CloneIndex.service"
+	sudo sh -c "echo '[Service]'                                                    			>> /etc/systemd/system/$ContainerPrefix$CloneIndex.service"
+	sudo sh -c "echo 'Type=oneshot'                                                 			>> /etc/systemd/system/$ContainerPrefix$CloneIndex.service"
+	sudo sh -c "echo 'User=root'                                                    			>> /etc/systemd/system/$ContainerPrefix$CloneIndex.service"
+	sudo sh -c "echo 'RemainAfterExit=yes'                                          			>> /etc/systemd/system/$ContainerPrefix$CloneIndex.service"
+	sudo sh -c "echo 'ExecStart=/etc/network/openvswitch/strt_$ContainerPrefix$CloneIndex.sh start' 	>> /etc/systemd/system/$ContainerPrefix$CloneIndex.service"
+	sudo sh -c "echo 'ExecStop=/etc/network/openvswitch/strt_$ContainerPrefix$CloneIndex.sh stop'   	>> /etc/systemd/system/$ContainerPrefix$CloneIndex.service"
+	sudo sh -c "echo ''                                                             			>> /etc/systemd/system/$ContainerPrefix$CloneIndex.service"
+	sudo sh -c "echo '[Install]'                                                    			>> /etc/systemd/system/$ContainerPrefix$CloneIndex.service"
+	sudo sh -c "echo 'WantedBy=multi-user.target'                                   			>> /etc/systemd/system/$ContainerPrefix$CloneIndex.service"
 
-        sudo chmod 644 /etc/systemd/system/$ContainerPrefix$i.service
+	sudo chmod 644 /etc/systemd/system/$ContainerPrefix$CloneIndex.service
+	
+	echo ''
+	sudo cat /etc/systemd/system/$ContainerPrefix$CloneIndex.service
+	echo ''
+	sudo systemctl enable $ContainerPrefix$CloneIndex
+	
+	echo ''
+	echo "=============================================="
+	echo "Created $CP$CloneIndex Onboot Service.        "
+	echo "=============================================="
+	echo ''
 
-        echo ''
-        sudo cat /etc/systemd/system/$ContainerPrefix$i.service
-        echo ''
-        sudo systemctl enable $ContainerPrefix$i
+CopyCompleted=$((CopyCompleted+1))
+CloneIndex=$((CloneIndex+1))
 
-        echo ''
-        echo "=============================================="
-        echo "Created $ContainerPrefix$i Onboot Service.   "
-        echo "=============================================="
-        echo ''
+sleep 5
 
-        sleep 5
+clear
 
-        clear
-
-## New End
-
-#	sudo sh -c "echo '#!/bin/bash'						>  /etc/network/openvswitch/strt_$ContainerPrefix$i.sh"
-#	sudo sh -c "echo '# Start lxc container after required networks are up'	>> /etc/network/openvswitch/strt_$ContainerPrefix$i.sh"
-#	sudo sh -c "echo 'switches='sw1''					>> /etc/network/openvswitch/strt_$ContainerPrefix$i.sh"
-#	sudo sh -c "echo 'm=0'							>> /etc/network/openvswitch/strt_$ContainerPrefix$i.sh"
-#	sudo sh -c "echo 'for i in \$switches'					>> /etc/network/openvswitch/strt_$ContainerPrefix$i.sh"
-#	sudo sh -c "echo 'do'							>> /etc/network/openvswitch/strt_$ContainerPrefix$i.sh"
-#	sudo sh -c "echo '	sudo ip link | grep $i >/dev/null 2>&1'		>> /etc/network/openvswitch/strt_$ContainerPrefix$i.sh"
-#	sudo sh -c "echo '	while [ $? -ne 0 ]'				>> /etc/network/openvswitch/strt_$ContainerPrefix$i.sh"
-#	sudo sh -c "echo '	do'						>> /etc/network/openvswitch/strt_$ContainerPrefix$i.sh"
-#	sudo sh -c "echo '		m=$((m+1))'				>> /etc/network/openvswitch/strt_$ContainerPrefix$i.sh"
-#	sudo sh -c "echo '		if [ $m -eq 1000 ]'			>> /etc/network/openvswitch/strt_$ContainerPrefix$i.sh"
-#	sudo sh -c "echo '		then'					>> /etc/network/openvswitch/strt_$ContainerPrefix$i.sh"
-#	sudo sh -c "echo '			exit'				>> /etc/network/openvswitch/strt_$ContainerPrefix$i.sh"
-#	sudo sh -c "echo '		fi'					>> /etc/network/openvswitch/strt_$ContainerPrefix$i.sh"
-#	sudo sh -c "echo '		sudo ip link | grep $i >/dev/null 2>&1'	>> /etc/network/openvswitch/strt_$ContainerPrefix$i.sh"
-#	sudo sh -c "echo '	done'						>> /etc/network/openvswitch/strt_$ContainerPrefix$i.sh"
-#	sudo sh -c "echo 'done'							>> /etc/network/openvswitch/strt_$ContainerPrefix$i.sh"
-#	sudo sh -c "echo 'sudo lxc-start -n $ContainerPrefix$i >/dev/null 2>&1'	>> /etc/network/openvswitch/strt_$ContainerPrefix$i.sh"
-#	sudo chmod +x /etc/network/openvswitch/strt_$ContainerPrefix$i.sh
-#	sudo sed -i "s/sw1/'sw1'/" /etc/network/openvswitch/strt_$ContainerPrefix$i.sh
-#	sudo sh -c "echo '/etc/network/openvswitch/strt_$ContainerPrefix$i.sh 2>&1 > /etc/network/openvswitch/strt_$ContainerPrefix$i.log' >> /etc/network/if-up.d/orabuntu-lxc-net"
-
-i=$((i+1))
 done
 
 echo ''
@@ -297,7 +292,8 @@ echo "=============================================="
 
 sleep 5
 
-sudo /etc/network/openvswitch/create-ovs-sw-files-v2.sh $ContainerPrefix $NumCon $NewHighestContainerIndex
+# sudo /etc/network/openvswitch/create-ovs-sw-files-v2.sh $ContainerPrefix $NumCon $NewHighestContainerIndex $HighestContainerIndex
+  sudo /etc/network/openvswitch/create-ovs-sw-files-v2.sh $ContainerPrefix $NumCon $CloneIndex
 
 echo ''
 echo "=============================================="
@@ -310,19 +306,23 @@ clear
 
 echo ''
 echo "=============================================="
-echo "      Reset config file for oel$OracleRelease."
-echo "Removes ASM and RAC private network interfaces"
-echo "      from seed container oel$OracleRelease   "
+echo "Reset config file for $SeedContainerName.     "
+echo "Removes extra OpenvSwitch networks            "
+echo "from seed container $SeedContainerName        "
 echo "(cloned containers are not affected by reset) "
 echo "=============================================="
 echo ''
 
-read -e -p "Reset Seed Container oel$OracleRelease to single DHCP interface ? [Y/N]   " -i "Y" ResetSingleDHCPInterface
+read -e -p "Reset Seed Container $SeedContainerName to single DHCP interface ? [Y/N]   " -i "Y" ResetSingleDHCPInterface
 
 if [ $ResetSingleDHCPInterface = 'y' ] || [ $ResetSingleDHCPInterface = 'Y' ]
 then
-sudo cp -p /var/lib/lxc/oel$OracleRelease/config.oracle /var/lib/lxc/oel$OracleRelease/config
-sudo sed -i "s/ContainerName/oel$OracleRelease/g" /var/lib/lxc/oel$OracleRelease/config
+sudo cp -p /var/lib/lxc/$SeedContainerName/config.oracle /var/lib/lxc/$SeedContainerName/config
+sudo sed -i "s/ContainerName/$SeedContainerName/g" /var/lib/lxc/$SeedContainerName/config
+# GLS 20170618 reset mtu to 1340 in Seed container
+sudo sed -i "s/mtu = 1500/mtu = $MultiHostVar7/" /var/lib/lxc/$SeedContainerName/config
+sudo sed -i 's/sw1/sx1/g' /var/lib/lxc/$SeedContainerName/config
+# sudo sed -i "s/lxc\.mount\.entry = \/dev\/lxc_luns/#lxc\.mount\.entry = \/dev\/lxc_luns/g" /var/lib/lxc/$SeedContainerName/config
 fi
 
 echo ''

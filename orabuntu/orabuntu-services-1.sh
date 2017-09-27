@@ -20,9 +20,9 @@
 #    v2.8 GLS 20151231
 #    v3.0 GLS 20160710 Updates for Ubuntu 16.04
 #    v4.0 GLS 20161025 DNS DHCP services moved into an LXC container
-#    v4.3 GLS 20161126 Additional enhancements for multi-distro (RedHat-based and Debian-based)
+#    v5.0 GLS 20170909 Orabuntu-LXC MultiHost
 
-#    Note that this software builds a conntainerized DNS DHCP solution for the Ubuntu Desktop environment for running Oracle Enteprise software products directly on the Ubuntu kernel.
+#    Note that this software builds a conntainerized DNS DHCP solution for the Desktop environment.
 #    The nameserver should NOT be the name of an EXISTING nameserver but an arbitrary name because this software is CREATING a new LXC-containerized nameserver.
 #    The domain names can be arbitrary fictional names or they can be a domain that you actually own and operate.
 #    There are two domains and two networks because the "seed" LXC containers are on a separate network from the production LXC containers.
@@ -35,28 +35,44 @@ OracleVersion=$1.$2
 Domain1=$3
 Domain2=$4
 NameServer=$5
-LinuxOSMemoryReservation=$6
+OSMemRes=$6
+MultiHost=$7
 
-echo ''
-echo "=============================================="
-echo "Establish sudo privileges ...                 "
-echo "=============================================="
-echo ''
+function GetMultiHostVar2 {
+echo $MultiHost | cut -f2 -d':'
+}
+MultiHostVar2=$(GetMultiHostVar2)
 
-sudo date
+function GetMultiHostVar7 {
+	echo $MultiHost | cut -f7 -d':'
+}
+MultiHostVar7=$(GetMultiHostVar7)
 
-echo ''
-echo "=============================================="
-echo "Establish sudo privileges successful.         "
-echo "=============================================="
-echo ''
+function GetMultiHostVar8 {
+	echo $MultiHost | cut -f8 -d':'
+}
+MultiHostVar8=$(GetMultiHostVar8)
 
-sleep 5
+function GetMultiHostVar9 {
+	echo $MultiHost | cut -f9 -d':'
+}
+MultiHostVar9=$(GetMultiHostVar9)
 
-clear
+function CheckNetworkManagerInstalled {
+	dpkg -l | grep -v  network-manager- | grep network-manager | wc -l
+}
+NetworkManagerInstalled=$(CheckNetworkManagerInstalled)
+
+function CheckSystemdResolvedInstalled {
+	sudo netstat -ulnp | grep 53 | sed 's/  */ /g' | rev | cut -f1 -d'/' | rev | sort -u | grep systemd- | wc -l
+}
+SystemdResolvedInstalled=$(CheckSystemdResolvedInstalled)
 
 GetLinuxFlavors(){
-if [[ -e /etc/redhat-release ]]
+if   [[ -e /etc/oracle-release ]]
+then
+        LinuxFlavors=$(cat /etc/oracle-release | cut -f1 -d' ')
+elif [[ -e /etc/redhat-release ]]
 then
         LinuxFlavors=$(cat /etc/redhat-release | cut -f1 -d' ')
 elif [[ -e /usr/bin/lsb_release ]]
@@ -75,6 +91,29 @@ function TrimLinuxFlavors {
 echo $LinuxFlavors | sed 's/^[ \t]//;s/[ \t]$//'
 }
 LinuxFlavor=$(TrimLinuxFlavors)
+LF=$LinuxFlavor
+
+if [ -f /etc/lsb-release ]
+then
+	function GetUbuntuVersion {
+		cat /etc/lsb-release | grep DISTRIB_RELEASE | cut -f2 -d'='
+	}
+	UbuntuVersion=$(GetUbuntuVersion)
+fi
+RL=$UbuntuVersion
+
+if [ -f /etc/lsb-release ]
+then
+	function GetUbuntuMajorVersion {
+		cat /etc/lsb-release | grep DISTRIB_RELEASE | cut -f2 -d'=' | cut -f1 -d'.'
+	}
+	UbuntuMajorVersion=$(GetUbuntuMajorVersion)
+fi
+
+function GetOperation {
+echo $MultiHost | cut -f1 -d':'
+}
+Operation=$(GetOperation)
 
 sleep 5
 
@@ -82,25 +121,184 @@ clear
 
 echo ''
 echo "=============================================="
-echo "Linux Flavor.                                 "
+echo "Script:  orabuntu-services-1.sh               "
 echo "=============================================="
-echo ''
-echo $LinuxFlavor
+
+sleep 5
+
+clear
+
 echo ''
 echo "=============================================="
-echo "Linux Flavor.                                 "
+echo "Establish sudo privileges...                  "
 echo "=============================================="
 echo ''
 
-sleep 5
+sudo date
+
+echo ''
+echo "=============================================="
+echo "Establish sudo privileges completed.          "
+echo "=============================================="
+
+sleep 5 
+
+clear
+
+echo ''
+echo "=============================================="
+echo "Performance settings for sshd_config.         "
+echo "=============================================="
+echo ''
+echo "=============================================="
+echo "These make the install of Orabuntu-LXC faster."
+echo "You can change these back after install or    "
+echo "leave them at the new settings shown below.   "
+echo "=============================================="
+echo ''
+echo "=============================================="
+echo "There are security impllications for keeping  "
+echo "these new sshd_config settings.  You should   "
+echo "research the implications of new sshd_config  "
+echo "parameters and make an informed decision on   "
+echo "how you want to set them after the install of "
+echo "Orabuntu-LXC is complete.                     "
+echo "=============================================="
+echo ''
+echo "=============================================="
+echo "Orabuntu-LXC has made a backup of sshd_config "
+echo "located in the /etc/ssh directory if you want "
+echo "to revert sshd_config to original settings    "
+echo "after Orabuntu-LXC install is completed.      "
+echo "=============================================="
+echo ''
+
+sleep 25
+
+if	[ $SystemdResolvedInstalled -eq 1 ]
+then
+	sudo sed -i '/GSSAPIAuthentication/s/yes/no/'                                /etc/ssh/sshd_config
+	sudo sed -i '/UseDNS/s/yes/no/'                                              /etc/ssh/sshd_config
+	sudo sed -i '/GSSAPIAuthentication/s/#//'                                    /etc/ssh/sshd_config
+	sudo sed -i '/UseDNS/s/#//'                                                  /etc/ssh/sshd_config
+	sudo egrep 'GSSAPIAuthentication|UseDNS'                                     /etc/ssh/sshd_config
+	sudo service sshd restart
+fi
+
+echo ''
+echo "=============================================="
+echo "Done: edit sshd_config.                       "
+echo "=============================================="
+echo ''
+
+sleep 5 
 
 clear
 
 if [ -f /etc/orabuntu-lxc-release ]
 then
+	which lxc-ls > /dev/null 2>&1
+	if [ $? -eq 0 ] && [ $Operation = 'reinstall' ]
+	then
+		echo ''
+		echo "=============================================="
+		echo "Orabuntu-LXC Reinstall delete lxc & reboot... "
+		echo "=============================================="
+		echo '' 
+		echo "=============================================="
+		echo "Re-run anylinux-services.sh after reboot...   "
+		echo "=============================================="
+
+		sudo /etc/orabuntu-lxc-scripts/stop_containers.sh
+
+		if [ -d /var/lib/lxc ]
+		then
+			function CheckContainersExist {
+				sudo ls /var/lib/lxc | more | sed 's/$/ /' | tr -d '\n' | sed 's/  */ /g'
+			}
+			ContainersExist=$(CheckContainersExist)
+
+			echo ''
+			echo "=============================================="
+			read -e -p "Delete All LXC Containers? [ Y/N ]      " -i "Y" DestroyAllContainers
+			echo "=============================================="
+			echo ''
+
+			if [ $DestroyAllContainers = 'Y' ] || [ $DestroyContainers = 'y' ]
+			then
+				DestroyContainers=$(CheckContainersExist)
+				for j in $DestroyContainers
+				do
+					sudo lxc-stop -n $j
+					sleep 2
+					sudo lxc-destroy -n $j -f 
+					sudo rm -rf /var/lib/lxc/$j
+				done
+
+				echo ''
+				echo "=============================================="
+				echo "Destruction of Containers complete            "
+				echo "=============================================="
+			else
+				echo "=============================================="
+				echo "Destruction of Containers not executed.       "
+				echo "=============================================="
+			fi
+		fi
+
+		echo ''
+		echo "=============================================="
+		echo "Delete OpenvSwitch bridges...                 "
+		echo "=============================================="
+		echo ''
+
+		sudo /etc/network/openvswitch/del-bridges.sh >/dev/null 2>&1
+		sudo ovs-vsctl show
+
+		echo ''
+		echo "=============================================="
+		echo "Done:  Delete OpenvSwitch Bridges.            "
+		echo "=============================================="
+		echo ''
+
+		sudo rm -f  /etc/systemd/system/ora*c*.service
+		sudo rm -f  /etc/systemd/system/oel*c*.service
+		sudo rm -f  /etc/network/if-up.d/openvswitch/*
+		sudo rm -f  /etc/network/if-down.d/openvswitch/*
+
+		echo ''
+		echo "=============================================="
+		echo "Uninstall lxc packages...                     "
+		echo "=============================================="
+		echo ''
+
+		sudo apt-get -y purge lxc lxc-common lxc-templates lxc1 lxcfs python3-lxc liblxc1
+	
+		echo ''
+		echo "=============================================="
+		echo "Uninstall lxc packages completed.             "
+		echo "=============================================="
+		echo ''	
+		echo "=============================================="
+		echo "Rebooting to clear bridge lxcbr0...           "
+		echo "=============================================="
+		echo '' 
+		echo "=============================================="
+		echo "Re-run anylinux-services.sh after reboot...   "
+		echo "=============================================="
+
+		sleep 5
+	
+		sudo reboot
+		exit
+
+		fi
+
+# GLS 20170919 Ubuntu Specific Code Block 1 BEGIN
+
 	echo ''
 	echo "=============================================="
-	echo "Installing required LXC package...            "
+	echo "Install LXC and prerequisite packages...      "
 	echo "=============================================="
 	echo ''
 
@@ -108,7 +306,7 @@ then
 
 	echo ''
 	echo "=============================================="
-	echo "Installing required LXC package complete.     "
+	echo "LXC and prerequisite packages completed.      "
 	echo "=============================================="
 	echo ''
 
@@ -116,44 +314,171 @@ then
 
 	clear
 
+	echo ''
 	echo "=============================================="
-	echo "Delete the etc/orabuntu-lxc-release file if   "
-	echo "re-running orabuntu-lxc from scratch.         "
-	echo "                                              " 
-	read -e -p "rm /etc/orabuntu-lxc-release? [Y/N]     " -i "Y" DeleteOrabuntuLXCRelease
-	echo "                                              "
+	echo "Run LXC Checkconfig...                        "
 	echo "=============================================="
 	echo ''
 
-	if [ $DeleteOrabuntuLXCRelease = 'y' ] || [ $DeleteOrabuntuLXCRelease = 'Y' ]
-	then
-		echo ''
-		echo "=============================================="
-		echo "Delete /etc/orabuntu-lxc-release file...      "
-		echo "=============================================="
-		echo ''
+	sleep 5
 
-		sudo rm -f /etc/orabuntu-lxc-release
+	sudo lxc-checkconfig
 
-		echo ''
-		echo "=============================================="
-		echo "File /etc/orabuntu-lxc-release deleted.       "
-		echo "=============================================="
+	echo "=============================================="
+	echo "LXC Checkconfig completed.                    "
+	echo "=============================================="
+	echo ''
+		
+	sleep 5
 
-		sleep 5
-
-		clear
-	fi
+	clear
 
 	echo ''
 	echo "=============================================="
-	echo "Cleaning up OpenvSwitch iptables rules...     "
+	echo "Display LXC Version...                        "
 	echo "=============================================="
 	echo ''
 
+	sudo lxc-create --version
+
+	echo ''
+	echo "=============================================="
+	echo "LXC version displayed.                        "
+	echo "=============================================="
+	echo ''
+	
+	sleep 5
+
+	clear
+fi
+
+# GLS 20170919 Ubuntu Specific Code Block 1 END
+ 
+# GLS 20170919 Ubuntu Specific Code Block 2 BEGIN
+
+if [ ! -f /etc/orabuntu-lxc-release ]
+then
+	echo ''
+	echo "=============================================="
+	echo "Install LXC and prerequisite packages...      "
+	echo "=============================================="
+	echo ''
+
+	sudo apt-get install -y lxc facter iptables
+
+	echo ''
+	echo "=============================================="
+	echo "LXC and prerequisite packages completed.      "
+	echo "=============================================="
+	echo ''
+
+	sleep 5
+
+	clear
+
+	echo ''
+	echo "=============================================="
+	echo "Run LXC Checkconfig...                        "
+	echo "=============================================="
+	echo ''
+
+	sleep 5
+
+	sudo lxc-checkconfig
+
+	echo ''
+	echo "=============================================="
+	echo "LXC Checkconfig completed.                    "
+	echo "=============================================="
+	echo ''
+		
+	sleep 5
+
+	clear
+
+	echo ''
+	echo "=============================================="
+	echo "Display LXC Version...                        "
+	echo "=============================================="
+	echo ''
+
+	sudo lxc-create --version
+
+	echo ''
+	echo "=============================================="
+	echo "LXC version displayed.                        "
+	echo "=============================================="
+	echo ''
+
+	sleep 5
+
+	clear
+fi
+	
+# GLS 20170919 Ubuntu Specific Code Block 2 END
+# GLS 20170919 LXC at version 2.0.8
+
+function CheckAptGetRunning {
+	ps -ef | grep apt-get | sed 's/  */ /g' | wc -l
+}
+AptGetRunning=$(CheckAptGetRunning)
+
+if [ $AptGetRunning -gt 1 ]
+then
+	echo "Another apt-get process is already running...please kill it and rerun anylinux-services.sh"
+	exit
+fi
+
+echo ''
+echo "=============================================="
+echo "Installation required packages...             "
+echo "=============================================="
+echo ''
+
+sleep 5
+
+sudo apt-get install -y uml-utilities openvswitch-switch openvswitch-common hugepages ntp
+sudo apt-get install -y bind9utils dnsutils apparmor-utils openssh-server uuid rpm yum
+sudo apt-get install -y iotop sshpass facter iptables
+
+if [ $NetworkManagerInstalled -eq 1 ]
+then
+	sudo apt-get -y install dnsmasq
+fi
+
+if [ $UbuntuVersion = '15.04' ] || [ $UbuntuVersion = '15.10' ]
+then
+	sudo apt-get -y install db5.1 db5.1-util
+fi
+
+if [ $UbuntuVersion = '16.04' ] || [ $UbuntuVersion = '17.04' ]
+then
+	sudo apt-get -y install db5.3 db5.3-util
+	sudo ln -s /usr/bin/db5.3_dump /usr/bin/db5.1_dump
+fi
+sudo aa-complain /usr/bin/lxc-start
+echo ''
+echo "=============================================="
+echo "Package Installation complete.                "
+echo "=============================================="
+echo ''
+
+sleep 5
+
+clear
+
+if [ $Operation != new ]
+then
 	SwitchList='sw1 sx1'
 	for k in $SwitchList
 	do
+		echo ''
+		echo "=============================================="
+		echo "Cleaning up OpenvSwitch $k iptables rules...  "
+		echo "=============================================="
+		echo ''
+
+		sudo iptables -S | grep $k
 		function CheckRuleExist {
 		sudo iptables -S | grep -c $k
 		}
@@ -169,8 +494,8 @@ then
 			}
 			SwitchRuleCount=$(GetSwitchRuleCount)
 		else
-			SwitchRuleCount=0
-		fi
+ 			SwitchRuleCount=0
+ 		fi
 		function GetSwitchRule {
 		sudo iptables -S | grep $k | sort -u | head -1 | cut -f2-10 -d' '
 		}
@@ -186,6 +511,25 @@ then
 			SearchString=$(FormatSearchString) 
 			SwitchRuleCount=$(GetSwitchRuleCount)
 			RuleExist=$(CheckRuleExist)
+			echo ''
+			echo "Rules remaining to be deleted for OpenvSwitch $k:"
+			echo ''
+			function GetIptablesRulesCount {
+				sudo iptables -S | grep -c $k
+			}
+			IptablesRulesCount=$(GetIptablesRulesCount)
+			if [ $IptablesRulesCount -gt 0 ]
+			then
+				sudo iptables -S | grep $k
+			else
+				echo "=============================================="
+				echo "All iptables switch $k rules deleted.         "
+				echo "=============================================="
+				
+				sleep 5
+
+				clear
+			fi
 		done
 	done
 
@@ -200,54 +544,28 @@ then
 	sleep 5
 
 	clear
+else
+	sleep 5
+
+	clear
+fi
+
+which lxc-ls > /dev/null 2>&1
+if [ $? -ne 0 ]
+then
+	echo ''
+	echo "=============================================="
+	echo "Install LXC and prerequisite packages...      "
+	echo "=============================================="
+	echo ''
+	
+	sudo apt-get install -y lxc facter iptables
 
 	echo ''
 	echo "=============================================="
-	echo "Default "N" to NOT destroy existing leases.   "
-	echo "This deletes DHCP leases in the DNS DHCP LXC  "
-	echo "container.  It does NOT delete any DHCP leases"
-	echo "on this Orabuntu-LXC host.                    "
-	echo "                                              "
-	echo "This step is typically used when reinstalling "
-	echo "Orabuntu-LXC from scratch to zero out the     "
-	echo "leases from the previous Orabuntu-LXC install."
-	echo "                                              " 
-	echo "On the first run of Orabuntu-LXC this can be  "
-	echo "left set to "N" because there are no leases to"
-	echo "delete on the first run.                      "
-	echo "                                              "
-	read -e -p "Terminate Existing DHCP Leases? [Y/N]   " -i "N" TerminateLeases 
-	echo "                                              "
+	echo "LXC and prerequisite packages completed.      "
 	echo "=============================================="
 	echo ''
-
-	if [ $TerminateLeases = 'y' ] || [ $TerminateLeases = 'Y' ] && [ ! -z $NameServer ] 
-	then
-		echo ''
-		echo "=============================================="
-		echo "Clear DHCP leases...                          "
-		echo "=============================================="
-		echo ''
-
-		if [ -e /var/lib/lxc/$NameServer/rootfs/var/lib/dhcp/dhcpd.leases ] 
-		then
-		sudo lxc-attach -n $NameServer -- sudo service isc-dhcp-server stop >/dev/null 2>&1
-			if [ -e /var/lib/lxc/$NameServer/rootfs/var/lib/dhcp/dhcpd.leases~ ]
-			then
-				sudo rm /var/lib/lxc/$NameServer/rootfs/var/lib/dhcp/dhcpd.leases~
-			fi
-
-			if [ -e /var/lib/lxc/$NameServer/rootfs/var/lib/dhcp/dhcpd.leases ]
-			then
-				sudo rm /var/lib/lxc/$NameServer/rootfs/var/lib/dhcp/dhcpd.leases
-			fi
-			sudo lxc-attach -n $NameServer -- sudo service isc-dhcp-server start >/dev/null 2>&1
-		fi 
-
-		echo "=============================================="
-		echo "Clear DHCP leases complete.                   "
-		echo "=============================================="
-	fi 
 
 	sleep 5
 
@@ -255,215 +573,42 @@ then
 
 	echo ''
 	echo "=============================================="
-	echo "         Optional step to destroy             "
-	echo "      existing LXC linux containers.          "
-	echo "                                              "
-	echo " Clone containers script starts cloning from  "
-	echo "            the n+1th container               "
-	echo "          so this step is optional            "
-	echo "      even on re-runs of Orabuntu-LXC         "
-	echo "                                              "
-	echo " If you have non-Orabuntu-LXC containers then "
-	echo "  answer N to this question or else your LXC  "
-	echo "        containers will be deleted.           "
+	echo "Run LXC Checkconfig...                        "
 	echo "=============================================="
 	echo ''
+
+	sleep 5
+
+	sudo lxc-checkconfig
+
+	echo ''
 	echo "=============================================="
-	echo "                                              "
-	read -e -p "Delete Existing LXC Containers? [Y/N]   " -i "N" DestroyContainers 
-	echo "                                              "
+	echo "LXC Checkconfig completed.                    "
 	echo "=============================================="
-
-	if [ $DestroyContainers = 'y' ] || [ $DestroyContainers = 'Y' ] 
-	then
-		echo ''
-		echo "=============================================="
-		echo "          Destruction of Containers           "
-		echo "                                              "
-		echo "                !!WARNING!!                   "
-		echo "                                              "
-		echo "     This step (optionally) destroys          "
-		echo "          all existing containers             "
-		echo "                                              "
-		echo "   If any doubts, <CTRL>+c NOW to exit and    " 
-		echo "    review scripts first before running!      "
-		echo "                                              "
-		echo "    Sleeping 25 seconds to give you time      "
-		echo "              to think...                     "
-		echo "                                              "
-		echo "=============================================="
-
-		sleep 25
-
-		clear
-
-		function CheckContainersExist {
-		sudo ls /var/lib/lxc | more | sed 's/$/ /' | tr -d '\n' | sed 's/  */ /g'
-		}
-		ContainersExist=$(CheckContainersExist)
-
-		function CheckSeedContainersExist {
-		sudo ls /var/lib/lxc | more | grep oel | sed 's/$/ /' | tr -d '\n' | sed 's/  */ /g'
-		}
-		SeedContainersExist=$(CheckSeedContainersExist)
-
-		echo ''
-		echo "=============================================="
-		read -e -p "Delete Only Container oel$OracleRelease? [Y/N]    " -i "Y" DestroySeedContainerOnly
-		echo "=============================================="
-		echo ''
-
-		if [ $DestroySeedContainerOnly = 'Y' ] || [ $DestroySeedContainerOnly = 'y' ]
-		then
-			DestroyContainers=$(CheckSeedContainersExist)
-		else
-			DestroyContainers=$(CheckContainersExist)
-		fi
-
-		for j in $DestroyContainers
-		do
-			sudo lxc-stop -n $j
-			sleep 2
-			sudo lxc-destroy -n $j -f 
-			sudo rm -rf /var/lib/lxc/$j
-		done
-
-		echo ''
-		echo "=============================================="
-		echo "Destruction of Containers complete            "
-		echo "=============================================="
+	echo ''
 		
-	fi 
-
 	sleep 5
 
 	clear
 
 	echo ''
 	echo "=============================================="
-	echo "         Show Defined Containers...           "
+	echo "Display LXC Version...                        "
 	echo "=============================================="
 	echo ''
 
-	which lxc-ls > /dev/null 2>&1
-	if [ $? -eq 0 ]
-	then
-		sudo lxc-ls -f
-	fi
+	sudo lxc-create --version
 
 	echo ''
 	echo "=============================================="
-	echo "         Container Check completed.           "
+	echo "LXC version displayed.                        "
 	echo "=============================================="
+	echo ''
+	
+	sleep 5
+
+	clear
 fi
-
-echo ''
-echo "=============================================="
-echo "Ubuntu Package Installation...                "
-echo "=============================================="
-echo ''
-
-function CheckAptGetRunning {
-	ps -ef | grep apt-get | sed 's/  */ /g' | wc -l
-}
-AptGetRunning=$(CheckAptGetRunning)
-
-if [ $AptGetRunning -gt 1 ]
-then
-	echo "Another apt-get process is already running...please kill it and rerun anylinux-services.sh"
-	exit
-fi
-
-sudo apt-get install -y lxc
-
-# GLS 20160103 synaptic and cpu-checker packages not necessary.
-# sudo apt-get install -y synaptic
-# sudo apt-get install -y cpu-checker
-
-sudo apt-get install -y uml-utilities
-sudo apt-get install -y openvswitch-switch
-sudo apt-get install -y openvswitch-common
-
-# GLS 20151126 openvswitch-controller package no longer available, no longer needed.
-# sudo apt-get install -y openvswitch-controller
-
-sudo apt-get install -y bind9utils dnsutils
-sudo apt-get install -y apparmor-utils
-sudo apt-get install -y openssh-server
-sudo apt-get install -y uuid
-
-# GLS 20151206 Not needed for LXC.
-# Uncomment if you want KVM vm capability.
-# sudo apt-get install -y qemu-kvm
-# sudo apt-get install -y libvirt-bin
-# sudo apt-get install -y virt-manager
-
-sudo apt-get install -y rpm
-sudo apt-get install -y yum
-sudo apt-get install -y hugepages
-
-# GLS 20160103 nfs-kernel-server and nfs-common-portmap not needed
-# sudo apt-get install -y nfs-kernel-server
-# sudo apt-get install -y nfs-common portmap
-# GLS 20160103 multipath-tools and open-iscsi install moved to ./orabuntu-lxc-master/scst-files SCST SAN installer scripts.
-# sudo apt-get install -y multipath-tools
-# sudo apt-get install -y open-iscsi 
-
-sudo apt-get install -y ntp
-sudo apt-get install -y iotop
-sudo apt-get install -y flashplugin-installer
-sudo apt-get install -y sshpass
-sudo apt-get install -y facter iptables
-
-# GLS 20151213 gawk needed for scst custom kernel build on linux 4.x kernels.
-# GLS 20162022 gawk no longer needed because custom kernels no longer needed for SCST for kernels >= 2.6.30
-
-function GetUbuntuVersion {
-cat /etc/lsb-release | grep DISTRIB_RELEASE | cut -f2 -d'='
-}
-UbuntuVersion=$(GetUbuntuVersion)
-
-if [ $UbuntuVersion = '15.04' ] || [ $UbuntuVersion = '15.10' ]
-then
-	sudo apt-get -y install db5.1 db5.1-util
-fi
-
-if [ $UbuntuVersion = '16.04' ] || [ $UbuntuVersion = '17.04' ]
-then
-	sudo apt-get -y install db5.3 db5.3-util
-	sudo ln -s /usr/bin/db5.3_dump /usr/bin/db5.1_dump
-fi
-
-### New Code Begin 2017-08-22 GLS ###
-# 2017-08-22 GLS Adds back dnsmasq so that /etc/NetworkManager/dnsmasq.d/local file is used for LXC container network resolution.
-# if [ $UbuntuVersion = '16.10' ] || [ $UbuntuVersion = '17.04' ]
-# then
-# 	sudo apt-get install dnsmasq
-# 	function CheckDnsmasqSet {
-# 		grep 'dns=dnsmasq' /etc/NetworkManager/NetworkManager.conf | wc -l
-# 	}
-# 	DnsmasqSet=$(CheckDnsmasqSet)
-# 	if [ $DnsmasqSet -eq 0 ]
-# 	then
-# 		sudo sed -i '/\[main\]/{p;s/.*/1/;H;g;/^\(\n1\)\{1\}$/s//dns=dnsmasq/p;d}' /etc/NetworkManager/NetworkManager.conf
-# 		sudo sed -i '/hosts:/s/files/dns files/g' /etc/nsswitch.conf
-# 	fi
-# 	sudo sh -c "echo 'DNS=127.0.1.1' 		> /etc/systemd/resolved.conf"
-# 	sudo sh -c "echo 'FallbackDNS=127.0.1.1' 	> /etc/systemd/resolved.conf"
-# fi
-### New Code End 2017-08-22 GLS ###
-
-sudo aa-complain /usr/bin/lxc-start
-
-echo ''
-echo "=============================================="
-echo "Ubuntu Package Installation complete          "
-echo "=============================================="
-echo ''
-
-sleep 5
-
-clear
 
 echo ''
 echo "=============================================="
@@ -471,23 +616,18 @@ echo "Verify required packages status...            "
 echo "=============================================="
 echo ''
 
-function GetUbuntuVersion {
-cat /etc/lsb-release | grep DISTRIB_RELEASE | cut -f2 -d'='
-}
-UbuntuVersion=$(GetUbuntuVersion)
-
 if [ $UbuntuVersion = '15.10' ] || [ $UbuntuVersion = '15.04' ]
 then
 	function CheckPackageInstalled {
-echo 'facter lxc uml-utilities openvswitch-switch openvswitch-common bind9utils dnsutils apparmor-utils openssh-server uuid rpm yum hugepages ntp iotop flashplugin-installer sshpass db5.1-util'
-}
+		echo 'facter lxc uml-utilities openvswitch-switch openvswitch-common bind9utils dnsutils apparmor-utils openssh-server uuid rpm yum hugepages ntp iotop sshpass db5.1-util'
+	}
 fi
 
 if [ $UbuntuVersion = '16.04' ] || [ $UbuntuVersion = '17.04' ]
 then
-function CheckPackageInstalled {
-echo 'facter lxc uml-utilities openvswitch-switch openvswitch-common bind9utils dnsutils apparmor-utils openssh-server uuid rpm yum hugepages ntp iotop flashplugin-installer sshpass db5.3-util'
-}
+	function CheckPackageInstalled {
+	echo 'facter lxc uml-utilities openvswitch-switch openvswitch-common bind9utils dnsutils apparmor-utils openssh-server uuid rpm yum hugepages ntp iotop sshpass db5.3-util'
+	}
 fi
 
 PackageInstalled=$(CheckPackageInstalled)
@@ -507,8 +647,6 @@ sleep 5
 
 clear
 
-# Check existing file backups to be sure they were made successfully
-
 echo ''
 echo "=============================================="
 echo "Pre-install backup of key files...            "
@@ -519,9 +657,7 @@ echo "Extracting backup scripts...                  "
 echo "==============================================" 
 echo ''
 
-cd ~/Downloads/orabuntu-lxc-master/orabuntu/archives
-sudo tar -vP --extract --file=ubuntu-host.tar /etc/orabuntu-lxc-scripts/ubuntu-host-backup.sh
-
+sudo tar -vP --extract --file=/home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/ubuntu-host.tar /etc/orabuntu-lxc-scripts/ubuntu-host-backup.sh --touch
 sudo /etc/orabuntu-lxc-scripts/ubuntu-host-backup.sh
 
 echo ''
@@ -533,143 +669,159 @@ sleep 5
 
 clear
 
-# Create Ubuntu LXC DNS DHCP container.
+function CheckNameServerExists {
+	sudo lxc-ls -f | grep -c "$NameServer"
+}
+NameServerExists=$(CheckNameServerExists)
 
-echo ''
-echo "=============================================="
-echo "Create Ubuntu LXC DNS DHCP container...       "
-echo "=============================================="
-echo ''
-
-# GLS 20170707 Try both methods.
-# GLS 20170707 Second method will just say 'nsa already exists' if first method succeeds.
-
-sudo lxc-create -t download -n nsa -- -d ubuntu -r xenial -a amd64
-echo ''
-sudo lxc-create -n nsa -t ubuntu
-
-echo ''
-echo "=============================================="
-echo "Create Ubuntu LXC DNS DHCP container complete."
-echo "=============================================="
-
-sleep 5
-
-clear
-
-echo ''
-echo "=============================================="
-echo "Installing DNS DHCP in LXC container...       "
-echo "=============================================="
-echo ''
-sudo sed -i '0,/.*nameserver.*/s/.*nameserver.*/nameserver 8.8.8.8\n&/' /var/lib/lxc/nsa/rootfs/etc/resolv.conf
-sudo lxc-start -n nsa
-echo ''
-
-sleep 5
-
-clear
-
-echo ''
-echo "=============================================="
-echo "Testing lxc-attach for ubuntu user...         "
-echo "=============================================="
-echo ''
-
-sudo lxc-attach -n nsa -- uname -a
-if [ $? -ne 0 ]
+if [ $NameServerExists -eq 0 ] && [ $MultiHostVar2 = 'N' ]
 then
 	echo ''
 	echo "=============================================="
-	echo "lxc-attach to nsa has issue(s).               "
-	echo "lxc-attach tonsa must succeed.                "
-	echo "Fix issues retry script.                      "
-	echo "Script exiting.                               "
+	echo "Create LXC DNS DHCP container...              "
 	echo "=============================================="
-	exit
-else
 	echo ''
 	echo "=============================================="
-	echo "lxc-attach to nsa successful.                 "
+	echo "Trying Method 1...                            "
+	echo "                                              "
+	echo "Patience...download of rootfs takes time...   "
 	echo "=============================================="
+	echo ''
+
+	sudo lxc-create -t download -n nsa -- --dist ubuntu --release xenial --arch amd64
+
+	echo ''
+	echo "=============================================="
+	echo "Trying Method 2...                            "
+	echo "=============================================="
+	echo ''
+	
+	sudo lxc-create -n nsa -t ubuntu -- --release xenial --arch amd64
+
+	echo ''
+	echo "=============================================="
+	echo "Create LXC DNS DHCP container complete.       "
+	echo "=============================================="
+
+	sleep 5
+
+	clear
+
+	echo ''
+	echo "=============================================="
+	echo "Install & configure DNS DHCP LXC container... "
+	echo "=============================================="
+
+	echo ''
+	sudo touch /var/lib/lxc/nsa/rootfs/etc/resolv.conf
+	sudo sed -i '0,/.*nameserver.*/s/.*nameserver.*/nameserver 8.8.8.8\n&/' /var/lib/lxc/nsa/rootfs/etc/resolv.conf
+	sudo lxc-start -n nsa
+	echo ''
+
+	sleep 5 
+
+	clear
+
+	echo ''
+	echo "=============================================="
+	echo "Testing lxc-attach for ubuntu user...         "
+	echo "=============================================="
+	echo ''
+
+
+	sudo lxc-attach -n nsa -- uname -a
+	if [ $? -ne 0 ]
+	then
+		echo ''
+		echo "=============================================="
+		echo "lxc-attach has issue(s).                      "
+		echo "=============================================="
+	else
+		echo ''
+		echo "=============================================="
+		echo "lxc-attach successful.                        "
+		echo "=============================================="
+
+		sleep 5 
+	fi
+
+	sleep 5
+
+	clear
+
+	echo ''
+	echo "=============================================="
+	echo "Install bind9 & isc-dhcp-server in container. "
+	echo "Install openssh-server in container.          "
+	echo "=============================================="
+	echo ''
+
+	sudo lxc-attach -n nsa -- sudo apt-get -y update
+	sudo lxc-attach -n nsa -- sudo apt-get -y install bind9 isc-dhcp-server bind9utils dnsutils openssh-server
+
+	sleep 2
+
+	sudo lxc-attach -n nsa -- sudo service isc-dhcp-server start
+	sudo lxc-attach -n nsa -- sudo service bind9 start
+
+	echo ''
+	echo "=============================================="
+	echo "Install bind9 & isc-dhcp-server complete.     "
+	echo "Install openssh-server complete.              "
+	echo "=============================================="
+
+	sleep 5
+
+	clear
+
+	echo ''
+	echo "=============================================="
+	echo "DNS DHCP installed in LXC container.          "
+	echo "=============================================="
+
+	sleep 5
+
+	clear
+
+	echo ''
+	echo "=============================================="
+	echo "Stopping DNS DHCP LXC container...            "
+	echo "=============================================="
+	echo ''
+
+	sudo lxc-stop -n nsa
+	sudo lxc-info -n nsa
+
+	echo ''
+	echo "=============================================="
+	echo "DNS DHCP LXC container stopped.               "
+	echo "=============================================="
+	echo ''
+
+	sleep 5 
+
+	clear
 fi
 
-sleep 5
+# Unpack customized OS host files for Oracle on LXC host server
 
-clear
-
-echo ''
-echo "=============================================="
-echo "Install bind9 & isc-dhcp-server in container. "
-echo "Install openssh-server in container.          "
-echo "=============================================="
-echo ''
-
-sudo lxc-attach -n nsa -- apt-get update
-sudo lxc-attach -n nsa -- apt-get install -y bind9 isc-dhcp-server bind9utils dnsutils openssh-server
-sudo lxc-attach -n nsa -- sudo apt-get -y install bind9 isc-dhcp-server bind9utils dnsutils
-
-sudo sleep 2
-sudo lxc-attach -n nsa -- service bind9 start
-sudo lxc-attach -n nsa -- service isc-dhcp-server start
-sudo lxc-attach -n nsa -- sudo service bind9 start
-sudo lxc-attach -n nsa -- sudo service isc-dhcp-server start
+function CheckNsaExists {
+	sudo lxc-ls -f | grep -c nsa
+}
+NsaExists=$(CheckNsaExists)
+FirstRunNsa=$NsaExists
 
 echo ''
 echo "=============================================="
-echo "Install bind9 & isc-dhcp-server complete.     "
-echo "Install openssh-server complete.              "
+echo "Unpack G1 host files for $LF Linux $RL...     "
 echo "=============================================="
 echo ''
 
-sleep 5
-
-clear
+sudo tar -P -xvf /home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/ubuntu-host.tar --touch
 
 echo ''
 echo "=============================================="
-echo "DNS DHCP installed in LXC container.          "
-echo "=============================================="
-echo ''
-
-sleep 5 
-
-clear
-
-echo ''
-echo "=============================================="
-echo "Stopping DNS DHCP LXC container...            "
-echo "=============================================="
-echo ''
-
-sudo lxc-stop -n nsa
-sudo lxc-ls -f
-
-echo ''
-echo "=============================================="
-echo "DNS DHCP LXC container stopped.               "
-echo "=============================================="
-echo ''
-
-sleep 5 
-
-clear
-
-# Unpack customized OS host files for Oracle on Ubuntu LXC host server
-
-echo ''
-echo "=============================================="
-echo "Unpacking G1 host files for Ubuntu...         "
-echo "=============================================="
-echo ''
-
-cd ~/Downloads/orabuntu-lxc-master/orabuntu/archives
-
-sudo tar -P -xvf ubuntu-host.tar --touch
-
-echo ''
-echo "=============================================="
-echo "Unpacked G1 host files for Ubuntu.            "
+echo "Done: Unpack G1 host files for $LF Linux $RL. "
 echo "=============================================="
 
 sleep 5
@@ -678,21 +830,32 @@ clear
 
 echo ''
 echo "=============================================="
-echo "Unpacking G2 host files for Ubuntu...         "
+echo "Unpack G2 host files for $LF Linux $RL...     "
 echo "=============================================="
 echo ''
 
-sudo tar -P -xvf dns-dhcp-host.tar --touch
+sudo tar -P -xvf /home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/dns-dhcp-host.tar --touch
+sudo chmod +x /etc/network/openvswitch/crt_ovs_s*.sh
 
-# GLS 20161124 Tweaks to files unpacked from dns-dhcp-host.tar file
-sudo sed -i -e :a -e '/^\n*$/{$d;N;ba' -e '}' /etc/network/if-up.d/orabuntu-lxc-net
-sudo sed -i '/# end script/s/# end script//'  /etc/network/if-up.d/orabuntu-lxc-net
-sudo sed -i '/# script/s/# script/#/'         /etc/network/if-up.d/orabuntu-lxc-net
+if [ $MultiHostVar2 = 'Y' ]
+then
+	sudo rm /var/lib/lxc/nsa/config
+fi
 
 echo ''
 echo "=============================================="
-echo "Unpacked G2 host files for Ubuntu.            "
+echo "Done: Unpack G2 host files for $LF Linux $RL. "
 echo "=============================================="
+
+sleep 5
+
+clear
+
+echo ''
+echo "=============================================="
+echo "Custom files for $LF Linux $RL installed.     "
+echo "=============================================="
+echo ''
 
 sleep 5
 
@@ -720,21 +883,21 @@ sudo touch /etc/sysctl.d/60-oracle.conf
 sudo cat /etc/sysctl.d/60-oracle.conf
 sudo chmod +x /etc/sysctl.d/60-oracle.conf
 
-echo 'Linux OS Memory Reservation (in Kb) ... '$LinuxOSMemoryReservation 
+echo 'Linux OS Memory Reservation (in Kb) ... '$OSMemRes 
 function GetMemTotal {
-cat /proc/meminfo | grep MemTotal | cut -f2 -d':' |  sed 's/  *//g' | cut -f1 -d'k'
+sudo cat /proc/meminfo | grep MemTotal | cut -f2 -d':' |  sed 's/  *//g' | cut -f1 -d'k'
 }
 MemTotal=$(GetMemTotal)
 echo 'Memory (in Kb) ........................ '$MemTotal
 
-((MemOracleKb = MemTotal - LinuxOSMemoryReservation))
+((MemOracleKb = MemTotal - OSMemRes))
 echo 'Memory for Oracle (in Kb) ............. '$MemOracleKb
 
 ((MemOracleBytes = MemOracleKb * 1024))
 echo 'Memory for Oracle (in bytes) .......... '$MemOracleBytes
 
 function GetPageSize {
-getconf PAGE_SIZE
+sudo getconf PAGE_SIZE
 }
 PageSize=$(GetPageSize)
 echo 'Page Size (in bytes) .................. '$PageSize
@@ -761,12 +924,18 @@ sudo sh -c "echo 'kernel.shmmni = 4096'                      >> /etc/sysctl.d/60
 sudo sh -c "echo 'kernel.sem = 250 32000 100 128'            >> /etc/sysctl.d/60-oracle.conf"
 sudo sh -c "echo 'fs.file-max = 6815744'                     >> /etc/sysctl.d/60-oracle.conf"
 sudo sh -c "echo 'fs.aio-max-nr = 1048576'                   >> /etc/sysctl.d/60-oracle.conf"
-sudo sh -c "echo 'net.ipv4.ip_local_port_range = 9000 65500' >> /etc/sysctl.d/60-oracle.conf"
+sudo sh -c "echo 'net.ipv4.ip_local_port_range = 9000 65501' >> /etc/sysctl.d/60-oracle.conf"
 sudo sh -c "echo 'net.core.rmem_default = 262144'            >> /etc/sysctl.d/60-oracle.conf"
 sudo sh -c "echo 'net.core.rmem_max = 4194304'               >> /etc/sysctl.d/60-oracle.conf"
 sudo sh -c "echo 'net.core.wmem_default = 262144'            >> /etc/sysctl.d/60-oracle.conf"
 sudo sh -c "echo 'net.core.wmem_max = 1048576'               >> /etc/sysctl.d/60-oracle.conf"
+# sudo sh -c "echo 'vm.nr_hugepages = 3500'                  >> /etc/sysctl.d/60-oracle.conf"
 sudo sh -c "echo 'kernel.panic_on_oops = 1'                  >> /etc/sysctl.d/60-oracle.conf"
+
+echo ''
+echo "=============================================="
+echo "Created /etc/sysctl.d/60-oracle.conf file ... "
+echo "=============================================="
 echo ''
 echo "=============================================="
 echo "Display /etc/sysctl.d/60-oracle.conf"
@@ -774,7 +943,6 @@ echo "=============================================="
 echo ''
 
 sudo sysctl -p /etc/sysctl.d/60-oracle.conf
-sudo sed -i '/sysctl/s/^# //' /etc/network/if-up.d/orabuntu-lxc-net
 
 echo ''
 echo "=============================================="
@@ -793,28 +961,24 @@ echo ''
 
 if [ ! -f /etc/systemd/system/60-oracle.service ]
 then
-	sudo sh -c "echo '[Unit]'                                    			 > /etc/systemd/system/60-oracle.service"
-	sudo sh -c "echo 'Description=60-oracle Service'            			>> /etc/systemd/system/60-oracle.service"
-	sudo sh -c "echo 'After=network.target'                     			>> /etc/systemd/system/60-oracle.service"
-	sudo sh -c "echo ''                                         			>> /etc/systemd/system/60-oracle.service"
-	sudo sh -c "echo '[Service]'                                			>> /etc/systemd/system/60-oracle.service"
-	sudo sh -c "echo 'Type=oneshot'                             			>> /etc/systemd/system/60-oracle.service"
-	sudo sh -c "echo 'User=root'                                			>> /etc/systemd/system/60-oracle.service"
-	sudo sh -c "echo 'RemainAfterExit=yes'                      			>> /etc/systemd/system/60-oracle.service"
+sudo sh -c "echo '[Unit]'                                    			 > /etc/systemd/system/60-oracle.service"
+sudo sh -c "echo 'Description=60-oracle Service'            			>> /etc/systemd/system/60-oracle.service"
+sudo sh -c "echo 'After=network.target'                     			>> /etc/systemd/system/60-oracle.service"
+sudo sh -c "echo ''                                         			>> /etc/systemd/system/60-oracle.service"
+sudo sh -c "echo '[Service]'                                			>> /etc/systemd/system/60-oracle.service"
+sudo sh -c "echo 'Type=oneshot'                             			>> /etc/systemd/system/60-oracle.service"
+sudo sh -c "echo 'User=root'                                			>> /etc/systemd/system/60-oracle.service"
+sudo sh -c "echo 'RemainAfterExit=yes'                      			>> /etc/systemd/system/60-oracle.service"
+sudo sh -c "echo 'ExecStart=/usr/sbin/sysctl -p /etc/sysctl.d/60-oracle.conf'	>> /etc/systemd/system/60-oracle.service"
+sudo sh -c "echo ''                                         			>> /etc/systemd/system/60-oracle.service"
+sudo sh -c "echo '[Install]'                                			>> /etc/systemd/system/60-oracle.service"
+sudo sh -c "echo 'WantedBy=multi-user.target'               			>> /etc/systemd/system/60-oracle.service"
 
-if [ $LinuxFlavor = 'Ubuntu' ]
-then
-	sudo sh -c "echo 'ExecStart=/sbin/sysctl -p /etc/sysctl.d/60-oracle.conf'	>> /etc/systemd/system/60-oracle.service"
-else
-	sudo sh -c "echo 'ExecStart=/usr/sbin/sysctl -p /etc/sysctl.d/60-oracle.conf'	>> /etc/systemd/system/60-oracle.service"
+sudo chmod 644 /etc/systemd/system/60-oracle.service
+sudo systemctl enable 60-oracle
 fi
-	sudo sh -c "echo ''                                         			>> /etc/systemd/system/60-oracle.service"
-	sudo sh -c "echo '[Install]'                                			>> /etc/systemd/system/60-oracle.service"
-	sudo sh -c "echo 'WantedBy=multi-user.target'               			>> /etc/systemd/system/60-oracle.service"
 
-	sudo chmod 644 /etc/systemd/system/60-oracle.service
-	sudo systemctl enable 60-oracle
-fi
+sudo cat /etc/systemd/system/60-oracle.service
 
 echo ''
 echo "=============================================="
@@ -842,29 +1006,29 @@ sudo chmod +x /etc/security/limits.d/70-oracle.conf
 
 # Oracle Kernel Parameters
 
-sudo sh -c "echo '#                                     '  > /etc/security/limits.d/70-oracle.conf"
-sudo sh -c "echo '# Oracle DB Parameters                ' >> /etc/security/limits.d/70-oracle.conf"
-sudo sh -c "echo '#                                     ' >> /etc/security/limits.d/70-oracle.conf"
-sudo sh -c "echo 'oracle	soft	nproc       2047' >> /etc/security/limits.d/70-oracle.conf"
-sudo sh -c "echo 'oracle	hard	nproc      16384' >> /etc/security/limits.d/70-oracle.conf"
-sudo sh -c "echo 'oracle	soft	nofile      1024' >> /etc/security/limits.d/70-oracle.conf"
-sudo sh -c "echo 'oracle	hard	nofile     65536' >> /etc/security/limits.d/70-oracle.conf"
-sudo sh -c "echo 'oracle	soft	stack      10240' >> /etc/security/limits.d/70-oracle.conf"
-sudo sh -c "echo 'oracle	hard	stack      10240' >> /etc/security/limits.d/70-oracle.conf"
-sudo sh -c "echo '* 	soft 	memlock  9873408'         >> /etc/security/limits.d/70-oracle.conf"
-sudo sh -c "echo '* 	hard 	memlock  9873408'         >> /etc/security/limits.d/70-oracle.conf"
+sudo sh -c "echo '#                                        '  > /etc/security/limits.d/70-oracle.conf"
+sudo sh -c "echo '# Oracle DB Parameters                   ' >> /etc/security/limits.d/70-oracle.conf"
+sudo sh -c "echo '#                                        ' >> /etc/security/limits.d/70-oracle.conf"
+sudo sh -c "echo 'oracle	soft	nproc       2047   ' >> /etc/security/limits.d/70-oracle.conf"
+sudo sh -c "echo 'oracle	hard	nproc      16384   ' >> /etc/security/limits.d/70-oracle.conf"
+sudo sh -c "echo 'oracle	soft	nofile      1024   ' >> /etc/security/limits.d/70-oracle.conf"
+sudo sh -c "echo 'oracle	hard	nofile     65536   ' >> /etc/security/limits.d/70-oracle.conf"
+sudo sh -c "echo 'oracle	soft	stack      10240   ' >> /etc/security/limits.d/70-oracle.conf"
+sudo sh -c "echo 'oracle	hard	stack      10240   ' >> /etc/security/limits.d/70-oracle.conf"
+sudo sh -c "echo '* 	soft 	memlock  9873408           ' >> /etc/security/limits.d/70-oracle.conf"
+sudo sh -c "echo '* 	hard 	memlock  9873408           ' >> /etc/security/limits.d/70-oracle.conf"
 
 # Oracle Grid Infrastructure Kernel Parameters
 	
-sudo sh -c "echo '#                             '         >> /etc/security/limits.d/70-oracle.conf"
-sudo sh -c "echo '# Oracle GI Parameters        '         >> /etc/security/limits.d/70-oracle.conf"
-sudo sh -c "echo '#                             '         >> /etc/security/limits.d/70-oracle.conf"
-sudo sh -c "echo 'grid	soft	nproc       2047'         >> /etc/security/limits.d/70-oracle.conf"
-sudo sh -c "echo 'grid	hard	nproc      16384'         >> /etc/security/limits.d/70-oracle.conf"
-sudo sh -c "echo 'grid	soft	nofile      1024'         >> /etc/security/limits.d/70-oracle.conf"
-sudo sh -c "echo 'grid	hard	nofile     65536'         >> /etc/security/limits.d/70-oracle.conf"
-sudo sh -c "echo 'grid	soft	stack      10240'         >> /etc/security/limits.d/70-oracle.conf"
-sudo sh -c "echo 'grid	hard	stack      10240'         >> /etc/security/limits.d/70-oracle.conf"
+sudo sh -c "echo '#                                        ' >> /etc/security/limits.d/70-oracle.conf"
+sudo sh -c "echo '# Oracle GI Parameters                   ' >> /etc/security/limits.d/70-oracle.conf"
+sudo sh -c "echo '#                                        ' >> /etc/security/limits.d/70-oracle.conf"
+sudo sh -c "echo 'grid	soft	nproc       2047           ' >> /etc/security/limits.d/70-oracle.conf"
+sudo sh -c "echo 'grid	hard	nproc      16384           ' >> /etc/security/limits.d/70-oracle.conf"
+sudo sh -c "echo 'grid	soft	nofile      1024           ' >> /etc/security/limits.d/70-oracle.conf"
+sudo sh -c "echo 'grid	hard	nofile     65536           ' >> /etc/security/limits.d/70-oracle.conf"
+sudo sh -c "echo 'grid	soft	stack      10240           ' >> /etc/security/limits.d/70-oracle.conf"
+sudo sh -c "echo 'grid	hard	stack      10240           ' >> /etc/security/limits.d/70-oracle.conf"
 
 echo "=============================================="
 echo 'Display /etc/security/limits.d/70-oracle.conf '
@@ -874,256 +1038,224 @@ sudo cat /etc/security/limits.d/70-oracle.conf
 echo ''
 echo "=============================================="
 echo "Created /etc/security/limits.d/70-oracle.conf "
+echo "Sleeping 10 seconds for settings review ...   "
 echo "=============================================="
 echo ''
-
-sleep 5
-
-clear
-
-echo ''
-echo "=============================================="
-echo "Starting OpenvSwitch sw1 ...                  "
-echo "=============================================="
-
-sudo chmod 755 /etc/network/openvswitch/crt_ovs_sw1.sh
-sudo sed -i "s/orabuntu-lxc\.com/$Domain1/g" 		/etc/network/openvswitch/crt_ovs_sw1.sh
-sudo sed -i "s/consultingcommandos\.us/$Domain2/g" 	/etc/network/openvswitch/crt_ovs_sw1.sh
-sudo /etc/network/openvswitch/crt_ovs_sw1.sh >/dev/null 2>&1
-echo ''
-sleep 3
-sudo ifconfig sw1
-sudo sed -i '/sw1/s/^# //g' /etc/network/if-up.d/orabuntu-lxc-net
-
-echo "=============================================="
-echo "OpenvSwitch sw1 started.                      "
-echo "=============================================="
-echo ''
-
-sleep 5
-
-clear
-
-echo ''
-echo "=============================================="
-echo "Starting OpenvSwitch sx1 ...                  "
-echo "=============================================="
-
-sudo chmod 755 /etc/network/openvswitch/crt_ovs_sx1.sh
-sudo /etc/network/openvswitch/crt_ovs_sx1.sh >/dev/null 2>&1
-echo ''
-sleep 3
-sudo ifconfig sx1
-sudo sed -i '/sx1/s/^# //g' /etc/network/if-up.d/orabuntu-lxc-net
-
-echo "=============================================="
-echo "OpenvSwitch sx1 started.                      "
-echo "=============================================="
-echo ''
-
-sleep 5
-
-clear
-
-echo ''
-echo "=============================================="
-echo "Verify iptables rules are set correctly...    "
-echo "=============================================="
-echo ''
-
-sudo iptables -S | egrep 'sx1|sw1'
-
-echo ''
-echo "=============================================="
-echo "Verification of iptables rules complete.      "
-echo "=============================================="
-echo ''
-
-sleep 5
-
-clear
-
-echo ''
-echo "=============================================="
-echo "Ensure 10.207.39.0/24 & 10.207.29.0/24 up...  "
-echo "=============================================="
-echo ''
-
-sudo ifconfig sw1
-sudo ifconfig sx1
-
-echo "=============================================="
-echo "Networks are up.                              "
-echo "=============================================="
-echo ''
-
-sleep 5
-
-clear
-
-# Unpack customized OS host files for Oracle on Ubuntu LXC host server
-
-echo ''
-echo "=============================================="
-echo "Unpacking LXC nameserver custom files...      "
-echo "=============================================="
-echo ''
-	
-cd ~/Downloads/orabuntu-lxc-master/orabuntu/archives
-sudo tar -P -xvf dns-dhcp-cont.tar
-
-echo ''
-echo "=============================================="
-echo "Unpacked LXC nameserver custom files.         "
-echo "=============================================="
-
-sleep 5
-
-clear
-
-echo ''
-echo "=============================================="
-echo "Setting secret in dhcpd.conf file...          "
-echo "=============================================="
-echo ''
-
-function GetKeySecret {
-sudo cat /var/lib/lxc/nsa/rootfs/etc/bind/rndc.key | grep secret | sed 's/^[ \t]*//;s/[ \t]*$//'
-}
-KeySecret=$(GetKeySecret)
-echo $KeySecret
-sudo sed -i "/secret/c\key rndc-key { algorithm hmac-md5; $KeySecret }" /var/lib/lxc/nsa/rootfs/etc/dhcp/dhcpd.conf
-echo 'The following keys should match (for dynamic DNS updates by DHCP):'
-echo ''
-sudo cat /var/lib/lxc/nsa/rootfs/etc/dhcp/dhcpd.conf | grep secret | cut -f7 -d' ' | cut -f1 -d';'
-sudo cat /var/lib/lxc/nsa/rootfs/etc/bind/rndc.key | grep secret | cut -f2 -d' ' | cut -f1 -d';'
-echo ''
-sudo cat /var/lib/lxc/nsa/rootfs/etc/dhcp/dhcpd.conf | grep secret
-
-echo ''
-echo "=============================================="
-echo "Secret successfuly set in dhcpd.conf file.    "
-echo "=============================================="
 
 sleep 10
 
 clear
 
-echo ''
-echo "=============================================="
-echo "Customize nameserver & domains ...            "
-echo "=============================================="
-echo ''
-
-# Remove the extra nameserver line used for DNS DHCP setup and add the required nameservers.
+if [ $NameServerExists -eq 0  ]
+then
+	if [ $MultiHostVar2 = 'N' ]
+	then
+		echo ''
+		echo "=============================================="
+		echo "Unpacking LXC nameserver custom files...      "
+		echo "=============================================="
+		echo ''
 	
-	sudo sed -i '/8.8.8.8/d' /var/lib/lxc/nsa/rootfs/etc/resolv.conf
-	sudo sed -i '/nameserver/c\nameserver 10.207.39.2' /var/lib/lxc/nsa/rootfs/etc/resolv.conf
-	sudo sh -c "echo 'nameserver 10.207.29.2' >> /var/lib/lxc/nsa/rootfs/etc/resolv.conf"
-	sudo sh -c "echo 'search orabuntu-lxc.com consultingcommandos.us' >> /var/lib/lxc/nsa/rootfs/etc/resolv.conf"
-	sudo sed -i "/baremetal/s/baremetal/$HOSTNAME/g" /var/lib/lxc/nsa/rootfs/var/lib/bind/fwd.orabuntu-lxc.com
-	sudo sed -i "/baremetal/s/baremetal/$HOSTNAME/g" /var/lib/lxc/nsa/rootfs/var/lib/bind/fwd.consultingcommandos.us
-	sudo sed -i "/baremetal/s/baremetal/$HOSTNAME/g" /var/lib/lxc/nsa/rootfs/var/lib/bind/rev.orabuntu-lxc.com
-	sudo sed -i "/baremetal/s/baremetal/$HOSTNAME/g" /var/lib/lxc/nsa/rootfs/var/lib/bind/rev.consultingcommandos.us
+		sudo tar -P -xvf /home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/dns-dhcp-cont.tar --touch
 
-function GetUbuntuDistribRelease {
-cat /etc/lsb-release | grep DISTRIB_RELEASE | cut -f2 -d'='
-}
-UbuntuDistribRelease=$(GetUbuntuDistribRelease)
-if [ $UbuntuDistribRelease = '16.04' ] || [ $UbuntuDistribRelease = '17.04' ]
-then
-	sudo sed -i '/nameserver/d' /etc/resolv.conf
-	sudo sed -i '/search/d'     /etc/resolv.conf
-	sudo sed -i '/domain/d'     /etc/resolv.conf
-	sudo sh -c "echo 'nameserver 10.207.39.2' >> /etc/resolv.conf"
-	sudo sh -c "echo 'nameserver 10.207.29.2' >> /etc/resolv.conf"
-	sudo sh -c "echo 'nameserver 127.0.0.1'   >> /etc/resolv.conf"
-fi
-	sudo sh -c "echo 'search orabuntu-lxc.com consultingcommandos.us gns1.orabuntu-lxc.com' >> /etc/resolv.conf"
+		echo ''
+		echo "=============================================="
+		echo "Custom files unpack complete                  "
+		echo "=============================================="
+	fi
 
-if [ -n $NameServer ]
-then
-	# GLS 20151223 Settable Nameserver feature added
-	# GLS 20161022 Settable Nameserver feature moved into DNS DHCP LXC container.
-	# GLS 20162011 Settable Nameserver feature expanded to include nameserver and both domains.
-	sudo sed -i "/nsa/s/nsa/$NameServer/g" /var/lib/lxc/nsa/rootfs/var/lib/bind/fwd.orabuntu-lxc.com
-	sudo sed -i "/nsa/s/nsa/$NameServer/g" /var/lib/lxc/nsa/rootfs/var/lib/bind/rev.orabuntu-lxc.com
-	sudo sed -i "/nsa/s/nsa/$NameServer/g" /var/lib/lxc/nsa/rootfs/var/lib/bind/fwd.consultingcommandos.us
-	sudo sed -i "/nsa/s/nsa/$NameServer/g" /var/lib/lxc/nsa/rootfs/var/lib/bind/rev.consultingcommandos.us
-	sudo sed -i "/nsa/s/nsa/$NameServer/g" /var/lib/lxc/nsa/config
-	sudo sed -i "/nsa/s/nsa/$NameServer/g" /var/lib/lxc/nsa/rootfs/etc/hostname
-	sudo sed -i "/nsa/s/nsa/$NameServer/g" /var/lib/lxc/nsa/rootfs/etc/hosts
-	sudo sed -i '/strt/s/^# //' /etc/network/if-up.d/orabuntu-lxc-net
-	sudo sed -i "/nsa/s/nsa/$NameServer/g" /etc/network/if-up.d/orabuntu-lxc-net
-	sudo sed -i "/nsa/s/nsa/$NameServer/g" /etc/network/openvswitch/strt_nsa.sh
-	sudo mv /var/lib/lxc/nsa /var/lib/lxc/$NameServer
-	sudo mv /etc/network/if-up.d/openvswitch/nsa-pub-ifup-sw1 /etc/network/if-up.d/openvswitch/$NameServer-pub-ifup-sw1
-	sudo mv /etc/network/if-down.d/openvswitch/nsa-pub-ifdown-sw1 /etc/network/if-down.d/openvswitch/$NameServer-pub-ifdown-sw1
-	sudo mv /etc/network/if-up.d/openvswitch/nsa-pub-ifup-sx1 /etc/network/if-up.d/openvswitch/$NameServer-pub-ifup-sx1
-	sudo mv /etc/network/if-down.d/openvswitch/nsa-pub-ifdown-sx1 /etc/network/if-down.d/openvswitch/$NameServer-pub-ifdown-sx1
-	sudo mv /etc/network/openvswitch/strt_nsa.sh /etc/network/openvswitch/strt_$NameServer.sh
-fi
+	sleep 10
 
-if [ -n $Domain1 ]
-then
-# GLS 20151221 Settable Domain feature added
-	sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/var/lib/bind/fwd.orabuntu-lxc.com
-	sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/var/lib/bind/rev.orabuntu-lxc.com
-	sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/etc/resolv.conf
-	sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/etc/dhcp/dhclient.conf
-	sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /etc/NetworkManager/dnsmasq.d/local
-	sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /etc/network/interfaces
-	sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /etc/resolv.conf
-	sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/etc/bind/named.conf.local
-	sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/etc/dhcp/dhcpd.conf
-	sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/etc/network/interfaces
-	sudo mv /var/lib/lxc/$NameServer/rootfs/var/lib/bind/fwd.orabuntu-lxc.com /var/lib/lxc/$NameServer/rootfs/var/lib/bind/fwd.$Domain1
-	sudo mv /var/lib/lxc/$NameServer/rootfs/var/lib/bind/rev.orabuntu-lxc.com /var/lib/lxc/$NameServer/rootfs/var/lib/bind/rev.$Domain1
-fi
+	clear
 
-if [ -n $Domain2 ]
-then
-# GLS 20151221 Settable Domain feature added
-	sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /var/lib/lxc/$NameServer/rootfs/var/lib/bind/fwd.consultingcommandos.us
-	sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /var/lib/lxc/$NameServer/rootfs/var/lib/bind/rev.consultingcommandos.us
-	sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /var/lib/lxc/$NameServer/rootfs/etc/resolv.conf
-	sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /var/lib/lxc/$NameServer/rootfs/etc/dhcp/dhclient.conf
-	sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /etc/NetworkManager/dnsmasq.d/local
-	sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /etc/dhcp/dhclient.conf
-	sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /etc/network/interfaces
-	sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /etc/resolv.conf
-	sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /var/lib/lxc/$NameServer/rootfs/etc/bind/named.conf.local
-	sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /var/lib/lxc/$NameServer/rootfs/etc/dhcp/dhcpd.conf
-	sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /var/lib/lxc/$NameServer/rootfs/etc/network/interfaces
-	sudo mv /var/lib/lxc/$NameServer/rootfs/var/lib/bind/fwd.consultingcommandos.us /var/lib/lxc/$NameServer/rootfs/var/lib/bind/fwd.$Domain2
-	sudo mv /var/lib/lxc/$NameServer/rootfs/var/lib/bind/rev.consultingcommandos.us /var/lib/lxc/$NameServer/rootfs/var/lib/bind/rev.$Domain2
+	echo ''
+	echo "=============================================="
+	echo "Customize domains and display /etc/resolv.conf"
+	echo "=============================================="
+	echo ''
+
+	function GetHostName {
+		echo $HOSTNAME | cut -f1 -d'.'
+	}
+	HostName=$(GetHostName)
+
+	if [ -n $Domain1 ] 
+	then
+		if [ $NetworkManagerInstalled -eq 1 ]
+		then
+			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /etc/NetworkManager/dnsmasq.d/local
+		fi
+		sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /etc/network/openvswitch/crt_ovs_sw1.sh
+	fi
+		
+	if [ -n $Domain2 ] 
+	then
+		if [ $NetworkManagerInstalled -eq 1 ]
+		then
+			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /etc/NetworkManager/dnsmasq.d/local
+		fi
+		sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /etc/network/openvswitch/crt_ovs_sw1.sh
+	fi
+
+	if [ $MultiHostVar2 = 'N' ]
+	then
+		# Remove the extra nameserver line used for DNS DHCP setup and add the required nameservers.
+
+		sudo sed -i '/8.8.8.8/d' /var/lib/lxc/nsa/rootfs/etc/resolv.conf
+		sudo sed -i '/nameserver/c\nameserver 10.207.39.2' /var/lib/lxc/nsa/rootfs/etc/resolv.conf
+		sudo sh -c "echo 'nameserver 10.207.29.2' >> /var/lib/lxc/nsa/rootfs/etc/resolv.conf"
+		sudo sh -c "echo 'search orabuntu-lxc.com consultingcommandos.us' >> /var/lib/lxc/nsa/rootfs/etc/resolv.conf"
+
+		if [ ! -z $HostName ]
+		then
+			sudo sed -i "/baremetal/s/baremetal/$HostName/g" /var/lib/lxc/nsa/rootfs/var/lib/bind/fwd.orabuntu-lxc.com
+			sudo sed -i "/baremetal/s/baremetal/$HostName/g" /var/lib/lxc/nsa/rootfs/var/lib/bind/rev.orabuntu-lxc.com
+			sudo sed -i "/baremetal/s/baremetal/$HostName/g" /var/lib/lxc/nsa/rootfs/var/lib/bind/fwd.consultingcommandos.us
+			sudo sed -i "/baremetal/s/baremetal/$HostName/g" /var/lib/lxc/nsa/rootfs/var/lib/bind/rev.consultingcommandos.us
+		fi
+
+		if [ -n $NameServer ]
+		then
+			# GLS 20151223 Settable Nameserver feature added
+			# GLS 20161022 Settable Nameserver feature moved into DNS DHCP LXC container.
+			# GLS 20162011 Settable Nameserver feature expanded to include nameserver and both domains.
+			sudo sed -i "/nsa/s/nsa/$NameServer/g" /var/lib/lxc/nsa/rootfs/var/lib/bind/fwd.orabuntu-lxc.com
+			sudo sed -i "/nsa/s/nsa/$NameServer/g" /var/lib/lxc/nsa/rootfs/var/lib/bind/rev.orabuntu-lxc.com
+			sudo sed -i "/nsa/s/nsa/$NameServer/g" /var/lib/lxc/nsa/rootfs/var/lib/bind/fwd.consultingcommandos.us
+			sudo sed -i "/nsa/s/nsa/$NameServer/g" /var/lib/lxc/nsa/rootfs/var/lib/bind/rev.consultingcommandos.us
+			sudo sed -i "/nsa/s/nsa/$NameServer/g" /var/lib/lxc/nsa/config
+			sudo sed -i "/nsa/s/nsa/$NameServer/g" /var/lib/lxc/nsa/rootfs/etc/hostname
+			sudo sed -i "/nsa/s/nsa/$NameServer/g" /var/lib/lxc/nsa/rootfs/etc/hosts
+			sudo sed -i "/nsa/s/nsa/$NameServer/g" /etc/network/openvswitch/strt_nsa.sh
+			sudo mv /var/lib/lxc/nsa /var/lib/lxc/$NameServer
+			sudo mv /etc/network/if-up.d/openvswitch/nsa-pub-ifup-sw1 /etc/network/if-up.d/openvswitch/$NameServer-pub-ifup-sw1
+			sudo mv /etc/network/if-down.d/openvswitch/nsa-pub-ifdown-sw1 /etc/network/if-down.d/openvswitch/$NameServer-pub-ifdown-sw1
+			sudo mv /etc/network/if-up.d/openvswitch/nsa-pub-ifup-sx1 /etc/network/if-up.d/openvswitch/$NameServer-pub-ifup-sx1
+			sudo mv /etc/network/if-down.d/openvswitch/nsa-pub-ifdown-sx1 /etc/network/if-down.d/openvswitch/$NameServer-pub-ifdown-sx1
+			sudo mv /etc/network/openvswitch/strt_nsa.sh /etc/network/openvswitch/strt_$NameServer.sh
+		fi
+
+		if [ -n $Domain1 ]
+		then
+			# GLS 20151221 Settable Domain feature added
+			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/var/lib/bind/fwd.orabuntu-lxc.com
+			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/var/lib/bind/rev.orabuntu-lxc.com
+			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/etc/resolv.conf
+			if [ $NetworkManagerInstalled -eq 1 ]
+			then
+				sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /etc/NetworkManager/dnsmasq.d/local
+			fi
+			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /etc/network/openvswitch/crt_ovs_sw1.sh
+			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/etc/bind/named.conf.local
+			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/etc/dhcp/dhcpd.conf
+			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/etc/network/interfaces
+			sudo mv /var/lib/lxc/$NameServer/rootfs/var/lib/bind/fwd.orabuntu-lxc.com /var/lib/lxc/$NameServer/rootfs/var/lib/bind/fwd.$Domain1
+			sudo mv /var/lib/lxc/$NameServer/rootfs/var/lib/bind/rev.orabuntu-lxc.com /var/lib/lxc/$NameServer/rootfs/var/lib/bind/rev.$Domain1
+		fi
+
+		if [ -n $Domain2 ]
+		then
+			# GLS 20151221 Settable Domain feature added
+			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /var/lib/lxc/$NameServer/rootfs/var/lib/bind/fwd.consultingcommandos.us
+			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /var/lib/lxc/$NameServer/rootfs/var/lib/bind/rev.consultingcommandos.us
+			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /var/lib/lxc/$NameServer/rootfs/etc/resolv.conf
+			if [ $NetworkManagerInstalled -eq 1 ]
+			then
+				sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /etc/NetworkManager/dnsmasq.d/local
+			fi
+			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /etc/network/openvswitch/crt_ovs_sw1.sh
+			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /var/lib/lxc/$NameServer/rootfs/etc/bind/named.conf.local
+			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /var/lib/lxc/$NameServer/rootfs/etc/dhcp/dhcpd.conf
+			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /var/lib/lxc/$NameServer/rootfs/etc/network/interfaces
+			sudo mv /var/lib/lxc/$NameServer/rootfs/var/lib/bind/fwd.consultingcommandos.us /var/lib/lxc/$NameServer/rootfs/var/lib/bind/fwd.$Domain2
+			sudo mv /var/lib/lxc/$NameServer/rootfs/var/lib/bind/rev.consultingcommandos.us /var/lib/lxc/$NameServer/rootfs/var/lib/bind/rev.$Domain2
+		fi
+	fi
+
+	# Cleanup duplicate search lines in /etc/resolv.conf if Orabuntu-LXC has been re-run
+	if [ $NetworkManagerInstalled -eq 1 ]
+	then
+		sudo sed -i '$!N; /^\(.*\)\n\1$/!P; D' /etc/resolv.conf
+	fi
+
+	sudo cat /etc/resolv.conf
+
+	sleep 5
+
+	echo ''
+	echo "=============================================="
+	echo "Done:  Customize and display.                 "
+	echo "=============================================="
 fi
 
 sleep 5
 
 clear
 
-echo ''
-echo "=============================================="
-echo "Remove duplicate /etc/resolv.conf searches..."
-echo "=============================================="
-echo ''
+if	[ $NetworkManagerInstalled -eq 1 ]
+then
+	echo ''
+	echo "=============================================="
+	echo "Activating NetworkManager dnsmasq service ... "
+	echo "=============================================="
+	echo ''
 
-sudo sed -i '$!N; /^\(.*\)\n\1$/!P; D' /etc/resolv.conf
+	# So that settings in /etc/NetworkManager/dnsmasq.d/local & /etc/NetworkManager/NetworkManager.conf take effect.
 
-sudo cat /etc/resolv.conf
+	sudo cat /etc/resolv.conf
+	sudo sed -i '/plugins=ifupdown,keyfile/a dns=dnsmasq' /etc/NetworkManager/NetworkManager.conf
+	sudo sed -i '$!N; /^\(.*\)\n\1$/!P; D' /etc/NetworkManager/NetworkManager.conf
 
-echo ''
-echo "=============================================="
-echo "Duplicate searches removed.                   "
-echo "=============================================="
+	sudo service NetworkManager restart
+
+	function CheckResolvReady {
+		sudo cat /etc/resolv.conf | egrep -c 'nameserver 127\.0\.1\.1|nameserver 127\.0\.0\.1'
+	}
+	ResolvReady=$(CheckResolvReady)
+	NumResolvReadyTries=0
+	while [ $ResolvReady -ne 1 ] && [ $NumResolvReadyTries -lt 60 ]
+	do
+		ResolvReady=$(CheckResolvReady)
+		((NumResolvReadyTries=NumResolvReadyTries+1))
+		sleep 1
+		echo 'NumResolvReadyTries = '$NumResolvReadyTries
+	done
+
+	if [ $ResolvReady -eq 1 ]
+	then
+		echo ''
+ 		sudo service sw1 restart >/dev/null 2>&1
+	else
+		echo ''
+ 		echo "=============================================="
+		echo "NetworkManager didn't set nameserver 127.0.0.1"
+		echo "which is the setting required for NM dnsmasq. "
+		echo "=============================================="
+ 	fi
+
+	# sudo sh -c "echo 'search $Domain1 $Domain2 gns1.$Domain1' >> /etc/resolv.conf"
+
+	echo "=============================================="
+	echo "NetworkManager dnsmasq activated.             "
+	echo "=============================================="
+fi
 
 sleep 5
 
 clear
 
-if [ $UbuntuVersion = '17.04' ]
+sudo chmod 755 /etc/network/openvswitch/*.sh
+
+if   [ $UbuntuVersion = 16.04 ] || [ $UbuntuVersion = 16.10 ] || [ $UbuntuVersion = 17.04 ] || [ $UbuntuVersion = 17.10 ]
 then
+	function GetMultiHostVar3 {
+		echo $MultiHost | cut -f3 -d':'
+	}
+	MultiHostVar3=$(GetMultiHostVar3)
+
+	sudo sed -i "s/SWITCH_IP/$MultiHostVar3/g" /etc/network/openvswitch/crt_ovs_sx1.sh
+	sudo sed -i "s/SWITCH_IP/$MultiHostVar3/g" /etc/network/openvswitch/crt_ovs_sw1.sh
+
 	SwitchList='sw1 sx1'
 	for k in $SwitchList
 	do
@@ -1131,11 +1263,10 @@ then
 		echo "=============================================="
 		echo "Installing OpenvSwitch $k...                  "
 		echo "=============================================="
-		echo ''
 
-       		 if [ ! -f /etc/systemd/system/$k.service ]
-       		 then
-       	         	sudo sh -c "echo '[Unit]'						 > /etc/systemd/system/$k.service"
+       		if [ ! -f /etc/systemd/system/$k.service ]
+       		then
+       	        	sudo sh -c "echo '[Unit]'						 > /etc/systemd/system/$k.service"
        	         	sudo sh -c "echo 'Description=$k Service'				>> /etc/systemd/system/$k.service"
 		
 		if [ $k = 'sw1' ]
@@ -1154,14 +1285,10 @@ then
                 	sudo sh -c "echo 'User=root'						>> /etc/systemd/system/$k.service"
                 	sudo sh -c "echo 'RemainAfterExit=yes'					>> /etc/systemd/system/$k.service"
                 	sudo sh -c "echo 'ExecStart=/etc/network/openvswitch/crt_ovs_$k.sh' 	>> /etc/systemd/system/$k.service"
-                	sudo sh -c "echo 'ExecStop=/usr/bin/ovs-vsctl del-br $k' 		>> /etc/systemd/system/$k.service"
+			sudo sh -c "echo 'ExecStop=/usr/bin/ovs-vsctl del-br $k'                >> /etc/systemd/system/$k.service"
                 	sudo sh -c "echo ''							>> /etc/systemd/system/$k.service"
                 	sudo sh -c "echo '[Install]'						>> /etc/systemd/system/$k.service"
                 	sudo sh -c "echo 'WantedBy=multi-user.target'				>> /etc/systemd/system/$k.service"
-
-			sleep 5
-
-			clear
 		
 			echo ''
 			echo "=============================================="
@@ -1172,18 +1299,20 @@ then
        			sudo chmod 644 /etc/systemd/system/$k.service
 			sudo systemctl daemon-reload
        			sudo systemctl enable $k.service
-#			sudo service $k start
-#			sudo service $k status
+			sudo service $k start
+			sudo service $k status
 
 			echo ''
 			echo "=============================================="
-			echo "Started OpenvSwitch $k.                       "
+			echo "Done:  OpenvSwitch $k started.                "
 			echo "=============================================="
 
 			sleep 5
 
 			clear
 		else
+			clear
+
 			echo ''
 			echo "=============================================="
 			echo "OpenvSwitch $k previously installed.          "
@@ -1195,85 +1324,481 @@ then
 			clear
         	fi
 
-#		echo ''
-#		echo "=============================================="
-#		echo "Installed OpenvSwitch $k.                     "
-#		echo "=============================================="
+		echo ''
+		echo "=============================================="
+		echo "Installed OpenvSwitch $k.                     "
+		echo "=============================================="
 
-# 		sleep 5
+		sleep 5
 
-# 		clear
+		clear
 	done
+else
+	echo ''
+	echo "=============================================="
+	echo "Starting OpenvSwitch sw1 ...                  "
+	echo "=============================================="
+
+	sudo chmod 755 /etc/network/openvswitch/crt_ovs_sw1.sh
+	sudo /etc/network/openvswitch/crt_ovs_sw1.sh >/dev/null 2>&1
+	echo ''
+	sleep 3
+	sudo ifconfig sw1
+	sudo sed -i '/sw1/s/^# //g' /etc/network/if-up.d/orabuntu-lxc-net
+
+	echo "=============================================="
+	echo "OpenvSwitch sw1 started.                      "
+	echo "=============================================="
+	echo ''
+
+	sleep 5
+
+	clear
+
+	echo ''
+	echo "=============================================="
+	echo "Starting OpenvSwitch sx1 ...                  "
+	echo "=============================================="
+
+	sudo chmod 755 /etc/network/openvswitch/crt_ovs_sx1.sh
+	sudo /etc/network/openvswitch/crt_ovs_sx1.sh >/dev/null 2>&1
+	echo ''
+	sleep 3
+	sudo ifconfig sx1
+	sudo sed -i '/sx1/s/^# //g' /etc/network/if-up.d/orabuntu-lxc-net
+
+	echo "=============================================="
+	echo "OpenvSwitch sx1 started.                      "
+	echo "=============================================="
+
+	sleep 5
+
+	clear
+
+	echo ''
+	echo "=============================================="
+	echo "Ensure 10.207.39.0/24 & 10.207.29.0/24 up...  "
+	echo "=============================================="
+	echo ''
+
+	sudo ifconfig sw1
+	sudo ifconfig sx1
+
+	echo "=============================================="
+	echo "Networks are up.                              "
+	echo "=============================================="
+	echo ''
+
+	sleep 5
+
+	clear
 fi
 
-sleep 5
-
-clear
-
-if [ ! -f /etc/systemd/system/$NameServer.service ]
+if [ $MultiHostVar2 = 'N' ]
 then
 	echo ''
 	echo "=============================================="
-	echo "Create $NameServer Onboot Service...          "
+	echo "Setting secret in dhcpd.conf file...          "
 	echo "=============================================="
 	echo ''
 
-	sudo sh -c "echo '[Unit]'             	         				 > /etc/systemd/system/$NameServer.service"
-	sudo sh -c "echo 'Description=$NameServer Service'  				>> /etc/systemd/system/$NameServer.service"
-	sudo sh -c "echo 'Wants=network-online.target sw1.service sx1.service'		>> /etc/systemd/system/$NameServer.service"
-	sudo sh -c "echo 'After=network-online.target sw1.service sx1.service'		>> /etc/systemd/system/$NameServer.service"
-	sudo sh -c "echo ''                                 				>> /etc/systemd/system/$NameServer.service"
-	sudo sh -c "echo '[Service]'                        				>> /etc/systemd/system/$NameServer.service"
-	sudo sh -c "echo 'Type=oneshot'                     				>> /etc/systemd/system/$NameServer.service"
-	sudo sh -c "echo 'User=root'                        				>> /etc/systemd/system/$NameServer.service"
-	sudo sh -c "echo 'RemainAfterExit=yes'              				>> /etc/systemd/system/$NameServer.service"
-	sudo sh -c "echo 'ExecStart=/etc/network/openvswitch/strt_$NameServer.sh start'	>> /etc/systemd/system/$NameServer.service"
-	sudo sh -c "echo 'ExecStop=/etc/network/openvswitch/strt_$NameServer.sh stop'	>> /etc/systemd/system/$NameServer.service"
-	sudo sh -c "echo ''                                 				>> /etc/systemd/system/$NameServer.service"
-	sudo sh -c "echo '[Install]'                        				>> /etc/systemd/system/$NameServer.service"
-	sudo sh -c "echo 'WantedBy=multi-user.target'       				>> /etc/systemd/system/$NameServer.service"
-	sudo chmod 644 /etc/systemd/system/$NameServer.service
-	sudo systemctl enable $NameServer
+	function GetKeySecret {
+	sudo cat /var/lib/lxc/$NameServer/rootfs/etc/bind/rndc.key | grep secret | sed 's/^[ \t]*//;s/[ \t]*$//'
+	}
+	KeySecret=$(GetKeySecret)
+	echo $KeySecret
+	sudo sed -i "/secret/c\key rndc-key { algorithm hmac-md5; $KeySecret }" /var/lib/lxc/$NameServer/rootfs/etc/dhcp/dhcpd.conf
+	echo 'The following keys should match (for dynamic DNS updates by DHCP):'
+	echo ''
+	sudo cat /var/lib/lxc/$NameServer/rootfs/etc/dhcp/dhcpd.conf | grep secret | cut -f7 -d' ' | cut -f1 -d';'
+	sudo cat /var/lib/lxc/$NameServer/rootfs/etc/bind/rndc.key   | grep secret | cut -f2 -d' ' | cut -f1 -d';'
+	echo ''
+	sudo cat /var/lib/lxc/$NameServer/rootfs/etc/dhcp/dhcpd.conf | grep secret
 
 	echo ''
 	echo "=============================================="
-	echo "Created $NameServer Onboot Service.           "
+	echo "Secret successfuly set in dhcpd.conf file.    "
 	echo "=============================================="
+
+	sleep 5
+
+	clear
+
+	if [ ! -f /etc/systemd/system/$NameServer.service ]
+	then
+		echo ''
+		echo "=============================================="
+		echo "Create $NameServer Onboot Service...          "
+		echo "=============================================="
+		echo ''
+
+		sudo sh -c "echo '[Unit]'             	         				 > /etc/systemd/system/$NameServer.service"
+		sudo sh -c "echo 'Description=$NameServer Service'  				>> /etc/systemd/system/$NameServer.service"
+		sudo sh -c "echo 'Wants=network-online.target sw1.service sx1.service'		>> /etc/systemd/system/$NameServer.service"
+		sudo sh -c "echo 'After=network-online.target sw1.service sx1.service'		>> /etc/systemd/system/$NameServer.service"
+		sudo sh -c "echo ''                                 				>> /etc/systemd/system/$NameServer.service"
+		sudo sh -c "echo '[Service]'                        				>> /etc/systemd/system/$NameServer.service"
+		sudo sh -c "echo 'Type=oneshot'                     				>> /etc/systemd/system/$NameServer.service"
+		sudo sh -c "echo 'User=root'                        				>> /etc/systemd/system/$NameServer.service"
+		sudo sh -c "echo 'RemainAfterExit=yes'              				>> /etc/systemd/system/$NameServer.service"
+		sudo sh -c "echo 'ExecStart=/etc/network/openvswitch/strt_$NameServer.sh start'	>> /etc/systemd/system/$NameServer.service"
+		sudo sh -c "echo 'ExecStop=/etc/network/openvswitch/strt_$NameServer.sh stop'	>> /etc/systemd/system/$NameServer.service"
+		sudo sh -c "echo ''                                 				>> /etc/systemd/system/$NameServer.service"
+		sudo sh -c "echo '[Install]'                        				>> /etc/systemd/system/$NameServer.service"
+		sudo sh -c "echo 'WantedBy=multi-user.target'       				>> /etc/systemd/system/$NameServer.service"
+		sudo chmod 644 /etc/systemd/system/$NameServer.service
+		sudo systemctl enable $NameServer
+
+		echo ''
+		echo "=============================================="
+		echo "Created $NameServer Onboot Service.           "
+		echo "=============================================="
+	fi
 fi
 
 sleep 5
 
 clear
-
-## New End
 
 echo ''
 echo "=============================================="
-echo "Re-starting LXC container and testing DNS...   "
+echo "Checking OpenvSwitch sw1...                   "
 echo "=============================================="
+echo ''
 
-if [ -n $NameServer ]
+sudo service sw1 stop
+sleep 2
+sudo service sw1 start
+sleep 2
+echo ''
+ifconfig sw1
+echo ''
+sudo service sw1 status
+
+echo ''
+echo "=============================================="
+echo "OpenvSwitch sw1 is up.                        "
+echo "=============================================="
+echo ''
+
+sleep 5
+
+clear
+
+echo ''
+echo "=============================================="
+echo "Checking OpenvSwitch sx1...                   "
+echo "=============================================="
+echo ''
+
+sudo service sx1 stop
+sleep 2
+sudo service sx1 start
+sleep 2
+echo ''
+ifconfig sx1
+echo ''
+sudo service sx1 status
+
+echo ''
+echo "=============================================="
+echo "OpenvSwitch sx1 is up.                        "
+echo "=============================================="
+echo ''
+
+sleep 5
+
+clear
+
+echo ''
+echo "=============================================="
+echo "Both required networks are up.                "
+echo "=============================================="
+echo ''
+
+sleep 5
+
+clear
+
+echo ''
+echo "=============================================="
+echo "Verify iptables rules are set correctly...    "
+echo "=============================================="
+echo ''
+
+sudo iptables -S | egrep 'sw1|sx1'
+
+echo ''
+echo "=============================================="
+echo "Verification of iptables rules complete.      "
+echo "=============================================="
+echo ''
+
+sleep 5
+
+clear
+
+if [ $MultiHostVar2 = 'N' ]
 then
-	sudo lxc-start -n $NameServer > /dev/null 2>&1
 	echo ''
-	nslookup $NameServer
-	if [ $? -ne 0 ]
+	echo "=============================================="
+	echo "Starting LXC DNS container and testing DNS... "
+	echo "=============================================="
+	echo ''
+
+	if [ -n $NameServer ]
 	then
-		echo "DNS is NOT RUNNING with correct status!"
+		sudo service sw1 restart
+		sudo service sx1 restart
+		sudo sed -i "s/mtu = 1500/mtu = $MultiHostVar7/g" /var/lib/lxc/$NameServer/config 
+		sudo lxc-stop -n $NameServer  >/dev/null 2>&1
+		sudo lxc-start -n $NameServer >/dev/null 2>&1
+		if [ $SystemdResolvedInstalled -eq 1 ]
+		then
+			sudo service systemd-resolved restart
+		fi
+		nslookup $NameServer.$Domain1
+		if [ $? -ne 0 ]
+		then
+			echo "DNS is NOT RUNNING with correct status!"
+		fi
+	else
+		sudo lxc-start -n nsa > /dev/null 2>&1
+		nslookup nsa.$Domain
+		if [ $? -ne 0 ]
+		then
+			echo "DNS is NOT RUNNING with correct status!"
+		fi
 	fi
-else
+
 	echo ''
-	sudo lxc-start -n nsa > /dev/null 2>&1
-	echo ''
-	nslookup nsa
-	if [ $? -ne 0 ]
-	then
-		echo "DNS is NOT RUNNING with correct status!"
-	fi
+	echo "=============================================="
+	echo "LXC container restarted & DNS tested.         "
+	echo "=============================================="
 fi
 
+sleep 5
+
+clear
+
+echo ''
 echo "=============================================="
-echo "LXC container restarted & DNS tested.         "
+echo "Checking and Configuring MultiHost Settings..."
+echo "=============================================="
+echo ''
+
+if [ $MultiHostVar2 = 'N' ]
+then
+	function GetMultiHostVar3 {
+		echo $MultiHost | cut -f3 -d':'
+	}
+	MultiHostVar3=$(GetMultiHostVar3)
+
+#	GLS 20170904 Switches sx1 and sw1 are set earlier so they are not set here.
+
+	sudo sed -i "s/SWITCH_IP/$MultiHostVar3/g" /etc/network/openvswitch/crt_ovs_sw2.sh
+	sudo sed -i "s/SWITCH_IP/$MultiHostVar3/g" /etc/network/openvswitch/crt_ovs_sw3.sh
+	sudo sed -i "s/SWITCH_IP/$MultiHostVar3/g" /etc/network/openvswitch/crt_ovs_sw4.sh
+	sudo sed -i "s/SWITCH_IP/$MultiHostVar3/g" /etc/network/openvswitch/crt_ovs_sw5.sh
+	sudo sed -i "s/SWITCH_IP/$MultiHostVar3/g" /etc/network/openvswitch/crt_ovs_sw6.sh
+	sudo sed -i "s/SWITCH_IP/$MultiHostVar3/g" /etc/network/openvswitch/crt_ovs_sw7.sh
+	sudo sed -i "s/SWITCH_IP/$MultiHostVar3/g" /etc/network/openvswitch/crt_ovs_sw8.sh
+	sudo sed -i "s/SWITCH_IP/$MultiHostVar3/g" /etc/network/openvswitch/crt_ovs_sw9.sh
+		
+	echo "=============================================="
+	echo "Setting ubuntu user password in $NameServer..."
+	echo "=============================================="
+	echo ''
+	echo "=============================================="
+	echo "The $NameServer nameserver ubuntu user account"
+	echo "password will now be set to:  $MultiHostVar8  "
+	echo "                                              "
+	echo "It is set in the anylinux-services.sh script  "
+	echo "and you can recheck what is is set to there.  "
+	echo "=============================================="
+	echo ''
+
+	sleep 5
+
+	clear
+
+	echo "=============================================="
+	echo "If you get the following warning message:     "
+	echo "                                              "
+	echo "Message:  mktemp: No such file or directory   "
+	echo "it is OK and can be safely ignored.           "
+	echo "                                              "
+	echo "=============================================="
+	echo ''
+	echo "=============================================="
+	echo "If you get the following warning message:     "
+	echo "                                              "
+	echo "Warning: Permanently added...known_hosts.     "
+	echo "it is OK and can be safely ignored.           "
+	echo "=============================================="
+	echo ''
+	echo "=============================================="
+	echo "If you get the following warning message:     "
+	echo "                                              "
+	echo "do_known_hosts: hostkeys_foreach failed...    "
+	echo "it is OK and can be safely ignored.           "
+	echo "=============================================="
+	echo ''
+
+	sleep 15	
+
+	sudo lxc-attach -n $NameServer -- usermod --password `perl -e "print crypt('$MultiHostVar8','$MultiHostVar8');"` ubuntu
+	ssh-keygen -f "/home/ubuntu/.ssh/known_hosts" -R 10.207.39.2
+	ssh-keygen -f "/home/ubuntu/.ssh/known_hosts" -R $NameServer
+	sshpass -p $MultiHostVar8 ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.39.2 "date; uname -a"
+
+	echo ''	
+	echo "=============================================="
+	echo "Done: Set ubuntu password in $NameServer.     "
+	echo "=============================================="
+fi
+
+sleep 5
+
+if [ $MultiHostVar2 = 'Y' ]
+then
+	# GLS 20170904 rm known_hosts file for ubuntu user to prevent ssh failures.
+
+	function GetMultiHostVar2 {
+		echo $MultiHost | cut -f2 -d':'
+	}
+	MultiHostVar2=$(GetMultiHostVar2)
+
+	function GetMultiHostVar3 {
+		echo $MultiHost | cut -f3 -d':'
+	}
+	MultiHostVar3=$(GetMultiHostVar3)
+
+#	GLS 20170904 Switches sx1 and sw1 are set earlier (around lines 1988,1989) so they are not set here.
+
+	sudo sed -i "s/SWITCH_IP/$MultiHostVar3/g" /etc/network/openvswitch/crt_ovs_sw2.sh
+	sudo sed -i "s/SWITCH_IP/$MultiHostVar3/g" /etc/network/openvswitch/crt_ovs_sw3.sh
+	sudo sed -i "s/SWITCH_IP/$MultiHostVar3/g" /etc/network/openvswitch/crt_ovs_sw4.sh
+	sudo sed -i "s/SWITCH_IP/$MultiHostVar3/g" /etc/network/openvswitch/crt_ovs_sw5.sh
+	sudo sed -i "s/SWITCH_IP/$MultiHostVar3/g" /etc/network/openvswitch/crt_ovs_sw6.sh
+	sudo sed -i "s/SWITCH_IP/$MultiHostVar3/g" /etc/network/openvswitch/crt_ovs_sw7.sh
+	sudo sed -i "s/SWITCH_IP/$MultiHostVar3/g" /etc/network/openvswitch/crt_ovs_sw8.sh
+	sudo sed -i "s/SWITCH_IP/$MultiHostVar3/g" /etc/network/openvswitch/crt_ovs_sw9.sh
+
+	sudo route add -net 192.220.39.0/24 gw 10.207.39.$MultiHostVar3 dev sw1 >/dev/null 2>&1
+	sudo route add -net 192.221.39.0/24 gw 10.207.39.$MultiHostVar3 dev sw1 >/dev/null 2>&1
+  	sudo route add -net 192.222.39.0/24 gw 10.207.39.$MultiHostVar3 dev sw1 >/dev/null 2>&1
+  	sudo route add -net 192.223.39.0/24 gw 10.207.39.$MultiHostVar3 dev sw1 >/dev/null 2>&1
+  	sudo route add -net 172.230.40.0/24 gw 10.207.39.$MultiHostVar3 dev sw1 >/dev/null 2>&1
+  	sudo route add -net 172.231.40.0/24 gw 10.207.39.$MultiHostVar3 dev sw1 >/dev/null 2>&1
+  	sudo route add -net 10.207.39.0/24  gw 10.207.39.$MultiHostVar3 dev sw1 >/dev/null 2>&1
+
+	function GetMultiHostVar5 {
+	echo $MultiHost | cut -f5 -d':'
+	}
+	MultiHostVar5=$(GetMultiHostVar5)
+
+	function GetMultiHostVar6 {
+	echo $MultiHost | cut -f6 -d':'
+	}
+	MultiHostVar6=$(GetMultiHostVar6)
+
+	sudo sed -i "/route add -net/s/#/ /"				/etc/network/openvswitch/crt_ovs_sw1.sh	
+	sudo sed -i "/REMOTE_GRE_ENDPOINT/s/#/ /"			/etc/network/openvswitch/crt_ovs_sw1.sh	
+	sudo sed -i "s/REMOTE_GRE_ENDPOINT/$MultiHostVar5/g"		/etc/network/openvswitch/crt_ovs_sw1.sh
+
+	function CheckGre0Exists {
+		sudo ovs-vsctl show | grep gre0 | wc -l
+	}
+	Gre0Exists=$(CheckGre0Exists)
+
+	if [ $Gre0Exists -gt 0 ]
+	then
+		sudo ovs-vsctl del-port gre0
+	fi
+
+	function CheckGre1Exists {
+		sudo ovs-vsctl show | grep gre1 | wc -l
+	}
+	Gre1Exists=$(CheckGre1Exists)
+
+	if [ $Gre1Exists -gt 0 ]
+	then
+		sudo ovs-vsctl del-port gre1
+	fi
+
+	sudo ovs-vsctl add-port sw1 gre0 -- set interface gre0 type=gre options:remote_ip=$MultiHostVar5
+
+ 	sudo sed -i "s/MultiHostVar6/$MultiHostVar6/g" 	/etc/network/openvswitch/setup_gre_and_routes.sh
+#	sudo sed -i "s/MultiHostVar3/$MultiHostVar3/g" 	/etc/network/openvswitch/setup_gre_and_routes.sh
+#	sudo sed -i "s/MHV3/MultiHostVar3/g"		/etc/network/openvswitch/setup_gre_and_routes.sh
+#	sudo sed -i "s/MHV6/MultiHostVar6/g"		/etc/network/openvswitch/setup_gre_and_routes.sh
+
+	sudo chmod 775 /etc/network/openvswitch/setup_gre_and_routes.sh
+
+	echo "=============================================="
+	echo "Setup GRE & Routes on $MultiHostVar5...       "
+	echo "=============================================="
+	echo ''
+
+	sudo service sw1 restart
+	sudo service sx1 restart
+
+	sudo chmod 777 /etc/network/openvswitch/setup_gre_and_routes.sh
+
+	ssh-keygen -f "/home/ubuntu/.ssh/known_hosts" -R $MultiHostVar9
+	sshpass -p $MultiHostVar9 ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 date
+	if [ $? -eq 0 ]
+	then
+		sshpass -p $MultiHostVar9 scp -p /etc/network/openvswitch/setup_gre_and_routes.sh ubuntu@$MultiHostVar5:~/Downloads/.
+	fi
+	sshpass -p $MultiHostVar9 ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 "sudo -S <<< "ubuntu" ls -l ~/Downloads/setup_gre_and_routes.sh"
+	if [ $? -eq 0 ]
+	then
+		sshpass -p $MultiHostVar9 ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 "sudo -S <<< "ubuntu" ~/Downloads/setup_gre_and_routes.sh"
+	fi
+
+	function GetShortHost {
+		uname -n | cut -f1 -d'.'
+	}
+	ShortHost=$(GetShortHost)
+		
+	echo ''
+	echo "=============================================="
+	echo "Create ADD DNS $Domain1 $ShortHost...         "
+	echo "=============================================="
+	echo ''
+
+	sudo sh -c "echo 'echo \"server 10.207.39.2'								    	>  /etc/network/openvswitch/nsupdate_add_$ShortHost.sh"
+	sudo sh -c "echo 'update add $ShortHost.orabuntu-lxc.com 3600 IN A 10.207.39.$MultiHostVar3'		    	>> /etc/network/openvswitch/nsupdate_add_$ShortHost.sh"
+	sudo sh -c "echo 'send'											    	>> /etc/network/openvswitch/nsupdate_add_$ShortHost.sh"
+	sudo sh -c "echo 'update add $MultiHostVar3.39.207.10.in-addr.arpa 3600 IN PTR $ShortHost.orabuntu-lxc.com' 	>> /etc/network/openvswitch/nsupdate_add_$ShortHost.sh"
+	sudo sh -c "echo 'send'											    	>> /etc/network/openvswitch/nsupdate_add_$ShortHost.sh"
+	sudo sh -c "echo 'quit'											    	>> /etc/network/openvswitch/nsupdate_add_$ShortHost.sh"
+	sudo sh -c "echo '\" | nsupdate -k /etc/bind/rndc.key'							    	>> /etc/network/openvswitch/nsupdate_add_$ShortHost.sh"
+
+	sudo chmod 777 					/etc/network/openvswitch/nsupdate_add_$ShortHost.sh
+	sudo ls -l     					/etc/network/openvswitch/nsupdate_add_$ShortHost.sh
+	sudo sed -i "s/orabuntu-lxc\.com/$Domain1/g"	/etc/network/openvswitch/nsupdate_add_$ShortHost.sh
+	sudo cat					/etc/network/openvswitch/nsupdate_add_$ShortHost.sh
+
+	sudo service sw1 restart
+	sudo service sx1 restart
+
+	ssh-keygen -f "/home/ubuntu/.ssh/known_hosts" -R 10.207.39.2
+	ssh-keygen -f "/home/ubuntu/.ssh/known_hosts" -R $NameServer
+	sshpass -p $MultiHostVar8 ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.39.2 "sudo -S <<< "ubuntu" mkdir -p ~/Downloads"
+	sshpass -p $MultiHostVar8 ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.39.2 "sudo -S <<< "ubuntu" chown ubuntu:ubuntu Downloads"
+	sshpass -p $MultiHostVar8 scp -p /etc/network/openvswitch/nsupdate_add_$ShortHost.sh ubuntu@10.207.39.2:~/Downloads/.
+	sshpass -p $MultiHostVar8 ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.39.2 "sudo -S <<< "ubuntu" ~/Downloads/nsupdate_add_$ShortHost.sh"
+fi
+
+# GLS 20161118 This section for any tweaks to the unpacked files from archives.
+sudo rm /etc/network/if-up.d/orabuntu-lxc-net
+
+echo ''
+echo "=============================================="
+echo "MultiHost Settings Completed.                 "
 echo "=============================================="
 
 sleep 5
@@ -1284,10 +1809,12 @@ echo ''
 echo "=============================================="
 echo "Moving seed openvswitch veth files...         "
 echo "=============================================="
+echo ''
 
 if [ ! -e /etc/orabuntu-lxc-release ] || [ ! -e /etc/network/if-up.d/lxcora00-pub-ifup-sw1 ] || [ ! -e /etc/network/if-down.d/lxcora00-pub-ifdown-sw1 ]
 then
 	cd /etc/network/if-up.d/openvswitch
+
 	sudo cp lxcora00-asm1-ifup-sw8  oel$OracleRelease-asm1-ifup-sw8
 	sudo cp lxcora00-asm2-ifup-sw9  oel$OracleRelease-asm2-ifup-sw9
 	sudo cp lxcora00-priv1-ifup-sw4 oel$OracleRelease-priv1-ifup-sw4
@@ -1295,7 +1822,6 @@ then
 	sudo cp lxcora00-priv3-ifup-sw6 oel$OracleRelease-priv3-ifup-sw6 
 	sudo cp lxcora00-priv4-ifup-sw7 oel$OracleRelease-priv4-ifup-sw7
 	sudo cp lxcora00-pub-ifup-sw1   oel$OracleRelease-pub-ifup-sw1
-	sudo cp lxcora00-pub-ifup-sw1   oel$OracleRelease-pub-ifup-sx1
 
 	cd /etc/network/if-down.d/openvswitch
 
@@ -1306,14 +1832,17 @@ then
 	sudo cp lxcora00-priv3-ifdown-sw6 oel$OracleRelease-priv3-ifdown-sw6
 	sudo cp lxcora00-priv4-ifdown-sw7 oel$OracleRelease-priv4-ifdown-sw7
 	sudo cp lxcora00-pub-ifdown-sw1   oel$OracleRelease-pub-ifdown-sw1
-	sudo cp lxcora00-pub-ifdown-sw1   oel$OracleRelease-pub-ifdown-sx1
-	
-	sudo useradd -u 1098 grid 		>/dev/null 2>&1
-	sudo useradd -u 500 oracle 		>/dev/null 2>&1
-	sudo groupadd -g 1100 asmadmin		>/dev/null 2>&1
-	sudo usermod -a -G asmadmin grid	>/dev/null 2>&1
 
+	sudo ls -l /etc/network/if-up.d/openvswitch
+	echo ''
+	sudo ls -l /etc/network/if-down.d/openvswitch
 fi
+
+echo ''
+echo "=============================================="
+echo "Moving seed openvswitch veth files complete.  "
+echo "=============================================="
+echo ''
 
 sleep 5
 
@@ -1324,6 +1853,11 @@ echo "=============================================="
 echo "Verify existence of Oracle and Grid users...  "
 echo "=============================================="
 echo ''
+
+sudo useradd -u 1098 grid 		>/dev/null 2>&1
+sudo useradd -u 500 oracle 		>/dev/null 2>&1
+sudo groupadd -g 1100 asmadmin		>/dev/null 2>&1
+sudo usermod -a -G asmadmin grid	>/dev/null 2>&1
 
 id grid
 id oracle
@@ -1349,10 +1883,10 @@ then
 ssh-keygen -f ~/.ssh/id_rsa -t rsa -N ''
 fi
 
-if [ -e ~/.ssh/known_hosts ]
-then
-rm ~/.ssh/known_hosts
-fi
+# if [ -e ~/.ssh/known_hosts ]
+# then
+# rm ~/.ssh/known_hosts
+# fi
 
 if [ -e ~/.ssh/authorized_keys ]
 then
@@ -1368,7 +1902,6 @@ cat ~/.ssh/id_rsa.pub
 }
 AuthorizedKey=$(GetAuthorizedKey)
 
-echo ''
 echo 'Authorized Key:'
 echo ''
 echo $AuthorizedKey 
@@ -1405,114 +1938,117 @@ echo ''
 echo "=============================================="
 echo "Create the crt_links.sh script...             "
 echo "=============================================="
+echo ''
 
 sudo mkdir -p /etc/orabuntu-lxc-scripts
 
-sudo sh -c "echo 'sudo ln -sf /var/lib/lxc .' 									 > /etc/orabuntu-lxc-scripts/crt_links.sh"
-sudo sh -c "echo 'sudo ln -sf /etc/resolv.conf .' 								>> /etc/orabuntu-lxc-scripts/crt_links.sh"
+sudo sh -c "echo ' ln -sf /var/lib/lxc .' 								    > /etc/orabuntu-lxc-scripts/crt_links.sh"
+sudo sh -c "echo ' ln -sf /etc/resolv.conf .' 								   >> /etc/orabuntu-lxc-scripts/crt_links.sh"
+sudo sh -c "echo ' ln -sf /etc/ssh/sshd_config .' 							   >> /etc/orabuntu-lxc-scripts/crt_links.sh"
 
-if [ -n $NameServer ]
+if [ -n $NameServer ] && [ $MultiHostVar2 = 'N' ]
 then
-	sudo sh -c "echo 'sudo ln -sf /etc/network/if-up.d/openvswitch/$NameServer-pub-ifup-sw1 .' 		>> /etc/orabuntu-lxc-scripts/crt_links.sh"
-	sudo sh -c "echo 'sudo ln -sf /etc/network/if-up.d/openvswitch/$NameServer-pub-ifup-sx1 .' 		>> /etc/orabuntu-lxc-scripts/crt_links.sh"
-	sudo sh -c "echo 'sudo ln -sf /etc/network/if-down.d/openvswitch/$NameServer-pub-ifdown-sw1 .'		>> /etc/orabuntu-lxc-scripts/crt_links.sh"
-	sudo sh -c "echo 'sudo ln -sf /etc/network/if-down.d/openvswitch/$NameServer-pub-ifdown-sx1 .'		>> /etc/orabuntu-lxc-scripts/crt_links.sh"
-	sudo sh -c "echo 'sudo ln -sf /var/lib/lxc/$NameServer/rootfs/etc/resolv.conf .' 			>> /etc/orabuntu-lxc-scripts/crt_links.sh"
-	sudo sh -c "echo 'sudo ln -sf /var/lib/lxc/$NameServer/rootfs/etc/network/interfaces .'			>> /etc/orabuntu-lxc-scripts/crt_links.sh"
-	sudo sh -c "echo 'sudo ln -sf /var/lib/lxc/$NameServer/rootfs/etc/bind/rndc.key .' 			>> /etc/orabuntu-lxc-scripts/crt_links.sh"
-	sudo sh -c "echo 'sudo ln -sf /var/lib/lxc/$NameServer/rootfs/etc/default/bind9 .' 			>> /etc/orabuntu-lxc-scripts/crt_links.sh"
-	sudo sh -c "echo 'sudo ln -sf /var/lib/lxc/$NameServer/rootfs/var/lib/dhcp/dhcpd.leases .' 		>> /etc/orabuntu-lxc-scripts/crt_links.sh"
-	sudo sh -c "echo 'sudo ln -sf /var/lib/lxc/$NameServer/rootfs/etc/dhcp .' 				>> /etc/orabuntu-lxc-scripts/crt_links.sh"
-	sudo sh -c "echo 'sudo ln -sf /var/lib/lxc/$NameServer/rootfs/etc/dhcp/dhcpd.conf .' 			>> /etc/orabuntu-lxc-scripts/crt_links.sh"
-	sudo sh -c "echo 'sudo ln -sf /var/lib/lxc/$NameServer/rootfs/etc/default/isc-dhcp-server .' 		>> /etc/orabuntu-lxc-scripts/crt_links.sh"
-	sudo sh -c "echo 'sudo ln -sf /var/lib/lxc/$NameServer/rootfs/etc/default/bind9 .' 			>> /etc/orabuntu-lxc-scripts/crt_links.sh"
-	sudo sh -c "echo 'sudo ln -sf /var/lib/lxc/$NameServer/rootfs/etc/bind/named.conf .' 			>> /etc/orabuntu-lxc-scripts/crt_links.sh"
-	sudo sh -c "echo 'sudo ln -sf /var/lib/lxc/$NameServer/rootfs/etc/bind/named.conf.local .' 		>> /etc/orabuntu-lxc-scripts/crt_links.sh"
-	sudo sh -c "echo 'sudo ln -sf /var/lib/lxc/$NameServer/rootfs/etc/bind/named.conf.options .' 		>> /etc/orabuntu-lxc-scripts/crt_links.sh"
-fi
-if [ ! -n $NameServer ]
-then
-	sudo sh -c "echo 'sudo ln -sf /etc/network/if-up.d/openvswitch/nsa-pub-ifup-sw1 .' 			>> /etc/orabuntu-lxc-scripts/crt_links.sh"
-	sudo sh -c "echo 'sudo ln -sf /etc/network/if-up.d/openvswitch/nsa-pub-ifup-sx1 .' 			>> /etc/orabuntu-lxc-scripts/crt_links.sh"
-	sudo sh -c "echo 'sudo ln -sf /etc/network/if-down.d/openvswitch/nsa-pub-ifdown-sw1 .'			>> /etc/orabuntu-lxc-scripts/crt_links.sh"
-	sudo sh -c "echo 'sudo ln -sf /etc/network/if-down.d/openvswitch/nsa-pub-ifdown-sx1 .'			>> /etc/orabuntu-lxc-scripts/crt_links.sh"
-	sudo sh -c "echo 'sudo ln -sf /var/lib/lxc/nsa/rootfs/etc/resolv.conf .' 				>> /etc/orabuntu-lxc-scripts/crt_links.sh"
-	sudo sh -c "echo 'sudo ln -sf /var/lib/lxc/nsa/rootfs/etc/bind/rndc.key .' 				>> /etc/orabuntu-lxc-scripts/crt_links.sh"
-	sudo sh -c "echo 'sudo ln -sf /var/lib/lxc/nsa/rootfs/etc/default/bind9 .' 				>> /etc/orabuntu-lxc-scripts/crt_links.sh"
-	sudo sh -c "echo 'sudo ln -sf /var/lib/lxc/nsa/rootfs/var/lib/dhcp/dhcpd.leases .' 			>> /etc/orabuntu-lxc-scripts/crt_links.sh"
-	sudo sh -c "echo 'sudo ln -sf /var/lib/lxc/nsa/rootfs/etc/dhcp .' 					>> /etc/orabuntu-lxc-scripts/crt_links.sh"
-	sudo sh -c "echo 'sudo ln -sf /var/lib/lxc/nsa/rootfs/etc/dhcp/dhcpd.conf .' 				>> /etc/orabuntu-lxc-scripts/crt_links.sh"
-	sudo sh -c "echo 'sudo ln -sf /var/lib/lxc/nsa/rootfs/etc/default/isc-dhcp-server .' 			>> /etc/orabuntu-lxc-scripts/crt_links.sh"
-	sudo sh -c "echo 'sudo ln -sf /var/lib/lxc/nsa/rootfs/etc/default/bind9 .' 				>> /etc/orabuntu-lxc-scripts/crt_links.sh"
-	sudo sh -c "echo 'sudo ln -sf /var/lib/lxc/nsa/rootfs/etc/bind/named.conf .' 				>> /etc/orabuntu-lxc-scripts/crt_links.sh"
-	sudo sh -c "echo 'sudo ln -sf /var/lib/lxc/nsa/rootfs/etc/bind/named.conf.local .' 			>> /etc/orabuntu-lxc-scripts/crt_links.sh"
-	sudo sh -c "echo 'sudo ln -sf /var/lib/lxc/nsa/rootfs/etc/bind/named.conf.options .' 			>> /etc/orabuntu-lxc-scripts/crt_links.sh"
+	sudo sh -c "echo ' ln -sf /etc/network/if-up.d/openvswitch/$NameServer-pub-ifup-sw1 .' 		   >> /etc/orabuntu-lxc-scripts/crt_links.sh"
+	sudo sh -c "echo ' ln -sf /etc/network/if-up.d/openvswitch/$NameServer-pub-ifup-sx1 .' 		   >> /etc/orabuntu-lxc-scripts/crt_links.sh"
+	sudo sh -c "echo ' ln -sf /etc/network/if-down.d/openvswitch/$NameServer-pub-ifdown-sw1 .'	   >> /etc/orabuntu-lxc-scripts/crt_links.sh"
+	sudo sh -c "echo ' ln -sf /etc/network/if-down.d/openvswitch/$NameServer-pub-ifdown-sx1 .'	   >> /etc/orabuntu-lxc-scripts/crt_links.sh"
+	sudo sh -c "echo ' ln -sf /var/lib/lxc/$NameServer/rootfs/etc/resolv.conf .' 			   >> /etc/orabuntu-lxc-scripts/crt_links.sh"
+	sudo sh -c "echo ' ln -sf /var/lib/lxc/$NameServer/rootfs/etc/network/interfaces .'		   >> /etc/orabuntu-lxc-scripts/crt_links.sh"
+	sudo sh -c "echo ' ln -sf /var/lib/lxc/$NameServer/rootfs/etc/bind/rndc.key .' 			   >> /etc/orabuntu-lxc-scripts/crt_links.sh"
+	sudo sh -c "echo ' ln -sf /var/lib/lxc/$NameServer/rootfs/etc/default/bind9 .' 			   >> /etc/orabuntu-lxc-scripts/crt_links.sh"
+	sudo sh -c "echo ' ln -sf /var/lib/lxc/$NameServer/rootfs/var/lib/dhcp/dhcpd.leases .' 		   >> /etc/orabuntu-lxc-scripts/crt_links.sh"
+	sudo sh -c "echo ' ln -sf /var/lib/lxc/$NameServer/rootfs/etc/dhcp .' 				   >> /etc/orabuntu-lxc-scripts/crt_links.sh"
+	sudo sh -c "echo ' ln -sf /var/lib/lxc/$NameServer/rootfs/etc/dhcp/dhcpd.conf .' 		   >> /etc/orabuntu-lxc-scripts/crt_links.sh"
+	sudo sh -c "echo ' ln -sf /var/lib/lxc/$NameServer/rootfs/etc/default/isc-dhcp-server .' 	   >> /etc/orabuntu-lxc-scripts/crt_links.sh"
+	sudo sh -c "echo ' ln -sf /var/lib/lxc/$NameServer/rootfs/etc/default/bind9 .' 			   >> /etc/orabuntu-lxc-scripts/crt_links.sh"
+	sudo sh -c "echo ' ln -sf /var/lib/lxc/$NameServer/rootfs/etc/bind/named.conf .' 		   >> /etc/orabuntu-lxc-scripts/crt_links.sh"
+	sudo sh -c "echo ' ln -sf /var/lib/lxc/$NameServer/rootfs/etc/bind/named.conf.local .' 		   >> /etc/orabuntu-lxc-scripts/crt_links.sh"
+	sudo sh -c "echo ' ln -sf /var/lib/lxc/$NameServer/rootfs/etc/bind/named.conf.options .' 	   >> /etc/orabuntu-lxc-scripts/crt_links.sh"
 fi
 
-if [ -n $NameServer ] && [ -n $Domain1 ]
+if [ ! -n $NameServer ] && [ $MultiHostVar2 = 'N' ]
 then
-	sudo sh -c "echo 'sudo ln -sf /var/lib/lxc/$NameServer/rootfs/var/lib/bind/fwd.$Domain1 .' 		>> /etc/orabuntu-lxc-scripts/crt_links.sh"
-	sudo sh -c "echo 'sudo ln -sf /var/lib/lxc/$NameServer/rootfs/var/lib/bind/rev.$Domain1 .' 		>> /etc/orabuntu-lxc-scripts/crt_links.sh"
+	sudo sh -c "echo ' ln -sf /etc/network/if-up.d/openvswitch/nsa-pub-ifup-sw1 .' 			   >> /etc/orabuntu-lxc-scripts/crt_links.sh"
+	sudo sh -c "echo ' ln -sf /etc/network/if-up.d/openvswitch/nsa-pub-ifup-sx1 .' 			   >> /etc/orabuntu-lxc-scripts/crt_links.sh"
+	sudo sh -c "echo ' ln -sf /etc/network/if-down.d/openvswitch/nsa-pub-ifdown-sw1 .'		   >> /etc/orabuntu-lxc-scripts/crt_links.sh"
+	sudo sh -c "echo ' ln -sf /etc/network/if-down.d/openvswitch/nsa-pub-ifdown-sx1 .'		   >> /etc/orabuntu-lxc-scripts/crt_links.sh"
+	sudo sh -c "echo ' ln -sf /var/lib/lxc/nsa/rootfs/etc/resolv.conf .' 				   >> /etc/orabuntu-lxc-scripts/crt_links.sh"
+	sudo sh -c "echo ' ln -sf /var/lib/lxc/nsa/rootfs/etc/bind/rndc.key .' 				   >> /etc/orabuntu-lxc-scripts/crt_links.sh"
+	sudo sh -c "echo ' ln -sf /var/lib/lxc/nsa/rootfs/etc/default/bind9 .' 				   >> /etc/orabuntu-lxc-scripts/crt_links.sh"
+	sudo sh -c "echo ' ln -sf /var/lib/lxc/nsa/rootfs/var/lib/dhcp/dhcpd.leases .' 			   >> /etc/orabuntu-lxc-scripts/crt_links.sh"
+	sudo sh -c "echo ' ln -sf /var/lib/lxc/nsa/rootfs/etc/dhcp .' 					   >> /etc/orabuntu-lxc-scripts/crt_links.sh"
+	sudo sh -c "echo ' ln -sf /var/lib/lxc/nsa/rootfs/etc/dhcp/dhcpd.conf .' 			   >> /etc/orabuntu-lxc-scripts/crt_links.sh"
+	sudo sh -c "echo ' ln -sf /var/lib/lxc/nsa/rootfs/etc/default/isc-dhcp-server .' 		   >> /etc/orabuntu-lxc-scripts/crt_links.sh"
+	sudo sh -c "echo ' ln -sf /var/lib/lxc/nsa/rootfs/etc/default/bind9 .' 				   >> /etc/orabuntu-lxc-scripts/crt_links.sh"
+	sudo sh -c "echo ' ln -sf /var/lib/lxc/nsa/rootfs/etc/bind/named.conf .' 			   >> /etc/orabuntu-lxc-scripts/crt_links.sh"
+	sudo sh -c "echo ' ln -sf /var/lib/lxc/nsa/rootfs/etc/bind/named.conf.local .' 			   >> /etc/orabuntu-lxc-scripts/crt_links.sh"
+	sudo sh -c "echo ' ln -sf /var/lib/lxc/nsa/rootfs/etc/bind/named.conf.options .' 		   >> /etc/orabuntu-lxc-scripts/crt_links.sh"
 fi
 
-if [ -n $NameServer ] && [ -n $Domain2 ]
+if [ -n $NameServer ] && [ -n $Domain1 ] && [ $MultiHostVar2 = 'N' ]
 then
-	sudo sh -c "echo 'sudo ln -sf /var/lib/lxc/$NameServer/rootfs/var/lib/bind/fwd.$Domain2 .' 		>> /etc/orabuntu-lxc-scripts/crt_links.sh"
-	sudo sh -c "echo 'sudo ln -sf /var/lib/lxc/$NameServer/rootfs/var/lib/bind/rev.$Domain2 .' 		>> /etc/orabuntu-lxc-scripts/crt_links.sh"
+	sudo sh -c "echo ' ln -sf /var/lib/lxc/$NameServer/rootfs/var/lib/bind/fwd.$Domain1 .' 		   >> /etc/orabuntu-lxc-scripts/crt_links.sh"
+	sudo sh -c "echo ' ln -sf /var/lib/lxc/$NameServer/rootfs/var/lib/bind/rev.$Domain1 .' 		   >> /etc/orabuntu-lxc-scripts/crt_links.sh"
 fi
 
-if [ -n $NameServer ] && [ ! -n $Domain1 ]
+if [ -n $NameServer ] && [ -n $Domain2 ] && [ $MultiHostVar2 = 'N' ]
 then
-	sudo sh -c "echo 'sudo ln -sf /var/lib/lxc/$NameServer/rootfs/var/lib/bind/fwd.orabuntu-lxc.com .' 	>> /etc/orabuntu-lxc-scripts/crt_links.sh"
-	sudo sh -c "echo 'sudo ln -sf /var/lib/lxc/$NameServer/rootfs/var/lib/bind/rev.orabuntu-lxc.com .' 	>> /etc/orabuntu-lxc-scripts/crt_links.sh"
+	sudo sh -c "echo ' ln -sf /var/lib/lxc/$NameServer/rootfs/var/lib/bind/fwd.$Domain2 .' 		   >> /etc/orabuntu-lxc-scripts/crt_links.sh"
+	sudo sh -c "echo ' ln -sf /var/lib/lxc/$NameServer/rootfs/var/lib/bind/rev.$Domain2 .' 		   >> /etc/orabuntu-lxc-scripts/crt_links.sh"
 fi
 
-if [ -n $NameServer ] && [ ! -n $Domain2 ]
+sudo sh -c "echo ' ln -sf /etc/sysctl.d/60-oracle.conf .' 			         		   >> /etc/orabuntu-lxc-scripts/crt_links.sh"
+sudo sh -c "echo ' ln -sf /etc/security/limits.d/70-oracle.conf .' 					   >> /etc/orabuntu-lxc-scripts/crt_links.sh"
+
+if [ $NetworkManagerInstalled -eq 1 ]
 then
-       sudo sh -c "echo 'sudo ln -sf /var/lib/lxc/$NameServer/rootfs/var/lib/bind/fwd.consultingcommandos.us .' >> /etc/orabuntu-lxc-scripts/crt_links.sh"
-       sudo sh -c "echo 'sudo ln -sf /var/lib/lxc/$NameServer/rootfs/var/lib/bind/rev.consultingcommandos.us .' >> /etc/orabuntu-lxc-scripts/crt_links.sh"
+	sudo sh -c "echo ' ln -sf /etc/NetworkManager/dnsmasq.d/local .' 				   >> /etc/orabuntu-lxc-scripts/crt_links.sh"
+	sudo sh -c "echo ' ln -sf /etc/NetworkManager/NetworkManager.conf .' 				   >> /etc/orabuntu-lxc-scripts/crt_links.sh"
 fi
 
-sudo sh -c "echo 'sudo ln -sf /etc/sysctl.d/60-oracle.conf .' 							>> /etc/orabuntu-lxc-scripts/crt_links.sh"
-sudo sh -c "echo 'sudo ln -sf /etc/security/limits.d/70-oracle.conf .' 						>> /etc/orabuntu-lxc-scripts/crt_links.sh"
-sudo sh -c "echo 'sudo ln -sf /etc/network/interfaces .' 							>> /etc/orabuntu-lxc-scripts/crt_links.sh"
-sudo sh -c "echo 'sudo ln -sf /etc/NetworkManager/dnsmasq.d/local .' 						>> /etc/orabuntu-lxc-scripts/crt_links.sh"
-sudo sh -c "echo 'sudo ln -sf /etc/orabuntu-lxc-scripts/stop_containers.sh .' 					>> /etc/orabuntu-lxc-scripts/crt_links.sh"
-sudo sh -c "echo 'sudo ln -sf /etc/orabuntu-lxc-scripts/start_containers.sh .' 					>> /etc/orabuntu-lxc-scripts/crt_links.sh"
-sudo sh -c "echo 'sudo ln -sf /etc/network/openvswitch .' 							>> /etc/orabuntu-lxc-scripts/crt_links.sh"
-sudo sh -c "echo 'sudo ln -sf /etc/network/if-up.d/orabuntu-lxc-net .' 						>> /etc/orabuntu-lxc-scripts/crt_links.sh"
-sudo sh -c "echo 'sudo ln -sf /etc/network/openvswitch/crt_ovs_sw1.sh .' 					>> /etc/orabuntu-lxc-scripts/crt_links.sh"
-sudo sh -c "echo 'sudo ln -sf /etc/network/openvswitch/crt_ovs_sw2.sh .' 					>> /etc/orabuntu-lxc-scripts/crt_links.sh"
-sudo sh -c "echo 'sudo ln -sf /etc/network/openvswitch/crt_ovs_sw3.sh .' 					>> /etc/orabuntu-lxc-scripts/crt_links.sh"
-sudo sh -c "echo 'sudo ln -sf /etc/network/openvswitch/crt_ovs_sw4.sh .' 					>> /etc/orabuntu-lxc-scripts/crt_links.sh"
-sudo sh -c "echo 'sudo ln -sf /etc/network/openvswitch/crt_ovs_sw5.sh .' 					>> /etc/orabuntu-lxc-scripts/crt_links.sh"
-sudo sh -c "echo 'sudo ln -sf /etc/network/openvswitch/crt_ovs_sw6.sh .' 					>> /etc/orabuntu-lxc-scripts/crt_links.sh"
-sudo sh -c "echo 'sudo ln -sf /etc/network/openvswitch/crt_ovs_sw7.sh .' 					>> /etc/orabuntu-lxc-scripts/crt_links.sh"
-sudo sh -c "echo 'sudo ln -sf /etc/network/openvswitch/crt_ovs_sw8.sh .' 					>> /etc/orabuntu-lxc-scripts/crt_links.sh"
-sudo sh -c "echo 'sudo ln -sf /etc/network/openvswitch/crt_ovs_sw9.sh .' 					>> /etc/orabuntu-lxc-scripts/crt_links.sh"
-sudo sh -c "echo 'sudo ln -sf /etc/network/openvswitch/crt_ovs_sx1.sh .' 					>> /etc/orabuntu-lxc-scripts/crt_links.sh"
-sudo sh -c "echo 'sudo ln -sf /etc/network/openvswitch/crt_ovs_vm1.sh .' 					>> /etc/orabuntu-lxc-scripts/crt_links.sh"
-sudo sh -c "echo 'sudo ln -sf /etc/network/openvswitch/del-bridges.sh .' 					>> /etc/orabuntu-lxc-scripts/crt_links.sh"
-sudo sh -c "echo 'sudo ln -sf /etc/network/openvswitch/veth_cleanups.sh .' 					>> /etc/orabuntu-lxc-scripts/crt_links.sh"
-sudo sh -c "echo 'sudo ln -sf /etc/network/openvswitch/create-ovs-sw-files-v2.sh .' 				>> /etc/orabuntu-lxc-scripts/crt_links.sh"
-sudo sh -c "echo 'sudo ln -sf /etc/init/openvswitch-switch.conf .' 						>> /etc/orabuntu-lxc-scripts/crt_links.sh"
-sudo sh -c "echo 'sudo ln -sf /etc/default/openvswitch-switch .' 						>> /etc/orabuntu-lxc-scripts/crt_links.sh"
-sudo sh -c "echo 'sudo ln -sf /etc/multipath.conf .' 								>> /etc/orabuntu-lxc-scripts/crt_links.sh"
-sudo sh -c "echo 'sudo ln -sf /etc/multipath.conf.example .' 							>> /etc/orabuntu-lxc-scripts/crt_links.sh"
-sudo sh -c "echo 'sudo ln -sf /etc/network/if-down.d/scst-net .' 						>> /etc/orabuntu-lxc-scripts/crt_links.sh"
+if	[ $SystemdResolvedInstalled -eq 1 ]
+then
+	sudo sh -c "echo ' ln -sf /etc/systemd/resolved.conf .' 					   >> /etc/orabuntu-lxc-scripts/crt_links.sh"
+fi
+
+sudo sh -c "echo ' ln -sf /etc/orabuntu-lxc-scripts/stop_containers.sh .' 				   >> /etc/orabuntu-lxc-scripts/crt_links.sh"
+sudo sh -c "echo ' ln -sf /etc/orabuntu-lxc-scripts/start_containers.sh .' 				   >> /etc/orabuntu-lxc-scripts/crt_links.sh"
+sudo sh -c "echo ' ln -sf /etc/network/openvswitch .' 							   >> /etc/orabuntu-lxc-scripts/crt_links.sh"
+sudo sh -c "echo ' ln -sf /etc/network/openvswitch/crt_ovs_sw1.sh .' 					   >> /etc/orabuntu-lxc-scripts/crt_links.sh"
+sudo sh -c "echo ' ln -sf /etc/network/openvswitch/crt_ovs_sw2.sh .' 					   >> /etc/orabuntu-lxc-scripts/crt_links.sh"
+sudo sh -c "echo ' ln -sf /etc/network/openvswitch/crt_ovs_sw3.sh .' 					   >> /etc/orabuntu-lxc-scripts/crt_links.sh"
+sudo sh -c "echo ' ln -sf /etc/network/openvswitch/crt_ovs_sw4.sh .' 					   >> /etc/orabuntu-lxc-scripts/crt_links.sh"
+sudo sh -c "echo ' ln -sf /etc/network/openvswitch/crt_ovs_sw5.sh .' 					   >> /etc/orabuntu-lxc-scripts/crt_links.sh"
+sudo sh -c "echo ' ln -sf /etc/network/openvswitch/crt_ovs_sw6.sh .' 					   >> /etc/orabuntu-lxc-scripts/crt_links.sh"
+sudo sh -c "echo ' ln -sf /etc/network/openvswitch/crt_ovs_sw7.sh .' 					   >> /etc/orabuntu-lxc-scripts/crt_links.sh"
+sudo sh -c "echo ' ln -sf /etc/network/openvswitch/crt_ovs_sw8.sh .' 					   >> /etc/orabuntu-lxc-scripts/crt_links.sh"
+sudo sh -c "echo ' ln -sf /etc/network/openvswitch/crt_ovs_sw9.sh .' 					   >> /etc/orabuntu-lxc-scripts/crt_links.sh"
+sudo sh -c "echo ' ln -sf /etc/network/openvswitch/crt_ovs_sx1.sh .' 					   >> /etc/orabuntu-lxc-scripts/crt_links.sh"
+sudo sh -c "echo ' ln -sf /etc/network/openvswitch/del-bridges.sh .' 					   >> /etc/orabuntu-lxc-scripts/crt_links.sh"
+sudo sh -c "echo ' ln -sf /etc/network/openvswitch/veth_cleanups.sh .' 					   >> /etc/orabuntu-lxc-scripts/crt_links.sh"
+sudo sh -c "echo ' ln -sf /etc/network/openvswitch/create-ovs-sw-files-v2.sh .' 			   >> /etc/orabuntu-lxc-scripts/crt_links.sh"
+sudo sh -c "echo ' ln -sf /etc/init/openvswitch-switch.conf .' 						   >> /etc/orabuntu-lxc-scripts/crt_links.sh"
+sudo sh -c "echo ' ln -sf /etc/default/openvswitch-switch .' 						   >> /etc/orabuntu-lxc-scripts/crt_links.sh"
+sudo sh -c "echo ' ln -sf /etc/multipath.conf .' 							   >> /etc/orabuntu-lxc-scripts/crt_links.sh"
+sudo sh -c "echo ' ln -sf /etc/multipath.conf.example .' 						   >> /etc/orabuntu-lxc-scripts/crt_links.sh"
+sudo sh -c "echo ' ln -sf /etc/network/if-down.d/scst-net .' 						   >> /etc/orabuntu-lxc-scripts/crt_links.sh"
+
+ls -l /etc/orabuntu-lxc-scripts/crt_links.sh
 
 echo ''
 echo "=============================================="
-echo "Script crt_links.sh created.                  "
+echo "Created the crt_links.sh script.              "
 echo "=============================================="
+echo ''
 
 sleep 5
 
 clear
 
 echo ''
-echo "============================================"
-echo "Next script to run: orabuntu-services-2.sh  "
-echo "============================================"
+echo "=============================================="
+echo "Next script to run: orabuntu-services-2.sh    "
+echo "=============================================="
 
+sleep 5
 
