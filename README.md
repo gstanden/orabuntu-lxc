@@ -6,7 +6,7 @@ To install the software:
 * Connect as the "ubuntu" admin linux user and create a "/home/ubuntu/Downloads" directory if it does not already exist.
 * Note that for RedHat based linuxes there is a script to create the "ubuntu" admin user.  Those scripts are:
 * uekulele-services-0.sh
-* xcentos-services-0.sh
+* lxcentos-services-0.sh
 * You can also just create an "ubuntu" linux admin user at the time you install the OS.
 * Install unzip package on OS 
 * Download our github zip archive from our github to "/home/ubuntu/Downloads" directory or user wget to download it.
