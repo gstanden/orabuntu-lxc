@@ -9,7 +9,7 @@ To install the software:
 * lxcentos-services-0.sh
 * You can also just create an "ubuntu" linux admin user at the time you install the OS.
 * Install unzip package on OS 
-* Download our github zip archive from our github to "/home/ubuntu/Downloads" directory or user wget to download it.
+* Download our github zip archive from our github to "/home/ubuntu/Downloads" directory or user wget, curl etc.
 * Unzip the zip archive.
 * Navigate to /home/ubuntu/Downloads/orabuntu-lxc-master/anylinux
 * Edit the "anylinux-services.sh" script to set the parameters you want for your deployment.
