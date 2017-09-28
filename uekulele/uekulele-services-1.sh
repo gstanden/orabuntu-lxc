@@ -504,12 +504,15 @@ sleep 5
 
 clear
 
+# GLS 20170927 credit yairchu 
+function SoftwareVersion { echo "$@" | awk -F. '{ printf("%d%03d%03d%03d\n", $1,$2,$3,$4); }'; }
+
 function GetLXCVersion {
-	lxc-create --version | sed 's/\.//g'
+        lxc-create --version
 }
 LXCVersion=$(GetLXCVersion)
 
-if [ $LXCVersion -lt 205 ]	
+if [ $(SoftwareVersion $LXCVersion) -lt $(SoftwareVersion "2.0.5") ]
 then
 	echo ''
 	echo "=============================================="
@@ -964,12 +967,7 @@ then
 	clear
 fi
 
-function GetLXCVersion {
-lxc-create --version | sed 's/\.//g'
-}
-LXCVersion=$(GetLXCVersion)
-
-if [ $LXCVersion -lt 205 ]	
+if [ $(SoftwareVersion $LXCVersion) -lt $(SoftwareVersion "2.0.5") ]
 then
 	echo ''
 	echo "=============================================="
