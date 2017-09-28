@@ -32,7 +32,7 @@ To install the software:
 * Note that when presenting the storage you need to edit the path to the storage in the config file too.
 * Note that our blog https://sites.google.com/site/nandydandyoracle has much valuable hands-on learning.
 
-# Please follow the Orabuntu-LXC project with your github account and log issues here at this github.
+#### Please follow the Orabuntu-LXC project with your github account and log issues here at this github.
 
 Send feedback to gilbert@orabuntu-lxc.com
 Thank You, 
