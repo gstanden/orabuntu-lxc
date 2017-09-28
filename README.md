@@ -3,7 +3,7 @@
 To install the software:
 
 (1)   
-Create an "ubuntu" linux user that has SUDO ALL privilege (root privileges)
+* Create an "ubuntu" linux user that has SUDO ALL privilege (root privileges)
 (2)   
 Connect as the "ubuntu" admin linux user and create a "/home/ubuntu/Downloads" directory if it does not already exist.
 (3)   
