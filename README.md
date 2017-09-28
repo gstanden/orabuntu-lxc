@@ -29,6 +29,7 @@ To install the software:
 * /dev/containername1
 * /dev/containername2 etc.
 * To present the LUNs edit the config files of the LXC containers and uncomment the two lines for LUN presentation.
+* Note that when presenting the storage you need to edit the path to the storage in the config file too.
 
 Send feedback to gilbert@orabuntu-lxc.com
 Thank You
