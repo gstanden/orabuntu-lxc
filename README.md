@@ -24,7 +24,7 @@ To install the software:
 * Orabuntu-LXC comes with an enterprise-grade SAN solution (SCST) 
 * SCST can be used with your Orabuntu-LXC container deployment.
 * SCST comes with "scst-files.tar" which completely automates building file-backed LUNs for your LXC deployment.
-* SCST can of course be used alternatively with manual configuraiton of fiber channel HBA's, Infiniband, etc.
+* SCST can of course be used alternatively with manual configuration of fiber channel HBA's, Infiniband, etc.
 * Multipath LUNs are configured on boot in directories of the form:
 * /dev/containername1
 * /dev/containername2 etc.
