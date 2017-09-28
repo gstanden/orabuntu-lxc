@@ -21,7 +21,10 @@ To install the software:
 * Will optionally add in additional networks
 * Will clone the seed container to a user-set number of identical copies.
 * Will start the clone containers and assign a DHCP address and add them to DNS dynamically
-* Orabuntu-LXC comes with an enterprise-grade SAN solution to be used with your Orabuntu-LXC container deployment.  
+* Orabuntu-LXC comes with an enterprise-grade SAN solution (SCST) 
+* SCST can be used with your Orabuntu-LXC container deployment.
+* SCST comes with "scst-files.tar" which completely automates building file-backed LUNs for your LXC deployment.
+* SCST can of course be used alternatively with manual configuraiton of fiber channel HBA's, Infiniband, etc.
 * Multipath LUNs are configured on boot in directories of the form:
 * /dev/containername1
 * /dev/containername2 etc.
