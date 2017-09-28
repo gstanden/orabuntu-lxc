@@ -1622,6 +1622,7 @@ then
 
 	clear
 
+	echo ''
 	echo "=============================================="
 	echo "If you get the following warning message:     "
 	echo "                                              "
@@ -1647,6 +1648,7 @@ then
 
 	sleep 15	
 
+	sudo touch ~/.ssh/known_hosts
 	sudo lxc-attach -n $NameServer -- usermod --password `perl -e "print crypt('$MultiHostVar8','$MultiHostVar8');"` ubuntu
 	ssh-keygen -f "/home/ubuntu/.ssh/known_hosts" -R 10.207.39.2
 	ssh-keygen -f "/home/ubuntu/.ssh/known_hosts" -R $NameServer
@@ -1882,11 +1884,6 @@ then
 # ssh-keygen -t rsa
 ssh-keygen -f ~/.ssh/id_rsa -t rsa -N ''
 fi
-
-# if [ -e ~/.ssh/known_hosts ]
-# then
-# rm ~/.ssh/known_hosts
-# fi
 
 if [ -e ~/.ssh/authorized_keys ]
 then
