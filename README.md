@@ -2,14 +2,11 @@
 
 To install the software:
 
-(1)   
 * Create an "ubuntu" linux user that has SUDO ALL privilege (root privileges)
-(2)   
-Connect as the "ubuntu" admin linux user and create a "/home/ubuntu/Downloads" directory if it does not already exist.
-(3)   
-Note that for RedHat based linuxes there is a script to create the "ubuntu" admin user.  Those scripts are:
-     (3a) uekulele-services-0.sh
-     (3b) xcentos-services-0.sh
+* Connect as the "ubuntu" admin linux user and create a "/home/ubuntu/Downloads" directory if it does not already exist.
+* Note that for RedHat based linuxes there is a script to create the "ubuntu" admin user.  Those scripts are:
+** uekulele-services-0.sh
+** xcentos-services-0.sh
 (4)   
 Note that if you are creating a VM to try Orabuntu-LXC the simplest thing is to create an "ubuntu" linux admin user    at the time you install the OS.
 (4)   
