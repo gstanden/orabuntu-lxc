@@ -163,15 +163,6 @@ echo "leave them at the new settings shown below.   "
 echo "=============================================="
 echo ''
 echo "=============================================="
-echo "There are security impllications for keeping  "
-echo "these new sshd_config settings.  You should   "
-echo "research the implications of new sshd_config  "
-echo "parameters and make an informed decision on   "
-echo "how you want to set them after the install of "
-echo "Orabuntu-LXC is complete.                     "
-echo "=============================================="
-echo ''
-echo "=============================================="
 echo "Orabuntu-LXC has made a backup of sshd_config "
 echo "located in the /etc/ssh directory if you want "
 echo "to revert sshd_config to original settings    "
@@ -179,7 +170,7 @@ echo "after Orabuntu-LXC install is completed.      "
 echo "=============================================="
 echo ''
 
-sleep 25
+sleep 5
 
 sudo sed -i '/GSSAPIAuthentication/s/yes/no/'                                /etc/ssh/sshd_config
 sudo sed -i '/UseDNS/s/yes/no/'                                              /etc/ssh/sshd_config
@@ -198,7 +189,7 @@ sleep 5
 
 clear
 
-if [ -f /etc/orabuntu-lxc-release ]
+if [ -f /etc/orabuntu-lxc-release ] 
 then
 	which lxc-ls > /dev/null 2>&1
 	if [ $? -eq 0 ] && [ $Operation = 'reinstall' ]
@@ -298,7 +289,7 @@ then
 		sudo reboot
 		exit
 
-		fi
+	fi
 
 # GLS 20170919 Oracle Linux Specific Code Block 1 BEGIN
 
@@ -526,7 +517,7 @@ then
 
 	echo ''
 	echo "=============================================="
-	echo "Upgrade LXC from Source on $LF Linux.         "
+	echo "Upgrade LXC from Source on $LF Linux $RL      "
 	echo "=============================================="
 
 	sleep 5
@@ -540,7 +531,7 @@ then
 	echo ''
 
 	sleep 5
-		
+
 	sudo touch /etc/rpm/macros
 	function CheckMacrosFile {
 		cat /etc/rpm/macros | grep _unpackaged_files_terminate_build | sort -u | grep -c 0
@@ -552,7 +543,7 @@ then
 		sudo sh -c "echo '%_unpackaged_files_terminate_build 0' >> /etc/rpm/macros"
 	fi
 
-	rpmbuild --define '_topdir /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc/rpmbuild' -ba lxc.spec
+	rpmbuild --define '_topdir /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc/rpmbuild' -ba lxc.spec > /dev/null 2>&1
 	sudo yum -y install rpm-build wget openssl-devel gcc make docbook2X xmlto docbook automake graphviz
 	mkdir -p /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc
 	cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc
@@ -659,7 +650,7 @@ then
 	then
 		echo ''
 		echo "=============================================="
-		echo "LXC RPMs built on $LF Linux.                  "
+		echo "LXC RPMs built on $LF Linux $RL.              "
 		echo "=============================================="
 	fi
 
@@ -671,7 +662,7 @@ then
 	then
 		echo ''
 		echo "=============================================="
-		echo "LXC RPMs built on $LF Linux.                  " 
+		echo "LXC RPMs built on $LF Linux $RL.              " 
 		echo "=============================================="
 	fi
 
@@ -909,6 +900,8 @@ then
 	echo "=============================================="
 	echo ''
 
+	sleep 5
+
 	if [ $Release -eq 7 ]
 	then
 		sudo systemctl start lxc.service
@@ -965,10 +958,7 @@ then
 	sleep 5
 
 	clear
-fi
-
-if [ $(SoftwareVersion $LXCVersion) -lt $(SoftwareVersion "2.0.5") ]
-then
+	
 	echo ''
 	echo "=============================================="
 	echo "Install LXC complete.                         "
@@ -979,6 +969,11 @@ then
 
 	clear
 
+fi
+
+which lxc-ls > /dev/null 2>&1
+if [ $(SoftwareVersion $LXCVersion) -lt $(SoftwareVersion "2.0.5") ] && [ $? -ne 0 ]
+then
 	echo ''
 	echo "=============================================="
 	echo "Upgrade LXC from Source on $LF Linux $RL      "
@@ -1449,7 +1444,6 @@ echo "=============================================="
 echo ''
 
 sudo tar -vP --extract --file=/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/archives/ubuntu-host.tar /etc/orabuntu-lxc-scripts/ubuntu-host-backup.sh --touch
-echo ''
 sudo /etc/orabuntu-lxc-scripts/ubuntu-host-backup.sh
 
 echo ''
@@ -1723,6 +1717,11 @@ echo ''
 echo "=============================================="
 echo "Created /etc/sysctl.d/60-oracle.conf file ... "
 echo "=============================================="
+
+sleep 5
+
+clear
+
 echo ''
 echo "=============================================="
 echo "Display /etc/sysctl.d/60-oracle.conf          "
@@ -2380,6 +2379,7 @@ then
 	echo "=============================================="
 	echo ''
 
+	sudo touch /home/ubuntu/.ssh/known_hosts
 	sudo lxc-attach -n $NameServer -- usermod --password `perl -e "print crypt('ubuntu','ubuntu');"` ubuntu
 	ssh-keygen -f "/home/ubuntu/.ssh/known_hosts" -R 10.207.39.2
 	sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.39.2 "date; uname -a"
@@ -2478,6 +2478,7 @@ then
 
 	sudo chmod 777 /etc/network/openvswitch/setup_gre_and_routes.sh
 
+	sudo touch /home/ubuntu/.ssh/known_hosts
 	ssh-keygen -f "/home/ubuntu/.ssh/known_hosts" -R $MultiHostVar5
 	sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 date
 	if [ $? -eq 0 ]
@@ -2517,6 +2518,7 @@ then
 	sudo service sw1 restart
 	sudo service sx1 restart
 
+	sudo touch /home/ubuntu/.ssh/known_hosts
 	ssh-keygen -f "/home/ubuntu/.ssh/known_hosts" -R 10.207.39.2
 	sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.39.2 "sudo -S <<< "ubuntu" mkdir -p ~/Downloads"
 	sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.39.2 "sudo -S <<< "ubuntu" chown ubuntu:ubuntu Downloads"
@@ -2614,11 +2616,6 @@ then
 ssh-keygen -f ~/.ssh/id_rsa -t rsa -N ''
 fi
 
-if [ -e ~/.ssh/known_hosts ]
-then
-rm ~/.ssh/known_hosts
-fi
-
 if [ -e ~/.ssh/authorized_keys ]
 then
 rm ~/.ssh/authorized_keys
@@ -2633,7 +2630,6 @@ cat ~/.ssh/id_rsa.pub
 }
 AuthorizedKey=$(GetAuthorizedKey)
 
-echo ''
 echo 'Authorized Key:'
 echo ''
 echo $AuthorizedKey 
@@ -2790,6 +2786,7 @@ sleep 5
 
 clear
 
+echo ''
 echo "=============================================="
 echo "Next script to run: uekulele-services-2.sh    "
 echo "=============================================="

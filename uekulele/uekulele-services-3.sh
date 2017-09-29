@@ -305,15 +305,12 @@ then
 	echo "=============================================="
 	echo ''
 
+	sudo lxc-attach -n $SeedContainerName -- ntpd -x
 	sudo lxc-attach -n $SeedContainerName -- chmod +x /etc/systemd/system/ntp.service
 	sudo lxc-attach -n $SeedContainerName -- systemctl enable ntp.service
-	echo ''
 	sudo lxc-attach -n $SeedContainerName -- service ntp start
-	echo ''
 	sudo lxc-attach -n $SeedContainerName -- service ntpd start
-	echo ''
-	sudo lxc-attach -n $SeedContainerName -- service ntp status
-	echo ''
+#	sudo lxc-attach -n $SeedContainerName -- service ntp status
 	sudo lxc-attach -n $SeedContainerName -- chkconfig ntp on
 	sudo lxc-attach -n $SeedContainerName -- chkconfig ntpd on
 

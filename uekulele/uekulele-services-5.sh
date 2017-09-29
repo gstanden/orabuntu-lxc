@@ -51,9 +51,8 @@ sleep 5
 
 clear
 
-
-
-eco "=============================================="
+echo ''
+echo "=============================================="
 echo "Create additonal OpenvSwitch networks...      "
 echo "=============================================="
 echo ''
@@ -309,9 +308,7 @@ Facter=$(GetFacter)
 if [ $Facter = 'physical' ]
 then
 	sudo setenforce 0
-	echo ''
 	sudo getenforce
-	echo ''
 	if [ -f /etc/sysconfig/selinux ]
 	then
 		echo ''
