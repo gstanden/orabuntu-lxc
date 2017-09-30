@@ -6,11 +6,16 @@ Build an environment of 10 containers for example in about 15 minutes complete w
 
 The available library of Oracle Linux container templates include Oracle Linux 5, 6 and 7 https://www.oracle.com/linux/index.html.  You can create customized gold copies libraries of Oracle Linux 5, 6 and 7 LXC containers that you have customized with your specialized package prerequities and other customizations and then deploy those containers as you need them.  The possibilities are endless!  Our seed containers run on a separate network that talks with the container design network.
 
-Add additional networks easily with the IP ranges you need simply by adding a forward and reverse lookup zone to the LXC DNS/DHCP container that Orabuntu-LXC v5 EE MultiHost provides and simply add a patch port and new VLAN and voila! you can layer on as many custom IP-range OpenvSwitch subnets as you need for your project to accurately model the real environment you have.
+But wait, there's more on networking! Orabuntu-LXC v5 EE MultiHost comes with a BUILT-IN Oracle GNS (Grid Naming Service) capability built into the DNS DHCP networking solution.  You can use Oracle GNS right out of the box when installing Oracle RAC into Orabuntu-LXC v5 EE MultiHost Oracle Linux LXC containers.  Our Oracle GNS is located at 10.207.39.3 and is the easiest way to deploy Oracle 12c ASM Flex Cluster RAC.  
 
-Orabuntu-LXC v5 EE MultiHost is great for use with Oracle Cloud Compute Baremetal Service https://cloud.oracle.com/infrastructure/compute/pricing. Just provising some bare metal servers from Oracle Cloud, then use Orabuntu-LXC v5 EE MultiHost to deploy your LXC container networks across multiple hosts in just minutes and voila! you are up and running a production-grade LXC multi-host deployment before you're second cup of morning coffee or tea!
+[ubuntu@ol74b-server orabuntu-lxc]$ nslookup 10.207.39.3
+Server:		127.0.0.1
+Address:	127.0.0.1#53
 
-Because OpenvSwitch is a true production-grade multilayer switch solution you can do all kinds of projects that would be difficult to model accurately in terms of steps to complete, for example moving an entire existing Oracle RAC deployment to new subnet IP ranges.  With Orabuntu-LXC v5 EE MultiHost you can do it because unlike VirtualBox our software switches are NOT just Linux bridges, they are real production-quality multilayer full-featured switches very similar to what Google, Facebook and Twitter run in their datacenters.
+3.39.207.10.in-addr.arpa	name = lxc1-gns-vip.urdomain1.com.
+[ubuntu@ol74b-server orabuntu-lxc]$ 
+
+With Orabuntu-LXC v5 EE MultiHost you can do it because unlike VirtualBox our software switches are NOT just Linux bridges, they are real production-quality multilayer full-featured switches very similar to what Google, Facebook and Twitter run in their datacenters.
 
 Ideal for training classes, prototyping, development, and now, with Orabuntu-v5 EE enterprise deployment as well!  Orabuntu-LXC v5 EE includes a GRE tunnel auto-configuration which allows you to build hub-and-spoke networks of LXC physical hosts and span your container networks across the physical hosts. You can easily build your own add-on GRE tunnels to connect the spoke hosts to each other and build a "wheel" of hosts!  With the production-grade industrial-strength OpenvSwitch network http://openvswitch.org/ that Orabuntu-LXC v5 EE MultiHost uses, you can do pretty much anything you can imagine with your networking.
 
