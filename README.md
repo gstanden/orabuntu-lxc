@@ -17,6 +17,7 @@ To install the software:
 * That's it.  There are a few prompts you answer. The software is coded in bash so you can easily take out prompts.
 * The software automatically does the following:
 * Creates an Ubuntu Xenial DNS/DHCP LXC container providing dynamic DNS/DHCP services to your LXC networks.
+* Creates an OpenvSwitch SDN (Software-Defined Network) with VLAN support on which the containers run.
 * A seed Oracle Linux (5 6 or 7) LXC container configured with the prerequisites of your choice (see script 3)
 * Will optionally add in additional networks
 * Will clone the seed container to a user-set number of identical copies.
