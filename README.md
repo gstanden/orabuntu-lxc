@@ -21,7 +21,7 @@ Address:	127.0.0.1#53
 [ubuntu@ol74b-server orabuntu-lxc]$
 ```
 
-Ideal for training classes, prototyping, development, and now, with Orabuntu-v5 EE enterprise deployment as well!  Orabuntu-LXC v5 EE includes a GRE tunnel auto-configuration which allows you to build hub-and-spoke networks of LXC physical hosts and span your container networks across the physical hosts. You can easily build your own add-on GRE tunnels to connect the spoke hosts to each other and build a "wheel" of hosts!  With the production-grade industrial-strength OpenvSwitch network http://openvswitch.org/ that Orabuntu-LXC v5 EE MultiHost uses, you can do pretty much anything you can imagine with your networking.
+Ideal for training classes, prototyping, development, and now, with Orabuntu-v5 EE MultiHost enterprise deployment as well!  Orabuntu-LXC v5 EE includes a GRE tunnel auto-configuration which allows you to build hub-and-spoke networks of LXC physical hosts and span your container networks across the physical hosts. You can easily build your own add-on GRE tunnels to connect the spoke hosts to each other and build a "wheel" of hosts!  With the production-grade industrial-strength OpenvSwitch network http://openvswitch.org/ that Orabuntu-LXC v5 EE MultiHost uses, you can do pretty much anything you can imagine with your networking.
 
 The included central DNS/DHCP solution provides DNS/DHCP for all the containers across all the hosts.  
 
