@@ -11,11 +11,11 @@ Need additional networks with custom IP ranges for your work?  No problem!  Just
 But wait, there's more on networking! Orabuntu-LXC v5 EE MultiHost comes with a BUILT-IN Oracle GNS (Grid Naming Service) capability built into the DNS DHCP networking solution.  You can use Oracle GNS right out of the box when installing Oracle RAC into Orabuntu-LXC v5 EE MultiHost Oracle Linux LXC containers.  Our Oracle GNS is located at 10.207.39.3 and is the easiest way to deploy Oracle 12c ASM Flex Cluster RAC.  
 
 > [ubuntu@ol74b-server orabuntu-lxc]$ nslookup 10.207.39.3
-Server:		127.0.0.1
-Address:	127.0.0.1#53
-
-3.39.207.10.in-addr.arpa	name = lxc1-gns-vip.urdomain1.com.
-[ubuntu@ol74b-server orabuntu-lxc]$ 
+> Server:		127.0.0.1
+> Address:	127.0.0.1#53
+>
+> 3.39.207.10.in-addr.arpa	name = lxc1-gns-vip.urdomain1.com.
+> [ubuntu@ol74b-server orabuntu-lxc]$ 
 
 With Orabuntu-LXC v5 EE MultiHost you can do it because unlike VirtualBox our software switches are NOT just Linux bridges, they are real production-quality multilayer full-featured switches very similar to what Google, Facebook and Twitter run in their datacenters.
 
