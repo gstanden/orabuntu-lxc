@@ -37,6 +37,10 @@ You can review my slideshow from my Linux Foundation presentation here (a little
 
 http://events.linuxfoundation.org/sites/events/files/slides/Standen_Linux_Clusters_1.pdf
 
+Orabuntu-LXC v5 EE MultiHost is an open source GPL3 licensed product of Stillman Real Consulting LLC http://www.consultingcommandos.us/ and we would love to help your enterprise deploy Orabuntu-LXC v5 EE MultiHost and turbocharge performance and efficiency in your landscape.
+
+Stillman Real Consulting LLC, an Oracle Consulting provider of enterprise database consulting and support services with a vision of providing to our clients excellence and cutting-edge Oracle consulting with compliance to all applicable accounting and privacy standards with respect to the data entrusted to our consultants.  Stillman Real Consulting LLC, delivering compliance to our clients with Sarbanes-Oxley (SOX);  21 CFR Part 11;  and HIPAA as well as other company-specific and industry-specific laws, regulations, and guidelines. 
+
 To install the software:
 
 * Create an "ubuntu" linux user that has SUDO ALL privilege (root privileges)
