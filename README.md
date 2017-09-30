@@ -8,6 +8,8 @@ The available library of Oracle Linux container templates include Oracle Linux 5
 
 Need additional networks with custom IP ranges for your work?  No problem!  Just add the forward and reverse zone files to the included DNS DHCP container, and add another OpenvSwitch, configure the patch ports to the main switch (all easy and quick) and voila! you have the additional networks you need, and you can add as many as you like, all with full networking configured.
 
+With Orabuntu-LXC v5 EE MultiHost you can do it because unlike VirtualBox our software switches are NOT just Linux bridges, they are real production-quality multilayer full-featured switches very similar to what Google, Facebook and Twitter run in their datacenters.
+
 But wait, there's more on networking! Orabuntu-LXC v5 EE MultiHost comes with a BUILT-IN Oracle GNS (Grid Naming Service) capability built into the DNS DHCP networking solution.  You can use Oracle GNS right out of the box when installing Oracle RAC into Orabuntu-LXC v5 EE MultiHost Oracle Linux LXC containers.  Our Oracle GNS is located at 10.207.39.3 and is the easiest way to deploy Oracle 12c ASM Flex Cluster RAC.  
 
 ```
@@ -18,8 +20,6 @@ Address:	127.0.0.1#53
 3.39.207.10.in-addr.arpa	name = lxc1-gns-vip.urdomain1.com.
 [ubuntu@ol74b-server orabuntu-lxc]$
 ```
-
-With Orabuntu-LXC v5 EE MultiHost you can do it because unlike VirtualBox our software switches are NOT just Linux bridges, they are real production-quality multilayer full-featured switches very similar to what Google, Facebook and Twitter run in their datacenters.
 
 Ideal for training classes, prototyping, development, and now, with Orabuntu-v5 EE enterprise deployment as well!  Orabuntu-LXC v5 EE includes a GRE tunnel auto-configuration which allows you to build hub-and-spoke networks of LXC physical hosts and span your container networks across the physical hosts. You can easily build your own add-on GRE tunnels to connect the spoke hosts to each other and build a "wheel" of hosts!  With the production-grade industrial-strength OpenvSwitch network http://openvswitch.org/ that Orabuntu-LXC v5 EE MultiHost uses, you can do pretty much anything you can imagine with your networking.
 
