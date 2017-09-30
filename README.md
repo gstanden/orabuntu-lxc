@@ -27,6 +27,10 @@ Whether you want to use Orabuntu-LXC v5 for the desktop, or for the enterprise, 
 
 And yes, Virginia, you can run Oracle RDBMS 12c ASM Flex Cluster RAC even directly on Ubuntu Linux kernel in our Oracle Linux containers with perfect results with our Orabuntu-LXC v5 EE MultiHost edition.
 
+You can review my slideshow from my Linux Foundation presentation here (a little bit dated here and there) but still with very relevant overview of the power of LXC Linux containers for running Oracle Enterprise software and now with the amazing rapid-deployment full-featured, enterprise-ready, desktop-ready power of Orabuntu-LXC v5 EE MultiHost Editon!
+
+http://events.linuxfoundation.org/sites/events/files/slides/Standen_Linux_Clusters_1.pdf
+
 To install the software:
 
 * Create an "ubuntu" linux user that has SUDO ALL privilege (root privileges)
