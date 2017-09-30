@@ -1,6 +1,6 @@
 # Orabuntu-LXC
 
-Orabuntu-LXC v5 EE Multihost is high-performance LXC Linux Container software https://linuxcontainers.org/ for Oracle for the Enterprise or the Desktop. It uses LXC with OpenvSwitch http://openvswitch.org/ and VLANs and provides a DNS/DHCP dynamic containerized bundled naming DHCP services solution.  
+Orabuntu-LXC v5 EE Multihost is high-performance LXC Linux Container software https://linuxcontainers.org/ for Oracle for the Enterprise or the Desktop. It uses LXC with OpenvSwitch http://openvswitch.org/ and VLANs and provides a DNS/DHCP dynamic containerized bundled naming DHCP services solution.  Orabuntu-LXC v5 EE MultiHost is licensed under GPL3.
 
 Build an environment of 10 Oracle Linux https://www.oracle.com/linux/index.html containers for example in about 15 minutes complete with full networking capability and DNS/DHCP.  Erase that same entire 10-container environment in less than 1 minute and create a new enviro! Great, fast solution for re-provisioning local or cloud training environments literally in just minutes at the push of a single button!
 
