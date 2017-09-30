@@ -244,8 +244,8 @@ echo 'OSMemRes                  = '$OSMemRes
 MultiHost=$8
 if [ -z $8 ]
 then
-	#MultiHost='new:N:1:0:192.168.1.49:192.168.1.52:1420:ubuntu:ubuntu'
-	 MultiHost='new:Y:4:0:192.168.1.49:192.168.1.50:1420:ubuntu:ubuntu'
+	 MultiHost='new:N:1:0:192.168.0.0:192.168.0.0:1420:ubuntu:ubuntu'
+	#MultiHost='new:Y:4:0:192.168.1.49:192.168.1.50:1420:ubuntu:ubuntu'
 	#MultiHost='reinstall:N:1:0:192.168.1.56:192.168.1.52:1420:ubuntu:ubuntu'
 	#MultiHost='reinstall:Y:4:0:192.168.1.56:192.168.1.52:1420:ubuntu:ubuntu'
 	#MultiHost='addclones'
