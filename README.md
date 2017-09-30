@@ -15,7 +15,8 @@ Server:		127.0.0.1
 Address:	127.0.0.1#53
 
 3.39.207.10.in-addr.arpa	name = lxc1-gns-vip.urdomain1.com.
-[ubuntu@ol74b-server orabuntu-lxc]$```
+[ubuntu@ol74b-server orabuntu-lxc]$
+```
 
 With Orabuntu-LXC v5 EE MultiHost you can do it because unlike VirtualBox our software switches are NOT just Linux bridges, they are real production-quality multilayer full-featured switches very similar to what Google, Facebook and Twitter run in their datacenters.
 
