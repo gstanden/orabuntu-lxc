@@ -1,4 +1,4 @@
-# Orabuntu-LXC v5 EE MultiHost Edition
+# Orabuntu-LXC v5 EE
 
 Orabuntu-LXC v5 EE Multihost https://github.com/gstanden/orabuntu-lxc is high-performance LXC Linux Container software https://linuxcontainers.org/ for Oracle for the Enterprise or the Desktop. It uses LXC with OpenvSwitch http://openvswitch.org/ and VLANs and provides a DNS/DHCP dynamic containerized bundled naming DHCP services solution.  Orabuntu-LXC v5 EE MultiHost is licensed under GPL3 https://www.gnu.org/licenses/gpl-3.0.en.html.
 
