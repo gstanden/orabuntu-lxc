@@ -141,7 +141,24 @@ echo "=============================================="
 echo "Establish sudo privileges completed.          "
 echo "=============================================="
 
-sleep 5 
+sleep 5
+
+clear
+
+echo ''
+echo "=============================================="
+echo "Install required packages...                  "
+echo "=============================================="
+echo ''
+
+sudo apt-get install wget unzip openssh-server net-tools bind9utils
+
+echo ''
+echo "=============================================="
+echo "Done:  Install required packages.             "
+echo "=============================================="
+
+sleep 5
 
 clear
 
@@ -158,30 +175,24 @@ echo "=============================================="
 echo ''
 echo "=============================================="
 echo "There are security impllications for keeping  "
-echo "these new sshd_config settings.  You should   "
-echo "research the implications of new sshd_config  "
-echo "parameters and make an informed decision on   "
-echo "how you want to set them after the install of "
-echo "Orabuntu-LXC is complete.                     "
+echo "these new sshd_config settings.               "
 echo "=============================================="
 echo ''
 echo "=============================================="
 echo "Orabuntu-LXC has made a backup of sshd_config "
-echo "located in the /etc/ssh directory if you want "
-echo "to revert sshd_config to original settings    "
-echo "after Orabuntu-LXC install is completed.      "
+echo "located in the /etc/ssh directory.            "
 echo "=============================================="
 echo ''
 
-sleep 25
+sleep 5
 
 if	[ $SystemdResolvedInstalled -eq 1 ]
 then
-	sudo sed -i '/GSSAPIAuthentication/s/yes/no/'                                /etc/ssh/sshd_config
-	sudo sed -i '/UseDNS/s/yes/no/'                                              /etc/ssh/sshd_config
-	sudo sed -i '/GSSAPIAuthentication/s/#//'                                    /etc/ssh/sshd_config
-	sudo sed -i '/UseDNS/s/#//'                                                  /etc/ssh/sshd_config
-	sudo egrep 'GSSAPIAuthentication|UseDNS'                                     /etc/ssh/sshd_config
+	sudo sed -i '/GSSAPIAuthentication/s/yes/no/'                                /etc/ssh/ssh_config
+	sudo sed -i '/UseDNS/s/yes/no/'                                              /etc/ssh/ssh_config
+	sudo sed -i '/GSSAPIAuthentication/s/#//'                                    /etc/ssh/ssh_config
+	sudo sed -i '/UseDNS/s/#//'                                                  /etc/ssh/ssh_config
+	sudo egrep 'GSSAPIAuthentication|UseDNS'                                     /etc/ssh/ssh_config
 	sudo service sshd restart
 fi
 
