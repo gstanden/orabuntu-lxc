@@ -29,6 +29,10 @@ Domain2=$4
 MultiHost=$5
 NameServer=$6
 
+sudo su -c "echo 'nameserver 127.0.0.53' >> /etc/resolv.conf"
+sudo sed -i '$!N; /^\(.*\)\n\1$/!P; D' /etc/resolv.conf
+sudo sed -i -n 'G; s/\n/&&/; /^\([ -~]*\n\).*\n\1/d; s/\n//; h; P' /etc/resolv.conf
+
 function GetMultiHostVar7 {
 	echo $MultiHost | cut -f7 -d':'
 }
@@ -38,6 +42,7 @@ function CheckSystemdResolvedInstalled {
 	sudo netstat -ulnp | grep 53 | sed 's/  */ /g' | rev | cut -f1 -d'/' | rev | sort -u | grep systemd- | wc -l
 }
 SystemdResolvedInstalled=$(CheckSystemdResolvedInstalled)
+echo $SystemdResolvedInstalled
 
 SeedIndex=10
 function CheckHighestSeedIndexHit {
