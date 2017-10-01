@@ -163,6 +163,7 @@ sudo lxc-ls -f | sed 's/  */ /g' | grep oel$OracleRelease | cut -f3 -d' ' | sed 
 }
 PublicIP=$(CheckPublicIP)
 
+
 echo ''
 echo "=============================================="
 echo "Starting LXC Seed Container for Oracle        "
@@ -180,6 +181,7 @@ then
 		sudo lxc-ls -f | grep oel$OracleRelease | cut -f1 -d' '	
 	}
 	SeedContainerName=$(GetSeedContainerName)
+	sudo sed -i "s/mtu = 1500/mtu = $MultiHostVar7/g" /var/lib/lxc/$SeedContainerName/config
 
 	sleep 5
 
@@ -316,7 +318,7 @@ echo "Configuring $SeedContainerName for Oracle...  "
 echo "=============================================="
 echo ''
 
-sudo lxc-attach -n $SeedContainerName -- ip link set eth0 mtu $MultiHostVar7
+sudo lxc-attach -n $SeedContainerName -- ip link set eth0 mtu 1420
 sudo lxc-attach -n $SeedContainerName -- /root/packages.sh
 sudo lxc-attach -n $SeedContainerName -- /root/create_users.sh
 sudo lxc-attach -n $SeedContainerName -- /root/lxc-services.sh
