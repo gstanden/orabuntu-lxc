@@ -287,6 +287,8 @@ then
 			echo "Tested: Ubuntu Linux 17.x  ALL  (VM)  Server  "
 			echo "Tested: Ubuntu Linux 17.x  ALL  (PH)  Desktop "
 			echo "Tested: Ubuntu Linux 17.x  ALL  (PH)  Server  "
+			echo "Tested: CentOS Linux 7.x   ALL  (VM)  Server  "
+			echo "Tested: CentOS Linux 7.x   ALL  (PH)  Server  "
 			echo "                                              "
 			echo "Legend:                                       "
 			echo "                                              "
@@ -523,7 +525,7 @@ then
 					echo "                                              "
 					echo "=============================================="
 					echo "                                              " 
-				read -e -p   "Adding Orabuntu-LXC containers? [Y/N]         " -i "Y" CloningAdditional
+				read -e -p   "Adding Orabuntu-LXC containers? [Y/N]         " -i "N" CloningAdditional
 					echo "                                              "
 					echo "=============================================="
 					
@@ -589,7 +591,7 @@ then
 					echo "                                              "
 					echo "=============================================="
 					echo "                                              " 
-				read -e -p   "Adding Orabuntu-LXC containers? [Y/N]  " -i "Y" CloningAdditional
+				read -e -p   "Adding Orabuntu-LXC containers? [Y/N]         " -i "N" CloningAdditional
 					echo "                                              "
 					echo "=============================================="
 					echo ''
@@ -700,6 +702,8 @@ then
 			echo "Tested: Ubuntu Linux 17.x  ALL  (VM)  Server  "
 			echo "Tested: Ubuntu Linux 17.x  ALL  (PH)  Desktop "
 			echo "Tested: Ubuntu Linux 17.x  ALL  (PH)  Server  "
+			echo "Tested: CentOS Linux 7.x   ALL  (VM)  Server  "
+			echo "Tested: CentOS Linux 7.x   ALL  (PH)  Server  "
 			echo "                                              "
 			echo "Legend:                                       "
 			echo "                                              "
@@ -936,7 +940,7 @@ then
 					echo "                                              "
 					echo "=============================================="
 					echo "                                              " 
-				read -e -p   "Adding Orabuntu-LXC containers? [Y/N]         " -i "Y" CloningAdditional
+				read -e -p   "Adding Orabuntu-LXC containers? [Y/N]         " -i "N" CloningAdditional
 					echo "                                              "
 					echo "=============================================="
 					
@@ -1002,7 +1006,7 @@ then
 					echo "                                              "
 					echo "=============================================="
 					echo "                                              " 
-				read -e -p   "Adding Orabuntu-LXC containers? [Y/N]  " -i "Y" CloningAdditional
+				read -e -p   "Adding Orabuntu-LXC containers? [Y/N]         " -i "N" CloningAdditional
 					echo "                                              "
 					echo "=============================================="
 					echo ''
@@ -1113,6 +1117,8 @@ then
 			echo "Tested: Ubuntu Linux 17.x  ALL  (VM)  Server  "
 			echo "Tested: Ubuntu Linux 17.x  ALL  (PH)  Desktop "
 			echo "Tested: Ubuntu Linux 17.x  ALL  (PH)  Server  "
+			echo "Tested: CentOS Linux 7.x   ALL  (VM)  Server  "
+			echo "Tested: CentOS Linux 7.x   ALL  (PH)  Server  "
 			echo "                                              "
 			echo "Legend:                                       "
 			echo "                                              "
@@ -1335,7 +1341,7 @@ then
 					echo "                                              "
 					echo "=============================================="
 					echo "                                              " 
-				read -e -p   "Adding Orabuntu-LXC containers? [Y/N]  " -i "Y" CloningAdditional
+				read -e -p   "Adding Orabuntu-LXC containers? [Y/N]         " -i "N" CloningAdditional
 					echo "                                              "
 					echo "=============================================="
 				
@@ -1406,7 +1412,7 @@ then
 					echo "                                              "
 					echo "=============================================="
 					echo "                                              " 
-				read -e -p   "Adding Orabuntu-LXC containers? [Y/N]  " -i "Y" CloningAdditional
+				read -e -p   "Adding Orabuntu-LXC containers? [Y/N]         " -i "N" CloningAdditional
 					echo "                                              "
 					echo "=============================================="
 				
