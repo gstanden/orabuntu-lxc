@@ -301,8 +301,8 @@ then
 
 	sudo yum clean all
 	sudo yum -y install wget tar gzip
- 	mkdir -p /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/epel
-  	cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/epel
+ 	mkdir -p ./uekulele/epel
+  	cd ./uekulele/epel
 	if   [ $Release -eq 7 ]
 	then
   		wget https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
@@ -313,7 +313,7 @@ then
   		sudo rpm -ivh epel-release-latest-6.noarch.rpm 
 	fi
 	sudo yum provides lxc | sed '/^\s*$/d' | grep Repo | sort -u
-	cd /home/ubuntu/Downloads/orabuntu-lxc-master
+	cd .
 
 	sudo yum -y install debootstrap perl libvirt bash-completion bash-completion-extras
 	sudo yum -y install lxc libcap-devel libcgroup wget bridge-utils
@@ -404,8 +404,8 @@ then
 	echo ''
 
 	sudo yum -y install wget tar gzip
- 	mkdir -p /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/epel
-  	cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/epel
+ 	mkdir -p ./uekulele/epel
+  	cd ./uekulele/epel
 	if [ $Release -eq 7 ] 
 	then
   		wget https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
@@ -416,7 +416,7 @@ then
   		sudo rpm -ivh epel-release-latest-6.noarch.rpm 
 	fi
 	sudo yum provides lxc | sed '/^\s*$/d' | grep Repo | sort -u
-	cd /home/ubuntu/Downloads/orabuntu-lxc-master
+	cd .
 
 	sudo yum -y install debootstrap perl libvirt
 	sudo yum -y install lxc libcap-devel libcgroup wget bridge-utils
@@ -543,13 +543,13 @@ then
 		sudo sh -c "echo '%_unpackaged_files_terminate_build 0' >> /etc/rpm/macros"
 	fi
 
-	rpmbuild --define '_topdir /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc/rpmbuild' -ba lxc.spec > /dev/null 2>&1
+	rpmbuild --define '_topdir ./uekulele/lxc/rpmbuild' -ba lxc.spec > /dev/null 2>&1
 	sudo yum -y install rpm-build wget openssl-devel gcc make docbook2X xmlto docbook automake graphviz
-	mkdir -p /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc
-	cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc
+	mkdir -p ./uekulele/lxc
+	cd ./uekulele/lxc
 	wget https://linuxcontainers.org/downloads/lxc/lxc-"$LxcVersion".tar.gz
-	mkdir -p /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc/rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
-	cp -p lxc-"$LxcVersion".tar.gz /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc/rpmbuild/SOURCES/.
+	mkdir -p ./uekulele/lxc/rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
+	cp -p lxc-"$LxcVersion".tar.gz ./uekulele/lxc/rpmbuild/SOURCES/.
 
 	echo ''
 	echo "=============================================="
@@ -560,8 +560,8 @@ then
 
 	clear
 
-	mkdir -p /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc/rpmbuild/RPMS/x86_64
-	cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc/rpmbuild/RPMS/x86_64
+	mkdir -p ./uekulele/lxc/rpmbuild/RPMS/x86_64
+	cd ./uekulele/lxc/rpmbuild/RPMS/x86_64
 	touch marker.rpm
 
 	function GetLXCPackageCount {
@@ -582,14 +582,14 @@ then
 			sleep 5
 
 			sudo yum -y install rpm-build wget openssl-devel gcc make docbook2X xmlto docbook automake graphviz
-			mkdir -p /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc
-			cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc
+			mkdir -p ./uekulele/lxc
+			cd ./uekulele/lxc
 			wget https://linuxcontainers.org/downloads/lxc/lxc-"$LxcVersion".tar.gz
-			mkdir -p /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc/rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
-			cp -p lxc-"$LxcVersion".tar.gz /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc/rpmbuild/SOURCES/.
+			mkdir -p ./uekulele/lxc/rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
+			cp -p lxc-"$LxcVersion".tar.gz ./uekulele/lxc/rpmbuild/SOURCES/.
 			tar -zxvf lxc-"$LxcVersion".tar.gz
-			cp -p lxc-"$LxcVersion"/lxc.spec /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc/.
-			cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc
+			cp -p lxc-"$LxcVersion"/lxc.spec ./uekulele/lxc/.
+			cd ./uekulele/lxc
 
 			function CheckMacrosFile {
 				cat /etc/rpm/macros | grep _unpackaged_files_terminate_build | sort -u | grep -c 0
@@ -600,11 +600,11 @@ then
 			then
 				sudo sh -c "echo '%_unpackaged_files_terminate_build 0' >> /etc/rpm/macros"
 			fi
-			rpmbuild --define '_topdir /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc/rpmbuild' -ba lxc.spec
-			cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc/rpmbuild/RPMS/x86_64
+			rpmbuild --define '_topdir ./uekulele/lxc/rpmbuild' -ba lxc.spec
+			cd ./uekulele/lxc/rpmbuild/RPMS/x86_64
 			sudo yum -y localinstall lxc* > /dev/null 2>&1
 			LXCPackageCount=$(GetLXCPackageCount)
-			cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc
+			cd ./uekulele/lxc
 		done
 	fi
 	if [ $Release -eq 6 ] 
@@ -620,14 +620,14 @@ then
 			sleep 5
 
 			sudo yum -y install rpm-build wget openssl-devel gcc make docbook2X xmlto docbook automake graphviz
-			mkdir -p /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc
-			cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc
+			mkdir -p ./uekulele/lxc
+			cd ./uekulele/lxc
 			wget https://linuxcontainers.org/downloads/lxc/lxc-"$LxcVersion".tar.gz
-			mkdir -p /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc/rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
-			cp -p lxc-"$LxcVersion".tar.gz /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc/rpmbuild/SOURCES/.
+			mkdir -p ./uekulele/lxc/rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
+			cp -p lxc-"$LxcVersion".tar.gz ./uekulele/lxc/rpmbuild/SOURCES/.
 			tar -zxvf lxc-"$LxcVersion".tar.gz
-			cp -p lxc-"$LxcVersion"/lxc.spec /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc/.
-			cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc
+			cp -p lxc-"$LxcVersion"/lxc.spec ./uekulele/lxc/.
+			cd ./uekulele/lxc
 
 			function CheckMacrosFile {
 				cat /etc/rpm/macros | grep _unpackaged_files_terminate_build | sort -u | grep -c 0
@@ -638,11 +638,11 @@ then
 			then
 				sudo sh -c "echo '%_unpackaged_files_terminate_build 0' >> /etc/rpm/macros"
 			fi
-			rpmbuild --define '_topdir /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc/rpmbuild' -ba lxc.spec
-			cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc/rpmbuild/RPMS/x86_64
+			rpmbuild --define '_topdir ./uekulele/lxc/rpmbuild' -ba lxc.spec
+			cd ./uekulele/lxc/rpmbuild/RPMS/x86_64
 			sudo yum -y localinstall lxc* > /dev/null 2>&1
 			LXCPackageCount=$(GetLXCPackageCount)
-			cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc
+			cd ./uekulele/lxc
 		done
 	fi
 	
@@ -676,7 +676,7 @@ then
 	echo "=============================================="
 	echo ''
 
-	cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc/rpmbuild/RPMS/x86_64
+	cd ./uekulele/lxc/rpmbuild/RPMS/x86_64
 	sudo yum -y localinstall lxc*
 
 	echo ''
@@ -747,7 +747,7 @@ echo ''
 
 sleep 5
 
-cd /home/ubuntu/Downloads/orabuntu-lxc-master
+cd .
 
 sudo yum -y install curl ruby tar which	
 sudo yum -y install wget tar gzip
@@ -868,8 +868,8 @@ then
 	echo ''
 
 	sudo yum -y install wget tar gzip
- 	mkdir -p /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/epel
-  	cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/epel
+ 	mkdir -p ./uekulele/epel
+  	cd ./uekulele/epel
 	if [ $Release -eq 7 ]
 	then
   		wget https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
@@ -880,7 +880,7 @@ then
   		sudo rpm -ivh epel-release-latest-6.noarch.rpm 
 	fi
 	sudo yum provides lxc | sed '/^\s*$/d' | grep Repo | sort -u
-	cd /home/ubuntu/Downloads/orabuntu-lxc-master
+	cd .
 	sudo yum -y install debootstrap perl libvirt bash-completion bash-completion-extras
 	sudo yum -y install lxc libcap-devel libcgroup wget bridge-utils
 
@@ -1002,13 +1002,13 @@ then
 		sudo sh -c "echo '%_unpackaged_files_terminate_build 0' >> /etc/rpm/macros"
 	fi
 
-	rpmbuild --define '_topdir /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc/rpmbuild' -ba lxc.spec
+	rpmbuild --define '_topdir ./uekulele/lxc/rpmbuild' -ba lxc.spec
 	sudo yum -y install rpm-build wget openssl-devel gcc make docbook2X xmlto docbook automake graphviz
-	mkdir -p /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc
-	cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc
+	mkdir -p ./uekulele/lxc
+	cd ./uekulele/lxc
 	wget https://linuxcontainers.org/downloads/lxc/lxc-"$LxcVersion".tar.gz
-	mkdir -p /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc/rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
-	cp -p lxc-"$LxcVersion".tar.gz /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc/rpmbuild/SOURCES/.
+	mkdir -p ./uekulele/lxc/rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
+	cp -p lxc-"$LxcVersion".tar.gz ./uekulele/lxc/rpmbuild/SOURCES/.
 
 	echo ''
 	echo "=============================================="
@@ -1019,8 +1019,8 @@ then
 
 	clear
 
-	mkdir -p /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc/rpmbuild/RPMS/x86_64
-	cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc/rpmbuild/RPMS/x86_64
+	mkdir -p ./uekulele/lxc/rpmbuild/RPMS/x86_64
+	cd ./uekulele/lxc/rpmbuild/RPMS/x86_64
 	touch marker.rpm
 
 	function GetLXCPackageCount {
@@ -1041,14 +1041,14 @@ then
 			sleep 5
 
 			sudo yum -y install rpm-build wget openssl-devel gcc make docbook2X xmlto docbook automake graphviz
-			mkdir -p /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc
-			cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc
+			mkdir -p ./uekulele/lxc
+			cd ./uekulele/lxc
 			wget https://linuxcontainers.org/downloads/lxc/lxc-"$LxcVersion".tar.gz
-			mkdir -p /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc/rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
-			cp -p lxc-"$LxcVersion".tar.gz /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc/rpmbuild/SOURCES/.
+			mkdir -p ./uekulele/lxc/rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
+			cp -p lxc-"$LxcVersion".tar.gz ./uekulele/lxc/rpmbuild/SOURCES/.
 			tar -zxvf lxc-"$LxcVersion".tar.gz
-			cp -p lxc-"$LxcVersion"/lxc.spec /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc/.
-			cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc
+			cp -p lxc-"$LxcVersion"/lxc.spec ./uekulele/lxc/.
+			cd ./uekulele/lxc
 	
 			function CheckMacrosFile {
 				cat /etc/rpm/macros | grep _unpackaged_files_terminate_build | sort -u | grep -c 0
@@ -1059,11 +1059,11 @@ then
 			then
 				sudo sh -c "echo '%_unpackaged_files_terminate_build 0' >> /etc/rpm/macros"
 			fi
-			rpmbuild --define '_topdir /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc/rpmbuild' -ba lxc.spec
-			cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc/rpmbuild/RPMS/x86_64
+			rpmbuild --define '_topdir ./uekulele/lxc/rpmbuild' -ba lxc.spec
+			cd ./uekulele/lxc/rpmbuild/RPMS/x86_64
 			sudo yum -y localinstall lxc* > /dev/null 2>&1
 			LXCPackageCount=$(GetLXCPackageCount)
-			cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc
+			cd ./uekulele/lxc
 		done
 	fi
 	if [ $Release -eq 6 ]
@@ -1079,14 +1079,14 @@ then
 			sleep 5
 
 			sudo yum -y install rpm-build wget openssl-devel gcc make docbook2X xmlto docbook automake graphviz
-			mkdir -p /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc
-			cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc
+			mkdir -p ./uekulele/lxc
+			cd ./uekulele/lxc
 			wget https://linuxcontainers.org/downloads/lxc/lxc-"$LxcVersion".tar.gz
-			mkdir -p /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc/rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
-			cp -p lxc-"$LxcVersion".tar.gz /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc/rpmbuild/SOURCES/.
+			mkdir -p ./uekulele/lxc/rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
+			cp -p lxc-"$LxcVersion".tar.gz ./uekulele/lxc/rpmbuild/SOURCES/.
 			tar -zxvf lxc-"$LxcVersion".tar.gz
-			cp -p lxc-"$LxcVersion"/lxc.spec /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc/.
-			cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc
+			cp -p lxc-"$LxcVersion"/lxc.spec ./uekulele/lxc/.
+			cd ./uekulele/lxc
 	
 			function CheckMacrosFile {
 				cat /etc/rpm/macros | grep _unpackaged_files_terminate_build | sort -u | grep -c 0
@@ -1097,11 +1097,11 @@ then
 			then
 				sudo sh -c "echo '%_unpackaged_files_terminate_build 0' >> /etc/rpm/macros"
 			fi
-			rpmbuild --define '_topdir /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc/rpmbuild' -ba lxc.spec
-			cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc/rpmbuild/RPMS/x86_64
+			rpmbuild --define '_topdir ./uekulele/lxc/rpmbuild' -ba lxc.spec
+			cd ./uekulele/lxc/rpmbuild/RPMS/x86_64
 			sudo yum -y localinstall lxc* > /dev/null 2>&1
 			LXCPackageCount=$(GetLXCPackageCount)
-			cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc
+			cd ./uekulele/lxc
 		done
 	fi
 		
@@ -1135,7 +1135,7 @@ then
 	echo "=============================================="
 	echo ''
 
-	cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc/rpmbuild/RPMS/x86_64
+	cd ./uekulele/lxc/rpmbuild/RPMS/x86_64
 	sudo yum -y localinstall lxc*
 
 	echo ''
@@ -1206,8 +1206,8 @@ then
 
 	clear
 
-	mkdir -p /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/openvswitch/rpmbuild/RPMS/x86_64
-	cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/openvswitch/rpmbuild/RPMS/x86_64
+	mkdir -p ./uekulele/openvswitch/rpmbuild/RPMS/x86_64
+	cd ./uekulele/openvswitch/rpmbuild/RPMS/x86_64
 	touch marker-2.rpm
 
 	function GetOVSPackageCount {
@@ -1239,17 +1239,17 @@ then
 			sudo sed -i -e '/\[public_ol6_software_collections\]/,/^\[/s/enabled=1/enabled=0/' /etc/yum.repos.d/public-yum-ol6.repo
 			sleep 5
 			wget http://openvswitch.org/releases/openvswitch-"$OvsVersion".tar.gz
-			mkdir -p /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/openvswitch/rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
-			cp -p openvswitch-"$OvsVersion".tar.gz /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/openvswitch/rpmbuild/SOURCES/.
+			mkdir -p ./uekulele/openvswitch/rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
+			cp -p openvswitch-"$OvsVersion".tar.gz ./uekulele/openvswitch/rpmbuild/SOURCES/.
 
 		elif [ $Release -eq 7 ]
 		then
 			sudo yum -y install rpm-build wget openssl-devel gcc make
-			mkdir -p /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/openvswitch
-			cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/openvswitch
+			mkdir -p ./uekulele/openvswitch
+			cd ./uekulele/openvswitch
 			wget http://openvswitch.org/releases/openvswitch-"$OvsVersion".tar.gz
-			mkdir -p /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/openvswitch/rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
-			cp -p openvswitch-"$OvsVersion".tar.gz /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/openvswitch/rpmbuild/SOURCES/.
+			mkdir -p ./uekulele/openvswitch/rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
+			cp -p openvswitch-"$OvsVersion".tar.gz ./uekulele/openvswitch/rpmbuild/SOURCES/.
 		fi
 
 		echo ''
@@ -1271,29 +1271,29 @@ then
 
 		if    [ $Release -eq 6 ]
 		then
-			cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/openvswitch/rpmbuild/SOURCES
+			cd ./uekulele/openvswitch/rpmbuild/SOURCES
 			tar -xzvf openvswitch-"$OvsVersion".tar.gz
 			cd openvswitch-"$OvsVersion"
-			sudo sed -i '/python >= 2\.7/s/python >= 2\.7/python27/g' /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/openvswitch/rpmbuild/SOURCES/openvswitch-"$OvsVersion"/rhel/openvswitch.spec
+			sudo sed -i '/python >= 2\.7/s/python >= 2\.7/python27/g' ./uekulele/openvswitch/rpmbuild/SOURCES/openvswitch-"$OvsVersion"/rhel/openvswitch.spec
 			sleep 5
 			sudo sed -i '/python >= 2\.7/s/python >= 2\.7/python27/' openvswitch.spec
-			rpmbuild --define '_topdir /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/openvswitch/rpmbuild' -bb rhel/openvswitch.spec
-			cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/openvswitch/rpmbuild/RPMS/x86_64
+			rpmbuild --define '_topdir ./uekulele/openvswitch/rpmbuild' -bb rhel/openvswitch.spec
+			cd ./uekulele/openvswitch/rpmbuild/RPMS/x86_64
 			sudo yum -y localinstall openvswitch* > /dev/null 2>&1
 			OVSPackageCount=$(GetOVSPackageCount)
-			cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/openvswitch
+			cd ./uekulele/openvswitch
 
 		elif [ $Release -eq 7 ]
 		then
-			cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/openvswitch/rpmbuild/SOURCES
+			cd ./uekulele/openvswitch/rpmbuild/SOURCES
 			tar -zxvf openvswitch-"$OvsVersion".tar.gz
-			cp -p openvswitch-"$OvsVersion"/rhel/*.spec /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/openvswitch/.
-			cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/openvswitch
-			rpmbuild --define '_topdir /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/openvswitch/rpmbuild' -ba openvswitch.spec
-			cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/openvswitch/rpmbuild/RPMS/x86_64
+			cp -p openvswitch-"$OvsVersion"/rhel/*.spec ./uekulele/openvswitch/.
+			cd ./uekulele/openvswitch
+			rpmbuild --define '_topdir ./uekulele/openvswitch/rpmbuild' -ba openvswitch.spec
+			cd ./uekulele/openvswitch/rpmbuild/RPMS/x86_64
 			sudo yum -y localinstall openvswitch* > /dev/null 2>&1
 			OVSPackageCount=$(GetOVSPackageCount)
-			cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/openvswitch
+			cd ./uekulele/openvswitch
 		fi
 	done
 
@@ -1334,7 +1334,7 @@ then
 
 	sleep 5
 
-	cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/openvswitch/rpmbuild/RPMS/x86_64
+	cd ./uekulele/openvswitch/rpmbuild/RPMS/x86_64
 	sudo yum -y localinstall openvswitch*
 
 	echo ''
@@ -1443,7 +1443,7 @@ echo "Extracting backup scripts...                  "
 echo "==============================================" 
 echo ''
 
-sudo tar -vP --extract --file=/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/archives/ubuntu-host.tar /etc/orabuntu-lxc-scripts/ubuntu-host-backup.sh --touch
+sudo tar -vP --extract --file=./uekulele/archives/ubuntu-host.tar /etc/orabuntu-lxc-scripts/ubuntu-host-backup.sh --touch
 sudo /etc/orabuntu-lxc-scripts/ubuntu-host-backup.sh
 
 echo ''
@@ -1609,7 +1609,7 @@ echo "Unpack G1 files $LF Linux $RL                 "
 echo "=============================================="
 echo ''
 
-sudo tar -P -xvf /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/archives/ubuntu-host.tar --touch
+sudo tar -P -xvf ./uekulele/archives/ubuntu-host.tar --touch
 
 echo ''
 echo "=============================================="
@@ -1626,7 +1626,7 @@ echo "Unpack G2 files for $LF Linux $RL...          "
 echo "=============================================="
 echo ''
 
-sudo tar -P -xvf /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/archives/dns-dhcp-host.tar --touch
+sudo tar -P -xvf ./uekulele/archives/dns-dhcp-host.tar --touch
 sudo chmod +x /etc/network/openvswitch/crt_ovs_s*.sh
 
 if [ $MultiHostVar2 = 'Y' ]
@@ -1842,7 +1842,7 @@ then
 		echo "=============================================="
 		echo ''
 	
-		sudo tar -P -xvf /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/archives/dns-dhcp-cont.tar --touch
+		sudo tar -P -xvf ./uekulele/archives/dns-dhcp-cont.tar --touch
 
 		echo ''
 		echo "=============================================="

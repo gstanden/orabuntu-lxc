@@ -248,43 +248,43 @@ echo "Create selinux-lxc.sh file...                 "
 echo "=============================================="
 echo ''
 
-mkdir -p /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/selinux
-touch /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/selinux/selinux-lxc.sh
-ls -l /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/selinux/selinux-lxc.sh
-sudo chmod 775 /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/selinux/selinux-lxc.sh
+mkdir -p ./uekulele/selinux
+touch ./uekulele/selinux/selinux-lxc.sh
+ls -l ./uekulele/selinux/selinux-lxc.sh
+sudo chmod 775 ./uekulele/selinux/selinux-lxc.sh
 echo ''
-cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/selinux
+cd ./uekulele/selinux
 
-echo 'sudo ausearch -c 'lxcattach' --raw | audit2allow -M my-lxcattach'			>  /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/selinux/selinux-lxc.sh
-echo 'sudo semodule -i my-lxcattach.pp'							>> /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/selinux/selinux-lxc.sh
-echo 'sudo ausearch -c 'dhclient' --raw | audit2allow -M my-dhclient'			>> /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/selinux/selinux-lxc.sh
-echo 'sudo semodule -i my-dhclient.pp'							>> /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/selinux/selinux-lxc.sh
-echo 'sudo ausearch -c 'passwd' --raw | audit2allow -M my-passwd'			>> /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/selinux/selinux-lxc.sh
-echo 'sudo semodule -i my-passwd.pp'							>> /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/selinux/selinux-lxc.sh
-echo 'sudo ausearch -c 'sedispatch' --raw | audit2allow -M my-sedispatch'		>> /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/selinux/selinux-lxc.sh
-echo 'sudo semodule -i my-sedispatch.pp'						>> /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/selinux/selinux-lxc.sh
-echo 'sudo ausearch -c 'systemd-sysctl' --raw | audit2allow -M my-systemdsysctl'	>> /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/selinux/selinux-lxc.sh
-echo 'sudo semodule -i my-systemdsysctl.pp'						>> /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/selinux/selinux-lxc.sh
-echo 'sudo ausearch -c 'ovs-vsctl' --raw | audit2allow -M my-ovsvsctl'			>> /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/selinux/selinux-lxc.sh
-echo 'sudo semodule -i my-ovsvsctl.pp'							>> /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/selinux/selinux-lxc.sh
-echo 'sudo ausearch -c 'sshd' --raw | audit2allow -M my-sshd'				>> /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/selinux/selinux-lxc.sh
-echo 'sudo semodule -i my-sshd.pp'							>> /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/selinux/selinux-lxc.sh
-echo 'sudo ausearch -c 'gdm-session-wor' --raw | audit2allow -M my-gdmsessionwor'	>> /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/selinux/selinux-lxc.sh
-echo 'sudo semodule -i my-gdmsessionwor.pp'						>> /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/selinux/selinux-lxc.sh
-echo 'sudo ausearch -c 'pickup' --raw | audit2allow -M my-pickup'			>> /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/selinux/selinux-lxc.sh
-echo 'sudo semodule -i my-pickup.pp'							>> /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/selinux/selinux-lxc.sh
-echo 'sudo ausearch -c 'sedispatch' --raw | audit2allow -M my-sedispatch'		>> /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/selinux/selinux-lxc.sh
-echo 'sudo semodule -i my-sedispatch.pp'						>> /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/selinux/selinux-lxc.sh
-echo 'sudo ausearch -c 'iscsid' --raw | audit2allow -M my-iscsid'			>> /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/selinux/selinux-lxc.sh
-echo 'sudo semodule -i my-iscsid.pp'							>> /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/selinux/selinux-lxc.sh
-echo 'sudo ausearch -c 'dhclient' --raw | audit2allow -M my-dhclient'			>> /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/selinux/selinux-lxc.sh
-echo 'sudo semodule -i my-dhclient.pp'							>> /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/selinux/selinux-lxc.sh
-echo 'sudo ausearch -c 'ovs-vsctl' --raw | audit2allow -M my-ovsvsctl'			>> /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/selinux/selinux-lxc.sh
-echo 'sudo semodule -i my-ovsvsctl.pp'							>> /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/selinux/selinux-lxc.sh
-echo 'sudo ausearch -c 'chpasswd' --raw | audit2allow -M my-chpasswd'			>> /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/selinux/selinux-lxc.sh
-echo 'sudo semodule -i my-chpasswd.pp'							>> /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/selinux/selinux-lxc.sh
-echo 'sudo ausearch -c 'colord' --raw | audit2allow -M my-colord'			>> /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/selinux/selinux-lxc.sh
-echo 'sudo semodule -i my-colord.pp'							>> /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/selinux/selinux-lxc.sh
+echo 'sudo ausearch -c 'lxcattach' --raw | audit2allow -M my-lxcattach'			>  ./uekulele/selinux/selinux-lxc.sh
+echo 'sudo semodule -i my-lxcattach.pp'							>> ./uekulele/selinux/selinux-lxc.sh
+echo 'sudo ausearch -c 'dhclient' --raw | audit2allow -M my-dhclient'			>> ./uekulele/selinux/selinux-lxc.sh
+echo 'sudo semodule -i my-dhclient.pp'							>> ./uekulele/selinux/selinux-lxc.sh
+echo 'sudo ausearch -c 'passwd' --raw | audit2allow -M my-passwd'			>> ./uekulele/selinux/selinux-lxc.sh
+echo 'sudo semodule -i my-passwd.pp'							>> ./uekulele/selinux/selinux-lxc.sh
+echo 'sudo ausearch -c 'sedispatch' --raw | audit2allow -M my-sedispatch'		>> ./uekulele/selinux/selinux-lxc.sh
+echo 'sudo semodule -i my-sedispatch.pp'						>> ./uekulele/selinux/selinux-lxc.sh
+echo 'sudo ausearch -c 'systemd-sysctl' --raw | audit2allow -M my-systemdsysctl'	>> ./uekulele/selinux/selinux-lxc.sh
+echo 'sudo semodule -i my-systemdsysctl.pp'						>> ./uekulele/selinux/selinux-lxc.sh
+echo 'sudo ausearch -c 'ovs-vsctl' --raw | audit2allow -M my-ovsvsctl'			>> ./uekulele/selinux/selinux-lxc.sh
+echo 'sudo semodule -i my-ovsvsctl.pp'							>> ./uekulele/selinux/selinux-lxc.sh
+echo 'sudo ausearch -c 'sshd' --raw | audit2allow -M my-sshd'				>> ./uekulele/selinux/selinux-lxc.sh
+echo 'sudo semodule -i my-sshd.pp'							>> ./uekulele/selinux/selinux-lxc.sh
+echo 'sudo ausearch -c 'gdm-session-wor' --raw | audit2allow -M my-gdmsessionwor'	>> ./uekulele/selinux/selinux-lxc.sh
+echo 'sudo semodule -i my-gdmsessionwor.pp'						>> ./uekulele/selinux/selinux-lxc.sh
+echo 'sudo ausearch -c 'pickup' --raw | audit2allow -M my-pickup'			>> ./uekulele/selinux/selinux-lxc.sh
+echo 'sudo semodule -i my-pickup.pp'							>> ./uekulele/selinux/selinux-lxc.sh
+echo 'sudo ausearch -c 'sedispatch' --raw | audit2allow -M my-sedispatch'		>> ./uekulele/selinux/selinux-lxc.sh
+echo 'sudo semodule -i my-sedispatch.pp'						>> ./uekulele/selinux/selinux-lxc.sh
+echo 'sudo ausearch -c 'iscsid' --raw | audit2allow -M my-iscsid'			>> ./uekulele/selinux/selinux-lxc.sh
+echo 'sudo semodule -i my-iscsid.pp'							>> ./uekulele/selinux/selinux-lxc.sh
+echo 'sudo ausearch -c 'dhclient' --raw | audit2allow -M my-dhclient'			>> ./uekulele/selinux/selinux-lxc.sh
+echo 'sudo semodule -i my-dhclient.pp'							>> ./uekulele/selinux/selinux-lxc.sh
+echo 'sudo ausearch -c 'ovs-vsctl' --raw | audit2allow -M my-ovsvsctl'			>> ./uekulele/selinux/selinux-lxc.sh
+echo 'sudo semodule -i my-ovsvsctl.pp'							>> ./uekulele/selinux/selinux-lxc.sh
+echo 'sudo ausearch -c 'chpasswd' --raw | audit2allow -M my-chpasswd'			>> ./uekulele/selinux/selinux-lxc.sh
+echo 'sudo semodule -i my-chpasswd.pp'							>> ./uekulele/selinux/selinux-lxc.sh
+echo 'sudo ausearch -c 'colord' --raw | audit2allow -M my-colord'			>> ./uekulele/selinux/selinux-lxc.sh
+echo 'sudo semodule -i my-colord.pp'							>> ./uekulele/selinux/selinux-lxc.sh
 
 echo ''
 echo "=============================================="

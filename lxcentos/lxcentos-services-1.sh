@@ -316,8 +316,8 @@ else
 
 	sudo yum clean all
 	sudo yum -y install wget tar gzip
-	mkdir -p /home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/epel
-	cd /home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/epel
+	mkdir -p ./lxcentos/epel
+	cd ./lxcentos/epel
 	if   [ $Release -eq 7 ]
 	then
 		wget https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
@@ -328,7 +328,7 @@ else
   		sudo rpm -ivh epel-release-latest-6.noarch.rpm 
 	fi
 	sudo yum provides lxc | sed '/^\s*$/d' | grep Repo | sort -u
-	cd /home/ubuntu/Downloads/orabuntu-lxc-master
+	cd .
 
 	sudo yum -y install debootstrap perl libvirt wget bridge-utils
 	sudo yum -y install lxc libcap-devel lxc-extra lxc-devel lxc-templates lua-lxc libcgroup
@@ -559,11 +559,11 @@ then
 	fi
 
 	sudo yum -y install rpm-build wget openssl-devel gcc make docbook2X xmlto docbook automake graphviz
-	mkdir -p /home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/lxc
-	cd /home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/lxc
+	mkdir -p ./lxcentos/lxc
+	cd ./lxcentos/lxc
 	wget https://linuxcontainers.org/downloads/lxc/lxc-2.0.5.tar.gz
-	mkdir -p /home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/lxc/rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
-	cp -p lxc-2.0.5.tar.gz /home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/lxc/rpmbuild/SOURCES/.
+	mkdir -p ./lxcentos/lxc/rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
+	cp -p lxc-2.0.5.tar.gz ./lxcentos/lxc/rpmbuild/SOURCES/.
 
 	echo ''
 	echo "=============================================="
@@ -574,8 +574,8 @@ then
 
 	clear
 
-	mkdir -p /home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/lxc/rpmbuild/RPMS/x86_64
-	cd /home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/lxc/rpmbuild/RPMS/x86_64
+	mkdir -p ./lxcentos/lxc/rpmbuild/RPMS/x86_64
+	cd ./lxcentos/lxc/rpmbuild/RPMS/x86_64
 	touch marker.rpm
 
 	function GetLXCPackageCount {
@@ -594,14 +594,14 @@ then
 		sleep 5
 
 		sudo yum -y install rpm-build wget openssl-devel gcc make docbook2X xmlto docbook automake graphviz
-		mkdir -p /home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/lxc
-		cd /home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/lxc
+		mkdir -p ./lxcentos/lxc
+		cd ./lxcentos/lxc
 		wget https://linuxcontainers.org/downloads/lxc/lxc-2.0.5.tar.gz
-		mkdir -p /home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/lxc/rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
-		cp -p lxc-2.0.5.tar.gz /home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/lxc/rpmbuild/SOURCES/.
+		mkdir -p ./lxcentos/lxc/rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
+		cp -p lxc-2.0.5.tar.gz ./lxcentos/lxc/rpmbuild/SOURCES/.
 		tar -zxvf lxc-2.0.5.tar.gz
-		cp -p lxc-2.0.5/lxc.spec /home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/lxc/.
-		cd /home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/lxc
+		cp -p lxc-2.0.5/lxc.spec ./lxcentos/lxc/.
+		cd ./lxcentos/lxc
 	
 		function CheckMacrosFile {
 			cat /etc/rpm/macros | grep _unpackaged_files_terminate_build | sort -u | grep -c 0
@@ -613,12 +613,12 @@ then
 			sudo sh -c "echo '%_unpackaged_files_terminate_build 0' >> /etc/rpm/macros"
 		fi
 	
-		rpmbuild --define '_topdir /home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/lxc/rpmbuild' -ba lxc.spec
-		cd /home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/lxc/rpmbuild/RPMS/x86_64
+		rpmbuild --define '_topdir ./lxcentos/lxc/rpmbuild' -ba lxc.spec
+		cd ./lxcentos/lxc/rpmbuild/RPMS/x86_64
 		sudo yum -y remove lxc-libs
 		sudo yum -y localinstall lxc* > /dev/null 2>&1
 		LXCPackageCount=$(GetLXCPackageCount)
-		cd /home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/lxc
+		cd ./lxcentos/lxc
 	done
 		
 	if [ $LXCPackageCount -eq 5 ]
@@ -639,7 +639,7 @@ then
 	echo "=============================================="
 	echo ''
 
-	cd /home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/lxc/rpmbuild/RPMS/x86_64
+	cd ./lxcentos/lxc/rpmbuild/RPMS/x86_64
 	sudo yum -y localinstall lxc*
 
 	echo ''
@@ -728,7 +728,7 @@ echo ''
 
 sleep 5
 
-cd /home/ubuntu/Downloads/orabuntu-lxc-master
+cd .
 
 sudo yum -y install curl ruby tar which	
 sudo yum -y install wget tar gzip
@@ -851,8 +851,8 @@ then
 
 	clear
 
-	mkdir -p /home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/openvswitch/rpmbuild/RPMS/x86_64
-	cd /home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/openvswitch/rpmbuild/RPMS/x86_64
+	mkdir -p ./lxcentos/openvswitch/rpmbuild/RPMS/x86_64
+	cd ./lxcentos/openvswitch/rpmbuild/RPMS/x86_64
 	touch marker-2.rpm
 
 	function GetOVSPackageCount {
@@ -884,17 +884,17 @@ then
 			sudo sed -i -e '/\[public_ol6_software_collections\]/,/^\[/s/enabled=1/enabled=0/' /etc/yum.repos.d/public-yum-ol6.repo
 			sleep 5
 			wget http://openvswitch.org/releases/openvswitch-"$OvsVersion".tar.gz
-			mkdir -p /home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/openvswitch/rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
-			cp -p openvswitch-"$OvsVersion".tar.gz /home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/openvswitch/rpmbuild/SOURCES/.
+			mkdir -p ./lxcentos/openvswitch/rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
+			cp -p openvswitch-"$OvsVersion".tar.gz ./lxcentos/openvswitch/rpmbuild/SOURCES/.
 
 		elif [ $Release -eq 7 ]
 		then
 			sudo yum -y install rpm-build wget openssl-devel gcc make
-			mkdir -p /home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/openvswitch
-			cd /home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/openvswitch
+			mkdir -p ./lxcentos/openvswitch
+			cd ./lxcentos/openvswitch
 			wget http://openvswitch.org/releases/openvswitch-"$OvsVersion".tar.gz
-			mkdir -p /home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/openvswitch/rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
-			cp -p openvswitch-"$OvsVersion".tar.gz /home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/openvswitch/rpmbuild/SOURCES/.
+			mkdir -p ./lxcentos/openvswitch/rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
+			cp -p openvswitch-"$OvsVersion".tar.gz ./lxcentos/openvswitch/rpmbuild/SOURCES/.
 		fi
 
 		echo ''
@@ -916,29 +916,29 @@ then
 
 		if    [ $Release -eq 6 ]
 		then
-			cd /home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/openvswitch/rpmbuild/SOURCES
+			cd ./lxcentos/openvswitch/rpmbuild/SOURCES
 			tar -xzvf openvswitch-"$OvsVersion".tar.gz
 			cd openvswitch-"$OvsVersion"
-			sudo sed -i '/python >= 2\.7/s/python >= 2\.7/python27/g' /home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/openvswitch/rpmbuild/SOURCES/openvswitch-"$OvsVersion"/rhel/openvswitch.spec
+			sudo sed -i '/python >= 2\.7/s/python >= 2\.7/python27/g' ./lxcentos/openvswitch/rpmbuild/SOURCES/openvswitch-"$OvsVersion"/rhel/openvswitch.spec
 			sleep 5
 			sudo sed -i '/python >= 2\.7/s/python >= 2\.7/python27/' openvswitch.spec
-			rpmbuild --define '_topdir /home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/openvswitch/rpmbuild' -bb rhel/openvswitch.spec
-			cd /home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/openvswitch/rpmbuild/RPMS/x86_64
+			rpmbuild --define '_topdir ./lxcentos/openvswitch/rpmbuild' -bb rhel/openvswitch.spec
+			cd ./lxcentos/openvswitch/rpmbuild/RPMS/x86_64
 			sudo yum -y localinstall openvswitch* > /dev/null 2>&1
 			OVSPackageCount=$(GetOVSPackageCount)
-			cd /home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/openvswitch
+			cd ./lxcentos/openvswitch
 
 		elif [ $Release -eq 7 ]
 		then
-			cd /home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/openvswitch/rpmbuild/SOURCES
+			cd ./lxcentos/openvswitch/rpmbuild/SOURCES
 			tar -zxvf openvswitch-"$OvsVersion".tar.gz
-			cp -p openvswitch-"$OvsVersion"/rhel/*.spec /home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/openvswitch/.
-			cd /home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/openvswitch
-			rpmbuild --define '_topdir /home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/openvswitch/rpmbuild' -ba openvswitch.spec
-			cd /home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/openvswitch/rpmbuild/RPMS/x86_64
+			cp -p openvswitch-"$OvsVersion"/rhel/*.spec ./lxcentos/openvswitch/.
+			cd ./lxcentos/openvswitch
+			rpmbuild --define '_topdir ./lxcentos/openvswitch/rpmbuild' -ba openvswitch.spec
+			cd ./lxcentos/openvswitch/rpmbuild/RPMS/x86_64
 			sudo yum -y localinstall openvswitch* > /dev/null 2>&1
 			OVSPackageCount=$(GetOVSPackageCount)
-			cd /home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/openvswitch
+			cd ./lxcentos/openvswitch
 		fi
 	done
 
@@ -979,7 +979,7 @@ then
 
 	sleep 5
 
-	cd /home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/openvswitch/rpmbuild/RPMS/x86_64
+	cd ./lxcentos/openvswitch/rpmbuild/RPMS/x86_64
 	sudo yum -y localinstall openvswitch*
 
 	echo ''
@@ -1088,7 +1088,7 @@ echo "Extracting backup scripts...                  "
 echo "==============================================" 
 echo ''
 
-sudo tar -vP --extract --file=/home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/archives/ubuntu-host.tar /etc/orabuntu-lxc-scripts/ubuntu-host-backup.sh --touch
+sudo tar -vP --extract --file=./lxcentos/archives/ubuntu-host.tar /etc/orabuntu-lxc-scripts/ubuntu-host-backup.sh --touch
 echo ''
 sudo /etc/orabuntu-lxc-scripts/ubuntu-host-backup.sh
 
@@ -1256,7 +1256,7 @@ echo "Unpack G1 files $LF Linux $RL                 "
 echo "=============================================="
 echo ''
 
-sudo tar -P -xvf /home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/archives/ubuntu-host.tar --touch
+sudo tar -P -xvf ./lxcentos/archives/ubuntu-host.tar --touch
 
 echo ''
 echo "=============================================="
@@ -1273,7 +1273,7 @@ echo "Unpack G2 files for $LF Linux $RL...          "
 echo "=============================================="
 echo ''
 
-sudo tar -P -xvf /home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/archives/dns-dhcp-host.tar --touch
+sudo tar -P -xvf ./lxcentos/archives/dns-dhcp-host.tar --touch
 sudo chmod +x /etc/network/openvswitch/crt_ovs_s*.sh
 
 if [ $MultiHostVar2 = 'Y' ]
@@ -1484,7 +1484,7 @@ then
 		echo "=============================================="
 		echo ''
 	
-		sudo tar -P -xvf /home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/archives/dns-dhcp-cont.tar --touch
+		sudo tar -P -xvf ./lxcentos/archives/dns-dhcp-cont.tar --touch
 
 		echo ''
 		echo "=============================================="

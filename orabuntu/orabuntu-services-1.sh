@@ -141,24 +141,7 @@ echo "=============================================="
 echo "Establish sudo privileges completed.          "
 echo "=============================================="
 
-sleep 5
-
-clear
-
-echo ''
-echo "=============================================="
-echo "Install required packages...                  "
-echo "=============================================="
-echo ''
-
-sudo apt-get install wget unzip openssh-server net-tools bind9utils
-
-echo ''
-echo "=============================================="
-echo "Done:  Install required packages.             "
-echo "=============================================="
-
-sleep 5
+sleep 5 
 
 clear
 
@@ -175,24 +158,30 @@ echo "=============================================="
 echo ''
 echo "=============================================="
 echo "There are security impllications for keeping  "
-echo "these new sshd_config settings.               "
+echo "these new sshd_config settings.  You should   "
+echo "research the implications of new sshd_config  "
+echo "parameters and make an informed decision on   "
+echo "how you want to set them after the install of "
+echo "Orabuntu-LXC is complete.                     "
 echo "=============================================="
 echo ''
 echo "=============================================="
 echo "Orabuntu-LXC has made a backup of sshd_config "
-echo "located in the /etc/ssh directory.            "
+echo "located in the /etc/ssh directory if you want "
+echo "to revert sshd_config to original settings    "
+echo "after Orabuntu-LXC install is completed.      "
 echo "=============================================="
 echo ''
 
-sleep 5
+sleep 25
 
 if	[ $SystemdResolvedInstalled -eq 1 ]
 then
-	sudo sed -i '/GSSAPIAuthentication/s/yes/no/'                                /etc/ssh/ssh_config
-	sudo sed -i '/UseDNS/s/yes/no/'                                              /etc/ssh/ssh_config
-	sudo sed -i '/GSSAPIAuthentication/s/#//'                                    /etc/ssh/ssh_config
-	sudo sed -i '/UseDNS/s/#//'                                                  /etc/ssh/ssh_config
-	sudo egrep 'GSSAPIAuthentication|UseDNS'                                     /etc/ssh/ssh_config
+	sudo sed -i '/GSSAPIAuthentication/s/yes/no/'                                /etc/ssh/sshd_config
+	sudo sed -i '/UseDNS/s/yes/no/'                                              /etc/ssh/sshd_config
+	sudo sed -i '/GSSAPIAuthentication/s/#//'                                    /etc/ssh/sshd_config
+	sudo sed -i '/UseDNS/s/#//'                                                  /etc/ssh/sshd_config
+	sudo egrep 'GSSAPIAuthentication|UseDNS'                                     /etc/ssh/sshd_config
 	sudo service sshd restart
 fi
 
@@ -668,7 +657,7 @@ echo "Extracting backup scripts...                  "
 echo "==============================================" 
 echo ''
 
-sudo tar -vP --extract --file=/home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/ubuntu-host.tar /etc/orabuntu-lxc-scripts/ubuntu-host-backup.sh --touch
+sudo tar -vP --extract --file=./orabuntu/archives/ubuntu-host.tar /etc/orabuntu-lxc-scripts/ubuntu-host-backup.sh --touch
 sudo /etc/orabuntu-lxc-scripts/ubuntu-host-backup.sh
 
 echo ''
@@ -828,7 +817,7 @@ echo "Unpack G1 host files for $LF Linux $RL...     "
 echo "=============================================="
 echo ''
 
-sudo tar -P -xvf /home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/ubuntu-host.tar --touch
+sudo tar -P -xvf ./orabuntu/archives/ubuntu-host.tar --touch
 
 echo ''
 echo "=============================================="
@@ -845,7 +834,7 @@ echo "Unpack G2 host files for $LF Linux $RL...     "
 echo "=============================================="
 echo ''
 
-sudo tar -P -xvf /home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/dns-dhcp-host.tar --touch
+sudo tar -P -xvf ./orabuntu/archives/dns-dhcp-host.tar --touch
 sudo chmod +x /etc/network/openvswitch/crt_ovs_s*.sh
 
 if [ $MultiHostVar2 = 'Y' ]
@@ -1067,7 +1056,7 @@ then
 		echo "=============================================="
 		echo ''
 	
-		sudo tar -P -xvf /home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/dns-dhcp-cont.tar --touch
+		sudo tar -P -xvf ./orabuntu/archives/dns-dhcp-cont.tar --touch
 
 		echo ''
 		echo "=============================================="
@@ -1568,10 +1557,12 @@ then
 		then
 			sudo service systemd-resolved restart
 		fi
-		sudo su -c "echo 'nameserver 127.0.0.53' >> /etc/resolv.conf"
-		sudo sed -i '$!N; /^\(.*\)\n\1$/!P; D' /etc/resolv.conf
-		sudo sed -i -n 'G; s/\n/&&/; /^\([ -~]*\n\).*\n\1/d; s/\n//; h; P' /etc/resolv.conf
-		sleep 2
+		if	[ $SystemdResolvedInstalled -eq 1 ]
+		then
+			sudo su -c "echo 'nameserver 127.0.0.53' >> /etc/resolv.conf"
+			sudo sed -i '$!N; /^\(.*\)\n\1$/!P; D' /etc/resolv.conf
+			sudo sed -i -n 'G; s/\n/&&/; /^\([ -~]*\n\).*\n\1/d; s/\n//; h; P' /etc/resolv.conf
+		fi
 		nslookup $NameServer.$Domain1
 		if [ $? -ne 0 ]
 		then

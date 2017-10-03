@@ -29,10 +29,6 @@ Domain2=$4
 MultiHost=$5
 NameServer=$6
 
-sudo su -c "echo 'nameserver 127.0.0.53' >> /etc/resolv.conf"
-sudo sed -i '$!N; /^\(.*\)\n\1$/!P; D' /etc/resolv.conf
-sudo sed -i -n 'G; s/\n/&&/; /^\([ -~]*\n\).*\n\1/d; s/\n//; h; P' /etc/resolv.conf
-
 function GetMultiHostVar7 {
 	echo $MultiHost | cut -f7 -d':'
 }
@@ -42,7 +38,6 @@ function CheckSystemdResolvedInstalled {
 	sudo netstat -ulnp | grep 53 | sed 's/  */ /g' | rev | cut -f1 -d'/' | rev | sort -u | grep systemd- | wc -l
 }
 SystemdResolvedInstalled=$(CheckSystemdResolvedInstalled)
-echo $SystemdResolvedInstalled
 
 SeedIndex=10
 function CheckHighestSeedIndexHit {
@@ -128,8 +123,7 @@ echo "Extracting oracle-specific files to container."
 echo "=============================================="
 echo ''
 
-cd ~/Downloads/orabuntu-lxc-master/orabuntu/archives
-sudo tar -xvf lxc-oracle-files.tar -C /var/lib/lxc/oel$OracleRelease$SeedPostfix --touch
+sudo tar -xvf ./orabuntu/archives/lxc-oracle-files.tar -C /var/lib/lxc/oel$OracleRelease$SeedPostfix --touch
 
 sudo chown root:root /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/root/hugepages_setting.sh
 sudo chmod 755 /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/root/hugepages_setting.sh
@@ -450,6 +444,11 @@ NetworkUp=$(CheckNetworkUp)
 n=$((n+1))
 done
 
+if [ $SystemdResolvedInstalled -eq 1 ]
+then
+	sudo service systemd-resolved restart > /dev/null 2>&1
+	sleep 2
+fi
 ping -c 3 oel$OracleRelease$SeedPostfix.$Domain2
 
 if [ "$NetworkUp" != '0%packetloss' ]

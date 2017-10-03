@@ -297,43 +297,43 @@ echo "Create selinux-lxc.sh file...                 "
 echo "=============================================="
 echo ''
 
-mkdir -p /home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/selinux
-touch /home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/selinux/selinux-lxc.sh
-ls -l /home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/selinux/selinux-lxc.sh
-sudo chmod 775 /home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/selinux/selinux-lxc.sh
+mkdir -p ./lxcentos/selinux
+touch ./lxcentos/selinux/selinux-lxc.sh
+ls -l ./lxcentos/selinux/selinux-lxc.sh
+sudo chmod 775 ./lxcentos/selinux/selinux-lxc.sh
 echo ''
-cd /home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/selinux
+cd ./lxcentos/selinux
 
-echo 'sudo ausearch -c 'lxcattach' --raw | audit2allow -M my-lxcattach'			>  /home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/selinux/selinux-lxc.sh
-echo 'sudo semodule -i my-lxcattach.pp'							>> /home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/selinux/selinux-lxc.sh
-echo 'sudo ausearch -c 'dhclient' --raw | audit2allow -M my-dhclient'			>> /home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/selinux/selinux-lxc.sh
-echo 'sudo semodule -i my-dhclient.pp'							>> /home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/selinux/selinux-lxc.sh
-echo 'sudo ausearch -c 'passwd' --raw | audit2allow -M my-passwd'			>> /home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/selinux/selinux-lxc.sh
-echo 'sudo semodule -i my-passwd.pp'							>> /home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/selinux/selinux-lxc.sh
-echo 'sudo ausearch -c 'sedispatch' --raw | audit2allow -M my-sedispatch'		>> /home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/selinux/selinux-lxc.sh
-echo 'sudo semodule -i my-sedispatch.pp'						>> /home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/selinux/selinux-lxc.sh
-echo 'sudo ausearch -c 'systemd-sysctl' --raw | audit2allow -M my-systemdsysctl'	>> /home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/selinux/selinux-lxc.sh
-echo 'sudo semodule -i my-systemdsysctl.pp'						>> /home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/selinux/selinux-lxc.sh
-echo 'sudo ausearch -c 'ovs-vsctl' --raw | audit2allow -M my-ovsvsctl'			>> /home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/selinux/selinux-lxc.sh
-echo 'sudo semodule -i my-ovsvsctl.pp'							>> /home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/selinux/selinux-lxc.sh
-echo 'sudo ausearch -c 'sshd' --raw | audit2allow -M my-sshd'				>> /home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/selinux/selinux-lxc.sh
-echo 'sudo semodule -i my-sshd.pp'							>> /home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/selinux/selinux-lxc.sh
-echo 'sudo ausearch -c 'gdm-session-wor' --raw | audit2allow -M my-gdmsessionwor'	>> /home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/selinux/selinux-lxc.sh
-echo 'sudo semodule -i my-gdmsessionwor.pp'						>> /home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/selinux/selinux-lxc.sh
-echo 'sudo ausearch -c 'pickup' --raw | audit2allow -M my-pickup'			>> /home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/selinux/selinux-lxc.sh
-echo 'sudo semodule -i my-pickup.pp'							>> /home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/selinux/selinux-lxc.sh
-echo 'sudo ausearch -c 'sedispatch' --raw | audit2allow -M my-sedispatch'		>> /home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/selinux/selinux-lxc.sh
-echo 'sudo semodule -i my-sedispatch.pp'						>> /home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/selinux/selinux-lxc.sh
-echo 'sudo ausearch -c 'iscsid' --raw | audit2allow -M my-iscsid'			>> /home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/selinux/selinux-lxc.sh
-echo 'sudo semodule -i my-iscsid.pp'							>> /home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/selinux/selinux-lxc.sh
-echo 'sudo ausearch -c 'dhclient' --raw | audit2allow -M my-dhclient'			>> /home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/selinux/selinux-lxc.sh
-echo 'sudo semodule -i my-dhclient.pp'							>> /home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/selinux/selinux-lxc.sh
-echo 'sudo ausearch -c 'ovs-vsctl' --raw | audit2allow -M my-ovsvsctl'			>> /home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/selinux/selinux-lxc.sh
-echo 'sudo semodule -i my-ovsvsctl.pp'							>> /home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/selinux/selinux-lxc.sh
-echo 'sudo ausearch -c 'chpasswd' --raw | audit2allow -M my-chpasswd'			>> /home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/selinux/selinux-lxc.sh
-echo 'sudo semodule -i my-chpasswd.pp'							>> /home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/selinux/selinux-lxc.sh
-echo 'sudo ausearch -c 'colord' --raw | audit2allow -M my-colord'			>> /home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/selinux/selinux-lxc.sh
-echo 'sudo semodule -i my-colord.pp'							>> /home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/selinux/selinux-lxc.sh
+echo 'sudo ausearch -c 'lxcattach' --raw | audit2allow -M my-lxcattach'			>  ./lxcentos/selinux/selinux-lxc.sh
+echo 'sudo semodule -i my-lxcattach.pp'							>> ./lxcentos/selinux/selinux-lxc.sh
+echo 'sudo ausearch -c 'dhclient' --raw | audit2allow -M my-dhclient'			>> ./lxcentos/selinux/selinux-lxc.sh
+echo 'sudo semodule -i my-dhclient.pp'							>> ./lxcentos/selinux/selinux-lxc.sh
+echo 'sudo ausearch -c 'passwd' --raw | audit2allow -M my-passwd'			>> ./lxcentos/selinux/selinux-lxc.sh
+echo 'sudo semodule -i my-passwd.pp'							>> ./lxcentos/selinux/selinux-lxc.sh
+echo 'sudo ausearch -c 'sedispatch' --raw | audit2allow -M my-sedispatch'		>> ./lxcentos/selinux/selinux-lxc.sh
+echo 'sudo semodule -i my-sedispatch.pp'						>> ./lxcentos/selinux/selinux-lxc.sh
+echo 'sudo ausearch -c 'systemd-sysctl' --raw | audit2allow -M my-systemdsysctl'	>> ./lxcentos/selinux/selinux-lxc.sh
+echo 'sudo semodule -i my-systemdsysctl.pp'						>> ./lxcentos/selinux/selinux-lxc.sh
+echo 'sudo ausearch -c 'ovs-vsctl' --raw | audit2allow -M my-ovsvsctl'			>> ./lxcentos/selinux/selinux-lxc.sh
+echo 'sudo semodule -i my-ovsvsctl.pp'							>> ./lxcentos/selinux/selinux-lxc.sh
+echo 'sudo ausearch -c 'sshd' --raw | audit2allow -M my-sshd'				>> ./lxcentos/selinux/selinux-lxc.sh
+echo 'sudo semodule -i my-sshd.pp'							>> ./lxcentos/selinux/selinux-lxc.sh
+echo 'sudo ausearch -c 'gdm-session-wor' --raw | audit2allow -M my-gdmsessionwor'	>> ./lxcentos/selinux/selinux-lxc.sh
+echo 'sudo semodule -i my-gdmsessionwor.pp'						>> ./lxcentos/selinux/selinux-lxc.sh
+echo 'sudo ausearch -c 'pickup' --raw | audit2allow -M my-pickup'			>> ./lxcentos/selinux/selinux-lxc.sh
+echo 'sudo semodule -i my-pickup.pp'							>> ./lxcentos/selinux/selinux-lxc.sh
+echo 'sudo ausearch -c 'sedispatch' --raw | audit2allow -M my-sedispatch'		>> ./lxcentos/selinux/selinux-lxc.sh
+echo 'sudo semodule -i my-sedispatch.pp'						>> ./lxcentos/selinux/selinux-lxc.sh
+echo 'sudo ausearch -c 'iscsid' --raw | audit2allow -M my-iscsid'			>> ./lxcentos/selinux/selinux-lxc.sh
+echo 'sudo semodule -i my-iscsid.pp'							>> ./lxcentos/selinux/selinux-lxc.sh
+echo 'sudo ausearch -c 'dhclient' --raw | audit2allow -M my-dhclient'			>> ./lxcentos/selinux/selinux-lxc.sh
+echo 'sudo semodule -i my-dhclient.pp'							>> ./lxcentos/selinux/selinux-lxc.sh
+echo 'sudo ausearch -c 'ovs-vsctl' --raw | audit2allow -M my-ovsvsctl'			>> ./lxcentos/selinux/selinux-lxc.sh
+echo 'sudo semodule -i my-ovsvsctl.pp'							>> ./lxcentos/selinux/selinux-lxc.sh
+echo 'sudo ausearch -c 'chpasswd' --raw | audit2allow -M my-chpasswd'			>> ./lxcentos/selinux/selinux-lxc.sh
+echo 'sudo semodule -i my-chpasswd.pp'							>> ./lxcentos/selinux/selinux-lxc.sh
+echo 'sudo ausearch -c 'colord' --raw | audit2allow -M my-colord'			>> ./lxcentos/selinux/selinux-lxc.sh
+echo 'sudo semodule -i my-colord.pp'							>> ./lxcentos/selinux/selinux-lxc.sh
 
 echo ''
 echo "=============================================="
@@ -481,7 +481,7 @@ echo "=============================================="
 echo ''
 echo "=============================================="
 echo "                                              "
-read -e -p "Reboot Now ? [Y/N]                      " -i "N" Reboot
+read -e -p "Reboot Now ? [Y/N]                      " -i "Y" Reboot
 echo "                                              "
 echo "=============================================="
 echo ''

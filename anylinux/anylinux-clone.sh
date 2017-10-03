@@ -27,7 +27,7 @@ clear
 
 # Usage:
 
-# ~/Downloads/orabuntu-lxc-master/ubuntu-clone.sh MajorRelease MinorRelease NumCon
+# ./ubuntu-clone.sh MajorRelease MinorRelease NumCon
 
 # Example explanation:
 
@@ -43,13 +43,13 @@ clear
 # ora67c13  RUNNING  10.207.39.13, 172.230.40.13, 172.231.40.13, 192.220.39.13, 192.221.39.13, 192.222.39.13, 192.223.39.13        -     -       NO         
 
 # Running the command:
-# ~/Downloads/orabuntu-lxc-master/ubuntu-clone.sh 6 7 4
+# ./ubuntu-clone.sh 6 7 4
 # will result in the following containers being created: {ora67c14,ora67c15,ora67c16,ora67c17}
 
 # Oracle Enteprise Linux OS versions OEL5, OEL6, and OEL7 are currently supported.
 
 clear
-~/Downloads/orabuntu-lxc-master/anylinux-services-4.sh $1 $2 $3 ora$1$2c
+./anylinux-services-4.sh $1 $2 $3 ora$1$2c
 clear
-~/Downloads/orabuntu-lxc-master/anylinux-services-5.sh $1 $2
+./anylinux-services-5.sh $1 $2
 
