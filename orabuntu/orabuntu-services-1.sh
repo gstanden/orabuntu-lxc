@@ -1568,6 +1568,10 @@ then
 		then
 			sudo service systemd-resolved restart
 		fi
+		sudo su -c "echo 'nameserver 127.0.0.53' >> /etc/resolv.conf"
+		sudo sed -i '$!N; /^\(.*\)\n\1$/!P; D' /etc/resolv.conf
+		sudo sed -i -n 'G; s/\n/&&/; /^\([ -~]*\n\).*\n\1/d; s/\n//; h; P' /etc/resolv.conf
+		sleep 2
 		nslookup $NameServer.$Domain1
 		if [ $? -ne 0 ]
 		then
