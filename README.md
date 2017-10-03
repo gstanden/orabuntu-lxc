@@ -54,7 +54,7 @@ To install the software:
 * Unzip the zip archive.
 * Navigate to /home/ubuntu/Downloads/orabuntu-lxc-master/anylinux
 * Edit the "anylinux-services.sh" script to set the parameters you want for your deployment.
-* As the "ubuntu" user, run the following script:  "./anylinux-services.sh"
+* As the "ubuntu" user, run the following command from where you untarred the software:  "./anylinux/anylinux-services.sh"
 * That's it.  There are a few prompts you answer. The software is coded in bash so you can easily take out prompts.
 * The software automatically does the following:
 * Creates an Ubuntu Xenial DNS/DHCP LXC container providing dynamic DNS/DHCP services to your LXC networks.
