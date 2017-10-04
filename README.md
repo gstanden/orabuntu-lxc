@@ -56,7 +56,7 @@ To install the software:
 ```
        * mv orabuntu-5.0-beta orabuntu-lxc-master 
 ```
-* This is because some absolute paths are used. Roadmap is to remove these absolute paths but for now you must do the mv step.
+* This is because some absolute paths still need to be removed and for now you must do the mv step.
 * Navigate to /home/ubuntu/Downloads/orabuntu-lxc-master/anylinux
 * Edit the "anylinux-services.sh" script to set the parameters you want for your deployment.
 * As the "ubuntu" user, run the following command:  "./anylinux/anylinux-services.sh"
