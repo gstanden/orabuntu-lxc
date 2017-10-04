@@ -49,8 +49,6 @@ To install the software:
 * uekulele-services-0.sh
 * lxcentos-services-0.sh
 * You can also just create an "ubuntu" linux admin user at the time you install the OS.
-* NOTE 1: The "ubuntu" user is ONLY needed for INSTALL. Once Orabuntu-LXC is installe you can DELETE th 2e "ubuntu" user.
-* NOTE 2: The installation code under orabuntu-lxc-master can be deleted after install as well.
 * Install unzip package on OS 
 * Download zip archive github dev code or release from github to "/home/ubuntu/Downloads" directory or user wget, curl etc.
 * Unzip the zip archive.
