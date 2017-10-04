@@ -50,8 +50,11 @@ To install the software:
 * lxcentos-services-0.sh
 * You can also just create an "ubuntu" linux admin user at the time you install the OS.
 * Install unzip package on OS 
-* Download our github zip archive from our github to "/home/ubuntu/Downloads" directory or user wget, curl etc.
+* Download zip archive github dev code or release from github to "/home/ubuntu/Downloads" directory or user wget, curl etc.
 * Unzip the zip archive.
+* If download was a release, you MUST move the release top directory to "orabuntu-lxc-master" e.g.
+       mv orabuntu-5.0-beta orabuntu-lxc-master 
+  This is because some absolute paths are used. Roadmap is to remove these absolute paths but for now you must do the mv step.
 * Navigate to /home/ubuntu/Downloads/orabuntu-lxc-master/anylinux
 * Edit the "anylinux-services.sh" script to set the parameters you want for your deployment.
 * As the "ubuntu" user, run the following command:  "./anylinux/anylinux-services.sh"
