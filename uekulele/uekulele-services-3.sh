@@ -51,6 +51,28 @@ sleep 5
 
 clear
 
+function GetMultiHostVar4 {
+        echo $MultiHost | cut -f4 -d':'
+}
+MultiHostVar4=$(GetMultiHostVar4)
+
+echo ''
+echo "=============================================="
+echo "Establish sudo privileges...                  "
+echo "=============================================="
+echo ''
+
+echo $MultiHostVar4 | sudo -S date
+
+echo ''
+echo "=============================================="
+echo "Privileges established.                       "
+echo "=============================================="
+
+sleep 5
+
+clear
+
 echo ''
 echo "=============================================="
 echo "Ping google.com test...                       "
@@ -231,6 +253,28 @@ sleep 5
 
 clear
 
+function GetMultiHostVar4 {
+        echo $MultiHost | cut -f4 -d':'
+}
+MultiHostVar4=$(GetMultiHostVar4)
+
+echo ''
+echo "=============================================="
+echo "Establish sudo privileges...                  "
+echo "=============================================="
+echo ''
+
+echo $MultiHostVar4 | sudo -S date
+
+echo ''
+echo "=============================================="
+echo "Privileges established.                       "
+echo "=============================================="
+
+sleep 5
+
+clear
+
 echo ''
 echo "=============================================="
 echo "Testing connectivity to $SeedContainerName... "
@@ -268,7 +312,6 @@ echo "Configuring $SeedContainerName for Oracle...  "
 echo "=============================================="
 echo ''
 
-sudo lxc-attach -n $SeedContainerName -- ip link set eth0 mtu $MultiHostVar7
 sudo lxc-attach -n $SeedContainerName -- /root/packages.sh
 sudo lxc-attach -n $SeedContainerName -- /root/create_users.sh
 sudo lxc-attach -n $SeedContainerName -- /root/lxc-services.sh

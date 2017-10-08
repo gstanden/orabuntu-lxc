@@ -134,17 +134,22 @@ sleep 5
 
 clear
 
+function GetMultiHostVar4 {
+        echo $MultiHost | cut -f4 -d':'
+}
+MultiHostVar4=$(GetMultiHostVar4)
+
 echo ''
 echo "=============================================="
 echo "Establish sudo privileges...                  "
 echo "=============================================="
 echo ''
 
-sudo date
+echo $MultiHostVar4 | sudo -S date
 
 echo ''
 echo "=============================================="
-echo "Done: Establish sudo privileges.              "
+echo "Privileges established.                       "
 echo "=============================================="
 
 sleep 5
@@ -301,8 +306,8 @@ then
 
 	sudo yum clean all
 	sudo yum -y install wget tar gzip
- 	mkdir -p ./uekulele/epel
-  	cd ./uekulele/epel
+ 	mkdir -p /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/epel
+  	cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/epel
 	if   [ $Release -eq 7 ]
 	then
   		wget https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
@@ -313,7 +318,7 @@ then
   		sudo rpm -ivh epel-release-latest-6.noarch.rpm 
 	fi
 	sudo yum provides lxc | sed '/^\s*$/d' | grep Repo | sort -u
-	cd .
+	cd /home/ubuntu/Downloads/orabuntu-lxc-master
 
 	sudo yum -y install debootstrap perl libvirt bash-completion bash-completion-extras
 	sudo yum -y install lxc libcap-devel libcgroup wget bridge-utils
@@ -404,8 +409,8 @@ then
 	echo ''
 
 	sudo yum -y install wget tar gzip
- 	mkdir -p ./uekulele/epel
-  	cd ./uekulele/epel
+ 	mkdir -p /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/epel
+  	cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/epel
 	if [ $Release -eq 7 ] 
 	then
   		wget https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
@@ -416,7 +421,7 @@ then
   		sudo rpm -ivh epel-release-latest-6.noarch.rpm 
 	fi
 	sudo yum provides lxc | sed '/^\s*$/d' | grep Repo | sort -u
-	cd .
+	cd /home/ubuntu/Downloads/orabuntu-lxc-master
 
 	sudo yum -y install debootstrap perl libvirt
 	sudo yum -y install lxc libcap-devel libcgroup wget bridge-utils
@@ -543,13 +548,13 @@ then
 		sudo sh -c "echo '%_unpackaged_files_terminate_build 0' >> /etc/rpm/macros"
 	fi
 
-	rpmbuild --define '_topdir ./uekulele/lxc/rpmbuild' -ba lxc.spec > /dev/null 2>&1
+	rpmbuild --define '_topdir /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc/rpmbuild' -ba lxc.spec > /dev/null 2>&1
 	sudo yum -y install rpm-build wget openssl-devel gcc make docbook2X xmlto docbook automake graphviz
-	mkdir -p ./uekulele/lxc
-	cd ./uekulele/lxc
+	mkdir -p /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc
+	cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc
 	wget https://linuxcontainers.org/downloads/lxc/lxc-"$LxcVersion".tar.gz
-	mkdir -p ./uekulele/lxc/rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
-	cp -p lxc-"$LxcVersion".tar.gz ./uekulele/lxc/rpmbuild/SOURCES/.
+	mkdir -p /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc/rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
+	cp -p lxc-"$LxcVersion".tar.gz /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc/rpmbuild/SOURCES/.
 
 	echo ''
 	echo "=============================================="
@@ -560,8 +565,8 @@ then
 
 	clear
 
-	mkdir -p ./uekulele/lxc/rpmbuild/RPMS/x86_64
-	cd ./uekulele/lxc/rpmbuild/RPMS/x86_64
+	mkdir -p /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc/rpmbuild/RPMS/x86_64
+	cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc/rpmbuild/RPMS/x86_64
 	touch marker.rpm
 
 	function GetLXCPackageCount {
@@ -582,14 +587,14 @@ then
 			sleep 5
 
 			sudo yum -y install rpm-build wget openssl-devel gcc make docbook2X xmlto docbook automake graphviz
-			mkdir -p ./uekulele/lxc
-			cd ./uekulele/lxc
+			mkdir -p /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc
+			cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc
 			wget https://linuxcontainers.org/downloads/lxc/lxc-"$LxcVersion".tar.gz
-			mkdir -p ./uekulele/lxc/rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
-			cp -p lxc-"$LxcVersion".tar.gz ./uekulele/lxc/rpmbuild/SOURCES/.
+			mkdir -p /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc/rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
+			cp -p lxc-"$LxcVersion".tar.gz /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc/rpmbuild/SOURCES/.
 			tar -zxvf lxc-"$LxcVersion".tar.gz
-			cp -p lxc-"$LxcVersion"/lxc.spec ./uekulele/lxc/.
-			cd ./uekulele/lxc
+			cp -p lxc-"$LxcVersion"/lxc.spec /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc/.
+			cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc
 
 			function CheckMacrosFile {
 				cat /etc/rpm/macros | grep _unpackaged_files_terminate_build | sort -u | grep -c 0
@@ -600,11 +605,11 @@ then
 			then
 				sudo sh -c "echo '%_unpackaged_files_terminate_build 0' >> /etc/rpm/macros"
 			fi
-			rpmbuild --define '_topdir ./uekulele/lxc/rpmbuild' -ba lxc.spec
-			cd ./uekulele/lxc/rpmbuild/RPMS/x86_64
+			rpmbuild --define '_topdir /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc/rpmbuild' -ba lxc.spec
+			cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc/rpmbuild/RPMS/x86_64
 			sudo yum -y localinstall lxc* > /dev/null 2>&1
 			LXCPackageCount=$(GetLXCPackageCount)
-			cd ./uekulele/lxc
+			cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc
 		done
 	fi
 	if [ $Release -eq 6 ] 
@@ -620,14 +625,14 @@ then
 			sleep 5
 
 			sudo yum -y install rpm-build wget openssl-devel gcc make docbook2X xmlto docbook automake graphviz
-			mkdir -p ./uekulele/lxc
-			cd ./uekulele/lxc
+			mkdir -p /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc
+			cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc
 			wget https://linuxcontainers.org/downloads/lxc/lxc-"$LxcVersion".tar.gz
-			mkdir -p ./uekulele/lxc/rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
-			cp -p lxc-"$LxcVersion".tar.gz ./uekulele/lxc/rpmbuild/SOURCES/.
+			mkdir -p /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc/rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
+			cp -p lxc-"$LxcVersion".tar.gz /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc/rpmbuild/SOURCES/.
 			tar -zxvf lxc-"$LxcVersion".tar.gz
-			cp -p lxc-"$LxcVersion"/lxc.spec ./uekulele/lxc/.
-			cd ./uekulele/lxc
+			cp -p lxc-"$LxcVersion"/lxc.spec /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc/.
+			cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc
 
 			function CheckMacrosFile {
 				cat /etc/rpm/macros | grep _unpackaged_files_terminate_build | sort -u | grep -c 0
@@ -638,11 +643,11 @@ then
 			then
 				sudo sh -c "echo '%_unpackaged_files_terminate_build 0' >> /etc/rpm/macros"
 			fi
-			rpmbuild --define '_topdir ./uekulele/lxc/rpmbuild' -ba lxc.spec
-			cd ./uekulele/lxc/rpmbuild/RPMS/x86_64
+			rpmbuild --define '_topdir /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc/rpmbuild' -ba lxc.spec
+			cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc/rpmbuild/RPMS/x86_64
 			sudo yum -y localinstall lxc* > /dev/null 2>&1
 			LXCPackageCount=$(GetLXCPackageCount)
-			cd ./uekulele/lxc
+			cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc
 		done
 	fi
 	
@@ -676,7 +681,7 @@ then
 	echo "=============================================="
 	echo ''
 
-	cd ./uekulele/lxc/rpmbuild/RPMS/x86_64
+	cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc/rpmbuild/RPMS/x86_64
 	sudo yum -y localinstall lxc*
 
 	echo ''
@@ -747,7 +752,7 @@ echo ''
 
 sleep 5
 
-cd .
+cd /home/ubuntu/Downloads/orabuntu-lxc-master
 
 sudo yum -y install curl ruby tar which	
 sudo yum -y install wget tar gzip
@@ -868,8 +873,8 @@ then
 	echo ''
 
 	sudo yum -y install wget tar gzip
- 	mkdir -p ./uekulele/epel
-  	cd ./uekulele/epel
+ 	mkdir -p /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/epel
+  	cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/epel
 	if [ $Release -eq 7 ]
 	then
   		wget https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
@@ -880,7 +885,7 @@ then
   		sudo rpm -ivh epel-release-latest-6.noarch.rpm 
 	fi
 	sudo yum provides lxc | sed '/^\s*$/d' | grep Repo | sort -u
-	cd .
+	cd /home/ubuntu/Downloads/orabuntu-lxc-master
 	sudo yum -y install debootstrap perl libvirt bash-completion bash-completion-extras
 	sudo yum -y install lxc libcap-devel libcgroup wget bridge-utils
 
@@ -1002,13 +1007,13 @@ then
 		sudo sh -c "echo '%_unpackaged_files_terminate_build 0' >> /etc/rpm/macros"
 	fi
 
-	rpmbuild --define '_topdir ./uekulele/lxc/rpmbuild' -ba lxc.spec
+	rpmbuild --define '_topdir /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc/rpmbuild' -ba lxc.spec
 	sudo yum -y install rpm-build wget openssl-devel gcc make docbook2X xmlto docbook automake graphviz
-	mkdir -p ./uekulele/lxc
-	cd ./uekulele/lxc
+	mkdir -p /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc
+	cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc
 	wget https://linuxcontainers.org/downloads/lxc/lxc-"$LxcVersion".tar.gz
-	mkdir -p ./uekulele/lxc/rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
-	cp -p lxc-"$LxcVersion".tar.gz ./uekulele/lxc/rpmbuild/SOURCES/.
+	mkdir -p /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc/rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
+	cp -p lxc-"$LxcVersion".tar.gz /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc/rpmbuild/SOURCES/.
 
 	echo ''
 	echo "=============================================="
@@ -1019,8 +1024,8 @@ then
 
 	clear
 
-	mkdir -p ./uekulele/lxc/rpmbuild/RPMS/x86_64
-	cd ./uekulele/lxc/rpmbuild/RPMS/x86_64
+	mkdir -p /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc/rpmbuild/RPMS/x86_64
+	cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc/rpmbuild/RPMS/x86_64
 	touch marker.rpm
 
 	function GetLXCPackageCount {
@@ -1041,14 +1046,14 @@ then
 			sleep 5
 
 			sudo yum -y install rpm-build wget openssl-devel gcc make docbook2X xmlto docbook automake graphviz
-			mkdir -p ./uekulele/lxc
-			cd ./uekulele/lxc
+			mkdir -p /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc
+			cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc
 			wget https://linuxcontainers.org/downloads/lxc/lxc-"$LxcVersion".tar.gz
-			mkdir -p ./uekulele/lxc/rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
-			cp -p lxc-"$LxcVersion".tar.gz ./uekulele/lxc/rpmbuild/SOURCES/.
+			mkdir -p /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc/rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
+			cp -p lxc-"$LxcVersion".tar.gz /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc/rpmbuild/SOURCES/.
 			tar -zxvf lxc-"$LxcVersion".tar.gz
-			cp -p lxc-"$LxcVersion"/lxc.spec ./uekulele/lxc/.
-			cd ./uekulele/lxc
+			cp -p lxc-"$LxcVersion"/lxc.spec /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc/.
+			cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc
 	
 			function CheckMacrosFile {
 				cat /etc/rpm/macros | grep _unpackaged_files_terminate_build | sort -u | grep -c 0
@@ -1059,11 +1064,11 @@ then
 			then
 				sudo sh -c "echo '%_unpackaged_files_terminate_build 0' >> /etc/rpm/macros"
 			fi
-			rpmbuild --define '_topdir ./uekulele/lxc/rpmbuild' -ba lxc.spec
-			cd ./uekulele/lxc/rpmbuild/RPMS/x86_64
+			rpmbuild --define '_topdir /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc/rpmbuild' -ba lxc.spec
+			cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc/rpmbuild/RPMS/x86_64
 			sudo yum -y localinstall lxc* > /dev/null 2>&1
 			LXCPackageCount=$(GetLXCPackageCount)
-			cd ./uekulele/lxc
+			cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc
 		done
 	fi
 	if [ $Release -eq 6 ]
@@ -1079,14 +1084,14 @@ then
 			sleep 5
 
 			sudo yum -y install rpm-build wget openssl-devel gcc make docbook2X xmlto docbook automake graphviz
-			mkdir -p ./uekulele/lxc
-			cd ./uekulele/lxc
+			mkdir -p /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc
+			cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc
 			wget https://linuxcontainers.org/downloads/lxc/lxc-"$LxcVersion".tar.gz
-			mkdir -p ./uekulele/lxc/rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
-			cp -p lxc-"$LxcVersion".tar.gz ./uekulele/lxc/rpmbuild/SOURCES/.
+			mkdir -p /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc/rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
+			cp -p lxc-"$LxcVersion".tar.gz /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc/rpmbuild/SOURCES/.
 			tar -zxvf lxc-"$LxcVersion".tar.gz
-			cp -p lxc-"$LxcVersion"/lxc.spec ./uekulele/lxc/.
-			cd ./uekulele/lxc
+			cp -p lxc-"$LxcVersion"/lxc.spec /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc/.
+			cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc
 	
 			function CheckMacrosFile {
 				cat /etc/rpm/macros | grep _unpackaged_files_terminate_build | sort -u | grep -c 0
@@ -1097,11 +1102,11 @@ then
 			then
 				sudo sh -c "echo '%_unpackaged_files_terminate_build 0' >> /etc/rpm/macros"
 			fi
-			rpmbuild --define '_topdir ./uekulele/lxc/rpmbuild' -ba lxc.spec
-			cd ./uekulele/lxc/rpmbuild/RPMS/x86_64
+			rpmbuild --define '_topdir /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc/rpmbuild' -ba lxc.spec
+			cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc/rpmbuild/RPMS/x86_64
 			sudo yum -y localinstall lxc* > /dev/null 2>&1
 			LXCPackageCount=$(GetLXCPackageCount)
-			cd ./uekulele/lxc
+			cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc
 		done
 	fi
 		
@@ -1135,7 +1140,7 @@ then
 	echo "=============================================="
 	echo ''
 
-	cd ./uekulele/lxc/rpmbuild/RPMS/x86_64
+	cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc/rpmbuild/RPMS/x86_64
 	sudo yum -y localinstall lxc*
 
 	echo ''
@@ -1194,6 +1199,28 @@ then
 	clear
 fi
 
+function GetMultiHostVar4 {
+        echo $MultiHost | cut -f4 -d':'
+}
+MultiHostVar4=$(GetMultiHostVar4)
+
+echo ''
+echo "=============================================="
+echo "Establish sudo privileges...                  "
+echo "=============================================="
+echo ''
+
+echo $MultiHostVar4 | sudo -S date
+
+echo ''
+echo "=============================================="
+echo "Privileges established.                       "
+echo "=============================================="
+
+sleep 5
+
+clear
+
 which ovs-vsctl > /dev/null 2>&1
 if [ $? -ne 0 ]
 then
@@ -1206,8 +1233,8 @@ then
 
 	clear
 
-	mkdir -p ./uekulele/openvswitch/rpmbuild/RPMS/x86_64
-	cd ./uekulele/openvswitch/rpmbuild/RPMS/x86_64
+	mkdir -p /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/openvswitch/rpmbuild/RPMS/x86_64
+	cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/openvswitch/rpmbuild/RPMS/x86_64
 	touch marker-2.rpm
 
 	function GetOVSPackageCount {
@@ -1234,22 +1261,22 @@ then
 			sudo ln -s /usr/src/kernels/`uname -r` /lib/modules/`uname -r`/build
 			sudo sed -i -e '/\[public_ol6_software_collections\]/,/^\[/s/enabled=0/enabled=1/' /etc/yum.repos.d/public-yum-ol6.repo
 			sudo yum -y install python27
-		1G1Grce /opt/rh/python27/enable
+			source /opt/rh/python27/enable
 			python -V
 			sudo sed -i -e '/\[public_ol6_software_collections\]/,/^\[/s/enabled=1/enabled=0/' /etc/yum.repos.d/public-yum-ol6.repo
 			sleep 5
 			wget http://openvswitch.org/releases/openvswitch-"$OvsVersion".tar.gz
-			mkdir -p ./uekulele/openvswitch/rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
-			cp -p openvswitch-"$OvsVersion".tar.gz ./uekulele/openvswitch/rpmbuild/SOURCES/.
+			mkdir -p /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/openvswitch/rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
+			cp -p openvswitch-"$OvsVersion".tar.gz /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/openvswitch/rpmbuild/SOURCES/.
 
 		elif [ $Release -eq 7 ]
 		then
 			sudo yum -y install rpm-build wget openssl-devel gcc make
-			mkdir -p ./uekulele/openvswitch
-			cd ./uekulele/openvswitch
+			mkdir -p /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/openvswitch
+			cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/openvswitch
 			wget http://openvswitch.org/releases/openvswitch-"$OvsVersion".tar.gz
-			mkdir -p ./uekulele/openvswitch/rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
-			cp -p openvswitch-"$OvsVersion".tar.gz ./uekulele/openvswitch/rpmbuild/SOURCES/.
+			mkdir -p /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/openvswitch/rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
+			cp -p openvswitch-"$OvsVersion".tar.gz /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/openvswitch/rpmbuild/SOURCES/.
 		fi
 
 		echo ''
@@ -1271,29 +1298,75 @@ then
 
 		if    [ $Release -eq 6 ]
 		then
-			cd ./uekulele/openvswitch/rpmbuild/SOURCES
+			cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/openvswitch/rpmbuild/SOURCES
 			tar -xzvf openvswitch-"$OvsVersion".tar.gz
 			cd openvswitch-"$OvsVersion"
-			sudo sed -i '/python >= 2\.7/s/python >= 2\.7/python27/g' ./uekulele/openvswitch/rpmbuild/SOURCES/openvswitch-"$OvsVersion"/rhel/openvswitch.spec
+			sudo sed -i '/python >= 2\.7/s/python >= 2\.7/python27/g' /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/openvswitch/rpmbuild/SOURCES/openvswitch-"$OvsVersion"/rhel/openvswitch.spec
 			sleep 5
 			sudo sed -i '/python >= 2\.7/s/python >= 2\.7/python27/' openvswitch.spec
-			rpmbuild --define '_topdir ./uekulele/openvswitch/rpmbuild' -bb rhel/openvswitch.spec
-			cd ./uekulele/openvswitch/rpmbuild/RPMS/x86_64
+			rpmbuild --define '_topdir /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/openvswitch/rpmbuild' -bb rhel/openvswitch.spec
+			cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/openvswitch/rpmbuild/RPMS/x86_64
+			
+			echo ''
+			echo "=============================================="
+			echo "Establish sudo privileges...                  "
+			echo "=============================================="
+			echo ''
+
+			function GetMultiHostVar4 {
+        			echo $MultiHost | cut -f4 -d':'
+			}
+			MultiHostVar4=$(GetMultiHostVar4)
+
+			echo $MultiHostVar4 | sudo -S date
+
+			echo ''
+			echo "=============================================="
+			echo "Privileges established.                       "
+			echo "=============================================="
+
+			sleep 5
+
+			clear
+
 			sudo yum -y localinstall openvswitch* > /dev/null 2>&1
 			OVSPackageCount=$(GetOVSPackageCount)
-			cd ./uekulele/openvswitch
+			cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/openvswitch
 
 		elif [ $Release -eq 7 ]
 		then
-			cd ./uekulele/openvswitch/rpmbuild/SOURCES
+			cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/openvswitch/rpmbuild/SOURCES
 			tar -zxvf openvswitch-"$OvsVersion".tar.gz
-			cp -p openvswitch-"$OvsVersion"/rhel/*.spec ./uekulele/openvswitch/.
-			cd ./uekulele/openvswitch
-			rpmbuild --define '_topdir ./uekulele/openvswitch/rpmbuild' -ba openvswitch.spec
-			cd ./uekulele/openvswitch/rpmbuild/RPMS/x86_64
+			cp -p openvswitch-"$OvsVersion"/rhel/*.spec /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/openvswitch/.
+			cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/openvswitch
+			rpmbuild --define '_topdir /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/openvswitch/rpmbuild' -ba openvswitch.spec
+			cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/openvswitch/rpmbuild/RPMS/x86_64
+	
+			echo ''
+			echo "=============================================="
+			echo "Establish sudo privileges...                  "
+			echo "=============================================="
+			echo ''
+
+			function GetMultiHostVar4 {
+        			echo $MultiHost | cut -f4 -d':'
+			}
+			MultiHostVar4=$(GetMultiHostVar4)
+
+			echo $MultiHostVar4 | sudo -S date
+
+			echo ''
+			echo "=============================================="
+			echo "Privileges established.                       "
+			echo "=============================================="
+
+			sleep 5
+
+			clear
+
 			sudo yum -y localinstall openvswitch* > /dev/null 2>&1
 			OVSPackageCount=$(GetOVSPackageCount)
-			cd ./uekulele/openvswitch
+			cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/openvswitch
 		fi
 	done
 
@@ -1311,30 +1384,13 @@ then
 
 	echo ''
 	echo "=============================================="
-	echo "Establish sudo privileges...                  "
-	echo "=============================================="
-	echo ''
-
-	sudo date
-
-	echo ''
-	echo "=============================================="
-	echo "Establish sudo privileges completed.          "
-	echo "=============================================="
-	
-	sleep 5
-
-	clear
-
-	echo ''
-	echo "=============================================="
 	echo "Install OpenvSwitch RPM...                    "
 	echo "=============================================="
 	echo ''
 
 	sleep 5
 
-	cd ./uekulele/openvswitch/rpmbuild/RPMS/x86_64
+	cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/openvswitch/rpmbuild/RPMS/x86_64
 	sudo yum -y localinstall openvswitch*
 
 	echo ''
@@ -1443,7 +1499,7 @@ echo "Extracting backup scripts...                  "
 echo "==============================================" 
 echo ''
 
-sudo tar -vP --extract --file=./uekulele/archives/ubuntu-host.tar /etc/orabuntu-lxc-scripts/ubuntu-host-backup.sh --touch
+sudo tar -vP --extract --file=/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/archives/ubuntu-host.tar /etc/orabuntu-lxc-scripts/ubuntu-host-backup.sh --touch
 sudo /etc/orabuntu-lxc-scripts/ubuntu-host-backup.sh
 
 echo ''
@@ -1480,7 +1536,38 @@ then
         echo "=============================================="
 	echo ''
 
-	sudo lxc-create -t download -n nsa -- --dist ubuntu --release xenial --arch amd64
+ 	sudo lxc-create -t download -n nsa -- --dist ubuntu --release xenial --arch amd64
+
+	echo ''
+	echo "=============================================="
+	echo "Method 1 complete.                            "
+	echo "=============================================="
+
+	sleep 5
+
+	clear
+
+	echo ''
+	echo "=============================================="
+	echo "Establish sudo privileges...                  "
+	echo "=============================================="
+	echo ''
+
+	function GetMultiHostVar4 {
+        	echo $MultiHost | cut -f4 -d':'
+	}
+	MultiHostVar4=$(GetMultiHostVar4)
+
+	echo $MultiHostVar4 | sudo -S date
+
+	echo ''
+	echo "=============================================="
+	echo "Privileges established.                       "
+	echo "=============================================="
+
+	sleep 5
+
+	clear
 
 	echo ''
 	echo "=============================================="
@@ -1488,11 +1575,33 @@ then
 	echo "=============================================="
 	echo ''
 
-	sudo lxc-create -n nsa -t ubuntu -- --release xenial --arch amd64
+ 	sudo lxc-create -n nsa -t ubuntu -- --release xenial --arch amd64
 
 	echo ''
 	echo "=============================================="
 	echo "Create LXC DNS DHCP container complete.       "
+	echo "=============================================="
+
+	sleep 5
+
+	clear
+
+	echo ''
+	echo "=============================================="
+	echo "Establish sudo privileges...                  "
+	echo "=============================================="
+	echo ''
+
+	function GetMultiHostVar4 {
+       		echo $MultiHost | cut -f4 -d':'
+	}
+	MultiHostVar4=$(GetMultiHostVar4)
+
+	echo $MultiHostVar4 | sudo -S date
+
+	echo ''
+	echo "=============================================="
+	echo "Privileges established.                       "
 	echo "=============================================="
 
 	sleep 5
@@ -1548,18 +1657,40 @@ then
 	echo "=============================================="
 	echo ''
 
-	sudo lxc-attach -n nsa -- sudo apt-get -y update
-	sudo lxc-attach -n nsa -- sudo apt-get -y install bind9 isc-dhcp-server bind9utils dnsutils openssh-server
+ 	sudo lxc-attach -n nsa -- sudo apt-get -y update
+ 	sudo lxc-attach -n nsa -- sudo apt-get -y install bind9 isc-dhcp-server bind9utils dnsutils openssh-server
 
 	sleep 2
 
-	sudo lxc-attach -n nsa -- sudo service isc-dhcp-server start
-	sudo lxc-attach -n nsa -- sudo service bind9 start
+ 	sudo lxc-attach -n nsa -- sudo service isc-dhcp-server start
+ 	sudo lxc-attach -n nsa -- sudo service bind9 start
 
 	echo ''
 	echo "=============================================="
 	echo "Install bind9 & isc-dhcp-server complete.     "
 	echo "Install openssh-server complete.              "
+	echo "=============================================="
+
+	sleep 5
+
+	clear
+
+	echo ''
+	echo "=============================================="
+	echo "Establish sudo privileges...                  "
+	echo "=============================================="
+	echo ''
+
+	function GetMultiHostVar4 {
+       		echo $MultiHost | cut -f4 -d':'
+	}
+	MultiHostVar4=$(GetMultiHostVar4)
+
+	echo $MultiHostVar4 | sudo -S date
+
+	echo ''
+	echo "=============================================="
+	echo "Privileges established.                       "
 	echo "=============================================="
 
 	sleep 5
@@ -1609,7 +1740,7 @@ echo "Unpack G1 files $LF Linux $RL                 "
 echo "=============================================="
 echo ''
 
-sudo tar -P -xvf ./uekulele/archives/ubuntu-host.tar --touch
+sudo tar -P -xvf /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/archives/ubuntu-host.tar --touch
 
 echo ''
 echo "=============================================="
@@ -1626,7 +1757,7 @@ echo "Unpack G2 files for $LF Linux $RL...          "
 echo "=============================================="
 echo ''
 
-sudo tar -P -xvf ./uekulele/archives/dns-dhcp-host.tar --touch
+sudo tar -P -xvf /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/archives/dns-dhcp-host.tar --touch
 sudo chmod +x /etc/network/openvswitch/crt_ovs_s*.sh
 
 if [ $MultiHostVar2 = 'Y' ]
@@ -1842,7 +1973,7 @@ then
 		echo "=============================================="
 		echo ''
 	
-		sudo tar -P -xvf ./uekulele/archives/dns-dhcp-cont.tar --touch
+		sudo tar -P -xvf /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/archives/dns-dhcp-cont.tar --touch
 
 		echo ''
 		echo "=============================================="
@@ -2010,7 +2141,7 @@ then
                 	sudo sh -c "echo ''							>> /etc/systemd/system/$k.service"
                 	sudo sh -c "echo '[Install]'						>> /etc/systemd/system/$k.service"
                 	sudo sh -c "echo 'WantedBy=multi-user.target'				>> /etc/systemd/system/$k.service"
-		
+
 			echo ''
 			echo "=============================================="
 			echo "Starting OpenvSwitch $k ...                   "
@@ -2124,6 +2255,8 @@ echo ''
 
 # So that settings in /etc/NetworkManager/dnsmasq.d/local & /etc/NetworkManager/NetworkManager.conf take effect.
 
+sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g"			/etc/resolv.conf
+sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g"	/etc/resolv.conf
 sudo cat /etc/resolv.conf
 sudo sed -i '/plugins=ifcfg-rh/a dns=dnsmasq' /etc/NetworkManager/NetworkManager.conf
 echo ''
@@ -2324,7 +2457,6 @@ then
 	then
 		sudo service sw1 restart > /dev/null 2>&1
 		sudo service sx1 restart > /dev/null 2>&1
-		sudo sed -i "s/mtu = 1500/mtu = $MultiHostVar7/g" /var/lib/lxc/$NameServer/config
 		sudo lxc-stop -n $NameServer  > /dev/null 2>&1
 		sudo lxc-start -n $NameServer > /dev/null 2>&1
 		nslookup $NameServer
@@ -2382,7 +2514,8 @@ then
 	sudo touch /home/ubuntu/.ssh/known_hosts
 	sudo lxc-attach -n $NameServer -- usermod --password `perl -e "print crypt('ubuntu','ubuntu');"` ubuntu
 	ssh-keygen -f "/home/ubuntu/.ssh/known_hosts" -R 10.207.39.2
-	sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.39.2 "date; uname -a"
+#	sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ubuntu@10.207.39.2 "ssh-keygen -f ~/.ssh/id_rsa -t rsa -N ''"
+	sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ubuntu@10.207.39.2 "date; uname -a"
 	
 	echo ''
 	echo "=============================================="
@@ -2418,11 +2551,11 @@ then
 
 	sudo route add -net 192.220.39.0/24 gw 10.207.39.$MultiHostVar3 dev sw1 >/dev/null 2>&1
 	sudo route add -net 192.221.39.0/24 gw 10.207.39.$MultiHostVar3 dev sw1 >/dev/null 2>&1
-  	sudo route add -net 192.222.39.0/24 gw 10.207.39.$MultiHostVar3 dev sw1 >/dev/null 2>&1
+ 	sudo route add -net 192.222.39.0/24 gw 10.207.39.$MultiHostVar3 dev sw1 >/dev/null 2>&1
   	sudo route add -net 192.223.39.0/24 gw 10.207.39.$MultiHostVar3 dev sw1 >/dev/null 2>&1
   	sudo route add -net 172.230.40.0/24 gw 10.207.39.$MultiHostVar3 dev sw1 >/dev/null 2>&1
   	sudo route add -net 172.231.40.0/24 gw 10.207.39.$MultiHostVar3 dev sw1 >/dev/null 2>&1
-  	sudo route add -net 10.207.39.0/24  gw 10.207.39.$MultiHostVar3 dev sw1 >/dev/null 2>&1
+   	sudo route add -net 10.207.39.0/24  gw 10.207.39.$MultiHostVar3 dev sw1 >/dev/null 2>&1
 
 	function GetMultiHostVar5 {
 	echo $MultiHost | cut -f5 -d':'
@@ -2483,12 +2616,15 @@ then
 	sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 date
 	if [ $? -eq 0 ]
 	then
-		sshpass -p ubuntu scp -p /etc/network/openvswitch/setup_gre_and_routes.sh ubuntu@$MultiHostVar5:~/Downloads/.
+		sshpass -p ubuntu scp -p /etc/network/openvswitch/setup_gre_and_routes.sh ubuntu@$MultiHostVar5:~/.
 	fi
-	sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 "sudo -S <<< "ubuntu" ls -l ~/Downloads/setup_gre_and_routes.sh"
+	sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 "sudo -S <<< "ubuntu" ls -l ~/setup_gre_and_routes.sh"
 	if [ $? -eq 0 ]
 	then
-		sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 "sudo -S <<< "ubuntu" ~/Downloads/setup_gre_and_routes.sh"
+		sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 "sudo -S <<< "ubuntu" ~/setup_gre_and_routes.sh"
+		sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 "sudo -S <<< "ubuntu" service sw1 restart"
+		sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 "sudo -S <<< "ubuntu" /etc/orabuntu-lxc-scripts/stop_containers.sh"
+		sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 "sudo -S <<< "ubuntu" /etc/orabuntu-lxc-scripts/start_containers.sh"
 	fi
 
 	function GetShortHost {

@@ -80,7 +80,29 @@ echo "This script creates oracle-ready lxc clones   "
 echo "for oracle-ready RAC container nodes          "
 echo "=============================================="
 
-sleep 10
+sleep 5
+
+clear
+
+function GetMultiHostVar4 {
+        echo $MultiHost | cut -f4 -d':'
+}
+MultiHostVar4=$(GetMultiHostVar4)
+
+echo ''
+echo "=============================================="
+echo "Establish sudo privileges...                  "
+echo "=============================================="
+echo ''
+
+echo $MultiHostVar4 | sudo -S date
+
+echo ''
+echo "=============================================="
+echo "Privileges established.                       "
+echo "=============================================="
+
+sleep 5
 
 clear
 
@@ -121,7 +143,8 @@ echo "Configure Extra Networks (optional e.g. RAC)  "
 echo "=============================================="
 echo ''
 
-read -e -p "Add Extra Private Networks (e.g for Oracle RAC ASM Flex Cluster) [Y/N]   " -i "Y" AddPrivateNetworks
+AddPrivateNetworks=Y
+# read -e -p "Add Extra Private Networks (e.g for Oracle RAC ASM Flex Cluster) [Y/N]   " -i "Y" AddPrivateNetworks
 
 if [ $AddPrivateNetworks = 'y' ] || [ $AddPrivateNetworks = 'Y' ]
 then
@@ -203,7 +226,6 @@ do
 	sudo sed -i "s/$SeedContainerName/$ContainerPrefix$CloneIndex/g" /var/lib/lxc/$ContainerPrefix$CloneIndex/config
 	sudo sed -i "s/\.10/\.$CloneIndex/g" /var/lib/lxc/$ContainerPrefix$CloneIndex/config
 	sudo sed -i 's/sx1/sw1/g' /var/lib/lxc/$ContainerPrefix$CloneIndex/config
-	sudo sed -i "s/mtu = 1500/mtu = $MultiHostVar7/g" /var/lib/lxc/$ContainerPrefix$CloneIndex/config
 
 	function GetHostName (){ echo $ContainerPrefix$CloneIndex\1; }
 	HostName=$(GetHostName)
@@ -307,14 +329,13 @@ echo "(cloned containers are not affected by reset) "
 echo "=============================================="
 echo ''
 
-read -e -p "Reset Seed Container $SeedContainerName to single DHCP interface ? [Y/N]   " -i "Y" ResetSingleDHCPInterface
+ResetSingleDHCPInterface=Y
+# read -e -p "Reset Seed Container $SeedContainerName to single DHCP interface ? [Y/N]   " -i "Y" ResetSingleDHCPInterface
 
 if [ $ResetSingleDHCPInterface = 'y' ] || [ $ResetSingleDHCPInterface = 'Y' ]
 then
 sudo cp -p /var/lib/lxc/$SeedContainerName/config.oracle /var/lib/lxc/$SeedContainerName/config
 sudo sed -i "s/ContainerName/$SeedContainerName/g" /var/lib/lxc/$SeedContainerName/config
-# GLS 20170618 reset mtu to 1340 in Seed container
-sudo sed -i "s/mtu = 1500/mtu = $MultiHostVar7/g" /var/lib/lxc/$SeedContainerName/config
 sudo sed -i 's/sw1/sx1/g' /var/lib/lxc/$SeedContainerName/config
 fi
 

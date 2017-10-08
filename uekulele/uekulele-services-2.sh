@@ -65,19 +65,23 @@ sleep 5
 
 clear
 
-echo ''
-echo "=============================================="
-echo "Establish sudo privileges ...                 "
-echo "=============================================="
-echo ''
-
-sudo date
+function GetMultiHostVar4 {
+        echo $MultiHost | cut -f4 -d':'
+}
+MultiHostVar4=$(GetMultiHostVar4)
 
 echo ''
 echo "=============================================="
-echo "Establish sudo privileges successful.         "
+echo "Establish sudo privileges...                  "
 echo "=============================================="
 echo ''
+
+echo $MultiHostVar4 | sudo -S date
+
+echo ''
+echo "=============================================="
+echo "Privileges established.                       "
+echo "=============================================="
 
 sleep 5
 
@@ -109,7 +113,8 @@ echo "Extracting oracle-specific files to container."
 echo "=============================================="
 echo ''
 
-sudo tar -xvf ./uekulele/archives/lxc-oracle-files.tar -C /var/lib/lxc/oel$OracleRelease$SeedPostfix --touch
+cd ~/Downloads/orabuntu-lxc-master/uekulele/archives
+sudo tar -xvf ~/Downloads/orabuntu-lxc-master/uekulele/archives/lxc-oracle-files.tar -C /var/lib/lxc/oel$OracleRelease$SeedPostfix --touch
 
 sudo chown root:root /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/root/hugepages_setting.sh
 sudo chmod 755 /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/root/hugepages_setting.sh
@@ -331,7 +336,6 @@ sudo sed -i 's/sw1/sx1/' /etc/network/if-up.d/openvswitch/oel$OracleRelease$Seed
 sudo sed -i 's/sw1/sx1/' /etc/network/if-down.d/openvswitch/oel$OracleRelease$SeedPostfix*
 sudo sed -i 's/tag=10/tag=11/' /etc/network/if-up.d/openvswitch/oel$OracleRelease$SeedPostfix*
 sudo sed -i 's/tag=10/tag=11/' /etc/network/if-down.d/openvswitch/oel$OracleRelease$SeedPostfix*
-sudo sed -i "s/mtu = 1500/mtu = $MultiHostVar7/g" /var/lib/lxc/oel$OracleRelease$SeedPostfix/config
 
 if [ $ContainerUp != 'RUNNING' ] || [ $PublicIP != 1020729 ]
 then
@@ -397,6 +401,28 @@ echo "Container Up.                                 "
 echo "=============================================="
 
 sleep 10
+
+clear
+
+function GetMultiHostVar4 {
+        echo $MultiHost | cut -f4 -d':'
+}
+MultiHostVar4=$(GetMultiHostVar4)
+
+echo ''
+echo "=============================================="
+echo "Establish sudo privileges...                  "
+echo "=============================================="
+echo ''
+
+echo $MultiHostVar4 | sudo -S date
+
+echo ''
+echo "=============================================="
+echo "Privileges established.                       "
+echo "=============================================="
+
+sleep 5
 
 clear
 
