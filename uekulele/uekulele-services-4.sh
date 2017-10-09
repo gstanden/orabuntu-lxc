@@ -198,7 +198,7 @@ do
 	RedHatVersion=$(GetRedHatVersion)
 
 	function CheckDNSLookup {
-		nslookup 10.207.39.$CloneIndex | grep 'name =' | cut -f2 -d'=' | sed 's/^[ \t]*//;s/[ \t]*$//' | wc -l
+	sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.39.2 nslookup 10.207.39.$CloneIndex | grep 'name =' | cut -f2 -d'=' | sed 's/^[ \t]*//;s/[ \t]*$//' | wc -l
 	}
 	DNSLookup=$(CheckDNSLookup)
 
