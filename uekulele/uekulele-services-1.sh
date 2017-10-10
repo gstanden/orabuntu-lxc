@@ -182,7 +182,7 @@ sudo sed -i '/UseDNS/s/yes/no/'                                              /et
 sudo sed -i '/GSSAPIAuthentication/s/#//'                                    /etc/ssh/sshd_config
 sudo sed -i '/UseDNS/s/#//'                                                  /etc/ssh/sshd_config
 sudo egrep 'GSSAPIAuthentication|UseDNS'         	                     /etc/ssh/sshd_config
-sudo service sshd restart
+sudo service sshd restart > /dev/null 2>&1
 
 echo ''
 echo "=============================================="
@@ -252,6 +252,7 @@ then
 		echo ''
 
 		sudo /etc/network/openvswitch/del-bridges.sh >/dev/null 2>&1
+		sudo rm -f /etc/network/openvswitch/*
 		sudo ovs-vsctl show
 
 		echo ''
@@ -775,6 +776,21 @@ echo "=============================================="
 sleep 5
 
 clear
+
+echo ''
+echo "=============================================="
+echo "Configure NTP on LXC host...                  "
+echo "=============================================="
+echo ''
+
+sudo service ntpd start
+sudo ntpq -p
+date
+
+echo ''
+echo "=============================================="
+echo "Done:  Configure NTP on LXC host.             "
+echo "=============================================="
 
 if [ $Operation != new ]
 then
@@ -1341,6 +1357,10 @@ then
 			cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/openvswitch
 			rpmbuild --define '_topdir /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/openvswitch/rpmbuild' -ba openvswitch.spec
 			cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/openvswitch/rpmbuild/RPMS/x86_64
+			
+			sleep 5
+
+			clear
 	
 			echo ''
 			echo "=============================================="
@@ -1759,6 +1779,7 @@ echo ''
 
 sudo tar -P -xvf /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/archives/dns-dhcp-host.tar --touch
 sudo chmod +x /etc/network/openvswitch/crt_ovs_s*.sh
+sudo sed -i "/NAMESERVER/s/NAMESERVER/$NameServer/g" /etc/network/openvswitch/crt_ovs_sw1.sh
 
 if [ $MultiHostVar2 = 'Y' ]
 then
@@ -1817,11 +1838,11 @@ echo 'Page Size (in bytes) .................. '$PageSize
 
 ((shmall = MemOracleBytes / 4096))
 echo 'shmall (in 4Kb pages) ................. '$shmall
-sudo sysctl -w kernel.shmall=$shmall
+sudo sysctl -w kernel.shmall=$shmall > /dev/null 2>&1
 
 ((shmmax = MemOracleBytes / 2))
 echo 'shmmax (in bytes) ..................... '$shmmax
-sudo sysctl -w kernel.shmmax=$shmmax
+sudo sysctl -w kernel.shmmax=$shmmax > /dev/null 2>&1
 
 sudo sh -c "echo '# New Stack Settings'                       > /etc/sysctl.d/60-oracle.conf"
 sudo sh -c "echo ''                                          >> /etc/sysctl.d/60-oracle.conf"
@@ -2044,6 +2065,7 @@ then
 			sudo mv /etc/network/if-up.d/openvswitch/nsa-pub-ifup-sx1 /etc/network/if-up.d/openvswitch/$NameServer-pub-ifup-sx1
 			sudo mv /etc/network/if-down.d/openvswitch/nsa-pub-ifdown-sx1 /etc/network/if-down.d/openvswitch/$NameServer-pub-ifdown-sx1
 			sudo mv /etc/network/openvswitch/strt_nsa.sh /etc/network/openvswitch/strt_$NameServer.sh
+			sudo sed -i "/NAMESERVER/s/NAMESERVER/$NameServer/g" /etc/network/openvswitch/crt_ovs_sw1.sh
 		fi
 
 		if [ -n $Domain1 ]
@@ -2142,7 +2164,6 @@ then
                 	sudo sh -c "echo '[Install]'						>> /etc/systemd/system/$k.service"
                 	sudo sh -c "echo 'WantedBy=multi-user.target'				>> /etc/systemd/system/$k.service"
 
-			echo ''
 			echo "=============================================="
 			echo "Starting OpenvSwitch $k ...                   "
 			echo "=============================================="
@@ -2280,7 +2301,7 @@ done
 if [ $ResolvReady -eq 1 ]
 then
 	echo ''
-	sudo service sw1 restart
+	sudo service sw1 restart > /dev/null 2>&1
 else
 	echo ''
 	echo "=============================================="
@@ -2369,38 +2390,11 @@ clear
 
 echo ''
 echo "=============================================="
-echo "Checking OpenvSwitch sw1...                   "
-echo "=============================================="
-echo ''
-
-sudo service sw1 stop
-sleep 2
-sudo systemctl start sw1
-sleep 2
-echo ''
-ifconfig sw1
-echo ''
-sudo service sw1 status
-
-echo ''
-echo "=============================================="
-echo "OpenvSwitch sw1 is up.                        "
-echo "=============================================="
-echo ''
-
-sleep 5
-
-clear
-
-echo ''
-echo "=============================================="
 echo "Checking OpenvSwitch sx1...                   "
 echo "=============================================="
 echo ''
 
-sudo service sx1 stop
-sleep 2
-sudo systemctl start sx1
+sudo service sx1 restart
 sleep 2
 echo ''
 ifconfig sx1
@@ -2410,6 +2404,29 @@ sudo service sx1 status
 echo ''
 echo "=============================================="
 echo "OpenvSwitch sx1 is up.                        "
+echo "=============================================="
+echo ''
+
+sleep 5
+
+clear
+
+echo ''
+echo "=============================================="
+echo "Checking OpenvSwitch sw1...                   "
+echo "=============================================="
+echo ''
+
+sudo service sw1 restart
+sleep 2
+echo ''
+ifconfig sw1
+echo ''
+sudo service sw1 status
+
+echo ''
+echo "=============================================="
+echo "OpenvSwitch sw1 is up.                        "
 echo "=============================================="
 echo ''
 
@@ -2449,21 +2466,43 @@ if [ $MultiHostVar2 = 'N' ]
 then
 	echo ''
 	echo "=============================================="
-	echo "Starting LXC container and testing DNS...     "
+	echo "Start LXC DNS: Test DNS                       "
 	echo "=============================================="
 	echo ''
 
 	if [ -n $NameServer ]
 	then
-		sudo service sw1 restart > /dev/null 2>&1
 		sudo service sx1 restart > /dev/null 2>&1
-		sudo lxc-stop -n $NameServer  > /dev/null 2>&1
-		sudo lxc-start -n $NameServer > /dev/null 2>&1
+		sleep 2
+		sudo service sw1 restart > /dev/null 2>&1
+		sleep 2
+		sudo service olive restart > /dev/null 2>&1
+		sleep 2
 		nslookup $NameServer
 		if [ $? -ne 0 ]
 		then
 			echo "DNS is NOT RUNNING with correct status!"
 		fi
+
+		sleep 5
+
+		clear
+
+		echo ''
+		echo "=============================================="
+		echo "Starting LXC DNS: Ping DNS Server IPs         "
+		echo "=============================================="
+		echo ''
+
+		ping -c 3 10.207.39.2
+		echo ''
+		ping -c 3 10.207.29.2
+
+		echo ''
+		echo "=============================================="
+		echo "Done: Ping DNS Server IPs.                    "
+		echo "=============================================="
+		echo ''
 	else
 		sudo lxc-start -n nsa > /dev/null 2>&1
 		nslookup nsa
@@ -2474,8 +2513,13 @@ then
 	fi
 fi
 
+sleep 5
+
+clear
+
+echo ''
 echo "=============================================="
-echo "LXC container restarted & DNS tested.         "
+echo "Done: Test DNS and ping DNS Server IPs.       "
 echo "=============================================="
 
 sleep 5
@@ -2505,7 +2549,31 @@ then
 	sudo sed -i "s/SWITCH_IP/$MultiHostVar3/g" /etc/network/openvswitch/crt_ovs_sw7.sh
 	sudo sed -i "s/SWITCH_IP/$MultiHostVar3/g" /etc/network/openvswitch/crt_ovs_sw8.sh
 	sudo sed -i "s/SWITCH_IP/$MultiHostVar3/g" /etc/network/openvswitch/crt_ovs_sw9.sh
+
+	sleep 5
+
+	clear
 		
+	echo ''
+	echo "=============================================="
+	echo "Set SELINUX to permissive...                  "
+	echo "=============================================="
+	echo ''
+
+	sudo setenforce permissive
+	sudo sed -i '/SELINUX=enforcing/s/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config
+
+	echo ''
+	echo "=============================================="
+	echo "Done: Set SELINUX to permissive.              "
+	echo "=============================================="
+	echo ''
+
+	sleep 5
+
+	clear
+
+	echo ''
 	echo "=============================================="
 	echo "Setting ubuntu user password in $NameServer..."
 	echo "=============================================="
@@ -2514,7 +2582,7 @@ then
 	sudo touch /home/ubuntu/.ssh/known_hosts
 	sudo lxc-attach -n $NameServer -- usermod --password `perl -e "print crypt('ubuntu','ubuntu');"` ubuntu
 	ssh-keygen -f "/home/ubuntu/.ssh/known_hosts" -R 10.207.39.2
-#	sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ubuntu@10.207.39.2 "ssh-keygen -f ~/.ssh/id_rsa -t rsa -N ''"
+ 	sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ubuntu@10.207.39.2 "ssh-keygen -f ~/.ssh/id_rsa -t rsa -N ''"
 	sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ubuntu@10.207.39.2 "date; uname -a"
 	
 	echo ''
@@ -2606,8 +2674,11 @@ then
 	echo "=============================================="
 	echo ''
 
-	sudo service sw1 restart
-	sudo service sx1 restart
+	sudo service sw1 restart > /dev/null 2>&1
+	sleep 2
+	sudo service sx1 restart > /dev/null 2>&1
+	sleep 2
+	sudo service olive restart > /dev/null 2>&1
 
 	sudo chmod 777 /etc/network/openvswitch/setup_gre_and_routes.sh
 
@@ -2623,8 +2694,7 @@ then
 	then
 		sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 "sudo -S <<< "ubuntu" ~/setup_gre_and_routes.sh"
 		sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 "sudo -S <<< "ubuntu" service sw1 restart"
-		sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 "sudo -S <<< "ubuntu" /etc/orabuntu-lxc-scripts/stop_containers.sh"
-		sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 "sudo -S <<< "ubuntu" /etc/orabuntu-lxc-scripts/start_containers.sh"
+		sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 "sudo -S <<< "ubuntu" service $NameServer restart"
 	fi
 
 	function GetShortHost {
@@ -2651,8 +2721,11 @@ then
 	sudo sed -i "s/orabuntu-lxc\.com/$Domain1/g"	/etc/network/openvswitch/nsupdate_add_$ShortHost.sh
 	sudo cat					/etc/network/openvswitch/nsupdate_add_$ShortHost.sh
 
-	sudo service sw1 restart
-	sudo service sx1 restart
+	sudo service sw1 restart > /dev/null 2>&1
+	sleep 2
+	sudo service sx1 restart > /dev/null 2>&1
+	sleep 2
+	sudo service olive restart > /dev/null 2>&1
 
 	sudo touch /home/ubuntu/.ssh/known_hosts
 	ssh-keygen -f "/home/ubuntu/.ssh/known_hosts" -R 10.207.39.2
@@ -2664,6 +2737,10 @@ fi
 
 # GLS 20161118 This section for any tweaks to the unpacked files from archives.
 sudo rm /etc/network/if-up.d/orabuntu-lxc-net
+
+sleep 5
+
+clear
 
 echo ''
 echo "=============================================="

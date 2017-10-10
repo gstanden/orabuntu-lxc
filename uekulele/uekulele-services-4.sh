@@ -139,7 +139,7 @@ clear
 
 echo ''
 echo "=============================================="
-echo "Configure Extra Networks (optional e.g. RAC)  "
+echo "Configure extra networks (optional e.g. RAC)  "
 echo "=============================================="
 echo ''
 
@@ -163,9 +163,13 @@ then
         sudo sed -i "s/ContainerName/$SeedContainerName/g" /var/lib/lxc/$SeedContainerName/config
 fi
 
+sleep 5
+
+clear
+
 echo ''
 echo "=============================================="
-echo "Configure extra private networks completed.   "
+echo "Configure extra networks completed.   "
 echo "=============================================="
 
 sleep 5
@@ -198,7 +202,7 @@ do
 	RedHatVersion=$(GetRedHatVersion)
 
 	function CheckDNSLookup {
-	sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.39.2 nslookup 10.207.39.$CloneIndex | grep 'name =' | cut -f2 -d'=' | sed 's/^[ \t]*//;s/[ \t]*$//' | wc -l
+		sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no -o LogLevel=QUIET ubuntu@10.207.39.2 nslookup 10.207.39.$CloneIndex | grep 'name =' | cut -f2 -d'=' | sed 's/^[ \t]*//;s/[ \t]*$//' | wc -l
 	}
 	DNSLookup=$(CheckDNSLookup)
 
@@ -322,9 +326,9 @@ clear
 
 echo ''
 echo "=============================================="
-echo "   Reset config file for $SeedContainerName.  "
+echo "     Reset config file for $SeedContainerName."
 echo "Removes ASM and RAC private network interfaces"
-echo "    from seed container $SeedContainerName    "
+echo "      from seed container $SeedContainerName  "
 echo "(cloned containers are not affected by reset) "
 echo "=============================================="
 echo ''
@@ -338,6 +342,10 @@ sudo cp -p /var/lib/lxc/$SeedContainerName/config.oracle /var/lib/lxc/$SeedConta
 sudo sed -i "s/ContainerName/$SeedContainerName/g" /var/lib/lxc/$SeedContainerName/config
 sudo sed -i 's/sw1/sx1/g' /var/lib/lxc/$SeedContainerName/config
 fi
+
+sleep 5
+
+clear
 
 echo ''
 echo "=============================================="

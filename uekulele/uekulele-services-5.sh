@@ -144,17 +144,19 @@ do
 	echo ''
 	if [ $RedHatVersion = '7' ] || [ $RedHatVersion = '6' ]
 	then
-		function CheckPublicIPIterative {
-			sudo lxc-ls -f | sed 's/  */ /g' | grep $j | grep RUNNING | cut -f2 -d'-' | sed 's/^[ \t]*//;s/[ \t]*$//' | cut -f1 -d' ' | cut -f1-2 -d'.' | sed 's/\.//g'
-		}
+	function CheckPublicIPIterative {
+	sudo lxc-ls -f | sed 's/  */ /g' | grep $j | grep RUNNING | cut -f2 -d'-' | sed 's/^[ \t]*//;s/[ \t]*$//' | cut -f1 -d' ' | cut -f1-2 -d'.' | sed 's/\.//g'
+	}
 	fi
 	PublicIPIterative=$(CheckPublicIPIterative)
 	echo $j | grep oel > /dev/null 2>&1
 	if [ $? -eq 0 ]
 	then
 	sudo bash -c "cat $Config|grep ipv4|cut -f2 -d'='|sed 's/^[ \t]*//;s/[ \t]*$//'|cut -f4 -d'.'|sed 's/^/\./'|xargs -I '{}' sed -i "/ipv4/s/\{}/\.1$OR/g" $Config"
+#	sudo sed -i "s/\.39/\.$OracleRelease/g" /var/lib/lxc/$SeedContainerName/config
+#	sudo sed -i "s/\.40/\.$OracleRelease/g" /var/lib/lxc/$SeedContainerName/config
 	fi
-	sudo lxc-stop  -n $j > /dev/null 2>&1
+#	sudo service sw1 restart > /dev/null 2>&1
 	sleep 2
 	sudo lxc-start -n $j > /dev/null 2>&1
 	sleep 5
@@ -171,6 +173,8 @@ do
 			echo ''
 			sudo /etc/network/openvswitch/veth_cleanups.sh $j
 			echo ''
+			sleep 2
+#			sudo service sw1 restart > /dev/null 2>&1
 			sleep 2
 			sudo lxc-start -n $j
 			sleep 5
@@ -314,7 +318,7 @@ then
 		echo "=============================================="
 		echo "Set SELINUX to Permissive mode.               "
 		echo "=============================================="
-		echo ''
+		
 		sudo sed -i '/\([^T][^Y][^P][^E]\)\|\([^#]\)/ s/enforcing/permissive/' /etc/sysconfig/selinux
 	fi
 	sudo ausearch -c 'lxcattach' --raw | audit2allow -M my-lxcattach > /dev/null 2>&1

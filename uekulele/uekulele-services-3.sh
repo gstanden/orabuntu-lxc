@@ -171,6 +171,8 @@ then
 		PublicIPIterative=$(CheckPublicIPIterative)
 		echo "Starting container $j ..."
 		echo ''
+#		sudo service sw1 restart > /dev/null 2>&1
+		sleep 2
 		sudo lxc-start -n $j > /dev/null 2>&1
 		i=1
 		while [ "$PublicIPIterative" != 10207 ] && [ "$i" -le 10 ]
@@ -185,6 +187,8 @@ then
 			sudo lxc-stop -n $j > /dev/null 2>&1
 			sudo /etc/network/openvswitch/veth_cleanups.sh $SeedContainerName
 			echo ''
+#			sudo service sw1 restart > /dev/null 2>&1
+			sleep 2
 			sudo lxc-start -n $j > /dev/null 2>&1
 			fi
 		sleep 1

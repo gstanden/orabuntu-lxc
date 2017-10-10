@@ -26,6 +26,7 @@ OracleVersion=$1.$2
 Domain1=$3
 Domain2=$4
 MultiHost=$5
+# NameServer=$6
 OR=$OracleRelease
 
 function GetMultiHostVar7 {
@@ -361,6 +362,7 @@ then
 		PublicIPIterative=$(CheckPublicIPIterative)
 		echo "Starting container $j ..."
 		echo ''
+#		sudo service sw1 restart > /dev/null 2>&1
 		sudo lxc-start -n $j > /dev/null 2>&1
 		i=1
 		while [ "$PublicIPIterative" != 10207 ] && [ "$i" -le 10 ]
@@ -374,6 +376,7 @@ then
 			sudo lxc-stop -n $j > /dev/null 2>&1
 			sudo /etc/network/openvswitch/veth_cleanups.sh oel$OracleRelease$SeedPostfix
 			echo ''
+#			sudo service sw1 restart > /dev/null 2>&1
 			sudo lxc-start -n $j > /dev/null 2>&1
 			fi
 		sleep 1
@@ -421,6 +424,30 @@ echo ''
 echo "=============================================="
 echo "Privileges established.                       "
 echo "=============================================="
+
+sleep 5
+
+clear
+
+echo ''
+echo "=============================================="
+echo "LXC DNS: Ping DNS Server IPs         "
+echo "=============================================="
+echo ''
+
+# sudo  lxc-stop -n $NameServer
+# sleep 2
+# sudo lxc-start -n $NameServer
+
+ping -c 3 10.207.39.2
+echo ''
+ping -c 3 10.207.29.2
+
+echo ''
+echo "=============================================="
+echo "Done: Ping LXC DNS Server IPs.                "
+echo "=============================================="
+echo ''
 
 sleep 5
 
