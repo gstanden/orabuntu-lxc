@@ -67,7 +67,7 @@ To install the software:
 * A seed Oracle Linux (5 6 or 7) LXC container configured with the prerequisites of your choice (see script 3)
 * Will optionally add in additional networks
 * Will clone the seed to whatever number of clone containers you require of that version
-* Includes an enterprise-grade SAN solution (SCST) 
+* Includes an optional scst-files.tar archive which deploys the enterprise-grade SAN solution (SCST) 
 * SCST can be used with your Orabuntu-LXC container deployment.
 * SCST comes with "scst-files.tar" which completely automates building file-backed LUNs for your LXC deployment.
 * SCST can of course be used alternatively with manual configuration of fiber channel HBA's, Infiniband, etc.
