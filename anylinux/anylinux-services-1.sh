@@ -209,7 +209,7 @@ uname -a
 # GLS 20160924 If the kernel version is lower than 2.6.30 and if you use the options SCST Linux SAN archive it will be necessary to compile a custom kernel.
 
 function VersionKernelPassFail () {
-    ./anylinux/vercomp | cut -f1 -d':'
+    /home/ubuntu/Downloads/orabuntu-lxc-master/anylinux/vercomp | cut -f1 -d':'
 }
 KernelPassFail=$(VersionKernelPassFail)
 
@@ -471,8 +471,8 @@ then
 
 				sleep 5
 
-				mkdir -p ./lxcentos/facter
-				cd ./lxcentos/facter
+				mkdir -p /home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/facter
+				cd /home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/facter
 				curl -s http://downloads.puppetlabs.com/facter/facter-2.4.4.tar.gz | sudo tar xz; sudo ruby facter*/install.rb
 
 				echo ''
@@ -533,27 +533,27 @@ then
 
 					if [ $CloningAdditional = 'n' ] || [ $CloningAdditional = 'N' ] # 8
 					then
- 						./lxcentos/lxcentos-services-1.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $OSMemRes $MultiHost
- 						./lxcentos/lxcentos-services-2.sh $MajorRelease $PointRelease $Domain1 $Domain2 $MultiHost
- 						./lxcentos/lxcentos-services-3.sh $MajorRelease $PointRelease 
-						./lxcentos/lxcentos-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer $MultiHost 
-						./lxcentos/lxcentos-services-5.sh $MajorRelease $PointRelease 
+ 						/home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/lxcentos-services-1.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $OSMemRes $MultiHost
+ 						/home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/lxcentos-services-2.sh $MajorRelease $PointRelease $Domain1 $Domain2 $MultiHost
+ 						/home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/lxcentos-services-3.sh $MajorRelease $PointRelease 
+						/home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/lxcentos-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer $MultiHost 
+						/home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/lxcentos-services-5.sh $MajorRelease $PointRelease 
 					fi # OK 8
 
 					if [ $CloningAdditional = 'y' ] || [ $CloningAdditional = 'Y' ] || [ $MultiHostVar1 = 'addclones' ] # 9
 					then
-						./lxcentos/lxcentos-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer $MultiHost
-						./lxcentos/lxcentos-services-5.sh $MajorRelease $PointRelease
+						/home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/lxcentos-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer $MultiHost
+						/home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/lxcentos-services-5.sh $MajorRelease $PointRelease
 					fi # OK 9
 				fi # OK 7
 
 				if [ ! -f /etc/orabuntu-lxc-release ] # 10
 				then
-					./lxcentos/lxcentos-services-1.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $OSMemRes $MultiHost
-					./lxcentos/lxcentos-services-2.sh $MajorRelease $PointRelease $Domain1 $Domain $MultiHost
-					./lxcentos/lxcentos-services-3.sh $MajorRelease $PointRelease 
-					./lxcentos/lxcentos-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer $MultiHost 
-					./lxcentos/lxcentos-services-5.sh $MajorRelease $PointRelease 
+					/home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/lxcentos-services-1.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $OSMemRes $MultiHost
+					/home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/lxcentos-services-2.sh $MajorRelease $PointRelease $Domain1 $Domain $MultiHost
+					/home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/lxcentos-services-3.sh $MajorRelease $PointRelease 
+					/home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/lxcentos-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer $MultiHost 
+					/home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/lxcentos-services-5.sh $MajorRelease $PointRelease 
 				fi # OK 10
 
  				echo ''
@@ -600,27 +600,27 @@ then
 
 					if [ $CloningAdditional = 'n' ] || [ $CloningAdditional = 'N' ] # 12
 					then
- 						./lxcentos/lxcentos-services-1.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $OSMemRes $MultiHost
- 						./lxcentos/lxcentos-services-2.sh $MajorRelease $PointRelease $Domain1 $Domain2 $MultiHost
- 						./lxcentos/lxcentos-services-3.sh $MajorRelease $PointRelease 
-						./lxcentos/lxcentos-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer $MultiHost 
-						./lxcentos/lxcentos-services-5.sh $MajorRelease $PointRelease 
+ 						/home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/lxcentos-services-1.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $OSMemRes $MultiHost
+ 						/home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/lxcentos-services-2.sh $MajorRelease $PointRelease $Domain1 $Domain2 $MultiHost
+ 						/home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/lxcentos-services-3.sh $MajorRelease $PointRelease 
+						/home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/lxcentos-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer $MultiHost 
+						/home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/lxcentos-services-5.sh $MajorRelease $PointRelease 
 					fi # OK 12
 
 					if [ $CloningAdditional = 'y' ] || [ $CloningAdditional = 'Y' ] || [ $MultiHostVar1 = 'addclones' ] # 13
 					then
-						./lxcentos/lxcentos-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer $MultiHost
-						./lxcentos/lxcentos-services-5.sh $MajorRelease $PointRelease
+						/home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/lxcentos-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer $MultiHost
+						/home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/lxcentos-services-5.sh $MajorRelease $PointRelease
 					fi # OK 13
 				fi # OK 10
 
 				if [ ! -f /etc/orabuntu-lxc-release ] # 14
 				then
-					./lxcentos/lxcentos-services-1.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $OSMemRes $MultiHost
-					./lxcentos/lxcentos-services-2.sh $MajorRelease $PointRelease $Domain1 $Domain $MultiHost
-					./lxcentos/lxcentos-services-3.sh $MajorRelease $PointRelease 
-					./lxcentos/lxcentos-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer $MultiHost 
-					./lxcentos/lxcentos-services-5.sh $MajorRelease $PointRelease 
+					/home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/lxcentos-services-1.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $OSMemRes $MultiHost
+					/home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/lxcentos-services-2.sh $MajorRelease $PointRelease $Domain1 $Domain $MultiHost
+					/home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/lxcentos-services-3.sh $MajorRelease $PointRelease 
+					/home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/lxcentos-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer $MultiHost 
+					/home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/lxcentos-services-5.sh $MajorRelease $PointRelease 
 				fi # OK 14
 
 				sleep 5
@@ -883,8 +883,8 @@ then
 
 				sleep 5
 
-				mkdir -p ./uekulele/facter
-				cd ./uekulele/facter
+				mkdir -p /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/facter
+				cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/facter
 				curl -s http://downloads.puppetlabs.com/facter/facter-2.4.4.tar.gz | sudo tar xz; sudo ruby facter*/install.rb
 
 				echo ''
@@ -946,27 +946,27 @@ then
 
 					if [ $CloningAdditional = 'n' ] || [ $CloningAdditional = 'N' ] # 8
 					then
- 						./uekulele/uekulele-services-1.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $OSMemRes $MultiHost $LxcOvsVersion
- 						./uekulele/uekulele-services-2.sh $MajorRelease $PointRelease $Domain1 $Domain2 $MultiHost
- 						./uekulele/uekulele-services-3.sh $MajorRelease $PointRelease $Domain2 $MultiHost
-						./uekulele/uekulele-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer $MultiHost 
-						./uekulele/uekulele-services-5.sh $MajorRelease $PointRelease 
+ 						/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/uekulele-services-1.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $OSMemRes $MultiHost $LxcOvsVersion
+ 						/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/uekulele-services-2.sh $MajorRelease $PointRelease $Domain1 $Domain2 $MultiHost
+ 						/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/uekulele-services-3.sh $MajorRelease $PointRelease $Domain2 $MultiHost
+						/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/uekulele-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer $MultiHost 
+						/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/uekulele-services-5.sh $MajorRelease $PointRelease 
 					fi # OK 8
 
 					if [ $CloningAdditional = 'y' ] || [ $CloningAdditional = 'Y' ] || [ $MultiHostVar1 = 'addclones' ] # 9
 					then
-						./uekulele/uekulele-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer $MultiHost
-						./uekulele/uekulele-services-5.sh $MajorRelease $PointRelease
+						/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/uekulele-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer $MultiHost
+						/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/uekulele-services-5.sh $MajorRelease $PointRelease
 					fi # OK 9
 				fi # OK 7
 
 				if [ ! -f /etc/orabuntu-lxc-release ] # 10
 				then
-					./uekulele/uekulele-services-1.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $OSMemRes $MultiHost $LxcOvsVersion
-					./uekulele/uekulele-services-2.sh $MajorRelease $PointRelease $Domain1 $Domain2 $MultiHost
-					./uekulele/uekulele-services-3.sh $MajorRelease $PointRelease $Domain2 $MultiHost
-					./uekulele/uekulele-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer $MultiHost 
-					./uekulele/uekulele-services-5.sh $MajorRelease $PointRelease 
+					/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/uekulele-services-1.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $OSMemRes $MultiHost $LxcOvsVersion
+					/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/uekulele-services-2.sh $MajorRelease $PointRelease $Domain1 $Domain2 $MultiHost
+					/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/uekulele-services-3.sh $MajorRelease $PointRelease $Domain2 $MultiHost
+					/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/uekulele-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer $MultiHost 
+					/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/uekulele-services-5.sh $MajorRelease $PointRelease 
 				fi # OK 10
 
  				echo ''
@@ -1013,27 +1013,27 @@ then
 
 					if [ $CloningAdditional = 'n' ] || [ $CloningAdditional = 'N' ] # 12
 					then
- 						./uekulele/uekulele-services-1.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $OSMemRes $MultiHost $LxcOvsVersion
- 						./uekulele/uekulele-services-2.sh $MajorRelease $PointRelease $Domain1 $Domain2 $MultiHost 
- 						./uekulele/uekulele-services-3.sh $MajorRelease $PointRelease $Domain2 $MultiHost
-						./uekulele/uekulele-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer $MultiHost 
-						./uekulele/uekulele-services-5.sh $MajorRelease $PointRelease 
+ 						/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/uekulele-services-1.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $OSMemRes $MultiHost $LxcOvsVersion
+ 						/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/uekulele-services-2.sh $MajorRelease $PointRelease $Domain1 $Domain2 $MultiHost 
+ 						/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/uekulele-services-3.sh $MajorRelease $PointRelease $Domain2 $MultiHost
+						/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/uekulele-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer $MultiHost 
+						/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/uekulele-services-5.sh $MajorRelease $PointRelease 
 					fi # OK 12
 
 					if [ $CloningAdditional = 'y' ] || [ $CloningAdditional = 'Y' ] || [ $MultiHostVar1 = 'addclones' ] # 13
 					then
-						./uekulele/uekulele-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer $MultiHost
-						./uekulele/uekulele-services-5.sh $MajorRelease $PointRelease
+						/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/uekulele-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer $MultiHost
+						/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/uekulele-services-5.sh $MajorRelease $PointRelease
 					fi # OK 13
 				fi # OK 11
 		
 				if [ ! -f /etc/orabuntu-lxc-release ] # 14
 				then
-					./uekulele/uekulele-services-1.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $OSMemRes $MultiHost $LxcOvsVersion
-					./uekulele/uekulele-services-2.sh $MajorRelease $PointRelease $Domain1 $Domain2 $MultiHost 
-					./uekulele/uekulele-services-3.sh $MajorRelease $PointRelease $Domain2 $MultiHost
-					./uekulele/uekulele-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer $MultiHost 
-					./uekulele/uekulele-services-5.sh $MajorRelease $PointRelease 
+					/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/uekulele-services-1.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $OSMemRes $MultiHost $LxcOvsVersion
+					/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/uekulele-services-2.sh $MajorRelease $PointRelease $Domain1 $Domain2 $MultiHost 
+					/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/uekulele-services-3.sh $MajorRelease $PointRelease $Domain2 $MultiHost
+					/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/uekulele-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer $MultiHost 
+					/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/uekulele-services-5.sh $MajorRelease $PointRelease 
 				fi # OK 14
 
 				sleep 5
@@ -1345,28 +1345,28 @@ then
 
 					if [ $CloningAdditional = 'n' ] || [ $CloningAdditional = 'N' ] # 8
 					then
- 						./orabuntu/orabuntu-services-1.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $OSMemRes $MultiHost
- 						./orabuntu/orabuntu-services-2.sh $MajorRelease $PointRelease $Domain1 $Domain2 $MultiHost $NameServer
- 						./orabuntu/orabuntu-services-3.sh $MajorRelease $PointRelease $Domain2
-						./orabuntu/orabuntu-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer $MultiHost
-						./orabuntu/orabuntu-services-5.sh $MajorRelease $PointRelease 
+ 						/home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/orabuntu-services-1.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $OSMemRes $MultiHost
+ 						/home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/orabuntu-services-2.sh $MajorRelease $PointRelease $Domain1 $Domain2 $MultiHost $NameServer
+ 						/home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/orabuntu-services-3.sh $MajorRelease $PointRelease $Domain2
+						/home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/orabuntu-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer $MultiHost
+						/home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/orabuntu-services-5.sh $MajorRelease $PointRelease 
 					fi # OK 8
 
 					if [ $CloningAdditional = 'y' ] || [ $CloningAdditional = 'Y' ] || [ $MultiHostVar1 = 'addclones' ] # 9
 					then
-						./orabuntu/orabuntu-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer $MultiHost
-						./orabuntu/orabuntu-services-5.sh $MajorRelease $PointRelease
+						/home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/orabuntu-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer $MultiHost
+						/home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/orabuntu-services-5.sh $MajorRelease $PointRelease
 					fi # OK 9
 
 				fi # OK 7
 		
 				if [ ! -f /etc/orabuntu-lxc-release ] # 10
 				then
-					./orabuntu/orabuntu-services-1.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $OSMemRes $MultiHost
-					./orabuntu/orabuntu-services-2.sh $MajorRelease $PointRelease $Domain1 $Domain2 $MultiHost $NameServer
-					./orabuntu/orabuntu-services-3.sh $MajorRelease $PointRelease $Domain2
-					./orabuntu/orabuntu-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer $MultiHost
-					./orabuntu/orabuntu-services-5.sh $MajorRelease $PointRelease 
+					/home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/orabuntu-services-1.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $OSMemRes $MultiHost
+					/home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/orabuntu-services-2.sh $MajorRelease $PointRelease $Domain1 $Domain2 $MultiHost $NameServer
+					/home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/orabuntu-services-3.sh $MajorRelease $PointRelease $Domain2
+					/home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/orabuntu-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer $MultiHost
+					/home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/orabuntu-services-5.sh $MajorRelease $PointRelease 
 				fi # OK 10
 
 				clear
@@ -1416,27 +1416,27 @@ then
 
 					if [ $CloningAdditional = 'n' ] || [ $CloningAdditional = 'N' ] # 12
 					then
- 						./orabuntu/orabuntu-services-1.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $OSMemRes $MultiHost
- 						./orabuntu/orabuntu-services-2.sh $MajorRelease $PointRelease $Domain1 $Domain2 $MultiHost $NameServer
- 						./orabuntu/orabuntu-services-3.sh $MajorRelease $PointRelease $Domain2
-						./orabuntu/orabuntu-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer $MultiHost  
-						./orabuntu/orabuntu-services-5.sh $MajorRelease $PointRelease 
+ 						/home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/orabuntu-services-1.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $OSMemRes $MultiHost
+ 						/home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/orabuntu-services-2.sh $MajorRelease $PointRelease $Domain1 $Domain2 $MultiHost $NameServer
+ 						/home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/orabuntu-services-3.sh $MajorRelease $PointRelease $Domain2
+						/home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/orabuntu-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer $MultiHost  
+						/home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/orabuntu-services-5.sh $MajorRelease $PointRelease 
 					fi # OK 12
 
 					if [ $CloningAdditional = 'y' ] || [ $CloningAdditional = 'Y' ] || [ $MultiHostVar1 = 'addclones' ] # 13
 					then
-						./orabuntu/orabuntu-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer $MultiHost
-						./orabuntu/orabuntu-services-5.sh $MajorRelease $PointRelease
+						/home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/orabuntu-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer $MultiHost
+						/home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/orabuntu-services-5.sh $MajorRelease $PointRelease
 					fi # OK 13
 				fi # OK 11
 		
 				if [ ! -f /etc/orabuntu-lxc-release ] # 14
 				then
-					./orabuntu/orabuntu-services-1.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $OSMemRes $MultiHost
-					./orabuntu/orabuntu-services-2.sh $MajorRelease $PointRelease $Domain1 $Domain2 $MultiHost $NameServer
-					./orabuntu/orabuntu-services-3.sh $MajorRelease $PointRelease $Domain2
-					./orabuntu/orabuntu-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer $MultiHost 
-					./orabuntu/orabuntu-services-5.sh $MajorRelease $PointRelease 
+					/home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/orabuntu-services-1.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $OSMemRes $MultiHost
+					/home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/orabuntu-services-2.sh $MajorRelease $PointRelease $Domain1 $Domain2 $MultiHost $NameServer
+					/home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/orabuntu-services-3.sh $MajorRelease $PointRelease $Domain2
+					/home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/orabuntu-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer $MultiHost 
+					/home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/orabuntu-services-5.sh $MajorRelease $PointRelease 
 				fi # OK 14
 
 				sleep 5

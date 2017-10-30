@@ -21,11 +21,11 @@
 
 #    Usage:
 
-#    ./anylinux/anylinux-services.sh MajorRelease MinorRelease NumCon yourdomain1.com yourdomain2.com YourNewNameserver OSMemRes(Kb
+#    /home/ubuntu/Downloads/orabuntu-lxc-master/anylinux/anylinux-services.sh MajorRelease MinorRelease NumCon yourdomain1.com yourdomain2.com YourNewNameserver OSMemRes(Kb
 
 #    Example
-#    ./anylinux/anylinux-services.sh $1 $2 $3 $4            $5                $6      $7  
-#    ./anylinux/anylinux-services.sh  7  3  4  urdomain1.com urdomain2.com     olive   1024
+#    /home/ubuntu/Downloads/orabuntu-lxc-master/anylinux/anylinux-services.sh $1 $2 $3 $4            $5                $6      $7  
+#    /home/ubuntu/Downloads/orabuntu-lxc-master/anylinux/anylinux-services.sh  7  3  4  urdomain1.com urdomain2.com     olive   1024
 
 #    Example explanation:
 
@@ -281,7 +281,7 @@ sleep 10
 
 clear
 
-./anylinux/anylinux-services-1.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $OSMemRes $NumCon $MultiHost $LxcOvsVersion
+/home/ubuntu/Downloads/orabuntu-lxc-master/anylinux/anylinux-services-1.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $OSMemRes $NumCon $MultiHost $LxcOvsVersion
 
 exit
 
