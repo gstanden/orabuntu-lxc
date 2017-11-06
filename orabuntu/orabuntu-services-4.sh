@@ -28,6 +28,13 @@ NumCon=$3
 NameServer=$4
 MultiHost=$5
 
+function SoftwareVersion { echo "$@" | awk -F. '{ printf("%d%03d%03d%03d\n", $1,$2,$3,$4); }'; }
+
+function GetLXCVersion {
+        lxc-create --version
+}
+LXCVersion=$(GetLXCVersion)
+
 function GetMultiHostVar7 {
         echo $MultiHost | cut -f7 -d':'
 }
@@ -123,7 +130,15 @@ echo ''
 
 read -e -p "Add Extra Private Networks (e.g for Oracle RAC ASM Flex Cluster) [Y/N]   " -i "Y" AddPrivateNetworks
 
-if [ $AddPrivateNetworks = 'y' ] || [ $AddPrivateNetworks = 'Y' ]
+if   [ $AddPrivateNetworks = 'n' ] || [ $AddPrivateNetworks = 'N' ]
+then
+	sudo cp -p /var/lib/lxc/$SeedContainerName/config.oracle /var/lib/lxc/$SeedContainerName/config
+	sudo sed -i "s/ContainerName/$SeedContainerName/g" /var/lib/lxc/$SeedContainerName/config
+	if [ $(SoftwareVersion $LXCVersion) -ge $(SoftwareVersion "2.1.0") ]
+	then
+		sudo lxc-update-config -c /var/lib/lxc/$SeedContainerName/config
+	fi
+elif [ $AddPrivateNetworks = 'y' ] || [ $AddPrivateNetworks = 'Y' ]
 then
 	sudo bash -c "cat /var/lib/lxc/$SeedContainerName/config.oracle /var/lib/lxc/$SeedContainerName/config.asm.flex.cluster > /var/lib/lxc/$SeedContainerName/config"
 	sudo sed -i "s/ContainerName/$SeedContainerName/g" /var/lib/lxc/$SeedContainerName/config
@@ -132,12 +147,10 @@ then
 	do
 		echo 'nothing' > /dev/null 2>&1	
 	done
-fi
-
-if [ $AddPrivateNetworks = 'n' ] || [ $AddPrivateNetworks = 'N' ]
-then
-	sudo cp -p /var/lib/lxc/$SeedContainerName/config.oracle /var/lib/lxc/$SeedContainerName/config
-	sudo sed -i "s/ContainerName/$SeedContainerName/g" /var/lib/lxc/$SeedContainerName/config
+	if [ $(SoftwareVersion $LXCVersion) -ge $(SoftwareVersion "2.1.0") ]
+	then
+		sudo lxc-update-config -c /var/lib/lxc/$SeedContainerName/config
+	fi
 fi
 
 echo ''
@@ -267,6 +280,11 @@ do
 	echo "=============================================="
 	echo ''
 
+	if [ $(SoftwareVersion $LXCVersion) -ge $(SoftwareVersion "2.1.0") ]
+	then
+		sudo lxc-update-config -c /var/lib/lxc/$CP$CloneIndex/config
+	fi
+
 CopyCompleted=$((CopyCompleted+1))
 CloneIndex=$((CloneIndex+1))
 
@@ -323,6 +341,11 @@ sudo sed -i "s/ContainerName/$SeedContainerName/g" /var/lib/lxc/$SeedContainerNa
 sudo sed -i "s/mtu = 1500/mtu = $MultiHostVar7/" /var/lib/lxc/$SeedContainerName/config
 sudo sed -i 's/sw1/sx1/g' /var/lib/lxc/$SeedContainerName/config
 # sudo sed -i "s/lxc\.mount\.entry = \/dev\/lxc_luns/#lxc\.mount\.entry = \/dev\/lxc_luns/g" /var/lib/lxc/$SeedContainerName/config
+fi
+
+if [ $(SoftwareVersion $LXCVersion) -ge $(SoftwareVersion "2.1.0") ]
+then
+	sudo lxc-update-config -c /var/lib/lxc/$SeedContainerName/config
 fi
 
 echo ''

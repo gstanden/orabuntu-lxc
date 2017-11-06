@@ -29,6 +29,13 @@ Domain2=$4
 MultiHost=$5
 NameServer=$6
 
+function SoftwareVersion { echo "$@" | awk -F. '{ printf("%d%03d%03d%03d\n", $1,$2,$3,$4); }'; }
+
+function GetLXCVersion {
+        lxc-create --version
+}
+LXCVersion=$(GetLXCVersion)
+
 function GetMultiHostVar7 {
 	echo $MultiHost | cut -f7 -d':'
 }
@@ -104,6 +111,11 @@ echo "=============================================="
 echo ''
 
 sudo lxc-create -n oel$OracleRelease$SeedPostfix -t oracle -- --release=$OracleVersion
+
+if [ $(SoftwareVersion $LXCVersion) -ge $(SoftwareVersion "2.1.0") ]
+then
+	sudo lxc-update-config -c /var/lib/lxc/oel$OracleRelease$SeedPostfix/config
+fi
 
 echo ''
 echo "=============================================="
@@ -317,6 +329,11 @@ fi
 #sleep 5
 
 #clear
+
+if [ $(SoftwareVersion $LXCVersion) -ge $(SoftwareVersion "2.1.0") ]
+then
+	sudo lxc-update-config -c /var/lib/lxc/oel$OracleRelease$SeedPostfix/config
+fi
 
 echo ''
 echo "=============================================="

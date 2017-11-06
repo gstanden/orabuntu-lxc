@@ -29,6 +29,13 @@ OracleVersion=$1.$2
 OR=$OracleRelease
 Config=/var/lib/lxc/$SeedContainerName/config
 
+function SoftwareVersion { echo "$@" | awk -F. '{ printf("%d%03d%03d%03d\n", $1,$2,$3,$4); }'; }
+
+function GetLXCVersion {
+       lxc-create --version
+}
+LXCVersion=$(GetLXCVersion)
+
 function GetSeedContainerName {
         sudo lxc-ls -f | grep oel$OracleRelease | cut -f1 -d' '
 }
@@ -160,6 +167,10 @@ do
 #		sudo sed -i "s/\.39/\.$OracleRelease/g" /var/lib/lxc/$SeedContainerName/config
 #		sudo sed -i "s/\.40/\.$OracleRelease/g" /var/lib/lxc/$SeedContainerName/config
 	fi
+	if [ $(SoftwareVersion $LXCVersion) -ge $(SoftwareVersion "2.1.0") ]
+	then
+		sudo service sx1 stop
+	fi
 	sudo lxc-start -n $j > /dev/null 2>&1
 	sleep 5
 	i=1
@@ -184,6 +195,10 @@ do
 			fi
 		fi
 	sleep 1
+	if [ $(SoftwareVersion $LXCVersion) -ge $(SoftwareVersion "2.1.0") ]
+	then
+		sudo service sx1 start
+	fi
 	i=$((i+1))
 	done
 done

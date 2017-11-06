@@ -38,6 +38,8 @@ NameServer=$5
 OSMemRes=$6
 MultiHost=$7
 
+function SoftwareVersion { echo "$@" | awk -F. '{ printf("%d%03d%03d%03d\n", $1,$2,$3,$4); }'; }
+
 function GetMultiHostVar2 {
 echo $MultiHost | cut -f2 -d':'
 }
@@ -621,16 +623,21 @@ then
 	function CheckPackageInstalled {
 		echo 'facter lxc uml-utilities openvswitch-switch openvswitch-common bind9utils dnsutils apparmor-utils openssh-server uuid rpm yum hugepages ntp iotop sshpass db5.1-util'
 	}
+	PackageInstalled=$(CheckPackageInstalled)
 fi
 
 if [ $UbuntuVersion = '16.04' ] || [ $UbuntuVersion = '17.04' ]
 then
 	function CheckPackageInstalled {
-	echo 'facter lxc uml-utilities openvswitch-switch openvswitch-common bind9utils dnsutils apparmor-utils openssh-server uuid rpm yum hugepages ntp iotop sshpass db5.3-util'
+		echo 'facter lxc uml-utilities openvswitch-switch openvswitch-common bind9utils dnsutils apparmor-utils openssh-server uuid rpm yum hugepages ntp iotop sshpass db5.3-util'
 	}
+	PackageInstalled=$(CheckPackageInstalled)
 fi
 
-PackageInstalled=$(CheckPackageInstalled)
+echo ''
+echo $PackageInstalled
+echo ''
+sleep 5
 
 for i in $PackageInstalled
 do
@@ -674,6 +681,11 @@ function CheckNameServerExists {
 }
 NameServerExists=$(CheckNameServerExists)
 
+function GetLXCVersion {
+        lxc-create --version
+}
+LXCVersion=$(GetLXCVersion)
+
 if [ $NameServerExists -eq 0 ] && [ $MultiHostVar2 = 'N' ]
 then
 	echo ''
@@ -689,6 +701,11 @@ then
 	echo ''
 
 	sudo lxc-create -t download -n nsa -- --dist ubuntu --release xenial --arch amd64
+	
+	if [ $(SoftwareVersion $LXCVersion) -ge $(SoftwareVersion "2.1.0") ]
+	then
+		sudo lxc-update-config -c /var/lib/lxc/nsa/config
+	fi
 
 	echo ''
 	echo "=============================================="
@@ -697,6 +714,11 @@ then
 	echo ''
 	
 	sudo lxc-create -n nsa -t ubuntu -- --release xenial --arch amd64
+
+	if [ $(SoftwareVersion $LXCVersion) -ge $(SoftwareVersion "2.1.0") ]
+	then
+		sudo lxc-update-config -c /var/lib/lxc/nsa/config
+	fi
 
 	echo ''
 	echo "=============================================="
@@ -1578,6 +1600,11 @@ echo ''
 sleep 5
 
 clear
+
+if [ $(SoftwareVersion $LXCVersion) -ge $(SoftwareVersion "2.1.0") ]
+then
+	sudo lxc-update-config -c /var/lib/lxc/$NameServer/config
+fi
 
 if [ $MultiHostVar2 = 'N' ]
 then

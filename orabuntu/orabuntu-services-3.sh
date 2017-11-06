@@ -29,6 +29,13 @@ OracleVersion=$1.$2
 Domain2=$3
 MultiHost=$4
 
+function SoftwareVersion { echo "$@" | awk -F. '{ printf("%d%03d%03d%03d\n", $1,$2,$3,$4); }'; }
+
+function GetLXCVersion {
+	lxc-create --version
+}
+LXCVersion=$(GetLXCVersion)
+
 function CheckSystemdResolvedInstalled {
 	        sudo netstat -ulnp | grep 53 | sed 's/  */ /g' | rev | cut -f1 -d'/' | rev | sort -u | grep systemd- | wc -l
 	}
