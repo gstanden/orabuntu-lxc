@@ -33,6 +33,8 @@
 #    There are two domains and two networks because the "seed" LXC containers are on a separate network from the production LXC containers.
 #    If the domain is an actual domain, you will need to change the subnet though (a feature this software does not yet support - it's on the roadmap) to match your subnet manually.
 
+trap "exit" INT TERM; trap "kill 0" EXIT; sudo -v || exit $?; sleep 1; while true; do sleep 60; sudo -nv; done 2>/dev/null &
+
 MajorRelease=$1
 PointRelease=$2
 OracleRelease=$1$2
@@ -523,7 +525,7 @@ then
 					echo "                                              "
 					echo "=============================================="
 					echo "                                              " 
-				read -e -p   "Adding Orabuntu-LXC containers? [Y/N]         " -i "Y" CloningAdditional
+				read -e -p   "Adding Orabuntu-LXC containers? [Y/N]         " -i "N" CloningAdditional
 					echo "                                              "
 					echo "=============================================="
 					
@@ -589,7 +591,7 @@ then
 					echo "                                              "
 					echo "=============================================="
 					echo "                                              " 
-				read -e -p   "Adding Orabuntu-LXC containers? [Y/N]  " -i "Y" CloningAdditional
+				read -e -p   "Adding Orabuntu-LXC containers? [Y/N]  " -i "N" CloningAdditional
 					echo "                                              "
 					echo "=============================================="
 					echo ''
@@ -936,7 +938,7 @@ then
 					echo "                                              "
 					echo "=============================================="
 					echo "                                              " 
-				read -e -p   "Adding Orabuntu-LXC containers? [Y/N]         " -i "Y" CloningAdditional
+				read -e -p   "Adding Orabuntu-LXC containers? [Y/N]         " -i "N" CloningAdditional
 					echo "                                              "
 					echo "=============================================="
 					
@@ -950,13 +952,13 @@ then
  						/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/uekulele-services-2.sh $MajorRelease $PointRelease $Domain1 $Domain2 $MultiHost
  						/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/uekulele-services-3.sh $MajorRelease $PointRelease $Domain2 $MultiHost
 						/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/uekulele-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer $MultiHost 
-						/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/uekulele-services-5.sh $MajorRelease $PointRelease 
+						/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/uekulele-services-5.sh $MajorRelease $PointRelease $MultiHost
 					fi # OK 8
 
 					if [ $CloningAdditional = 'y' ] || [ $CloningAdditional = 'Y' ] || [ $MultiHostVar1 = 'addclones' ] # 9
 					then
 						/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/uekulele-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer $MultiHost
-						/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/uekulele-services-5.sh $MajorRelease $PointRelease
+						/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/uekulele-services-5.sh $MajorRelease $PointRelease $MultiHost
 					fi # OK 9
 				fi # OK 7
 
@@ -966,7 +968,7 @@ then
 					/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/uekulele-services-2.sh $MajorRelease $PointRelease $Domain1 $Domain2 $MultiHost
 					/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/uekulele-services-3.sh $MajorRelease $PointRelease $Domain2 $MultiHost
 					/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/uekulele-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer $MultiHost 
-					/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/uekulele-services-5.sh $MajorRelease $PointRelease 
+					/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/uekulele-services-5.sh $MajorRelease $PointRelease $MultiHost
 				fi # OK 10
 
  				echo ''
@@ -1002,7 +1004,7 @@ then
 					echo "                                              "
 					echo "=============================================="
 					echo "                                              " 
-				read -e -p   "Adding Orabuntu-LXC containers? [Y/N]  " -i "Y" CloningAdditional
+				read -e -p   "Adding Orabuntu-LXC containers? [Y/N]  " -i "N" CloningAdditional
 					echo "                                              "
 					echo "=============================================="
 					echo ''
@@ -1017,13 +1019,13 @@ then
  						/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/uekulele-services-2.sh $MajorRelease $PointRelease $Domain1 $Domain2 $MultiHost 
  						/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/uekulele-services-3.sh $MajorRelease $PointRelease $Domain2 $MultiHost
 						/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/uekulele-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer $MultiHost 
-						/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/uekulele-services-5.sh $MajorRelease $PointRelease 
+						/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/uekulele-services-5.sh $MajorRelease $PointRelease $MultiHost
 					fi # OK 12
 
 					if [ $CloningAdditional = 'y' ] || [ $CloningAdditional = 'Y' ] || [ $MultiHostVar1 = 'addclones' ] # 13
 					then
 						/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/uekulele-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer $MultiHost
-						/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/uekulele-services-5.sh $MajorRelease $PointRelease
+						/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/uekulele-services-5.sh $MajorRelease $PointRelease $MultiHost
 					fi # OK 13
 				fi # OK 11
 		
@@ -1033,7 +1035,7 @@ then
 					/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/uekulele-services-2.sh $MajorRelease $PointRelease $Domain1 $Domain2 $MultiHost 
 					/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/uekulele-services-3.sh $MajorRelease $PointRelease $Domain2 $MultiHost
 					/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/uekulele-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer $MultiHost 
-					/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/uekulele-services-5.sh $MajorRelease $PointRelease 
+					/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/uekulele-services-5.sh $MajorRelease $PointRelease $MultiHost
 				fi # OK 14
 
 				sleep 5
@@ -1335,7 +1337,7 @@ then
 					echo "                                              "
 					echo "=============================================="
 					echo "                                              " 
-				read -e -p   "Adding Orabuntu-LXC containers? [Y/N]  " -i "Y" CloningAdditional
+				read -e -p   "Adding Orabuntu-LXC containers? [Y/N]  " -i "N" CloningAdditional
 					echo "                                              "
 					echo "=============================================="
 				
@@ -1406,7 +1408,7 @@ then
 					echo "                                              "
 					echo "=============================================="
 					echo "                                              " 
-				read -e -p   "Adding Orabuntu-LXC containers? [Y/N]  " -i "Y" CloningAdditional
+				read -e -p   "Adding Orabuntu-LXC containers? [Y/N]  " -i "N" CloningAdditional
 					echo "                                              "
 					echo "=============================================="
 				

@@ -53,6 +53,8 @@
 #    v4.4 GLS 20170609 Enhancements to clone additional functionality and multiple host
 #    v5.0 GLS 20170909 uekulele multihost for Oracle Linux 
 
+SudoPassword=ubuntu
+
 clear
 
 echo ''
@@ -166,6 +168,8 @@ then
 	echo "9.  'Creating an IP Tunnel using GRE on Linux' http://www.cnblogs.com/popsuper1982/p/3800548.html/"
 	echo "10. 'When Should You Use a GRE Tunnel' https://supportforums.adtran.com/thread/1408/"
 	echo "11. 'Connecting OVS Bridges with Patch Ports' Scott Lowe https://blog.scottlowe.org/2012/11/27/connecting-ovs-bridges-with-patch-ports/"
+	echo "12. 'Make systemd service last service on boot' SimonPe https://superuser.com/questions/544399/how-do-you-make-a-systemd-service-as-the-last-service-on-boot"
+	echo "13. 'Temporarily increase sudo timeout' Rockallite https://serverfault.com/questions/266039/temporarily-increasing-sudos-timeout-for-the-duration-of-an-install-script"
 	echo ''
 	echo "Acknowledgements"
 	echo ''
@@ -244,10 +248,10 @@ echo 'OSMemRes                  = '$OSMemRes
 MultiHost=$8
 if [ -z $8 ]
 then
-	 MultiHost='new:N:1:0:192.168.0.3:192.168.1.52:1420:ubuntu:ubuntu'
-	#MultiHost='new:Y:4:0:192.168.1.49:192.168.1.50:1420:ubuntu:ubuntu'
-	#MultiHost='reinstall:N:1:0:192.168.1.56:192.168.1.52:1420:ubuntu:ubuntu'
-	#MultiHost='reinstall:Y:4:0:192.168.1.56:192.168.1.52:1420:ubuntu:ubuntu'
+	#MultiHost='new:N:1:$SudoPassword:192.168.1.67:192.168.1.68:1420:ubuntu:ubuntu'
+	 MultiHost='new:Y:4:$SudoPassword:192.168.1.67:192.168.1.70:1420:ubuntu:ubuntu'
+	#MultiHost='reinstall:N:1:$SudoPassword:192.168.1.67:192.168.1.68:1420:ubuntu:ubuntu'
+	#MultiHost='reinstall:Y:4:$SudoPassword:192.168.1.67:192.168.1.68:1420:ubuntu:ubuntu'
 	#MultiHost='addclones'
 fi
 echo 'MultiHost                 = '$MultiHost
@@ -259,7 +263,7 @@ echo 'MultiHost                 = '$MultiHost
 LxcOvsVersion=$9
 if [ -z $9 ]
 then
-	LxcOvsVersion="2.0.5:2.5.3"
+	LxcOvsVersion="2.0.8:2.5.3"
 fi
 if   [ $LinuxFlavor = 'RedHat' ]
 then

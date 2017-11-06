@@ -4,7 +4,7 @@ Orabuntu-LXC v5 EE Multihost https://github.com/gstanden/orabuntu-lxc is high-pe
 
 Build an environment of 10 Oracle Linux https://www.oracle.com/linux/index.html containers for example in about 15 minutes complete with full networking capability and DNS/DHCP.  Erase that same entire 10-container environment in less than 1 minute and create a new enviro! Great, fast solution for re-provisioning local or cloud training environments literally in just minutes at the push of a single button!
 
-The available library of Oracle Linux container templates include Oracle Linux 5, 6 and 7.  You can create customized gold copies libraries of Oracle Linux 5, 6 and 7 LXC containers that you have customized with your specialized package prerequities and other customizations and then deploy those containers as you need them.  The possibilities are endless!  Our seed containers run on a separate OpenvSwitch network that optionally can talk or not talk with the main default container design network.
+The available library of Oracle Linux container templates include Oracle Linux 5, 6 and 7.  You can create customized gold copies libraries of Oracle Linux 5, 6 and 7 LXC containers that you have customized with your specialized package prerequities and other customizations and then deploy those containers as you need them.  The possibilities are endless!  Our seed containers run on a separate OpenvSwitch network that talks with the main default container design network.
 
 Need additional networks with custom IP ranges for your work?  No problem!  Just add the forward and reverse zone files to the included DNS DHCP container, and add another OpenvSwitch, configure the patch ports to the main switch (all easy and quick) and voila! you have the additional networks you need, and you can add as many as you like, all with full networking configured.
 
@@ -59,7 +59,7 @@ To install the software:
 * This is because some absolute paths still need to be removed and for now you must do the mv step.
 * Navigate to /home/ubuntu/Downloads/orabuntu-lxc-master/anylinux
 * Edit the "anylinux-services.sh" script to set the parameters you want for your deployment.
-* As the "ubuntu" user, run the following command:  "./anylinux-services.sh"
+* As the "ubuntu" user, run the following command:  "./anylinux/anylinux-services.sh"
 * That's it.  There are a few prompts you answer. The software is coded in bash so you can easily take out prompts.
 * The software automatically does the following:
 * Creates an Ubuntu Xenial DNS/DHCP LXC container providing dynamic DNS/DHCP services to your LXC networks.
@@ -67,7 +67,7 @@ To install the software:
 * A seed Oracle Linux (5 6 or 7) LXC container configured with the prerequisites of your choice (see script 3)
 * Will optionally add in additional networks
 * Will clone the seed to whatever number of clone containers you require of that version
-* Includes an optional scst-files.tar archive which deploys the enterprise-grade SAN solution (SCST) 
+* Includes an enterprise-grade SAN solution (SCST) 
 * SCST can be used with your Orabuntu-LXC container deployment.
 * SCST comes with "scst-files.tar" which completely automates building file-backed LUNs for your LXC deployment.
 * SCST can of course be used alternatively with manual configuration of fiber channel HBA's, Infiniband, etc.

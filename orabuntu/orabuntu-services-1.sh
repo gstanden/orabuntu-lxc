@@ -173,7 +173,7 @@ echo "after Orabuntu-LXC install is completed.      "
 echo "=============================================="
 echo ''
 
-sleep 25
+sleep 5
 
 if	[ $SystemdResolvedInstalled -eq 1 ]
 then
@@ -657,7 +657,7 @@ echo "Extracting backup scripts...                  "
 echo "==============================================" 
 echo ''
 
-sudo tar -vP --extract --file=./orabuntu/archives/ubuntu-host.tar /etc/orabuntu-lxc-scripts/ubuntu-host-backup.sh --touch
+sudo tar -vP --extract --file=/home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/ubuntu-host.tar /etc/orabuntu-lxc-scripts/ubuntu-host-backup.sh --touch
 sudo /etc/orabuntu-lxc-scripts/ubuntu-host-backup.sh
 
 echo ''
@@ -817,7 +817,7 @@ echo "Unpack G1 host files for $LF Linux $RL...     "
 echo "=============================================="
 echo ''
 
-sudo tar -P -xvf ./orabuntu/archives/ubuntu-host.tar --touch
+sudo tar -P -xvf /home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/ubuntu-host.tar --touch
 
 echo ''
 echo "=============================================="
@@ -834,7 +834,7 @@ echo "Unpack G2 host files for $LF Linux $RL...     "
 echo "=============================================="
 echo ''
 
-sudo tar -P -xvf ./orabuntu/archives/dns-dhcp-host.tar --touch
+sudo tar -P -xvf /home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/dns-dhcp-host.tar --touch
 sudo chmod +x /etc/network/openvswitch/crt_ovs_s*.sh
 
 if [ $MultiHostVar2 = 'Y' ]
@@ -1056,7 +1056,7 @@ then
 		echo "=============================================="
 		echo ''
 	
-		sudo tar -P -xvf ./orabuntu/archives/dns-dhcp-cont.tar --touch
+		sudo tar -P -xvf /home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/dns-dhcp-cont.tar --touch
 
 		echo ''
 		echo "=============================================="
@@ -1276,8 +1276,8 @@ then
 		fi
 		if [ $k = 'sx1' ]
 		then
-                	sudo sh -c "echo 'Wants=network-online.target'				>> /etc/systemd/system/$k.service"
-                	sudo sh -c "echo 'After=network-online.target sw1.service'		>> /etc/systemd/system/$k.service"
+                	sudo sh -c "echo 'Wants=sw1.service'					>> /etc/systemd/system/$k.service"
+                	sudo sh -c "echo 'After=sw1.service'					>> /etc/systemd/system/$k.service"
 		fi
                 	sudo sh -c "echo ''							>> /etc/systemd/system/$k.service"
                 	sudo sh -c "echo '[Service]'						>> /etc/systemd/system/$k.service"
@@ -1393,6 +1393,47 @@ else
 
 	clear
 fi
+
+sleep 5
+
+clear
+
+echo ''
+echo "=============================================="
+echo "Create systemd-resolved-helper service...     "
+echo "=============================================="
+echo ''
+
+if [ $SystemdResolvedInstalled -eq 1 ]
+then
+	sudo sh -c "echo '[Unit]'                                                	 > /etc/systemd/system/systemd-resolved-helper.service"
+	sudo sh -c "echo 'Description=resolved Service'					>> /etc/systemd/system/systemd-resolved-helper.service"
+	sudo sh -c "echo 'Wants=sw1.service sx1.service'				>> /etc/systemd/system/systemd-resolved-helper.service"
+	sudo sh -c "echo 'After=sw1.service sx1.service'				>> /etc/systemd/system/systemd-resolved-helper.service"
+	sudo sh -c "echo ''								>> /etc/systemd/system/systemd-resolved-helper.service"
+	sudo sh -c "echo '[Service]'							>> /etc/systemd/system/systemd-resolved-helper.service"
+	sudo sh -c "echo 'Type=idle'							>> /etc/systemd/system/systemd-resolved-helper.service"
+	sudo sh -c "echo 'User=root'							>> /etc/systemd/system/systemd-resolved-helper.service"
+	sudo sh -c "echo 'RemainAfterExit=yes'						>> /etc/systemd/system/systemd-resolved-helper.service"
+	sudo sh -c "echo 'ExecStart=/usr/sbin/service systemd-resolved restart'		>> /etc/systemd/system/systemd-resolved-helper.service"
+	sudo sh -c "echo 'ExecStop=/usr/sbin/service systemd-resolved stop'		>> /etc/systemd/system/systemd-resolved-helper.service"
+	sudo sh -c "echo ''								>> /etc/systemd/system/systemd-resolved-helper.service"
+	sudo sh -c "echo '[Install]'							>> /etc/systemd/system/systemd-resolved-helper.service"
+	sudo sh -c "echo 'WantedBy=multi-user.target'					>> /etc/systemd/system/systemd-resolved-helper.service"
+
+	sudo systemctl enable systemd-resolved-helper
+	sudo service systemd-resolved-helper start
+fi
+
+echo ''
+echo "=============================================="
+echo "Done: Create systemd-resolved-helper service  "
+echo "=============================================="
+echo ''
+
+sleep 5
+
+clear
 
 if [ $MultiHostVar2 = 'N' ]
 then
@@ -1548,8 +1589,8 @@ then
 
 	if [ -n $NameServer ]
 	then
-		sudo service sw1 restart
-		sudo service sx1 restart
+#		sudo service sw1 restart
+#		sudo service sx1 restart
 		sudo sed -i "s/mtu = 1500/mtu = $MultiHostVar7/g" /var/lib/lxc/$NameServer/config 
 		sudo lxc-stop -n $NameServer  >/dev/null 2>&1
 		sudo lxc-start -n $NameServer >/dev/null 2>&1
@@ -1557,12 +1598,12 @@ then
 		then
 			sudo service systemd-resolved restart
 		fi
-		if	[ $SystemdResolvedInstalled -eq 1 ]
-		then
-			sudo su -c "echo 'nameserver 127.0.0.53' >> /etc/resolv.conf"
-			sudo sed -i '$!N; /^\(.*\)\n\1$/!P; D' /etc/resolv.conf
-			sudo sed -i -n 'G; s/\n/&&/; /^\([ -~]*\n\).*\n\1/d; s/\n//; h; P' /etc/resolv.conf
-		fi
+#		if	[ $SystemdResolvedInstalled -eq 1 ]
+#		then
+#			sudo su -c "echo 'nameserver 127.0.0.53' >> /etc/resolv.conf"
+#			sudo sed -i '$!N; /^\(.*\)\n\1$/!P; D' /etc/resolv.conf
+#			sudo sed -i -n 'G; s/\n/&&/; /^\([ -~]*\n\).*\n\1/d; s/\n//; h; P' /etc/resolv.conf
+#		fi
 		nslookup $NameServer.$Domain1
 		if [ $? -ne 0 ]
 		then

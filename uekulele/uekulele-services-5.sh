@@ -29,50 +29,12 @@ OracleRelease=$1$2
 OracleVersion=$1.$2
 OR=$OracleRelease
 Config=/var/lib/lxc/$SeedContainerName/config
+MultiHost=$3
 
-GetLinuxFlavors(){
-if   [[ -e /etc/oracle-release ]]
-then
-        LinuxFlavors=$(cat /etc/oracle-release | cut -f1 -d' ')
-elif [[ -e /etc/redhat-release ]]
-then
-        LinuxFlavors=$(cat /etc/redhat-release | cut -f1 -d' ')
-elif [[ -e /usr/bin/lsb_release ]]
-then
-        LinuxFlavors=$(lsb_release -d | awk -F ':' '{print $2}' | cut -f1 -d' ')
-elif [[ -e /etc/issue ]]
-then
-        LinuxFlavors=$(cat /etc/issue | cut -f1 -d' ')
-else
-        LinuxFlavors=$(cat /proc/version | cut -f1 -d' ')
-fi
+function GetMultiHostVar7 {
+	echo $MultiHost | cut -f7 -d':'
 }
-GetLinuxFlavors
-
-function TrimLinuxFlavors {
-echo $LinuxFlavors | sed 's/^[ \t]//;s/[ \t]$//'
-}
-LinuxFlavor=$(TrimLinuxFlavors)
-
-if   [ $LinuxFlavor = 'Oracle' ]
-then
-        function GetOracleDistroRelease {
-                sudo cat /etc/oracle-release | cut -f5 -d' ' | cut -f1 -d'.'
-        }
-        OracleDistroRelease=$(GetOracleDistroRelease)
-        Release=$OracleDistroRelease
-        LF=$LinuxFlavor
-        RL=$Release
-elif [ $LinuxFlavor = 'Red' ]
-then
-        function GetRedHatVersion {
-                sudo cat /etc/redhat-release | cut -f7 -d' ' | cut -f1 -d'.'
-        }
-        RedHatVersion=$(GetRedHatVersion)
-        Release=$RedHatVersion
-        LF=$LinuxFlavor'Hat'
-        RL=$Release
-fi
+MultiHostVar7=$(GetMultiHostVar7)
 
 function GetSeedContainerName {
         sudo lxc-ls -f | grep oel$OracleRelease | cut -f1 -d' '
@@ -106,241 +68,152 @@ sleep 5
 
 clear
 
-if [ $Release -eq 7 ]
-then
-	SwitchList='sw2 sw3 sw4 sw5 sw6 sw7 sw8 sw9'
-	for k in $SwitchList
-	do
-		echo ''
-		echo "=============================================="
-		echo "Create systemd OpenvSwitch $k service...      "
-		echo "=============================================="
-
-       		if [ ! -f /etc/systemd/system/$k.service ]
-       		then
-               		sudo sh -c "echo '[Unit]'						 > /etc/systemd/system/$k.service"
-                	sudo sh -c "echo 'Description=$k Service'				>> /etc/systemd/system/$k.service"
-                	sudo sh -c "echo 'After=network-online.target'				>> /etc/systemd/system/$k.service"
-                	sudo sh -c "echo ''							>> /etc/systemd/system/$k.service"
-                	sudo sh -c "echo '[Service]'						>> /etc/systemd/system/$k.service"
-                	sudo sh -c "echo 'Type=oneshot'						>> /etc/systemd/system/$k.service"
-                	sudo sh -c "echo 'User=root'						>> /etc/systemd/system/$k.service"
-                	sudo sh -c "echo 'RemainAfterExit=yes'					>> /etc/systemd/system/$k.service"
-                	sudo sh -c "echo 'ExecStart=/etc/network/openvswitch/crt_ovs_$k.sh' 	>> /etc/systemd/system/$k.service"
-                	sudo sh -c "echo ''							>> /etc/systemd/system/$k.service"
-                	sudo sh -c "echo '[Install]'						>> /etc/systemd/system/$k.service"
-                	sudo sh -c "echo 'WantedBy=multi-user.target'				>> /etc/systemd/system/$k.service"
-		fi
-	
-		echo ''
-		echo "=============================================="
-		echo "Start OpenvSwitch $k ...                      "
-		echo "=============================================="
-		echo ''
-
-        	sudo chmod 644 /etc/systemd/system/$k.service
-        	sudo systemctl enable $k.service
-		sudo service $k start
-		sudo service $k status
-
-		echo ''
-		echo "=============================================="
-		echo "OpenvSwitch $k is up.                         "
-		echo "=============================================="
-	
-		sleep 3
-
-		clear
-	done
-
+SwitchList='sw2 sw3 sw4 sw5 sw6 sw7 sw8 sw9'
+for k in $SwitchList
+do
 	echo ''
 	echo "=============================================="
-	echo "Openvswitch networks installed & configured.  "
+	echo "Create systemd OpenvSwitch $k service...      "
 	echo "=============================================="
-	echo ''
 
-elif [ $Release -eq 6 ]
-then
-	SwitchList='sx1 sw1 sw2 sw3 sw4 sw5 sw6 sw7 sw8 sw9'
-	for k in $SwitchList
-	do
-#     		echo ''
-#        	echo "=============================================="
-#        	echo "Starting OpenvSwitch $k ...                   "
-#        	echo "=============================================="
-
-#        	function GetMultiHostVar3 {
-#                	echo $MultiHost | cut -f3 -d':'
-#        	}
-#        	MultiHostVar3=$(GetMultiHostVar3)
-
-#        	sudo sed -i "s/SWITCH_IP/$MultiHostVar3/g" /etc/network/openvswitch/crt_ovs_$k.sh
-#        	sudo chmod 755 /etc/network/openvswitch/crt_ovs_$k.sh
-#        	sudo /etc/network/openvswitch/crt_ovs_$k.sh >/dev/null 2>&1
-#        	echo ''
-#        	sleep 3
-#        	sudo ifconfig sw1
-#        	sudo sed -i "/$k/s/^# //g" /etc/network/if-up.d/orabuntu-lxc-net
-
-#        	echo "=============================================="
-#        	echo "OpenvSwitch $k started.                       "
-#        	echo "=============================================="
-#        	echo ''
-
-#        	sleep 5
-
-#        	clear
-
-        	echo ''
-        	echo "=============================================="
-        	echo "Ensure OpenvSwitch $k is up...                "
-        	echo "=============================================="
-        	echo ''
-
-        	sudo ifconfig $k
-
-        	echo "=============================================="
-        	echo "Networks are up.                              "
-        	echo "=============================================="
-        	echo ''
-
-        	sleep 5
-
-        	clear
-
-#        	echo ''
-#        	echo "=============================================="
-#        	echo "Set Onboot $LF Linux $RL OVS $k...            "
-#        	echo "=============================================="
-#        	echo ''
-
-#		sudo cp -p /etc/init.d/sw1 /etc/init.d/$k
-#		sudo chmod 755 /etc/init.d/$k
-#      		sudo chkconfig --add $k
-
-#       	sleep 5
-
-#       	clear
-
-#       	echo ''
-#       	echo "=============================================="
-#       	echo "Done: Set Onboot $LF Linux $RL OVS $k.        "
-#       	echo "=============================================="
-
-#       	sleep 5
-
-#       	clear
-	done
+        if [ ! -f /etc/systemd/system/$k.service ]
+        then
+                sudo sh -c "echo '[Unit]'						 > /etc/systemd/system/$k.service"
+                sudo sh -c "echo 'Description=$k Service'				>> /etc/systemd/system/$k.service"
+                sudo sh -c "echo 'After=network-online.target'				>> /etc/systemd/system/$k.service"
+                sudo sh -c "echo ''							>> /etc/systemd/system/$k.service"
+                sudo sh -c "echo '[Service]'						>> /etc/systemd/system/$k.service"
+                sudo sh -c "echo 'Type=oneshot'						>> /etc/systemd/system/$k.service"
+                sudo sh -c "echo 'User=root'						>> /etc/systemd/system/$k.service"
+                sudo sh -c "echo 'RemainAfterExit=yes'					>> /etc/systemd/system/$k.service"
+                sudo sh -c "echo 'ExecStart=/etc/network/openvswitch/crt_ovs_$k.sh' 	>> /etc/systemd/system/$k.service"
+                sudo sh -c "echo ''							>> /etc/systemd/system/$k.service"
+                sudo sh -c "echo '[Install]'						>> /etc/systemd/system/$k.service"
+                sudo sh -c "echo 'WantedBy=multi-user.target'				>> /etc/systemd/system/$k.service"
+	fi
 	
 	echo ''
 	echo "=============================================="
-	echo "Openvswitch networks installed & configured.  "
+	echo "Start OpenvSwitch $k ...            "
 	echo "=============================================="
 	echo ''
-fi
+
+        sudo chmod 644 /etc/systemd/system/$k.service
+        sudo systemctl enable $k.service
+	sudo service $k start
+	sudo service $k status
+
+	echo ''
+	echo "=============================================="
+	echo "OpenvSwitch $k is up.                         "
+	echo "=============================================="
+	
+	sleep 3
+
+	clear
+done
+
+echo ''
+echo "=============================================="
+echo "Openvswitch networks installed & configured.  "
+echo "=============================================="
+echo ''
 
 sleep 5
 
 clear
 
-if [ $Release -eq 7 ]
-then
-	echo ''
-	echo "=============================================="
-	echo "Starting LXC cloned containers for Oracle...  "
-	echo "=============================================="
+echo ''
+echo "=============================================="
+echo "Starting LXC cloned containers for Oracle...  "
+echo "=============================================="
 
-	function CheckClonedContainersExist {
-		sudo ls /var/lib/lxc | grep "ora$OracleRelease" | sort -V | sed 's/$/ /' | tr -d '\n' 
+function CheckClonedContainersExist {
+sudo ls /var/lib/lxc | grep "ora$OracleRelease" | sort -V | sed 's/$/ /' | tr -d '\n' 
+}
+ClonedContainersExist=$(CheckClonedContainersExist)
+
+for j in $ClonedContainersExist
+do
+	# GLS 20160707 updated to use lxc-copy instead of lxc-clone for Ubuntu 16.04
+	# GLS 20160707 continues to use lxc-clone for Ubuntu 15.04 and 15.10
+
+	sudo /etc/network/openvswitch/veth_cleanups.sh $j > /dev/null 2>&1
+
+	function GetRedHatVersion {
+	cat /etc/redhat-release  | cut -f7 -d' ' | cut -f1 -d'.'
 	}
-	ClonedContainersExist=$(CheckClonedContainersExist)
+	RedHatVersion=$(GetRedHatVersion)
 
-	for j in $ClonedContainersExist
+	echo ''
+	echo "Starting container $j ..."
+	echo ''
+	if [ $RedHatVersion = '7' ] || [ $RedHatVersion = '6' ]
+	then
+	function CheckPublicIPIterative {
+	sudo lxc-ls -f | sed 's/  */ /g' | grep $j | grep RUNNING | cut -f2 -d'-' | sed 's/^[ \t]*//;s/[ \t]*$//' | cut -f1 -d' ' | cut -f1-2 -d'.' | sed 's/\.//g'
+	}
+	fi
+	PublicIPIterative=$(CheckPublicIPIterative)
+	echo $j | grep oel > /dev/null 2>&1
+	if [ $? -eq 0 ]
+	then
+	sudo bash -c "cat $Config|grep ipv4|cut -f2 -d'='|sed 's/^[ \t]*//;s/[ \t]*$//'|cut -f4 -d'.'|sed 's/^/\./'|xargs -I '{}' sed -i "/ipv4/s/\{}/\.1$OR/g" $Config"
+	fi
+	sudo sed -i "s/MtuSetting/$MultiHostVar7/g" /var/lib/lxc/$j/config
+	sudo lxc-start -n $j > /dev/null 2>&1
+	sleep 5
+	i=1
+	while [ "$PublicIPIterative" != 10207 ] && [ "$i" -le 10 ]
 	do
-		# GLS 20160707 updated to use lxc-copy instead of lxc-clone for Ubuntu 16.04
-		# GLS 20160707 continues to use lxc-clone for Ubuntu 15.04 and 15.10
-
-		sudo /etc/network/openvswitch/veth_cleanups.sh $j > /dev/null 2>&1
-
-		function GetRedHatVersion {
-			cat /etc/redhat-release  | cut -f7 -d' ' | cut -f1 -d'.'
-		}
-		RedHatVersion=$(GetRedHatVersion)
-
-		echo ''
-		echo "Starting container $j ..."
-		echo ''
-		if [ $RedHatVersion = '7' ] || [ $RedHatVersion = '6' ]
-		then
-			function CheckPublicIPIterative {
-				sudo lxc-ls -f | sed 's/  */ /g' | grep $j | grep RUNNING | cut -f2 -d'-' | sed 's/^[ \t]*//;s/[ \t]*$//' | cut -f1 -d' ' | cut -f1-2 -d'.' | sed 's/\.//g'
-			}
-		fi
+		echo "Waiting for $j Public IP to come up..."
+		sleep 20
 		PublicIPIterative=$(CheckPublicIPIterative)
-		echo $j | grep oel > /dev/null 2>&1
-		if [ $? -eq 0 ]
+		if [ $i -eq 5 ]
 		then
-			sudo bash -c "cat $Config|grep ipv4|cut -f2 -d'='|sed 's/^[ \t]*//;s/[ \t]*$//'|cut -f4 -d'.'|sed 's/^/\./'|xargs -I '{}' sed -i "/ipv4/s/\{}/\.1$OR/g" $Config"
-#			sudo sed -i "s/\.39/\.$OracleRelease/g" /var/lib/lxc/$SeedContainerName/config
-#			sudo sed -i "s/\.40/\.$OracleRelease/g" /var/lib/lxc/$SeedContainerName/config
-		fi
-#		sudo service sw1 restart > /dev/null 2>&1
-		sleep 2
-		sudo lxc-start -n $j > /dev/null 2>&1
-		sleep 5
-		i=1
-		while [ "$PublicIPIterative" != 10207 ] && [ "$i" -le 10 ]
-		do
-			echo "Waiting for $j Public IP to come up..."
-			sleep 20
-			PublicIPIterative=$(CheckPublicIPIterative)
-			if [ $i -eq 5 ]
+			sudo lxc-stop -n $j
+			sleep 2
+			echo ''
+			sudo /etc/network/openvswitch/veth_cleanups.sh $j
+			echo ''
+			sleep 2
+			sudo sed -i "s/MtuSetting/$MultiHostVar7/g" /var/lib/lxc/$j/config
+			sudo lxc-start -n $j
+			sleep 5
+			if [ $MajorRelease -eq 6 ] || [ $MajorRelease -eq 5 ]
 			then
-				sudo lxc-stop -n $j
-				sleep 2
-				echo ''
-				sudo /etc/network/openvswitch/veth_cleanups.sh $j
-				echo ''
-				sleep 2
-#				sudo service sw1 restart > /dev/null 2>&1
-				sleep 2
-				sudo lxc-start -n $j
-				sleep 5
-				if [ $MajorRelease -eq 6 ] || [ $MajorRelease -eq 5 ]
-				then
-					sudo lxc-attach -n $j -- ntpd -x
-				fi
+				sudo lxc-attach -n $j -- ntpd -x
 			fi
-		sleep 1
-		i=$((i+1))
-		done
+		fi
+	sleep 1
+	i=$((i+1))
 	done
+done
 
-	echo ''
-	echo "=============================================="
-	echo "LXC clone containers for Oracle started.      "
-	echo "=============================================="
-	echo ''
-fi
+echo ''
+echo "=============================================="
+echo "LXC clone containers for Oracle started.      "
+echo "=============================================="
+echo ''
 
 sleep 5
 
 clear
 
-# echo ''
-# echo "=============================================="
-# echo "LXC containers for Oracle started.            "
-# echo "=============================================="
-# echo ''
+echo ''
+echo "=============================================="
+echo "LXC containers for Oracle started.            "
+echo "=============================================="
+echo ''
 
-# sudo lxc-ls -f
+sudo lxc-ls -f
 
-# echo ''
-# echo "=============================================="
+echo ''
+echo "=============================================="
 
-# sleep 5
+sleep 5
 
-# clear
+clear
 
 echo ''
 echo "=============================================="
@@ -447,7 +320,7 @@ then
 		echo "=============================================="
 		echo "Set SELINUX to Permissive mode.               "
 		echo "=============================================="
-		
+		echo ''
 		sudo sed -i '/\([^T][^Y][^P][^E]\)\|\([^#]\)/ s/enforcing/permissive/' /etc/sysconfig/selinux
 	fi
 	sudo ausearch -c 'lxcattach' --raw | audit2allow -M my-lxcattach > /dev/null 2>&1
@@ -518,7 +391,7 @@ echo ''
 if [ ! -f /etc/orabuntu-lxc-release ]
 then
 	sudo touch /etc/orabuntu-lxc-release
-	sudo sh -c "echo 'Orabuntu-LXC v5.0-beta EE MultiHost' > /etc/orabuntu-lxc-release"
+	sudo sh -c "echo 'Orabuntu-LXC v4.0' > /etc/orabuntu-lxc-release"
 fi
 sudo ls -l /etc/orabuntu-lxc-release
 
@@ -533,46 +406,49 @@ clear
 
 echo ''
 echo "=============================================="
-echo "Next step is to setup storage e.g. for a DB   "
-echo "That step is optional and is done as follows: "
-echo "tar -xvf scst-files.tar                       "
+echo "                                              "
+echo "Setup LUNs (optional).                        "
+echo "                                              "
 echo "cd scst-files                                 "
-echo "cat README                                    "
-echo "follow the instructions in the README         "
+echo "./create-scst.sh                              "
+echo "                                              "
+echo "(Follow the instructions in the README)       "
+echo "                                              "
 echo "Builds the SCST Linux SAN.                    "
 echo "                                              "
+echo "=============================================="
+echo "                                              "
+echo "=============================================="
+echo "                                              "
 echo "Note that deployment management links are     "
-echo "in /home/ubuntu/Play-The-Uekulele   "
+echo "in /home/ubuntu/Play-The-Uekulele             "
 echo "where you can learn more about what files and "
 echo "configurations are used for the Orabuntu-LXC  "
 echo "project.                                      "
+echo "                                              "
 echo "=============================================="
 
 sleep 5 
 
 clear
 
-if [ $Release -eq 6 ]
+echo ''
+echo "=============================================="
+echo " A reboot is recommended (but not required!)  "
+echo "=============================================="
+
+Reboot=N
+# echo ''
+# echo "=============================================="
+# echo "                                              "
+# read -e -p "Reboot Now ? [Y/N]                    " -i "N" Reboot
+# echo "                                              "
+# echo "=============================================="
+# echo ''
+
+if [ $Reboot = 'y' ] || [ $Reboot = 'Y' ]
 then
-	echo ''
-	echo "=============================================="
-	echo "Reboot required for $LF Linux $RL...          "
-	echo "=============================================="
-
-#	Reboot=N
-
-	echo ''
-	echo "=============================================="
-	echo "                                              "
-	read -e -p "Reboot Now ? [Y/N]                    " -i "N" Reboot
-	echo "                                              "
-	echo "=============================================="
-	echo ''
-
-	if [ $Reboot = 'y' ] || [ $Reboot = 'Y' ]
-	then
-		sudo reboot
-	fi
+	sudo reboot
 fi
 
 sleep 5
