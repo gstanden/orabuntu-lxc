@@ -40,6 +40,11 @@ MultiHost=$7
 
 function SoftwareVersion { echo "$@" | awk -F. '{ printf("%d%03d%03d%03d\n", $1,$2,$3,$4); }'; }
 
+function GetMultiHostVar1 {
+echo $MultiHost | cut -f1 -d':'
+}
+MultiHostVar1=$(GetMultiHostVar1)
+
 function GetMultiHostVar2 {
 echo $MultiHost | cut -f2 -d':'
 }
@@ -1265,6 +1270,75 @@ fi
 sleep 5
 
 clear
+
+if [ $UbuntuVersion = '16.04' ] && [ $SystemdResolvedInstalled -eq 0 ] && [ $MultiHostVar1 = 'new' ]
+then
+	echo ''
+	echo "=============================================="
+	echo "Configure DNS (dnsmasq)                       "
+	echo "=============================================="
+	echo ''
+	echo "=============================================="
+	echo "Display original /etc/resolv.conf...          "
+	echo "=============================================="
+	echo ''
+
+	sudo cat /etc/resolv.conf
+
+	echo ''
+	echo "=============================================="
+	echo "Done: Display original /etc/resolv.conf.      "
+	echo "=============================================="
+	echo ''
+	echo "=============================================="
+	echo "Install and Configure dnsmasq...              "
+	echo "=============================================="
+	echo ''
+
+	sudo dpkg --configure -a
+	sudo apt-get install dnsmasq
+	sudo service dnsmasq stop
+	sleep 5
+	
+	sudo sed -i '0,/.*#listen-address.*/s/.*#listen-address.*/listen-address=127.0.0.1\n&/'                                                 /etc/dnsmasq.conf
+	sudo sed -i '0,/.*#server=\/localnet.*/s/.*#server=\/localnet.*/server=\/urdomain1\.com\/10.207.39.2\n&/'                               /etc/dnsmasq.conf
+	sudo sed -i '0,/.*#server=\/localnet.*/s/.*#server=\/localnet.*/server=\/urdomain2\.com\/10.207.29.2\n&/'                               /etc/dnsmasq.conf
+	sudo sed -i '0,/.*#server=\/localnet.*/s/.*#server=\/localnet.*/server=\/gns1\.urdomain1\.com\/10.207.39.2\n&/'                         /etc/dnsmasq.conf
+	sudo sed -i '0,/.*#server=\/3\.168\.192.*/s/.*#server=\/3\.168\.192.*/server=\/39\.207\.10\.in-addr\.arpa\/10\.207\.39\.2\n&/'          /etc/dnsmasq.conf
+	sudo sed -i '0,/.*#server=\/3\.168\.192.*/s/.*#server=\/3\.168\.192.*/server=\/29\.207\.10\.in-addr\.arpa\/10\.207\.29\.2\n&/'          /etc/dnsmasq.conf
+
+	sudo systemctl enable dnsmasq
+
+	sudo service dnsmasq start
+
+	sudo sh -c "echo 'search urdomain1.com urdomain2.com gns1.urdomain1.com' >> /etc/resolv.conf"
+
+	echo ''	
+	echo "=============================================="
+	echo "Done: Install and Configure dnsmasq           "
+	echo "=============================================="
+	echo ''
+	echo "=============================================="
+	echo "Display dnsmasq /etc/resolv.conf...           "
+	echo "=============================================="
+	echo ''
+
+	sudo cat /etc/resolv.conf
+	sleep 5
+
+	echo ''
+	echo "=============================================="
+	echo "Done: Display dnsmasq /etc/resolv.conf        "
+	echo "=============================================="
+	echo ''
+	echo "=============================================="
+	echo "Done: Configure /etc/dhcp/dhclient.conf       "
+	echo "=============================================="
+
+	sleep 5
+
+	clear
+fi
 
 sudo chmod 755 /etc/network/openvswitch/*.sh
 

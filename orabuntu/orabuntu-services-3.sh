@@ -29,6 +29,11 @@ OracleVersion=$1.$2
 Domain2=$3
 MultiHost=$4
 
+function GetMultiHostVar7 {
+	echo $MultiHost | cut -f7 -d':'
+}
+MultiHostVar7=$(GetMultiHostVar7)
+
 function SoftwareVersion { echo "$@" | awk -F. '{ printf("%d%03d%03d%03d\n", $1,$2,$3,$4); }'; }
 
 function GetLXCVersion {
