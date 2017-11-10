@@ -46,19 +46,14 @@ function CheckSystemdResolvedInstalled {
 }
 SystemdResolvedInstalled=$(CheckSystemdResolvedInstalled)
 
+if [ $SystemdResolvedInstalled -gt 0 ]
+then
+	sudo service systemd-resolved restart
+fi
+
 SeedIndex=10
 function CheckHighestSeedIndexHit {
-	if [ $SystemdResolvedInstalled -eq 1 ]
-	then
-		sudo service systemd-resolved restart > /dev/null 2>&1
-		sleep 2
-	fi
 	nslookup 10.207.29.$SeedIndex | grep -i "can't find" | wc -l
-	if [ $SystemdResolvedInstalled -eq 1 ]
-	then
-		sudo service systemd-resolved restart > /dev/null 2>&1
-		sleep 2
-	fi
 }
 HighestSeedIndexHit=$(CheckHighestSeedIndexHit)
 
