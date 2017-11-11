@@ -1751,7 +1751,26 @@ then
 	sudo sed -i "s/SWITCH_IP/$MultiHostVar3/g" /etc/network/openvswitch/crt_ovs_sw7.sh
 	sudo sed -i "s/SWITCH_IP/$MultiHostVar3/g" /etc/network/openvswitch/crt_ovs_sw8.sh
 	sudo sed -i "s/SWITCH_IP/$MultiHostVar3/g" /etc/network/openvswitch/crt_ovs_sw9.sh
+	
+	echo ''
+	echo "=============================================="
+	echo "Unpack SCST Linux SAN Files...                "
+	echo "=============================================="
+	echo ''
+
+	sudo tar -P -xvf /home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/scst-files.tar -C /home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives	
+	sudo sed -i "s/SWITCH_IP/$MultiHostVar3/g" /home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/scst-files/create-scst-oracle.sh
 		
+	echo ''
+	echo "=============================================="
+	echo "Done: Unpack SCST Linux SAN Files.            "
+	echo "=============================================="
+	echo ''
+
+	sleep 5
+
+	clear
+
 	echo "=============================================="
 	echo "Setting ubuntu user password in $NameServer..."
 	echo "=============================================="
