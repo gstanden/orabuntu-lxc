@@ -62,6 +62,11 @@ function GetMultiHostVar1 {
 }
 MultiHostVar1=$(GetMultiHostVar1)
 
+function GetMultiHostVar4 {
+	echo $MultiHost | cut -f4 -d':'
+}
+MultiHostVar4=$(GetMultiHostVar4)
+
 GetLinuxFlavors(){
 if   [[ -e /etc/oracle-release ]]
 then
@@ -143,7 +148,7 @@ echo "Establish sudo privileges...                  "
 echo "=============================================="
 echo ''
 
-sudo date
+echo $MultiHostVar4 | sudo -S date
 
 echo ''
 echo "==============================================" 
@@ -302,101 +307,103 @@ then
 			echo "OS Versions Compatibility Notice End          "
 			echo "=============================================="
 		
-			echo ''	
-			read -n 1 -s -p "Press any key to continue"
+#			read -n 1 -s -p "Press any key to continue"
+
+			sleep 5
 
 			clear
 
-			if [ ! -f /etc/orabuntu-lxc-terms ] # 2
-			then
-				echo ''
-				echo "=========================================================================================="
-				echo "Please answer 'Y' below to signify that you understand that the above fresh install       "
-				echo "OS/physical and OS/VM combination(s) are the only combinations that have been tested with "
-				echo "this software.                                                                            "
-				echo "                                                                                          "
-				echo "By answering 'Y' you also understand that while every effort has been made to certify this"
-				echo "software on the OS/VM and OS/physical combos above, the above-listed combos do not        "
-				echo "constitute a guarantee of results as stated in the GPL 3.0 license YMMV.                  "
-				echo "                                                                                          "
-				echo "It is recommended to first create a fresh VM of one of the supported versions listed above"
-				echo "and test out this software on the VM before doing an install on a physical host.  This is "
-				echo "so that you can get experience with this software first on a VM.  The installation of this"
-				echo "software takes about 15-20  minutes so such a VM test is fairly low-cost in terms of time "
-				echo "and effort on your part (of course building the VM takes a little while too).             "
-				echo "                                                                                          "
-				echo "Note that this software was designed to be as minimally invasive as possible and so every "
-				echo "effort has been made to minimize the risk of loss of service(s) due to installing this    "
-				echo "software.  However not all outcomes on all systems can be anticipated if installing on a  "
-				echo "system that has been running for awhile and has been customized or if installing on an OS "
-				echo "not listed above. The list of files touched by Orabuntu-LXC is in ubuntu-host.tar archive."
-			        echo "                                                                                          "	
-				echo "You can extract that file using this command (you may need to use sudo privilege):        "
-				echo "tar -vP --extract --file=ubuntu-host.tar /etc/orabuntu-lxc-scripts/ubuntu-host-backup.sh  "
-				echo "                                                                                          "
-				echo "You can choose to answer 'Y' below also if you wish to try this software on an OS/VM or   "
-				echo "OS/physical combination that is not listed above understanding that there may be results  "
-				echo "that are unexpected in that case. If you have a Linux OS that you would like to add to the"
-			        echo "list of tested systems above, you are free to fork this software under the GNU3 license   "
-				echo "which governs this open source software, or you can send an email to:                     "
-				echo "                                                                                          " 
-				echo "gilbert@orabuntu-lxc.com                                                                  "
-				echo "                                                                                          "
-				echo "and request that support for that OS be developed into this software and also supported.  "
-				echo "=========================================================================================="	
-				echo "                                                                                          "
-				echo "=========================================================================================="	
-				echo "                                                                                          " 
-				read -e -p "Accept installation terms? [Y/N]     " -i "Y" InstallationTerms
-				echo "                                                                                          "
-				echo "=========================================================================================="
-				echo ''
-			else
-				InstallationTerms=Y
-			fi #OK 2
-
-			if [ $InstallationTerms = 'y' ] || [ $InstallationTerms = 'Y' ] && [ ! -f /etc/orabuntu-lxc-terms ] # 3
-			then
-				clear
-
-				echo ''
-				echo "=============================================="	
-				echo "Install terms accepted.                       "
-				echo "=============================================="
-
-				sudo su -c "echo 'Orabuntu-LXC terms accepted' > /etc/orabuntu-lxc-terms"
-
-				sleep 5
-
-				clear
-
-			elif [ -f /etc/orabuntu-lxc-terms ]
-			then
-				clear
-
-				echo ''
-				echo "=============================================="	
-				echo "Install Terms previously accepted.            "
-				echo "=============================================="
-				echo ''
-				sudo ls -l /etc/orabuntu-lxc-terms
-				echo ''
-				sudo cat /etc/orabuntu-lxc-terms
-				echo ''
-				echo "=============================================="	
-				echo "Install terms file information displayed.     "
-				echo "=============================================="
-
-				sleep 5
-
-				clear
-			else
-				echo ''
-				echo "=============================================="	
-				echo "Terms Not Accepted. Terminating Installation. "
-				echo "=============================================="	
-				exit
-			fi #OK 3
+#			if [ ! -f /etc/orabuntu-lxc-terms ] # 2
+#			then
+#				echo ''
+#				echo "=========================================================================================="
+#				echo "Please answer 'Y' below to signify that you understand that the above fresh install       "
+#				echo "OS/physical and OS/VM combination(s) are the only combinations that have been tested with "
+#				echo "this software.                                                                            "
+#				echo "                                                                                          "
+#				echo "By answering 'Y' you also understand that while every effort has been made to certify this"
+#				echo "software on the OS/VM and OS/physical combos above, the above-listed combos do not        "
+#				echo "constitute a guarantee of results as stated in the GPL 3.0 license YMMV.                  "
+#				echo "                                                                                          "
+#				echo "It is recommended to first create a fresh VM of one of the supported versions listed above"
+#				echo "and test out this software on the VM before doing an install on a physical host.  This is "
+#				echo "so that you can get experience with this software first on a VM.  The installation of this"
+#				echo "software takes about 15-20  minutes so such a VM test is fairly low-cost in terms of time "
+#				echo "and effort on your part (of course building the VM takes a little while too).             "
+#				echo "                                                                                          "
+#				echo "Note that this software was designed to be as minimally invasive as possible and so every "
+#				echo "effort has been made to minimize the risk of loss of service(s) due to installing this    "
+#				echo "software.  However not all outcomes on all systems can be anticipated if installing on a  "
+#				echo "system that has been running for awhile and has been customized or if installing on an OS "
+#				echo "not listed above. The list of files touched by Orabuntu-LXC is in ubuntu-host.tar archive."
+#			        echo "                                                                                          "	
+#				echo "You can extract that file using this command (you may need to use sudo privilege):        "
+#				echo "tar -vP --extract --file=ubuntu-host.tar /etc/orabuntu-lxc-scripts/ubuntu-host-backup.sh  "
+#				echo "                                                                                          "
+#				echo "You can choose to answer 'Y' below also if you wish to try this software on an OS/VM or   "
+#				echo "OS/physical combination that is not listed above understanding that there may be results  "
+#				echo "that are unexpected in that case. If you have a Linux OS that you would like to add to the"
+#			        echo "list of tested systems above, you are free to fork this software under the GNU3 license   "
+#				echo "which governs this open source software, or you can send an email to:                     "
+#				echo "                                                                                          " 
+#				echo "gilbert@orabuntu-lxc.com                                                                  "
+#				echo "                                                                                          "
+#				echo "and request that support for that OS be developed into this software and also supported.  "
+#				echo "=========================================================================================="	
+#			
+#				echo ''
+#
+#				read -e -p "Accept installation terms? [Y/N]     " -i "Y" InstallationTerms
+#
+#				sleep 5
+#
+#				clear
+#			else
+#				InstallationTerms=Y
+#			fi #OK 2
+#
+#			if [ $InstallationTerms = 'y' ] || [ $InstallationTerms = 'Y' ] && [ ! -f /etc/orabuntu-lxc-terms ] # 3
+#			then
+#				clear
+#
+#				echo ''
+#				echo "=============================================="	
+#				echo "Install terms accepted.                       "
+#				echo "=============================================="
+#
+#				sudo su -c "echo 'Orabuntu-LXC terms accepted' > /etc/orabuntu-lxc-terms"
+#
+#				sleep 5
+#
+#				clear
+#
+#			elif [ -f /etc/orabuntu-lxc-terms ]
+#			then
+#				clear
+#
+#				echo ''
+#				echo "=============================================="	
+#				echo "Install Terms previously accepted.            "
+#				echo "=============================================="
+#				echo ''
+#				sudo ls -l /etc/orabuntu-lxc-terms
+#				echo ''
+#				sudo cat /etc/orabuntu-lxc-terms
+#				echo ''
+#				echo "=============================================="	
+#				echo "Install terms file information displayed.     "
+#				echo "=============================================="
+#
+#				sleep 5
+#
+#				clear
+#			else
+#				echo ''
+#				echo "=============================================="	
+#				echo "Terms Not Accepted. Terminating Installation. "
+#				echo "=============================================="	
+#				exit
+#			fi #OK 3
 			
 			function CheckUser {
 			id | cut -f1 -d' ' | cut -f2 -d'(' | cut -f1 -d')'
@@ -715,101 +722,103 @@ then
 			echo "OS Versions Compatibility Notice End          "
 			echo "=============================================="
 		
-			echo ''	
-			read -n 1 -s -p "Press any key to continue"
+#			read -n 1 -s -p "Press any key to continue"
+
+			sleep 5
 
 			clear
 
-			if [ ! -f /etc/orabuntu-lxc-terms ] # 2
-			then
-				echo ''
-				echo "=========================================================================================="
-				echo "Please answer 'Y' below to signify that you understand that the above fresh install       "
-				echo "OS/physical and OS/VM combination(s) are the only combinations that have been tested with "
-				echo "this software.                                                                            "
-				echo "                                                                                          "
-				echo "By answering 'Y' you also understand that while every effort has been made to certify this"
-				echo "software on the OS/VM and OS/physical combos above, the above-listed combos do not        "
-				echo "constitute a guarantee of results as stated in the GPL 3.0 license YMMV.                  "
-				echo "                                                                                          "
-				echo "It is recommended to first create a fresh VM of one of the supported versions listed above"
-				echo "and test out this software on the VM before doing an install on a physical host.  This is "
-				echo "so that you can get experience with this software first on a VM.  The installation of this"
-				echo "software takes about 15-20  minutes so such a VM test is fairly low-cost in terms of time "
-				echo "and effort on your part (of course building the VM takes a little while too).             "
-				echo "                                                                                          "
-				echo "Note that this software was designed to be as minimally invasive as possible and so every "
-				echo "effort has been made to minimize the risk of loss of service(s) due to installing this    "
-				echo "software.  However not all outcomes on all systems can be anticipated if installing on a  "
-				echo "system that has been running for awhile and has been customized or if installing on an OS "
-				echo "not listed above. The list of files touched by Orabuntu-LXC is in ubuntu-host.tar archive."
-			        echo "                                                                                          "	
-				echo "You can extract that file using this command (you may need to use sudo privilege):        "
-				echo "tar -vP --extract --file=ubuntu-host.tar /etc/orabuntu-lxc-scripts/ubuntu-host-backup.sh  "
-				echo "                                                                                          "
-				echo "You can choose to answer 'Y' below also if you wish to try this software on an OS/VM or   "
-				echo "OS/physical combination that is not listed above understanding that there may be results  "
-				echo "that are unexpected in that case. If you have a Linux OS that you would like to add to the"
-			        echo "list of tested systems above, you are free to fork this software under the GNU3 license   "
-				echo "which governs this open source software, or you can send an email to:                     "
-				echo "                                                                                          " 
-				echo "gilbert@orabuntu-lxc.com                                                                  "
-				echo "                                                                                          "
-				echo "and request that support for that OS be developed into this software and also supported.  "
-				echo "=========================================================================================="	
-				echo "                                                                                          "
-				echo "=========================================================================================="	
-				echo "                                                                                          " 
-				read -e -p "Accept installation terms? [Y/N]     " -i "Y" InstallationTerms
-				echo "                                                                                          "
-				echo "=========================================================================================="
-				echo ''
-			else
-				InstallationTerms=Y
-			fi # OK 2
-
-			if [ $InstallationTerms = 'y' ] || [ $InstallationTerms = 'Y' ] && [ ! -f /etc/orabuntu-lxc-terms ] # 3
-			then
-				clear
-
-				echo ''
-				echo "=============================================="	
-				echo "Install terms accepted.                       "
-				echo "=============================================="
-
-				sudo su -c "echo 'Orabuntu-LXC terms accepted' > /etc/orabuntu-lxc-terms"
-
-				sleep 5
-
-				clear
-
-			elif [ -f /etc/orabuntu-lxc-terms ]
-			then
-				clear
-
-				echo ''
-				echo "=============================================="	
-				echo "Install Terms previously accepted.            "
-				echo "=============================================="
-				echo ''
-				sudo ls -l /etc/orabuntu-lxc-terms
-				echo ''
-				sudo cat /etc/orabuntu-lxc-terms
-				echo ''
-				echo "=============================================="	
-				echo "Install terms file information displayed.     "
-				echo "=============================================="
-
-				sleep 5
-
-				clear
-			else
-				echo ''
-				echo "=============================================="	
-				echo "Terms Not Accepted. Terminating Installation. "
-				echo "=============================================="	
-				exit
-			fi # OK 3
+#			if [ ! -f /etc/orabuntu-lxc-terms ] # 2
+#			then
+#				echo ''
+#				echo "=========================================================================================="
+#				echo "Please answer 'Y' below to signify that you understand that the above fresh install       "
+#				echo "OS/physical and OS/VM combination(s) are the only combinations that have been tested with "
+#				echo "this software.                                                                            "
+#				echo "                                                                                          "
+#				echo "By answering 'Y' you also understand that while every effort has been made to certify this"
+#				echo "software on the OS/VM and OS/physical combos above, the above-listed combos do not        "
+#				echo "constitute a guarantee of results as stated in the GPL 3.0 license YMMV.                  "
+#				echo "                                                                                          "
+#				echo "It is recommended to first create a fresh VM of one of the supported versions listed above"
+#				echo "and test out this software on the VM before doing an install on a physical host.  This is "
+#				echo "so that you can get experience with this software first on a VM.  The installation of this"
+#				echo "software takes about 15-20  minutes so such a VM test is fairly low-cost in terms of time "
+#				echo "and effort on your part (of course building the VM takes a little while too).             "
+#				echo "                                                                                          "
+#				echo "Note that this software was designed to be as minimally invasive as possible and so every "
+#				echo "effort has been made to minimize the risk of loss of service(s) due to installing this    "
+#				echo "software.  However not all outcomes on all systems can be anticipated if installing on a  "
+#				echo "system that has been running for awhile and has been customized or if installing on an OS "
+#				echo "not listed above. The list of files touched by Orabuntu-LXC is in ubuntu-host.tar archive."
+#			        echo "                                                                                          "	
+#				echo "You can extract that file using this command (you may need to use sudo privilege):        "
+#				echo "tar -vP --extract --file=ubuntu-host.tar /etc/orabuntu-lxc-scripts/ubuntu-host-backup.sh  "
+#				echo "                                                                                          "
+#				echo "You can choose to answer 'Y' below also if you wish to try this software on an OS/VM or   "
+#				echo "OS/physical combination that is not listed above understanding that there may be results  "
+#				echo "that are unexpected in that case. If you have a Linux OS that you would like to add to the"
+#			        echo "list of tested systems above, you are free to fork this software under the GNU3 license   "
+#				echo "which governs this open source software, or you can send an email to:                     "
+#				echo "                                                                                          " 
+#				echo "gilbert@orabuntu-lxc.com                                                                  "
+#				echo "                                                                                          "
+#				echo "and request that support for that OS be developed into this software and also supported.  "
+#				echo "=========================================================================================="	
+#
+#				echo ''
+#
+#				read -e -p "Accept installation terms? [Y/N]     " -i "Y" InstallationTerms
+#
+#				sleep 5
+#
+#				clear
+#			else
+#				InstallationTerms=Y
+#			fi # OK 2
+#
+#			if [ $InstallationTerms = 'y' ] || [ $InstallationTerms = 'Y' ] && [ ! -f /etc/orabuntu-lxc-terms ] # 3
+#			then
+#				clear
+#
+#				echo ''
+#				echo "=============================================="	
+#				echo "Install terms accepted.                       "
+#				echo "=============================================="
+#
+#				sudo su -c "echo 'Orabuntu-LXC terms accepted' > /etc/orabuntu-lxc-terms"
+#
+#				sleep 5
+#
+#				clear
+#
+#			elif [ -f /etc/orabuntu-lxc-terms ]
+#			then
+#				clear
+#
+#				echo ''
+#				echo "=============================================="	
+#				echo "Install Terms previously accepted.            "
+#				echo "=============================================="
+#				echo ''
+#				sudo ls -l /etc/orabuntu-lxc-terms
+#				echo ''
+#				sudo cat /etc/orabuntu-lxc-terms
+#				echo ''
+#				echo "=============================================="	
+#				echo "Install terms file information displayed.     "
+#				echo "=============================================="
+#
+#				sleep 5
+#
+#				clear
+#			else
+#				echo ''
+#				echo "=============================================="	
+#				echo "Terms Not Accepted. Terminating Installation. "
+#				echo "=============================================="	
+#				exit
+#			fi # OK 3
 		
 			function CheckUser {
 				id | cut -f1 -d' ' | cut -f2 -d'(' | cut -f1 -d')'
@@ -1127,102 +1136,104 @@ then
 			echo "=============================================="
 			echo "OS Versions Compatibility Notice End          "
 			echo "=============================================="
-		
-			echo ''	
-			read -n 1 -s -p "Press any key to continue"
+	
+			sleep 5
 
 			clear
 
-			if [ ! -f /etc/orabuntu-lxc-terms ] # 2
-			then
-				echo ''
-				echo "=========================================================================================="
-				echo "Please answer 'Y' below to signify that you understand that the above fresh install       "
-				echo "OS/physical and OS/VM combination(s) are the only combinations that have been tested with "
-				echo "this software.                                                                            "
-				echo "                                                                                          "
-				echo "By answering 'Y' you also understand that while every effort has been made to certify this"
-				echo "software on the OS/VM and OS/physical combos above, the above-listed combos do not        "
-				echo "constitute a guarantee of results as stated in the GPL 3.0 license YMMV.                  "
-				echo "                                                                                          "
-				echo "It is recommended to first create a fresh VM of one of the supported versions listed above"
-				echo "and test out this software on the VM before doing an install on a physical host.  This is "
-				echo "so that you can get experience with this software first on a VM.  The installation of this"
-				echo "software takes about 15-20  minutes so such a VM test is fairly low-cost in terms of time "
-				echo "and effort on your part (of course building the VM takes a little while too).             "
-				echo "                                                                                          "
-				echo "Note that this software was designed to be as minimally invasive as possible and so every "
-				echo "effort has been made to minimize the risk of loss of service(s) due to installing this    "
-				echo "software.  However not all outcomes on all systems can be anticipated if installing on a  "
-				echo "system that has been running for awhile and has been customized or if installing on an OS "
-				echo "not listed above. The list of files touched by Orabuntu-LXC is in ubuntu-host.tar archive."
-			        echo "                                                                                          "	
-				echo "You can extract that file using this command (you may need to use sudo privilege):        "
-				echo "tar -vP --extract --file=ubuntu-host.tar /etc/orabuntu-lxc-scripts/ubuntu-host-backup.sh  "
-				echo "                                                                                          "
-				echo "You can choose to answer 'Y' below also if you wish to try this software on an OS/VM or   "
-				echo "OS/physical combination that is not listed above understanding that there may be results  "
-				echo "that are unexpected in that case. If you have a Linux OS that you would like to add to the"
-			        echo "list of tested systems above, you are free to fork this software under the GNU3 license   "
-				echo "which governs this open source software, or you can send an email to:                     "
-				echo "                                                                                          " 
-				echo "gilbert@orabuntu-lxc.com                                                                  "
-				echo "                                                                                          "
-				echo "and request that support for that OS be developed into this software and also supported.  "
-				echo "=========================================================================================="	
-				echo "                                                                                          "
-				echo "=========================================================================================="	
-				echo "                                                                                          " 
-				read -e -p "Accept installation terms? [Y/N]     " -i "Y" InstallationTerms
-				echo "                                                                                          "
-				echo "=========================================================================================="
-				echo ''
-			else
-				InstallationTerms=Y
-			fi # OK 2
+#			read -n 1 -s -p "Press any key to continue"
 
-			if [ $InstallationTerms = 'y' ] || [ $InstallationTerms = 'Y' ] && [ ! -f /etc/orabuntu-lxc-terms ] # 3
-			then
-				clear
-
-				echo ''
-				echo "=============================================="	
-				echo "Install terms accepted.                       "
-				echo "=============================================="
-	
-				sudo su -c "echo 'Orabuntu-LXC terms accepted' > /etc/orabuntu-lxc-terms"
-
-				sleep 5
-
-				clear
-
-			elif [ -f /etc/orabuntu-lxc-terms ]
-			then
-				clear
-
-				echo ''
-				echo "=============================================="	
-				echo "Install terms previously accepted.            "
-				echo "=============================================="
-				echo ''
-				sudo ls -l /etc/orabuntu-lxc-terms
-				echo ''
-				sudo cat /etc/orabuntu-lxc-terms
-				echo ''
-				echo "=============================================="	
-				echo "Install terms file information displayed.     "
-				echo "=============================================="
-
-				sleep 5
-
-				clear
-			else
-				echo ''
-				echo "=============================================="	
-				echo "Terms Not Accepted. Terminating Installation. "
-				echo "=============================================="	
-				exit
-			fi # OK 3
+#			if [ ! -f /etc/orabuntu-lxc-terms ] # 2
+#			then
+#				echo ''
+#				echo "=========================================================================================="
+#				echo "Please answer 'Y' below to signify that you understand that the above fresh install       "
+#				echo "OS/physical and OS/VM combination(s) are the only combinations that have been tested with "
+#				echo "this software.                                                                            "
+#				echo "                                                                                          "
+#				echo "By answering 'Y' you also understand that while every effort has been made to certify this"
+#				echo "software on the OS/VM and OS/physical combos above, the above-listed combos do not        "
+#				echo "constitute a guarantee of results as stated in the GPL 3.0 license YMMV.                  "
+#				echo "                                                                                          "
+#				echo "It is recommended to first create a fresh VM of one of the supported versions listed above"
+#				echo "and test out this software on the VM before doing an install on a physical host.  This is "
+#				echo "so that you can get experience with this software first on a VM.  The installation of this"
+#				echo "software takes about 15-20  minutes so such a VM test is fairly low-cost in terms of time "
+#				echo "and effort on your part (of course building the VM takes a little while too).             "
+#				echo "                                                                                          "
+#				echo "Note that this software was designed to be as minimally invasive as possible and so every "
+#				echo "effort has been made to minimize the risk of loss of service(s) due to installing this    "
+#				echo "software.  However not all outcomes on all systems can be anticipated if installing on a  "
+#				echo "system that has been running for awhile and has been customized or if installing on an OS "
+#				echo "not listed above. The list of files touched by Orabuntu-LXC is in ubuntu-host.tar archive."
+#			        echo "                                                                                          "	
+#				echo "You can extract that file using this command (you may need to use sudo privilege):        "
+#				echo "tar -vP --extract --file=ubuntu-host.tar /etc/orabuntu-lxc-scripts/ubuntu-host-backup.sh  "
+#				echo "                                                                                          "
+#				echo "You can choose to answer 'Y' below also if you wish to try this software on an OS/VM or   "
+#				echo "OS/physical combination that is not listed above understanding that there may be results  "
+#				echo "that are unexpected in that case. If you have a Linux OS that you would like to add to the"
+#			        echo "list of tested systems above, you are free to fork this software under the GNU3 license   "
+#				echo "which governs this open source software, or you can send an email to:                     "
+#				echo "                                                                                          " 
+#				echo "gilbert@orabuntu-lxc.com                                                                  "
+#				echo "                                                                                          "
+#				echo "and request that support for that OS be developed into this software and also supported.  "
+#				echo "=========================================================================================="	
+#			
+#				echo ''
+#
+#				read -e -p "Accept installation terms? [Y/N]     " -i "Y" InstallationTerms
+#
+#				sleep 5
+#
+#				clear
+#			else
+#				InstallationTerms=Y
+#			fi # OK 2
+#
+#			if [ $InstallationTerms = 'y' ] || [ $InstallationTerms = 'Y' ] && [ ! -f /etc/orabuntu-lxc-terms ] # 3
+#			then
+#				clear
+#
+#				echo ''
+#				echo "=============================================="	
+#				echo "Install terms accepted.                       "
+#				echo "=============================================="
+#	
+#				sudo su -c "echo 'Orabuntu-LXC terms accepted' > /etc/orabuntu-lxc-terms"
+#
+#				sleep 5
+#
+#				clear
+#
+#			elif [ -f /etc/orabuntu-lxc-terms ]
+#			then
+#				clear
+#
+#				echo ''
+#				echo "=============================================="	
+#				echo "Install terms previously accepted.            "
+#				echo "=============================================="
+#				echo ''
+#				sudo ls -l /etc/orabuntu-lxc-terms
+#				echo ''
+#				sudo cat /etc/orabuntu-lxc-terms
+#				echo ''
+#				echo "=============================================="	
+#				echo "Install terms file information displayed.     "
+#				echo "=============================================="
+#
+#				sleep 5
+#
+#				clear
+#			else
+#				echo ''
+#				echo "=============================================="	
+#				echo "Terms Not Accepted. Terminating Installation. "
+#				echo "=============================================="	
+#				exit
+#			fi # OK 3
 
 			function CheckUser {
 				id | cut -f1 -d' ' | cut -f2 -d'(' | cut -f1 -d')'

@@ -72,7 +72,7 @@ echo "Establish sudo privileges...                  "
 echo "=============================================="
 echo ''
 
-sudo date
+echo $SudoPassword | sudo -S date
 
 echo ''
 echo "==============================================" 
@@ -186,7 +186,7 @@ then
 	echo "=============================================="
 	echo ''
 
-	sleep 10
+	sleep 5
 
 	clear
 fi
@@ -249,7 +249,7 @@ echo 'OSMemRes                  = '$OSMemRes
 MultiHost=$8
 if [ -z $8 ]
 then
-	 MultiHost='new:N:1:$SudoPassword:192.168.1.12:192.168.1.13:1420:ubuntu:ubuntu'
+	 MultiHost='new:N:1:$SudoPassword:192.168.1.74:192.168.1.13:1420:ubuntu:ubuntu'
 	#MultiHost='new:Y:4:$SudoPassword:192.168.1.67:192.168.1.70:1420:ubuntu:ubuntu'
 	#MultiHost='reinstall:N:1:$SudoPassword:192.168.1.67:192.168.1.68:1420:ubuntu:ubuntu'
 	#MultiHost='reinstall:Y:4:$SudoPassword:192.168.1.67:192.168.1.68:1420:ubuntu:ubuntu'

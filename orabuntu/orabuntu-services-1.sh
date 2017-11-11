@@ -50,6 +50,11 @@ echo $MultiHost | cut -f2 -d':'
 }
 MultiHostVar2=$(GetMultiHostVar2)
 
+function GetMultiHostVar4 {
+echo $MultiHost | cut -f4 -d':'
+}
+MultiHostVar4=$(GetMultiHostVar4)
+
 function GetMultiHostVar7 {
 	echo $MultiHost | cut -f7 -d':'
 }
@@ -458,7 +463,7 @@ then
 	sudo apt-get -y install db5.1 db5.1-util
 fi
 
-if [ $UbuntuVersion = '16.04' ] || [ $UbuntuVersion = '17.04' ]
+if [ $UbuntuVersion = '16.04' ] || [ $UbuntuVersion = '17.04' ] || [ $UbuntuVersion = '17.10' ]
 then
 	sudo apt-get -y install db5.3 db5.3-util
 	sudo ln -s /usr/bin/db5.3_dump /usr/bin/db5.1_dump
@@ -631,18 +636,13 @@ then
 	PackageInstalled=$(CheckPackageInstalled)
 fi
 
-if [ $UbuntuVersion = '16.04' ] || [ $UbuntuVersion = '17.04' ]
+if [ $UbuntuVersion = '16.04' ] || [ $UbuntuVersion = '17.04' ] || [ $UbuntuVersion = '17.10' ]
 then
 	function CheckPackageInstalled {
 		echo 'facter lxc uml-utilities openvswitch-switch openvswitch-common bind9utils dnsutils apparmor-utils openssh-server uuid rpm yum hugepages ntp iotop sshpass db5.3-util'
 	}
 	PackageInstalled=$(CheckPackageInstalled)
 fi
-
-echo ''
-echo $PackageInstalled
-echo ''
-sleep 5
 
 for i in $PackageInstalled
 do
@@ -1494,14 +1494,14 @@ sleep 5
 
 clear
 
-echo ''
-echo "=============================================="
-echo "Create systemd-resolved-helper service...     "
-echo "=============================================="
-echo ''
-
 if [ $SystemdResolvedInstalled -eq 1 ]
 then
+	echo ''
+	echo "=============================================="
+	echo "Create systemd-resolved-helper service...     "
+	echo "=============================================="
+	echo ''
+
 	sudo sh -c "echo '[Unit]'                                                	 > /etc/systemd/system/systemd-resolved-helper.service"
 	sudo sh -c "echo 'Description=resolved Service'					>> /etc/systemd/system/systemd-resolved-helper.service"
 	sudo sh -c "echo 'Wants=sw1.service sx1.service'				>> /etc/systemd/system/systemd-resolved-helper.service"
@@ -1519,17 +1519,17 @@ then
 
 	sudo systemctl enable systemd-resolved-helper
 	sudo service systemd-resolved-helper start
+
+	echo ''
+	echo "=============================================="
+	echo "Done: Create systemd-resolved-helper service  "
+	echo "=============================================="
+	echo ''
+
+	sleep 5
+
+	clear
 fi
-
-echo ''
-echo "=============================================="
-echo "Done: Create systemd-resolved-helper service  "
-echo "=============================================="
-echo ''
-
-sleep 5
-
-clear
 
 if [ $MultiHostVar2 = 'N' ]
 then
@@ -1675,7 +1675,7 @@ sleep 5
 
 clear
 
-if [ $(SoftwareVersion $LXCVersion) -ge $(SoftwareVersion "2.1.0") ]
+if [ $(SoftwareVersion $LXCVersion) -ge $(SoftwareVersion "2.1.0") ] && [ $MultiHostVar2 = 'N' ]
 then
 	sudo lxc-update-config -c /var/lib/lxc/$NameServer/config
 fi
@@ -1719,7 +1719,6 @@ then
 		fi
 	fi
 
-	echo ''
 	echo "=============================================="
 	echo "LXC container restarted & DNS tested.         "
 	echo "=============================================="
@@ -1760,42 +1759,11 @@ then
 	echo "=============================================="
 	echo "The $NameServer nameserver ubuntu user account"
 	echo "password will now be set to:  $MultiHostVar8  "
-	echo "                                              "
-	echo "It is set in the anylinux-services.sh script  "
-	echo "and you can recheck what is is set to there.  "
 	echo "=============================================="
-	echo ''
 
-	sleep 5
-
-	clear
+	sleep 5	
 
 	echo ''
-	echo "=============================================="
-	echo "If you get the following warning message:     "
-	echo "                                              "
-	echo "Message:  mktemp: No such file or directory   "
-	echo "it is OK and can be safely ignored.           "
-	echo "                                              "
-	echo "=============================================="
-	echo ''
-	echo "=============================================="
-	echo "If you get the following warning message:     "
-	echo "                                              "
-	echo "Warning: Permanently added...known_hosts.     "
-	echo "it is OK and can be safely ignored.           "
-	echo "=============================================="
-	echo ''
-	echo "=============================================="
-	echo "If you get the following warning message:     "
-	echo "                                              "
-	echo "do_known_hosts: hostkeys_foreach failed...    "
-	echo "it is OK and can be safely ignored.           "
-	echo "=============================================="
-	echo ''
-
-	sleep 15	
-
 	sudo touch ~/.ssh/known_hosts
 	sudo lxc-attach -n $NameServer -- usermod --password `perl -e "print crypt('$MultiHostVar8','$MultiHostVar8');"` ubuntu
 	ssh-keygen -f "/home/ubuntu/.ssh/known_hosts" -R 10.207.39.2
