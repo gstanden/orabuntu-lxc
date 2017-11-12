@@ -1,0 +1,8 @@
+
+# Conventional Current Multipath Naming
+ENV{DM_UUID}=="mpath-wwid", SYMLINK+="asm/FriendlyName", OWNER:="Owner", GROUP:="Group", MODE:="Mode"
+
+# Container-Friendly Multipath Naming
+KERNEL=="dm-*", SUBSYSTEM=="block", PROGRAM=="/lib/udev/scsi_id --page=0x83 --whitelisted --device=/dev/%k", RESULT=="wwid", RUN+="/bin/sh -c '/bin/mkdir -p /dev/ContainerName; /bin/mknod /dev/ContainerName/FriendlyName b $major $minor; chown Owner:Group /dev/ContainerName/FriendlyName; chmod 0660 /dev/ContainerName/FriendlyName'"
+
+###
