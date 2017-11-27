@@ -28,6 +28,13 @@ Domain2=$4
 MultiHost=$5
 OR=$OracleRelease
 
+function SoftwareVersion { echo "$@" | awk -F. '{ printf("%d%03d%03d%03d\n", $1,$2,$3,$4); }'; }
+
+function GetLXCVersion {
+        lxc-create --version
+}
+LXCVersion=$(GetLXCVersion)
+
 function GetMultiHostVar7 {
         echo $MultiHost | cut -f7 -d':'
 }
@@ -94,6 +101,11 @@ echo "=============================================="
 echo ''
 
 sudo lxc-create -n oel$OracleRelease$SeedPostfix -t oracle -- --release=$OracleVersion
+
+if [ $(SoftwareVersion $LXCVersion) -ge $(SoftwareVersion "2.1.0") ]
+then
+        sudo lxc-update-config -c /var/lib/lxc/oel$OracleRelease$SeedPostfix/config
+fi
 
 echo ''
 echo "=============================================="
@@ -283,23 +295,28 @@ then
 	echo "Created LXC NTP service file.                 "
 	echo "=============================================="
 
-	sleep 5
+#	sleep 5
 
-	clear
+#	clear
 	
-	echo ''
-	echo "=============================================="
-	echo "Set NTP '-x' option in ntpd file...           "
-	echo "=============================================="
-	echo ''
+#	echo ''
+#	echo "=============================================="
+#	echo "Set NTP '-x' option in ntpd file...           "
+#	echo "=============================================="
+#	echo ''
 
-	sudo sed -i -e '/OPTIONS/{ s/.*/OPTIONS="-g -x"/ }' /etc/sysconfig/ntpd
-	sudo sed -i -e '/OPTIONS/{ s/.*/OPTIONS="-g -x"/ }' /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/etc/sysconfig/ntpd
+#	sudo sed -i -e '/OPTIONS/{ s/.*/OPTIONS="-g -x"/ }' /etc/sysconfig/ntpd
+#	sudo sed -i -e '/OPTIONS/{ s/.*/OPTIONS="-g -x"/ }' /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/etc/sysconfig/ntpd
 fi
 
-sleep 5
+#sleep 5
 
-clear
+#clear
+
+if [ $(SoftwareVersion $LXCVersion) -ge $(SoftwareVersion "2.1.0") ]
+then
+        sudo lxc-update-config -c /var/lib/lxc/oel$OracleRelease$SeedPostfix/config
+fi
 
 echo ''
 echo "=============================================="

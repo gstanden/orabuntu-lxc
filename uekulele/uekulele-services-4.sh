@@ -28,6 +28,13 @@ NumCon=$3
 NameServer=$4
 MultiHost=$5
 
+function SoftwareVersion { echo "$@" | awk -F. '{ printf("%d%03d%03d%03d\n", $1,$2,$3,$4); }'; }
+
+function GetLXCVersion {
+        lxc-create --version
+}
+LXCVersion=$(GetLXCVersion)
+
 function GetMultiHostVar7 {
         echo $MultiHost | cut -f7 -d':'
 }
@@ -137,40 +144,40 @@ sleep 5
 
 clear
 
-echo ''
-echo "=============================================="
-echo "Configure Extra Networks (optional e.g. RAC)  "
-echo "=============================================="
-echo ''
+# echo ''
+# echo "=============================================="
+# echo "Configure Extra Networks (optional e.g. RAC)  "
+# echo "=============================================="
+# echo ''
 
-AddPrivateNetworks=Y
-# read -e -p "Add Extra Private Networks (e.g for Oracle RAC ASM Flex Cluster) [Y/N]   " -i "Y" AddPrivateNetworks
+# AddPrivateNetworks=Y
+# # read -e -p "Add Extra Private Networks (e.g for Oracle RAC ASM Flex Cluster) [Y/N]   " -i "Y" AddPrivateNetworks
 
-if [ $AddPrivateNetworks = 'y' ] || [ $AddPrivateNetworks = 'Y' ]
-then
-        sudo bash -c "cat /var/lib/lxc/$SeedContainerName/config.oracle /var/lib/lxc/$SeedContainerName/config.asm.flex.cluster > /var/lib/lxc/$SeedContainerName/config"
-        sudo sed -i "s/ContainerName/$SeedContainerName/g" /var/lib/lxc/$SeedContainerName/config
-        OracleNonPublicNetworks='sw2 sw3 sw4 sw5 sw6 sw7 sw8 sw9'
-        for j in $OracleNonPublicNetworks
-        do
-                echo 'nothing' > /dev/null 2>&1
-        done
-fi
+# if [ $AddPrivateNetworks = 'y' ] || [ $AddPrivateNetworks = 'Y' ]
+# then
+#         sudo bash -c "cat /var/lib/lxc/$SeedContainerName/config.oracle /var/lib/lxc/$SeedContainerName/config.asm.flex.cluster > /var/lib/lxc/$SeedContainerName/config"
+#         sudo sed -i "s/ContainerName/$SeedContainerName/g" /var/lib/lxc/$SeedContainerName/config
+#         OracleNonPublicNetworks='sw2 sw3 sw4 sw5 sw6 sw7 sw8 sw9'
+#         for j in $OracleNonPublicNetworks
+#         do
+#                 echo 'nothing' > /dev/null 2>&1
+#         done
+# fi
 
-if [ $AddPrivateNetworks = 'n' ] || [ $AddPrivateNetworks = 'N' ]
-then
-        sudo cp -p /var/lib/lxc/$SeedContainerName/config.oracle /var/lib/lxc/$SeedContainerName/config
-        sudo sed -i "s/ContainerName/$SeedContainerName/g" /var/lib/lxc/$SeedContainerName/config
-fi
+# if [ $AddPrivateNetworks = 'n' ] || [ $AddPrivateNetworks = 'N' ]
+# then
+#         sudo cp -p /var/lib/lxc/$SeedContainerName/config.oracle /var/lib/lxc/$SeedContainerName/config
+#         sudo sed -i "s/ContainerName/$SeedContainerName/g" /var/lib/lxc/$SeedContainerName/config
+# fi
 
-echo ''
-echo "=============================================="
-echo "Configure extra private networks completed.   "
-echo "=============================================="
+# echo ''
+# echo "=============================================="
+# echo "Configure extra private networks completed.   "
+# echo "=============================================="
 
-sleep 5
+# sleep 5
 
-clear
+# clear
 
 if [ $MultiHostVar2 = 'Y' ]
 then
@@ -225,6 +232,11 @@ do
 			echo "Clone Container Name = $ContainerPrefix$CloneIndex"
 
       			sudo lxc-copy -n $SeedContainerName -N $ContainerPrefix$CloneIndex
+
+                        sudo sed -i "s/$SeedContainerName/$ContainerPrefix$CloneIndex/g"        /var/lib/lxc/$ContainerPrefix$CloneIndex/rootfs/etc/hostname
+                        sudo sed -i "s/$SeedContainerName/$ContainerPrefix$CloneIndex/g"        /var/lib/lxc/$ContainerPrefix$CloneIndex/rootfs/etc/sysconfig/network-scripts/ifcfg-eth0
+                        sudo sed -i "s/$SeedContainerName/$ContainerPrefix$CloneIndex/g"        /var/lib/lxc/$ContainerPrefix$CloneIndex/rootfs/etc/sysconfig/network
+                        sudo sed -i "s/$SeedContainerName/$ContainerPrefix$CloneIndex/g"        /var/lib/lxc/$ContainerPrefix$CloneIndex/rootfs/etc/hosts
 		fi
 	fi
 
@@ -288,6 +300,11 @@ do
 	echo "=============================================="
 	echo ''
 
+        if [ $(SoftwareVersion $LXCVersion) -ge $(SoftwareVersion "2.1.0") ]
+        then
+                sudo lxc-update-config -c /var/lib/lxc/$CP$CloneIndex/config
+        fi
+
 CopyCompleted=$((CopyCompleted+1))
 CloneIndex=$((CloneIndex+1))
 
@@ -325,29 +342,50 @@ sleep 5
 
 clear
 
-echo ''
-echo "=============================================="
-echo "   Reset config file for $SeedContainerName.  "
-echo "Removes ASM and RAC private network interfaces"
-echo "    from seed container $SeedContainerName    "
-echo "(cloned containers are not affected by reset) "
-echo "=============================================="
-echo ''
+# echo ''
+# echo "=============================================="
+# echo "   Reset config file for $SeedContainerName.  "
+# echo "Removes ASM and RAC private network interfaces"
+# echo "    from seed container $SeedContainerName    "
+# echo "(cloned containers are not affected by reset) "
+# echo "=============================================="
+# echo ''
 
-ResetSingleDHCPInterface=Y
-# read -e -p "Reset Seed Container $SeedContainerName to single DHCP interface ? [Y/N]   " -i "Y" ResetSingleDHCPInterface
+# ResetSingleDHCPInterface=Y
+# # read -e -p "Reset Seed Container $SeedContainerName to single DHCP interface ? [Y/N]   " -i "Y" ResetSingleDHCPInterface
 
-if [ $ResetSingleDHCPInterface = 'y' ] || [ $ResetSingleDHCPInterface = 'Y' ]
+# if [ $ResetSingleDHCPInterface = 'y' ] || [ $ResetSingleDHCPInterface = 'Y' ]
+# then
+# sudo cp -p /var/lib/lxc/$SeedContainerName/config.oracle /var/lib/lxc/$SeedContainerName/config
+# sudo sed -i "s/ContainerName/$SeedContainerName/g" /var/lib/lxc/$SeedContainerName/config
+# sudo sed -i 's/sw1/sx1/g' /var/lib/lxc/$SeedContainerName/config
+# fi
+
+# echo ''
+# echo "=============================================="
+# echo "Config file reset successful.                 "
+# echo "=============================================="
+
+# sleep 5
+
+# clear
+
+if [ $(SoftwareVersion $LXCVersion) -ge $(SoftwareVersion "2.1.0") ]
 then
-sudo cp -p /var/lib/lxc/$SeedContainerName/config.oracle /var/lib/lxc/$SeedContainerName/config
-sudo sed -i "s/ContainerName/$SeedContainerName/g" /var/lib/lxc/$SeedContainerName/config
-sudo sed -i 's/sw1/sx1/g' /var/lib/lxc/$SeedContainerName/config
-fi
+        echo ''
+        echo "=============================================="
+        echo "Update config for LXC 2.1.0+                  "
+        echo "=============================================="
+        echo ''
 
-echo ''
-echo "=============================================="
-echo "Config file reset successful.                 "
-echo "=============================================="
+        sudo lxc-update-config -c /var/lib/lxc/$SeedContainerName/config
+
+        echo ''
+        echo "=============================================="
+        echo "Done: Update config for LXC 2.1.0+            "
+        echo "=============================================="
+        echo ''
+fi
 
 sleep 5
 

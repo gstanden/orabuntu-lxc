@@ -249,10 +249,10 @@ echo 'OSMemRes                  = '$OSMemRes
 MultiHost=$8
 if [ -z $8 ]
 then
-	 MultiHost='new:N:1:$SudoPassword:192.168.1.74:192.168.1.13:1420:ubuntu:ubuntu'
-	#MultiHost='new:Y:4:$SudoPassword:192.168.1.67:192.168.1.70:1420:ubuntu:ubuntu'
-	#MultiHost='reinstall:N:1:$SudoPassword:192.168.1.67:192.168.1.68:1420:ubuntu:ubuntu'
-	#MultiHost='reinstall:Y:4:$SudoPassword:192.168.1.67:192.168.1.68:1420:ubuntu:ubuntu'
+	#MultiHost='new:N:1:$SudoPassword:192.168.1.32:10.207.39.13:1500:ubuntu:ubuntu'
+	 MultiHost='new:Y:4:$SudoPassword:10.207.39.14:10.207.39.13:1500:ubuntu:ubuntu'
+	#MultiHost='reinstall:N:1:$SudoPassword:192.168.1.32:192.168.1.68:1500:ubuntu:ubuntu'
+	#MultiHost='reinstall:Y:4:$SudoPassword:192.168.1.67:192.168.1.68:1500:ubuntu:ubuntu'
 	#MultiHost='addclones'
 fi
 echo 'MultiHost                 = '$MultiHost
@@ -264,7 +264,7 @@ echo 'MultiHost                 = '$MultiHost
 LxcOvsVersion=$9
 if [ -z $9 ]
 then
-	LxcOvsVersion="2.0.8:2.5.3"
+	LxcOvsVersion="2.1.1:2.5.4"
 fi
 if   [ $LinuxFlavor = 'RedHat' ]
 then

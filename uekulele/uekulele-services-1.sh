@@ -38,6 +38,7 @@ NameServer=$5
 OSMemRes=$6
 MultiHost=$7
 LxcOvsVersion=$8
+OnVm=Y
 
 function GetLxcVersion {
 echo $LxcOvsVersion | cut -f1 -d':'
@@ -1211,6 +1212,11 @@ then
 
  	sudo lxc-create -t download -n nsa -- --dist ubuntu --release xenial --arch amd64
 
+        if [ $(SoftwareVersion $LXCVersion) -ge $(SoftwareVersion "2.1.0") ]
+        then
+                sudo lxc-update-config -c /var/lib/lxc/nsa/config
+        fi
+
 	echo ''
 	echo "=============================================="
 	echo "Method 1 complete.                            "
@@ -1244,6 +1250,11 @@ then
 	echo ''
 
  	sudo lxc-create -n nsa -t ubuntu -- --release xenial --arch amd64
+
+        if [ $(SoftwareVersion $LXCVersion) -ge $(SoftwareVersion "2.1.0") ]
+        then
+                sudo lxc-update-config -c /var/lib/lxc/nsa/config
+        fi
 
 	echo ''
 	echo "=============================================="
@@ -1905,55 +1916,58 @@ then
 	clear
 fi
 
-echo ''
-echo "=============================================="
-echo "Activating NetworkManager dnsmasq service ... "
-echo "=============================================="
-echo ''
-
-# So that settings in /etc/NetworkManager/dnsmasq.d/local & /etc/NetworkManager/NetworkManager.conf take effect.
-
-sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g"			/etc/resolv.conf
-sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g"	/etc/resolv.conf
-sudo cat /etc/resolv.conf
-sudo sed -i '/plugins=ifcfg-rh/a dns=dnsmasq' /etc/NetworkManager/NetworkManager.conf
-echo ''
-
-sudo service NetworkManager restart
-
-function CheckResolvReady {
-sudo cat /etc/resolv.conf | grep -c 'nameserver 127\.0\.0\.1'
-}
-ResolvReady=$(CheckResolvReady)
-echo ''
-NumResolvReadyTries=0
-while [ $ResolvReady -ne 1 ] && [ $NumResolvReadyTries -lt 60 ]
-do
-ResolvReady=$(CheckResolvReady)
-((NumResolvReadyTries=NumResolvReadyTries+1))
-sleep 1
-echo 'NumResolvReadyTries = '$NumResolvReadyTries
-done
-
-if [ $ResolvReady -eq 1 ]
+if [ $OnVm = 'N' ]
 then
 	echo ''
-	sudo service sw1 restart
-else
-	echo ''
 	echo "=============================================="
-	echo "NetworkManager didn't set nameserver 127.0.0.1"
-	echo "which is the setting required for NM dnsmasq. "
+	echo "Activating NetworkManager dnsmasq service ... "
+	echo "=============================================="
+	echo ''
+
+	# So that settings in /etc/NetworkManager/dnsmasq.d/local & /etc/NetworkManager/NetworkManager.conf take effect.
+
+	sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g"			/etc/resolv.conf
+	sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g"	/etc/resolv.conf
+	sudo cat /etc/resolv.conf
+	sudo sed -i '/plugins=ifcfg-rh/a dns=dnsmasq' /etc/NetworkManager/NetworkManager.conf
+	echo ''
+
+	sudo service NetworkManager restart
+
+	function CheckResolvReady {
+		sudo cat /etc/resolv.conf | grep -c 'nameserver 127\.0\.0\.1'
+	}
+	ResolvReady=$(CheckResolvReady)
+	echo ''
+	NumResolvReadyTries=0
+	while [ $ResolvReady -ne 1 ] && [ $NumResolvReadyTries -lt 60 ]
+	do
+		ResolvReady=$(CheckResolvReady)
+		((NumResolvReadyTries=NumResolvReadyTries+1))
+		sleep 1
+		echo 'NumResolvReadyTries = '$NumResolvReadyTries
+	done
+
+	if [ $ResolvReady -eq 1 ]
+	then
+		echo ''
+		sudo service sw1 restart
+	else
+		echo ''
+		echo "=============================================="
+		echo "NetworkManager didn't set nameserver 127.0.0.1"
+		echo "which is the setting required for NM dnsmasq. "
+		echo "=============================================="
+	fi
+
+	# sudo sh -c "echo 'search $Domain1 $Domain2 gns1.$Domain1' >> /etc/resolv.conf"
+	sudo cat /etc/resolv.conf
+	echo ''
+
+	echo "=============================================="
+	echo "NetworkManager dnsmasq activated.             "
 	echo "=============================================="
 fi
-
-# sudo sh -c "echo 'search $Domain1 $Domain2 gns1.$Domain1' >> /etc/resolv.conf"
-sudo cat /etc/resolv.conf
-echo ''
-
-echo "=============================================="
-echo "NetworkManager dnsmasq activated.             "
-echo "=============================================="
 
 sleep 5
 
@@ -2031,7 +2045,10 @@ echo "Checking OpenvSwitch sw1...                   "
 echo "=============================================="
 echo ''
 
-sudo service sw1 stop
+if [ $OnVm = 'N' ]
+then
+	sudo service sw1 stop
+fi
 sleep 2
 sudo systemctl start sw1
 sleep 2
@@ -2103,7 +2120,12 @@ sleep 5
 
 clear
 
-if [ $MultiHostVar2 = 'N' ]
+if [ $(SoftwareVersion $LXCVersion) -ge $(SoftwareVersion "2.1.0") ] && [ $MultiHostVar2 = 'N' ]
+then
+        sudo lxc-update-config -c /var/lib/lxc/$NameServer/config
+fi
+
+if [ $MultiHostVar2 = 'N' ] && [ $OnVm = 'N' ]
 then
 	echo ''
 	echo "=============================================="
@@ -2202,7 +2224,7 @@ then
 
 fi
 
-if [ $MultiHostVar2 = 'Y' ]
+if [ $MultiHostVar2 = 'Y' ] && [ $OnVm = 'N' ]
 then
 	# GLS 20170904 rm known_hosts file for ubuntu user to prevent ssh failures.
 

@@ -402,6 +402,7 @@ then
 elif [ $MajorRelease -eq 6 ] || [ $MajorRelease -eq 5 ]
 then
 	sudo lxc-attach -n $SeedContainerName -- ntpd -x
+	sudo lxc-attach -n $SeedContainerName -- dhcpcd -k
 fi
 
 echo ''

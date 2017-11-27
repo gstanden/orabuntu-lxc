@@ -37,6 +37,7 @@ Domain2=$4
 NameServer=$5
 OSMemRes=$6
 MultiHost=$7
+OnVm=Y
 
 function SoftwareVersion { echo "$@" | awk -F. '{ printf("%d%03d%03d%03d\n", $1,$2,$3,$4); }'; }
 
@@ -266,17 +267,37 @@ then
 
 		sudo /etc/network/openvswitch/del-bridges.sh >/dev/null 2>&1
 		sudo ovs-vsctl show
+		sudo rm -f /etc/network/openvswitch/crt_ovs_s*.sh
+		sudo apt-get -y purge lxc lxc-common lxc-templates lxc1 lxcfs python3-lxc liblxc1
+		sudo service dnsmasq stop
+		sudo apt-get purge dnsmasq
+ 		sudo rm -f /etc/default/lxc-net
 
 		echo ''
 		echo "=============================================="
 		echo "Done:  Delete OpenvSwitch Bridges.            "
 		echo "=============================================="
 		echo ''
+	
+		sudo rm -f  /etc/network/if-up.d/openvswitch/*
+		sudo rm -f  /etc/network/if-down.d/openvswitch/*
+
+		sudo rm -rf /etc/network/openvswitch
+		sudo systemctl disable sw1
+		sudo systemctl disable sw2
+		sudo systemctl disable sw3
+		sudo systemctl disable sw4
+		sudo systemctl disable sw5
+		sudo systemctl disable sw6
+		sudo systemctl disable sw7
+		sudo systemctl disable sw8
+		sudo systemctl disable sw9
+		sudo systemctl disable sx1
 
 		sudo rm -f  /etc/systemd/system/ora*c*.service
 		sudo rm -f  /etc/systemd/system/oel*c*.service
-		sudo rm -f  /etc/network/if-up.d/openvswitch/*
-		sudo rm -f  /etc/network/if-down.d/openvswitch/*
+		sudo rm -f /etc/systemd/sw*.service
+		sudo rm -f /etc/systemd/sx*.service
 
 		echo ''
 		echo "=============================================="
@@ -1219,7 +1240,7 @@ sleep 5
 
 clear
 
-if	[ $NetworkManagerInstalled -eq 1 ]
+if	[ $NetworkManagerInstalled -eq 1 ] && [ $SystemdResolvedInstalled -eq 0 ]
 then
 	echo ''
 	echo "=============================================="
@@ -1251,7 +1272,10 @@ then
 	if [ $ResolvReady -eq 1 ]
 	then
 		echo ''
- 		sudo service sw1 restart >/dev/null 2>&1
+		if [ $OnVm = 'N' ]
+		then
+ 			sudo service sw1 restart >/dev/null 2>&1
+		fi
 	else
 		echo ''
  		echo "=============================================="
@@ -1603,7 +1627,10 @@ echo "Checking OpenvSwitch sw1...                   "
 echo "=============================================="
 echo ''
 
-sudo service sw1 stop
+if [ $OnVm = 'N' ]
+then
+	sudo service sw1 stop
+fi
 sleep 2
 sudo service sw1 start
 sleep 2
@@ -1878,7 +1905,10 @@ then
 	echo "=============================================="
 	echo ''
 
-	sudo service sw1 restart
+	if [ $OnVm = 'N' ]
+	then
+		sudo service sw1 restart
+	fi
 	sudo service sx1 restart
 
 	sudo chmod 777 /etc/network/openvswitch/setup_gre_and_routes.sh
@@ -1919,7 +1949,10 @@ then
 	sudo sed -i "s/orabuntu-lxc\.com/$Domain1/g"	/etc/network/openvswitch/nsupdate_add_$ShortHost.sh
 	sudo cat					/etc/network/openvswitch/nsupdate_add_$ShortHost.sh
 
-	sudo service sw1 restart
+	if [ $OnVm = 'N' ]
+	then
+		sudo service sw1 restart
+	fi
 	sudo service sx1 restart
 
 	ssh-keygen -f "/home/ubuntu/.ssh/known_hosts" -R 10.207.39.2
