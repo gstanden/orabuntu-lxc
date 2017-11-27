@@ -309,9 +309,9 @@ then
 #	sudo sed -i -e '/OPTIONS/{ s/.*/OPTIONS="-g -x"/ }' /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/etc/sysconfig/ntpd
 fi
 
-#sleep 5
+sleep 5
 
-#clear
+clear
 
 if [ $(SoftwareVersion $LXCVersion) -ge $(SoftwareVersion "2.1.0") ]
 then

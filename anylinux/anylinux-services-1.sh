@@ -380,7 +380,7 @@ then
 
        			 	echo ''
        			 	echo "=============================================="
-       			 	echo "Build and install Facter from source...       "
+       			 	echo "Build and install Facter from Ruby Gems...    "
        			 	echo "=============================================="
        			 	echo ''
 
@@ -700,7 +700,7 @@ then
 
        			 	echo ''
        			 	echo "=============================================="
-       			 	echo "Build and install Facter from source...       "
+       			 	echo "Build and install Facter from Ruby Gems...    "
        			 	echo "=============================================="
        			 	echo ''
 

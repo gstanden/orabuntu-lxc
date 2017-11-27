@@ -990,7 +990,11 @@ then
 			sudo sed -i '/python >= 2\.7/s/python >= 2\.7/python27/' openvswitch.spec
 			rpmbuild --define '_topdir /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/openvswitch/rpmbuild' -bb rhel/openvswitch.spec
 			cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/openvswitch/rpmbuild/RPMS/x86_64
-			
+		
+			sleep 5
+
+			clear
+	
 			echo ''
 			echo "=============================================="
 			echo "Establish sudo privileges...                  "
@@ -2206,6 +2210,7 @@ then
 
 	clear
 
+	echo ''
 	echo "=============================================="
 	echo "Setting ubuntu user password in $NameServer..."
 	echo "=============================================="
@@ -2224,7 +2229,7 @@ then
 
 fi
 
-if [ $MultiHostVar2 = 'Y' ] && [ $OnVm = 'N' ]
+if [ $MultiHostVar2 = 'Y' ]
 then
 	# GLS 20170904 rm known_hosts file for ubuntu user to prevent ssh failures.
 
@@ -2286,99 +2291,102 @@ then
 	}
 	MultiHostVar6=$(GetMultiHostVar6)
 
-	sudo sed -i "/route add -net/s/#/ /"				/etc/network/openvswitch/crt_ovs_sw1.sh	
-	sudo sed -i "/REMOTE_GRE_ENDPOINT/s/#/ /"			/etc/network/openvswitch/crt_ovs_sw1.sh	
-	sudo sed -i "s/REMOTE_GRE_ENDPOINT/$MultiHostVar5/g"		/etc/network/openvswitch/crt_ovs_sw1.sh
-
-	function CheckGre0Exists {
-		sudo ovs-vsctl show | grep gre0 | wc -l
-	}
-	Gre0Exists=$(CheckGre0Exists)
-
-	if [ $Gre0Exists -gt 0 ]
+	if [ $OnVm = 'N' ]
 	then
-		sudo ovs-vsctl del-port gre0
-	fi
+		sudo sed -i "/route add -net/s/#/ /"				/etc/network/openvswitch/crt_ovs_sw1.sh	
+		sudo sed -i "/REMOTE_GRE_ENDPOINT/s/#/ /"			/etc/network/openvswitch/crt_ovs_sw1.sh	
+		sudo sed -i "s/REMOTE_GRE_ENDPOINT/$MultiHostVar5/g"		/etc/network/openvswitch/crt_ovs_sw1.sh
 
-	function CheckGre1Exists {
-		sudo ovs-vsctl show | grep gre1 | wc -l
-	}
-	Gre1Exists=$(CheckGre1Exists)
+		function CheckGre0Exists {
+			sudo ovs-vsctl show | grep gre0 | wc -l
+		}
+		Gre0Exists=$(CheckGre0Exists)
 
-	if [ $Gre1Exists -gt 0 ]
-	then
-		sudo ovs-vsctl del-port gre1
-	fi
+		if [ $Gre0Exists -gt 0 ]
+		then
+			sudo ovs-vsctl del-port gre0
+		fi
 
-	sudo ovs-vsctl add-port sw1 gre0 -- set interface gre0 type=gre options:remote_ip=$MultiHostVar5
+		function CheckGre1Exists {
+			sudo ovs-vsctl show | grep gre1 | wc -l
+		}
+		Gre1Exists=$(CheckGre1Exists)
 
- 	sudo sed -i "s/MultiHostVar6/$MultiHostVar6/g" 	/etc/network/openvswitch/setup_gre_and_routes.sh
-#	sudo sed -i "s/MultiHostVar3/$MultiHostVar3/g" 	/etc/network/openvswitch/setup_gre_and_routes.sh
-#	sudo sed -i "s/MHV3/MultiHostVar3/g"		/etc/network/openvswitch/setup_gre_and_routes.sh
-#	sudo sed -i "s/MHV6/MultiHostVar6/g"		/etc/network/openvswitch/setup_gre_and_routes.sh
+		if [ $Gre1Exists -gt 0 ]
+		then
+			sudo ovs-vsctl del-port gre1
+		fi
 
-	sudo chmod 775 /etc/network/openvswitch/setup_gre_and_routes.sh
+		sudo ovs-vsctl add-port sw1 gre0 -- set interface gre0 type=gre options:remote_ip=$MultiHostVar5
 
-	echo ''
-	echo "=============================================="
-	echo "Setup GRE & Routes on $MultiHostVar5...       "
-	echo "=============================================="
-	echo ''
+ 		sudo sed -i "s/MultiHostVar6/$MultiHostVar6/g" 	/etc/network/openvswitch/setup_gre_and_routes.sh
+#		sudo sed -i "s/MultiHostVar3/$MultiHostVar3/g" 	/etc/network/openvswitch/setup_gre_and_routes.sh
+#		sudo sed -i "s/MHV3/MultiHostVar3/g"		/etc/network/openvswitch/setup_gre_and_routes.sh
+#		sudo sed -i "s/MHV6/MultiHostVar6/g"		/etc/network/openvswitch/setup_gre_and_routes.sh
 
-	sudo service sw1 restart
-	sudo service sx1 restart
+		sudo chmod 775 /etc/network/openvswitch/setup_gre_and_routes.sh
 
-	sudo chmod 777 /etc/network/openvswitch/setup_gre_and_routes.sh
+		echo ''
+		echo "=============================================="
+		echo "Setup GRE & Routes on $MultiHostVar5...       "
+		echo "=============================================="
+		echo ''
+	
+		sudo service sw1 restart
+		sudo service sx1 restart
 
-	sudo touch /home/ubuntu/.ssh/known_hosts
-	ssh-keygen -f "/home/ubuntu/.ssh/known_hosts" -R $MultiHostVar5
-	sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 date
-	if [ $? -eq 0 ]
-	then
-		sshpass -p ubuntu scp -p /etc/network/openvswitch/setup_gre_and_routes.sh ubuntu@$MultiHostVar5:~/.
-	fi
-	sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 "sudo -S <<< "ubuntu" ls -l ~/setup_gre_and_routes.sh"
-	if [ $? -eq 0 ]
-	then
-		sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 "sudo -S <<< "ubuntu" ~/setup_gre_and_routes.sh"
-		sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 "sudo -S <<< "ubuntu" service sw1 restart"
-		sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 "sudo -S <<< "ubuntu" /etc/orabuntu-lxc-scripts/stop_containers.sh"
-		sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 "sudo -S <<< "ubuntu" /etc/orabuntu-lxc-scripts/start_containers.sh"
-	fi
+		sudo chmod 777 /etc/network/openvswitch/setup_gre_and_routes.sh
 
-	function GetShortHost {
-		uname -n | cut -f1 -d'.'
-	}
-	ShortHost=$(GetShortHost)
+		sudo touch /home/ubuntu/.ssh/known_hosts
+		ssh-keygen -f "/home/ubuntu/.ssh/known_hosts" -R $MultiHostVar5
+		sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 date
+		if [ $? -eq 0 ]
+		then
+			sshpass -p ubuntu scp -p /etc/network/openvswitch/setup_gre_and_routes.sh ubuntu@$MultiHostVar5:~/.
+		fi
+		sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 "sudo -S <<< "ubuntu" ls -l ~/setup_gre_and_routes.sh"
+		if [ $? -eq 0 ]
+		then
+			sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 "sudo -S <<< "ubuntu" ~/setup_gre_and_routes.sh"
+			sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 "sudo -S <<< "ubuntu" service sw1 restart"
+			sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 "sudo -S <<< "ubuntu" /etc/orabuntu-lxc-scripts/stop_containers.sh"
+			sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 "sudo -S <<< "ubuntu" /etc/orabuntu-lxc-scripts/start_containers.sh"
+		fi
+
+		function GetShortHost {
+			uname -n | cut -f1 -d'.'
+		}
+		ShortHost=$(GetShortHost)
 		
-	echo ''
-	echo "=============================================="
-	echo "Create ADD DNS $Domain1 $ShortHost...         "
-	echo "=============================================="
-	echo ''
+		echo ''
+		echo "=============================================="
+		echo "Create ADD DNS $Domain1 $ShortHost...         "
+		echo "=============================================="
+		echo ''
 
-	sudo sh -c "echo 'echo \"server 10.207.39.2'								    	>  /etc/network/openvswitch/nsupdate_add_$ShortHost.sh"
-	sudo sh -c "echo 'update add $ShortHost.orabuntu-lxc.com 3600 IN A 10.207.39.$MultiHostVar3'		    	>> /etc/network/openvswitch/nsupdate_add_$ShortHost.sh"
-	sudo sh -c "echo 'send'											    	>> /etc/network/openvswitch/nsupdate_add_$ShortHost.sh"
-	sudo sh -c "echo 'update add $MultiHostVar3.39.207.10.in-addr.arpa 3600 IN PTR $ShortHost.orabuntu-lxc.com' 	>> /etc/network/openvswitch/nsupdate_add_$ShortHost.sh"
-	sudo sh -c "echo 'send'											    	>> /etc/network/openvswitch/nsupdate_add_$ShortHost.sh"
-	sudo sh -c "echo 'quit'											    	>> /etc/network/openvswitch/nsupdate_add_$ShortHost.sh"
-	sudo sh -c "echo '\" | nsupdate -k /etc/bind/rndc.key'							    	>> /etc/network/openvswitch/nsupdate_add_$ShortHost.sh"
+		sudo sh -c "echo 'echo \"server 10.207.39.2'								    	>  /etc/network/openvswitch/nsupdate_add_$ShortHost.sh"
+		sudo sh -c "echo 'update add $ShortHost.orabuntu-lxc.com 3600 IN A 10.207.39.$MultiHostVar3'		    	>> /etc/network/openvswitch/nsupdate_add_$ShortHost.sh"
+		sudo sh -c "echo 'send'											    	>> /etc/network/openvswitch/nsupdate_add_$ShortHost.sh"
+		sudo sh -c "echo 'update add $MultiHostVar3.39.207.10.in-addr.arpa 3600 IN PTR $ShortHost.orabuntu-lxc.com' 	>> /etc/network/openvswitch/nsupdate_add_$ShortHost.sh"
+		sudo sh -c "echo 'send'											    	>> /etc/network/openvswitch/nsupdate_add_$ShortHost.sh"
+		sudo sh -c "echo 'quit'											    	>> /etc/network/openvswitch/nsupdate_add_$ShortHost.sh"
+		sudo sh -c "echo '\" | nsupdate -k /etc/bind/rndc.key'							    	>> /etc/network/openvswitch/nsupdate_add_$ShortHost.sh"
 
-	sudo chmod 777 					/etc/network/openvswitch/nsupdate_add_$ShortHost.sh
-	sudo ls -l     					/etc/network/openvswitch/nsupdate_add_$ShortHost.sh
-	sudo sed -i "s/orabuntu-lxc\.com/$Domain1/g"	/etc/network/openvswitch/nsupdate_add_$ShortHost.sh
-	sudo cat					/etc/network/openvswitch/nsupdate_add_$ShortHost.sh
+		sudo chmod 777 					/etc/network/openvswitch/nsupdate_add_$ShortHost.sh
+		sudo ls -l     					/etc/network/openvswitch/nsupdate_add_$ShortHost.sh
+		sudo sed -i "s/orabuntu-lxc\.com/$Domain1/g"	/etc/network/openvswitch/nsupdate_add_$ShortHost.sh
+		sudo cat					/etc/network/openvswitch/nsupdate_add_$ShortHost.sh
 
-	sudo service sw1 restart
-	sudo service sx1 restart
+		sudo service sw1 restart
+		sudo service sx1 restart
 
-	sudo touch /home/ubuntu/.ssh/known_hosts
-	ssh-keygen -f "/home/ubuntu/.ssh/known_hosts" -R 10.207.39.2
-	sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.39.2 "sudo -S <<< "ubuntu" mkdir -p ~/Downloads"
-	sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.39.2 "sudo -S <<< "ubuntu" chown ubuntu:ubuntu Downloads"
-	sshpass -p ubuntu scp -p /etc/network/openvswitch/nsupdate_add_$ShortHost.sh ubuntu@10.207.39.2:~/Downloads/.
-	sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.39.2 "sudo -S <<< "ubuntu" ~/Downloads/nsupdate_add_$ShortHost.sh"
+		sudo touch /home/ubuntu/.ssh/known_hosts
+		ssh-keygen -f "/home/ubuntu/.ssh/known_hosts" -R 10.207.39.2
+		sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.39.2 "sudo -S <<< "ubuntu" mkdir -p ~/Downloads"
+		sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.39.2 "sudo -S <<< "ubuntu" chown ubuntu:ubuntu Downloads"
+		sshpass -p ubuntu scp -p /etc/network/openvswitch/nsupdate_add_$ShortHost.sh ubuntu@10.207.39.2:~/Downloads/.
+		sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.39.2 "sudo -S <<< "ubuntu" ~/Downloads/nsupdate_add_$ShortHost.sh"
+	fi
 fi
 
 # GLS 20161118 This section for any tweaks to the unpacked files from archives.

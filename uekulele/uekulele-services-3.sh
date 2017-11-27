@@ -197,7 +197,7 @@ then
 		echo ''
 		if [ $MultiHostVar2 = 'Y' ]
 		then
-			ls -l /var/lib/lxc/$j/config
+			sudo ls -l /var/lib/lxc/$j/config
 			sudo sed -i "s/MtuSetting/$MultiHostVar7/g" /var/lib/lxc/$j/config
 		fi
 		sudo lxc-start -n $j > /dev/null 2>&1

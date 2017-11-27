@@ -40,6 +40,11 @@ function GetMultiHostVar7 {
 }
 MultiHostVar7=$(GetMultiHostVar7)
 
+function GetMultiHostVar2 {
+        echo $MultiHost | cut -f2 -d':'
+}
+MultiHostVar2=$(GetMultiHostVar2)
+
 echo ''
 echo "=============================================="
 echo "Script:  uekulele-services-4.sh NumCon        "
