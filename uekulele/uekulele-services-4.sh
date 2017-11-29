@@ -215,7 +215,7 @@ do
 	RedHatVersion=$(GetRedHatVersion)
 
 	function CheckDNSLookup {
-		nslookup $ContainerPrefix$CloneIndex | grep 'Name' | grep $ContainerPrefix$CloneIndex | wc -l
+		nslookup -timeout=1 $ContainerPrefix$CloneIndex | grep -v '#' | grep Address | grep '10\.207\.39' | wc -l
 	}
 	DNSLookup=$(CheckDNSLookup)
 

@@ -438,13 +438,7 @@ echo "Restart containers and OvS networks...        "
 echo "=============================================="
 echo ''
 
-/etc/orabuntu-lxc-scripts/stop_containers.sh 
-sleep 1
-sudo service sw1 stop
-sleep 1
-sudo service sw1 start
-sleep 1
-/etc/orabuntu-lxc-scripts/start_containers.sh 
+sudo service NetworkManager restart > /dev/null 2>&1
 
 echo ''
 echo "=============================================="

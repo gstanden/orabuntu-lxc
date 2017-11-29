@@ -54,7 +54,7 @@
 #    v5.0 GLS 20170909 uekulele multihost for Oracle Linux 
 
 SudoPassword=ubuntu
-GRE=Y
+GRE=N
 
 clear
 
@@ -250,8 +250,8 @@ echo 'OSMemRes                  = '$OSMemRes
 MultiHost=$8
 if [ -z $8 ]
 then
-	#MultiHost="new:N:1:$SudoPassword:192.168.1.32:10.207.39.13:1500:ubuntu:ubuntu:$GRE"
-	 MultiHost="new:Y:4:$SudoPassword:10.207.39.14:10.207.39.17:1500:ubuntu:ubuntu:$GRE"
+	 MultiHost="new:N:1:$SudoPassword:192.168.1.82:10.207.39.13:1500:ubuntu:ubuntu:$GRE"
+	#MultiHost="new:Y:4:$SudoPassword:10.207.39.14:10.207.39.17:1500:ubuntu:ubuntu:$GRE"
 	#MultiHost="reinstall:N:1:$SudoPassword:192.168.1.32:192.168.1.68:1500:ubuntu:ubuntu:$GRE"
 	#MultiHost="reinstall:Y:4:$SudoPassword:192.168.1.32:192.168.1.68:1500:ubuntu:ubuntu:$GRE"
 	#MultiHost="addclones"

@@ -28,33 +28,6 @@ Domain2=$4
 MultiHost=$5
 OR=$OracleRelease
 
-function SoftwareVersion { echo "$@" | awk -F. '{ printf("%d%03d%03d%03d\n", $1,$2,$3,$4); }'; }
-
-function GetLXCVersion {
-        lxc-create --version
-}
-LXCVersion=$(GetLXCVersion)
-
-function GetMultiHostVar7 {
-        echo $MultiHost | cut -f7 -d':'
-}
-MultiHostVar7=$(GetMultiHostVar7)
-
-SeedIndex=10
-SeedPostfix=c$SeedIndex
-function CheckHighestSeedIndexHit {
-	nslookup oel$OracleRelease$SeedPostfix | grep "can't find" | wc -l
-}
-HighestSeedIndexHit=$(CheckHighestSeedIndexHit)
-
-while [ $HighestSeedIndexHit = 0 ]
-do
-	SeedIndex=$((SeedIndex+1))
-	SeedPostfix=c$SeedIndex
-	HighestSeedIndexHit=$(CheckHighestSeedIndexHit)
-done
-SeedPostfix=c$SeedIndex
-
 clear
 
 echo ''
@@ -71,6 +44,35 @@ echo "This script is re-runnable                    "
 echo "=============================================="
 
 sleep 5
+
+clear
+
+function SoftwareVersion { echo "$@" | awk -F. '{ printf("%d%03d%03d%03d\n", $1,$2,$3,$4); }'; }
+
+function GetLXCVersion {
+        lxc-create --version
+}
+LXCVersion=$(GetLXCVersion)
+
+function GetMultiHostVar7 {
+        echo $MultiHost | cut -f7 -d':'
+}
+MultiHostVar7=$(GetMultiHostVar7)
+
+SeedIndex=10
+SeedPostfix=c$SeedIndex
+function CheckHighestSeedIndexHit {
+	nslookup -timeout=1 oel$OracleRelease$SeedPostfix | grep -v '#' | grep Address | grep '10\.207\.29' | wc -l
+}
+HighestSeedIndexHit=$(CheckHighestSeedIndexHit)
+
+while [ $HighestSeedIndexHit = 1 ]
+do
+	SeedIndex=$((SeedIndex+1))
+	SeedPostfix=c$SeedIndex
+	HighestSeedIndexHit=$(CheckHighestSeedIndexHit)
+done
+SeedPostfix=c$SeedIndex
 
 clear
 
@@ -450,6 +452,8 @@ echo "=============================================="
 echo "Container oel$OracleRelease$SeedPostfix ping test..."
 echo "=============================================="
 echo ''
+
+sudo service NetworkManager restart > /dev/null 2>&1
 
 function CheckNetworkUp {
 ping -c 3 oel$OracleRelease$SeedPostfix | grep packet | cut -f3 -d',' | sed 's/ //g'
