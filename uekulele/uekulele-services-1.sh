@@ -38,7 +38,6 @@ NameServer=$5
 OSMemRes=$6
 MultiHost=$7
 LxcOvsVersion=$8
-OnVm=Y
 
 function GetLxcVersion {
 echo $LxcOvsVersion | cut -f1 -d':'
@@ -74,6 +73,25 @@ function GetMultiHostVar9 {
 	echo $MultiHost | cut -f9 -d':'
 }
 MultiHostVar9=$(GetMultiHostVar9)
+
+function GetMultiHostVar10 {
+	echo $MultiHost | cut -f10 -d':'
+}
+MultiHostVar10=$(GetMultiHostVar10)
+
+function GetMultiHostVar11 {
+	echo $MultiHost | cut -f11 -d':'
+}
+MultiHostVar11=$(GetMultiHostVar11)
+
+function GetMultiHostVar12 {
+	echo $MultiHost | cut -f12 -d':'
+}
+MultiHostVar12=$(GetMultiHostVar12)
+
+GRE=$MultiHostVar10
+OnVm1=$MultiHostVar11
+OnVm2=$MultiHostVar12
 
 function CheckSystemdResolvedInstalled {
         sudo netstat -ulnp | grep 53 | sed 's/  */ /g' | rev | cut -f1 -d'/' | rev | sort -u | grep systemd- | wc -l
@@ -563,7 +581,7 @@ then
 		then
 			echo ''
 			echo "=============================================="
-			echo "Untar source code and build LXC RPM...        "
+			echo "Install required packages and prepare...      "
 			echo "=============================================="
 			echo ''
 
@@ -573,6 +591,22 @@ then
 			sudo yum -y install rpm-build wget openssl-devel gcc make docbook2X xmlto docbook automake graphviz libtool
 			mkdir -p /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc
 			cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc
+			
+			echo ''
+			echo "=============================================="
+			echo "Done: Install required packages and prepare.  "
+			echo "=============================================="
+
+			sleep 5
+
+			clear
+
+			echo ''
+			echo "=============================================="
+			echo "Untar source code and build LXC RPM...        "
+			echo "=============================================="
+			echo ''
+			
 			wget --timeout=3 --tries=3 https://linuxcontainers.org/downloads/lxc/lxc-"$LxcVersion".tar.gz
 			mkdir -p /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc/rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
 			cp -p lxc-"$LxcVersion".tar.gz /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc/rpmbuild/SOURCES/.
@@ -596,7 +630,6 @@ then
 			echo "=============================================="
 			echo "Done: Untar source code and build LXC RPM     "
 			echo "=============================================="
-			echo ''
 		
 			sleep 5
 
@@ -604,7 +637,7 @@ then
 	
 			echo ''
 			echo "=============================================="
-			echo "Upgrade LXC from source: Install RPM's...     "
+			echo "Install LXC RPM's...                          "
 			echo "=============================================="
 			echo ''
 
@@ -1024,6 +1057,10 @@ then
 			cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/openvswitch
 			rpmbuild --define '_topdir /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/openvswitch/rpmbuild' -ba openvswitch.spec
 			cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/openvswitch/rpmbuild/RPMS/x86_64
+
+			sleep 5
+
+			clear
 	
 			echo ''
 			echo "=============================================="
@@ -1336,7 +1373,7 @@ then
 	echo ''
 
  	sudo lxc-attach -n nsa -- sudo apt-get -y update
- 	sudo lxc-attach -n nsa -- sudo apt-get -y install bind9 isc-dhcp-server bind9utils dnsutils openssh-server
+ 	sudo lxc-attach -n nsa -- sudo apt-get -y install bind9 isc-dhcp-server bind9utils dnsutils openssh-server man
 
 	sleep 2
 
@@ -1920,7 +1957,7 @@ then
 	clear
 fi
 
-if [ $OnVm = 'N' ]
+if [ $OnVm1 = 'N' ] && [ $OnVm2 = 'N' ]
 then
 	echo ''
 	echo "=============================================="
@@ -2049,10 +2086,7 @@ echo "Checking OpenvSwitch sw1...                   "
 echo "=============================================="
 echo ''
 
-if [ $OnVm = 'N' ]
-then
-	sudo service sw1 stop
-fi
+sudo service sw1 stop
 sleep 2
 sudo systemctl start sw1
 sleep 2
@@ -2129,7 +2163,7 @@ then
         sudo lxc-update-config -c /var/lib/lxc/$NameServer/config
 fi
 
-if [ $MultiHostVar2 = 'N' ] && [ $OnVm = 'N' ]
+if [ $MultiHostVar2 = 'N' ] && [ $OnVm1 = 'N' ] && [ $OnVm2 = 'N' ]
 then
 	echo ''
 	echo "=============================================="
@@ -2156,11 +2190,11 @@ then
 			echo "DNS is NOT RUNNING with correct status!"
 		fi
 	fi
-fi
 
-echo "=============================================="
-echo "LXC container restarted & DNS tested.         "
-echo "=============================================="
+	echo "=============================================="
+	echo "LXC container restarted & DNS tested.         "
+	echo "=============================================="
+fi
 
 sleep 5
 
@@ -2196,7 +2230,7 @@ then
 	echo "=============================================="
 	echo ''
 
-	sudo tar -P -xvf /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/archives/scst-files.tar -C /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/archives
+	sudo tar -P -xvf /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/archives/scst-files.tar --touch -C /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/archives
 	sleep 2
 	sudo sed -i "s/SWITCH_IP/$MultiHostVar3/g" /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/archives/scst-files/create-scst-oracle.sh
 		
@@ -2291,7 +2325,7 @@ then
 	}
 	MultiHostVar6=$(GetMultiHostVar6)
 
-	if [ $OnVm = 'N' ]
+	if [ $OnVm1 = 'N' ] && [ $OnVm2 = 'N' ] || [ $GRE = 'Y' ]
 	then
 		sudo sed -i "/route add -net/s/#/ /"				/etc/network/openvswitch/crt_ovs_sw1.sh	
 		sudo sed -i "/REMOTE_GRE_ENDPOINT/s/#/ /"			/etc/network/openvswitch/crt_ovs_sw1.sh	
@@ -2357,35 +2391,43 @@ then
 			uname -n | cut -f1 -d'.'
 		}
 		ShortHost=$(GetShortHost)
-		
-		echo ''
-		echo "=============================================="
-		echo "Create ADD DNS $Domain1 $ShortHost...         "
-		echo "=============================================="
-		echo ''
 
-		sudo sh -c "echo 'echo \"server 10.207.39.2'								    	>  /etc/network/openvswitch/nsupdate_add_$ShortHost.sh"
-		sudo sh -c "echo 'update add $ShortHost.orabuntu-lxc.com 3600 IN A 10.207.39.$MultiHostVar3'		    	>> /etc/network/openvswitch/nsupdate_add_$ShortHost.sh"
-		sudo sh -c "echo 'send'											    	>> /etc/network/openvswitch/nsupdate_add_$ShortHost.sh"
-		sudo sh -c "echo 'update add $MultiHostVar3.39.207.10.in-addr.arpa 3600 IN PTR $ShortHost.orabuntu-lxc.com' 	>> /etc/network/openvswitch/nsupdate_add_$ShortHost.sh"
-		sudo sh -c "echo 'send'											    	>> /etc/network/openvswitch/nsupdate_add_$ShortHost.sh"
-		sudo sh -c "echo 'quit'											    	>> /etc/network/openvswitch/nsupdate_add_$ShortHost.sh"
-		sudo sh -c "echo '\" | nsupdate -k /etc/bind/rndc.key'							    	>> /etc/network/openvswitch/nsupdate_add_$ShortHost.sh"
+		function CheckHostnameLookup {
+			nslookup $HOSTNAME.urdomain1.com | grep Address | grep -v '#' | wc -l
+		}
+		HostnameLookup=$(CheckHostnameLookup)
 
-		sudo chmod 777 					/etc/network/openvswitch/nsupdate_add_$ShortHost.sh
-		sudo ls -l     					/etc/network/openvswitch/nsupdate_add_$ShortHost.sh
-		sudo sed -i "s/orabuntu-lxc\.com/$Domain1/g"	/etc/network/openvswitch/nsupdate_add_$ShortHost.sh
-		sudo cat					/etc/network/openvswitch/nsupdate_add_$ShortHost.sh
+		if [ $HostnameLookup -eq 0 ]
+		then		
+			echo ''
+			echo "=============================================="
+			echo "Create ADD DNS $Domain1 $ShortHost...         "
+			echo "=============================================="
+			echo ''
 
-		sudo service sw1 restart
-		sudo service sx1 restart
+			sudo sh -c "echo 'echo \"server 10.207.39.2'								    	>  /etc/network/openvswitch/nsupdate_add_$ShortHost.sh"
+			sudo sh -c "echo 'update add $ShortHost.orabuntu-lxc.com 3600 IN A 10.207.39.$MultiHostVar3'		    	>> /etc/network/openvswitch/nsupdate_add_$ShortHost.sh"
+			sudo sh -c "echo 'send'											    	>> /etc/network/openvswitch/nsupdate_add_$ShortHost.sh"
+			sudo sh -c "echo 'update add $MultiHostVar3.39.207.10.in-addr.arpa 3600 IN PTR $ShortHost.orabuntu-lxc.com' 	>> /etc/network/openvswitch/nsupdate_add_$ShortHost.sh"
+			sudo sh -c "echo 'send'											    	>> /etc/network/openvswitch/nsupdate_add_$ShortHost.sh"
+			sudo sh -c "echo 'quit'											    	>> /etc/network/openvswitch/nsupdate_add_$ShortHost.sh"
+			sudo sh -c "echo '\" | nsupdate -k /etc/bind/rndc.key'							    	>> /etc/network/openvswitch/nsupdate_add_$ShortHost.sh"
 
-		sudo touch /home/ubuntu/.ssh/known_hosts
-		ssh-keygen -f "/home/ubuntu/.ssh/known_hosts" -R 10.207.39.2
-		sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.39.2 "sudo -S <<< "ubuntu" mkdir -p ~/Downloads"
-		sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.39.2 "sudo -S <<< "ubuntu" chown ubuntu:ubuntu Downloads"
-		sshpass -p ubuntu scp -p /etc/network/openvswitch/nsupdate_add_$ShortHost.sh ubuntu@10.207.39.2:~/Downloads/.
-		sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.39.2 "sudo -S <<< "ubuntu" ~/Downloads/nsupdate_add_$ShortHost.sh"
+			sudo chmod 777 					/etc/network/openvswitch/nsupdate_add_$ShortHost.sh
+			sudo ls -l     					/etc/network/openvswitch/nsupdate_add_$ShortHost.sh
+			sudo sed -i "s/orabuntu-lxc\.com/$Domain1/g"	/etc/network/openvswitch/nsupdate_add_$ShortHost.sh
+			sudo cat					/etc/network/openvswitch/nsupdate_add_$ShortHost.sh
+	
+			sudo service sw1 restart
+			sudo service sx1 restart
+
+			sudo touch /home/ubuntu/.ssh/known_hosts
+			ssh-keygen -f "/home/ubuntu/.ssh/known_hosts" -R 10.207.39.2
+			sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.39.2 "sudo -S <<< "ubuntu" mkdir -p ~/Downloads"
+			sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.39.2 "sudo -S <<< "ubuntu" chown ubuntu:ubuntu Downloads"
+			sshpass -p ubuntu scp -p /etc/network/openvswitch/nsupdate_add_$ShortHost.sh ubuntu@10.207.39.2:~/Downloads/.
+			sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.39.2 "sudo -S <<< "ubuntu" ~/Downloads/nsupdate_add_$ShortHost.sh"
+		fi
 	fi
 fi
 

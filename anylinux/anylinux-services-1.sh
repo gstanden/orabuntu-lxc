@@ -282,23 +282,17 @@ then
 			echo ''
 			echo "=============================================="
 			echo "DISTRO               REL   KERN TYPE  EDITION "
-			echo "Tested: Oracle Linux 7.x   UEK4 (VM)  Server  "
-			echo "Tested: Oracle Linux 7.x   UEK4 (PH)  Server  "
-			echo "Tested: Oracle Linux 7.x   RHEL (VM)  Server  "
-			echo "Tested: Oracle Linux 7.x   RHEL (PH)  Server  "
-			echo "Tested: Ubuntu Linux 16.x  ALL  (VM)  Desktop "
-			echo "Tested: Ubuntu Linux 16.x  ALL  (VM)  Server  "
-			echo "Tested: Ubuntu Linux 16.x  ALL  (PH)  Desktop "
-			echo "Tested: Ubuntu Linux 16.x  ALL  (PH)  Server  "
-			echo "Tested: Ubuntu Linux 17.x  ALL  (VM)  Desktop "
-			echo "Tested: Ubuntu Linux 17.x  ALL  (VM)  Server  "
-			echo "Tested: Ubuntu Linux 17.x  ALL  (PH)  Desktop "
-			echo "Tested: Ubuntu Linux 17.x  ALL  (PH)  Server  "
+			echo "Tested: Oracle Linux 7.x   UEK4 (V,P) ALL     "
+			echo "Tested: Oracle Linux 7.x   RHEL (V,P) ALL     "
+			echo "Tested: Ubuntu Linux 16.x  ALL  (V,P) (S,D)   "
+			echo "Tested: Ubuntu Linux 17.x  ALL  (V,P) (S,D)   "
 			echo "                                              "
 			echo "Legend:                                       "
 			echo "                                              "
-			echo "	VM=Virtual  Host                            "
-			echo "	PH=Physical Host                            "
+			echo "	V=Virtual Host                              "
+			echo "	P=Physical Host                             "
+			echo "	S=Server Edition                            "
+			echo "	D=Desktop Edition                           "
 			echo "	REL=Release                                 "
 			echo "	KERN=Kernel Version                         "
 			echo "=============================================="
@@ -404,7 +398,7 @@ then
 			fi #OK 5
 
 			function GetFacter {
-			facter virtual
+				facter virtual
 			}
 			Facter=$(GetFacter)
 			
@@ -414,6 +408,72 @@ then
 
 			if [ $Facter != 'physical' ] # 6
 			then
+				function GetVirtualInterfaces {
+					ifconfig | grep enp | cut -f1 -d':' | sed 's/$/ /' | tr -d '\n' | sed 's/^[ \t]*//;s/[ \t]*$//'
+				}
+				VirtualInterfaces=$(GetVirtualInterfaces)
+
+				for i in $VirtualInterfaces
+				do
+					function CheckIpOnVirtualInterface1 {
+						ifconfig $i | grep 10.207.39 | wc -l
+					}
+					IpOnVirtualInterface1=$(CheckIpOnVirtualInterface1)
+
+					function CheckIpOnVirtualInterface2 {
+						ifconfig $i | grep 10.207.29 | wc -l
+					}
+					IpOnVirtualInterface2=$(CheckIpOnVirtualInterface2)
+
+					sudo mkdir -p /etc/network/openvswitch
+
+					if [ $IpOnVirtualInterface1 -eq 1 ] || [ -f /etc/network/openvswitch/sw1.info ]
+					then
+						function GetIpVirtualInterface1 {
+							ifconfig $i | grep inet | grep 10.207.39 | sed 's/^[ \t]*//;s/[ \t]*$//' | cut -f2 -d' '
+						}
+						IpVirtualInterface1=$(GetIpVirtualInterface1)
+
+						if [ ! -f /etc/network/openvswitch/sw1.info ]
+						then
+							sudo sh -c "echo '$i:$IpVirtualInterface1:Y' > /etc/network/openvswitch/sw1.info"
+							sudo cat /etc/network/openvswitch/sw1.info
+							sleep 5
+						fi
+						function GetOnVm1 {
+							sudo cat /etc/network/openvswitch/sw1.info | cut -f3 -d':'
+						}
+						OnVm1=$(GetOnVm1)
+					else
+						OnVm1=N
+					fi
+	
+					if [ $IpOnVirtualInterface2 -eq 1 ] || [ -f /etc/network/openvswitch/sx1.info ]
+					then
+						function GetIpVirtualInterface2 {
+							ifconfig $i | grep inet | grep 10.207.29 | sed 's/^[ \t]*//;s/[ \t]*$//' | cut -f2 -d' '
+						}
+						IpVirtualInterface2=$(GetIpVirtualInterface2)
+
+						if [ ! -f /etc/network/openvswitch/sx1.info ]
+						then
+							sudo sh -c "echo '$i:$IpVirtualInterface2:Y' > /etc/network/openvswitch/sx1.info"
+							sudo cat /etc/network/openvswitch/sx1.info
+							sleep 5
+						fi
+						function GetOnVm2 {
+							sudo cat /etc/network/openvswitch/sx1.info | cut -f3 -d':'
+						}
+						OnVm2=$(GetOnVm2)
+					else
+						OnVm2=N
+					fi
+				done
+
+				echo ''
+
+				MultiHost="$MultiHost:$OnVm1:$OnVm2"
+
  				echo ''
 				echo "=============================================="
 				echo "Orabuntu-LXC $LF Linux $RL on $Facter.        "
@@ -479,6 +539,9 @@ then
 				sleep 5
 	
  			else # OK 6
+
+				OnVm=N
+				MultiHost="$MultiHost:$OnVm"
 
 				echo ''
 				echo "=============================================="
@@ -603,23 +666,17 @@ then
 			echo ''
 			echo "=============================================="
 			echo "DISTRO               REL   KERN TYPE  EDITION "
-			echo "Tested: Oracle Linux 7.x   UEK4 (VM)  Server  "
-			echo "Tested: Oracle Linux 7.x   UEK4 (PH)  Server  "
-			echo "Tested: Oracle Linux 7.x   RHEL (VM)  Server  "
-			echo "Tested: Oracle Linux 7.x   RHEL (PH)  Server  "
-			echo "Tested: Ubuntu Linux 16.x  ALL  (VM)  Desktop "
-			echo "Tested: Ubuntu Linux 16.x  ALL  (VM)  Server  "
-			echo "Tested: Ubuntu Linux 16.x  ALL  (PH)  Desktop "
-			echo "Tested: Ubuntu Linux 16.x  ALL  (PH)  Server  "
-			echo "Tested: Ubuntu Linux 17.x  ALL  (VM)  Desktop "
-			echo "Tested: Ubuntu Linux 17.x  ALL  (VM)  Server  "
-			echo "Tested: Ubuntu Linux 17.x  ALL  (PH)  Desktop "
-			echo "Tested: Ubuntu Linux 17.x  ALL  (PH)  Server  "
+			echo "Tested: Oracle Linux 7.x   UEK4 (V,P) ALL     "
+			echo "Tested: Oracle Linux 7.x   RHEL (V,P) ALL     "
+			echo "Tested: Ubuntu Linux 16.x  ALL  (V,P) (S,D)   "
+			echo "Tested: Ubuntu Linux 17.x  ALL  (V,P) (S,D)   "
 			echo "                                              "
 			echo "Legend:                                       "
 			echo "                                              "
-			echo "	VM=Virtual  Host                            "
-			echo "	PH=Physical Host                            "
+			echo "	V=Virtual Host                              "
+			echo "	P=Physical Host                             "
+			echo "	S=Server Edition                            "
+			echo "	D=Desktop Edition                           "
 			echo "	REL=Release                                 "
 			echo "	KERN=Kernel Version                         "
 			echo "=============================================="
@@ -735,6 +792,66 @@ then
 
 			if [ $Facter != 'physical' ] # 6
 			then
+				function GetVirtualInterfaces {
+					ifconfig | grep enp | cut -f1 -d':' | sed 's/$/ /' | tr -d '\n' | sed 's/^[ \t]*//;s/[ \t]*$//'
+				}
+				VirtualInterfaces=$(GetVirtualInterfaces)
+
+				for i in $VirtualInterfaces
+				do
+					function CheckIpOnVirtualInterface1 {
+						ifconfig $i | grep 10.207.39 | wc -l
+					}
+					IpOnVirtualInterface1=$(CheckIpOnVirtualInterface1)
+
+					function CheckIpOnVirtualInterface2 {
+						ifconfig $i | grep 10.207.29 | wc -l
+					}
+					IpOnVirtualInterface2=$(CheckIpOnVirtualInterface2)
+
+					sudo mkdir -p /etc/network/openvswitch
+
+					if [ $IpOnVirtualInterface1 -eq 1 ] || [ -f /etc/network/openvswitch/sw1.info ]
+					then
+						function GetIpVirtualInterface1 {
+							ifconfig $i | grep inet | grep 10.207.39 | sed 's/^[ \t]*//;s/[ \t]*$//' | cut -f2 -d' '
+						}
+						IpVirtualInterface1=$(GetIpVirtualInterface1)
+
+						if [ ! -f /etc/network/openvswitch/sw1.info ]
+						then
+							sudo sh -c "echo '$i:$IpVirtualInterface1:Y' > /etc/network/openvswitch/sw1.info"
+						fi
+						function GetOnVm1 {
+							sudo cat /etc/network/openvswitch/sw1.info | cut -f3 -d':'
+						}
+						OnVm1=$(GetOnVm1)
+					else
+						OnVm1=N
+					fi
+	
+					if [ $IpOnVirtualInterface2 -eq 1 ] || [ -f /etc/network/openvswitch/sx1.info ]
+					then
+						function GetIpVirtualInterface2 {
+							ifconfig $i | grep inet | grep 10.207.29 | sed 's/^[ \t]*//;s/[ \t]*$//' | cut -f2 -d' '
+						}
+						IpVirtualInterface2=$(GetIpVirtualInterface2)
+
+						if [ ! -f /etc/network/openvswitch/sx1.info ]
+						then
+							sudo sh -c "echo '$i:$IpVirtualInterface2:Y' > /etc/network/openvswitch/sx1.info"
+						fi
+						function GetOnVm2 {
+							sudo cat /etc/network/openvswitch/sx1.info | cut -f3 -d':'
+						}
+						OnVm2=$(GetOnVm2)
+					else
+						OnVm2=N
+					fi
+				done
+
+				MultiHost="$MultiHost:$OnVm1:$OnVm2"
+
  				echo ''
 				echo "=============================================="
 				echo "Orabuntu-LXC $LF Linux $RL on $Facter.        "
@@ -800,6 +917,9 @@ then
 				sleep 5
 
  			else # OK 6
+
+				OnVm=N
+				MultiHost="$MultiHost:$OnVm"
 
 				echo ''
 				echo "=============================================="
@@ -924,23 +1044,17 @@ then
 			echo ''
 			echo "=============================================="
 			echo "DISTRO               REL   KERN TYPE  EDITION "
-			echo "Tested: Oracle Linux 7.x   UEK4 (VM)  Server  "
-			echo "Tested: Oracle Linux 7.x   UEK4 (PH)  Server  "
-			echo "Tested: Oracle Linux 7.x   RHEL (VM)  Server  "
-			echo "Tested: Oracle Linux 7.x   RHEL (PH)  Server  "
-			echo "Tested: Ubuntu Linux 16.x  ALL  (VM)  Desktop "
-			echo "Tested: Ubuntu Linux 16.x  ALL  (VM)  Server  "
-			echo "Tested: Ubuntu Linux 16.x  ALL  (PH)  Desktop "
-			echo "Tested: Ubuntu Linux 16.x  ALL  (PH)  Server  "
-			echo "Tested: Ubuntu Linux 17.x  ALL  (VM)  Desktop "
-			echo "Tested: Ubuntu Linux 17.x  ALL  (VM)  Server  "
-			echo "Tested: Ubuntu Linux 17.x  ALL  (PH)  Desktop "
-			echo "Tested: Ubuntu Linux 17.x  ALL  (PH)  Server  "
+			echo "Tested: Oracle Linux 7.x   UEK4 (V,P) ALL     "
+			echo "Tested: Oracle Linux 7.x   RHEL (V,P) ALL     "
+			echo "Tested: Ubuntu Linux 16.x  ALL  (V,P) (S,D)   "
+			echo "Tested: Ubuntu Linux 17.x  ALL  (V,P) (S,D)   "
 			echo "                                              "
 			echo "Legend:                                       "
 			echo "                                              "
-			echo "	VM=Virtual  Host                            "
-			echo "	PH=Physical Host                            "
+			echo "	V=Virtual Host                              "
+			echo "	P=Physical Host                             "
+			echo "	S=Server Edition                            "
+			echo "	D=Desktop Edition                           "
 			echo "	REL=Release                                 "
 			echo "	KERN=Kernel Version                         "
 			echo "=============================================="
@@ -1040,6 +1154,66 @@ then
 
 			if [ $Facter != 'physical' ] # 6
 			then
+				function GetVirtualInterfaces {
+					ifconfig | grep enp | cut -f1 -d':' | sed 's/$/ /' | tr -d '\n' | sed 's/^[ \t]*//;s/[ \t]*$//'
+				}
+				VirtualInterfaces=$(GetVirtualInterfaces)
+
+				for i in $VirtualInterfaces
+				do
+					function CheckIpOnVirtualInterface1 {
+						ifconfig $i | grep 10.207.39 | wc -l
+					}
+					IpOnVirtualInterface1=$(CheckIpOnVirtualInterface1)
+
+					function CheckIpOnVirtualInterface2 {
+						ifconfig $i | grep 10.207.29 | wc -l
+					}
+					IpOnVirtualInterface2=$(CheckIpOnVirtualInterface2)
+
+					sudo mkdir -p /etc/network/openvswitch
+
+					if [ $IpOnVirtualInterface1 -eq 1 ] || [ -f /etc/network/openvswitch/sw1.info ]
+					then
+						function GetIpVirtualInterface1 {
+							ifconfig $i | grep inet | grep 10.207.39 | sed 's/^[ \t]*//;s/[ \t]*$//' | cut -f2 -d' '
+						}
+						IpVirtualInterface1=$(GetIpVirtualInterface1)
+
+						if [ ! -f /etc/network/openvswitch/sw1.info ]
+						then
+							sudo sh -c "echo '$i:$IpVirtualInterface1:Y' > /etc/network/openvswitch/sw1.info"
+						fi
+						function GetOnVm1 {
+							sudo cat /etc/network/openvswitch/sw1.info | cut -f3 -d':'
+						}
+						OnVm1=$(GetOnVm1)
+					else
+						OnVm1=N
+					fi
+	
+					if [ $IpOnVirtualInterface2 -eq 1 ] || [ -f /etc/network/openvswitch/sx1.info ]
+					then
+						function GetIpVirtualInterface2 {
+							ifconfig $i | grep inet | grep 10.207.29 | sed 's/^[ \t]*//;s/[ \t]*$//' | cut -f2 -d' '
+						}
+						IpVirtualInterface2=$(GetIpVirtualInterface2)
+
+						if [ ! -f /etc/network/openvswitch/sx1.info ]
+						then
+							sudo sh -c "echo '$i:$IpVirtualInterface2:Y' > /etc/network/openvswitch/sx1.info"
+						fi
+						function GetOnVm2 {
+							sudo cat /etc/network/openvswitch/sx1.info | cut -f3 -d':'
+						}
+						OnVm2=$(GetOnVm2)
+					else
+						OnVm2=N
+					fi
+				done
+
+				MultiHost="$MultiHost:$OnVm1:$OnVm2"
+
  				echo ''
 				echo "=============================================="
 				echo "Orabuntu-LXC $LF Linux $RL on $Facter.        "
@@ -1110,6 +1284,9 @@ then
 				sleep 5
 
  			else # OK 6
+
+				OnVm=N
+				MultiHost="$MultiHost:$OnVm"
 
 				echo ''
 				echo "=============================================="

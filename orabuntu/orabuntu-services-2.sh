@@ -29,6 +29,10 @@ Domain2=$4
 MultiHost=$5
 NameServer=$6
 
+sudo cat /etc/resolv.conf | sort > new
+sudo mv new /etc/resolv.conf
+cat /etc/resolv.conf
+
 function SoftwareVersion { echo "$@" | awk -F. '{ printf("%d%03d%03d%03d\n", $1,$2,$3,$4); }'; }
 
 function GetLXCVersion {
@@ -52,14 +56,16 @@ then
 fi
 
 SeedIndex=10
+SeedPostfix=c$SeedIndex
 function CheckHighestSeedIndexHit {
-	nslookup 10.207.29.$SeedIndex | grep -i "can't find" | wc -l
+	nslookup oel$OracleRelease$SeedPostfix | grep "can't find" | wc -l
 }
 HighestSeedIndexHit=$(CheckHighestSeedIndexHit)
 
 while [ $HighestSeedIndexHit = 0 ]
 do
 	SeedIndex=$((SeedIndex+1))
+	SeedPostfix=c$SeedIndex
 	HighestSeedIndexHit=$(CheckHighestSeedIndexHit)
 done
 SeedPostfix=c$SeedIndex

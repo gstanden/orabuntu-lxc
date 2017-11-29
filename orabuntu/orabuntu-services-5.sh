@@ -305,6 +305,13 @@ sleep 5
 
 clear
 
+sudo service olive stop
+sudo service sx1 stop
+sleep 1
+sudo service sx1 start
+sleep 1
+sudo service olive start
+
 echo ''
 echo "=============================================="
 echo " A reboot is recommended (but not required!)  "

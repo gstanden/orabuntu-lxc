@@ -192,7 +192,7 @@ do
 	SystemdResolvedInstalled=$(CheckSystemdResolvedInstalled)
 
 	function CheckDNSLookup {
-		nslookup 10.207.39.$CloneIndex | grep 'name =' | cut -f2 -d'=' | sed 's/^[ \t]*//;s/[ \t]*$//' | wc -l
+		nslookup $ContainerPrefix$CloneIndex | grep 'Name' | grep $ContainerPrefix$CloneIndex | wc -l
 	}
 	DNSLookup=$(CheckDNSLookup)
 

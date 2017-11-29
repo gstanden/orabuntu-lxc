@@ -41,14 +41,16 @@ function GetMultiHostVar7 {
 MultiHostVar7=$(GetMultiHostVar7)
 
 SeedIndex=10
+SeedPostfix=c$SeedIndex
 function CheckHighestSeedIndexHit {
-	nslookup 10.207.29.$SeedIndex | grep "can't find" | wc -l
+	nslookup oel$OracleRelease$SeedPostfix | grep "can't find" | wc -l
 }
 HighestSeedIndexHit=$(CheckHighestSeedIndexHit)
 
 while [ $HighestSeedIndexHit = 0 ]
 do
 	SeedIndex=$((SeedIndex+1))
+	SeedPostfix=c$SeedIndex
 	HighestSeedIndexHit=$(CheckHighestSeedIndexHit)
 done
 SeedPostfix=c$SeedIndex
