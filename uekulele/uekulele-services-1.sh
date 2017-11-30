@@ -2265,8 +2265,6 @@ fi
 
 if [ $MultiHostVar2 = 'Y' ]
 then
-	# GLS 20170904 rm known_hosts file for ubuntu user to prevent ssh failures.
-
 	function GetMultiHostVar2 {
 		echo $MultiHost | cut -f2 -d':'
 	}
@@ -2325,7 +2323,7 @@ then
 	}
 	MultiHostVar6=$(GetMultiHostVar6)
 
-	if [ $OnVm1 = 'N' ] && [ $OnVm2 = 'N' ] || [ $GRE = 'Y' ]
+	if [ $GRE = 'Y' ]
 	then
 		sudo sed -i "/route add -net/s/#/ /"				/etc/network/openvswitch/crt_ovs_sw1.sh	
 		sudo sed -i "/REMOTE_GRE_ENDPOINT/s/#/ /"			/etc/network/openvswitch/crt_ovs_sw1.sh	
@@ -2391,11 +2389,13 @@ then
 			uname -n | cut -f1 -d'.'
 		}
 		ShortHost=$(GetShortHost)
+		echo $ShortHost
 
 		function CheckHostnameLookup {
-			nslookup $HOSTNAME.urdomain1.com | grep Address | grep -v '#' | wc -l
+			nslookup -timeout=2 $HOSTNAME.$Domain1 | grep Address | grep -v '#' | wc -l
 		}
 		HostnameLookup=$(CheckHostnameLookup)
+		echo $HostnameLookup
 
 		if [ $HostnameLookup -eq 0 ]
 		then		
@@ -2423,10 +2423,28 @@ then
 
 			sudo touch /home/ubuntu/.ssh/known_hosts
 			ssh-keygen -f "/home/ubuntu/.ssh/known_hosts" -R 10.207.39.2
+			sudo ifconfig sw1 mtu $MultiHostVar7
+			sudo ifconfig sx1 mtu $MultiHostVar7
+			sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar6 "sudo -S <<< "ubuntu" ifconfig sw1 mtu $MultiHostVar7"
+			sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar6 "sudo -S <<< "ubuntu" ifconfig sx1 mtu $MultiHostVar7"
 			sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.39.2 "sudo -S <<< "ubuntu" mkdir -p ~/Downloads"
 			sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.39.2 "sudo -S <<< "ubuntu" chown ubuntu:ubuntu Downloads"
 			sshpass -p ubuntu scp -p /etc/network/openvswitch/nsupdate_add_$ShortHost.sh ubuntu@10.207.39.2:~/Downloads/.
+			echo "apparently this one has problem..."
 			sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.39.2 "sudo -S <<< "ubuntu" ~/Downloads/nsupdate_add_$ShortHost.sh"
+		fi
+
+		if [ $OnVm1 = 'N' ] && [ $OnVm2 = 'N' ]
+		then
+			sudo sh -c "echo 'sudo ifconfig sw1 mtu $MultiHostVar7'		>  /etc/network/openvswitch/set_mtu.sh"
+			sudo sh -c "echo 'sudo ifconfig sx1 mtu $MultiHostVar7'	    	>> /etc/network/openvswitch/set_mtu.sh"
+			sudo sh -c "echo 'sudo ifconfig olivex mtu $MultiHostVar7'    	>> /etc/network/openvswitch/set_mtu.sh"
+			sudo sh -c "echo 'sudo ifconfig olivew mtu $MultiHostVar7'    	>> /etc/network/openvswitch/set_mtu.sh"
+			sudo chmod 777 /etc/network/openvswitch/set_mtu.sh
+			sshpass -p ubuntu scp -p /etc/network/openvswitch/set_mtu.sh ubuntu@$MultiHostVar5:~/.
+			sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.39.2 "sudo -S <<< "ubuntu" ifconfig eth0 mtu $MultiHostVar7"
+			sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.39.2 "sudo -S <<< "ubuntu" ifconfig eth1 mtu $MultiHostVar7"
+			sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 "sudo -S <<< "ubuntu" ~/set_mtu.sh"
 		fi
 	fi
 fi

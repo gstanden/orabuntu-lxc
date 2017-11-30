@@ -58,6 +58,13 @@ function GetMultiHostVar7 {
         echo $MultiHost | cut -f7 -d':'
 }
 MultiHostVar7=$(GetMultiHostVar7)
+MTU=$MultiHostVar7
+
+function GetMultiHostVar10 {
+        echo $MultiHost | cut -f10 -d':'
+}
+MultiHostVar10=$(GetMultiHostVar10)
+GRE=$MultiHostVar10
 
 SeedIndex=10
 SeedPostfix=c$SeedIndex
@@ -329,6 +336,11 @@ echo "=============================================="
 
 cd /etc/network/if-up.d/openvswitch
 sudo sed -i "s/ContainerName/oel$OracleRelease$SeedPostfix/g" /var/lib/lxc/oel$OracleRelease$SeedPostfix/config
+
+if [ $GRE = 'Y' ]
+then
+	sudo sed -i "/mtu/s/1500/$MTU/" /var/lib/lxc/oel$OracleRelease$SeedPostfix/config
+fi
 
 function CheckContainerUp {
 sudo lxc-ls -f | grep oel$OracleRelease$SeedPostfix | sed 's/  */ /g' | egrep 'RUNNING|STOPPED'  | cut -f2 -d' '
