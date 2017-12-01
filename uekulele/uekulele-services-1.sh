@@ -606,6 +606,8 @@ then
 			echo "Untar source code and build LXC RPM...        "
 			echo "=============================================="
 			echo ''
+
+			sleep 5
 			
 			wget --timeout=3 --tries=3 https://linuxcontainers.org/downloads/lxc/lxc-"$LxcVersion".tar.gz
 			mkdir -p /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc/rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
@@ -2305,13 +2307,13 @@ then
 
 	clear
 
-	sudo route add -net 192.220.39.0/24 gw 10.207.39.$MultiHostVar3 dev sw1 >/dev/null 2>&1
-	sudo route add -net 192.221.39.0/24 gw 10.207.39.$MultiHostVar3 dev sw1 >/dev/null 2>&1
- 	sudo route add -net 192.222.39.0/24 gw 10.207.39.$MultiHostVar3 dev sw1 >/dev/null 2>&1
-  	sudo route add -net 192.223.39.0/24 gw 10.207.39.$MultiHostVar3 dev sw1 >/dev/null 2>&1
-  	sudo route add -net 172.230.40.0/24 gw 10.207.39.$MultiHostVar3 dev sw1 >/dev/null 2>&1
-  	sudo route add -net 172.231.40.0/24 gw 10.207.39.$MultiHostVar3 dev sw1 >/dev/null 2>&1
-   	sudo route add -net 10.207.39.0/24  gw 10.207.39.$MultiHostVar3 dev sw1 >/dev/null 2>&1
+#	sudo route add -net 192.220.39.0/24 gw 10.207.39.$MultiHostVar3 dev sw1 >/dev/null 2>&1
+#	sudo route add -net 192.221.39.0/24 gw 10.207.39.$MultiHostVar3 dev sw1 >/dev/null 2>&1
+# 	sudo route add -net 192.222.39.0/24 gw 10.207.39.$MultiHostVar3 dev sw1 >/dev/null 2>&1
+#  	sudo route add -net 192.223.39.0/24 gw 10.207.39.$MultiHostVar3 dev sw1 >/dev/null 2>&1
+#  	sudo route add -net 172.230.40.0/24 gw 10.207.39.$MultiHostVar3 dev sw1 >/dev/null 2>&1
+#  	sudo route add -net 172.231.40.0/24 gw 10.207.39.$MultiHostVar3 dev sw1 >/dev/null 2>&1
+#   	sudo route add -net 10.207.39.0/24  gw 10.207.39.$MultiHostVar3 dev sw1 >/dev/null 2>&1
 
 	function GetMultiHostVar5 {
 	echo $MultiHost | cut -f5 -d':'
@@ -2389,13 +2391,11 @@ then
 			uname -n | cut -f1 -d'.'
 		}
 		ShortHost=$(GetShortHost)
-		echo $ShortHost
 
 		function CheckHostnameLookup {
 			nslookup -timeout=2 $HOSTNAME.$Domain1 | grep Address | grep -v '#' | wc -l
 		}
 		HostnameLookup=$(CheckHostnameLookup)
-		echo $HostnameLookup
 
 		if [ $HostnameLookup -eq 0 ]
 		then		
@@ -2433,7 +2433,7 @@ then
 			echo "apparently this one has problem..."
 			sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.39.2 "sudo -S <<< "ubuntu" ~/Downloads/nsupdate_add_$ShortHost.sh"
 		fi
-
+		
 		if [ $OnVm1 = 'N' ] && [ $OnVm2 = 'N' ]
 		then
 			sudo sh -c "echo 'sudo ifconfig sw1 mtu $MultiHostVar7'		>  /etc/network/openvswitch/set_mtu.sh"
