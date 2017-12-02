@@ -1,4 +1,4 @@
-# Orabuntu-LXC
+# Orabuntu-LXC Updates
 
 Begin Update:  December 2, 2017
 
@@ -41,6 +41,8 @@ That's it basically.  All of the GRE tunnel setup is handled by the scripts, and
 I know that a MUCH better documentation set is now needed for Orabuntu-LXC (wiki needed) but I wanted to get this update out and available to users of Orabuntu-LXC right away.  Better documentation and a comprehensive wiki is coming, I promise, barring some unfortunate event like my death or incapacitation from coding exhaustion!
 
 End Update:  December 2, 2017
+
+# Orabuntu-LXC Standard Install Info
 
 Orabuntu-LXC v5 EE Multihost https://github.com/gstanden/orabuntu-lxc is high-performance LXC Linux Container software https://linuxcontainers.org/ for Oracle for the Enterprise or the Desktop. It uses LXC with OpenvSwitch http://openvswitch.org/ and VLANs and provides a DNS/DHCP dynamic containerized bundled naming DHCP services solution.  Orabuntu-LXC v5 EE MultiHost is licensed under GPL3 https://www.gnu.org/licenses/gpl-3.0.en.html.
 
