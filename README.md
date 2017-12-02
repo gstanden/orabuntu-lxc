@@ -6,11 +6,11 @@ Note that in the following, this new update feature is only available on Oracle 
 
 Orabuntu-LXC latest development branch now supports putting your Oracle VirtualBox VM's on the Orabuntu-LXC OpenvSwitch network on the physical host.  To use this new feature, first install Orabuntu-LXC on the physical host (Oracle Linux, RedHat, Ubuntu), then next install VirtualBox on the physical host, and finally, bridge the VirtualBox VM to ports on the sw1 and/or sx1 OpenvSwitches.  For example, use pre-configured ports s2 and a2 on OpenvSwitches sw1 and sx1, respectively.
 
-If you want to also install Orabuntu-LXC itself in a VirtualBox VM that is on Orabuntu-LXC OpenvSwitch networks of the physical host then you must also set "Allow All" as the promiscuous mode of the VirtualBox Virtual NICs using the VirtualBox GUI or alternatively by using the VBoxManager CLI commands.  This will allow LXC containers running on the Orabuntu-LXC OpenvSwitch networks inside the VM to talk with the LXC containers running on the Orabuntu-LXC OpenvSwitch networks on the phyiscal host.  Indeed, this will allow all LXC containers, whether running in the VM or on the physical host, to have ssh connectivity with each other, and also will all hosts (both the physical host and the VM host).
+If you want to also install Orabuntu-LXC itself in a VirtualBox VM that is on Orabuntu-LXC OpenvSwitch networks of the physical host then you must also set "Allow All" as the promiscuous mode of the VirtualBox Virtual NICs using the VirtualBox GUI or alternatively by using the VBoxManager CLI commands.  This will allow LXC containers running on the Orabuntu-LXC OpenvSwitch networks inside the VM to talk with the LXC containers running on the Orabuntu-LXC OpenvSwitch networks on the phyiscal host.  Indeed, this will allow all LXC containers, whether running in the VM or on the physical host, to have ssh connectivity with each other, and also with all hosts (both the physical host and the VM host).
 
 Also, all VM hosts, and the physical host, and the LXC containers whether on the physical host or in the VM's, will ALL be in DNS and are accessible via DNS resolution or via IPs.
 
-Finally, if you want to have 2 or more VirtualBox VM's running on the physical host and allow all of the LXC containers on all of the VM's and the physical host to all be able to ssh to each other, then set the "GRE=Y" parameter in the "anylinux-services.sh" file to enable that.  One of the nice things about this setup (VirtualBox VM's on physical Orabuntu-LXC host) is that you can use MTU 1500 throughout even though traffic is going over a GRE tunnel between the VMs.
+Finally, if you want to have 2 or more VirtualBox VM's running on the physical host and allow all of the LXC containers on all of the VM's and the physical host to all be able to ssh to each other, then set the "GRE=Y" parameter in the "anylinux-services.sh" file when installing Orabuntu-LXC into the 2nd, 3rd, 4th, etc. VMs.  One of the nice things about this setup (VirtualBox VM's on physical Orabuntu-LXC host) is that you can use MTU 1500 throughout even though traffic is going over a GRE tunnel between the VMs.
 
 So, if you were setting this up, you would do the first install Orabuntu-LXC on the physical host with the following settings:
 
@@ -26,7 +26,7 @@ SudoPassword=<your-sudo-password>
 GRE=N
 MultiHost="new:Y:4:$SudoPassword:10.207.39.14:10.207.39.17:1500:ubuntu:ubuntu:$GRE"
 
-If installing Orabuntu-LXC in the second VirtualBox VM, use these settings (note set the first IP addresses reading from left to right in MultiHost to the IP address of the first VM you installed with Orabuntu-LXC and the second IP address to the second VM that you are about to install now with Orabuntu-LXC) as shown below.
+If installing Orabuntu-LXC in the second VirtualBox VM, use these settings (note set the first IP addresses reading from left to right in MultiHost to the IP address of the first VM you installed with Orabuntu-LXC and the second IP address to the second VM that you are about to install now with Orabuntu-LXC) as shown below.  These IP are used to automatically build the GRE tunnel between these two VM's.  If you have more than 2 VM's you can decide which two VM's you want to connect via a GRE tunnel and set the IP's accordingly. 
 
 SudoPassword=<your-sudo-password>
 GRE=Y
