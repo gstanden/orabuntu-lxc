@@ -2,7 +2,7 @@
 
 Begin Update:  December 2, 2017
 
-Note that in the following, this new update feature is only available on Oracle Linux 7 VM's at this time, but it should be ported very very soon to Ubuntu VM's as well.
+Note that in the following, this new update feature is only available on Oracle Linux 7 VM's at this time, but it should be ported very very soon to Ubuntu VM's as well. As far as physical hosts, ANY Orabuntu-LXC supported physical host can be used, including Ubuntu, Oracle Linux, and RedHat.  Only the VirtualBox VMs have to be Oracle Linux 7.  Support for Ubuntu VMs for this same feature will be released very soon.
 
 Orabuntu-LXC latest development branch now supports putting your Oracle VirtualBox VM's on the Orabuntu-LXC OpenvSwitch network on the physical host.  To use this new feature, bridge the VirtualBox VM to ports on the sw1 and/or sx1 OpenvSwitches.  For example, use pre-configured ports s2 and a2 on OpenvSwitches sw1 and sx1, respectively.
 
