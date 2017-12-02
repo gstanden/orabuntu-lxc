@@ -34,7 +34,7 @@ SudoPassword=<your-sudo-password>
 GRE=Y
 MultiHost="new:Y:5:$SudoPassword:10.207.39.14:10.207.39.17:1500:ubuntu:ubuntu:$GRE"
 ```
-Note that you should increment the 3rd variable of MultiHost (e.g. "5" above) for each VM you subsequently install so that the OpenvSwitches get unique names on each VM, and so that the SCST LUNs on each host get unique names.
+Note that you should increment the 3rd variable of MultiHost (e.g. "5" above) for each VM you subsequently install with Orabuntu-LXC so that the OpenvSwitches get unique names on each VM, and so that the SCST LUNs on each host get unique names.
 
 That's it basically.  All of the GRE tunnel setup is handled by the scripts, and the install is kicked off as usual by running "./anylinux-services.sh".  This feature isn't available for Ubuntu VM's yet, but it is available for both Ubuntu and Oracle Linux physical hosts, as long as your VM's are Oracle Linux 7.
 
