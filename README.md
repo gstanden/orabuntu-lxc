@@ -36,7 +36,7 @@ Note that you should increment the 3rd variable of MultiHost (e.g. "5" above) fo
 
 That's it basically.  All of the GRE tunnel setup is handled by the scripts, and the install is kicked off as usual by running "./anylinux-services.sh".  This feature isn't available for Ubuntu VM's yet, but it is available for both Ubuntu and Oracle Linux physical hosts, as long as your VM's are Oracle Linux 7.
 
-Better documentation and a comprehensive wiki is coming, I promise, barring some unfortunate event like my death from coding exhaustion!
+Better documentation and a comprehensive wiki is coming, I promise, barring some unfortunate event like my death or incapacitation from coding exhaustion!
 
 End Update:  December 2, 2017
 
