@@ -14,7 +14,7 @@ Also, all VM hosts, and the physical host, and the LXC containers whether on the
 
 Finally, if you want to have 2 or more VirtualBox VM's running on the physical host and allow all of the LXC containers on all of the VM's and the physical host to all be able to ssh to each other, then set the "GRE=Y" parameter in the "anylinux-services.sh" file when installing Orabuntu-LXC into the 2nd, 3rd, 4th, etc. VMs.  One of the nice things about this setup (VirtualBox VM's on physical Orabuntu-LXC host) is that you can use MTU 1500 throughout even though traffic is going over a GRE tunnel between the VMs.
 
-So, if you were setting this up, you would do the first install Orabuntu-LXC on the physical host with the following settings:
+So, if you were setting this up, you would do the first install Orabuntu-LXC on the physical host with the following settings in the anylinux-services.sh file:
 ```
 SudoPassword=<your-sudo-password>
 GRE=N
@@ -22,13 +22,13 @@ MultiHost="new:N:1:$SudoPassword:192.168.1.82:10.207.39.13:1500:ubuntu:ubuntu:$G
 ```
 Then create a VirtualBox VM with two bridged adapters, one bridged to port s2 on switch sw1 on the physical host, and one bridged to a2 on switch sx1 on the physical host, and optionally both adapters set to "Allow All" promiscuous mode (if you are planning to install Orabuntu-LXC itself in the VirtualBox VMs).
 
-If installing Orabuntu-LXC in the first VirtualBox VM, then use these settings (note IP address settings in MultiHost variable don't matter at this step, they are only used if GRE=Y):
+If installing Orabuntu-LXC in the first VirtualBox VM, then use these settings in the anylinux-services.sh file (note IP address settings in MultiHost variable don't matter at this step, they are only used if GRE=Y):
 ```
 SudoPassword=<your-sudo-password>
 GRE=N
 MultiHost="new:Y:4:$SudoPassword:10.207.39.14:10.207.39.17:1500:ubuntu:ubuntu:$GRE"
 ```
-If installing Orabuntu-LXC in the second VirtualBox VM, use these settings (note set the first IP addresses reading from left to right in MultiHost to the IP address of the first VM you installed with Orabuntu-LXC and the second IP address to the second VM that you are about to install now with Orabuntu-LXC) as shown below.  These IP are used to automatically build the GRE tunnel between these two VM's.  If you have more than 2 VM's you can decide which two VM's you want to connect via a GRE tunnel and set the IP's accordingly. 
+If installing Orabuntu-LXC in the second VirtualBox VM, use these settings in the anylinux-services.sh file (note set the first IP addresses reading from left to right in MultiHost to the IP address of the first VM you installed with Orabuntu-LXC and the second IP address to the second VM that you are about to install now with Orabuntu-LXC) as shown below.  These IP are used to automatically build the GRE tunnel between these two VM's.  If you have more than 2 VM's you can decide which two VM's you want to connect via a GRE tunnel and set the IP's accordingly. 
 ```
 SudoPassword=<your-sudo-password>
 GRE=Y
@@ -38,7 +38,7 @@ Note that you should increment the 3rd variable of MultiHost (e.g. "5" above) fo
 
 That's it basically.  All of the GRE tunnel setup is handled by the scripts, and the install is kicked off as usual by running "./anylinux-services.sh".  This feature isn't available for Ubuntu VM's yet, but it is available for both Ubuntu and Oracle Linux physical hosts, as long as your VM's are Oracle Linux 7.
 
-Better documentation and a comprehensive wiki is coming, I promise, barring some unfortunate event like my death or incapacitation from coding exhaustion!
+I know that a MUCH better documentation set is now needed for Orabuntu-LXC (wiki needed).  Better documentation and a comprehensive wiki is coming, I promise, barring some unfortunate event like my death or incapacitation from coding exhaustion!
 
 End Update:  December 2, 2017
 
