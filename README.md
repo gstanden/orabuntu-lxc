@@ -6,7 +6,7 @@ Note 1: that in the following, this new update feature is only available on Orac
 
 Orabuntu-LXC latest development branch now supports putting your Oracle VirtualBox VM's on the Orabuntu-LXC OpenvSwitch network on the physical host.  To use this new feature, first install Orabuntu-LXC on the physical host (Oracle Linux, RedHat, Ubuntu), then next install VirtualBox on the physical host, and finally, bridge the VirtualBox VM to ports on the sw1 and/or sx1 OpenvSwitches.  For example, use pre-configured ports s2 and a2 on OpenvSwitches sw1 and sx1, respectively.  Note that if you are planning to subsequently install Orabuntu-LXC itself in the Oracle Linux 7 VM, then you MUST bridge the VirtualBox VM to BOTH s2/sw1 and a2/sx1 (two adapters).  
 
-If you want to also install Orabuntu-LXC itself in a VirtualBox VM that is on Orabuntu-LXC OpenvSwitch networks of the physical host then you must also set "Allow All" as the promiscuous mode of the VirtualBox Virtual NICs using the VirtualBox GUI or alternatively by using the VBoxManager CLI commands.  This will allow LXC containers running on the Orabuntu-LXC OpenvSwitch networks inside the VM to talk with the LXC containers running on the Orabuntu-LXC OpenvSwitch networks on the phyiscal host.  Indeed, this will allow all LXC containers, whether running in the VM or on the physical host, to have ssh connectivity with each other, and also with all hosts (both the physical host and the VM host).
+If you want to also install Orabuntu-LXC itself in a VirtualBox VM that is on Orabuntu-LXC OpenvSwitch networks of the physical host then you must also set "Allow All" as the promiscuous mode of the VirtualBox Virtual NICs using the VirtualBox GUI or alternatively by using the VBoxManager CLI commands.  This will allow LXC containers running on the Orabuntu-LXC OpenvSwitch networks inside the VM to talk with the LXC containers running on the Orabuntu-LXC OpenvSwitch networks on the phyiscal host, and importantly, to talk with the nameserver LXC container on the physical host, which handles all DNS/DHCP for both the physical host and the VM container networks.  Indeed, this will allow all LXC containers, whether running in the VM or on the physical host, to have ssh connectivity with each other, and also with all hosts (both the physical host and the VM host).
 
 Also, all VM hosts, and the physical host, and the LXC containers whether on the physical host or in the VM's, will ALL be in DNS and are accessible via DNS resolution or via IPs.
 
@@ -35,6 +35,8 @@ MultiHost="new:Y:5:$SudoPassword:10.207.39.14:10.207.39.17:1500:ubuntu:ubuntu:$G
 Note that you should increment the 3rd variable of MultiHost (e.g. "5" above) for each VM you subsequently install so that the OpenvSwitches get unique names on each VM, and so that the SCST LUNs on each host get unique names.
 
 That's it basically.  All of the GRE tunnel setup is handled by the scripts, and the install is kicked off as usual by running "./anylinux-services.sh".  This feature isn't available for Ubuntu VM's yet, but it is available for both Ubuntu and Oracle Linux physical hosts, as long as your VM's are Oracle Linux 7.
+
+Better documentation and a comprehensive wiki is coming, I promise, barring some unfortunate event like my death from coding exhaustion!
 
 End Update:  December 2, 2017
 
