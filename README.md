@@ -14,7 +14,7 @@ Also, all VM hosts, and the physical host, and the LXC containers whether on the
 
 Finally, if you want to have 2 or more VirtualBox VM's running on the physical host and allow all of the LXC containers on all of the VM's and the physical host to all be able to ssh to each other, then set the "GRE=Y" parameter in the "anylinux-services.sh" file when installing Orabuntu-LXC into the 2nd, 3rd, 4th, etc. VMs.  One of the nice things about this setup (VirtualBox VM's on physical Orabuntu-LXC host) is that you can use MTU 1500 throughout even though traffic is going over a GRE tunnel between the VMs.
 
-So, if you were setting this up, you would do the first install Orabuntu-LXC on the physical host with the following settings in the anylinux-services.sh file:
+So, if you were setting this up, you would do the first install Orabuntu-LXC on the physical host with the following settings in the anylinux-services.sh file as shown below.  Note that the IP address settings are not used when MultiHostVar2 is set to "N" as in ("new:N:...") and are ignored so when MultiHostVar2 is set to N the IP addresses are ignored by the Orabuntu-LXC installer scripts.
 ```
 SudoPassword=<your-sudo-password>
 GRE=N
