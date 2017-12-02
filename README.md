@@ -1,5 +1,41 @@
 # Orabuntu-LXC
 
+Begin Update:  December 2, 2017
+
+Note that in the following, this new update feature is only available on Oracle Linux 7 VM's at this time, but it should be ported very very soon to Ubuntu VM's as well.
+
+Orabuntu-LXC latest development branch now supports putting your Oracle VirtualBox VM's on the Orabuntu-LXC OpenvSwitch network on the physical host.  To use this new feature, bridge the VirtualBox VM to ports on the sw1 and/or sx1 OpenvSwitches.  For example, use pre-configured ports s2 and a2 on OpenvSwitches sw1 and sx1, respectively.
+
+If you want to also install Orabuntu-LXC itself in a VirtualBox VM that is on Orabuntu-LXC OpenvSwitch networks of the physical host then you must also set "Allow All" as the promiscuous mode of the VirtualBox Virtual NICs using the VirtualBox GUI or alternatively by using the VBoxManager CLI commands.  This will allow LXC containers running on the Orabuntu-LXC OpenvSwitch networks inside the VM to talk with the LXC containers running on the Orabuntu-LXC OpenvSwitch networks on the phyiscal host.  Indeed, this will allow all LXC containers, whether running in the VM or on the physical host, to have ssh connectivity with each other, and also will all hosts (both the physical host and the VM host).
+
+Finally, if you want to have 2 or more VirtualBox VM's running on the physical host and allow all of the LXC containers on all of the VM's and the physical host to all be able to ssh to each other, then set the "GRE=Y" parameter in the "anylinux-services.sh" file to enable that.  One of the nice things about this setup (VirtualBox VM's on physical Orabuntu-LXC host) is that you can use MTU 1500 throughout even though traffic is going over a GRE tunnel between the VMs.
+
+So, if you were setting this up, you would do the first install Orabuntu-LXC on the physical host with the following settings:
+
+SudoPassword=<your-sudo-password>
+GRE=N
+MultiHost="new:N:1:$SudoPassword:192.168.1.82:10.207.39.13:1500:ubuntu:ubuntu:$GRE"
+
+Then create a VirtualBox VM with two bridged adapters, one bridged to port s2 on switch sw1 on the physical host, and one bridged to a2 on switch sx1 on the physical host, and optionally both adapters set to "Allow All" promiscuous mode (if you are planning to install Orabuntu-LXC itself in the VirtualBox VMs).
+
+If installing Orabuntu-LXC in the first VirtualBox VM, then use these settings (note IP address settings in MultiHost variable don't matter at this step, they are only used if GRE=Y):
+
+SudoPassword=<your-sudo-password>
+GRE=N
+MultiHost="new:Y:4:$SudoPassword:10.207.39.14:10.207.39.17:1500:ubuntu:ubuntu:$GRE"
+
+If installing Orabuntu-LXC in the second VirtualBox VM, use these settings (note set the first IP addresses reading from left to right in MultiHost to the IP address of the first VM you installed with Orabuntu-LXC and the second IP address to the second VM that you are about to install now with Orabuntu-LXC) as shown below.
+
+SudoPassword=<your-sudo-password>
+GRE=Y
+MultiHost="new:Y:5:$SudoPassword:10.207.39.14:10.207.39.17:1500:ubuntu:ubuntu:$GRE"
+
+Note that you should increment the 3rd variable of MultiHost (e.g. "5" above) for each VM you subsequently install so that the OpenvSwitches get unique names on each VM, and so that the SCST LUNs on each host get unique names.
+
+That's it basically.  All of the GRE tunnel setup is handled by the scripts, and the install is kicked off as usual by running "./anylinux-services.sh".  This feature isn't available for Ubuntu VM's yet, but it is available for both Ubuntu and Oracle Linux physical hosts, as long as your VM's are Oracle Linux 7.
+
+End Update:  December 2, 2017
+
 Orabuntu-LXC v5 EE Multihost https://github.com/gstanden/orabuntu-lxc is high-performance LXC Linux Container software https://linuxcontainers.org/ for Oracle for the Enterprise or the Desktop. It uses LXC with OpenvSwitch http://openvswitch.org/ and VLANs and provides a DNS/DHCP dynamic containerized bundled naming DHCP services solution.  Orabuntu-LXC v5 EE MultiHost is licensed under GPL3 https://www.gnu.org/licenses/gpl-3.0.en.html.
 
 Build an environment of 10 Oracle Linux https://www.oracle.com/linux/index.html containers for example in about 15 minutes complete with full networking capability and DNS/DHCP.  Erase that same entire 10-container environment in less than 1 minute and create a new enviro! Great, fast solution for re-provisioning local or cloud training environments literally in just minutes at the push of a single button!
