@@ -8,6 +8,8 @@ Orabuntu-LXC latest development branch now supports putting your Oracle VirtualB
 
 If you want to also install Orabuntu-LXC itself in a VirtualBox VM that is on Orabuntu-LXC OpenvSwitch networks of the physical host then you must also set "Allow All" as the promiscuous mode of the VirtualBox Virtual NICs using the VirtualBox GUI or alternatively by using the VBoxManager CLI commands.  This will allow LXC containers running on the Orabuntu-LXC OpenvSwitch networks inside the VM to talk with the LXC containers running on the Orabuntu-LXC OpenvSwitch networks on the phyiscal host.  Indeed, this will allow all LXC containers, whether running in the VM or on the physical host, to have ssh connectivity with each other, and also will all hosts (both the physical host and the VM host).
 
+Also, all VM hosts, and the physical host, and the LXC containers whether on the physical host or in the VM's, will ALL be in DNS and are accessible via DNS resolution or via IPs.
+
 Finally, if you want to have 2 or more VirtualBox VM's running on the physical host and allow all of the LXC containers on all of the VM's and the physical host to all be able to ssh to each other, then set the "GRE=Y" parameter in the "anylinux-services.sh" file to enable that.  One of the nice things about this setup (VirtualBox VM's on physical Orabuntu-LXC host) is that you can use MTU 1500 throughout even though traffic is going over a GRE tunnel between the VMs.
 
 So, if you were setting this up, you would do the first install Orabuntu-LXC on the physical host with the following settings:
