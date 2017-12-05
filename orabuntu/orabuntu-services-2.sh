@@ -21,6 +21,21 @@
 #    v4.0 GLS 20161025 DNS DHCP services moved into an LXC container
 #    v5.0 GLS 20170910 MultiHost
 
+echo ''
+echo "=============================================="
+echo "orabuntu-services-2.sh                        "
+echo "                                              "
+echo "Script creates the Oracle Linux container.    "
+echo "=============================================="
+echo ''
+echo "=============================================="
+echo "This script is re-runnable                    "
+echo "=============================================="
+
+sleep 5
+
+clear
+
 MajorRelease=$1
 OracleRelease=$1$2
 OracleVersion=$1.$2
@@ -28,10 +43,6 @@ Domain1=$3
 Domain2=$4
 MultiHost=$5
 NameServer=$6
-
-sudo cat /etc/resolv.conf | sort > new
-sudo mv new /etc/resolv.conf
-cat /etc/resolv.conf
 
 function SoftwareVersion { echo "$@" | awk -F. '{ printf("%d%03d%03d%03d\n", $1,$2,$3,$4); }'; }
 
@@ -57,12 +68,13 @@ fi
 
 SeedIndex=10
 SeedPostfix=c$SeedIndex
+
 function CheckHighestSeedIndexHit {
-	nslookup oel$OracleRelease$SeedPostfix | grep "can't find" | wc -l
+        nslookup -timeout=1 oel$OracleRelease$SeedPostfix | grep -v '#' | grep Address | grep '10\.207\.29' | wc -l
 }
 HighestSeedIndexHit=$(CheckHighestSeedIndexHit)
 
-while [ $HighestSeedIndexHit = 0 ]
+while [ $HighestSeedIndexHit = 1 ]
 do
 	SeedIndex=$((SeedIndex+1))
 	SeedPostfix=c$SeedIndex
@@ -70,24 +82,6 @@ do
 done
 SeedPostfix=c$SeedIndex
 
-clear
-
-echo ''
-echo "=============================================="
-echo "orabuntu-services-2.sh                        "
-echo "                                              "
-echo "Script creates the Oracle Linux container.    "
-echo "=============================================="
-echo ''
-echo "=============================================="
-echo "This script is re-runnable                    "
-echo "=============================================="
-
-sleep 5
-
-clear
-
-echo ''
 echo "=============================================="
 echo "Establish sudo privileges ...                 "
 echo "=============================================="

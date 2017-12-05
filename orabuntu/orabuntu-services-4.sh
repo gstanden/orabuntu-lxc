@@ -191,10 +191,10 @@ do
 	}
 	SystemdResolvedInstalled=$(CheckSystemdResolvedInstalled)
 
-	function CheckDNSLookup {
-		nslookup $ContainerPrefix$CloneIndex | grep 'Name' | grep $ContainerPrefix$CloneIndex | wc -l
-	}
-	DNSLookup=$(CheckDNSLookup)
+        function CheckDNSLookup {
+                nslookup -timeout=1 $ContainerPrefix$CloneIndex | grep -v '#' | grep Address | grep '10\.207\.39' | wc -l
+        }
+        DNSLookup=$(CheckDNSLookup)
 
 	if [ $UbuntuVersion = '16.04' ] || [ $UbuntuVersion = '16.10' ] || [ $UbuntuVersion = '17.04' ] || [ $UbuntuVersion = '17.10' ]
 	then
