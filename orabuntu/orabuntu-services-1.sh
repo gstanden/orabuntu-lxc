@@ -1735,22 +1735,13 @@ then
 
 	if [ -n $NameServer ]
 	then
-#		sudo service sw1 restart
-#		sudo service sx1 restart
-		sudo sed -i "s/mtu = 1500/mtu = $MultiHostVar7/g" /var/lib/lxc/$NameServer/config 
-		sudo lxc-stop -n $NameServer  >/dev/null 2>&1
+		sudo lxc-stop  -n $NameServer >/dev/null 2>&1
 		sudo lxc-start -n $NameServer >/dev/null 2>&1
 		if [ $SystemdResolvedInstalled -eq 1 ]
 		then
 			sudo service systemd-resolved restart
 		fi
-#		if	[ $SystemdResolvedInstalled -eq 1 ]
-#		then
-#			sudo su -c "echo 'nameserver 127.0.0.53' >> /etc/resolv.conf"
-#			sudo sed -i '$!N; /^\(.*\)\n\1$/!P; D' /etc/resolv.conf
-#			sudo sed -i -n 'G; s/\n/&&/; /^\([ -~]*\n\).*\n\1/d; s/\n//; h; P' /etc/resolv.conf
-#		fi
-		nslookup $NameServer.$Domain1
+		nslookup -timeout=1 $NameServer
 		if [ $? -ne 0 ]
 		then
 			echo "DNS is NOT RUNNING with correct status!"

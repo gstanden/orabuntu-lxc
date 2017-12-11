@@ -171,21 +171,15 @@ do
 	if [ $UbuntuVersion = '16.04' ] || [ $UbuntuVersion = '16.10' ] || [ $UbuntuVersion = '17.04' ] || [ $UbuntuVersion = '17.10' ]
 	then
 		function CheckPublicIPIterative {
-		sudo lxc-ls -f | sed 's/  */ /g' | grep $j | grep RUNNING | cut -f2 -d'-' | sed 's/^[ \t]*//;s/[ \t]*$//' | cut -f1 -d' ' | cut -f1-2 -d'.' | sed 's/\.//g'
+			sudo lxc-ls -f | sed 's/  */ /g' | grep $j | grep RUNNING | cut -f2 -d'-' | sed 's/^[ \t]*//;s/[ \t]*$//' | cut -f1 -d' ' | cut -f1-2 -d'.' | sed 's/\.//g'
 		}
 		fi
-		PublicIPIterative=$(CheckPublicIPIterative)
-		echo $j | grep oel > /dev/null 2>&1
-		if [ $? -eq 0 ]
-		then
+	PublicIPIterative=$(CheckPublicIPIterative)
+	echo $j | grep oel > /dev/null 2>&1
+	if [ $? -eq 0 ]
+	then
 		sudo bash -c "cat $Config|grep ipv4|cut -f2 -d'='|sed 's/^[ \t]*//;s/[ \t]*$//'|cut -f4 -d'.'|sed 's/^/\./'|xargs -I '{}' sed -i "/ipv4/s/\{}/\.1$OR/g" $Config"
-#		sudo sed -i "s/\.39/\.$OracleRelease/g" /var/lib/lxc/$SeedContainerName/config
-#		sudo sed -i "s/\.40/\.$OracleRelease/g" /var/lib/lxc/$SeedContainerName/config
 	fi
-#	if [ $(SoftwareVersion $LXCVersion) -ge $(SoftwareVersion "2.1.0") ]
-#	then
-#		sudo service sx1 stop
-#	fi
 	sudo lxc-start -n $j > /dev/null 2>&1
 	sleep 5
 	i=1
@@ -279,17 +273,12 @@ sudo cat /etc/orabuntu-lxc-release
 
 echo ''
 echo "=============================================="
-echo "Create /etc/orabuntu-lxc-release file complete.   "
+echo "Create /etc/orabuntu-lxc-release complete.    "
 echo "=============================================="
 
 sleep 5
 
 clear
-
-# sudo lxc-stop  -n $NameServer > /dev/null 2>&1
-# sleep 2
-# sudo lxc-start -n $NameServer > /dev/null 2>&1
-# sleep 2
 
 function CheckMtuSetLocalSw1 {
  	ifconfig sw1 | grep mtu | grep 1420 | wc -l
@@ -607,25 +596,3 @@ echo "=============================================="
 echo ''
 
 sleep 5
-
-# echo "=============================================="
-# echo " A reboot is recommended (but NOT required!)  "
-# echo " to test that all networks and containers     "
-# echo " start on boot.                               "
-# echo "=============================================="
-
-# echo ''
-# echo "=============================================="
-# echo "                                              "
-# read -e -p "Reboot Now ? [Y/N]                      " -i "Y" Reboot
-# echo "                                              "
-# echo "=============================================="
-# echo ''
-
-# sleep 5
-
-# if [ $Reboot = 'y' ] || [ $Reboot = 'Y' ]
-# then
-# 	sudo reboot
-# fi
-

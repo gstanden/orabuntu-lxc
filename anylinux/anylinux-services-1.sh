@@ -890,13 +890,13 @@ then
  						/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/uekulele-services-2.sh $MajorRelease $PointRelease $Domain1 $Domain2 $MultiHost
  						/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/uekulele-services-3.sh $MajorRelease $PointRelease $Domain2 $MultiHost
 						/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/uekulele-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer $MultiHost 
-						/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/uekulele-services-5.sh $MajorRelease $PointRelease $MultiHost
+						/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/uekulele-services-5.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $MultiHost 
 					fi # OK 8
 
 					if [ $CloningAdditional = 'y' ] || [ $CloningAdditional = 'Y' ] || [ $MultiHostVar1 = 'addclones' ] # 9
 					then
 						/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/uekulele-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer $MultiHost
-						/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/uekulele-services-5.sh $MajorRelease $PointRelease $MultiHost
+						/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/uekulele-services-5.sh $MajorRelease $PointRelease Domain1 $Domain2 $NameServer $MultiHost
 					fi # OK 9
 				fi # OK 7
 
@@ -906,7 +906,7 @@ then
 					/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/uekulele-services-2.sh $MajorRelease $PointRelease $Domain1 $Domain2 $MultiHost
 					/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/uekulele-services-3.sh $MajorRelease $PointRelease $Domain2 $MultiHost
 					/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/uekulele-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer $MultiHost 
-					/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/uekulele-services-5.sh $MajorRelease $PointRelease $MultiHost
+					/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/uekulele-services-5.sh $MajorRelease $PointRelease Domain1 $Domain2 $NameServer $MultiHost
 				fi # OK 10
 
  				echo ''
@@ -960,13 +960,13 @@ then
  						/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/uekulele-services-2.sh $MajorRelease $PointRelease $Domain1 $Domain2 $MultiHost 
  						/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/uekulele-services-3.sh $MajorRelease $PointRelease $Domain2 $MultiHost
 						/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/uekulele-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer $MultiHost 
-						/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/uekulele-services-5.sh $MajorRelease $PointRelease $MultiHost
+						/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/uekulele-services-5.sh $MajorRelease $PointRelease Domain1 $Domain2 $NameServer $MultiHost
 					fi # OK 12
 
 					if [ $CloningAdditional = 'y' ] || [ $CloningAdditional = 'Y' ] || [ $MultiHostVar1 = 'addclones' ] # 13
 					then
 						/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/uekulele-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer $MultiHost
-						/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/uekulele-services-5.sh $MajorRelease $PointRelease $MultiHost
+						/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/uekulele-services-5.sh $MajorRelease $PointRelease Domain1 $Domain2 $NameServer $MultiHost
 					fi # OK 13
 				fi # OK 11
 		
@@ -976,7 +976,7 @@ then
 					/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/uekulele-services-2.sh $MajorRelease $PointRelease $Domain1 $Domain2 $MultiHost 
 					/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/uekulele-services-3.sh $MajorRelease $PointRelease $Domain2 $MultiHost
 					/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/uekulele-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer $MultiHost 
-					/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/uekulele-services-5.sh $MajorRelease $PointRelease $MultiHost
+					/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/uekulele-services-5.sh $MajorRelease $PointRelease Domain1 $Domain2 $NameServer $MultiHost
 				fi # OK 14
 
 				sleep 5
