@@ -1,5 +1,9 @@
 # Orabuntu-LXC Updates
 
+Begin Update: December 10, 2017
+
+The development branch now supports putting your Oracle VirtualBox VM's on the Orabuntu-LXC OpenvSwitch network on the physical host, for both Ubuntu 17.10 server-edition physical hosts, and also for Oracle Linux 7.x physical hosts.  This update supercedes note 1 below from the December 2, 2017 update, and expands this new feature to both Ubuntu 17.10 and Oracle Linux 7 hosts.
+
 Begin Update:  December 2, 2017
 
 Note 1: that in the following, this new update feature is only available on Oracle Linux 7 VM's at this time, but it should be ported very very soon to Ubuntu VM's as well. As far as physical hosts, ANY Orabuntu-LXC supported physical host can be used, including Ubuntu, Oracle Linux, and RedHat.  Only the VirtualBox VMs have to be Oracle Linux 7.  Support for Ubuntu VMs for this same feature will be released very soon.
