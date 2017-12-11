@@ -283,7 +283,6 @@ echo "Configuring $SeedContainerName for Oracle...  "
 echo "=============================================="
 echo ''
 
-sudo lxc-attach -n $SeedContainerName -- ip link set eth0 mtu $MultiHostVar7
 sudo lxc-attach -n $SeedContainerName -- /root/packages.sh
 sudo lxc-attach -n $SeedContainerName -- /root/create_users.sh
 sudo lxc-attach -n $SeedContainerName -- /root/lxc-services.sh

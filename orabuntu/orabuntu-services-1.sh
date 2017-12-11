@@ -886,6 +886,11 @@ echo ''
 
 sudo tar -P -xvf /home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/ubuntu-host.tar --touch
 
+if	[ $SystemdResolvedInstalled -eq 0 ]
+then
+	rm /etc/systemd/resolved.conf
+fi
+
 echo ''
 echo "=============================================="
 echo "Done: Unpack G1 host files for $LF Linux $RL. "
@@ -1036,7 +1041,7 @@ sudo sh -c "echo '[Service]'                                			>> /etc/systemd/s
 sudo sh -c "echo 'Type=oneshot'                             			>> /etc/systemd/system/60-oracle.service"
 sudo sh -c "echo 'User=root'                                			>> /etc/systemd/system/60-oracle.service"
 sudo sh -c "echo 'RemainAfterExit=yes'                      			>> /etc/systemd/system/60-oracle.service"
-sudo sh -c "echo 'ExecStart=/usr/sbin/sysctl -p /etc/sysctl.d/60-oracle.conf'	>> /etc/systemd/system/60-oracle.service"
+sudo sh -c "echo 'ExecStart=/sbin/sysctl -p /etc/sysctl.d/60-oracle.conf'	>> /etc/systemd/system/60-oracle.service"
 sudo sh -c "echo ''                                         			>> /etc/systemd/system/60-oracle.service"
 sudo sh -c "echo '[Install]'                                			>> /etc/systemd/system/60-oracle.service"
 sudo sh -c "echo 'WantedBy=multi-user.target'               			>> /etc/systemd/system/60-oracle.service"
@@ -1958,12 +1963,8 @@ then
 		}
 		ShortHost=$(GetShortHost)
 
-		function CheckHostnameLookup {
-			nslookup -timeout=2 $HOSTNAME.$Domain1 | grep Address | grep -v '#' | wc -l
-		}
-		HostnameLookup=$(CheckHostnameLookup)
-
-		if [ $HostnameLookup -eq 0 ]
+		nslookup -timeout=1 $HOSTNAME.$Domain1 > /dev/null 2>&1
+		if [ $? -eq 1 ]
 		then		
 			echo ''
 			echo "=============================================="
@@ -1971,46 +1972,39 @@ then
 			echo "=============================================="
 			echo ''
 
-			sudo sh -c "echo 'echo \"server 10.207.39.2'								    	>  /etc/network/openvswitch/nsupdate_add_$ShortHost.sh"
-			sudo sh -c "echo 'update add $ShortHost.orabuntu-lxc.com 3600 IN A 10.207.39.$MultiHostVar3'		    	>> /etc/network/openvswitch/nsupdate_add_$ShortHost.sh"
-			sudo sh -c "echo 'send'											    	>> /etc/network/openvswitch/nsupdate_add_$ShortHost.sh"
-			sudo sh -c "echo 'update add $MultiHostVar3.39.207.10.in-addr.arpa 3600 IN PTR $ShortHost.orabuntu-lxc.com' 	>> /etc/network/openvswitch/nsupdate_add_$ShortHost.sh"
-			sudo sh -c "echo 'send'											    	>> /etc/network/openvswitch/nsupdate_add_$ShortHost.sh"
-			sudo sh -c "echo 'quit'											    	>> /etc/network/openvswitch/nsupdate_add_$ShortHost.sh"
-			sudo sh -c "echo '\" | nsupdate -k /etc/bind/rndc.key'							    	>> /etc/network/openvswitch/nsupdate_add_$ShortHost.sh"
+			sudo sh -c "echo 'echo \"server 10.207.39.2'								    		>  /etc/network/openvswitch/nsupdate_domain1_add_$ShortHost.sh"
+			sudo sh -c "echo 'update add $ShortHost.orabuntu-lxc.com 3600 IN A 10.207.39.$MultiHostVar3'		    		>> /etc/network/openvswitch/nsupdate_domain1_add_$ShortHost.sh"
+			sudo sh -c "echo 'send'											    		>> /etc/network/openvswitch/nsupdate_domain1_add_$ShortHost.sh"
+			sudo sh -c "echo 'update add $MultiHostVar3.39.207.10.in-addr.arpa 3600 IN PTR $ShortHost.orabuntu-lxc.com' 		>> /etc/network/openvswitch/nsupdate_domain1_add_$ShortHost.sh"
+			sudo sh -c "echo 'send'											    		>> /etc/network/openvswitch/nsupdate_domain1_add_$ShortHost.sh"
+			sudo sh -c "echo 'quit'											    		>> /etc/network/openvswitch/nsupdate_domain1_add_$ShortHost.sh"
+			sudo sh -c "echo '\" | nsupdate -k /etc/bind/rndc.key'							    		>> /etc/network/openvswitch/nsupdate_domain1_add_$ShortHost.sh"
 
-			sudo chmod 777 					/etc/network/openvswitch/nsupdate_add_$ShortHost.sh
-			sudo ls -l     					/etc/network/openvswitch/nsupdate_add_$ShortHost.sh
-			sudo sed -i "s/orabuntu-lxc\.com/$Domain1/g"	/etc/network/openvswitch/nsupdate_add_$ShortHost.sh
-			sudo cat					/etc/network/openvswitch/nsupdate_add_$ShortHost.sh
-	
-			sudo service sw1 restart
-			sudo service sx1 restart
-
-			sudo touch /home/ubuntu/.ssh/known_hosts
-			ssh-keygen -f "/home/ubuntu/.ssh/known_hosts" -R 10.207.39.2
-			sudo ifconfig sw1 mtu $MultiHostVar7
-			sudo ifconfig sx1 mtu $MultiHostVar7
-			sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar6 "sudo -S <<< "ubuntu" ifconfig sw1 mtu $MultiHostVar7"
-			sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar6 "sudo -S <<< "ubuntu" ifconfig sx1 mtu $MultiHostVar7"
-			sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.39.2 "sudo -S <<< "ubuntu" mkdir -p ~/Downloads"
-			sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.39.2 "sudo -S <<< "ubuntu" chown ubuntu:ubuntu Downloads"
-			sshpass -p ubuntu scp -p /etc/network/openvswitch/nsupdate_add_$ShortHost.sh ubuntu@10.207.39.2:~/Downloads/.
-			echo "apparently this one has problem..."
-			sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.39.2 "sudo -S <<< "ubuntu" ~/Downloads/nsupdate_add_$ShortHost.sh"
+			sudo chmod 777 					/etc/network/openvswitch/nsupdate_domain1_add_$ShortHost.sh
+			sudo ls -l     					/etc/network/openvswitch/nsupdate_domain1_add_$ShortHost.sh
+			sudo sed -i "s/orabuntu-lxc\.com/$Domain1/g"	/etc/network/openvswitch/nsupdate_domain1_add_$ShortHost.sh
 		fi
 		
-		if [ $OnVm1 = 'N' ] && [ $OnVm2 = 'N' ]
-		then
-			sudo sh -c "echo 'sudo ifconfig sw1 mtu $MultiHostVar7'		>  /etc/network/openvswitch/set_mtu.sh"
-			sudo sh -c "echo 'sudo ifconfig sx1 mtu $MultiHostVar7'	    	>> /etc/network/openvswitch/set_mtu.sh"
-			sudo sh -c "echo 'sudo ifconfig olivex mtu $MultiHostVar7'    	>> /etc/network/openvswitch/set_mtu.sh"
-			sudo sh -c "echo 'sudo ifconfig olivew mtu $MultiHostVar7'    	>> /etc/network/openvswitch/set_mtu.sh"
-			sudo chmod 777 /etc/network/openvswitch/set_mtu.sh
-			sshpass -p ubuntu scp -p /etc/network/openvswitch/set_mtu.sh ubuntu@$MultiHostVar5:~/.
-			sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.39.2 "sudo -S <<< "ubuntu" ifconfig eth0 mtu $MultiHostVar7"
-			sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.39.2 "sudo -S <<< "ubuntu" ifconfig eth1 mtu $MultiHostVar7"
-			sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 "sudo -S <<< "ubuntu" ~/set_mtu.sh"
+		nslookup -timeout=1 $HOSTNAME.$Domain2 > /dev/null 2>&1
+		if [ $? -eq 1 ]
+		then		
+			echo ''
+			echo "=============================================="
+			echo "Create ADD DNS $Domain2 $ShortHost...         "
+			echo "=============================================="
+			echo ''
+
+			sudo sh -c "echo 'echo \"server 10.207.29.2'								    		>  /etc/network/openvswitch/nsupdate_domain2_add_$ShortHost.sh"
+			sudo sh -c "echo 'update add $ShortHost.consultingcommandos.us 3600 IN A 10.207.29.$MultiHostVar3'		    	>> /etc/network/openvswitch/nsupdate_domain2_add_$ShortHost.sh"
+			sudo sh -c "echo 'send'											    		>> /etc/network/openvswitch/nsupdate_domain2_add_$ShortHost.sh"
+			sudo sh -c "echo 'update add $MultiHostVar3.29.207.10.in-addr.arpa 3600 IN PTR $ShortHost.consultingcommandos.us' 	>> /etc/network/openvswitch/nsupdate_domain2_add_$ShortHost.sh"
+			sudo sh -c "echo 'send'											    		>> /etc/network/openvswitch/nsupdate_domain2_add_$ShortHost.sh"
+			sudo sh -c "echo 'quit'											    		>> /etc/network/openvswitch/nsupdate_domain2_add_$ShortHost.sh"
+			sudo sh -c "echo '\" | nsupdate -k /etc/bind/rndc.key'							    		>> /etc/network/openvswitch/nsupdate_domain2_add_$ShortHost.sh"
+
+			sudo chmod 777 						/etc/network/openvswitch/nsupdate_domain2_add_$ShortHost.sh
+			sudo ls -l     						/etc/network/openvswitch/nsupdate_domain2_add_$ShortHost.sh
+			sudo sed -i "s/consultingcommandos\.us/$Domain2/g"	/etc/network/openvswitch/nsupdate_domain2_add_$ShortHost.sh
 		fi
 	fi
 fi

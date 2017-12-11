@@ -21,6 +21,8 @@
 #    v4.0 GLS 20161025 DNS DHCP services moved into an LXC container
 #    v5.0 GLS 20170910 MultiHost
 
+clear
+
 echo ''
 echo "=============================================="
 echo "orabuntu-services-2.sh                        "
@@ -82,6 +84,7 @@ do
 done
 SeedPostfix=c$SeedIndex
 
+echo ''
 echo "=============================================="
 echo "Establish sudo privileges ...                 "
 echo "=============================================="
