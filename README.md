@@ -6,7 +6,7 @@ The Orabuntu-LXC development branch now supports putting your Oracle VirtualBox 
 
 Begin Update:  December 2, 2017
 
-Note 1: that in the following, this new update feature is only available on Oracle Linux 7 VM's at this time, but it should be ported very very soon to Ubuntu VM's as well. As far as physical hosts, ANY Orabuntu-LXC supported physical host can be used, including Ubuntu, Oracle Linux.  Only the VirtualBox VMs have to be Oracle Linux 7.  Support for Ubuntu VMs for this same feature will be released very soon (ed. see latest update, Ubuntu VM support has been added).
+Note 1: that in the following, this new update feature is only available on Oracle Linux 7 VM's at this time, but it should be ported very very soon to Ubuntu VM's as well. As far as physical hosts, ANY Orabuntu-LXC supported physical host can be used, notably Ubuntu and Oracle Linux.  Only the VirtualBox VMs have to be Oracle Linux 7.  Support for Ubuntu VMs for this same feature will be released very soon (ed. see latest update, Ubuntu VM support has been added).
 
 This has been tested for Oracle VirtualBox VMs but should also work for any VM such as KVM or VMWare etc.  The only requirement is that (1) "bridged" network mode is supported by the VM technology and (2) that if LXC containers are also going to be run in the VMs on the Orabuntu-LXC OpenvSwitch networks that promiscuous mode on the VM virtual NICs be set to "Allow All".
 
