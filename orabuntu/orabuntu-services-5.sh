@@ -119,6 +119,7 @@ do
 
        		sudo chmod 644 /etc/systemd/system/$k.service
         	sudo systemctl enable $k.service
+		sudo service $k stop
 		sudo service $k start
 		sudo service $k status
 

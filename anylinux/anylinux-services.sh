@@ -251,9 +251,9 @@ MultiHost=$8
 if [ -z $8 ]
 then
 	#MultiHost="new:N:1:$SudoPassword:192.168.1.82:192.168.1.93:1500:ubuntu:ubuntu:$GRE"
-	 MultiHost="new:Y:9:$SudoPassword:192.168.1.32:192.168.1.5:1420:ubuntu:ubuntu:$GRE"
+	#MultiHost="new:Y:9:$SudoPassword:192.168.1.32:192.168.1.5:1420:ubuntu:ubuntu:$GRE"
 	#MultiHost="reinstall:N:1:$SudoPassword:192.168.1.32:192.168.1.68:1500:ubuntu:ubuntu:$GRE"
-	#MultiHost="reinstall:Y:9:$SudoPassword:192.168.1.32:192.168.1.5:1420:ubuntu:ubuntu:$GRE"
+	 MultiHost="reinstall:Y:9:$SudoPassword:192.168.1.32:192.168.1.5:1420:ubuntu:ubuntu:$GRE"
 	#MultiHost="addclones"
 fi
 echo 'MultiHost                 = '$MultiHost
