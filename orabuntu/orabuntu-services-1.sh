@@ -206,15 +206,12 @@ echo ''
 
 sleep 5
 
-if	[ $SystemdResolvedInstalled -eq 1 ]
-then
-	sudo sed -i '/GSSAPIAuthentication/s/yes/no/'                                /etc/ssh/sshd_config
-	sudo sed -i '/UseDNS/s/yes/no/'                                              /etc/ssh/sshd_config
-	sudo sed -i '/GSSAPIAuthentication/s/#//'                                    /etc/ssh/sshd_config
-	sudo sed -i '/UseDNS/s/#//'                                                  /etc/ssh/sshd_config
-	sudo egrep 'GSSAPIAuthentication|UseDNS'                                     /etc/ssh/sshd_config
-	sudo service sshd restart
-fi
+sudo sed -i '/GSSAPIAuthentication/s/yes/no/'                                /etc/ssh/sshd_config
+sudo sed -i '/UseDNS/s/yes/no/'                                              /etc/ssh/sshd_config
+sudo sed -i '/GSSAPIAuthentication/s/#//'                                    /etc/ssh/sshd_config
+sudo sed -i '/UseDNS/s/#//'                                                  /etc/ssh/sshd_config
+sudo egrep 'GSSAPIAuthentication|UseDNS'                                     /etc/ssh/sshd_config
+sudo service sshd restart
 
 echo ''
 echo "=============================================="
@@ -286,11 +283,6 @@ then
 		sudo /etc/network/openvswitch/del-bridges.sh >/dev/null 2>&1
 		sudo ovs-vsctl show
 		sudo rm -f /etc/network/openvswitch/crt_ovs_s*.sh
-		sudo apt-get -y purge lxc lxc-common lxc-templates lxc1 lxcfs python3-lxc liblxc1
-		sudo service networkmanager stop
-		sudo service dnsmasq stop
-		sudo apt-get purge dnsmasq
- 		sudo rm -f /etc/default/lxc-net
 
 		echo ''
 		echo "=============================================="
@@ -303,8 +295,6 @@ then
 
 		sudo rm -rf /etc/network/openvswitch
 		sudo systemctl disable sw1
-		sudo systemctl disable sw2
-		sudo systemctl disable sw3
 		sudo systemctl disable sw4
 		sudo systemctl disable sw5
 		sudo systemctl disable sw6
@@ -313,10 +303,10 @@ then
 		sudo systemctl disable sw9
 		sudo systemctl disable sx1
 
-		sudo rm -f  /etc/systemd/system/ora*c*.service
-		sudo rm -f  /etc/systemd/system/oel*c*.service
-		sudo rm -f /etc/systemd/sw*.service
-		sudo rm -f /etc/systemd/sx*.service
+		sudo rm -f /etc/systemd/system/ora*c*.service
+		sudo rm -f /etc/systemd/system/oel*c*.service
+		sudo rm -f /etc/systemd/sw[1456789].service
+		sudo rm -f /etc/systemd/sx1.service
 
 		echo ''
 		echo "=============================================="
@@ -493,7 +483,7 @@ sudo apt-get install -y uml-utilities openvswitch-switch openvswitch-common huge
 sudo apt-get install -y bind9utils dnsutils apparmor-utils openssh-server uuid rpm yum
 sudo apt-get install -y iotop sshpass facter iptables
 
-if [ $NetworkManagerInstalled -eq 1 ]
+if [ $NetworkManagerInstalled -eq 1 ] && [ $SystemdResolvedInstalled -eq 0 ]
 then
 	sudo apt-get -y install dnsmasq
 fi
@@ -1539,7 +1529,7 @@ sleep 5
 
 clear
 
-if [ $SystemdResolvedInstalled -eq 1 ]
+if   [ $SystemdResolvedInstalled -eq 1 ] && [ $NetworkManagerInstalled -eq 1 ] && [ ! -f /etc/systemd/system/systemd-resolved-helper.service ]
 then
 	echo ''
 	echo "=============================================="
@@ -1547,21 +1537,28 @@ then
 	echo "=============================================="
 	echo ''
 
-	sudo sh -c "echo '[Unit]'                                                	 > /etc/systemd/system/systemd-resolved-helper.service"
-	sudo sh -c "echo 'Description=resolved Service'					>> /etc/systemd/system/systemd-resolved-helper.service"
-	sudo sh -c "echo 'Wants=sw1.service sx1.service'				>> /etc/systemd/system/systemd-resolved-helper.service"
-	sudo sh -c "echo 'After=sw1.service sx1.service'				>> /etc/systemd/system/systemd-resolved-helper.service"
-	sudo sh -c "echo ''								>> /etc/systemd/system/systemd-resolved-helper.service"
-	sudo sh -c "echo '[Service]'							>> /etc/systemd/system/systemd-resolved-helper.service"
-	sudo sh -c "echo 'Type=idle'							>> /etc/systemd/system/systemd-resolved-helper.service"
-	sudo sh -c "echo 'User=root'							>> /etc/systemd/system/systemd-resolved-helper.service"
-	sudo sh -c "echo 'RemainAfterExit=yes'						>> /etc/systemd/system/systemd-resolved-helper.service"
-	sudo sh -c "echo 'ExecStart=/usr/sbin/service systemd-resolved restart'		>> /etc/systemd/system/systemd-resolved-helper.service"
-	sudo sh -c "echo 'ExecStop=/usr/sbin/service systemd-resolved stop'		>> /etc/systemd/system/systemd-resolved-helper.service"
-	sudo sh -c "echo ''								>> /etc/systemd/system/systemd-resolved-helper.service"
-	sudo sh -c "echo '[Install]'							>> /etc/systemd/system/systemd-resolved-helper.service"
-	sudo sh -c "echo 'WantedBy=multi-user.target'					>> /etc/systemd/system/systemd-resolved-helper.service"
+	sudo sh -c "echo '[Unit]'                                                		 > /etc/systemd/system/systemd-resolved-helper.service"
+	sudo sh -c "echo 'Description=resolved Service'						>> /etc/systemd/system/systemd-resolved-helper.service"
+#	sudo sh -c "echo 'Wants=sw1.service sx1.service'					>> /etc/systemd/system/systemd-resolved-helper.service"
+#	sudo sh -c "echo 'After=sw1.service sx1.service'					>> /etc/systemd/system/systemd-resolved-helper.service"
+	sudo sh -c "echo ''									>> /etc/systemd/system/systemd-resolved-helper.service"
+	sudo sh -c "echo '[Service]'								>> /etc/systemd/system/systemd-resolved-helper.service"
+	sudo sh -c "echo 'Type=idle'								>> /etc/systemd/system/systemd-resolved-helper.service"
+	sudo sh -c "echo 'User=root'								>> /etc/systemd/system/systemd-resolved-helper.service"
+	sudo sh -c "echo 'RemainAfterExit=yes'							>> /etc/systemd/system/systemd-resolved-helper.service"
+	sudo sh -c "echo 'ExecStartPre=/bin/ln -sf /lib/systemd/resolv.conf /etc/resolv.conf'	>> /etc/systemd/system/systemd-resolved-helper.service"
+	sudo sh -c "echo 'ExecStart=/usr/sbin/service systemd-resolved restart'			>> /etc/systemd/system/systemd-resolved-helper.service"
+	sudo sh -c "echo 'ExecStop=/usr/sbin/service systemd-resolved stop'			>> /etc/systemd/system/systemd-resolved-helper.service"
+	sudo sh -c "echo ''									>> /etc/systemd/system/systemd-resolved-helper.service"
+	sudo sh -c "echo '[Install]'								>> /etc/systemd/system/systemd-resolved-helper.service"
+	sudo sh -c "echo 'WantedBy=multi-user.target'						>> /etc/systemd/system/systemd-resolved-helper.service"
 
+#	sudo cp -p /etc/systemd/system/multi-user.target.wants/NetworkManager.service /etc/systemd/system/multi-user.target.wants/NetworkManager.service.original
+
+#	sudo sed -i '/systemd-resolved-helper/!s/Before=network.target/Before=network.target systemd-resolved-helper.service/g' /etc/systemd/system/multi-user.target.wants/NetworkManager.service
+#	sudo sed -i '/systemd-resolved-helper/!s/Wants=network.target/Wants=network.target systemd-resolved-helper.service/g' /etc/systemd/system/multi-user.target.wants/NetworkManager.service
+
+	sudo systemctl daemon-reload
 	sudo systemctl enable systemd-resolved-helper
 	sudo service systemd-resolved-helper start
 
@@ -1814,7 +1811,6 @@ then
 	echo "=============================================="
 	echo ''
 
-	sudo touch /home/ubuntu/.ssh/known_hosts
 	sudo lxc-attach -n $NameServer -- usermod --password `perl -e "print crypt('ubuntu','ubuntu');"` ubuntu
 	ssh-keygen -f "/home/ubuntu/.ssh/known_hosts" -R 10.207.39.2
 #	sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ubuntu@10.207.39.2 "ssh-keygen -f ~/.ssh/id_rsa -t rsa -N ''"
@@ -1920,34 +1916,33 @@ then
 #		sudo sed -i "s/MHV3/MultiHostVar3/g"		/etc/network/openvswitch/setup_gre_and_routes.sh
 #		sudo sed -i "s/MHV6/MultiHostVar6/g"		/etc/network/openvswitch/setup_gre_and_routes.sh
 
-		sudo chmod 775 /etc/network/openvswitch/setup_gre_and_routes.sh
+#		sudo chmod 775 /etc/network/openvswitch/setup_gre_and_routes.sh
 
-		echo ''
-		echo "=============================================="
-		echo "Setup GRE & Routes on $MultiHostVar5...       "
-		echo "=============================================="
-		echo ''
+#		echo ''
+#		echo "=============================================="
+#		echo "Setup GRE & Routes on $MultiHostVar5...       "
+#		echo "=============================================="
+#		echo ''
 	
-		sudo service sw1 restart
-		sudo service sx1 restart
+#		sudo service sw1 restart
+#		sudo service sx1 restart
 
-		sudo chmod 777 /etc/network/openvswitch/setup_gre_and_routes.sh
+#		sudo chmod 777 /etc/network/openvswitch/setup_gre_and_routes.sh
 
-		sudo touch /home/ubuntu/.ssh/known_hosts
-		ssh-keygen -f "/home/ubuntu/.ssh/known_hosts" -R $MultiHostVar5
-		sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 date
-		if [ $? -eq 0 ]
-		then
-			sshpass -p ubuntu scp -p /etc/network/openvswitch/setup_gre_and_routes.sh ubuntu@$MultiHostVar5:~/.
-		fi
-		sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 "sudo -S <<< "ubuntu" ls -l ~/setup_gre_and_routes.sh"
-		if [ $? -eq 0 ]
-		then
-			sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 "sudo -S <<< "ubuntu" ~/setup_gre_and_routes.sh"
-			sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 "sudo -S <<< "ubuntu" service sw1 restart"
-			sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 "sudo -S <<< "ubuntu" /etc/orabuntu-lxc-scripts/stop_containers.sh"
-			sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 "sudo -S <<< "ubuntu" /etc/orabuntu-lxc-scripts/start_containers.sh"
-		fi
+#		ssh-keygen -f "/home/ubuntu/.ssh/known_hosts" -R $MultiHostVar5
+#		sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 date
+#		if [ $? -eq 0 ]
+#		then
+#			sshpass -p ubuntu scp -p /etc/network/openvswitch/setup_gre_and_routes.sh ubuntu@$MultiHostVar5:~/.
+#		fi
+#		sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 "sudo -S <<< "ubuntu" ls -l ~/setup_gre_and_routes.sh"
+#		if [ $? -eq 0 ]
+#		then
+#			sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 "sudo -S <<< "ubuntu" ~/setup_gre_and_routes.sh"
+#			sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 "sudo -S <<< "ubuntu" service sw1 restart"
+#			sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 "sudo -S <<< "ubuntu" /etc/orabuntu-lxc-scripts/stop_containers.sh"
+#			sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 "sudo -S <<< "ubuntu" /etc/orabuntu-lxc-scripts/start_containers.sh"
+#		fi
 
 		function GetShortHost {
 			uname -n | cut -f1 -d'.'

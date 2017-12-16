@@ -290,15 +290,15 @@ function CheckMtuSetLocalSx1 {
 }
 MtuSetLocalSx1=$(CheckMtuSetLocalSx1)
 
-function CheckMtuSetRemoteSw1 {
-	sshpass -p ubuntu ssh -q -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 "sudo -S <<< "ubuntu" ifconfig sw1 | grep mtu | grep 1420 | wc -l" | cut -f2 -d':' | sed 's/^[ \t]*//;s/[ \t]*$//' | cut -c1
-}
-MtuSetRemoteSw1=$(CheckMtuSetRemoteSw1)
+# function CheckMtuSetRemoteSw1 {
+# 	sshpass -p ubuntu ssh -q -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 "sudo -S <<< "ubuntu" ifconfig sw1 | grep mtu | grep 1420 | wc -l" | cut -f2 -d':' | sed 's/^[ \t]*//;s/[ \t]*$//' | cut -c1
+# }
+# MtuSetRemoteSw1=$(CheckMtuSetRemoteSw1)
 
-function CheckMtuSetRemoteSx1 {
-	sshpass -p ubuntu ssh -q -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 "sudo -S <<< "ubuntu" ifconfig sx1 | grep mtu | grep 1420 | wc -l" | cut -f2 -d':' | sed 's/^[ \t]*//;s/[ \t]*$//' | cut -c1
-}
-MtuSetRemoteSx1=$(CheckMtuSetRemoteSx1)
+# function CheckMtuSetRemoteSx1 {
+# 	sshpass -p ubuntu ssh -q -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 "sudo -S <<< "ubuntu" ifconfig sx1 | grep mtu | grep 1420 | wc -l" | cut -f2 -d':' | sed 's/^[ \t]*//;s/[ \t]*$//' | cut -c1
+# }
+# MtuSetRemoteSx1=$(CheckMtuSetRemoteSx1)
 
 if [ $GRE = 'Y' ]
 then
@@ -315,21 +315,21 @@ then
 		/etc/orabuntu-lxc-scripts/start_containers.sh
 	fi
 
-	if [ ! -f ~/sets-mtu.sh ]
-	then
-		echo 'sudo sh -c zzzsed -i zz/1500/s/1500/1420/zz /var/lib/lxc/*/configzzz' > ~/sets-mtu.sh
-		sudo sed -i 's/zzz/"/g' ~/sets-mtu.sh
-		sudo sed -i "s/zz/'/g" ~/sets-mtu.sh
-		sudo chmod 777 ~/sets-mtu.sh
-	fi
+# 	if [ ! -f ~/sets-mtu.sh ]
+# 	then
+# 		echo 'sudo sh -c zzzsed -i zz/1500/s/1500/1420/zz /var/lib/lxc/*/configzzz' > ~/sets-mtu.sh
+# 		sudo sed -i 's/zzz/"/g' ~/sets-mtu.sh
+# 		sudo sed -i "s/zz/'/g" ~/sets-mtu.sh
+# 		sudo chmod 777 ~/sets-mtu.sh
+# 	fi
 
-	if [ "$MtuSetRemoteSw1" -eq 0 ] && [ "$MtuSetRemoteSx1" -eq 0 ]
-	then
-		sshpass -p ubuntu scp -p ~/sets-mtu.sh ubuntu@$MultiHostVar5:~/Downloads/.
-		sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 "sudo -S <<< "ubuntu" ~/Downloads/sets-mtu.sh"
-		sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 "sudo -S <<< "ubuntu" /etc/orabuntu-lxc-scripts/stop_containers.sh"
-		sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 "sudo -S <<< "ubuntu" /etc/orabuntu-lxc-scripts/start_containers.sh"
-	fi
+# 	if [ "$MtuSetRemoteSw1" -eq 0 ] && [ "$MtuSetRemoteSx1" -eq 0 ]
+# 	then
+# 		sshpass -p ubuntu scp -p ~/sets-mtu.sh ubuntu@$MultiHostVar5:~/Downloads/.
+# 		sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 "sudo -S <<< "ubuntu" ~/Downloads/sets-mtu.sh"
+# 		sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 "sudo -S <<< "ubuntu" /etc/orabuntu-lxc-scripts/stop_containers.sh"
+# 		sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 "sudo -S <<< "ubuntu" /etc/orabuntu-lxc-scripts/start_containers.sh"
+# 	fi
 
 	function GetMtuRemote {
 		sshpass -p ubuntu ssh -q -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 "sudo -S 2>&1 <<< "ubuntu" ifconfig | grep mtu | grep 1420 | cut -f1,5 -d' ' | sed 's/  *//g' | sed 's/$/ /' | tr -d '\n'"
@@ -452,12 +452,11 @@ then
        	echo "=============================================="
 	echo ''
 
-	sudo touch /home/ubuntu/.ssh/known_hosts
 	ssh-keygen -f "/home/ubuntu/.ssh/known_hosts" -R 10.207.39.2
 	sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.39.2 "sudo -S <<< "ubuntu" mkdir -p ~/Downloads"
 	sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.39.2 "sudo -S <<< "ubuntu" chown ubuntu:ubuntu Downloads"
-	sshpass -p ubuntu scp -p /etc/network/openvswitch/nsupdate_domain1_add_$ShortHost.sh ubuntu@10.207.39.2:~/Downloads/.
-       	sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.39.2 "sudo -S <<< "ubuntu" ~/Downloads/nsupdate_domain1_add_$ShortHost.sh"
+	sshpass -p ubuntu scp    -o CheckHostIP=no -o StrictHostKeyChecking=no -p /etc/network/openvswitch/nsupdate_domain1_add_$ShortHost.sh ubuntu@10.207.39.2:~/Downloads/.
+	sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.39.2 "sudo -S <<< "ubuntu" ~/Downloads/nsupdate_domain1_add_$ShortHost.sh"
        	
 	echo ''
         echo "=============================================="
@@ -479,12 +478,11 @@ then
        	echo "=============================================="
 	echo ''
 
-	sudo touch /home/ubuntu/.ssh/known_hosts
 	ssh-keygen -f "/home/ubuntu/.ssh/known_hosts" -R 10.207.29.2
 	sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.29.2 "sudo -S <<< "ubuntu" mkdir -p ~/Downloads"
 	sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.29.2 "sudo -S <<< "ubuntu" chown ubuntu:ubuntu Downloads"
-	sshpass -p ubuntu scp -p /etc/network/openvswitch/nsupdate_domain2_add_$ShortHost.sh ubuntu@10.207.29.2:~/Downloads/.
-       	sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.39.2 "sudo -S <<< "ubuntu" ~/Downloads/nsupdate_domain2_add_$ShortHost.sh"
+	sshpass -p ubuntu scp    -o CheckHostIP=no -o StrictHostKeyChecking=no -p /etc/network/openvswitch/nsupdate_domain2_add_$ShortHost.sh ubuntu@10.207.39.2:~/Downloads/.
+	sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.39.2 "sudo -S <<< "ubuntu" ~/Downloads/nsupdate_domain2_add_$ShortHost.sh"
        	
 	echo ''
         echo "=============================================="
