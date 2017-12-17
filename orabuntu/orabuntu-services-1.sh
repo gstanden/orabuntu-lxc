@@ -1195,6 +1195,11 @@ then
 			sudo mv /etc/network/if-up.d/openvswitch/nsa-pub-ifup-sx1 /etc/network/if-up.d/openvswitch/$NameServer-pub-ifup-sx1
 			sudo mv /etc/network/if-down.d/openvswitch/nsa-pub-ifdown-sx1 /etc/network/if-down.d/openvswitch/$NameServer-pub-ifdown-sx1
 			sudo mv /etc/network/openvswitch/strt_nsa.sh /etc/network/openvswitch/strt_$NameServer.sh
+			echo "/var/lib/lxc/$NameServer"						 > /home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/nameserver.lst
+			echo "/etc/network/if-up.d/openvswitch/$NameServer-pub-ifup-sw1" 	>> /home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/nameserver.lst
+			echo "/etc/network/if-down.d/openvswitch/$NameServer-pub-ifdown-sw1" 	>> /home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/nameserver.lst
+			echo "/etc/network/if-up.d/openvswitch/$NameServer-pub-ifup-sx1" 	>> /home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/nameserver.lst
+			echo "/etc/network/if-down.d/openvswitch/$NameServer-pub-ifdown-sx1" 	>> /home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/nameserver.lst
 		fi
 
 		if [ -n $Domain1 ]
@@ -1626,6 +1631,9 @@ then
 		sudo sh -c "echo '[Install]'                        				>> /etc/systemd/system/$NameServer.service"
 		sudo sh -c "echo 'WantedBy=multi-user.target'       				>> /etc/systemd/system/$NameServer.service"
 		sudo chmod 644 /etc/systemd/system/$NameServer.service
+
+		echo "/etc/systemd/system/$NameServer.service" >> /home/ubuntu/Downloads/orabuntu-lxc-master/archives/nameserver.lst
+ 
 		sudo systemctl enable $NameServer
 
 		echo ''
@@ -1916,33 +1924,48 @@ then
 #		sudo sed -i "s/MHV3/MultiHostVar3/g"		/etc/network/openvswitch/setup_gre_and_routes.sh
 #		sudo sed -i "s/MHV6/MultiHostVar6/g"		/etc/network/openvswitch/setup_gre_and_routes.sh
 
-#		sudo chmod 775 /etc/network/openvswitch/setup_gre_and_routes.sh
-
-#		echo ''
-#		echo "=============================================="
-#		echo "Setup GRE & Routes on $MultiHostVar5...       "
-#		echo "=============================================="
-#		echo ''
+ 		echo ''
+ 		echo "=============================================="
+ 		echo "Setup GRE & Routes on $MultiHostVar5...       "
+ 		echo "=============================================="
+ 		echo ''
 	
 #		sudo service sw1 restart
 #		sudo service sx1 restart
 
-#		sudo chmod 777 /etc/network/openvswitch/setup_gre_and_routes.sh
+ 		sudo chmod 777 /etc/network/openvswitch/setup_gre_and_routes.sh
 
-#		ssh-keygen -f "/home/ubuntu/.ssh/known_hosts" -R $MultiHostVar5
-#		sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 date
-#		if [ $? -eq 0 ]
-#		then
-#			sshpass -p ubuntu scp -p /etc/network/openvswitch/setup_gre_and_routes.sh ubuntu@$MultiHostVar5:~/.
-#		fi
-#		sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 "sudo -S <<< "ubuntu" ls -l ~/setup_gre_and_routes.sh"
-#		if [ $? -eq 0 ]
-#		then
-#			sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 "sudo -S <<< "ubuntu" ~/setup_gre_and_routes.sh"
+ 		ssh-keygen -f "/home/ubuntu/.ssh/known_hosts" -R $MultiHostVar5
+ 		sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 date
+ 		if [ $? -eq 0 ]
+ 		then
+ 			sshpass -p ubuntu scp -p /etc/network/openvswitch/setup_gre_and_routes.sh ubuntu@$MultiHostVar5:~/.
+ 		fi
+ 		sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 "sudo -S <<< "ubuntu" ls -l ~/setup_gre_and_routes.sh"
+ 		if [ $? -eq 0 ]
+ 		then
+ 			sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 "sudo -S <<< "ubuntu" ~/setup_gre_and_routes.sh"
 #			sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 "sudo -S <<< "ubuntu" service sw1 restart"
 #			sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 "sudo -S <<< "ubuntu" /etc/orabuntu-lxc-scripts/stop_containers.sh"
 #			sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 "sudo -S <<< "ubuntu" /etc/orabuntu-lxc-scripts/start_containers.sh"
-#		fi
+ 		fi
+
+		if [ $NameServerExists -eq 0 ]
+		then
+ 			echo ''
+	 		echo "=============================================="
+ 			echo "Replicate $NameServer LXC locally...          "
+ 			echo "=============================================="
+ 			echo ''
+
+ 			/home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/nameserver_copy.sh $MultiHostVar5 $MultiHostVar6 $NameServer
+ 			
+			echo ''
+	 		echo "=============================================="
+ 			echo "Done: Replicate $NameServer LXC locally.      "
+ 			echo "=============================================="
+ 			echo ''
+		fi
 
 		function GetShortHost {
 			uname -n | cut -f1 -d'.'

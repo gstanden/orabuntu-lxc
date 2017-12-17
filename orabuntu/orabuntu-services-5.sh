@@ -551,6 +551,23 @@ sleep 5
 
 clear
 
+if [ $NameServerExists -eq 0 ] && [ $GRE = 'Y' ]
+then
+	echo ''
+	echo "=============================================="
+	echo "Replicate $NameServer LXC locally...          "
+	echo "=============================================="
+	echo ''
+
+	/home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/nameserver_copy.sh $MultiHostVar5 $MultiHostVar6 $NameServer
+
+	echo ''
+	echo "=============================================="
+	echo "Done: Replicate $NameServer LXC locally.      "
+	echo "=============================================="
+	echo ''
+fi
+
 echo ''
 echo "=============================================="
 echo "Management links directory creation...        "
