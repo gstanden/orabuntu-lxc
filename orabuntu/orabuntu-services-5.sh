@@ -77,6 +77,11 @@ function GetUbuntuMajorVersion {
 }
 UbuntuMajorVersion=$(GetUbuntuMajorVersion)
 
+function CheckNameServerExists {
+	sudo lxc-ls -f | grep -c "$NameServer"
+}
+NameServerExists=$(CheckNameServerExists)
+
 echo ''
 echo "=============================================="
 echo "Script: orabuntu-services-5.sh                  "
@@ -592,7 +597,7 @@ echo ''
 
 sleep 5
 
-if [ UbuntuMajorVersion -ge 17 ]
+if [ $UbuntuMajorVersion -ge 17 ]
 then
 	/home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/docker_install_ubuntu_17.sh
 fi
