@@ -1,5 +1,0 @@
-/var/lib/lxc/olive
-/etc/network/if-up.d/openvswitch/olive-pub-ifup-sw1
-/etc/network/if-down.d/openvswitch/olive-pub-ifdown-sw1
-/etc/network/if-up.d/openvswitch/olive-pub-ifup-sx1
-/etc/network/if-down.d/openvswitch/olive-pub-ifdown-sx1
