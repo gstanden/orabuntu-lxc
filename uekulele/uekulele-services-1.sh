@@ -1756,6 +1756,11 @@ then
 			sudo mv /etc/network/if-up.d/openvswitch/nsa-pub-ifup-sx1 /etc/network/if-up.d/openvswitch/$NameServer-pub-ifup-sx1
 			sudo mv /etc/network/if-down.d/openvswitch/nsa-pub-ifdown-sx1 /etc/network/if-down.d/openvswitch/$NameServer-pub-ifdown-sx1
 			sudo mv /etc/network/openvswitch/strt_nsa.sh /etc/network/openvswitch/strt_$NameServer.sh
+                        echo "/var/lib/lxc/$NameServer"                                          > /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/archives/nameserver.lst
+                        echo "/etc/network/if-up.d/openvswitch/$NameServer-pub-ifup-sw1"        >> /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/archives/nameserver.lst
+                        echo "/etc/network/if-down.d/openvswitch/$NameServer-pub-ifdown-sw1"    >> /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/archives/nameserver.lst
+                        echo "/etc/network/if-up.d/openvswitch/$NameServer-pub-ifup-sx1"        >> /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/archives/nameserver.lst
+                        echo "/etc/network/if-down.d/openvswitch/$NameServer-pub-ifdown-sx1"    >> /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/archives/nameserver.lst
 		fi
 
 		if [ -n $Domain1 ]
@@ -2069,6 +2074,9 @@ then
 		sudo sh -c "echo '[Install]'                        				>> /etc/systemd/system/$NameServer.service"
 		sudo sh -c "echo 'WantedBy=multi-user.target'       				>> /etc/systemd/system/$NameServer.service"
 		sudo chmod 644 /etc/systemd/system/$NameServer.service
+
+		echo "/etc/systemd/system/$NameServer.service" >> /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/archives/nameserver.lst
+
 		sudo systemctl enable $NameServer
 
 		echo ''
@@ -2366,12 +2374,11 @@ then
 		echo "=============================================="
 		echo ''
 	
-		sudo service sw1 restart
-		sudo service sx1 restart
+#		sudo service sw1 restart
+#		sudo service sx1 restart
 
 		sudo chmod 777 /etc/network/openvswitch/setup_gre_and_routes.sh
 
-		sudo touch /home/ubuntu/.ssh/known_hosts
 		ssh-keygen -f "/home/ubuntu/.ssh/known_hosts" -R $MultiHostVar5
 		sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 date
 		if [ $? -eq 0 ]
@@ -2382,9 +2389,9 @@ then
 		if [ $? -eq 0 ]
 		then
 			sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 "sudo -S <<< "ubuntu" ~/setup_gre_and_routes.sh"
-			sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 "sudo -S <<< "ubuntu" service sw1 restart"
-			sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 "sudo -S <<< "ubuntu" /etc/orabuntu-lxc-scripts/stop_containers.sh"
-			sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 "sudo -S <<< "ubuntu" /etc/orabuntu-lxc-scripts/start_containers.sh"
+#			sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 "sudo -S <<< "ubuntu" service sw1 restart"
+#			sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 "sudo -S <<< "ubuntu" /etc/orabuntu-lxc-scripts/stop_containers.sh"
+#			sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 "sudo -S <<< "ubuntu" /etc/orabuntu-lxc-scripts/start_containers.sh"
 		fi
 
 		function GetShortHost {
@@ -2393,7 +2400,7 @@ then
 		ShortHost=$(GetShortHost)
 
 		nslookup -timeout=1 $HOSTNAME.$Domain1 > /dev/null 2>&1
-		if [ $HostnameLookup -eq 0 ]
+		if [ $? -eq 1 ]
 		then		
 			echo ''
 			echo "=============================================="
@@ -2415,7 +2422,7 @@ then
 		fi
 
 		nslookup -timeout=1 $HOSTNAME.$Domain2 > /dev/null 2>&1
-		if [ $HostnameLookup -eq 0 ]
+		if [ $? -eq 1 ]
 		then		
 			echo ''
 			echo "=============================================="

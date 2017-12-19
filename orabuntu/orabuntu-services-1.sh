@@ -1273,7 +1273,7 @@ then
 	sudo sed -i '/plugins=ifupdown,keyfile/a dns=dnsmasq' /etc/NetworkManager/NetworkManager.conf
 	sudo sed -i '$!N; /^\(.*\)\n\1$/!P; D' /etc/NetworkManager/NetworkManager.conf
 
-	sudo service NetworkManager restart
+	sudo service NetworkManager restart > /dev/null 2>&1
 
 	function CheckResolvReady {
 		sudo cat /etc/resolv.conf | egrep -c 'nameserver 127\.0\.1\.1|nameserver 127\.0\.0\.1'
@@ -1632,7 +1632,7 @@ then
 		sudo sh -c "echo 'WantedBy=multi-user.target'       				>> /etc/systemd/system/$NameServer.service"
 		sudo chmod 644 /etc/systemd/system/$NameServer.service
 
-		echo "/etc/systemd/system/$NameServer.service" >> /home/ubuntu/Downloads/orabuntu-lxc-master/archives/nameserver.lst
+		echo "/etc/systemd/system/$NameServer.service" >> /home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/nameserver.lst
  
 		sudo systemctl enable $NameServer
 
@@ -1949,23 +1949,6 @@ then
 #			sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 "sudo -S <<< "ubuntu" /etc/orabuntu-lxc-scripts/stop_containers.sh"
 #			sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 "sudo -S <<< "ubuntu" /etc/orabuntu-lxc-scripts/start_containers.sh"
  		fi
-
-		if [ $NameServerExists -eq 0 ]
-		then
- 			echo ''
-	 		echo "=============================================="
- 			echo "Replicate $NameServer LXC locally...          "
- 			echo "=============================================="
- 			echo ''
-
- 			/home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/nameserver_copy.sh $MultiHostVar5 $MultiHostVar6 $NameServer
- 			
-			echo ''
-	 		echo "=============================================="
- 			echo "Done: Replicate $NameServer LXC locally.      "
- 			echo "=============================================="
- 			echo ''
-		fi
 
 		function GetShortHost {
 			uname -n | cut -f1 -d'.'

@@ -20,6 +20,7 @@
 #    v2.8 GLS 20151231
 #    v3.0 GLS 20160710 Updates for Ubuntu 16.04
 #    v4.0 GLS 20161025 DNS DHCP services moved into an LXC container
+#    v5.0 GLS 20171216 EE MultiHost Docker S3
 
 clear
 
@@ -37,6 +38,16 @@ function GetMultiHostVar5 {
 	echo $MultiHost | cut -f5 -d':'
 }
 MultiHostVar5=$(GetMultiHostVar5)
+
+function GetMultiHostVar6 {
+        echo $MultiHost | cut -f6 -d':'
+}
+MultiHostVar6=$(GetMultiHostVar6)
+
+function GetMultiHostVar7 {
+	echo $MultiHost | cut -f7 -d':'
+}
+MultiHostVar7=$(GetMultiHostVar7)
 
 function GetMultiHostVar10 {
 	echo $MultiHost | cut -f10 -d':'
@@ -60,6 +71,11 @@ function CheckSystemdResolvedInstalled {
 	sudo netstat -ulnp | grep 53 | sed 's/  */ /g' | rev | cut -f1 -d'/' | rev | sort -u | grep systemd- | wc -l
 }
 SystemdResolvedInstalled=$(CheckSystemdResolvedInstalled)
+
+function GetUbuntuMajorVersion {
+	cat /etc/lsb-release | grep DISTRIB_RELEASE | cut -f2 -d'=' | cut -f1 -d'.'
+}
+UbuntuMajorVersion=$(GetUbuntuMajorVersion)
 
 echo ''
 echo "=============================================="
@@ -113,7 +129,7 @@ do
 	
 		echo ''
 		echo "=============================================="
-		echo "Start OpenvSwitch $k ...            "
+		echo "Start OpenvSwitch $k ...                      "
 		echo "=============================================="
 		echo ''
 
@@ -161,20 +177,16 @@ do
 
 #	sudo /etc/network/openvswitch/veth_cleanups.sh $j > /dev/null 2>&1
 
-	function GetUbuntuVersion {
-		cat /etc/lsb-release | grep DISTRIB_RELEASE | cut -f2 -d'='
-	}
-	UbuntuVersion=$(GetUbuntuVersion)
-
 	echo ''
 	echo "Starting container $j ..."
 	echo ''
-	if [ $UbuntuVersion = '16.04' ] || [ $UbuntuVersion = '16.10' ] || [ $UbuntuVersion = '17.04' ] || [ $UbuntuVersion = '17.10' ]
+
+	if [ $UbuntuMajorVersion -ge 16 ]
 	then
 		function CheckPublicIPIterative {
 			sudo lxc-ls -f | sed 's/  */ /g' | grep $j | grep RUNNING | cut -f2 -d'-' | sed 's/^[ \t]*//;s/[ \t]*$//' | cut -f1 -d' ' | cut -f1-2 -d'.' | sed 's/\.//g'
 		}
-		fi
+	fi
 	PublicIPIterative=$(CheckPublicIPIterative)
 	echo $j | grep oel > /dev/null 2>&1
 	if [ $? -eq 0 ]
@@ -259,7 +271,7 @@ clear
 
 echo ''
 echo "=============================================="
-echo "Create /etc/orabuntu-lxc-release file...          "
+echo "Create /etc/orabuntu-lxc-release file...      "
 echo "=============================================="
 echo ''
 
@@ -359,37 +371,37 @@ then
 
 	clear
 
-       	echo ''
-        echo "=============================================="
-	echo "Show MTU on remote network devices.           "
-       	echo "=============================================="
-       	echo ''
+#      	echo ''
+#       echo "=============================================="
+#	echo "Show MTU on remote network devices.           "
+#      	echo "=============================================="
+#      	echo ''
 
-	for i in $MtuRemote
-	do
-		function GetNetworkDeviceName {
-			echo $i | cut -f1 -d':'
-		}
-		NetworkDeviceName=$(GetNetworkDeviceName)
+#	for i in $MtuRemote
+#	do
+#	function GetNetworkDeviceName {
+#		echo $i | cut -f1 -d':'
+#	}
+#	NetworkDeviceName=$(GetNetworkDeviceName)
 
-		function GetNetworkDeviceMtu {
-			echo $i | cut -f2 -d':'
-		}
-		NetworkDeviceMtu=$(GetNetworkDeviceMtu)
+#	function GetNetworkDeviceMtu {
+#		echo $i | cut -f2 -d':'
+#	}
+#	NetworkDeviceMtu=$(GetNetworkDeviceMtu)
 
-		echo 'Network Device Name = '$NetworkDeviceName
-		echo 'Network Device MTU  = '$NetworkDeviceMtu
-		echo ''
-	done
+#	echo 'Network Device Name = '$NetworkDeviceName
+#	echo 'Network Device MTU  = '$NetworkDeviceMtu
+#	echo ''
+#	done
 
-        echo "=============================================="
-	echo "Done: Show MTU on remote network devices.     "
-       	echo "=============================================="
-       	echo ''
+#       echo "=============================================="
+#	echo "Done: Show MTU on remote network devices.     "
+#      	echo "=============================================="
+#      	echo ''
 
-	sleep 10
+#	sleep 10
 
-	clear
+#	clear
 
 	function GetMtuLocal {
 		ifconfig | grep mtu | grep 1420 | cut -f1,5 -d' ' | sed 's/  *//g' | sed 's/$/ /' | tr -d '\n'
@@ -480,8 +492,8 @@ then
 	echo ''
 
 	ssh-keygen -f "/home/ubuntu/.ssh/known_hosts" -R 10.207.29.2
-	sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.29.2 "sudo -S <<< "ubuntu" mkdir -p ~/Downloads"
-	sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.29.2 "sudo -S <<< "ubuntu" chown ubuntu:ubuntu Downloads"
+	sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.39.2 "sudo -S <<< "ubuntu" mkdir -p ~/Downloads"
+	sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.39.2 "sudo -S <<< "ubuntu" chown ubuntu:ubuntu Downloads"
 	sshpass -p ubuntu scp    -o CheckHostIP=no -o StrictHostKeyChecking=no -p /etc/network/openvswitch/nsupdate_domain2_add_$ShortHost.sh ubuntu@10.207.39.2:~/Downloads/.
 	sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.39.2 "sudo -S <<< "ubuntu" ~/Downloads/nsupdate_domain2_add_$ShortHost.sh"
        	
@@ -566,7 +578,40 @@ then
 	echo "Done: Replicate $NameServer LXC locally.      "
 	echo "=============================================="
 	echo ''
+
+	sleep 5
+
+	clear
 fi
+
+echo ''
+echo "=============================================="
+echo "Install Docker...                             "
+echo "=============================================="
+echo ''
+
+sleep 5
+
+if [ UbuntuMajorVersion -ge 17 ]
+then
+	/home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/docker_install_ubuntu_17.sh
+fi
+
+echo "=============================================="
+echo "To connect to example container via ssh:      "
+echo "     ssh root@192.168.1.5 -p 2200             "
+echo "The docker container can connect to           "
+echo "LXC containers on this host directly via ssh  "
+echo "The docker container can connect to anything  "
+echo "on the OpenvSwitch network via any local LXC  "
+echo "container                                     "
+echo "=============================================="
+
+echo ''
+echo "=============================================="
+echo "Done: Install Docker.                         "
+echo "=============================================="
+echo ''
 
 echo ''
 echo "=============================================="
@@ -575,7 +620,7 @@ echo "=============================================="
 
 if [ ! -e /home/ubuntu/Manage-Orabuntu ]
 then
-mkdir /home/ubuntu/Manage-Orabuntu
+	mkdir /home/ubuntu/Manage-Orabuntu
 fi
 
 cd /home/ubuntu/Manage-Orabuntu
