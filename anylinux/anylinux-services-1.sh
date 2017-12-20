@@ -440,12 +440,6 @@ then
 							sudo cat /etc/network/openvswitch/sw1.info
 							sleep 5
 						fi
-						function GetOnVm1 {
-							sudo cat /etc/network/openvswitch/sw1.info | cut -f3 -d':'
-						}
-						OnVm1=$(GetOnVm1)
-					else
-						OnVm1=N
 					fi
 	
 					if [ $IpOnVirtualInterface2 -eq 1 ] || [ -f /etc/network/openvswitch/sx1.info ]
@@ -461,18 +455,10 @@ then
 							sudo cat /etc/network/openvswitch/sx1.info
 							sleep 5
 						fi
-						function GetOnVm2 {
-							sudo cat /etc/network/openvswitch/sx1.info | cut -f3 -d':'
-						}
-						OnVm2=$(GetOnVm2)
-					else
-						OnVm2=N
 					fi
 				done
 
 				echo ''
-
-				MultiHost="$MultiHost:$OnVm1:$OnVm2"
 
  				echo ''
 				echo "=============================================="
@@ -539,9 +525,6 @@ then
 				sleep 5
 	
  			else # OK 6
-
-				OnVm=N
-				MultiHost="$MultiHost:$OnVm"
 
 				echo ''
 				echo "=============================================="
@@ -822,12 +805,6 @@ then
 						then
 							sudo sh -c "echo '$i:$IpVirtualInterface1:Y' > /etc/network/openvswitch/sw1.info"
 						fi
-						function GetOnVm1 {
-							sudo cat /etc/network/openvswitch/sw1.info | cut -f3 -d':'
-						}
-						OnVm1=$(GetOnVm1)
-					else
-						OnVm1=N
 					fi
 	
 					if [ $IpOnVirtualInterface2 -eq 1 ] || [ -f /etc/network/openvswitch/sx1.info ]
@@ -841,16 +818,8 @@ then
 						then
 							sudo sh -c "echo '$i:$IpVirtualInterface2:Y' > /etc/network/openvswitch/sx1.info"
 						fi
-						function GetOnVm2 {
-							sudo cat /etc/network/openvswitch/sx1.info | cut -f3 -d':'
-						}
-						OnVm2=$(GetOnVm2)
-					else
-						OnVm2=N
 					fi
 				done
-
-				MultiHost="$MultiHost:$OnVm1:$OnVm2"
 
  				echo ''
 				echo "=============================================="
@@ -917,9 +886,6 @@ then
 				sleep 5
 
  			else # OK 6
-
-				OnVm=N
-				MultiHost="$MultiHost:$OnVm"
 
 				echo ''
 				echo "=============================================="
@@ -1184,12 +1150,6 @@ then
 						then
 							sudo sh -c "echo '$i:$IpVirtualInterface1:Y' > /etc/network/openvswitch/sw1.info"
 						fi
-						function GetOnVm1 {
-							sudo cat /etc/network/openvswitch/sw1.info | cut -f3 -d':'
-						}
-						OnVm1=$(GetOnVm1)
-					else
-						OnVm1=N
 					fi
 	
 					if [ $IpOnVirtualInterface2 -eq 1 ] || [ -f /etc/network/openvswitch/sx1.info ]
@@ -1203,16 +1163,8 @@ then
 						then
 							sudo sh -c "echo '$i:$IpVirtualInterface2:Y' > /etc/network/openvswitch/sx1.info"
 						fi
-						function GetOnVm2 {
-							sudo cat /etc/network/openvswitch/sx1.info | cut -f3 -d':'
-						}
-						OnVm2=$(GetOnVm2)
-					else
-						OnVm2=N
 					fi
 				done
-
-				MultiHost="$MultiHost:$OnVm1:$OnVm2"
 
  				echo ''
 				echo "=============================================="
@@ -1284,9 +1236,6 @@ then
 				sleep 5
 
  			else # OK 6
-
-				OnVm=N
-				MultiHost="$MultiHost:$OnVm"
 
 				echo ''
 				echo "=============================================="

@@ -131,24 +131,24 @@ do
                 sudo sh -c "echo ''							>> /etc/systemd/system/$k.service"
                 sudo sh -c "echo '[Install]'						>> /etc/systemd/system/$k.service"
                 sudo sh -c "echo 'WantedBy=multi-user.target'				>> /etc/systemd/system/$k.service"
-	
-		echo ''
-		echo "=============================================="
-		echo "Start OpenvSwitch $k ...                      "
-		echo "=============================================="
-		echo ''
-
-       		sudo chmod 644 /etc/systemd/system/$k.service
-        	sudo systemctl enable $k.service
-		sudo service $k stop
-		sudo service $k start
-		sudo service $k status
-
-		echo ''
-		echo "=============================================="
-		echo "OpenvSwitch $k is up.                         "
-		echo "=============================================="
 	fi
+	
+	echo ''
+	echo "=============================================="
+	echo "Start OpenvSwitch $k ...                      "
+	echo "=============================================="
+	echo ''
+
+       	sudo chmod 644 /etc/systemd/system/$k.service
+       	sudo systemctl enable $k.service
+	sudo service $k stop
+	sudo service $k start
+	sudo service $k status
+
+	echo ''
+	echo "=============================================="
+	echo "OpenvSwitch $k is up.                         "
+	echo "=============================================="
 	
 	sleep 3
 
@@ -236,6 +236,7 @@ do
        	echo "=============================================="
        	echo ''
 
+	ssh-keygen -f "/home/ubuntu/.ssh/known_hosts" -R $j
 	sshpass -p oracle ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no oracle@$j "uname -a; cat /etc/oracle-release"
 
        	echo ''

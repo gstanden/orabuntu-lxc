@@ -86,8 +86,6 @@ function GetMultiHostVar12 {
 MultiHostVar12=$(GetMultiHostVar12)
 
 GRE=$MultiHostVar10
-OnVm1=$MultiHostVar11
-OnVm2=$MultiHostVar12
 
 function CheckNetworkManagerInstalled {
 	dpkg -l | grep -v  network-manager- | grep network-manager | wc -l
@@ -280,9 +278,14 @@ then
 		echo "=============================================="
 		echo ''
 
-		sudo /etc/network/openvswitch/del-bridges.sh >/dev/null 2>&1
+		sudo /etc/network/openvswitch/del-bridges-keep-scst.sh >/dev/null 2>&1
 		sudo ovs-vsctl show
-		sudo rm -f /etc/network/openvswitch/crt_ovs_s*.sh
+		sudo rm -f /etc/network/openvswitch/crt_ovs_s4.sh
+		sudo rm -f /etc/network/openvswitch/crt_ovs_s5.sh
+		sudo rm -f /etc/network/openvswitch/crt_ovs_s6.sh
+		sudo rm -f /etc/network/openvswitch/crt_ovs_s7.sh
+		sudo rm -f /etc/network/openvswitch/crt_ovs_s8.sh
+		sudo rm -f /etc/network/openvswitch/crt_ovs_s9.sh
 
 		echo ''
 		echo "=============================================="
@@ -293,7 +296,6 @@ then
 		sudo rm -f  /etc/network/if-up.d/openvswitch/*
 		sudo rm -f  /etc/network/if-down.d/openvswitch/*
 
-		sudo rm -rf /etc/network/openvswitch
 		sudo systemctl disable sw1
 		sudo systemctl disable sw4
 		sudo systemctl disable sw5
@@ -305,8 +307,7 @@ then
 
 		sudo rm -f /etc/systemd/system/ora*c*.service
 		sudo rm -f /etc/systemd/system/oel*c*.service
-		sudo rm -f /etc/systemd/sw[1456789].service
-		sudo rm -f /etc/systemd/sx1.service
+		sudo rm -f /etc/systemd/sw[456789].service
 
 		echo ''
 		echo "=============================================="
@@ -1730,7 +1731,7 @@ then
 	sudo lxc-update-config -c /var/lib/lxc/$NameServer/config
 fi
 
-if [ $MultiHostVar2 = 'N' ] && [ $OnVm1 = 'N' ] && [ $OnVm2 = 'N' ]
+if [ $MultiHostVar2 = 'N' ]
 then
 	echo ''
 	echo "=============================================="

@@ -90,8 +90,6 @@ function GetMultiHostVar12 {
 MultiHostVar12=$(GetMultiHostVar12)
 
 GRE=$MultiHostVar10
-OnVm1=$MultiHostVar11
-OnVm2=$MultiHostVar12
 
 function CheckSystemdResolvedInstalled {
         sudo netstat -ulnp | grep 53 | sed 's/  */ /g' | rev | cut -f1 -d'/' | rev | sort -u | grep systemd- | wc -l
@@ -1964,7 +1962,7 @@ then
 	clear
 fi
 
-if [ $OnVm1 = 'N' ] && [ $OnVm2 = 'N' ]
+if [ $SystemdResolvedInstalled -eq 0 ]
 then
 	echo ''
 	echo "=============================================="
@@ -2173,7 +2171,7 @@ then
         sudo lxc-update-config -c /var/lib/lxc/$NameServer/config
 fi
 
-if [ $MultiHostVar2 = 'N' ] && [ $OnVm1 = 'N' ] && [ $OnVm2 = 'N' ]
+if [ $MultiHostVar2 = 'N' ]
 then
 	echo ''
 	echo "=============================================="
