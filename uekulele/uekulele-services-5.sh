@@ -226,19 +226,19 @@ do
 	done
 done
 
-sudo service NetworkManager restart > /dev/null 2>&1
-sleep 5
+sudo service lxc-net restart
 
 for j in $ClonedContainersExist
 do
         clear
-
+ 
         echo ''
         echo "=============================================="
         echo "SSH to local container $j...                  "
         echo "=============================================="
         echo ''
-
+	
+	ssh-keygen -f "/home/ubuntu/.ssh/known_hosts" -R $j
         sshpass -p oracle ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no oracle@$j "uname -a; cat /etc/oracle-release"
 
         echo ''
@@ -257,21 +257,6 @@ echo "=============================================="
 echo "LXC clone containers for Oracle started.      "
 echo "=============================================="
 echo ''
-
-sleep 5
-
-clear
-
-echo ''
-echo "=============================================="
-echo "LXC containers for Oracle Status...           "
-echo "=============================================="
-echo ''
-
-sudo lxc-ls -f
-
-echo ''
-echo "=============================================="
 
 sleep 5
 
@@ -366,17 +351,17 @@ then
         echo "Test SSH over GRE to $NameServer DNS...       "
         echo "=============================================="
         echo ''
-
+ 
         sshpass -p ubuntu ssh -q -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$NameServer "sudo -S <<< "ubuntu" uname -a; cat /etc/lsb-release"
-
+ 
         echo ''
         echo "=============================================="
         echo "Done: Test SSH over GRE to $NameServer DNS.   "
         echo "=============================================="
         echo ''
-
+ 
         sleep 5
-
+ 
         clear
 
 #       echo ''
@@ -499,11 +484,11 @@ then
         echo "=============================================="
         echo ''
 
-        ssh-keygen -f "/home/ubuntu/.ssh/known_hosts" -R 10.207.39.2
-        sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.39.2 "sudo -S <<< "ubuntu" mkdir -p ~/Downloads"
-        sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.39.2 "sudo -S <<< "ubuntu" chown ubuntu:ubuntu Downloads"
-        sshpass -p ubuntu scp    -o CheckHostIP=no -o StrictHostKeyChecking=no -p /etc/network/openvswitch/nsupdate_domain2_add_$ShortHost.sh ubuntu@10.207.39.2:~/Downloads/.
-        sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.39.2 "sudo -S <<< "ubuntu" ~/Downloads/nsupdate_domain2_add_$ShortHost.sh"
+        ssh-keygen -f "/home/ubuntu/.ssh/known_hosts" -R 10.207.29.2
+        sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.29.2 "sudo -S <<< "ubuntu" mkdir -p ~/Downloads"
+        sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.29.2 "sudo -S <<< "ubuntu" chown ubuntu:ubuntu Downloads"
+        sshpass -p ubuntu scp    -o CheckHostIP=no -o StrictHostKeyChecking=no -p /etc/network/openvswitch/nsupdate_domain2_add_$ShortHost.sh ubuntu@10.207.29.2:~/Downloads/.
+        sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.29.2 "sudo -S <<< "ubuntu" ~/Downloads/nsupdate_domain2_add_$ShortHost.sh"
 
         echo ''
         echo "=============================================="
@@ -537,10 +522,9 @@ then
         sleep 5
 
         clear
+else
+	sudo service lxc-net restart
 fi
-
-sudo service NetworkManager restart > /dev/null 2>&1
-sleep 5
 
 echo ''
 echo "=============================================="
@@ -576,23 +560,23 @@ clear
 
 if [ $NameServerExists -eq 0 ] && [ $GRE = 'Y' ]
 then
-        echo ''
-        echo "=============================================="
-        echo "Replicate $NameServer LXC locally...          "
-        echo "=============================================="
-        echo ''
+      echo ''
+      echo "=============================================="
+      echo "Replicate $NameServer LXC locally...          "
+      echo "=============================================="
+      echo ''
 
-        /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/archives/nameserver_copy.sh $MultiHostVar5 $MultiHostVar6 $NameServer
+      /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/archives/nameserver_copy.sh $MultiHostVar5 $MultiHostVar6 $NameServer
 
-        echo ''
-        echo "=============================================="
-        echo "Done: Replicate $NameServer LXC locally.      "
-        echo "=============================================="
-        echo ''
+      echo ''
+      echo "=============================================="
+      echo "Done: Replicate $NameServer LXC locally.      "
+      echo "=============================================="
+      echo ''
 
-        sleep 5
+      sleep 5
 
-        clear
+      clear
 fi
 
 echo ''
@@ -686,6 +670,7 @@ then
 	sudo getenforce
 	if [ -f /etc/sysconfig/selinux ]
 	then
+		echo ''
 		echo "=============================================="
 		echo "Set SELINUX to Permissive mode.               "
 		echo "=============================================="
@@ -764,6 +749,39 @@ echo "=============================================="
 sleep 5
 
 clear
+
+echo ''
+echo "=============================================="
+echo "LXC containers for Oracle Status...           "
+echo "=============================================="
+echo ''
+
+sudo lxc-ls -f
+
+echo ''
+echo "=============================================="
+
+sleep 5
+
+clear
+
+# echo ''
+# echo "=============================================="
+# echo "Copy nameserver to hub...                     "
+# echo "=============================================="
+# echo ''
+
+# ~/Downloads/orabuntu-lxc-master/uekulele/archives/nameserver_home.sh $MultiHostVar5 $MultiHostVar6 $NameServer
+
+# echo ''
+# echo "=============================================="
+# echo "Done:  Copy nameserver to hub.                "
+# echo "=============================================="
+# echo ''
+
+# sleep 5
+
+# clear
 
 echo ''
 echo "=============================================="

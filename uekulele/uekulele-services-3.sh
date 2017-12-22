@@ -253,6 +253,8 @@ echo "Container $SeedContainerName ping test...     "
 echo "=============================================="
 echo ''
 
+sudo service lxc-net restart
+
 ping -c 3 $SeedContainerName
 
 function CheckNetworkUp {
@@ -268,18 +270,17 @@ done
 
 if [ "$NetworkUp" != '0%packetloss' ]
 then
-echo ''
-echo "=============================================="
-echo "Container $SeedContainerName not pingable.    "
-echo "Script exiting.                               "
-echo "=============================================="
-exit
+	echo ''
+	echo "=============================================="
+	echo "Container $SeedContainerName not pingable.    "
+	echo "Script exiting.                               "
+	echo "=============================================="
 else
-echo ''
-echo "=============================================="
-echo "Container $SeedContainerName is pingable.     "
-echo "=============================================="
-echo ''
+	echo ''
+	echo "=============================================="
+	echo "Container $SeedContainerName is pingable.     "
+	echo "=============================================="
+	echo ''
 fi
 
 sleep 5

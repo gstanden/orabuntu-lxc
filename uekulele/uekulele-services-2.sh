@@ -25,7 +25,8 @@ OracleRelease=$1$2
 OracleVersion=$1.$2
 Domain1=$3
 Domain2=$4
-MultiHost=$5
+NameServer=$5
+MultiHost=$6
 OR=$OracleRelease
 
 clear
@@ -53,6 +54,16 @@ function GetLXCVersion {
         lxc-create --version
 }
 LXCVersion=$(GetLXCVersion)
+
+function GetMultiHostVar5 {
+        echo $MultiHost | cut -f5 -d':'
+}
+MultiHostVar5=$(GetMultiHostVar5)
+
+function GetMultiHostVar6 {
+        echo $MultiHost | cut -f6 -d':'
+}
+MultiHostVar6=$(GetMultiHostVar6)
 
 function GetMultiHostVar7 {
         echo $MultiHost | cut -f7 -d':'
@@ -359,6 +370,24 @@ sudo chmod 755 /etc/network/openvswitch/veth_cleanups.sh
 
 # GLS 20151217 Veth Pair Cleanups Scripts Create End
 
+# echo ''
+# echo "=============================================="
+# echo "Copy nameserver from hub...                   "
+# echo "=============================================="
+# echo ''
+
+# ~/Downloads/orabuntu-lxc-master/uekulele/archives/nameserver_copy.sh $MultiHostVar5 $MultiHostVar6 $NameServer
+
+# echo ''
+# echo "=============================================="
+# echo "Done:  Copy nameserver from hub.              "
+# echo "=============================================="
+# echo ''
+
+# sleep 5
+
+# clear
+
 echo ''
 echo "=============================================="
 echo "Starting LXC Seed Container for Oracle        "
@@ -465,7 +494,7 @@ echo "Container oel$OracleRelease$SeedPostfix ping test..."
 echo "=============================================="
 echo ''
 
-sudo service NetworkManager restart > /dev/null 2>&1
+sudo service lxc-net restart
 
 function CheckNetworkUp {
 ping -c 3 oel$OracleRelease$SeedPostfix | grep packet | cut -f3 -d',' | sed 's/ //g'

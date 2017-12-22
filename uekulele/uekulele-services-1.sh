@@ -96,6 +96,11 @@ function CheckSystemdResolvedInstalled {
 }
 SystemdResolvedInstalled=$(CheckSystemdResolvedInstalled)
 
+function CheckNetworkManagerRunning {
+	ps -ef | grep NetworkManager | grep -v grep | wc -l
+}
+NetworkManagerRunning=$(CheckNetworkManagerRunning)
+
 GetLinuxFlavors(){
 if   [[ -e /etc/oracle-release ]]
 then
@@ -199,13 +204,29 @@ sudo sed -i '/UseDNS/s/yes/no/'                                              /et
 sudo sed -i '/GSSAPIAuthentication/s/#//'                                    /etc/ssh/sshd_config
 sudo sed -i '/UseDNS/s/#//'                                                  /etc/ssh/sshd_config
 sudo egrep 'GSSAPIAuthentication|UseDNS'         	                     /etc/ssh/sshd_config
-sudo service sshd restart
 
 echo ''
 echo "=============================================="
 echo "Done: edit sshd_config.                       "
 echo "=============================================="
 echo ''
+
+sleep 5
+
+clear
+
+echo ''
+echo "=============================================="
+echo "Restart sshd...                               "
+echo "=============================================="
+echo ''
+
+sudo service sshd restart
+
+echo ''
+echo "=============================================="
+echo "Done: Restart sshd.                           "
+echo "=============================================="
 
 sleep 5
 
@@ -289,16 +310,33 @@ then
 		# GLS 20170925 Ubuntu Linux OVS and LXC are build from packages.  This step is not necessary on Ubuntu Linux.
 
 		echo "=============================================="
+		echo "Remove dns=none parameter from NM conf...     "
+		echo "=============================================="
+
+		sudo sed -i '/dns=none/d' /etc/NetworkManager/NetworkManager.conf
+		sudo systemctl daemon-reload
+
+		echo ''
+		echo "=============================================="
+		echo "Done Remove dns=none parameter from NM conf.  "
+		echo "=============================================="
+		echo ''
+
+		echo "=============================================="
 		echo "Uninstall lxc packages...                     "
 		echo "=============================================="
 		echo ''
 
-		sudo yum -y remove lxc lxc-libs
+		sudo systemctl disable dnsmasq
+		sudo yum -y erase lxc lxc-libs dnsmasq
+		sudo rm -f /etc/sysconfig/lxc-net	> /dev/null 2>&1
+		sudo rm -f /etc/dnsmasq.conf		> /dev/null 2>&1
 
 		echo ''
 		echo "=============================================="
 		echo "Uninstall lxc packages completed.             "
 		echo "=============================================="
+
 		echo ''	
 		echo "=============================================="
 		echo "Rebooting to clear bridge lxcbr0...           "
@@ -312,7 +350,6 @@ then
 	
 		sudo reboot
 		exit
-
 	fi
 
 # GLS 20170919 Oracle Linux Specific Code Block 1 BEGIN
@@ -339,7 +376,7 @@ then
 	sudo yum provides lxc | sed '/^\s*$/d' | grep Repo | sort -u
 	cd /home/ubuntu/Downloads/orabuntu-lxc-master
 
-	sudo yum -y install debootstrap perl libvirt bash-completion bash-completion-extras
+	sudo yum -y install debootstrap perl bash-completion bash-completion-extras
 	sudo yum -y install lxc libcap-devel libcgroup wget bridge-utils
 
 	echo ''
@@ -360,6 +397,7 @@ then
 
 	if [ $Release -eq 7 ] 
 	then
+		sudo systemctl daemon-reload
 		sudo systemctl start lxc.service
 		sudo systemctl status lxc.service
 		echo ''
@@ -450,23 +488,6 @@ then
 	echo "LXC and prerequisite packages completed.      "
 	echo "=============================================="
 	echo ''
-
-	sleep 5
-
-	clear
-
-	echo ''
-	echo "=============================================="
-	echo "Run: sudo libtool --finish /usr/lib64         "
-	echo "=============================================="
-	echo ''
-
-	sudo libtool --finish /usr/lib64
-
-	echo ''
-	echo "=============================================="
-	echo "Done: sudo libtool --finish /usr/lib64        "
-	echo "=============================================="
 
 	sleep 5
 
@@ -743,7 +764,6 @@ then
 
 	sudo ifconfig lxcbr0
 
-	echo ''
 	echo "=============================================="
 	echo "Done: Display Bridge lxcbr0                   "
 	echo "=============================================="
@@ -752,7 +772,6 @@ then
 
 	clear
 
-	echo ''
 	echo ''
 	echo "=============================================="
 	echo "Upgrade LXC from Source complete.             "
@@ -811,23 +830,6 @@ sudo yum -y install iptables gawk yum-utils
 echo ''
 echo "=============================================="
 echo "Package Installation complete                 "
-echo "=============================================="
-
-sleep 5
-
-clear
-
-echo ''
-echo "=============================================="
-echo "Run: sudo libtool --finish /usr/lib64         "
-echo "=============================================="
-echo ''
-
-sudo libtool --finish /usr/lib64
-
-echo ''
-echo "=============================================="
-echo "Done: sudo libtool --finish /usr/lib64        "
 echo "=============================================="
 
 sleep 5
@@ -1174,35 +1176,35 @@ then
 	clear
 fi
 
-echo ''
-echo "=============================================="
-echo "Verify required packages status...            "
-echo "=============================================="
-echo ''
+# echo ''
+# echo "=============================================="
+# echo "Verify required packages status...            "
+# echo "=============================================="
+# echo ''
 
-if [ $Release -eq 7 ] || [ $Release -eq 6 ]
-then
-function CheckPackageInstalled {
-echo 'automake bind-utils bridge-utils curl debootstrap docbook docbook2X facter gawk gcc graphviz gzip iotop iptables libcap-devel libcgroup libvirt libvirt-daemon-driver-lxc lxc-2 lxc-debug lxc-devel lxc-libs make net-tools ntp openssh-server openssl-devel openvswitch-2 openvswitch-debug perl rpm rpm-build ruby sshpass tar uuid wget which xmlto yum'
-}
-fi
+# if [ $Release -eq 7 ] || [ $Release -eq 6 ]
+# then
+# function CheckPackageInstalled {
+# echo 'automake bind-utils bridge-utils curl debootstrap docbook docbook2X facter gawk gcc graphviz gzip iotop iptables libcap-devel libcgroup lxc lxc-2 lxc-debug lxc-devel lxc-libs make net-tools ntp openssh-server openssl-devel openvswitch-2 openvswitch-debug perl rpm rpm-build ruby sshpass tar uuid wget which xmlto yum'
+# }
+# fi
 
-PackageInstalled=$(CheckPackageInstalled)
+# PackageInstalled=$(CheckPackageInstalled)
 
-for i in $PackageInstalled
-do
-sudo rpm -qa | grep $i | tail -1 | sed 's/^/Installed: /' 
-done
+# for i in $PackageInstalled
+# do
+# sudo rpm -qa | grep $i | tail -1 | sed 's/^/Installed: /' 
+# done
 
-echo ''
-echo "=============================================="
-echo "Verify required packages status completed.    "
-echo "=============================================="
-echo ''
+# echo ''
+# echo "=============================================="
+# echo "Verify required packages status completed.    "
+# echo "=============================================="
+# echo ''
 
-sleep 5
+# sleep 5
 
-clear
+# clear
 
 echo ''
 echo "=============================================="
@@ -1962,62 +1964,64 @@ then
 	clear
 fi
 
-if [ $SystemdResolvedInstalled -eq 0 ]
-then
-	echo ''
-	echo "=============================================="
-	echo "Activating NetworkManager dnsmasq service ... "
-	echo "=============================================="
-	echo ''
+# if [ $SystemdResolvedInstalled -eq 0 ] && [ $NMResolv -eq 0 ] && [ $GNS1 -eq 0 ]
+# then
+# 	echo ''
+#  	echo "=============================================="
+#  	echo "Activating NetworkManager dnsmasq service ... "
+#  	echo "=============================================="
+#  	echo ''
 
-	# So that settings in /etc/NetworkManager/dnsmasq.d/local & /etc/NetworkManager/NetworkManager.conf take effect.
+#  	# So that settings in /etc/NetworkManager/dnsmasq.d/local & /etc/NetworkManager/NetworkManager.conf take effect.
 
-	sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g"			/etc/resolv.conf
-	sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g"	/etc/resolv.conf
-	sudo cat /etc/resolv.conf
-	sudo sed -i '/plugins=ifcfg-rh/a dns=dnsmasq' /etc/NetworkManager/NetworkManager.conf
-	echo ''
+#  	sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g"			/etc/resolv.conf
+#  	sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g"	/etc/resolv.conf
+#  	sudo cat /etc/resolv.conf
+#  	sudo sed -i '/plugins=ifcfg-rh/a dns=none' /etc/NetworkManager/NetworkManager.conf
+#  	sudo sed -i '$!N; /^\(.*\)\n\1$/!P; D' /etc/NetworkManager/NetworkManager.conf
+#  	echo ''
 
-	sudo service NetworkManager restart
+#  	sudo service NetworkManager restart
+#  	sudo service sw1 restart	
 
-	function CheckResolvReady {
-		sudo cat /etc/resolv.conf | grep -c 'nameserver 127\.0\.0\.1'
-	}
-	ResolvReady=$(CheckResolvReady)
-	echo ''
-	NumResolvReadyTries=0
-	while [ $ResolvReady -ne 1 ] && [ $NumResolvReadyTries -lt 60 ]
-	do
-		ResolvReady=$(CheckResolvReady)
-		((NumResolvReadyTries=NumResolvReadyTries+1))
-		sleep 1
-		echo 'NumResolvReadyTries = '$NumResolvReadyTries
-	done
+#  	function CheckResolvReady {
+#  		sudo cat /etc/resolv.conf | grep -c 'nameserver 127\.0\.0\.1'
+#  	}
+#  	ResolvReady=$(CheckResolvReady)
+#  	echo ''
+#  	NumResolvReadyTries=0
+#  	while [ $ResolvReady -ne 1 ] && [ $NumResolvReadyTries -lt 60 ]
+#   	do
+#  		ResolvReady=$(CheckResolvReady)
+#  		((NumResolvReadyTries=NumResolvReadyTries+1))
+#  		sleep 1
+#  		echo 'NumResolvReadyTries = '$NumResolvReadyTries
+#  	done
 
-	if [ $ResolvReady -eq 1 ]
-	then
-		echo ''
-		sudo service sw1 restart
-	else
-		echo ''
-		echo "=============================================="
-		echo "NetworkManager didn't set nameserver 127.0.0.1"
-		echo "which is the setting required for NM dnsmasq. "
-		echo "=============================================="
-	fi
+#  	if [ $ResolvReady -eq 1 ]
+#  	then
+#  		echo ''
+#  		sudo service sw1 restart
+#  	else
+#  		echo ''
+#  		echo "=============================================="
+#  		echo "NetworkManager didn't set nameserver 127.0.0.1"
+#  		echo "which is the setting required for NM dnsmasq. "
+#  		echo "=============================================="
+#  	fi
 
-	# sudo sh -c "echo 'search $Domain1 $Domain2 gns1.$Domain1' >> /etc/resolv.conf"
-	sudo cat /etc/resolv.conf
-	echo ''
+#  	# sudo sh -c "echo 'search $Domain1 $Domain2 gns1.$Domain1' >> /etc/resolv.conf"
+#  	sudo cat /etc/resolv.conf
+#  	echo ''
 
-	echo "=============================================="
-	echo "NetworkManager dnsmasq activated.             "
-	echo "=============================================="
-fi
+#  	echo "=============================================="
+#  	echo "NetworkManager dnsmasq activated.             "
+#  	echo "=============================================="
+#  fi
 
-sleep 5
+# sleep 5
 
-clear
+# clear
 
 if [ $MultiHostVar2 = 'N' ]
 then
@@ -2181,7 +2185,7 @@ then
 
 	if [ -n $NameServer ]
 	then
-#		sudo service sw1 restart > /dev/null 2>&1
+# 		sudo service sw1 restart
 #		sudo service sx1 restart > /dev/null 2>&1
 		sudo lxc-stop  -n $NameServer > /dev/null 2>&1
 		sudo lxc-start -n $NameServer > /dev/null 2>&1
@@ -2258,7 +2262,7 @@ then
 	echo "=============================================="
 	echo ''
 
-	sudo touch /home/ubuntu/.ssh/known_hosts
+	touch /home/ubuntu/.ssh/known_hosts
 	sudo lxc-attach -n $NameServer -- usermod --password `perl -e "print crypt('ubuntu','ubuntu');"` ubuntu
 	ssh-keygen -f "/home/ubuntu/.ssh/known_hosts" -R 10.207.39.2
 #	sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ubuntu@10.207.39.2 "ssh-keygen -f ~/.ssh/id_rsa -t rsa -N ''"
@@ -2438,7 +2442,7 @@ then
 
 			sudo chmod 777 						/etc/network/openvswitch/nsupdate_domain2_add_$ShortHost.sh
 			sudo ls -l     						/etc/network/openvswitch/nsupdate_domain2_add_$ShortHost.sh
-			sudo sed -i "s/consultingcommandos\.us/$Domain1/g"	/etc/network/openvswitch/nsupdate_domain2_add_$ShortHost.sh
+			sudo sed -i "s/consultingcommandos\.us/$Domain2/g"	/etc/network/openvswitch/nsupdate_domain2_add_$ShortHost.sh
 		fi
 	fi
 fi
@@ -2450,6 +2454,73 @@ echo ''
 echo "=============================================="
 echo "MultiHost Settings Completed.                 "
 echo "=============================================="
+
+sleep 5
+
+clear
+
+if [ $SystemdResolvedInstalled -eq 0 ] && [ $NetworkManagerRunning -ge 1 ]
+then
+	echo ''
+	echo "=============================================="
+	echo "Configure NetworkManager with dnsmasq...      "
+	echo "=============================================="
+	echo ''
+
+	function GetDhcpRange {
+		cat /etc/sysconfig/lxc-net | grep LXC_DHCP_RANGE | cut -f2 -d'=' | sed 's/"//g' 
+	}
+	DhcpRange=$(GetDhcpRange)
+
+	function GetListenAddress {
+		cat /etc/sysconfig/lxc-net | grep LXC_ADDR | cut -f2 -d'=' | sed 's/"//g'
+	}
+	ListenAddress=$(GetListenAddress)
+
+	function GetDnsmasqPid {
+		ps -eo pid,comm | grep dnsmasq | sed 's/^[ \t]*//;s/[ \t]*$//' | cut -f1 -d' '
+	}
+	DnsmasqPid=$(GetDnsmasqPid)
+
+	sudo kill -9 $DnsmasqPid
+
+	DHR="$DhcpRange"
+	LFL="/var/lib/misc/dnsmasq.lxcbr0.leases"
+	ADR="$ListenAddress"
+	PFL="/var/run/lxc/dnsmasq.pid"
+	CFL="/etc/dnsmasq.conf"
+
+	sudo sed -i '/plugins=ifcfg-rh/a dns=none' /etc/NetworkManager/NetworkManager.conf
+	sudo sed -i '$!N; /^\(.*\)\n\1$/!P; D' /etc/NetworkManager/NetworkManager.conf
+	sudo yum -y install dnsmasq
+#	sudo tar -vP --extract --file=ubuntu-host.tar /etc/dnsmasq.conf
+#	sudo tar -vP --extract --file=ubuntu-host.tar /etc/resolv.dnsmasq
+	sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /etc/dnsmasq.conf
+	sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /etc/dnsmasq.conf
+	sudo sed -i '/LXC_DHCP_CONFILE/s/#//' /etc/sysconfig/lxc-net
+	sudo sed -i 's/^[ \t]*//' /etc/dnsmasq.conf
+	sudo sed -i "/LXC_DHCP_CONFILE/s/LXC_DHCP_CONFILE=\/etc\/lxc\/dnsmasq.conf/LXC_DHCP_CONFILE=\/etc\/dnsmasq.conf/" /etc/sysconfig/lxc-net
+	sudo sed -i "s/DHCP-RANGE-OLXC/dhcp-range=$DHR/" /etc/dnsmasq.conf
+	sudo service NetworkManager restart
+	sudo systemctl daemon-reload
+	sudo rm -f /etc/resolv.conf
+	sudo sh -c "echo 'nameserver 127.0.0.1' 			>  /etc/resolv.conf"
+	sudo sh -c "echo 'search $Domain1 $Domain2 gns1.$Domain1' 	>> /etc/resolv.conf"
+	sudo service lxc-net restart
+ 	sudo service lxc-net status
+	nslookup $NameServer
+	nslookup 10.207.39.2
+	nslookup 10.207.29.2
+	nslookup yum.oracle.com
+	ping -c 3 $NameServer
+	ping -c 3 yum.oracle.com
+	
+	echo ''
+	echo "=============================================="
+	echo "Done: Configure NetworkManager with dnsmasq.  "
+	echo "=============================================="
+	echo ''
+fi
 
 sleep 5
 
