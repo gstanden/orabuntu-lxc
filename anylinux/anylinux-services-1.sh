@@ -409,7 +409,7 @@ then
 			if [ $Facter != 'physical' ] # 6
 			then
 				function GetVirtualInterfaces {
-					ifconfig | grep enp | cut -f1 -d':' | sed 's/$/ /' | tr -d '\n' | sed 's/^[ \t]*//;s/[ \t]*$//'
+					ifconfig | grep enp | cut -f1 -d':' | cut -f1 -d' ' | sed 's/$/ /' | tr -d '\n' | sed 's/^[ \t]*//;s/[ \t]*$//'
 				}
 				VirtualInterfaces=$(GetVirtualInterfaces)
 
@@ -776,7 +776,7 @@ then
 			if [ $Facter != 'physical' ] # 6
 			then
 				function GetVirtualInterfaces {
-					ifconfig | grep enp | cut -f1 -d':' | sed 's/$/ /' | tr -d '\n' | sed 's/^[ \t]*//;s/[ \t]*$//'
+					ifconfig | grep enp | cut -f1 -d':' | cut -f1 -d' ' | sed 's/$/ /' | tr -d '\n' | sed 's/^[ \t]*//;s/[ \t]*$//'
 				}
 				VirtualInterfaces=$(GetVirtualInterfaces)
 
@@ -1121,7 +1121,7 @@ then
 			if [ $Facter != 'physical' ] # 6
 			then
 				function GetVirtualInterfaces {
-					ifconfig | grep enp | cut -f1 -d':' | sed 's/$/ /' | tr -d '\n' | sed 's/^[ \t]*//;s/[ \t]*$//'
+					ifconfig | grep enp | cut -f1 -d':' | cut -f1 -d' ' | sed 's/$/ /' | tr -d '\n' | sed 's/^[ \t]*//;s/[ \t]*$//'
 				}
 				VirtualInterfaces=$(GetVirtualInterfaces)
 

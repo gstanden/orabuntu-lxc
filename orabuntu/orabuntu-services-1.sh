@@ -88,7 +88,7 @@ MultiHostVar12=$(GetMultiHostVar12)
 GRE=$MultiHostVar10
 
 function CheckNetworkManagerInstalled {
-	dpkg -l | grep -v  network-manager- | grep network-manager | wc -l
+	sudo dpkg -l | grep -v  network-manager- | grep network-manager | wc -l
 }
 NetworkManagerInstalled=$(CheckNetworkManagerInstalled)
 
@@ -879,7 +879,7 @@ sudo tar -P -xvf /home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/ub
 
 if	[ $SystemdResolvedInstalled -eq 0 ]
 then
-	rm /etc/systemd/resolved.conf
+	sudo rm /etc/systemd/resolved.conf
 fi
 
 echo ''
@@ -1312,7 +1312,7 @@ sleep 5
 
 clear
 
-if [ $UbuntuVersion = '16.04' ] && [ $SystemdResolvedInstalled -eq 0 ] && [ $MultiHostVar1 = 'new' ]
+if [ $UbuntuVersion = '16.04' ] && [ $SystemdResolvedInstalled -eq 0 ] && [ $MultiHostVar1 = 'new' ] && [ $MultiHostVar2 = 'N' ]
 then
 	echo ''
 	echo "=============================================="
@@ -1337,7 +1337,7 @@ then
 	echo ''
 
 	sudo dpkg --configure -a
-	sudo apt-get install dnsmasq
+	sudo apt-get -y install dnsmasq
 	sudo service dnsmasq stop
 	sleep 5
 	
@@ -1383,7 +1383,7 @@ fi
 
 sudo chmod 755 /etc/network/openvswitch/*.sh
 
-if   [ $UbuntuVersion = 16.04 ] || [ $UbuntuVersion = 16.10 ] || [ $UbuntuVersion = 17.04 ] || [ $UbuntuVersion = 17.10 ]
+if   [ $UbuntuMajorVersion -ge 16 ]
 then
 	function GetMultiHostVar3 {
 		echo $MultiHost | cut -f3 -d':'

@@ -598,9 +598,9 @@ echo ''
 
 sleep 5
 
-if [ $UbuntuMajorVersion -ge 17 ]
+if [ $UbuntuMajorVersion -ge 16 ]
 then
-	/home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/docker_install_ubuntu_17.sh
+	/home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/docker_install_ubuntu.sh
 fi
 
 echo "=============================================="
