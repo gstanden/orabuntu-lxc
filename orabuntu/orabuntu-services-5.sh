@@ -226,6 +226,29 @@ do
 	done
 done
 
+if [ $SystemdResolvedInstalled -ge 1 ]
+then
+	echo ''
+	echo "=============================================="
+	echo "Restart systemd-resolved...                   "
+	echo "=============================================="
+	echo ''
+
+	sudo service systemd-resolved restart
+	sleep 2
+	systemd-resolve --status | head -6 | tail -5
+
+	echo ''
+	echo "=============================================="
+	echo "Done: Restart systemd-resolved.               "
+	echo "=============================================="
+	echo ''
+
+	sleep 5
+
+	clear
+fi
+
 for j in $ClonedContainersExist
 do
 	clear

@@ -1,3 +1,5 @@
+#!/bin/bash
+
 sudo yum-config-manager --enable ol7_addons
 sudo yum -y install docker-engine
 sudo systemctl enable docker
