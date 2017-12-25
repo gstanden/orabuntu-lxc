@@ -278,14 +278,7 @@ then
 		echo "=============================================="
 		echo ''
 
-		sudo /etc/network/openvswitch/del-bridges-keep-scst.sh >/dev/null 2>&1
-		sudo rm -f /etc/network/openvswitch/crt_ovs_s4.sh
-		sudo rm -f /etc/network/openvswitch/crt_ovs_s5.sh
-		sudo rm -f /etc/network/openvswitch/crt_ovs_s6.sh
-		sudo rm -f /etc/network/openvswitch/crt_ovs_s7.sh
-		sudo rm -f /etc/network/openvswitch/crt_ovs_s8.sh
-		sudo rm -f /etc/network/openvswitch/crt_ovs_s9.sh
-		sudo rm -f /etc/network/openvswitch/crt_ovs_sx1.sh
+		sudo /etc/network/openvswitch/del-bridges.sh >/dev/null 2>&1
 
 		echo ''
 		echo "=============================================="
@@ -302,13 +295,29 @@ then
 		sudo systemctl disable sw7
 		sudo systemctl disable sw8
 		sudo systemctl disable sw9
+		sudo systemctl disable sx1
 		sudo systemctl disable $NameServer
+
+		sudo rm -f /etc/network/openvswitch/crt_ovs_sw4.sh
+		sudo rm -f /etc/network/openvswitch/crt_ovs_sw5.sh
+		sudo rm -f /etc/network/openvswitch/crt_ovs_sw6.sh
+		sudo rm -f /etc/network/openvswitch/crt_ovs_sw7.sh
+		sudo rm -f /etc/network/openvswitch/crt_ovs_sw8.sh
+		sudo rm -f /etc/network/openvswitch/crt_ovs_sw9.sh
+		sudo rm -f /etc/network/openvswitch/crt_ovs_sx1.sh
 
 		sudo rm -f /etc/systemd/system/ora*c*.service
 		sudo rm -f /etc/systemd/system/oel*c*.service
-		sudo rm -f /etc/systemd/systemc/sw[1456789].service
-		sudo rm -f /etc/systemd/systemc/sx1.service
-		sudo rm -f /etc/systemd/systemd/$NameServer.service
+		sudo rm -f /etc/systemd/system/sw[456789].service
+		sudo rm -f /etc/systemd/system/sx1.service
+		sudo rm -f /etc/systemd/system/$NameServer.service
+
+		sudo ip link del a1
+		sudo ip link del a2
+		sudo ip link del a3
+		sudo ip link del a4
+		sudo ip link del a5
+		sudo ip link del a6
 
 		echo ''
 		echo "=============================================="

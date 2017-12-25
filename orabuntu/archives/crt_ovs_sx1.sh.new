@@ -1,0 +1,286 @@
+#    Copyright 2015-2017 Gilbert Standen
+#    This file is part of Orabuntu-LXC.
+
+#    Orabuntu-LXC is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+
+#    Orabuntu-LXC is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+
+#    You should have received a copy of the GNU General Public License
+#    along with Orabuntu-LXC.  If not, see <http://www.gnu.org/licenses/>.
+
+#    v2.4  GLS 20151224
+#    v2.8  GLS 20151231
+#    v3.0  GLS 20160710 Updates for Ubuntu 16.04
+#    v4.0  GLS 20161025 DNS DHCP services moved into an LXC container
+#    v5.0  GLS 20170909 Orabuntu-LXC MultiHost
+#    v5.3  GLS 20171209 Orabuntu-LXC MultiHost Docker S3
+#    v5.31 GLS 20171225 Orabuntu-LXC MultiHost Docker S3
+
+#    Note that Orabuntu-LXC v5.0  builds a conntainerized DNS DHCP solution for the Desktop or Enterprise environment.
+#    The nameserver should NOT be the name of an EXISTING nameserver but an arbitrary name because this software is CREATING a new LXC-containerized nameserver.
+#    The domain names can be arbitrary fictional names or they can be a domain that you actually own and operate.
+#    There are two domains and two networks because the "seed" LXC containers are on a separate network and domain from the production LXC containers.
+
+# GLS 20170916 Auxiliary Ports and Patch Port
+# Port a1 is reserved for patch port to port s1 on switch sw1 for multihost traffic over GRE tunnel
+# Other aX ports can be used for VM's or for any other purpose: ports {a2,a3,a4,...} are default auxiliary ports.
+
+GetLinuxFlavors(){
+if   [[ -e /etc/oracle-release ]]
+then
+        LinuxFlavors=$(cat /etc/oracle-release | cut -f1 -d' ')
+elif [[ -e /etc/redhat-release ]]
+then
+        LinuxFlavors=$(cat /etc/redhat-release | cut -f1 -d' ')
+elif [[ -e /usr/bin/lsb_release ]]
+then
+        LinuxFlavors=$(lsb_release -d | awk -F ':' '{print $2}' | cut -f1 -d' ')
+elif [[ -e /etc/issue ]]
+then
+        LinuxFlavors=$(cat /etc/issue | cut -f1 -d' ')
+else
+        LinuxFlavors=$(cat /proc/version | cut -f1 -d' ')
+fi
+}
+GetLinuxFlavors
+
+function TrimLinuxFlavors {
+echo $LinuxFlavors | sed 's/^[ \t]//;s/[ \t]$//'
+}
+LinuxFlavor=$(TrimLinuxFlavors)
+
+if   [ $LinuxFlavor = 'Oracle' ]
+then
+        function GetOracleDistroRelease {
+                sudo cat /etc/oracle-release | cut -f5 -d' ' | cut -f1 -d'.'
+        }
+        OracleDistroRelease=$(GetOracleDistroRelease)
+        Release=$OracleDistroRelease
+        LF=$LinuxFlavor
+        RL=$Release
+elif [ $LinuxFlavor = 'Red' ]
+then
+        function GetRedHatVersion {
+                sudo cat /etc/redhat-release | cut -f7 -d' ' | cut -f1 -d'.'
+        }
+        RedHatVersion=$(GetRedHatVersion)
+        Release=$RedHatVersion
+        LF=$LinuxFlavor'Hat'
+        RL=$Release
+fi
+
+  ovs-vsctl --may-exist add-br sx1
+
+# GLS 20140825 Get active external interface dynamically at boot.  Tested & works with {wlan0, eth0, bnep0} on Ubuntu 14.04.1 Desktop x86_64.
+# GLS 20140825 Interface "bnep0" is Blackberry Z30 OS10 Bluetooth Tether.
+# GLs 20151219 Added enp / wlp to support Ubuntu 15.10 Wily Werewolf and higher releases.
+
+### GLS v5.31-beta 20171225 ###
+### BEGIN new
+
+### BEGIN Get Active EXTIF Dynamcially. ###
+
+  INTIF="sx1"
+  function GetSx1Ip {
+          ifconfig sx1 | grep inet | grep '10.207.29' | wc -l
+  }
+
+  Sx1Ip=$(GetSx1Ip)
+
+  if [ $Sx1Ip -eq 0 ]
+  then
+          function GetInterfaces {
+                ifconfig | egrep 'enp|wlp|wlan|eth|bnep' | egrep -v 'ether|veth' | cut -f1 -d' ' | cut -f1 -d':' | sed 's/$/ /' | tr -d '\n' |  sed 's/^[ \t]*//;s/[ \t]*$//'
+          }
+          Interfaces=$(GetInterfaces)
+
+          for j in $Interfaces
+          do
+                function GetOnVm {
+                        ifconfig $j | grep inet | grep '10.207.29' | wc -l
+                }
+                OnVm=$(GetOnVm)
+
+                if   [ $OnVm -eq 1 ]
+                then
+                        Interface=$j
+
+                        function GetIP {
+                                ifconfig | grep -A1 $Interface | grep inet | sed '$!N;s/\n/ /' | sed 's/  */ /g' | cut -f3 -d' ' | rev | cut -f1 -d':' | rev
+                        }
+                        IP=$(GetIP)
+
+                        function GetInterfaceMtu {
+                                ifconfig $Interface | grep -i mtu | sed 's/^[ \t]*//;s/[ \t]*$//' | sed 's/,/ /g' | cut -f6-9 -d' ' | sed 's/^[ \t]*//;s/[ \t]*$//' | sed 's/ /:/g' | cut -f1,2 -d':' | cut -f2 -d':'
+                        }
+                        InterfaceMtu=$(GetInterfaceMtu)
+
+                        echo '       IP: '$(GetIP)
+                        echo 'Interface: '$Interface
+                        echo '      MTU: '$(GetInterfaceMtu)
+
+                        EXTIF=$Interface
+                        IP=$(GetIP)
+
+                        sudo sh -c "echo '$Interface:$IP:$InterfaceMtu' > /etc/network/openvswitch/sx1.info"
+
+                        ovs-vsctl add-port $INTIF $EXTIF
+                        ovs-vsctl set port $EXTIF tag=11
+                        ifconfig $EXTIF 0
+                        ifconfig $INTIF $IP netmask 255.255.255.0
+                        route add default gw 10.207.29.1 sx1
+                        ip link set sx1 up
+                fi
+        done
+  fi
+
+  Sx1Ip=$(GetSx1Ip)
+
+  if [ $Sx1Ip -eq 0 ] && [ -f /etc/network/openvswitch/sx1.info ]
+  then
+        function GetEXTIF {
+                cat /etc/network/openvswitch/sx1.info | cut -f1 -d':'
+        }
+        EXTIF=$(GetEXTIF)
+
+        function GetIP {
+                cat /etc/network/openvswitch/sx1.info | cut -f2 -d':'
+        }
+        IP=$(GetIP)
+
+        function GetMTU {
+                cat /etc/network/openvswitch/sx1.info | cut -f3 -d':'
+        }
+        MTU=$(GetMTU)
+
+        ovs-vsctl add-port $INTIF $EXTIF
+        ovs-vsctl set port $EXTIF tag=11
+        ifconfig $EXTIF 0
+        ifconfig $INTIF $IP netmask 255.255.255.0
+        route add default gw 10.207.29.1 sx1
+        ip link set sx1 up
+  fi
+
+  Sx1Ip=$(GetSx1Ip)
+
+  if [ $Sx1Ip -eq 0 ]
+  then
+        function GetInterface {
+                ifconfig | egrep -B1 'inet' | egrep -A1 'enp|wlp|wlan|eth|bnep' | sed '$!N;s/\n/ /' | sed 's/  */ /g' | cut -f1,7 -d' ' | sed 's/ addr//' | head -1 | cut -f1 -d':'
+        }
+        EXTIF=$(GetInterface)
+
+        ip addr add 10.207.29.SWITCH_IP/24 dev $INTIF
+        ip route replace 10.207.29.0/24 dev sw1
+        ip link set sx1 up
+
+	INTIF="sx1"
+	EXTIF=$(GetInterface)
+	IP=$(GetIP)
+
+  	echo 1 > /proc/sys/net/ipv4/ip_forward
+
+	function CheckIptablesRulesCount {
+		iptables -S | grep FORWARD | grep $INTIF | wc -l
+	}
+	IptablesRulesCount=$(CheckIptablesRulesCount)
+
+	while [ $IptablesRulesCount -ne 0 ]
+	do
+		iptables -D FORWARD -i $EXTIF -o $INTIF -j ACCEPT > /dev/null 2>&1
+		iptables -D FORWARD -i $INTIF -o $EXTIF -j ACCEPT > /dev/null 2>&1
+		IptablesRulesCount=$(CheckIptablesRulesCount)
+	done
+
+	# Set forwarding and NAT rules
+
+	iptables -A FORWARD -i $EXTIF -o $INTIF -j ACCEPT
+	iptables -A FORWARD -i $INTIF -o $EXTIF -j ACCEPT
+	iptables -t nat -A POSTROUTING -o $EXTIF -j MASQUERADE
+
+	### END iptables rules management ###
+  fi
+	
+  ip tuntap add a1 mode tap 
+  ip tuntap add a2 mode tap 
+  ip tuntap add a3 mode tap 
+  ip tuntap add a4 mode tap 
+  ip tuntap add a5 mode tap 
+  ip tuntap add a6 mode tap 
+# ip tuntap add YourCustomPortName mode tap
+
+  ip link set a1 up
+  ip link set a2 up
+  ip link set a3 up
+  ip link set a4 up
+  ip link set a5 up
+  ip link set a6 up
+# ip link set YourCustomPortName up
+
+  ovs-vsctl --may-exist add-port $INTIF a1
+  ovs-vsctl --may-exist add-port $INTIF a2
+  ovs-vsctl --may-exist add-port $INTIF a3
+  ovs-vsctl --may-exist add-port $INTIF a4
+  ovs-vsctl --may-exist add-port $INTIF a5
+  ovs-vsctl --may-exist add-port $INTIF a6
+# ovs-vsctl --may-exist add-port $INTIF YourCustomPortName
+
+  ovs-vsctl set port sx1 tag=11
+  ovs-vsctl set port  a1 tag=11
+  ovs-vsctl set port  a2 tag=11
+  ovs-vsctl set port  a3 tag=11
+  ovs-vsctl set port  a4 tag=11
+  ovs-vsctl set port  a5 tag=11
+  ovs-vsctl set port  a6 tag=11
+
+# Patch Ports
+  ovs-vsctl set interface a1 type=patch
+  ovs-vsctl set interface a1 options:peer=s1
+
+### END Get active EXTIF dynamically. ###
+
+### BEGIN MTU and tunnel settings. ###
+
+# function GetInterfaceMtu {
+#       ifconfig $Interface | grep mtu | rev | cut -f1 -d' ' | rev
+# }
+# InterfaceMtu=$(GetInterfaceMtu)
+
+# function CheckGreTunnelExist {
+#       sudo ovs-vsctl show | grep type | grep gre | cut -f2 -d':' | sed 's/^[ \t]*//;s/[ \t]*$//'
+# }
+# GreTunnelExist=$(CheckGreTunnelExist)
+
+# function CheckGreTunnelStringLen {
+#       sudo ovs-vsctl show | grep type | grep gre | cut -f2 -d':' | sed 's/^[ \t]*//;s/[ \t]*$//' | wc -l
+# }
+# GreTunnelStringLen=$(CheckGreTunnelStringLen)
+
+# function GetConfigCount {
+#       ls -l /var/lib/lxc |  wc -l
+# }
+# ConfigCount=$(GetConfigCount)
+
+# if [ $GreTunnelStringLen -gt 0 ] && [ $ConfigCount -gt 0 ]
+# then
+#       if [ $GreTunnelExist = 'gre' ]
+#       then
+#               MtuSetting=1420
+#		sed -i "/lxc.network.mtu =/c lxc.network.mtu = $MtuSetting" /var/lib/lxc/*/config
+#       fi
+# else
+#       MtuSetting=$InterfaceMtu
+#	sed -i "/lxc.network.mtu =/c lxc.network.mtu = $MtuSetting" /var/lib/lxc/*/config
+# fi
+
+### END MTU and tunnel settings. ###
+
+# service dhcpd restart # DNS and DHCP services have been moved to an LXC container.
+# service named restart # DNS and DHCP services have been moved to an LXC container.
+
