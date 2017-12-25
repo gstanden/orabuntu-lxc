@@ -54,7 +54,7 @@
 #    v5.0 GLS 20170909 EE MultiHost Docker S3
 
 SudoPassword=ubuntu
-GRE=N
+GRE=Y
 
 clear
 
@@ -252,8 +252,8 @@ if [ -z $8 ]
 then
 	#MultiHost="new:N:1:$SudoPassword:192.168.1.5:192.168.1.93:1500:ubuntu:ubuntu:$GRE"
 	#MultiHost="new:Y:4:$SudoPassword:10.207.39.1:10.207.39.15:1500:ubuntu:ubuntu:$GRE"
-	 MultiHost="reinstall:N:1:$SudoPassword:192.168.1.5:192.168.1.68:1500:ubuntu:ubuntu:$GRE"
-	#MultiHost="reinstall:Y:9:$SudoPassword:192.168.1.5:192.168.1.10:1420:ubuntu:ubuntu:$GRE"
+	#MultiHost="reinstall:N:1:$SudoPassword:192.168.1.5:192.168.1.68:1500:ubuntu:ubuntu:$GRE"
+	 MultiHost="reinstall:Y:7:$SudoPassword:192.168.1.5:192.168.1.10:1420:ubuntu:ubuntu:$GRE"
 	#MultiHost="addclones"
 fi
 echo 'MultiHost                 = '$MultiHost

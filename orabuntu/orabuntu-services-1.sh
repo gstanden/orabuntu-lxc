@@ -1911,31 +1911,33 @@ then
 		sudo sed -i "s/REMOTE_GRE_ENDPOINT/$MultiHostVar5/g"		/etc/network/openvswitch/crt_ovs_sw1.sh
 
 		function CheckGre0Exists {
-			sudo ovs-vsctl show | grep gre0 | wc -l
+			sudo ovs-vsctl show | grep gre$MultiHostVar3 | wc -l
 		}
 		Gre0Exists=$(CheckGre0Exists)
 
 		if [ $Gre0Exists -gt 0 ]
 		then
-			sudo ovs-vsctl del-port gre0
+			sudo ovs-vsctl del-port gre$MultiHostVar3
 		fi
 
-		function CheckGre1Exists {
-			sudo ovs-vsctl show | grep gre1 | wc -l
-		}
-		Gre1Exists=$(CheckGre1Exists)
+#		function CheckGre1Exists {
+#			sudo ovs-vsctl show | grep gre1 | wc -l
+#		}
+#		Gre1Exists=$(CheckGre1Exists)
 
-		if [ $Gre1Exists -gt 0 ]
-		then
-			sudo ovs-vsctl del-port gre1
-		fi
+#		if [ $Gre1Exists -gt 0 ]
+#		then
+#			sudo ovs-vsctl del-port gre1
+#		fi
 
-		sudo ovs-vsctl add-port sw1 gre0 -- set interface gre0 type=gre options:remote_ip=$MultiHostVar5
+		sudo ovs-vsctl add-port sw1 gre$MultiHostVar3 -- set interface gre$MultiHostVar3 type=gre options:remote_ip=$MultiHostVar5
 
- 		sudo sed -i "s/MultiHostVar6/$MultiHostVar6/g" 	/etc/network/openvswitch/setup_gre_and_routes.sh
-#		sudo sed -i "s/MultiHostVar3/$MultiHostVar3/g" 	/etc/network/openvswitch/setup_gre_and_routes.sh
-#		sudo sed -i "s/MHV3/MultiHostVar3/g"		/etc/network/openvswitch/setup_gre_and_routes.sh
-#		sudo sed -i "s/MHV6/MultiHostVar6/g"		/etc/network/openvswitch/setup_gre_and_routes.sh
+		sudo cp -p /etc/network/openvswitch/setup_gre_and_routes.sh /etc/network/openvswitch/setup_gre_and_routes_$HOSTNAME_$MultiHostVar3.sh
+
+ 		sudo sed -i "s/MultiHostVar6/$MultiHostVar6/g" 	/etc/network/openvswitch/setup_gre_and_routes_$HOSTNAME_$MultiHostVar3.sh
+ 		sudo sed -i "s/MultiHostVar3/$MultiHostVar3/g" 	/etc/network/openvswitch/setup_gre_and_routes_$HOSTNAME_$MultiHostVar3.sh
+#		sudo sed -i "s/MHV3/MultiHostVar3/g"		/etc/network/openvswitch/setup_gre_and_routes_$HOSTNAME_$MultiHostVar3.sh
+#		sudo sed -i "s/MHV6/MultiHostVar6/g"		/etc/network/openvswitch/setup_gre_and_routes_$HOSTNAME_$MultiHostVar3.sh
 
  		echo ''
  		echo "=============================================="
@@ -1946,18 +1948,18 @@ then
 #		sudo service sw1 restart
 #		sudo service sx1 restart
 
- 		sudo chmod 777 /etc/network/openvswitch/setup_gre_and_routes.sh
+ 		sudo chmod 777 /etc/network/openvswitch/setup_gre_and_routes_$HOSTNAME_$MultiHostVar3.sh
 
  		ssh-keygen -f "/home/ubuntu/.ssh/known_hosts" -R $MultiHostVar5
  		sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 date
  		if [ $? -eq 0 ]
  		then
- 			sshpass -p ubuntu scp -p /etc/network/openvswitch/setup_gre_and_routes.sh ubuntu@$MultiHostVar5:~/.
+ 			sshpass -p ubuntu scp -p /etc/network/openvswitch/setup_gre_and_routes_$HOSTNAME_$MultiHostVar3.sh ubuntu@$MultiHostVar5:~/.
  		fi
- 		sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 "sudo -S <<< "ubuntu" ls -l ~/setup_gre_and_routes.sh"
+ 		sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 "sudo -S <<< "ubuntu" ls -l ~/setup_gre_and_routes_$HOSTNAME_$MultiHostVar3.sh"
  		if [ $? -eq 0 ]
  		then
- 			sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 "sudo -S <<< "ubuntu" ~/setup_gre_and_routes.sh"
+ 			sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 "sudo -S <<< "ubuntu" ~/setup_gre_and_routes_$HOSTNAME_$MultiHostVar3.sh"
 #			sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 "sudo -S <<< "ubuntu" service sw1 restart"
 #			sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 "sudo -S <<< "ubuntu" /etc/orabuntu-lxc-scripts/stop_containers.sh"
 #			sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 "sudo -S <<< "ubuntu" /etc/orabuntu-lxc-scripts/start_containers.sh"
