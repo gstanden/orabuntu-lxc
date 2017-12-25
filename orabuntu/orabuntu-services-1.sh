@@ -279,13 +279,13 @@ then
 		echo ''
 
 		sudo /etc/network/openvswitch/del-bridges-keep-scst.sh >/dev/null 2>&1
-		sudo ovs-vsctl show
 		sudo rm -f /etc/network/openvswitch/crt_ovs_s4.sh
 		sudo rm -f /etc/network/openvswitch/crt_ovs_s5.sh
 		sudo rm -f /etc/network/openvswitch/crt_ovs_s6.sh
 		sudo rm -f /etc/network/openvswitch/crt_ovs_s7.sh
 		sudo rm -f /etc/network/openvswitch/crt_ovs_s8.sh
 		sudo rm -f /etc/network/openvswitch/crt_ovs_s9.sh
+		sudo rm -f /etc/network/openvswitch/crt_ovs_sx1.sh
 
 		echo ''
 		echo "=============================================="
@@ -296,18 +296,19 @@ then
 		sudo rm -f  /etc/network/if-up.d/openvswitch/*
 		sudo rm -f  /etc/network/if-down.d/openvswitch/*
 
-		sudo systemctl disable sw1
 		sudo systemctl disable sw4
 		sudo systemctl disable sw5
 		sudo systemctl disable sw6
 		sudo systemctl disable sw7
 		sudo systemctl disable sw8
 		sudo systemctl disable sw9
-		sudo systemctl disable sx1
+		sudo systemctl disable $NameServer
 
 		sudo rm -f /etc/systemd/system/ora*c*.service
 		sudo rm -f /etc/systemd/system/oel*c*.service
-		sudo rm -f /etc/systemd/sw[456789].service
+		sudo rm -f /etc/systemd/systemc/sw[1456789].service
+		sudo rm -f /etc/systemd/systemc/sx1.service
+		sudo rm -f /etc/systemd/systemd/$NameServer.service
 
 		echo ''
 		echo "=============================================="
@@ -315,7 +316,7 @@ then
 		echo "=============================================="
 		echo ''
 
-		sudo apt-get -y purge lxc lxc-common lxc-templates lxc1 lxcfs python3-lxc liblxc1
+		sudo apt-get -y purge lxc lxc-common lxc-templates lxc1 lxcfs python3-lxc liblxc1 dnsmasq
 	
 		echo ''
 		echo "=============================================="
