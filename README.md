@@ -16,6 +16,7 @@ On Ubuntu Linux create an "ubuntu" user and ensure it has membership in the grou
 ```
       uid=1000(ubuntu) gid=1000(ubuntu) groups=1000(ubuntu),4(adm),24(cdrom),27(sudo),30(dip),46(plugdev),118(lpadmin),128(sambashare)
 ```
+
 Create Required Directory
 ```
       mkdir -p /home/ubuntu/Downloads
