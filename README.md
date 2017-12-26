@@ -1,5 +1,26 @@
 # Orabuntu-LXC Updates
 
+Begin Update: December 26, 2017
+
+Installing
+
+Currently for all installs of Orabuntu-LXC a linux account "ubuntu" with "sudo" privileges is required for both Ubuntu Linux and Oracle Linux.  
+
+On Oracle Linux create this account as follows:
+```
+      ./uekulele-services-0.sh
+```
+(1) On the first host, whether physical or virtual, use the following settings in anylinux-services.sh
+
+
+
+Orabuntu-LXC v5.32-beta is released. The major new feature is the EE (Enterprise Edition) MultiHost feature.  This feature enables the following features:
+* Run VMs on the Orabuntu-LXC OpenvSwitch SDN networks
+* Install Orabuntu-LXC in VMs on the Orabuntu-LXC OpenvSwitch SDN networks
+* Install Orabuntu-LXC on remote physical hosts using the GRE=Y options
+* Install VMs on the Orabuntu-LXC OpenvSwitch SDN networks on the remote GRE hosts
+* Install Orabuntu-LXC in VMs on the GRE remote phyiscal hosts
+
 Begin Update: December 10, 2017
 
 The Orabuntu-LXC development branch now supports putting your Oracle VirtualBox VM's on the Orabuntu-LXC OpenvSwitch network on the physical host, for both Ubuntu Linux (16.x / 17.x) physical hosts, and Oracle Linux 7 physical hosts.  This update supercedes Note 1 below from the December 2, 2017 update, and expands this new feature to both Ubuntu Linux server-edition / desktop-edition VMs, and Oracle Linux 7 VMs. (Note, only Ubuntu Linux 17.10 VMs and Oracle Linux 7 VMs have been tested so far).
