@@ -12,22 +12,22 @@ Currently for all installs of Orabuntu-LXC a linux account "ubuntu" with "sudo" 
 
 On Oracle Linux create this account as follows using the script provided with Orabuntu-LXC:
 ```
-      ./uekulele-services-0.sh
+        ./uekulele-services-0.sh
 ```
 On Ubuntu Linux create an "ubuntu" user and ensure it has membership in the groups as shown below. 
 ```
-      uid=1000(ubuntu) gid=1000(ubuntu) groups=1000(ubuntu),4(adm),24(cdrom),27(sudo),30(dip),46(plugdev),118(lpadmin),128(sambashare)
+        uid=1000(ubuntu) gid=1000(ubuntu) groups=1000(ubuntu),4(adm),24(cdrom),27(sudo),30(dip),46(plugdev),118(lpadmin),128(sambashare)
 ```
 
 (2) Create Required Directory
 ```
-      mkdir -p /home/ubuntu/Downloads
+        mkdir -p /home/ubuntu/Downloads
 ```
 (3) Download and Unzip Orabuntu-LXC
 ```
-      cd /home/ubuntu/Downloads
-      wget https://github.com/gstanden/orabuntu-lxc/archive/master.zip
-      unzip master.zip
+        cd /home/ubuntu/Downloads
+        wget https://github.com/gstanden/orabuntu-lxc/archive/master.zip
+        unzip master.zip
  ```
 Installing for Various Cases
 
