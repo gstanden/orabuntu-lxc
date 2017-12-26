@@ -110,7 +110,7 @@ In all of the following:
 # Orabuntu-LXC v5.32-beta released
 
 Orabuntu-LXC v5.32-beta is released December 25, 2017. 
-The major new feature is the EE (Enterprise Edition) MultiHost feature.  
+The major new feature is the EE (Enterprise Edition) MultiHost 
 This feature enables the following:
 * Run VMs on the Orabuntu-LXC OpenvSwitch SDN networks
 * Install Orabuntu-LXC in VMs on the Orabuntu-LXC OpenvSwitch SDN networks
