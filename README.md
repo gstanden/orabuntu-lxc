@@ -36,7 +36,7 @@ On Ubuntu Linux create an "ubuntu" user and ensure it has membership in the grou
         wget https://github.com/gstanden/orabuntu-lxc/archive/master.zip
         unzip master.zip
  ```
-Installing for Various Cases
+Installing Orabuntu-LXC for Various Cases
 
 In all of the following:
 
