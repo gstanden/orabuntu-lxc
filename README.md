@@ -44,8 +44,8 @@ In all of the following:
 * 111.222.333.444 means that IP address is not used in this use case and can be set to anything.
 
 (1) Installing Orabuntu-LXC on a host on your LAN (physical host or VM host) aka "hub-host".
-<pre>
 ```
+<pre>
         SudoPassword=UbuntuSudoPassword
         GRE=N
         <b> MultiHost="new:N:1:$SudoPassword:111.222.333.444:111.222.333.444:1500:ubuntu:ubuntu:$GRE"</b>
@@ -53,8 +53,9 @@ In all of the following:
 	#MultiHost="reinstall:N:1:$SudoPassword:192.168.1.5:192.168.1.68:1500:ubuntu:ubuntu:$GRE"
 	#MultiHost="reinstall:Y:7:$SudoPassword:192.168.1.5:192.168.1.10:1420:ubuntu:ubuntu:$GRE"
 	#MultiHost="addclones"
- ```
  </pre>
+ ```
+
 (2) Installing Orabuntu-LXC in a VM on the "hub-host" that already has Orabuntu-LXC installed.
 <pre>
 ```
