@@ -1,5 +1,3 @@
-<pre>
-
 # Orabuntu-LXC Updates
 
 Begin Update: December 26, 2017
@@ -42,7 +40,7 @@ In all of the following:
 ```
         SudoPassword=<sudo password of ubuntu user>
         GRE=N
-        <b>#MultiHost="new:N:1:$SudoPassword:111.222.333.444:111.222.333.444:1500:ubuntu:ubuntu:$GRE"</b>
+        <pre><b>#MultiHost="new:N:1:$SudoPassword:111.222.333.444:111.222.333.444:1500:ubuntu:ubuntu:$GRE"</b></pre>
 	#MultiHost="new:Y:4:$SudoPassword:10.207.39.1:10.207.39.15:1500:ubuntu:ubuntu:$GRE"
 	#MultiHost="reinstall:N:1:$SudoPassword:192.168.1.5:192.168.1.68:1500:ubuntu:ubuntu:$GRE"
 	#MultiHost="reinstall:Y:7:$SudoPassword:192.168.1.5:192.168.1.10:1420:ubuntu:ubuntu:$GRE"
@@ -210,4 +208,3 @@ Thank You,
 Gilbert Standen, 
 October 2017
 
-<pre>
