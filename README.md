@@ -12,7 +12,7 @@ On Oracle Linux create this account as follows using the script provided with Or
 ```
       ./uekulele-services-0.sh
 ```
-On Ubuntu Linux create an "ubuntu" user and ensure it has membership in the groups as shown below.
+On Ubuntu Linux create an "ubuntu" user and ensure it has membership in the groups as shown below. 
 ```
       uid=1000(ubuntu) gid=1000(ubuntu) groups=1000(ubuntu),4(adm),24(cdrom),27(sudo),30(dip),46(plugdev),118(lpadmin),128(sambashare)
 ```
@@ -27,7 +27,21 @@ On Ubuntu Linux create an "ubuntu" user and ensure it has membership in the grou
       wget https://github.com/gstanden/orabuntu-lxc/archive/master.zip
       unzip master.zip
  ```
-      
+Installing for Various Cases
+
+(1) Installing on a standalone (non-MultiHost) physical or VM host.  Use the following settings in anylinux-services.sh
+```
+      SudoPassword=<sudo password of ubuntu user>
+      GRE=N
+	 MultiHost="new:N:1:$SudoPassword:192.168.1.5:192.168.1.93:1500:ubuntu:ubuntu:$GRE"
+	#MultiHost="new:Y:4:$SudoPassword:10.207.39.1:10.207.39.15:1500:ubuntu:ubuntu:$GRE"
+	#MultiHost="reinstall:N:1:$SudoPassword:192.168.1.5:192.168.1.68:1500:ubuntu:ubuntu:$GRE"
+	#MultiHost="reinstall:Y:7:$SudoPassword:192.168.1.5:192.168.1.10:1420:ubuntu:ubuntu:$GRE"
+	#MultiHost="addclones"
+ ```
+
+
+
 
 
 
