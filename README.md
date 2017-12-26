@@ -107,14 +107,17 @@ In all of the following:
       * In the VM you must set "MTU=1420" for both of the ifcfg-xxxxx before Orabuntu-LXC install and reboot.
       * Verify that MTU for both VNICs is 1420 before beginning Orabuntu-LXC install in the VM
 
+# Orabuntu-LXC v5.32-beta released
 
-
-Orabuntu-LXC v5.32-beta is released. The major new feature is the EE (Enterprise Edition) MultiHost feature.  This feature enables the following features:
+Orabuntu-LXC v5.32-beta is released December 25, 2017. 
+The major new feature is the EE (Enterprise Edition) MultiHost feature.  
+This feature enables the following:
 * Run VMs on the Orabuntu-LXC OpenvSwitch SDN networks
 * Install Orabuntu-LXC in VMs on the Orabuntu-LXC OpenvSwitch SDN networks
 * Install Orabuntu-LXC on remote physical hosts using the GRE=Y options
 * Install VMs on the Orabuntu-LXC OpenvSwitch SDN networks on the remote GRE hosts
 * Install Orabuntu-LXC in VMs on the GRE remote phyiscal hosts
+* Docker is now installed with Orabuntu-LXC and Docker containers have access to the OpenvSwitch network
 
 Begin Update: December 10, 2017
 
