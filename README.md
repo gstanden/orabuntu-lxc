@@ -6,11 +6,14 @@ Installing
 
 Currently for all installs of Orabuntu-LXC a linux account "ubuntu" with "sudo" privileges is required for both Ubuntu Linux and Oracle Linux.  
 
-On Oracle Linux create this account as follows:
+On Oracle Linux create this account as follows using the script provided with Orabuntu-LXC:
 ```
       ./uekulele-services-0.sh
 ```
-(1) On the first host, whether physical or virtual, use the following settings in anylinux-services.sh
+On Ubuntu Linux create an "ubuntu" user and ensure it has membership in the groups as shown below.
+```
+      uid=1000(ubuntu) gid=1000(ubuntu) groups=1000(ubuntu),4(adm),24(cdrom),27(sudo),30(dip),46(plugdev),118(lpadmin),128(sambashare)
+```
 
 
 
