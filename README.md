@@ -42,7 +42,7 @@ In all of the following:
         SudoPassword=UbuntuSudoPassword
         GRE=N
         <b> MultiHost="new:N:1:$SudoPassword:111.222.333.444:111.222.333.444:1500:ubuntu:ubuntu:$GRE"</b>
-	#MultiHost="new:Y:-4:$SudoPassword:10.207.39.1:10.207.39.15:1500:ubuntu:ubuntu:$GRE"
+	#MultiHost="new:Y:- 4:$SudoPassword:10.207.39.1:10.207.39.15:1500:ubuntu:ubuntu:$GRE"
 	#MultiHost="reinstall:N:1:$SudoPassword:192.168.1.5:192.168.1.68:1500:ubuntu:ubuntu:$GRE"
 	#MultiHost="reinstall:Y:7:$SudoPassword:192.168.1.5:192.168.1.10:1420:ubuntu:ubuntu:$GRE"
 	#MultiHost="addclones"
