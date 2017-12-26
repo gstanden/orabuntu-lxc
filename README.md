@@ -103,7 +103,8 @@ In all of the following:
 
       * 1st VNIC, bridge it to any of the following taps {s2,s3,s4,s5.s6} and set to "Allow All" mode.
       * 2nd VNIC, bridge it to any of the following taps {a2,a3,a4,a5,a6} and set to "Allow All" mode.
-      * In the VM you must set "MTU=1420" for both of the ifcfg-xxxxx 
+      * In the VM you must set "MTU=1420" for both of the ifcfg-xxxxx before Orabuntu-LXC install and reboot.
+      * Verify that MTU for both VNICs is 1420 before beginning Orabuntu-LXC install in the VM
 
 
 
