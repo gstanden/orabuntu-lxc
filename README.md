@@ -6,7 +6,9 @@ Begin Update: December 26, 2017
 
 Installing
 
-Currently for all installs of Orabuntu-LXC a linux account "ubuntu" with "sudo" privileges is required for both Ubuntu Linux and Oracle Linux.  The steps (1), (2), (3) below are required for all installs whether on physical host or VM.
+Currently for all installs of Orabuntu-LXC a linux account "ubuntu" with "sudo" privileges 
+is required for both Ubuntu Linux and Oracle Linux.  The steps (1), (2), (3) below are 
+required for all installs whether on physical host or VM.
 
 (1) Create Required User Account
 
