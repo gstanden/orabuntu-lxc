@@ -60,7 +60,7 @@ In all of the following:
 	#MultiHost="addclones"
  ```
  </pre>
-(3) Installing Orabuntu-LXC on the a "GRE-host" that will be connected to the Orabuntu-LXC hub host via GRE
+(3) Installing Orabuntu-LXC on the a "GRE-host" that will be connected to the Orabuntu-LXC "hub-host" via GRE
 <pre>
 ```
         SudoPassword=UbuntuSudoPassword
@@ -72,7 +72,7 @@ In all of the following:
 	#MultiHost="addclones"
  ```
  </pre>
-(4) Installing Orabuntu-LXC in a VM on a "GRE-host" that is connected to the Orabuntu-LXC hub host via GRE
+(4) Installing Orabuntu-LXC in a VM on a "GRE-host" that is connected to the Orabuntu-LXC "hub-host" via GRE
 <pre>
 ```
         SudoPassword=UbuntuSudoPassword
