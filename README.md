@@ -48,7 +48,7 @@ In all of the following:
 	#MultiHost="addclones"
  ```
  </pre>
-(2) Installing Orabuntu-LXC in a VM on a hub-host that already has Orabuntu-LXC installed.
+(2) Installing Orabuntu-LXC in a VM on the "hub-host" that already has Orabuntu-LXC installed.
 <pre>
 ```
         SudoPassword=UbuntuSudoPassword
@@ -60,19 +60,30 @@ In all of the following:
 	#MultiHost="addclones"
  ```
  </pre>
-(2) Installing Orabuntu-LXC on a host that will be connected to the Orabuntu-LXC hub host via GRE
+(3) Installing Orabuntu-LXC on the a "GRE-host" that will be connected to the Orabuntu-LXC hub host via GRE
 <pre>
 ```
         SudoPassword=UbuntuSudoPassword
         GRE=Y
         #MultiHost="new:N:1:$SudoPassword:111.222.333.444:111.222.333.444:1500:ubuntu:ubuntu:$GRE"
-	<b> MultiHost="new:Y:4:$SudoPassword:HUB.host.lan.ip:GRE.host.lan.ip:1420:ubuntu:ubuntu:$GRE"</b>
+	<b> MultiHost="new:Y:5:$SudoPassword:HUB.host.lan.ip:GRE.host.lan.ip:1420:ubuntu:ubuntu:$GRE"</b>
 	#MultiHost="reinstall:N:1:$SudoPassword:192.168.1.5:192.168.1.68:1500:ubuntu:ubuntu:$GRE"
 	#MultiHost="reinstall:Y:7:$SudoPassword:192.168.1.5:192.168.1.10:1420:ubuntu:ubuntu:$GRE"
 	#MultiHost="addclones"
  ```
  </pre>
-
+(4) Installing Orabuntu-LXC in a VM on a "GRE-host" that is connected to the Orabuntu-LXC hub host via GRE
+<pre>
+```
+        SudoPassword=UbuntuSudoPassword
+        GRE=Y
+        #MultiHost="new:N:1:$SudoPassword:111.222.333.444:111.222.333.444:1500:ubuntu:ubuntu:$GRE"
+	<b> MultiHost="new:Y:6:$SudoPassword:HUB.host.lan.ip:GRE.host.lan.ip:1420:ubuntu:ubuntu:$GRE"</b>
+	#MultiHost="reinstall:N:1:$SudoPassword:192.168.1.5:192.168.1.68:1500:ubuntu:ubuntu:$GRE"
+	#MultiHost="reinstall:Y:7:$SudoPassword:192.168.1.5:192.168.1.10:1420:ubuntu:ubuntu:$GRE"
+	#MultiHost="addclones"
+ ```
+ </pre>
 
 
 
