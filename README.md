@@ -29,18 +29,31 @@ On Ubuntu Linux create an "ubuntu" user and ensure it has membership in the grou
  ```
 Installing for Various Cases
 
-(1) Installing on a standalone (non-MultiHost) physical or VM host.  Use the following settings in anylinux-services.sh
+In all of the following:
+
+* Settings are made in the "anylinux-services.sh" file.
+* 111.222.333.444 means that IP address is not used in this use case and can be set to anything.
+
+(1) Installing on a standalone (non-MultiHost) physical or VM host.
 ```
-      SudoPassword=<sudo password of ubuntu user>
-      GRE=N
-	 MultiHost="new:N:1:$SudoPassword:192.168.1.5:192.168.1.93:1500:ubuntu:ubuntu:$GRE"
+        SudoPassword=<sudo password of ubuntu user>
+        GRE=N
+      **MultiHost="new:N:1:$SudoPassword:111.222.333.444:111.222.333.444:1500:ubuntu:ubuntu:$GRE"**
 	#MultiHost="new:Y:4:$SudoPassword:10.207.39.1:10.207.39.15:1500:ubuntu:ubuntu:$GRE"
 	#MultiHost="reinstall:N:1:$SudoPassword:192.168.1.5:192.168.1.68:1500:ubuntu:ubuntu:$GRE"
 	#MultiHost="reinstall:Y:7:$SudoPassword:192.168.1.5:192.168.1.10:1420:ubuntu:ubuntu:$GRE"
 	#MultiHost="addclones"
  ```
-
-
+(2) Installing in a VM running on a physical host that already has Orabuntu-LXC installed.
+```
+        SudoPassword=<sudo password of ubuntu user>
+        GRE=N
+	 MultiHost="new:Y:1:$SudoPassword:192.168.1.5:192.168.1.93:1500:ubuntu:ubuntu:$GRE"
+	#MultiHost="new:Y:4:$SudoPassword:10.207.39.1:10.207.39.15:1500:ubuntu:ubuntu:$GRE"
+	#MultiHost="reinstall:N:1:$SudoPassword:192.168.1.5:192.168.1.68:1500:ubuntu:ubuntu:$GRE"
+	#MultiHost="reinstall:Y:7:$SudoPassword:192.168.1.5:192.168.1.10:1420:ubuntu:ubuntu:$GRE"
+	#MultiHost="addclones"
+ ```
 
 
 
