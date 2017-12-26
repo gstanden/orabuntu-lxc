@@ -12,6 +12,9 @@ Note that if an OS is being installed in preparation for use with Orabuntu-LXC b
 and Ubuntu Linux OS installers have options for creating the install user "ubuntu" with
 admin sudo privileges.  
 
+Note I know that this install should be installable under any linux user with full sudo privilege
+and that is on the roadmap, but for now just use the "ubuntu" linux user as setup below.
+
 (1) Create Required User Account
 
 On Oracle Linux create this account as follows using the script provided with Orabuntu-LXC:
