@@ -1,3 +1,5 @@
+<pre>
+
 # Orabuntu-LXC Updates
 
 Begin Update: December 26, 2017
@@ -36,9 +38,10 @@ In all of the following:
 
 (1) Installing on a standalone (non-MultiHost) physical or VM host.
 ```
-        SudoPassword=<sudo password of ubuntu user>
-        GRE=N
-      **MultiHost="new:N:1:$SudoPassword:111.222.333.444:111.222.333.444:1500:ubuntu:ubuntu:$GRE"**
+         SudoPassword=<sudo password of ubuntu user>
+         GRE=N
+         <b>MultiHost="new:N:1:$SudoPassword:111.222.333.444:111.222.333.444:1500:ubuntu:ubuntu:$GRE"</b>
+	 <pre>
 	#MultiHost="new:Y:4:$SudoPassword:10.207.39.1:10.207.39.15:1500:ubuntu:ubuntu:$GRE"
 	#MultiHost="reinstall:N:1:$SudoPassword:192.168.1.5:192.168.1.68:1500:ubuntu:ubuntu:$GRE"
 	#MultiHost="reinstall:Y:7:$SudoPassword:192.168.1.5:192.168.1.10:1420:ubuntu:ubuntu:$GRE"
@@ -46,9 +49,9 @@ In all of the following:
  ```
 (2) Installing in a VM running on a physical host that already has Orabuntu-LXC installed.
 ```
-        SudoPassword=<sudo password of ubuntu user>
-        GRE=N
-	 MultiHost="new:Y:1:$SudoPassword:192.168.1.5:192.168.1.93:1500:ubuntu:ubuntu:$GRE"
+         SudoPassword=<sudo password of ubuntu user>
+         GRE=N
+	 MultiHost="new:Y:1:$SudoPassword:111.222.333.444:111.222.333.444:1500:ubuntu:ubuntu:$GRE"
 	#MultiHost="new:Y:4:$SudoPassword:10.207.39.1:10.207.39.15:1500:ubuntu:ubuntu:$GRE"
 	#MultiHost="reinstall:N:1:$SudoPassword:192.168.1.5:192.168.1.68:1500:ubuntu:ubuntu:$GRE"
 	#MultiHost="reinstall:Y:7:$SudoPassword:192.168.1.5:192.168.1.10:1420:ubuntu:ubuntu:$GRE"
