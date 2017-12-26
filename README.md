@@ -4,7 +4,9 @@ Begin Update: December 26, 2017
 
 Installing
 
-Currently for all installs of Orabuntu-LXC a linux account "ubuntu" with "sudo" privileges is required for both Ubuntu Linux and Oracle Linux.  
+Currently for all installs of Orabuntu-LXC a linux account "ubuntu" with "sudo" privileges is required for both Ubuntu Linux and Oracle Linux.
+
+Create Required User Account
 
 On Oracle Linux create this account as follows using the script provided with Orabuntu-LXC:
 ```
@@ -14,6 +16,17 @@ On Ubuntu Linux create an "ubuntu" user and ensure it has membership in the grou
 ```
       uid=1000(ubuntu) gid=1000(ubuntu) groups=1000(ubuntu),4(adm),24(cdrom),27(sudo),30(dip),46(plugdev),118(lpadmin),128(sambashare)
 ```
+Create Required Directory
+```
+      mkdir -p /home/ubuntu/Downloads
+```
+Download and Unzip Orabuntu-LXC
+```
+      cd /home/ubuntu/Downloads
+      wget https://github.com/gstanden/orabuntu-lxc/archive/master.zip
+      unzip master.zip
+ ```
+      
 
 
 
