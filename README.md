@@ -70,10 +70,10 @@ In all of the following:
  </pre>
  
       For this use case, you must also use two VNICs in the VM.
- ```
-      1st VNIC, bridge it to any of the following taps {s2,s3,s4,s5.s6} and set to "Allow All" mode.
-      2nd VNIC, bridge it to any of the following taps {a2,a3,a4,a5,a6} and set to "Allow All" mode.
- ```
+
+      * 1st VNIC, bridge it to any of the following taps {s2,s3,s4,s5.s6} and set to "Allow All" mode.
+      * 2nd VNIC, bridge it to any of the following taps {a2,a3,a4,a5,a6} and set to "Allow All" mode.
+
 (3) Installing Orabuntu-LXC on the a "GRE-host" that will be connected to the Orabuntu-LXC "hub-host" via GRE
 <pre>
 ```
