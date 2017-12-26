@@ -84,7 +84,7 @@ In all of the following:
 <pre>
 ```
         SudoPassword=UbuntuSudoPassword
-        GRE=Y
+        GRE=N
         #MultiHost="new:N:1:$SudoPassword:111.222.333.444:111.222.333.444:1500:ubuntu:ubuntu:$GRE"
 	<b> MultiHost="new:Y:6:$SudoPassword:HUB.host.lan.ip:GRE.host.lan.ip:1420:ubuntu:ubuntu:$GRE"</b>
 	#MultiHost="reinstall:N:1:$SudoPassword:192.168.1.5:192.168.1.68:1500:ubuntu:ubuntu:$GRE"
