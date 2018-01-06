@@ -1,25 +1,33 @@
 #!/bin/bash
 
-#    Copyright 2015-2017 Gilbert Standen
-#    This file is part of orabuntu-lxc.
+#    Copyright 2015-2018 Gilbert Standen
+#    This file is part of Orabuntu-LXC.
 
-#    Orabuntu-lxc is free software: you can redistribute it and/or modify
+#    Orabuntu-LXC is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
 #    the Free Software Foundation, either version 3 of the License, or
 #    (at your option) any later version.
 
-#    Orabuntu-lxc is distributed in the hope that it will be useful,
+#    Orabuntu-LXC is distributed in the hope that it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
 #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #    GNU General Public License for more details.
 
 #    You should have received a copy of the GNU General Public License
-#    along with orabuntu-lxc.  If not, see <http://www.gnu.org/licenses/>.
+#    along with Orabuntu-LXC.  If not, see <http://www.gnu.org/licenses/>.
 
-#    v2.4 GLS 20151224
-#    v2.8 GLS 20151231
-#    v3.0 GLS 20160710 Updates for Ubuntu 16.04
-#    v4.0 GLS 20161025 DNS DHCP services moved into an LXC container
+#    v2.4 	GLS 20151224
+#    v2.8 	GLS 20151231
+#    v3.0 	GLS 20160710 Updates for Ubuntu 16.04
+#    v4.0 	GLS 20161025 DNS DHCP services moved into an LXC container
+#    v5.0 	GLS 20170909 Orabuntu-LXC MultiHost
+#    v5.33-beta	GLS 20180106 Orabuntu-LXC EE MultiHost Docker AWS S3
+
+#    Note that this software builds a containerized DNS DHCP solution (bind9 / isc-dhcp-server).
+#    The nameserver should NOT be the name of an EXISTING nameserver but an arbitrary name because this software is CREATING a new LXC-containerized nameserver.
+#    The domain names can be arbitrary fictional names or they can be a domain that you actually own and operate.
+#    There are two domains and two networks because the "seed" LXC containers are on a separate network from the production LXC containers.
+#    If the domain is an actual domain, you will need to change the subnet though (a feature this software does not yet support - it's on the roadmap) to match your subnet manually.
 
 clear
 
@@ -317,19 +325,21 @@ echo ''
 sudo lxc-attach -n $SeedContainerName -- uname -a
 if [ $? -ne 0 ]
 then
-echo ''
-echo "=============================================="
-echo "No-password $SeedContainerName ssh has issue. "
-echo "No-password $SeedContainerName must succeed.  "
-echo "Fix issues retry script.                      "
-echo "Script exiting.                               "
-echo "=============================================="
-exit
+	echo ''
+	echo "=============================================="
+	echo "lxc-attach to $SeedContainerName as issue.    "
+	echo "lxc-attach to $SeedContainerName must succeed."
+	echo "Fix issues retry script.                      "
+	echo "Script exiting.                               "
+	echo "=============================================="
+	exit
+else
+	echo ''
+	echo "=============================================="
+	echo "lxc-attach $SeedContainerName successful.     "
+	echo "=============================================="
+	echo ''
 fi
-echo ''
-echo "=============================================="
-echo "No-password $SeedContainerName ssh successful."
-echo "=============================================="
 
 sleep 5
 
@@ -340,6 +350,14 @@ echo "=============================================="
 echo "Configuring $SeedContainerName for Oracle...  "
 echo "=============================================="
 echo ''
+echo "=============================================="
+echo "Note: sendmail install takes awhile (patience)"
+echo "The install may seem to hang at sendmail...   "
+echo "Give it a minute or two...it's working        "
+echo "=============================================="
+echo ''
+
+sleep 5
 
 if [ $MultiHostVar2 = 'Y' ]
 then
@@ -402,7 +420,6 @@ then
 elif [ $MajorRelease -eq 6 ] || [ $MajorRelease -eq 5 ]
 then
 	sudo lxc-attach -n $SeedContainerName -- ntpd -x
-	sudo lxc-attach -n $SeedContainerName -- dhcpcd -k
 fi
 
 echo ''

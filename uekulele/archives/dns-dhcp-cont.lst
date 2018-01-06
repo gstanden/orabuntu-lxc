@@ -1,3 +1,5 @@
+GNU3
+COPYING
 /var/lib/lxc/nsa/rootfs/etc/bind/named.conf.local
 /var/lib/lxc/nsa/rootfs/etc/bind/named.conf.options
 /var/lib/lxc/nsa/rootfs/etc/dhcp/dhcpd.conf
@@ -7,3 +9,7 @@
 /var/lib/lxc/nsa/rootfs/var/lib/bind/fwd.orabuntu-lxc.com
 /var/lib/lxc/nsa/rootfs/var/lib/bind/rev.orabuntu-lxc.com
 /var/lib/lxc/nsa/rootfs/etc/network/interfaces
+/var/lib/lxc/nsa/rootfs/root/ns_backup_update.lst
+/var/lib/lxc/nsa/rootfs/root/ns_backup.start.sh
+/var/lib/lxc/nsa/rootfs/root/crontab.txt
+/var/lib/lxc/nsa/rootfs/root/ns_backup_update.sh

@@ -15,8 +15,7 @@ GNU3
 /etc/network/if-up.d/openvswitch/lxcora00-priv3-ifup-sw6
 /etc/network/if-up.d/openvswitch/lxcora00-priv4-ifup-sw7
 /etc/network/if-up.d/openvswitch/lxcora00-pub-ifup-sw1
-/etc/network/openvswitch/crt_ovs_sw1.sh
-/etc/network/openvswitch/crt_ovs_sx1.sh
 /etc/orabuntu-lxc-scripts/start_containers.sh
 /etc/orabuntu-lxc-scripts/stop_containers.sh
 /etc/orabuntu-lxc-scripts/ubuntu-host-backup.sh
+/etc/systemd/resolved.conf

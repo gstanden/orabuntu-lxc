@@ -1,28 +1,28 @@
 #!/bin/bash
+#    Copyright 2015-2018 Gilbert Standen
+#    This file is part of Orabuntu-LXC.
 
-#    Copyright 2015-2017 Gilbert Standen
-#    This file is part of orabuntu-lxc.
-
-#    Orabuntu-lxc is free software: you can redistribute it and/or modify
+#    Orabuntu-LXC is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
 #    the Free Software Foundation, either version 3 of the License, or
 #    (at your option) any later version.
 
-#    Orabuntu-lxc is distributed in the hope that it will be useful,
+#    Orabuntu-LXC is distributed in the hope that it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
 #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #    GNU General Public License for more details.
 
 #    You should have received a copy of the GNU General Public License
-#    along with orabuntu-lxc.  If not, see <http://www.gnu.org/licenses/>.
+#    along with Orabuntu-LXC.  If not, see <http://www.gnu.org/licenses/>.
 
-#    v2.4 GLS 20151224
-#    v2.8 GLS 20151231
-#    v3.0 GLS 20160710 Updates for Ubuntu 16.04
-#    v4.0 GLS 20161025 DNS DHCP services moved into an LXC container
-#    v5.0 GLS 20170909 Orabuntu-LXC MultiHost
+#    v2.4 	GLS 20151224
+#    v2.8 	GLS 20151231
+#    v3.0 	GLS 20160710 Updates for Ubuntu 16.04
+#    v4.0 	GLS 20161025 DNS DHCP services moved into an LXC container
+#    v5.0 	GLS 20170909 Orabuntu-LXC MultiHost
+#    v5.33-beta	GLS 20180106 Orabuntu-LXC EE MultiHost Docker AWS S3
 
-#    Note that this software builds a conntainerized DNS DHCP solution for the Desktop environment.
+#    Note that this software builds a containerized DNS DHCP solution (bind9 / isc-dhcp-server).
 #    The nameserver should NOT be the name of an EXISTING nameserver but an arbitrary name because this software is CREATING a new LXC-containerized nameserver.
 #    The domain names can be arbitrary fictional names or they can be a domain that you actually own and operate.
 #    There are two domains and two networks because the "seed" LXC containers are on a separate network from the production LXC containers.
@@ -50,10 +50,25 @@ echo $MultiHost | cut -f2 -d':'
 }
 MultiHostVar2=$(GetMultiHostVar2)
 
+function GetMultiHostVar3 {
+echo $MultiHost | cut -f3 -d':'
+}
+MultiHostVar3=$(GetMultiHostVar3)
+
 function GetMultiHostVar4 {
 echo $MultiHost | cut -f4 -d':'
 }
 MultiHostVar4=$(GetMultiHostVar4)
+
+function GetMultiHostVar5 {
+echo $MultiHost | cut -f5 -d':'
+}
+MultiHostVar5=$(GetMultiHostVar5)
+
+function GetMultiHostVar6 {
+echo $MultiHost | cut -f6 -d':'
+}
+MultiHostVar6=$(GetMultiHostVar6)
 
 function GetMultiHostVar7 {
 	echo $MultiHost | cut -f7 -d':'
@@ -74,23 +89,17 @@ function GetMultiHostVar10 {
 	echo $MultiHost | cut -f10 -d':'
 }
 MultiHostVar10=$(GetMultiHostVar10)
-
-function GetMultiHostVar11 {
-	echo $MultiHost | cut -f11 -d':'
-}
-MultiHostVar11=$(GetMultiHostVar11)
-
-function GetMultiHostVar12 {
-        echo $MultiHost | cut -f12 -d':'
-}
-MultiHostVar12=$(GetMultiHostVar12)
-
 GRE=$MultiHostVar10
 
 function CheckNetworkManagerInstalled {
 	sudo dpkg -l | grep -v  network-manager- | grep network-manager | wc -l
 }
 NetworkManagerInstalled=$(CheckNetworkManagerInstalled)
+
+function CheckLxcNetRunning {
+        sudo systemctl | grep lxc-net | grep 'loaded active exited' | wc -l
+}
+LxcNetRunning=$(CheckLxcNetRunning)
 
 function CheckSystemdResolvedInstalled {
 	sudo netstat -ulnp | grep 53 | sed 's/  */ /g' | rev | cut -f1 -d'/' | rev | sort -u | grep systemd- | wc -l
@@ -825,7 +834,7 @@ then
 	echo ''
 
 	sudo lxc-attach -n nsa -- sudo apt-get -y update
-	sudo lxc-attach -n nsa -- sudo apt-get -y install bind9 isc-dhcp-server bind9utils dnsutils openssh-server
+	sudo lxc-attach -n nsa -- sudo apt-get -y install bind9 isc-dhcp-server bind9utils dnsutils openssh-server man awscli sshpass
 
 	sleep 2
 
@@ -890,6 +899,11 @@ sudo tar -P -xvf /home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/ub
 if	[ $SystemdResolvedInstalled -eq 0 ]
 then
 	sudo rm /etc/systemd/resolved.conf
+else
+	sudo sed -i "s/orabuntu-lxc\.com/$Domain1/g"		/etc/systemd/resolved.conf
+	sudo sed -i "s/consultingcommandos\.us/$Domain2/g"	/etc/systemd/resolved.conf
+	sudo sed -i "s/orabuntu-lxc\.com/$Domain1/g"		/run/systemd/resolve/stub-resolv.conf
+	sudo sed -i "s/consultingcommandos\.us/$Domain2/g"	/run/systemd/resolve/stub-resolv.conf
 fi
 
 echo ''
@@ -1199,6 +1213,10 @@ then
 			sudo sed -i "/nsa/s/nsa/$NameServer/g" /var/lib/lxc/nsa/config
 			sudo sed -i "/nsa/s/nsa/$NameServer/g" /var/lib/lxc/nsa/rootfs/etc/hostname
 			sudo sed -i "/nsa/s/nsa/$NameServer/g" /var/lib/lxc/nsa/rootfs/etc/hosts
+			sudo sed -i "/nsa/s/nsa/$NameServer/g" /var/lib/lxc/nsa/rootfs/root/crontab.txt
+			sudo sed -i "/nsa/s/nsa/$NameServer/g" /var/lib/lxc/nsa/rootfs/root/ns_backup_update.lst
+			sudo sed -i "/nsa/s/nsa/$NameServer/g" /var/lib/lxc/nsa/rootfs/root/ns_backup_update.sh
+			sudo sed -i "/nsa/s/nsa/$NameServer/g" /var/lib/lxc/nsa/rootfs/root/ns_backup.start.sh
 			sudo sed -i "/nsa/s/nsa/$NameServer/g" /etc/network/openvswitch/strt_nsa.sh
 			sudo mv /var/lib/lxc/nsa /var/lib/lxc/$NameServer
 			sudo mv /etc/network/if-up.d/openvswitch/nsa-pub-ifup-sw1 /etc/network/if-up.d/openvswitch/$NameServer-pub-ifup-sw1
@@ -1225,6 +1243,7 @@ then
 			fi
 			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /etc/network/openvswitch/crt_ovs_sw1.sh
 			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /etc/systemd/resolved.conf
+			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /run/systemd/resolve/stub-resolv.conf
 			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/etc/bind/named.conf.local
 			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/etc/dhcp/dhcpd.conf
 			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/etc/network/interfaces
@@ -1244,6 +1263,7 @@ then
 			fi
 			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /etc/network/openvswitch/crt_ovs_sw1.sh
 			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /etc/systemd/resolved.conf
+			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /run/systemd/resolve/stub-resolv.conf
 			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /var/lib/lxc/$NameServer/rootfs/etc/bind/named.conf.local
 			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /var/lib/lxc/$NameServer/rootfs/etc/dhcp/dhcpd.conf
 			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /var/lib/lxc/$NameServer/rootfs/etc/network/interfaces
@@ -1255,7 +1275,9 @@ then
 	# Cleanup duplicate search lines in /etc/resolv.conf if Orabuntu-LXC has been re-run
 	if [ $NetworkManagerInstalled -eq 1 ]
 	then
-		sudo sed -i '$!N; /^\(.*\)\n\1$/!P; D' /etc/resolv.conf
+		sudo sed -i '$!N; /^\(.*\)\n\1$/!P; D'	/etc/resolv.conf
+		sed -i '/orabuntu/d'			/etc/resolv.conf
+		sed -i '/consultingcommandos/d'		/etc/resolv.conf
 	fi
 
 	sudo cat /etc/resolv.conf
@@ -1395,15 +1417,64 @@ fi
 
 sudo chmod 755 /etc/network/openvswitch/*.sh
 
+if [ $MultiHostVar3 = 'X' ]
+then
+        echo ''
+        echo "=============================================="
+        echo "Get sx1 IP address...                         "
+        echo "=============================================="
+        echo ''
+
+        Sx1Index=10
+        function CheckHighestSx1IndexHit {
+                sshpass -p ubuntu ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 nslookup -timeout=1 10.207.29.$Sx1Index | grep 'name =' | wc -l
+        }
+        HighestSx1IndexHit=$(CheckHighestSx1IndexHit)
+
+        while [ $HighestSx1IndexHit = 1 ]
+        do
+                Sx1Index=$((Sx1Index+1))
+                HighestSx1IndexHit=$(CheckHighestSx1IndexHit)
+        done
+
+        sleep 5
+
+        clear
+
+        echo ''
+        echo "=============================================="
+        echo "Get sw1 IP address.                           "
+        echo "=============================================="
+        echo ''
+
+        Sw1Index=10
+        function CheckHighestSw1IndexHit {
+                sshpass -p ubuntu ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 nslookup -timeout=1 10.207.39.$Sw1Index | grep 'name =' | wc -l
+        }
+        HighestSw1IndexHit=$(CheckHighestSw1IndexHit)
+
+        while [ $HighestSw1IndexHit = 1 ]
+        do
+                Sw1Index=$((Sw1Index+1))
+                HighestSw1IndexHit=$(CheckHighestSw1IndexHit)
+        done
+
+        sleep 5
+
+        clear
+else
+        Sw1Index=$Sw1Index
+        Sx1Index=$Sw1Index
+fi
+
+sleep 5
+
+clear
+
 if   [ $UbuntuMajorVersion -ge 16 ]
 then
-	function GetMultiHostVar3 {
-		echo $MultiHost | cut -f3 -d':'
-	}
-	MultiHostVar3=$(GetMultiHostVar3)
-
-	sudo sed -i "s/SWITCH_IP/$MultiHostVar3/g" /etc/network/openvswitch/crt_ovs_sx1.sh
-	sudo sed -i "s/SWITCH_IP/$MultiHostVar3/g" /etc/network/openvswitch/crt_ovs_sw1.sh
+	sudo sed -i "s/SWITCH_IP/$Sx1Index/g" /etc/network/openvswitch/crt_ovs_sx1.sh
+	sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw1.sh
 
 	SwitchList='sw1 sx1'
 	for k in $SwitchList
@@ -1747,12 +1818,14 @@ if [ $MultiHostVar2 = 'N' ]
 then
 	echo ''
 	echo "=============================================="
-	echo "Starting LXC DNS container and testing DNS... "
+	echo "Start LXC DNS DHCP container...               "
 	echo "=============================================="
 	echo ''
 
 	if [ -n $NameServer ]
 	then
+		sudo service sw1 restart
+		sudo service sx1 restart
 		sudo lxc-stop  -n $NameServer >/dev/null 2>&1
 		sudo lxc-start -n $NameServer >/dev/null 2>&1
 		if [ $SystemdResolvedInstalled -eq 1 ]
@@ -1764,17 +1837,10 @@ then
 		then
 			echo "DNS is NOT RUNNING with correct status!"
 		fi
-	else
-		sudo lxc-start -n nsa > /dev/null 2>&1
-		nslookup nsa.$Domain
-		if [ $? -ne 0 ]
-		then
-			echo "DNS is NOT RUNNING with correct status!"
-		fi
 	fi
 
 	echo "=============================================="
-	echo "LXC container restarted & DNS tested.         "
+	echo "Done: Start LXC DNS DHCP container.           "
 	echo "=============================================="
 fi
 
@@ -1790,21 +1856,14 @@ echo ''
 
 if [ $MultiHostVar2 = 'N' ]
 then
-	function GetMultiHostVar3 {
-		echo $MultiHost | cut -f3 -d':'
-	}
-	MultiHostVar3=$(GetMultiHostVar3)
-
-#	GLS 20170904 Switches sx1 and sw1 are set earlier so they are not set here.
-
-	sudo sed -i "s/SWITCH_IP/$MultiHostVar3/g" /etc/network/openvswitch/crt_ovs_sw2.sh
-	sudo sed -i "s/SWITCH_IP/$MultiHostVar3/g" /etc/network/openvswitch/crt_ovs_sw3.sh
-	sudo sed -i "s/SWITCH_IP/$MultiHostVar3/g" /etc/network/openvswitch/crt_ovs_sw4.sh
-	sudo sed -i "s/SWITCH_IP/$MultiHostVar3/g" /etc/network/openvswitch/crt_ovs_sw5.sh
-	sudo sed -i "s/SWITCH_IP/$MultiHostVar3/g" /etc/network/openvswitch/crt_ovs_sw6.sh
-	sudo sed -i "s/SWITCH_IP/$MultiHostVar3/g" /etc/network/openvswitch/crt_ovs_sw7.sh
-	sudo sed -i "s/SWITCH_IP/$MultiHostVar3/g" /etc/network/openvswitch/crt_ovs_sw8.sh
-	sudo sed -i "s/SWITCH_IP/$MultiHostVar3/g" /etc/network/openvswitch/crt_ovs_sw9.sh
+	sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw2.sh
+	sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw3.sh
+	sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw4.sh
+	sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw5.sh
+	sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw6.sh
+	sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw7.sh
+	sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw8.sh
+	sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw9.sh
 
 	echo ''
 	echo "=============================================="
@@ -1814,7 +1873,7 @@ then
 
 	sudo tar -P -xvf /home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/scst-files.tar --touch -C /home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives
 	sleep 2
-	sudo sed -i "s/SWITCH_IP/$MultiHostVar3/g" /home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/scst-files/create-scst-oracle.sh
+	sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/scst-files/create-scst-oracle.sh
 		
 	echo ''
 	echo "=============================================="
@@ -1834,7 +1893,6 @@ then
 
 	sudo lxc-attach -n $NameServer -- usermod --password `perl -e "print crypt('ubuntu','ubuntu');"` ubuntu
 	ssh-keygen -f "/home/ubuntu/.ssh/known_hosts" -R 10.207.39.2
-#	sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ubuntu@10.207.39.2 "ssh-keygen -f ~/.ssh/id_rsa -t rsa -N ''"
 	sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ubuntu@10.207.39.2 "date; uname -a"
 	
 	echo ''
@@ -1842,30 +1900,42 @@ then
 	echo "Done: Set ubuntu password in $NameServer.     "
 	echo "=============================================="
 
+	sleep 5
+
+	clear
+
+	echo ''
+	echo "=============================================="
+	echo "Configure jobs in $NameServer...              "
+	echo "=============================================="
+	echo ''
+
+	sudo lxc-attach -n $NameServer -- crontab /root/crontab.txt
+	sudo lxc-attach -n $NameServer -- crontab -l
+	sudo lxc-attach -n $NameServer -- systemctl enable dns-sync
+	
+	echo ''
+	echo "=============================================="
+	echo "Done: Configure jobs in $NameServer.          "
+	echo "=============================================="
 fi
+
+sleep 5
+
+clear
 
 if [ $MultiHostVar2 = 'Y' ]
 then
-	function GetMultiHostVar2 {
-		echo $MultiHost | cut -f2 -d':'
-	}
-	MultiHostVar2=$(GetMultiHostVar2)
-
-	function GetMultiHostVar3 {
-		echo $MultiHost | cut -f3 -d':'
-	}
-	MultiHostVar3=$(GetMultiHostVar3)
-
 #	GLS 20170904 Switches sx1 and sw1 are set earlier (around lines 1988,1989) so they are not set here.
 
-	sudo sed -i "s/SWITCH_IP/$MultiHostVar3/g" /etc/network/openvswitch/crt_ovs_sw2.sh
-	sudo sed -i "s/SWITCH_IP/$MultiHostVar3/g" /etc/network/openvswitch/crt_ovs_sw3.sh
-	sudo sed -i "s/SWITCH_IP/$MultiHostVar3/g" /etc/network/openvswitch/crt_ovs_sw4.sh
-	sudo sed -i "s/SWITCH_IP/$MultiHostVar3/g" /etc/network/openvswitch/crt_ovs_sw5.sh
-	sudo sed -i "s/SWITCH_IP/$MultiHostVar3/g" /etc/network/openvswitch/crt_ovs_sw6.sh
-	sudo sed -i "s/SWITCH_IP/$MultiHostVar3/g" /etc/network/openvswitch/crt_ovs_sw7.sh
-	sudo sed -i "s/SWITCH_IP/$MultiHostVar3/g" /etc/network/openvswitch/crt_ovs_sw8.sh
-	sudo sed -i "s/SWITCH_IP/$MultiHostVar3/g" /etc/network/openvswitch/crt_ovs_sw9.sh
+	sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw2.sh
+	sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw3.sh
+	sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw4.sh
+	sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw5.sh
+	sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw6.sh
+	sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw7.sh
+	sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw8.sh
+	sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw9.sh
 	
 	echo ''
 	echo "=============================================="
@@ -1874,7 +1944,7 @@ then
 	echo ''
 
 	sudo tar -P -xvf /home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/scst-files.tar -C /home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives	
-	sudo sed -i "s/SWITCH_IP/$MultiHostVar3/g" /home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/scst-files/create-scst-oracle.sh
+	sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/scst-files/create-scst-oracle.sh
 		
 	echo ''
 	echo "=============================================="
@@ -1885,14 +1955,6 @@ then
 	sleep 5
 
 	clear
-
-#	sudo route add -net 192.220.39.0/24 gw 10.207.39.$MultiHostVar3 dev sw1 >/dev/null 2>&1
-#	sudo route add -net 192.221.39.0/24 gw 10.207.39.$MultiHostVar3 dev sw1 >/dev/null 2>&1
-# 	sudo route add -net 192.222.39.0/24 gw 10.207.39.$MultiHostVar3 dev sw1 >/dev/null 2>&1
-#  	sudo route add -net 192.223.39.0/24 gw 10.207.39.$MultiHostVar3 dev sw1 >/dev/null 2>&1
-#  	sudo route add -net 172.230.40.0/24 gw 10.207.39.$MultiHostVar3 dev sw1 >/dev/null 2>&1
-#  	sudo route add -net 172.231.40.0/24 gw 10.207.39.$MultiHostVar3 dev sw1 >/dev/null 2>&1
-#   	sudo route add -net 10.207.39.0/24  gw 10.207.39.$MultiHostVar3 dev sw1 >/dev/null 2>&1
 
 	function GetMultiHostVar5 {
 	echo $MultiHost | cut -f5 -d':'
@@ -1906,118 +1968,216 @@ then
 
 	if [ $GRE = 'Y' ]
 	then
-		sudo sed -i "/route add -net/s/#/ /"				/etc/network/openvswitch/crt_ovs_sw1.sh	
-		sudo sed -i "/REMOTE_GRE_ENDPOINT/s/#/ /"			/etc/network/openvswitch/crt_ovs_sw1.sh	
-		sudo sed -i "s/REMOTE_GRE_ENDPOINT/$MultiHostVar5/g"		/etc/network/openvswitch/crt_ovs_sw1.sh
+                sudo sed -i "/route add -net/s/#/ /"                            /etc/network/openvswitch/crt_ovs_sw1.sh
+                sudo sed -i "/REMOTE_GRE_ENDPOINT/s/#/ /"                       /etc/network/openvswitch/crt_ovs_sw1.sh
+                sudo sed -i "s/REMOTE_GRE_ENDPOINT/$MultiHostVar5/g"            /etc/network/openvswitch/crt_ovs_sw1.sh
 
-		function CheckGre0Exists {
-			sudo ovs-vsctl show | grep gre$MultiHostVar3 | wc -l
-		}
-		Gre0Exists=$(CheckGre0Exists)
+#                function GetGrePortName {
+#                        sudo ovs-vsctl show | grep -B3 "$MultiHostVar5" | grep Port | sed 's/  *//g' | cut -f2 -d'"'
+#                }
+#                GrePortName=$(GetGrePortName)
 
-		if [ $Gre0Exists -gt 0 ]
-		then
-			sudo ovs-vsctl del-port gre$MultiHostVar3
-		fi
+#                function GetGrePortNameStringLen {
+#                        echo $GrePortName | wc -c
+#                }
+#                GrePortNameStringLen=$(GetGrePortNameStringLen)
 
-#		function CheckGre1Exists {
-#			sudo ovs-vsctl show | grep gre1 | wc -l
-#		}
-#		Gre1Exists=$(CheckGre1Exists)
+#                if [ $GrePortNameStringLen -gt 1 ]
+#                then
+#                        function CheckGreExists {
+#                                sudo ovs-vsctl show | grep $GrePortName | wc -l
+#                        }
+#                        GreExists=$(CheckGreExists)
 
-#		if [ $Gre1Exists -gt 0 ]
-#		then
-#			sudo ovs-vsctl del-port gre1
-#		fi
+#                       if [ $GreExists -gt 0 ]
+#                       then
+#                               sudo ovs-vsctl del-port $GrePortName
+#                       fi
+#                fi
 
-		sudo ovs-vsctl add-port sw1 gre$MultiHostVar3 -- set interface gre$MultiHostVar3 type=gre options:remote_ip=$MultiHostVar5
+                sudo ovs-vsctl add-port sw1 gre$Sw1Index -- set interface gre$Sw1Index type=gre options:remote_ip=$MultiHostVar5
 
-		sudo cp -p /etc/network/openvswitch/setup_gre_and_routes.sh /etc/network/openvswitch/setup_gre_and_routes_$HOSTNAME_$MultiHostVar3.sh
+                sudo ovs-vsctl show | grep -A1 -B2 'type: gre' | grep -B4 "$MultiHostVar5" | sed 's/^[ \t]*//;s/[ \t]*$//'
 
- 		sudo sed -i "s/MultiHostVar6/$MultiHostVar6/g" 	/etc/network/openvswitch/setup_gre_and_routes_$HOSTNAME_$MultiHostVar3.sh
- 		sudo sed -i "s/MultiHostVar3/$MultiHostVar3/g" 	/etc/network/openvswitch/setup_gre_and_routes_$HOSTNAME_$MultiHostVar3.sh
-#		sudo sed -i "s/MHV3/MultiHostVar3/g"		/etc/network/openvswitch/setup_gre_and_routes_$HOSTNAME_$MultiHostVar3.sh
-#		sudo sed -i "s/MHV6/MultiHostVar6/g"		/etc/network/openvswitch/setup_gre_and_routes_$HOSTNAME_$MultiHostVar3.sh
+                sudo cp -p /etc/network/openvswitch/setup_gre_and_routes.sh /etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
 
- 		echo ''
- 		echo "=============================================="
- 		echo "Setup GRE & Routes on $MultiHostVar5...       "
- 		echo "=============================================="
- 		echo ''
-	
-#		sudo service sw1 restart
-#		sudo service sx1 restart
+                sudo sed -i "s/MultiHostVar6/$MultiHostVar6/g"  /etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
+                sudo sed -i "s/MultiHostVar3/$Sw1Index/g"       /etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
 
- 		sudo chmod 777 /etc/network/openvswitch/setup_gre_and_routes_$HOSTNAME_$MultiHostVar3.sh
+                sudo chmod 777 /etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
 
- 		ssh-keygen -f "/home/ubuntu/.ssh/known_hosts" -R $MultiHostVar5
- 		sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 date
- 		if [ $? -eq 0 ]
- 		then
- 			sshpass -p ubuntu scp -p /etc/network/openvswitch/setup_gre_and_routes_$HOSTNAME_$MultiHostVar3.sh ubuntu@$MultiHostVar5:~/.
- 		fi
- 		sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 "sudo -S <<< "ubuntu" ls -l ~/setup_gre_and_routes_$HOSTNAME_$MultiHostVar3.sh"
- 		if [ $? -eq 0 ]
- 		then
- 			sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 "sudo -S <<< "ubuntu" ~/setup_gre_and_routes_$HOSTNAME_$MultiHostVar3.sh"
-#			sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 "sudo -S <<< "ubuntu" service sw1 restart"
-#			sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 "sudo -S <<< "ubuntu" /etc/orabuntu-lxc-scripts/stop_containers.sh"
-#			sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 "sudo -S <<< "ubuntu" /etc/orabuntu-lxc-scripts/start_containers.sh"
- 		fi
+                sleep 5
 
-		function GetShortHost {
-			uname -n | cut -f1 -d'.'
-		}
-		ShortHost=$(GetShortHost)
+                clear
 
-		nslookup -timeout=1 $HOSTNAME.$Domain1 > /dev/null 2>&1
-		if [ $? -eq 1 ]
-		then		
-			echo ''
-			echo "=============================================="
-			echo "Create ADD DNS $Domain1 $ShortHost...         "
-			echo "=============================================="
-			echo ''
+                echo ''
+                echo "=============================================="
+                echo "Setup GRE & Routes on $MultiHostVar5...       "
+                echo "=============================================="
+                echo ''
 
-			sudo sh -c "echo 'echo \"server 10.207.39.2'								    		>  /etc/network/openvswitch/nsupdate_domain1_add_$ShortHost.sh"
-			sudo sh -c "echo 'update add $ShortHost.orabuntu-lxc.com 3600 IN A 10.207.39.$MultiHostVar3'		    		>> /etc/network/openvswitch/nsupdate_domain1_add_$ShortHost.sh"
-			sudo sh -c "echo 'send'											    		>> /etc/network/openvswitch/nsupdate_domain1_add_$ShortHost.sh"
-			sudo sh -c "echo 'update add $MultiHostVar3.39.207.10.in-addr.arpa 3600 IN PTR $ShortHost.orabuntu-lxc.com' 		>> /etc/network/openvswitch/nsupdate_domain1_add_$ShortHost.sh"
-			sudo sh -c "echo 'send'											    		>> /etc/network/openvswitch/nsupdate_domain1_add_$ShortHost.sh"
-			sudo sh -c "echo 'quit'											    		>> /etc/network/openvswitch/nsupdate_domain1_add_$ShortHost.sh"
-			sudo sh -c "echo '\" | nsupdate -k /etc/bind/rndc.key'							    		>> /etc/network/openvswitch/nsupdate_domain1_add_$ShortHost.sh"
+#               sudo service sw1 restart
+#               sudo service sx1 restart
 
-			sudo chmod 777 					/etc/network/openvswitch/nsupdate_domain1_add_$ShortHost.sh
-			sudo ls -l     					/etc/network/openvswitch/nsupdate_domain1_add_$ShortHost.sh
-			sudo sed -i "s/orabuntu-lxc\.com/$Domain1/g"	/etc/network/openvswitch/nsupdate_domain1_add_$ShortHost.sh
-		fi
-		
-		nslookup -timeout=1 $HOSTNAME.$Domain2 > /dev/null 2>&1
-		if [ $? -eq 1 ]
-		then		
-			echo ''
-			echo "=============================================="
-			echo "Create ADD DNS $Domain2 $ShortHost...         "
-			echo "=============================================="
-			echo ''
+                ssh-keygen -f "/home/ubuntu/.ssh/known_hosts" -R $MultiHostVar5
+                sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 date
+                if [ $? -eq 0 ]
+                then
+                        sshpass -p ubuntu scp -p /etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh ubuntu@$MultiHostVar5:~/.
+                fi
+                sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 "sudo -S <<< "ubuntu" ls -l ~/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh"
+                if [ $? -eq 0 ]
+                then
+                        sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 "sudo -S <<< "ubuntu" ~/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh"
+                fi
 
-			sudo sh -c "echo 'echo \"server 10.207.29.2'								    		>  /etc/network/openvswitch/nsupdate_domain2_add_$ShortHost.sh"
-			sudo sh -c "echo 'update add $ShortHost.consultingcommandos.us 3600 IN A 10.207.29.$MultiHostVar3'		    	>> /etc/network/openvswitch/nsupdate_domain2_add_$ShortHost.sh"
-			sudo sh -c "echo 'send'											    		>> /etc/network/openvswitch/nsupdate_domain2_add_$ShortHost.sh"
-			sudo sh -c "echo 'update add $MultiHostVar3.29.207.10.in-addr.arpa 3600 IN PTR $ShortHost.consultingcommandos.us' 	>> /etc/network/openvswitch/nsupdate_domain2_add_$ShortHost.sh"
-			sudo sh -c "echo 'send'											    		>> /etc/network/openvswitch/nsupdate_domain2_add_$ShortHost.sh"
-			sudo sh -c "echo 'quit'											    		>> /etc/network/openvswitch/nsupdate_domain2_add_$ShortHost.sh"
-			sudo sh -c "echo '\" | nsupdate -k /etc/bind/rndc.key'							    		>> /etc/network/openvswitch/nsupdate_domain2_add_$ShortHost.sh"
+                echo ''
+                echo "=============================================="
+                echo "Done: Setup GRE & Routes on $MultiHostVar5.   "
+                echo "=============================================="
+                echo ''
 
-			sudo chmod 777 						/etc/network/openvswitch/nsupdate_domain2_add_$ShortHost.sh
-			sudo ls -l     						/etc/network/openvswitch/nsupdate_domain2_add_$ShortHost.sh
-			sudo sed -i "s/consultingcommandos\.us/$Domain2/g"	/etc/network/openvswitch/nsupdate_domain2_add_$ShortHost.sh
-		fi
-	fi
+                sleep 5
+
+                clear
+
+                function GetShortHost {
+                        uname -n | cut -f1 -d'.'
+                }
+                ShortHost=$(GetShortHost)
+
+		sudo ifconfig sw1 mtu 1420
+		sudo ifconfig sx1 mtu 1420
+
+                nslookup -timeout=1 $HOSTNAME.$Domain1 > /dev/null 2>&1
+                if [ $? -eq 1 ]
+                then
+                        echo ''
+                        echo "=============================================="
+                        echo "Create ADD DNS $ShortHost.$Domain1...         "
+                        echo "=============================================="
+                        echo ''
+
+                        sudo sh -c "echo 'echo \"server 10.207.39.2'                                                                            >  /etc/network/openvswitch/nsupdate_domain1_add_$ShortHost.sh"
+                        sudo sh -c "echo 'update add $ShortHost.orabuntu-lxc.com 3600 IN A 10.207.39.$Sw1Index'                                 >> /etc/network/openvswitch/nsupdate_domain1_add_$ShortHost.sh"
+                        sudo sh -c "echo 'send'                                                                                                 >> /etc/network/openvswitch/nsupdate_domain1_add_$ShortHost.sh"
+                        sudo sh -c "echo 'update add $Sw1Index.39.207.10.in-addr.arpa 3600 IN PTR $ShortHost.orabuntu-lxc.com'                  >> /etc/network/openvswitch/nsupdate_domain1_add_$ShortHost.sh"
+                        sudo sh -c "echo 'send'                                                                                                 >> /etc/network/openvswitch/nsupdate_domain1_add_$ShortHost.sh"
+                        sudo sh -c "echo 'quit'                                                                                                 >> /etc/network/openvswitch/nsupdate_domain1_add_$ShortHost.sh"
+                        sudo sh -c "echo '\" | nsupdate -k /etc/bind/rndc.key'                                                                  >> /etc/network/openvswitch/nsupdate_domain1_add_$ShortHost.sh"
+
+                        sudo chmod 777                                          /etc/network/openvswitch/nsupdate_domain1_add_$ShortHost.sh
+                        sudo ls -l                                              /etc/network/openvswitch/nsupdate_domain1_add_$ShortHost.sh
+                        sudo sed -i "s/orabuntu-lxc\.com/$Domain1/g"            /etc/network/openvswitch/nsupdate_domain1_add_$ShortHost.sh
+
+                        ssh-keygen -f "/home/ubuntu/.ssh/known_hosts" -R 10.207.39.2
+                        sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.39.2 "sudo -S <<< "ubuntu" mkdir -p ~/Downloads"
+                        sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.39.2 "sudo -S <<< "ubuntu" chown ubuntu:ubuntu Downloads"
+                        sshpass -p ubuntu scp    -o CheckHostIP=no -o StrictHostKeyChecking=no -p /etc/network/openvswitch/nsupdate_domain1_add_$ShortHost.sh ubuntu@10.207.39.2:~/Downloads/.
+                        sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.39.2 "sudo -S <<< "ubuntu" ~/Downloads/nsupdate_domain1_add_$ShortHost.sh"
+
+                        echo ''
+                        echo "=============================================="
+                        echo "Done: Create ADD DNS $ShortHost.$Domain1      "
+                        echo "=============================================="
+                        echo ''
+
+                        sleep 5
+
+                        clear
+
+                fi
+
+                nslookup -timeout=1 $HOSTNAME.$Domain2 > /dev/null 2>&1
+                if [ $? -eq 1 ]
+                then
+                        echo ''
+                        echo "=============================================="
+                        echo "Create ADD DNS $ShortHost.$Domain2 ...        "
+                        echo "=============================================="
+                        echo ''
+
+                        sudo sh -c "echo 'echo \"server 10.207.29.2'                                                                            >  /etc/network/openvswitch/nsupdate_domain2_add_$ShortHost.sh"
+                        sudo sh -c "echo 'update add $ShortHost.consultingcommandos.us 3600 IN A 10.207.29.$Sx1Index'                           >> /etc/network/openvswitch/nsupdate_domain2_add_$ShortHost.sh"
+                        sudo sh -c "echo 'send'                                                                                                 >> /etc/network/openvswitch/nsupdate_domain2_add_$ShortHost.sh"
+                        sudo sh -c "echo 'update add $Sx1Index.29.207.10.in-addr.arpa 3600 IN PTR $ShortHost.consultingcommandos.us'            >> /etc/network/openvswitch/nsupdate_domain2_add_$ShortHost.sh"
+                        sudo sh -c "echo 'send'                                                                                                 >> /etc/network/openvswitch/nsupdate_domain2_add_$ShortHost.sh"
+                        sudo sh -c "echo 'quit'                                                                                                 >> /etc/network/openvswitch/nsupdate_domain2_add_$ShortHost.sh"
+                        sudo sh -c "echo '\" | nsupdate -k /etc/bind/rndc.key'                                                                  >> /etc/network/openvswitch/nsupdate_domain2_add_$ShortHost.sh"
+
+                        sudo chmod 777                                          /etc/network/openvswitch/nsupdate_domain2_add_$ShortHost.sh
+                        sudo ls -l                                              /etc/network/openvswitch/nsupdate_domain2_add_$ShortHost.sh
+                        sudo sed -i "s/consultingcommandos\.us/$Domain2/g"      /etc/network/openvswitch/nsupdate_domain2_add_$ShortHost.sh
+
+                        ssh-keygen -f "/home/ubuntu/.ssh/known_hosts" -R 10.207.29.2
+                        sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.29.2 "sudo -S <<< "ubuntu" mkdir -p ~/Downloads"
+                        sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.29.2 "sudo -S <<< "ubuntu" chown ubuntu:ubuntu Downloads"
+                        sshpass -p ubuntu scp    -o CheckHostIP=no -o StrictHostKeyChecking=no -p /etc/network/openvswitch/nsupdate_domain2_add_$ShortHost.sh ubuntu@10.207.29.2:~/Downloads/.
+                        sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.29.2 "sudo -S <<< "ubuntu" ~/Downloads/nsupdate_domain2_add_$ShortHost.sh"
+
+                        echo ''
+                        echo "=============================================="
+                        echo "Done: Create ADD DNS $ShortHost.$Domain2      "
+                        echo "=============================================="
+                        echo ''
+
+                        sleep 5
+
+                        clear
+                fi
+        fi
+fi
+
+if [ $SystemdResolvedInstalled -ge 1 ]
+then
+        echo ''
+        echo "=============================================="
+        echo "Restart systemd-resolved...                   "
+        echo "=============================================="
+        echo ''
+
+        sudo service systemd-resolved restart
+        sleep 2
+        systemd-resolve --status | head -6 | tail -5
+
+        echo ''
+        echo "=============================================="
+        echo "Done: Restart systemd-resolved.               "
+        echo "=============================================="
+        echo ''
+
+        sleep 5
+
+        clear
+
+elif [ $LxcNetRunning -ge 1 ]
+then
+        echo ''
+        echo "=============================================="
+        echo "Restart service lxc-net...                    "
+        echo "=============================================="
+        echo ''
+
+        sudo service lxc-net restart
+        sleep 2
+        sudo service lxc-net status
+
+        echo ''
+        echo "=============================================="
+        echo "Done: Restart service lxc-net.                "
+        echo "=============================================="
+        echo ''
+
+        sleep 5
+
+        clear
 fi
 
 # GLS 20161118 This section for any tweaks to the unpacked files from archives.
-sudo rm /etc/network/if-up.d/orabuntu-lxc-net
+if [ $UbuntuMajorVersion -ge 16 ]
+then
+	sudo rm /etc/network/if-up.d/orabuntu-lxc-net
+fi
 
 echo ''
 echo "=============================================="
