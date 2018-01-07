@@ -212,14 +212,14 @@ echo ''
 MajorRelease=$1
 if [ -z $1 ]
 then
-	MajorRelease=7
+	MajorRelease=5
 fi
 echo 'Oracle Linux MajorRelease = '$MajorRelease
 
 PointRelease=$2
 if [ -z $2 ]
 then
-	PointRelease=3
+	PointRelease=9
 fi
 echo 'Oracle Linux PointRelease = '$PointRelease
 
@@ -270,8 +270,8 @@ then
 
 	# Additional Orabuntu-LXC physical hosts (physical or virtual  hosts over GRE)
 
-	#MultiHost="new:Y:253:$SudoPassword:192.168.1.10:192.168.1.16:1420:ubuntu:ubuntu:$GRE"
-	 MultiHost="reinstall:Y:X:$SudoPassword:192.168.1.10:192.168.1.16:1420:ubuntu:ubuntu:$GRE"
+	#MultiHost="new:Y:X:$SudoPassword:192.168.1.10:192.168.1.16:1420:ubuntu:ubuntu:$GRE"
+	#MultiHost="reinstall:Y:X:$SudoPassword:192.168.1.10:192.168.1.32:1420:ubuntu:ubuntu:$GRE"
 
 	# Additional Orabuntu-LXC virtual hosts (VM is on an Orabuntu-LXC physical host AND VM is on the Orabuntu-LXC OpenvSwitch network)
 	# VM is on the first Orabuntu-LXC physical host (MTU 1500)
@@ -290,7 +290,7 @@ then
 
 	# Adding additional Oracle Linux container release versions to an existing Orabuntu-LXC host (physical or virtual)
 
-	#MultiHost="addrelease:N:X:$SudoPassword:X:X:1500:X:X:$GRE"
+	 MultiHost="addrelease:N:X:$SudoPassword:X:X:1420:X:X:$GRE"
 fi
 echo 'MultiHost                 = '$MultiHost
 

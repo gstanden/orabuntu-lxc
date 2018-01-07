@@ -419,6 +419,8 @@ sudo sed -i 's/sw1/sx1/' /etc/network/if-up.d/openvswitch/oel$OracleRelease$Seed
 sudo sed -i 's/sw1/sx1/' /etc/network/if-down.d/openvswitch/oel$OracleRelease$SeedPostfix*
 sudo sed -i 's/tag=10/tag=11/' /etc/network/if-up.d/openvswitch/oel$OracleRelease$SeedPostfix*
 sudo sed -i 's/tag=10/tag=11/' /etc/network/if-down.d/openvswitch/oel$OracleRelease$SeedPostfix*
+sudo sed -i "s/mtu = 1500/mtu = $MultiHostVar7/" /var/lib/lxc/oel$OracleRelease$SeedPostfix/config
+sudo sed -i "s/MtuSetting/$MultiHostVar7/" 	 /var/lib/lxc/oel$OracleRelease$SeedPostfix/config
 
 if [ $ContainerUp != 'RUNNING' ] || [ $PublicIP != 1020729 ]
 then
