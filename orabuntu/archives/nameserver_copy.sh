@@ -56,6 +56,8 @@ function CheckScpProgress {
 }
 
 # nohup sshpass -p ubuntu scp -o CheckHostIP=no -o StrictHostKeyChecking=no -p ubuntu@$MultiHostVar5:~/Manage-Orabuntu/$NameServer.tar.gz ~/Manage-Orabuntu/. &
+sshpass -p ubuntu ssh -tt -o CheckHostIP=no -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ubuntu@$MultiHostVar5 "sudo -S <<< "ubuntu" tar -P -czf ~/Manage-Orabuntu/$NameServer.tar.gz -T ~/Downloads/orabuntu-lxc-master/uekulele/archives/nameserver.lst --checkpoint=10000 --totals"
+sleep 5
 rsync -hP --rsh="sshpass -p ubuntu ssh -l ubuntu" $MultiHostVar5:~/Manage-Orabuntu/$NameServer.tar.gz ~/Manage-Orabuntu/.
 
 # echo ''

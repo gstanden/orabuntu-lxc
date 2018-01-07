@@ -635,8 +635,8 @@ then
   		echo "Replicate nameserver $NameServer...           "
   		echo "=============================================="
   		echo ''
- 
-  		/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/archives/nameserver_copy.sh $MultiHostVar5 $MultiHostVar6 $NameServer
+  		
+		/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/archives/nameserver_copy.sh $MultiHostVar5 $MultiHostVar6 $NameServer
 	
   		echo ''
   		echo "=============================================="
@@ -656,19 +656,7 @@ then
 
                 ssh-keygen -f "/home/ubuntu/.ssh/known_hosts" -R 10.207.39.2
                 ssh-keygen -f "/home/ubuntu/.ssh/known_hosts" -R $NameServer
-		sshpass -p ubuntu scp -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.39.2:/home/ubuntu/gre_hosts.txt /home/ubuntu/Manage-Orabuntu/gre_hosts.txt
-		if [ $? -eq 0 ] && [ -s /home/ubuntu/Manage-Orabuntu/gre_hosts.txt ]
-		then
-			function GetGreHosts {
-				cat /home/ubuntu/Manage-Orabuntu/gre_hosts.txt | sed 's/$/ /' | tr -d '\n' | sed 's/^[ \t]*//;s/[ \t]*$//'
-			}
-			GreHosts=$(GetGreHosts)
-			for g in $GreHosts
-			do
-                		ssh-keygen -f "/home/ubuntu/.ssh/known_hosts" -R $g
-				sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$g "sudo -S <<< "ubuntu" lxc-stop -n $NameServer"
-			done
-		fi
+		sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.39.2 "sudo -S <<< "ubuntu" echo $HOSTNAME > /home/ubuntu/new_gre_host.txt"
 		sleep 5
 	
 		if   [ $SystemdResolvedInstalled -ge 1 ]
@@ -712,8 +700,6 @@ then
 			sleep 5
 		fi
                 
-		sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.39.2 "sudo -S <<< "ubuntu" echo $HOSTNAME > /home/ubuntu/new_gre_host.txt"
-
                 echo ''
                 echo "=============================================="
                 echo "Done: Configure replica nameserver $NameServer"

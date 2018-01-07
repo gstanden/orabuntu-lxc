@@ -1754,6 +1754,7 @@ then
                         sudo sed -i "/nsa/s/nsa/$NameServer/g" /var/lib/lxc/nsa/rootfs/root/ns_backup_update.lst
                         sudo sed -i "/nsa/s/nsa/$NameServer/g" /var/lib/lxc/nsa/rootfs/root/ns_backup_update.sh
                         sudo sed -i "/nsa/s/nsa/$NameServer/g" /var/lib/lxc/nsa/rootfs/root/ns_backup.start.sh
+                        sudo sed -i "/nsa/s/nsa/$NameServer/g" /var/lib/lxc/nsa/rootfs/root/dns-sync.sh
 
 			sudo sed -i "/nsa/s/nsa/$NameServer/g" /etc/network/openvswitch/strt_nsa.sh
 			sudo mv /var/lib/lxc/nsa /var/lib/lxc/$NameServer
@@ -2322,6 +2323,10 @@ then
 
 	sudo lxc-attach -n $NameServer -- crontab /root/crontab.txt
 	sudo lxc-attach -n $NameServer -- crontab -l
+	sudo lxc-attach -n $NameServer -- mkdir -p /root/backup-lxc-container/olive/updates
+	sudo lxc-attach -n $NameServer -- tar -cvzPf /root/backup-lxc-container/olive/updates/backup_olive_ns_update.tar.gz /root/ns_backup_update.lst
+	sudo tar -vP --extract --file=/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/archives/dns-dhcp-cont.tar /var/lib/lxc/nsa/rootfs/etc/systemd/system/dns-sync.service
+	sudo mv /var/lib/lxc/nsa/rootfs/etc/systemd/system/dns-sync.service /var/lib/lxc/$NameServer/rootfs/etc/systemd/system/dns-sync.service
 	sudo lxc-attach -n $NameServer -- systemctl enable dns-sync
                
 	echo ''

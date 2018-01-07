@@ -1,33 +1,29 @@
 #!/bin/bash
 
-#    Copyright 2015-2017 Gilbert Standen
-#    This file is part of orabuntu-lxc.
+#    Copyright 2015-2018 Gilbert Standen
+#    This file is part of Orabuntu-LXC.
 
-#    Orabuntu-lxc is free software: you can redistribute it and/or modify
+#    Orabuntu-LXC is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
 #    the Free Software Foundation, either version 3 of the License, or
 #    (at your option) any later version.
 
-#    Orabuntu-lxc is distributed in the hope that it will be useful,
+#    Orabuntu-LXC is distributed in the hope that it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
 #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #    GNU General Public License for more details.
 
 #    You should have received a copy of the GNU General Public License
-#    along with orabuntu-lxc.  If not, see <http://www.gnu.org/licenses/>.
+#    along with Orabuntu-LXC.  If not, see <http://www.gnu.org/licenses/>.
 
-#    v2.4 GLS 20151224
-#    v2.8 GLS 20151231
-#    v3.0 GLS 20160710 Updates for Ubuntu 16.04
-#    v4.0 GLS 20161025 DNS DHCP services moved into an LXC container
-#    v4.3 GLS 20161126 Additional enhancements for multi-distro (Redhat-based and Debian-based)
-#    v5.0 GLS 20170924 Orabuntu-LXC Multi-Host
+#    v2.4 	GLS 20151224
+#    v2.8 	GLS 20151231
+#    v3.0 	GLS 20160710 Updates for Ubuntu 16.04
+#    v4.0 	GLS 20161025 DNS DHCP services moved into an LXC container
+#    v5.0 	GLS 20170909 Orabuntu-LXC MultiHost
+#    v5.33-beta	GLS 20180106 Orabuntu-LXC EE MultiHost Docker AWS S3
 
-#    Usage:   anylinux-services-1.sh $major_version $minor_version $Domain1 $Domain2 $NameServer $OSMemRes
-#    Example: anylinux-services-1.sh 7 2 yourdomain1.[com|net|us|info|...] yourdomain2.[com|net|us|info|...] yournameserver MemoryReservation(Kb)
-#    Example: anylinux-services-1.sh 7 2 bostonlox.com realcrumpets.info nycnsa
-
-#    Note that this software builds a conntainerized DNS DHCP solution for the Ubuntu Desktop environment.
+#    Note that this software builds a containerized DNS DHCP solution (bind9 / isc-dhcp-server).
 #    The nameserver should NOT be the name of an EXISTING nameserver but an arbitrary name because this software is CREATING a new LXC-containerized nameserver.
 #    The domain names can be arbitrary fictional names or they can be a domain that you actually own and operate.
 #    There are two domains and two networks because the "seed" LXC containers are on a separate network from the production LXC containers.
