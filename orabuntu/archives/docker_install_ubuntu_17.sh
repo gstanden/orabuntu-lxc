@@ -53,7 +53,7 @@ echo "=============================================="
 echo ''
 
 sudo docker run -d -p 2200:22 raesene/alpine-nettools
-# sudo docker exec -ti <container_name> /bin/sh
+## sudo docker exec -ti <container_name> /bin/sh
 sleep 2
 sudo docker ps -a
 
