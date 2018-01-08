@@ -1277,8 +1277,8 @@ then
 	if [ $NetworkManagerInstalled -eq 1 ]
 	then
 		sudo sed -i '$!N; /^\(.*\)\n\1$/!P; D'	/etc/resolv.conf
-		sed -i '/orabuntu/d'			/etc/resolv.conf
-		sed -i '/consultingcommandos/d'		/etc/resolv.conf
+#		sudo sed -i '/orabuntu/d'		/etc/resolv.conf
+#		sudo sed -i '/consultingcommandos/d'	/etc/resolv.conf
 	fi
 
 	sudo cat /etc/resolv.conf
@@ -2002,7 +2002,19 @@ then
 
                 sudo ovs-vsctl add-port sw1 gre$Sw1Index -- set interface gre$Sw1Index type=gre options:remote_ip=$MultiHostVar5
 
+                echo ''
+                echo "=============================================="
+                echo "Show local GRE endpoint...                    "
+                echo "=============================================="
+                echo ''
+
                 sudo ovs-vsctl show | grep -A1 -B2 'type: gre' | grep -B4 "$MultiHostVar5" | sed 's/^[ \t]*//;s/[ \t]*$//'
+
+                echo ''
+                echo "=============================================="
+                echo "Done: Show local GRE endpoint.                "
+                echo "=============================================="
+                echo ''
 
                 sudo cp -p /etc/network/openvswitch/setup_gre_and_routes.sh /etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
 

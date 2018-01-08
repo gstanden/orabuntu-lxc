@@ -172,7 +172,6 @@ then
 
         for j in $ContainersExist
         do
-		echo ''
 		echo "=============================================="
 		echo "Display LXC Seed Container Name...            "
 		echo "=============================================="
