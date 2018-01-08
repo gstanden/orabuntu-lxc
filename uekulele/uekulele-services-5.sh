@@ -611,7 +611,7 @@ then
 		
 		if [ ! -e /home/ubuntu/Manage-Orabuntu ]
 		then
-			mkdir /home/ubuntu/Manage-Orabuntu
+			sudo mkdir -p /home/ubuntu/Manage-Orabuntu
 		fi
 		
 		sudo tar -P -czf ~/Manage-Orabuntu/$NameServer.tar.gz -T ~/Downloads/orabuntu-lxc-master/uekulele/archives/nameserver.lst --checkpoint=10000 --totals
@@ -922,6 +922,11 @@ then
 	echo "Management links directory creation...        "
 	echo "=============================================="
 	
+	if [ ! -e /home/ubuntu/Manage-Orabuntu ]
+	then
+		sudo mkdir -p /home/ubuntu/Manage-Orabuntu
+	fi
+		
 	cd /home/ubuntu/Manage-Orabuntu
 	sudo chmod 755 /etc/orabuntu-lxc-scripts/crt_links.sh
 	sudo /etc/orabuntu-lxc-scripts/crt_links.sh

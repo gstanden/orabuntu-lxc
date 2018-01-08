@@ -612,6 +612,12 @@ then
                 then
                         sudo lxc-copy  -n $NameServer -N "$NameServer"-bk0
                 fi
+	
+		if [ ! -e /home/ubuntu/Manage-Orabuntu ]
+		then
+			sudo mkdir -p /home/ubuntu/Manage-Orabuntu
+		fi
+	
                 sudo tar -P -czf ~/Manage-Orabuntu/$NameServer.tar.gz -T ~/Downloads/orabuntu-lxc-master/orabuntu/archives/nameserver.lst --checkpoint=10000 --totals
                 sudo lxc-start -n $NameServer
 
@@ -780,7 +786,7 @@ then
 	
 	if [ ! -e /home/ubuntu/Manage-Orabuntu ]
 	then
-		mkdir /home/ubuntu/Manage-Orabuntu
+		sudo mkdir -p /home/ubuntu/Manage-Orabuntu
 	fi
 	
 	cd /home/ubuntu/Manage-Orabuntu
