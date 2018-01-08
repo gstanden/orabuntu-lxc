@@ -275,7 +275,7 @@ then
 	# First Orabuntu-LXC host (physical or virtual):
 	# (Note:  values for first Orabuntu-LXC host should normally not be changed from the following)
 
-	 MultiHost="new:N:1:$SudoPassword:X:X:1500:X:X:$GRE"
+	#MultiHost="new:N:1:$SudoPassword:X:X:1500:X:X:$GRE"
 	#MultiHost="reinstall:N:1:$SudoPassword:X:X:1500:X:X:$GRE"
 
 	# Additional Orabuntu-LXC physical hosts (physical or virtual  hosts over GRE):
@@ -288,17 +288,17 @@ then
 
 	# Additional Orabuntu-LXC virtual hosts (VM is on an Orabuntu-LXC physical host AND VM is on the Orabuntu-LXC OpenvSwitch network):
 
-	# VM is on the first Orabuntu-LXC physical host (MTU 1500):
-	# (Note: Set GRE to "N" in this use case).
+		# VM is on the first Orabuntu-LXC physical host (MTU 1500):
+		# (Note: Set GRE to "N" in this use case).
 
-	#MultiHost="new:Y:X:$SudoPassword:X:X:1500:X:X:$GRE"
-	#MultiHost="reinstall:N:X:$SudoPassword:X:X:1500:X:X:$GRE"
+		#MultiHost="new:Y:X:$SudoPassword:X:X:1500:X:X:$GRE"
+		#MultiHost="reinstall:N:X:$SudoPassword:X:X:1500:X:X:$GRE"
 
-	# On GRE Orabuntu-LXC hosts (physical or virtual) (MTU 1420):
-	# (Note: Set GRE to "N" in this use case).
+		# VM is on a GRE Orabuntu-LXC hosts (physical or virtual) (MTU 1420):
+		# (Note: Set GRE to "N" in this use case).
 
-	#MultiHost="new:Y:X:$SudoPassword:X:X:1420:X:X:$GRE"
-	#MultiHost="reinstall:N:X:$SudoPassword:X:X:1420:X:X:$GRE"
+		 MultiHost="new:Y:X:$SudoPassword:X:X:1420:X:X:$GRE"
+		#MultiHost="reinstall:N:X:$SudoPassword:X:X:1420:X:X:$GRE"
 
 	# Adding additional clones of a specific Oracle Linux container release (seed Orabuntu-LXC container for that version must ALREADY exist)
 

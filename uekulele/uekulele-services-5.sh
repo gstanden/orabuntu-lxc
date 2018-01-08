@@ -106,7 +106,7 @@ NameServerExists=$(CheckNameServerExists)
 
 echo ''
 echo "=============================================="
-echo "Script: uekulele-services-5.sh                  "
+echo "Script: uekulele-services-5.sh                "
 echo "=============================================="
 echo ''
 echo "=============================================="
@@ -115,11 +115,37 @@ echo "=============================================="
 echo ''
 echo "=============================================="
 echo "This script starts lxc clones                 "
+echo "This script installs Docker                   "
 echo "=============================================="
 
 sleep 5
 
 clear
+
+if [ $MultiHostVar1 = 'new' ]
+then
+	echo ''
+	echo "=============================================="
+	echo "Install Docker...                             "
+	echo "=============================================="
+	echo ''
+	
+	sleep 5
+	
+	if [ $RedHatVersion -eq 7 ]
+	then
+		/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/archives/docker_install_oracle_7.sh
+	fi
+	
+	echo ''
+	echo "=============================================="
+	echo "Done: Install Docker.                         "
+	echo "=============================================="
+
+	sleep 5
+	
+	clear
+fi
 
 if [ $MultiHostVar1 = 'new' ] || [ $MultiHostVar1 = 'reinstall' ]
 then
@@ -856,31 +882,6 @@ then
 		echo "Set selinux to permissive & set rules.        "
 		echo "=============================================="
 	
-		sleep 5
-	
-		clear
-	fi
-
-	if [ $MultiHostVar1 = 'new' ]
-	then
-		echo ''
-		echo "=============================================="
-		echo "Install Docker...                             "
-		echo "=============================================="
-		echo ''
-	
-		sleep 5
-	
-		if [ $RedHatVersion -eq 7 ]
-		then
-			/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/archives/docker_install_oracle_7.sh
-		fi
-	
-		echo ''
-		echo "=============================================="
-		echo "Done: Install Docker.                         "
-		echo "=============================================="
-
 		sleep 5
 	
 		clear

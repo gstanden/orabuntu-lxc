@@ -106,7 +106,7 @@ NameServerExists=$(CheckNameServerExists)
 
 echo ''
 echo "=============================================="
-echo "Script: orabuntu-services-5.sh                  "
+echo "Script: orabuntu-services-5.sh                "
 echo "=============================================="
 echo ''
 echo "=============================================="
@@ -115,11 +115,38 @@ echo "=============================================="
 echo ''
 echo "=============================================="
 echo "This script starts LXC clones                 "
+echo "This script installs Docker                   "
 echo "=============================================="
 
 sleep 5
 
 clear
+
+if [ $MultiHostVar1 = 'new' ]
+then	
+	echo ''
+	echo "=============================================="
+	echo "Install Docker...                             "
+	echo "=============================================="
+	echo ''
+
+	sleep 5
+
+	if [ $UbuntuMajorVersion -ge 16 ]
+	then
+		/home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/docker_install_ubuntu.sh
+	fi
+
+	echo ''
+	echo "=============================================="
+	echo "Done: Install Docker.                         "
+	echo "=============================================="
+	echo ''
+
+	sleep 5
+
+	clear
+fi
 
 if [ $MultiHostVar1 = 'new' ] || [ $MultiHostVar1 = 'reinstall' ]
 then
@@ -297,7 +324,7 @@ then
 
 	sudo service lxc-net restart
 	sleep 2
-	sudo service lxc-net status
+	sudo service lxc-net status | cat
 
 	echo ''
 	echo "=============================================="
@@ -549,7 +576,7 @@ then
 
                 sudo service lxc-net restart
                 sleep 2
-                sudo service lxc-net status
+                sudo service lxc-net status | cat
 
                 echo ''
                 echo "=============================================="
@@ -693,7 +720,7 @@ then
 
                         sudo service lxc-net restart 
                         sleep 2
-                        sudo service lxc-net status
+                        sudo service lxc-net status | cat
 
                         echo ''
                         echo "=============================================="
@@ -708,32 +735,6 @@ then
                 echo "=============================================="
                 echo "Done: Configure replica nameserver $NameServer"
                 echo "=============================================="
-
-                sleep 5
-
-                clear
-        fi
-
-        if [ $MultiHostVar1 = 'new' ]
-	then	
-                echo ''
-                echo "=============================================="
-                echo "Install Docker...                             "
-                echo "=============================================="
-                echo ''
-
-                sleep 5
-
-		if [ $UbuntuMajorVersion -ge 16 ]
-		then
-			/home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/docker_install_ubuntu.sh
-                fi
-
-                echo ''
-                echo "=============================================="
-                echo "Done: Install Docker.                         "
-                echo "=============================================="
-                echo ''
 
                 sleep 5
 

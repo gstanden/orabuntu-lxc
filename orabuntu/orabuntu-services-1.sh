@@ -2177,7 +2177,7 @@ then
 
         sudo service lxc-net restart
         sleep 2
-        sudo service lxc-net status
+        sudo service lxc-net status | cat
 
         echo ''
         echo "=============================================="

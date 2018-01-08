@@ -1101,7 +1101,8 @@ then
        				echo "Install facter package...                     "
        				echo "=============================================="
        				echo ''
-       	 	
+
+       	 			sudo apt-get -y update	
 				sudo apt-get -y install facter
 
 				echo ''
