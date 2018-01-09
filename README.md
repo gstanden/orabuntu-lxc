@@ -1,5 +1,9 @@
 # Orabuntu-LXC Updates
 
+Begin Update:  January 8, 2018
+
+Orabuntu-LXC 5.34-beta is out and the latest code is in dev branch. To use the software simply use the guidelines near the end of the "anylinux-services.sh" file.  The use cases are all explained there and which settings to use.  Orabuntu-LXC can build you a multi-host Docker and LXC container infrastructure spanning multiple hosts in just minutes with full networking between all LXC containers, Docker containers, VM's and physical hosts. Good documentation is coming.  user-selectable subnets are coming.
+
 Begin Update: December 10, 2017
 
 The Orabuntu-LXC development branch now supports putting your Oracle VirtualBox VM's on the Orabuntu-LXC OpenvSwitch network on the physical host, for both Ubuntu Linux (16.x / 17.x) physical hosts, and Oracle Linux 7 physical hosts.  This update supercedes Note 1 below from the December 2, 2017 update, and expands this new feature to both Ubuntu Linux server-edition / desktop-edition VMs, and Oracle Linux 7 VMs. (Note, only Ubuntu Linux 17.10 VMs and Oracle Linux 7 VMs have been tested so far).
