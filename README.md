@@ -2,7 +2,7 @@
 
 Begin Update:  January 8, 2018
 
-Orabuntu-LXC 5.34-beta is out and the latest code is in dev branch. To use the software simply use the guidelines near the end of the "anylinux-services.sh" file.  The use cases are all explained there and which settings to use.  Orabuntu-LXC can build you a multi-host Docker and LXC container infrastructure spanning multiple hosts in just minutes with full networking between all LXC containers, Docker containers, VM's and physical hosts. Good documentation is coming.  user-selectable subnets are coming.
+Orabuntu-LXC 5.34-beta is out and the latest code is in dev branch. To use the software simply use the guidelines near the end of the "anylinux-services.sh" file.  The use cases are all explained there and which settings to use.  Orabuntu-LXC can build you a multi-host Docker and LXC container infrastructure spanning multiple hosts in just minutes with full networking between all LXC containers, Docker containers, VM's and physical hosts. Good documentation is coming.  User-selectable subnets are coming.
 
 Begin Update: December 10, 2017
 
