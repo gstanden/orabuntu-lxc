@@ -37,6 +37,18 @@ OracleVersion=$1.$2
 Domain2=$3
 MultiHost=$4
 
+echo ''
+echo "=============================================="
+echo "Script:  uekulele-services-3.sh                 "
+echo "                                              "
+echo "This script installs packages into the Oracle "
+echo "Linux container required for running Oracle.  "
+echo "=============================================="
+echo ''
+echo "=============================================="
+echo "This script is re-runnable                    "
+echo "=============================================="
+
 function GetMultiHostVar2 {
         echo $MultiHost | cut -f2 -d':'
 }
@@ -52,27 +64,93 @@ function GetMultiHostVar7 {
 }
 MultiHostVar7=$(GetMultiHostVar7)
 
-echo ''
-echo "=============================================="
-echo "Script:  uekulele-services-3.sh                 "
-echo "                                              "
-echo "This script installs packages into the Oracle "
-echo "Linux container required for running Oracle.  "
-echo "=============================================="
-echo ''
-echo "=============================================="
-echo "This script is re-runnable                    "
-echo "=============================================="
-echo ''
+GetLinuxFlavors(){
+if   [[ -e /etc/oracle-release ]]
+then
+        LinuxFlavors=$(cat /etc/oracle-release | cut -f1 -d' ')
+elif [[ -e /etc/redhat-release ]]
+then
+        LinuxFlavors=$(cat /etc/redhat-release | cut -f1 -d' ')
+elif [[ -e /usr/bin/lsb_release ]]
+then
+        LinuxFlavors=$(lsb_release -d | awk -F ':' '{print $2}' | cut -f1 -d' ')
+elif [[ -e /etc/issue ]]
+then
+        LinuxFlavors=$(cat /etc/issue | cut -f1 -d' ')
+else
+        LinuxFlavors=$(cat /proc/version | cut -f1 -d' ')
+fi
+}
+GetLinuxFlavors
+
+function TrimLinuxFlavors {
+echo $LinuxFlavors | sed 's/^[ \t]//;s/[ \t]$//'
+}
+LinuxFlavor=$(TrimLinuxFlavors)
+
+if   [ $LinuxFlavor = 'Oracle' ]
+then
+	CutIndex=7
+        function GetRedHatVersion {
+                sudo cat /etc/redhat-release | cut -f"$CutIndex" -d' ' | cut -f1 -d'.'
+        }
+        RedHatVersion=$(GetRedHatVersion)
+        function GetOracleDistroRelease {
+                sudo cat /etc/oracle-release | cut -f5 -d' ' | cut -f1 -d'.'
+        }
+        OracleDistroRelease=$(GetOracleDistroRelease)
+        Release=$OracleDistroRelease
+        LF=$LinuxFlavor
+        RL=$Release
+elif [ $LinuxFlavor = 'Red' ] || [ $LinuxFlavor = 'CentOS' ]
+then
+        if   [ $LinuxFlavor = 'Red' ]
+        then
+                CutIndex=7
+        elif [ $LinuxFlavor = 'CentOS' ]
+        then
+                CutIndex=4
+        fi
+        function GetRedHatVersion {
+                sudo cat /etc/redhat-release | cut -f"$CutIndex" -d' ' | cut -f1 -d'.'
+        }
+        RedHatVersion=$(GetRedHatVersion)
+        Release=$RedHatVersion
+        LF=$LinuxFlavor
+        RL=$Release
+elif [ $LinuxFlavor = 'Fedora' ]
+then
+        CutIndex=3
+        function GetRedHatVersion {
+                sudo cat /etc/redhat-release | cut -f"$CutIndex" -d' ' | cut -f1 -d'.'
+        }
+        RedHatVersion=$(GetRedHatVersion)
+        if [ $RedHatVersion -ge 19 ]
+        then
+                Release=7
+        elif [ $RedHatVersion -ge 12 ] && [ $RedHatVersion -le 18 ]
+        then
+                Release=6
+        fi
+        LF=$LinuxFlavor
+        RL=$Release
+elif [ $LinuxFlavor = 'Ubuntu' ]
+then
+        function GetUbuntuVersion {
+                cat /etc/lsb-release | grep DISTRIB_RELEASE | cut -f2 -d'='
+        }
+        UbuntuVersion=$(GetUbuntuVersion)
+        LF=$LinuxFlavor
+        RL=$UbuntuVersion
+        function GetUbuntuMajorVersion {
+                cat /etc/lsb-release | grep DISTRIB_RELEASE | cut -f2 -d'=' | cut -f1 -d'.'
+        }
+        UbuntuMajorVersion=$(GetUbuntuMajorVersion)
+fi
 
 sleep 5
 
 clear
-
-function GetMultiHostVar4 {
-        echo $MultiHost | cut -f4 -d':'
-}
-MultiHostVar4=$(GetMultiHostVar4)
 
 echo ''
 echo "=============================================="
@@ -188,12 +266,10 @@ then
                 # GLS 20160707 updated to use lxc-copy instead of lxc-clone for Ubuntu 16.04
                 # GLS 20160707 continues to use lxc-clone for Ubuntu 15.04 and 15.10
 
-		function GetRedHatVersion {
-		cat /etc/redhat-release  | cut -f7 -d' ' | cut -f1 -d'.'
-		}
 		RedHatVersion=$(GetRedHatVersion)
-                # GLS 20160707
-                if [ $RedHatVersion = '7' ] || [ $RedHatVersion = '6' ]
+                
+		# GLS 20160707
+                if [ $Release -eq 7 ] || [ $Release -eq 6 ]
                 then
                 function CheckPublicIPIterative {
 		sudo lxc-ls -f | sed 's/  */ /g' | grep $j | grep RUNNING | cut -f2 -d'-' | sed 's/^[ \t]*//;s/[ \t]*$//' | cut -f1 -d' ' | cut -f1-2 -d'.' | sed 's/\.//g'
@@ -379,7 +455,7 @@ fi
 	sudo lxc-attach -n $SeedContainerName -- chown grid:oinstall /home/grid/.kshrc
 	sudo lxc-attach -n $SeedContainerName -- chown grid:oinstall /home/grid/.bash_logout
 	sudo lxc-attach -n $SeedContainerName -- chown grid:oinstall /home/grid/.
-	sudo lxc-attach -n $SeedContainerName -- yum -y install net-tools bind-utils ntp
+	sudo lxc-attach -n $SeedContainerName -- sudo yum -y install net-tools bind-utils ntp
 
 echo ''  
 echo "=============================================="

@@ -63,6 +63,12 @@ function GetMultiHostVar4 {
 }
 MultiHostVar4=$(GetMultiHostVar4)
 
+function GetMultiHostVar7 {
+	echo $MultiHost | cut -f7 -d':'
+}
+MultiHostVar7=$(GetMultiHostVar7)
+MTU=$MultiHostVar7
+
 GetLinuxFlavors(){
 if   [[ -e /etc/oracle-release ]]
 then
@@ -89,34 +95,67 @@ LinuxFlavor=$(TrimLinuxFlavors)
 
 if   [ $LinuxFlavor = 'Oracle' ]
 then
+	CutIndex=7
+	LF=$LinuxFlavor
+	LFA=$LinuxFlavor
+        function GetRedHatVersion {
+                sudo cat /etc/redhat-release | cut -f"$CutIndex" -d' ' | cut -f1 -d'.'
+        }
+        RedHatVersion=$(GetRedHatVersion)
         function GetOracleDistroRelease {
                 sudo cat /etc/oracle-release | cut -f5 -d' ' | cut -f1 -d'.'
         }
         OracleDistroRelease=$(GetOracleDistroRelease)
         Release=$OracleDistroRelease
-        LF=$LinuxFlavor
         RL=$Release
-elif [ $LinuxFlavor = 'Red' ]
+elif [ $LinuxFlavor = 'Red' ] || [ $LinuxFlavor = 'CentOS' ]
 then
+        if   [ $LinuxFlavor = 'Red' ]
+        then
+                CutIndex=7
+		LF=$LinuxFlavor'Hat'
+		LinuxFlavor=$LF
+		LFA=$LinuxFlavor
+        elif [ $LinuxFlavor = 'CentOS' ]
+        then
+                CutIndex=4
+		LF=$LinuxFlavor
+		LFA=$LinuxFlavor
+        fi
         function GetRedHatVersion {
-                sudo cat /etc/redhat-release | cut -f7 -d' ' | cut -f1 -d'.'
+                sudo cat /etc/redhat-release | cut -f"$CutIndex" -d' ' | cut -f1 -d'.'
         }
         RedHatVersion=$(GetRedHatVersion)
         Release=$RedHatVersion
-        LF=$LinuxFlavor'Hat'
+        RL=$Release
+elif [ $LinuxFlavor = 'Fedora' ]
+then
+        CutIndex=3
+        function GetRedHatVersion {
+                sudo cat /etc/redhat-release | cut -f"$CutIndex" -d' ' | cut -f1 -d'.'
+        }
+        RedHatVersion=$(GetRedHatVersion)
+        if [ $RedHatVersion -ge 19 ]
+        then
+                Release=7
+        elif [ $RedHatVersion -ge 12 ] && [ $RedHatVersion -le 18 ]
+        then
+                Release=6
+        fi
+        LF=$LinuxFlavor
         RL=$Release
 elif [ $LinuxFlavor = 'Ubuntu' ]
 then
-    	function GetUbuntuVersion {
-               	cat /etc/lsb-release | grep DISTRIB_RELEASE | cut -f2 -d'='
-       	}
-       	UbuntuVersion=$(GetUbuntuVersion)
-	LF=$LinuxFlavor
-	RL=$UbuntuVersion
-       	function GetUbuntuMajorVersion {
-               	cat /etc/lsb-release | grep DISTRIB_RELEASE | cut -f2 -d'=' | cut -f1 -d'.'
-       	}
-       	UbuntuMajorVersion=$(GetUbuntuMajorVersion)
+        function GetUbuntuVersion {
+                cat /etc/lsb-release | grep DISTRIB_RELEASE | cut -f2 -d'='
+        }
+        UbuntuVersion=$(GetUbuntuVersion)
+        LF=$LinuxFlavor
+        RL=$UbuntuVersion
+        function GetUbuntuMajorVersion {
+                cat /etc/lsb-release | grep DISTRIB_RELEASE | cut -f2 -d'=' | cut -f1 -d'.'
+        }
+        UbuntuMajorVersion=$(GetUbuntuMajorVersion)
 fi
 
 echo ''
@@ -228,379 +267,9 @@ then
 
 	clear
 
-	if [ $LinuxFlavor = 'CentOS' ] # $LinuxFlavor = 'CentOS'
+	if [ $LinuxFlavor = 'RedHat' ] || [ $LinuxFlavor = 'Oracle' ] || [ $LinuxFlavor = 'CentOS' ] || [ $LinuxFlavor = 'Fedora' ] # $LinuxFlavor = 'Red'
 	then
-		function GetCentOSVersion {
-		cat /etc/redhat-release | cut -f4 -d' ' | cut -f1 -d'.'
-		}
-		CentOSVersion=$(GetCentOSVersion)
-
-		if [ $CentOSVersion -ge 7 ] # $CentOSVersion -ge 7
-		then
- 			echo ''
-			echo "=============================================="
-			echo "Script:  anylinux-services-1.sh               "
-			echo "=============================================="
-
-			sleep 5
-			
-			clear
-			
-			echo ''
-			echo "=============================================="
-			echo "Linux OS version check...                     "
-			echo "=============================================="
-			echo ''
-  
-			if [ -f /etc/oracle-release ] # 1
-			then
-				cat /etc/oracle-release
-			else
-				cat /etc/redhat-release
-			fi #OK 1
-
-			echo ''
-			echo "=============================================="
-			echo "Linux OS version displayed.                   "
-			echo "=============================================="
-			echo ''	
-			echo "=============================================="
-			echo "OS Versions Compabtibility Notice Begin       "
-			echo "=============================================="
-			echo ''
-			echo "=============================================="
-			echo "              !!! NOTICE !!!                  "
-			echo "                                              "
-			echo "All OS version compabibility tests shown below"
-			echo "done on NEW FRESH INSTALL physical or VM hosts"
-			echo "AFTER ALL UPDATES applied.                    "
-			echo "=============================================="
-			echo ''
-			echo "=============================================="
-			echo "DISTRO               REL   KERN TYPE  EDITION "
-			echo "Tested: Oracle Linux 7.x   UEK4 (V,P) ALL     "
-			echo "Tested: Oracle Linux 7.x   RHEL (V,P) ALL     "
-			echo "Tested: Ubuntu Linux 16.x  ALL  (V,P) (S,D)   "
-			echo "Tested: Ubuntu Linux 17.x  ALL  (V,P) (S,D)   "
-			echo "                                              "
-			echo "Legend:                                       "
-			echo "                                              "
-			echo "	V=Virtual Host                              "
-			echo "	P=Physical Host                             "
-			echo "	S=Server Edition                            "
-			echo "	D=Desktop Edition                           "
-			echo "	REL=Release                                 "
-			echo "	KERN=Kernel Version                         "
-			echo "=============================================="
-			echo ''
-			echo "=============================================="
-			echo "OS Versions Compatibility Notice End          "
-			echo "=============================================="
-		
-			sleep 5
-
-			clear
-
-			function CheckUser {
-			id | cut -f1 -d' ' | cut -f2 -d'(' | cut -f1 -d')'
-			}
-			User=$(CheckUser)
-
-			if [ $User = 'root' ] # 4
-			then
-				echo ''
-				echo "=============================================="
-				echo "Check if install user is root...              "
-				echo "=============================================="
-				echo ''
-				echo "For $LF Linux $RL Linux user must be ubuntu.  "
-				echo "Connect as ubuntu and run the scripts again.  "
-				echo ''
-				echo "=============================================="
-				echo "Install user check completed.                 "
-				echo "=============================================="
-				echo ''
-				exit
-			fi #OK 4
-
-			echo ''
-			echo "=============================================="
-			echo "Check if host is physical or virtual...       "
-			echo "=============================================="
-			echo ''
-	
-			sleep 5
-	
-			clear
-	
-			echo ''
-			echo "=============================================="
-			echo "Facter package required for phys/VM check...  "
-			echo "=============================================="
-			echo ''
-	
-			sleep 5
-	
-			clear
-	
-			function CheckFacterInstalled {
-				sudo which facter > /dev/null 2>&1; echo $?
-			}
-			FacterInstalled=$(CheckFacterInstalled)
-
-			if [ $FacterInstalled -ne 0 ] # 5
-			then
-       			 	echo ''
-       			 	echo "=============================================="
-       			 	echo "Install package prerequisites for facter...   "
-       			 	echo "=============================================="
-       			 	echo ''
-
-				sudo yum clean all
-       			 	sudo yum -y install which ruby curl tar
-        	
-				echo ''
-       			 	echo "=============================================="
-       			 	echo "Facter package prerequisites installed.       "
-       			 	echo "=============================================="
-
-				sleep 5
-
-				clear
-
-       			 	echo ''
-       			 	echo "=============================================="
-       			 	echo "Build and install Facter from Ruby Gems...    "
-       			 	echo "=============================================="
-       			 	echo ''
-
-				sleep 5
-
-				mkdir -p /home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/facter
-				cd /home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/facter
-				curl -s http://downloads.puppetlabs.com/facter/facter-2.4.4.tar.gz | sudo tar xz; sudo ruby facter*/install.rb
-
-				echo ''
-       			 	echo "=============================================="
-       			 	echo "Build and install Facter completed.           "
-       			 	echo "=============================================="
-
-			else
-       			 	echo ''
-       			 	echo "=============================================="
-       			 	echo "Facter already installed.                     "
-       			 	echo "=============================================="
-       			 	echo ''
-			fi #OK 5
-
-			function GetFacter {
-				facter virtual
-			}
-			Facter=$(GetFacter)
-			
-			sleep 5
-
-			clear
-
-			if [ $Facter != 'physical' ] # 6
-			then
-				function GetVirtualInterfaces {
-					ifconfig | grep enp | cut -f1 -d':' | cut -f1 -d' ' | sed 's/$/ /' | tr -d '\n' | sed 's/^[ \t]*//;s/[ \t]*$//'
-				}
-				VirtualInterfaces=$(GetVirtualInterfaces)
-
-				for i in $VirtualInterfaces
-				do
-					function CheckIpOnVirtualInterface1 {
-						ifconfig $i | grep 10.207.39 | wc -l
-					}
-					IpOnVirtualInterface1=$(CheckIpOnVirtualInterface1)
-
-					function CheckIpOnVirtualInterface2 {
-						ifconfig $i | grep 10.207.29 | wc -l
-					}
-					IpOnVirtualInterface2=$(CheckIpOnVirtualInterface2)
-
-					sudo mkdir -p /etc/network/openvswitch
-
-					if [ $IpOnVirtualInterface1 -eq 1 ] || [ -f /etc/network/openvswitch/sw1.info ]
-					then
-						function GetIpVirtualInterface1 {
-							ifconfig $i | grep inet | grep 10.207.39 | sed 's/^[ \t]*//;s/[ \t]*$//' | cut -f2 -d' '
-						}
-						IpVirtualInterface1=$(GetIpVirtualInterface1)
-
-						if [ ! -f /etc/network/openvswitch/sw1.info ]
-						then
-							sudo sh -c "echo '$i:$IpVirtualInterface1:Y' > /etc/network/openvswitch/sw1.info"
-							sudo cat /etc/network/openvswitch/sw1.info
-							sleep 5
-						fi
-					fi
-	
-					if [ $IpOnVirtualInterface2 -eq 1 ] || [ -f /etc/network/openvswitch/sx1.info ]
-					then
-						function GetIpVirtualInterface2 {
-							ifconfig $i | grep inet | grep 10.207.29 | sed 's/^[ \t]*//;s/[ \t]*$//' | cut -f2 -d' '
-						}
-						IpVirtualInterface2=$(GetIpVirtualInterface2)
-
-						if [ ! -f /etc/network/openvswitch/sx1.info ]
-						then
-							sudo sh -c "echo '$i:$IpVirtualInterface2:Y' > /etc/network/openvswitch/sx1.info"
-							sudo cat /etc/network/openvswitch/sx1.info
-							sleep 5
-						fi
-					fi
-				done
-
-				echo ''
-
- 				echo ''
-				echo "=============================================="
-				echo "Orabuntu-LXC $LF Linux $RL on $Facter.        "
-				echo "=============================================="
-				echo ''
-
-				sleep 5
-
-				clear
-
-				if [ -f /etc/orabuntu-lxc-release ] # 7
-				then
-					echo ''
-					echo "=============================================="
-					echo "                                              "
-					echo "If you already have an Orabuntu-LXC install   "
-					echo "on this host and want to add more containers  "
-					echo "then answer 'Y' to this.                      "
-					echo "                                              "
-					echo "If you are doing a complete Orabuntu-LXC      "
-					echo "reinstall then answer 'N' to this.            "
-					echo "                                              "
-					echo "=============================================="
-					echo "                                              " 
-				read -e -p   "Adding Orabuntu-LXC containers? [Y/N]         " -i "N" CloningAdditional
-					echo "                                              "
-					echo "=============================================="
-					
-					sleep 5
-	
-					clear
-
-					if [ $CloningAdditional = 'n' ] || [ $CloningAdditional = 'N' ] # 8
-					then
- 						/home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/lxcentos-services-1.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $OSMemRes $MultiHost
- 						/home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/lxcentos-services-2.sh $MajorRelease $PointRelease $Domain1 $Domain2 $MultiHost
- 						/home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/lxcentos-services-3.sh $MajorRelease $PointRelease 
-						/home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/lxcentos-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer $MultiHost 
-						/home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/lxcentos-services-5.sh $MajorRelease $PointRelease 
-					fi # OK 8
-
-					if [ $CloningAdditional = 'y' ] || [ $CloningAdditional = 'Y' ] || [ $MultiHostVar1 = 'addclones' ] # 9
-					then
-						/home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/lxcentos-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer $MultiHost
-						/home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/lxcentos-services-5.sh $MajorRelease $PointRelease
-					fi # OK 9
-				fi # OK 7
-
-				if [ ! -f /etc/orabuntu-lxc-release ] # 10
-				then
-					/home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/lxcentos-services-1.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $OSMemRes $MultiHost
-					/home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/lxcentos-services-2.sh $MajorRelease $PointRelease $Domain1 $Domain $MultiHost
-					/home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/lxcentos-services-3.sh $MajorRelease $PointRelease 
-					/home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/lxcentos-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer $MultiHost 
-					/home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/lxcentos-services-5.sh $MajorRelease $PointRelease 
-				fi # OK 10
-
- 				echo ''
-				echo "=============================================="
-				echo "Orabuntu-LXC $LF Linux $RL complete.          "
-				echo "=============================================="
-
-				sleep 5
-	
- 			else # OK 6
-
-				echo ''
-				echo "=============================================="
-				echo "Orabuntu-LXC $LF Linux $RL on $Facter         "
-				echo "=============================================="
-				echo ''
-	
-				sleep 5
-
-				clear
-
-				if [ -f /etc/orabuntu-lxc-release ] # 11
-				then
-					echo ''
-					echo "=============================================="
-					echo "                                              "
-					echo "If you already have an Orabuntu-LXC install  "
-					echo "on this host and want to add more containers  "
-					echo "then answer 'Y' to this.                      "
-					echo "                                              "
-					echo "If you are doing a complete Orabuntu-LXC      "
-					echo "reinstall then answer 'N' to this.            "
-					echo "                                              "
-					echo "=============================================="
-					echo "                                              " 
-				read -e -p   "Adding Orabuntu-LXC containers? [Y/N]  " -i "N" CloningAdditional
-					echo "                                              "
-					echo "=============================================="
-					echo ''
-	
-					sleep 5
-
-					clear
-
-					if [ $CloningAdditional = 'n' ] || [ $CloningAdditional = 'N' ] # 12
-					then
- 						/home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/lxcentos-services-1.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $OSMemRes $MultiHost
- 						/home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/lxcentos-services-2.sh $MajorRelease $PointRelease $Domain1 $Domain2 $MultiHost
- 						/home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/lxcentos-services-3.sh $MajorRelease $PointRelease 
-						/home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/lxcentos-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer $MultiHost 
-						/home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/lxcentos-services-5.sh $MajorRelease $PointRelease 
-					fi # OK 12
-
-					if [ $CloningAdditional = 'y' ] || [ $CloningAdditional = 'Y' ] || [ $MultiHostVar1 = 'addclones' ] # 13
-					then
-						/home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/lxcentos-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer $MultiHost
-						/home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/lxcentos-services-5.sh $MajorRelease $PointRelease
-					fi # OK 13
-				fi # OK 10
-
-				if [ ! -f /etc/orabuntu-lxc-release ] # 14
-				then
-					/home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/lxcentos-services-1.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $OSMemRes $MultiHost
-					/home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/lxcentos-services-2.sh $MajorRelease $PointRelease $Domain1 $Domain $MultiHost
-					/home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/lxcentos-services-3.sh $MajorRelease $PointRelease 
-					/home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/lxcentos-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer $MultiHost 
-					/home/ubuntu/Downloads/orabuntu-lxc-master/lxcentos/lxcentos-services-5.sh $MajorRelease $PointRelease 
-				fi # OK 14
-
-				sleep 5
-
-				clear
-			
-				echo ''
-				echo "=============================================="
-				echo "Orabuntu-LXC for $LF Linux $RL complete.      "
-				echo "=============================================="
-
-			fi # OK 6
-
- 		fi # $CentOSVersion -ge 7
-
-	fi # OK $LinuxFlavor = 'CentOS'
-
-	if [ $LinuxFlavor = 'RedHat' ] || [ $LinuxFlavor = 'Oracle' ] # $LinuxFlavor = 'Red'
-	then
-		function GetRedHatVersion {
-		cat /etc/redhat-release  | cut -f7 -d' ' | cut -f1 -d'.'
-		}
-		RedHatVersion=$(GetRedHatVersion)
+ 		RedHatVersion=$(GetRedHatVersion)
 
 		if [ $RedHatVersion -ge 6 ] # [ $RedHatVersion -ge 6 ]
 		then
@@ -645,6 +314,7 @@ then
 			echo ''
 			echo "=============================================="
 			echo "DISTRO               REL   KERN TYPE  EDITION "
+			echo "Tested: CentOS Linux 7.x   ALL  (V,P) ALL     "
 			echo "Tested: Oracle Linux 7.x   UEK4 (V,P) ALL     "
 			echo "Tested: Oracle Linux 7.x   RHEL (V,P) ALL     "
 			echo "Tested: Ubuntu Linux 16.x  ALL  (V,P) (S,D)   "
@@ -723,7 +393,8 @@ then
        			 	echo "=============================================="
        			 	echo ''
 	
-       			 	sudo yum -y install which ruby curl tar
+       			 	sudo yum -y install which ruby curl tar yum-utils
+				sudo yum-complete-transaction
        	 	
 				echo ''
        			 	echo "=============================================="
@@ -796,7 +467,7 @@ then
 							ifconfig $i | grep inet | grep 10.207.39 | sed 's/^[ \t]*//;s/[ \t]*$//' | cut -f2 -d' '
 						}
 						IpVirtualInterface1=$(GetIpVirtualInterface1)
-
+						
 						if [ ! -f /etc/network/openvswitch/sw1.info ]
 						then
 							sudo sh -c "echo '$i:$IpVirtualInterface1:Y' > /etc/network/openvswitch/sw1.info"
@@ -809,7 +480,7 @@ then
 							ifconfig $i | grep inet | grep 10.207.29 | sed 's/^[ \t]*//;s/[ \t]*$//' | cut -f2 -d' '
 						}
 						IpVirtualInterface2=$(GetIpVirtualInterface2)
-
+						
 						if [ ! -f /etc/network/openvswitch/sx1.info ]
 						then
 							sudo sh -c "echo '$i:$IpVirtualInterface2:Y' > /etc/network/openvswitch/sx1.info"
@@ -819,7 +490,7 @@ then
 
  				echo ''
 				echo "=============================================="
-				echo "Orabuntu-LXC $LF Linux $RL on $Facter.        "
+				echo "Orabuntu-LXC $LFA Linux $RL on $Facter.       "
 				echo "=============================================="
 				echo ''
 
@@ -884,7 +555,7 @@ then
 
  				echo ''
 				echo "=============================================="
-				echo "Orabuntu-LXC for $LF Linux $RL complete.      "
+				echo "Orabuntu-LXC for $LFA Linux $RL complete.     "
 				echo "=============================================="
 	
 				sleep 5
@@ -893,7 +564,7 @@ then
 
 				echo ''
 				echo "=============================================="
-				echo "Orabuntu-LXC $LF Linux $RL on $Facter.        " 
+				echo "Orabuntu-LXC $LFA Linux $RL on $Facter.       " 
 				echo "=============================================="
 				echo ''
 
@@ -953,7 +624,7 @@ then
 					/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/uekulele-services-1.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $OSMemRes $MultiHost $LxcOvsVersion
 					/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/uekulele-services-2.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $MultiHost 
 					/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/uekulele-services-3.sh $MajorRelease $PointRelease $Domain2 $MultiHost
-					/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/uekulele-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer $MultiHost 
+					/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/uekulele-services-4.sh $MajorRelease $PointRelease $Domain1 $NumCon $NameServer $MultiHost 
 					/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/uekulele-services-5.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $MultiHost
 				fi # OK 14
 
@@ -963,14 +634,14 @@ then
 			
 				echo ''
 				echo "=============================================="
-				echo "Orabuntu-LXC for $LF Linux $RL complete.      "
+				echo "Orabuntu-LXC for $LFA Linux $RL complete.     "
 				echo "=============================================="
 
 			fi # OK 6
 
  		fi # [ $RedHatVersion -ge 6 ]
 
-	fi # $LinuxFlavor = 'Red'
+	fi # $LinuxFlavor = 'RedHat'
 
 	if [ $LinuxFlavor = 'Ubuntu' ] # $LinuxFlavor = 'Ubuntu'
 	then
@@ -1022,6 +693,7 @@ then
 			echo ''
 			echo "=============================================="
 			echo "DISTRO               REL   KERN TYPE  EDITION "
+			echo "Tested: CentOS Linux 7.x   ALL  (V,P) ALL     "
 			echo "Tested: Oracle Linux 7.x   UEK4 (V,P) ALL     "
 			echo "Tested: Oracle Linux 7.x   RHEL (V,P) ALL     "
 			echo "Tested: Ubuntu Linux 16.x  ALL  (V,P) (S,D)   "
@@ -1158,7 +830,7 @@ then
 							ifconfig $i | grep inet | grep 10.207.39 | sed 's/^[ \t]*//;s/[ \t]*$//' | cut -f2 -d' '
 						}
 						IpVirtualInterface1=$(GetIpVirtualInterface1)
-
+						
 						if [ ! -f /etc/network/openvswitch/sw1.info ]
 						then
 							sudo sh -c "echo '$i:$IpVirtualInterface1:Y' > /etc/network/openvswitch/sw1.info"
@@ -1171,7 +843,7 @@ then
 							ifconfig $i | grep inet | grep 10.207.29 | sed 's/^[ \t]*//;s/[ \t]*$//' | cut -f2 -d' '
 						}
 						IpVirtualInterface2=$(GetIpVirtualInterface2)
-
+						
 						if [ ! -f /etc/network/openvswitch/sx1.info ]
 						then
 							sudo sh -c "echo '$i:$IpVirtualInterface2:Y' > /etc/network/openvswitch/sx1.info"
@@ -1181,7 +853,7 @@ then
 
  				echo ''
 				echo "=============================================="
-				echo "Orabuntu-LXC $LF Linux $RL on $Facter.        "
+				echo "Orabuntu-LXC $LFA Linux $RL on $Facter.       "
 				echo "=============================================="
 				echo ''
 
@@ -1251,7 +923,7 @@ then
 
  				echo ''
 				echo "=============================================="
-				echo "Orabuntu-LXC $LF Linux $RL complete.          "
+				echo "Orabuntu-LXC $LFA Linux $RL complete.         "
 				echo "=============================================="
 	
 				sleep 5
@@ -1260,7 +932,7 @@ then
 
 				echo ''
 				echo "=============================================="
-				echo "Orabuntu-LXC $LF Linux $RL on $Facter.        "
+				echo "Orabuntu-LXC $LFA Linux $RL on $Facter.       "
 				echo "=============================================="
 				echo ''
 
@@ -1332,7 +1004,7 @@ then
 			
 				echo ''
 				echo "=============================================="
-				echo "Orabuntu-LXC for $LF Linux $RL complete.      "
+				echo "Orabuntu-LXC for $LFA Linux $RL complete.     "
 				echo "=============================================="
 	
 				sleep 5

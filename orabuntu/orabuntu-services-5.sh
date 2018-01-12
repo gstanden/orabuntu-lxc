@@ -134,7 +134,7 @@ then
 
 	if [ $UbuntuMajorVersion -ge 16 ]
 	then
-		/home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/docker_install_ubuntu.sh
+		/home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/docker_install_orabuntu.sh
 	fi
 
 	echo ''
@@ -368,7 +368,7 @@ then
 	echo ''
 	
 	sudo touch /etc/orabuntu-lxc-release
-	sudo sh -c "echo 'Orabuntu-LXC v5.33-beta' > /etc/orabuntu-lxc-release"
+	sudo sh -c "echo 'Orabuntu-LXC v5.35-beta' > /etc/orabuntu-lxc-release"
 	sudo ls -l /etc/orabuntu-lxc-release
 	echo ''
 	sudo cat /etc/orabuntu-lxc-release

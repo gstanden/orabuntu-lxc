@@ -121,22 +121,62 @@ LinuxFlavor=$(TrimLinuxFlavors)
 
 if   [ $LinuxFlavor = 'Oracle' ]
 then
-	function GetOracleDistroRelease {
-		sudo cat /etc/oracle-release | cut -f5 -d' ' | cut -f1 -d'.'
-	}
-	OracleDistroRelease=$(GetOracleDistroRelease)
-	Release=$OracleDistroRelease
-	LF=$LinuxFlavor
-	RL=$Release
-elif [ $LinuxFlavor = 'Red' ]
+	CutIndex=7
+        function GetRedHatVersion {
+                sudo cat /etc/redhat-release | cut -f"$CutIndex" -d' ' | cut -f1 -d'.'
+        }
+        RedHatVersion=$(GetRedHatVersion)
+        function GetOracleDistroRelease {
+                sudo cat /etc/oracle-release | cut -f5 -d' ' | cut -f1 -d'.'
+        }
+        OracleDistroRelease=$(GetOracleDistroRelease)
+        Release=$OracleDistroRelease
+        LF=$LinuxFlavor
+        RL=$Release
+elif [ $LinuxFlavor = 'Red' ] || [ $LinuxFlavor = 'CentOS' ]
 then
-	function GetRedHatVersion {
-		sudo cat /etc/redhat-release | cut -f7 -d' ' | cut -f1 -d'.'
-	}
-	RedHatVersion=$(GetRedHatVersion)
-	Release=$RedHatVersion 
-	LF=$LinuxFlavor
-	RL=$Release
+        if   [ $LinuxFlavor = 'Red' ]
+        then
+                CutIndex=7
+        elif [ $LinuxFlavor = 'CentOS' ]
+        then
+                CutIndex=4
+        fi
+        function GetRedHatVersion {
+                sudo cat /etc/redhat-release | cut -f"$CutIndex" -d' ' | cut -f1 -d'.'
+        }
+        RedHatVersion=$(GetRedHatVersion)
+        Release=$RedHatVersion
+        LF=$LinuxFlavor
+        RL=$Release
+elif [ $LinuxFlavor = 'Fedora' ]
+then
+        CutIndex=3
+        function GetRedHatVersion {
+                sudo cat /etc/redhat-release | cut -f"$CutIndex" -d' ' | cut -f1 -d'.'
+        }
+        RedHatVersion=$(GetRedHatVersion)
+        if [ $RedHatVersion -ge 19 ]
+        then
+                Release=7
+        elif [ $RedHatVersion -ge 12 ] && [ $RedHatVersion -le 18 ]
+        then
+                Release=6
+        fi
+        LF=$LinuxFlavor
+        RL=$Release
+elif [ $LinuxFlavor = 'Ubuntu' ]
+then
+        function GetUbuntuVersion {
+                cat /etc/lsb-release | grep DISTRIB_RELEASE | cut -f2 -d'='
+        }
+        UbuntuVersion=$(GetUbuntuVersion)
+        LF=$LinuxFlavor
+        RL=$UbuntuVersion
+        function GetUbuntuMajorVersion {
+                cat /etc/lsb-release | grep DISTRIB_RELEASE | cut -f2 -d'=' | cut -f1 -d'.'
+        }
+        UbuntuMajorVersion=$(GetUbuntuMajorVersion)
 fi
 
 if [ ! -f /etc/orabuntu-lxc-terms ]
@@ -209,6 +249,9 @@ echo "Display Installation Parameters ...           "
 echo "=============================================="
 echo ''
 
+echo 'Linux Flavor              = '$LinuxFlavor    
+echo 'Linux Release             = '$RedHatVersion
+echo 'Linux Base Release        = '$Release
 MajorRelease=$1
 if [ -z $1 ]
 then
@@ -298,7 +341,7 @@ then
 		# (Note: Set GRE to "N" in this use case).
 
 		 MultiHost="new:Y:X:$SudoPassword:X:X:1420:X:X:$GRE"
-		#MultiHost="reinstall:N:X:$SudoPassword:X:X:1420:X:X:$GRE"
+		#MultiHost="reinstall:Y:X:$SudoPassword:X:X:1420:X:X:$GRE"
 
 	# Adding additional clones of a specific Oracle Linux container release (seed Orabuntu-LXC container for that version must ALREADY exist)
 
@@ -317,9 +360,9 @@ echo 'MultiHost                 = '$MultiHost
 LxcOvsVersion=$9
 if [ -z $9 ]
 then
-	LxcOvsVersion="2.1.1:2.5.4"
+	LxcOvsVersion="2.0.5:2.5.4"
 fi
-if   [ $LinuxFlavor = 'RedHat' ]
+if   [ $LinuxFlavor = 'RedHat' ] || [ $LinuxFlavor = 'CentOS' ] || [ $LinuxFlavor = 'Fedora' ]
 then
 	echo 'LxcOvsVersion             = '$LxcOvsVersion
 elif [ $LinuxFlavor = 'Oracle' ]
@@ -337,9 +380,121 @@ echo "=============================================="
 echo "Display Installation Parameters complete.     "
 echo "=============================================="
 
-sleep 10
+sleep 5
 
 clear
+
+function GetMultiHostVar7 {
+	echo $MultiHost | cut -f7 -d':'
+}
+MultiHostVar7=$(GetMultiHostVar7)
+
+if [ $MultiHostVar7 -ne 1500 ]
+then
+	function GetVirtualInterfaces {
+       		ifconfig | grep enp | cut -f1 -d':' | cut -f1 -d' ' | sed 's/$/ /' | tr -d '\n' | sed 's/^[ \t]*//;s/[ \t]*$//'
+	}
+	VirtualInterfaces=$(GetVirtualInterfaces)
+	subnet="10.207.29 10.207.39"
+	for j in $subnet
+	do
+       		for i in $VirtualInterfaces
+       		do
+                	function CheckVirtualInterfaceMtu {
+                        	ifconfig $i | grep -B1 "$j" | grep mtu | cut -f5 -d' '
+                	}
+                	VirtualInterfaceMtu=$(CheckVirtualInterfaceMtu)
+                	function GetCharCount {
+                        	echo $VirtualInterfaceMtu | wc -c
+                	}
+                	CharCount=$(GetCharCount)
+                	if [ $CharCount -eq 5 ]
+                	then
+#                        	if [ $VirtualInterfaceMtu -ne 1420 ]
+#                        	then
+					echo ''
+					echo "=============================================="
+					echo "Set NIC $i to MTU $MultiHostVar7...           "
+					echo "=============================================="
+					echo ''
+
+                                	sudo ifconfig $i mtu 1420
+					ifconfig $i
+
+					echo "=============================================="
+					echo "Done: Set NIC $i to MTU $MultiHostVar7.       "
+					echo "=============================================="
+				
+					sleep 5
+
+					clear
+	
+					echo ''
+					echo "=============================================="
+					echo "Create $i-mtu manager systemd service...      "
+					echo "=============================================="
+					echo ''
+
+					sudo sh -c "echo '[Unit]'					 > /etc/systemd/system/$i-mtu.service"
+					sudo sh -c "echo 'Description=$i-mtu'				>> /etc/systemd/system/$i-mtu.service"
+					sudo sh -c "echo 'After=network-online.target'			>> /etc/systemd/system/$i-mtu.service"
+					sudo sh -c "echo ''						>> /etc/systemd/system/$i-mtu.service"
+					sudo sh -c "echo '[Service]'					>> /etc/systemd/system/$i-mtu.service"
+					sudo sh -c "echo 'Type=idle'					>> /etc/systemd/system/$i-mtu.service"
+					sudo sh -c "echo 'User=root'					>> /etc/systemd/system/$i-mtu.service"
+					sudo sh -c "echo 'RemainAfterExit=yes'				>> /etc/systemd/system/$i-mtu.service"
+					sudo sh -c "echo 'ExecStart=/usr/sbin/ifconfig $i mtu 1420'	>> /etc/systemd/system/$i-mtu.service"
+					sudo sh -c "echo 'ExecStop=/usr/sbin/ifconfig $i mtu 1500'	>> /etc/systemd/system/$i-mtu.service"
+					sudo sh -c "echo ''						>> /etc/systemd/system/$i-mtu.service"
+					sudo sh -c "echo '[Install]'					>> /etc/systemd/system/$i-mtu.service"
+					sudo sh -c "echo 'WantedBy=network-online.target'		>> /etc/systemd/system/$i-mtu.service"
+					sudo systemctl enable $i-mtu.service
+					sudo systemctl daemon-reload
+					sudo cat /etc/systemd/system/$i-mtu.service
+
+					echo ''
+					echo "=============================================="
+					echo "Done: Create $i-mtu manager systemd service.  "
+					echo "=============================================="
+
+					sleep 5
+
+					clear
+#                        	fi
+                	fi
+        	done
+	done
+fi
+
+if [ $LinuxFlavor = 'Fedora' ] && [ $RedHatVersion -ge 22 ]
+then
+	echo ''
+	echo "=============================================="
+	echo "Set Package Manager dnf $LinuxFlavor $RL.     "
+	echo "=============================================="
+	echo ''
+
+	sudo sed -i "s/yum -y install/dnf -y install/g" 			/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/uekulele-services-[012345].sh
+	sudo sed -i "s/yum -y erase/dnf -y erase/g" 				/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/uekulele-services-[012345].sh
+	sudo sed -i "s/yum -y localinstall/dnf -y localinstall/g" 		/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/uekulele-services-[012345].sh
+	sudo sed -i "s/yum clean all/dnf clean all/g" 				/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/uekulele-services-[012345].sh
+	sudo sed -i "s/yum provides/dnf provides/g" 				/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/uekulele-services-[012345].sh
+	sudo sed -i "s/yum-utils/dnf-utils/g" 					/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/uekulele-services-[012345].sh
+	sudo sed -i "s/yum -y install/dnf -y install/g"				/home/ubuntu/Downloads/orabuntu-lxc-master/anylinux/anylinux-services-1.sh
+	sudo sed -i "s/yum-utils/dnf-utils/g"					/home/ubuntu/Downloads/orabuntu-lxc-master/anylinux/anylinux-services-1.sh
+	sudo sed -i "s/yum-complete-transaction/dnf-complete-transaction/g"	/home/ubuntu/Downloads/orabuntu-lxc-master/anylinux/anylinux-services-1.sh
+	grep yum 								/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/uekulele-services-[012345].sh | egrep -v 'yum.repos.d|yum.oracle.com'
+	
+	echo ''
+	echo "=============================================="
+	echo "Done: Set Package Manager dnf $LinuxFlavor $RL"
+	echo "=============================================="
+	echo ''
+		
+	sleep 5
+
+	clear
+fi
 
 /home/ubuntu/Downloads/orabuntu-lxc-master/anylinux/anylinux-services-1.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $OSMemRes $NumCon $MultiHost $LxcOvsVersion
 

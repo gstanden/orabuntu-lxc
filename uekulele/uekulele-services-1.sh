@@ -139,22 +139,62 @@ LinuxFlavor=$(TrimLinuxFlavors)
 
 if   [ $LinuxFlavor = 'Oracle' ]
 then
-	function GetOracleDistroRelease {
-		sudo cat /etc/oracle-release | cut -f5 -d' ' | cut -f1 -d'.'
-	}
-	OracleDistroRelease=$(GetOracleDistroRelease)
-	Release=$OracleDistroRelease
-	LF=$LinuxFlavor
-	RL=$Release
-elif [ $LinuxFlavor = 'Red' ]
+        CutIndex=7
+        function GetRedHatVersion {
+                sudo cat /etc/redhat-release | cut -f"$CutIndex" -d' ' | cut -f1 -d'.'
+        }
+        RedHatVersion=$(GetRedHatVersion)
+        function GetOracleDistroRelease {
+                sudo cat /etc/oracle-release | cut -f5 -d' ' | cut -f1 -d'.'
+        }
+        OracleDistroRelease=$(GetOracleDistroRelease)
+        Release=$OracleDistroRelease
+        LF=$LinuxFlavor
+        RL=$Release
+elif [ $LinuxFlavor = 'Red' ] || [ $LinuxFlavor = 'CentOS' ]
 then
-	function GetRedHatVersion {
-		sudo cat /etc/redhat-release | cut -f7 -d' ' | cut -f1 -d'.'
-	}
-	RedHatVersion=$(GetRedHatVersion)
-	Release=$RedHatVersion 
-	LF=$LinuxFlavor'Hat'
-	RL=$Release
+        if   [ $LinuxFlavor = 'Red' ]
+        then
+                CutIndex=7
+        elif [ $LinuxFlavor = 'CentOS' ]
+        then
+                CutIndex=4
+        fi
+        function GetRedHatVersion {
+                sudo cat /etc/redhat-release | cut -f"$CutIndex" -d' ' | cut -f1 -d'.'
+        }
+        RedHatVersion=$(GetRedHatVersion)
+        Release=$RedHatVersion
+        LF=$LinuxFlavor
+        RL=$Release
+elif [ $LinuxFlavor = 'Fedora' ]
+then
+        CutIndex=3
+        function GetRedHatVersion {
+                sudo cat /etc/redhat-release | cut -f"$CutIndex" -d' ' | cut -f1 -d'.'
+        }
+        RedHatVersion=$(GetRedHatVersion)
+        if [ $RedHatVersion -ge 19 ]
+        then
+                Release=7
+        elif [ $RedHatVersion -ge 12 ] && [ $RedHatVersion -le 18 ]
+        then
+                Release=6
+        fi
+        LF=$LinuxFlavor
+        RL=$Release
+elif [ $LinuxFlavor = 'Ubuntu' ]
+then
+        function GetUbuntuVersion {
+                cat /etc/lsb-release | grep DISTRIB_RELEASE | cut -f2 -d'='
+        }
+        UbuntuVersion=$(GetUbuntuVersion)
+        LF=$LinuxFlavor
+        RL=$UbuntuVersion
+        function GetUbuntuMajorVersion {
+                cat /etc/lsb-release | grep DISTRIB_RELEASE | cut -f2 -d'=' | cut -f1 -d'.'
+        }
+        UbuntuMajorVersion=$(GetUbuntuMajorVersion)
 fi
 
 function GetOperation {
@@ -313,7 +353,11 @@ then
 		sudo rm -f /etc/network/if-up.d/openvswitch/*
 		sudo rm -f /etc/network/if-down.d/openvswitch/*
 		cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele
-		sudo rm -rf facter openvswitch epel lxc selinux
+		sudo rm -rf facter openvswitch lxc selinux
+		if [ $LinuxFlavor != 'Fedora' ]
+		then
+			sudo rm -rf epel
+		fi
 		sudo rm -f /etc/orabuntu-lxc-release
 
 		# GLS 20170925 Oracle Linux OVS and LXC are built from source.    This step deletes the source build directories.
@@ -372,22 +416,31 @@ then
 
 	sudo yum clean all
 	sudo yum -y install wget tar gzip
- 	mkdir -p /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/epel
-  	cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/epel
-	if   [ $Release -eq 7 ]
+	if [ $LinuxFlavor != 'Fedora' ]
 	then
-  		wget --timeout=3 --tries=3 https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
-  		sudo rpm -ivh epel-release-latest-7.noarch.rpm 
- 	elif [ $Release -eq 6 ] 
-	then
-  		wget --timeout=3 --tries=3 https://dl.fedoraproject.org/pub/epel/epel-release-latest-6.noarch.rpm
-  		sudo rpm -ivh epel-release-latest-6.noarch.rpm 
+ 		mkdir -p /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/epel
+  		cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/epel
+		if   [ $Release -eq 7 ]
+		then
+  			wget --timeout=3 --tries=3 https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+  			sudo rpm -ivh epel-release-latest-7.noarch.rpm 
+ 		elif [ $Release -eq 6 ] 
+		then
+  			wget --timeout=3 --tries=3 https://dl.fedoraproject.org/pub/epel/epel-release-latest-6.noarch.rpm
+  			sudo rpm -ivh epel-release-latest-6.noarch.rpm 
+		fi
+		sudo yum provides lxc | sed '/^\s*$/d' | grep Repo | sort -u
 	fi
-	sudo yum provides lxc | sed '/^\s*$/d' | grep Repo | sort -u
+
 	cd /home/ubuntu/Downloads/orabuntu-lxc-master
 
 	sudo yum -y install debootstrap perl bash-completion bash-completion-extras
-	sudo yum -y install lxc libcap-devel libcgroup wget bridge-utils
+	sudo yum -y install lxc libcap-devel libcgroup wget bridge-utils lsb
+
+	if [ $LinuxFlavor = 'Fedora' ]
+	then
+		sudo yum -y install lxc-templates lxc-extra libvirt gpg
+	fi
 
 	echo ''
 	echo "=============================================="
@@ -476,16 +529,19 @@ then
 	echo ''
 
 	sudo yum -y install wget tar gzip libtool
- 	mkdir -p /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/epel
-  	cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/epel
-	if [ $Release -eq 7 ] 
+	if [ $LinuxFlavor != 'Fedora' ]
 	then
-  		wget --timeout=3 --tries=3 https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
-  		sudo rpm -ivh epel-release-latest-7.noarch.rpm 
- 	elif [ $Release -eq 6 ] 
-	then
-  		wget --timeout=3 --tries=3 https://dl.fedoraproject.org/pub/epel/epel-release-latest-6.noarch.rpm
-  		sudo rpm -ivh epel-release-latest-6.noarch.rpm 
+ 		mkdir -p /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/epel
+  		cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/epel
+		if [ $Release -eq 7 ] 
+		then
+  			wget --timeout=3 --tries=3 https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+  			sudo rpm -ivh epel-release-latest-7.noarch.rpm 
+ 		elif [ $Release -eq 6 ] 
+		then
+  			wget --timeout=3 --tries=3 https://dl.fedoraproject.org/pub/epel/epel-release-latest-6.noarch.rpm
+  			sudo rpm -ivh epel-release-latest-6.noarch.rpm 
+		fi
 	fi
 	sudo yum provides lxc | sed '/^\s*$/d' | grep Repo | sort -u
 	cd /home/ubuntu/Downloads/orabuntu-lxc-master
@@ -673,6 +729,11 @@ then
 			echo ''
 
 			cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc/rpmbuild/RPMS/x86_64
+			if [ $LinuxFlavor = 'CentOS' ]
+			then
+				sudo yum -y erase lxc-libs
+			fi
+			sleep 5
 			sudo yum -y localinstall *.rpm
 			cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/lxc
 
@@ -766,16 +827,25 @@ then
 
 	echo ''
 	echo "=============================================="
-	echo "Display Bridge lxcbr0...                      "
+	echo "Display Bridge for LXC ...                    "
 	echo "=============================================="
 	echo ''
 
 	sleep 5
 
-	sudo ifconfig lxcbr0
+	if [ $LinuxFlavor != 'CentOS' ]
+	then
+		sudo ifconfig lxcbr0
+	else
+		sudo ifconfig virbr0
+		if [ $? -eq 0 ]
+		then
+			sudo sed -i "s/lxcbr0/virbr0/g" /etc/lxc/default.conf
+		fi
+	fi
 
 	echo "=============================================="
-	echo "Done: Display Bridge lxcbr0                   "
+	echo "Done: Display Bridge for LXC                  "
 	echo "=============================================="
 
 	sleep 5
@@ -824,7 +894,7 @@ sleep 5
 
 cd /home/ubuntu/Downloads/orabuntu-lxc-master
 
-sudo yum -y install curl ruby tar which	
+sudo yum -y install curl ruby tar which 
 sudo yum -y install wget tar gzip
 sudo yum -y install libcap-devel libcgroup 
 sudo yum -y install wget bridge-utils
@@ -836,6 +906,11 @@ sudo yum -y install net-tools wireless-tools
 sudo yum -y install openssh-server uuid sshpass
 sudo yum -y install rpm ntp iotop
 sudo yum -y install iptables gawk yum-utils
+
+if [ $LinuxFlavor = 'CentOS' ] || [ $LinuxFlavor = 'Fedora' ]
+then
+	sudo yum -y install lsb
+fi
 
 echo ''
 echo "=============================================="
@@ -983,9 +1058,9 @@ then
 		
 		if    [ $Release -eq 6 ]
 		then
-			sudo yum install -y autoconf automake gcc libtool rpm-build
-			sudo yum install -y openssl-devel python-devel kernel-uek-debug-devel kernel-devel 
-			sudo yum install -y kernel-uek-devel-`uname -r` redhat-rpm-config kabi-whitelists
+			sudo yum -y install autoconf automake gcc libtool rpm-build
+			sudo yum -y install openssl-devel python-devel kernel-uek-debug-devel kernel-devel 
+			sudo yum -y install kernel-uek-devel-`uname -r` redhat-rpm-config kabi-whitelists
 			sudo rm /lib/modules/`uname -r`/build
 			sudo ln -s /usr/src/kernels/`uname -r` /lib/modules/`uname -r`/build
 			sudo sed -i -e '/\[public_ol6_software_collections\]/,/^\[/s/enabled=0/enabled=1/' /etc/yum.repos.d/public-yum-ol6.repo
@@ -1186,35 +1261,42 @@ then
 	clear
 fi
 
-# echo ''
-# echo "=============================================="
-# echo "Verify required packages status...            "
-# echo "=============================================="
-# echo ''
+echo ''
+echo "=============================================="
+echo "Verify required packages status...            "
+echo "=============================================="
+echo ''
 
-# if [ $Release -eq 7 ] || [ $Release -eq 6 ]
-# then
-# function CheckPackageInstalled {
-# echo 'automake bind-utils bridge-utils curl debootstrap docbook docbook2X facter gawk gcc graphviz gzip iotop iptables libcap-devel libcgroup lxc lxc-2 lxc-debug lxc-devel lxc-libs make net-tools ntp openssh-server openssl-devel openvswitch-2 openvswitch-debug perl rpm rpm-build ruby sshpass tar uuid wget which xmlto yum'
-# }
-# fi
+if [ $Release -eq 7 ] || [ $Release -eq 6 ]
+then
+	if [ $LinuxFlavor != 'Fedora' ]
+	then
+		function CheckPackageInstalled {
+			echo 'automake bind-utils bridge-utils curl debootstrap docbook docbook2X facter gawk gcc graphviz gzip iotop iptables libcap-devel libcgroup lsb lxc lxc-2 lxc-debug lxc-devel lxc-libs make net-tools ntp openssh-server openssl-devel openvswitch-2 openvswitch-debug perl rpm rpm-build ruby sshpass tar uuid wget which xmlto yum-utils'
+		}
+	else
+		function CheckPackageInstalled {
+			echo 'automake bind-utils bridge-utils curl debootstrap docbook docbook2X facter gawk gcc graphviz gzip iotop iptables libcap-devel libcgroup lsb lxc lxc-2 lxc-debug lxc-devel lxc-libs make net-tools ntp openssh-server openssl-devel openvswitch-2 openvswitch-debug perl rpm rpm-build ruby sshpass tar uuid wget which xmlto yum-utils'
+		}
+	fi
+fi
 
-# PackageInstalled=$(CheckPackageInstalled)
+PackageInstalled=$(CheckPackageInstalled)
 
-# for i in $PackageInstalled
-# do
-# sudo rpm -qa | grep $i | tail -1 | sed 's/^/Installed: /' 
-# done
+for i in $PackageInstalled
+do
+sudo rpm -qa | grep $i | tail -1 | sed 's/^/Installed: /' 
+done
 
-# echo ''
-# echo "=============================================="
-# echo "Verify required packages status completed.    "
-# echo "=============================================="
-# echo ''
+echo ''
+echo "=============================================="
+echo "Verify required packages status completed.    "
+echo "=============================================="
+echo ''
 
-# sleep 5
+sleep 5
 
-# clear
+clear
 
 echo ''
 echo "=============================================="
@@ -1820,7 +1902,7 @@ clear
 
 sudo chmod 755 /etc/network/openvswitch/*.sh
 
-if [ $MultiHostVar3 = 'X' ]
+if   [ $MultiHostVar3 = 'X' ]
 then
 	echo ''
 	echo "=============================================="
@@ -1865,6 +1947,17 @@ then
 	sleep 5
 
 	clear
+elif [ $MultiHostVar3 = 'X' ] && [ $MultiHostVar2 = 'Y' ] && [ $GRE = 'N' ]
+then
+	function GetSx1Index {
+		sudo cat /etc/network/openvswitch/sx1.info | cut -f2 -d':' | cut -f4 -d'.'
+	}
+	Sx1Index=$(GetSx1Index)
+
+	function GetSw1Index {
+		sudo cat /etc/network/openvswitch/sw1.info | cut -f2 -d':' | cut -f4 -d'.'
+	}
+	Sw1Index=$(GetSw1Index)
 else
 	Sw1Index=$MultiHostVar3
 	Sx1Index=$MultiHostVar3
@@ -2611,67 +2704,70 @@ clear
 
 if [ $SystemdResolvedInstalled -eq 0 ] && [ $NetworkManagerRunning -ge 1 ]
 then
-	echo ''
-	echo "=============================================="
-	echo "Configure NetworkManager with dnsmasq...      "
-	echo "=============================================="
-	echo ''
+	if [ $GRE = 'Y' ] || [ $MultiHostVar2 = 'N' ]
+	then
+		echo ''
+		echo "=============================================="
+		echo "Configure NetworkManager with dnsmasq...      "
+		echo "=============================================="
+		echo ''
 
-	function GetDhcpRange {
-		cat /etc/sysconfig/lxc-net | grep LXC_DHCP_RANGE | cut -f2 -d'=' | sed 's/"//g' 
-	}
-	DhcpRange=$(GetDhcpRange)
+		function GetDhcpRange {
+			cat /etc/sysconfig/lxc-net | grep LXC_DHCP_RANGE | cut -f2 -d'=' | sed 's/"//g' 
+		}
+		DhcpRange=$(GetDhcpRange)
 
-	function GetListenAddress {
-		cat /etc/sysconfig/lxc-net | grep LXC_ADDR | cut -f2 -d'=' | sed 's/"//g'
-	}
-	ListenAddress=$(GetListenAddress)
+		function GetListenAddress {
+			cat /etc/sysconfig/lxc-net | grep LXC_ADDR | cut -f2 -d'=' | sed 's/"//g'
+		}
+		ListenAddress=$(GetListenAddress)
 
-	function GetDnsmasqPid {
-		ps -eo pid,comm | grep dnsmasq | sed 's/^[ \t]*//;s/[ \t]*$//' | cut -f1 -d' '
-	}
-	DnsmasqPid=$(GetDnsmasqPid)
+		function GetDnsmasqPid {
+			ps -eo pid,comm | grep dnsmasq | sed 's/^[ \t]*//;s/[ \t]*$//' | cut -f1 -d' '
+		}
+		DnsmasqPid=$(GetDnsmasqPid)
 
-#	sudo kill -9 $DnsmasqPid > /dev/null 2>&1
+#		sudo kill -9 $DnsmasqPid > /dev/null 2>&1
 
-	DHR="$DhcpRange"
-	LFL="/var/lib/misc/dnsmasq.lxcbr0.leases"
-	ADR="$ListenAddress"
-	PFL="/var/run/lxc/dnsmasq.pid"
-	CFL="/etc/dnsmasq.conf"
+		DHR="$DhcpRange"
+		LFL="/var/lib/misc/dnsmasq.lxcbr0.leases"
+		ADR="$ListenAddress"
+		PFL="/var/run/lxc/dnsmasq.pid"
+		CFL="/etc/dnsmasq.conf"
 
-	sudo sed -i '/plugins=ifcfg-rh/a dns=none' /etc/NetworkManager/NetworkManager.conf
-	sudo sed -i '$!N; /^\(.*\)\n\1$/!P; D' /etc/NetworkManager/NetworkManager.conf
-	sudo yum -y install dnsmasq
-#	sudo tar -vP --extract --file=ubuntu-host.tar /etc/dnsmasq.conf
-#	sudo tar -vP --extract --file=ubuntu-host.tar /etc/resolv.dnsmasq
-	sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /etc/dnsmasq.conf
-	sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /etc/dnsmasq.conf
-	sudo sed -i '/LXC_DHCP_CONFILE/s/#//' /etc/sysconfig/lxc-net
-	sudo sed -i 's/^[ \t]*//' /etc/dnsmasq.conf
-	sudo sed -i "/LXC_DHCP_CONFILE/s/LXC_DHCP_CONFILE=\/etc\/lxc\/dnsmasq.conf/LXC_DHCP_CONFILE=\/etc\/dnsmasq.conf/" /etc/sysconfig/lxc-net
-	sudo sed -i "s/DHCP-RANGE-OLXC/dhcp-range=$DHR/" /etc/dnsmasq.conf
-	sudo service NetworkManager restart
-	sleep 5
-	sudo systemctl daemon-reload
-	sudo rm -f /etc/resolv.conf
-	sudo sh -c "echo 'nameserver 127.0.0.1' 			>  /etc/resolv.conf"
-	sudo sh -c "echo 'search $Domain1 $Domain2 gns1.$Domain1' 	>> /etc/resolv.conf"
-	sudo service lxc-net restart
- 	sudo service lxc-net status
-	sleep 5
-	nslookup $NameServer
-#	nslookup 10.207.39.2
-#	nslookup 10.207.29.2
-#	nslookup yum.oracle.com
-	ping -c 3 $NameServer
-#	ping -c 3 yum.oracle.com
+		sudo sed -i '/plugins=ifcfg-rh/a dns=none' /etc/NetworkManager/NetworkManager.conf
+		sudo sed -i '$!N; /^\(.*\)\n\1$/!P; D' /etc/NetworkManager/NetworkManager.conf
+		sudo yum -y install dnsmasq
+#		sudo tar -vP --extract --file=ubuntu-host.tar /etc/dnsmasq.conf
+#		sudo tar -vP --extract --file=ubuntu-host.tar /etc/resolv.dnsmasq
+		sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /etc/dnsmasq.conf
+		sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /etc/dnsmasq.conf
+		sudo sed -i '/LXC_DHCP_CONFILE/s/#//' /etc/sysconfig/lxc-net
+		sudo sed -i 's/^[ \t]*//' /etc/dnsmasq.conf
+		sudo sed -i "/LXC_DHCP_CONFILE/s/LXC_DHCP_CONFILE=\/etc\/lxc\/dnsmasq.conf/LXC_DHCP_CONFILE=\/etc\/dnsmasq.conf/" /etc/sysconfig/lxc-net
+		sudo sed -i "s/DHCP-RANGE-OLXC/dhcp-range=$DHR/" /etc/dnsmasq.conf
+		sudo service NetworkManager restart
+		sleep 5
+		sudo systemctl daemon-reload
+		sudo rm -f /etc/resolv.conf
+		sudo sh -c "echo 'nameserver 127.0.0.1' 			>  /etc/resolv.conf"
+		sudo sh -c "echo 'search $Domain1 $Domain2 gns1.$Domain1' 	>> /etc/resolv.conf"
+		sudo service lxc-net restart
+ 		sudo service lxc-net status
+		sleep 5
+		nslookup $NameServer
+#		nslookup 10.207.39.2
+#		nslookup 10.207.29.2
+#		nslookup yum.oracle.com
+		ping -c 3 $NameServer
+#		ping -c 3 yum.oracle.com
 	
-	echo ''
-	echo "=============================================="
-	echo "Done: Configure NetworkManager with dnsmasq.  "
-	echo "=============================================="
-	echo ''
+		echo ''
+		echo "=============================================="
+		echo "Done: Configure NetworkManager with dnsmasq.  "
+		echo "=============================================="
+		echo ''
+	fi
 fi
 
 sleep 5

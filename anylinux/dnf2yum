@@ -1,0 +1,12 @@
+#!/bin/bash
+sudo sed -i "s/dnf -y install/yum -y install/g" 			/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/uekulele-services-[012345].sh
+sudo sed -i "s/dnf -y erase/yum -y erase/g" 				/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/uekulele-services-[012345].sh
+sudo sed -i "s/dnf -y localinstall/yum -y localinstall/g" 		/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/uekulele-services-[012345].sh
+sudo sed -i "s/dnf clean all/yum clean all/g" 				/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/uekulele-services-[012345].sh
+sudo sed -i "s/dnf provides/yum provides/g" 				/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/uekulele-services-[012345].sh
+sudo sed -i "s/dnf-utils/yum-utils/g" 					/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/uekulele-services-[012345].sh
+sudo sed -i "s/dnf -y install/yum -y install/g"				/home/ubuntu/Downloads/orabuntu-lxc-master/anylinux/anylinux-services-1.sh
+sudo sed -i "s/dnf-utils/yum-utils/g"					/home/ubuntu/Downloads/orabuntu-lxc-master/anylinux/anylinux-services-1.sh
+sudo sed -i "s/dnf-complete-transaction/yum-complete-transaction/g"	/home/ubuntu/Downloads/orabuntu-lxc-master/anylinux/anylinux-services-1.sh
+grep dnf 								/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/uekulele-services-[012345].sh | egrep -v 'yum.repos.d|yum.oracle.com'
+
