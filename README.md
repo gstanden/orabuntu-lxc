@@ -1,6 +1,6 @@
 # Orabuntu-LXC Updates
 
-Begin Update:  January 16, 2018
+Begin Update:  January 17, 2018
 
 Orabuntu-LXC announces the upcoming release of Orabuntu-LXC v6.0-beta "AMIDE" edition (already in dev branch).  
 
