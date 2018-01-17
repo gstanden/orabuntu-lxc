@@ -15,7 +15,7 @@ Want to quickly test Orabuntu-LXC v6.0-beta AMIDE edition?  Easy!
 ```
 That's it!  Orabuntu-LXC takes care of all the rest of the work!  
 
-Orabuntu-LXC is powerful infrastructure deployment software. Highly-flexible, it can span your container and VM networks across multiple physical hosts over GRE tunnels that it builds for you, running LXC and Docker containers on the physical hosts, as well as VMs on the physical hosts, and even Docker and LXC containers in the VM's on the physical hosts, all FULLY-NETWORKED (LAN and WAN) right out of the box over the included OpenvSwitch software defined network (SDN) in just minutes fully-automated.
+Orabuntu-LXC is powerful infrastructure deployment software. Highly-flexible, it can span your container and VM networks across multiple physical hosts over GRE tunnels that it builds for you, running LXC and Docker containers on the physical hosts, as well as VMs on the physical hosts, and even Docker and LXC containers in the VM's on the physical hosts, all FULLY-NETWORKED (LAN and WAN) right out of the box over the OpenvSwitch software defined network (SDN) which it builds for you in just minutes all fully-automated.
 
 On RedHat-based Linuxes, Orabuntu-LXC builds your choice (version is configurable in anylinux-services.sh) of LXC and OpenvSwitch version from source code as RPM packages and installs them.
 
