@@ -25,7 +25,7 @@ A blog post will be forthcoming detailing the extensive expansion of features an
 
 For installs beyond the first install including adding multiple GRE-connected physical hosts, rhe main variables that need to be set are shown below. The additional installs are ALL also done with the one simple command: 
 ```
-"./anylinux-services.sh"
+./anylinux-services.sh
 ```
 and configuration of a few simple variables in anylinux-services.sh listed below.
 ```
