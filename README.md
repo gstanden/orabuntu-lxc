@@ -23,7 +23,11 @@ When the v6.0-beta AMIDE is released in github, you will be able to use ANY linu
 
 A blog post will be forthcoming detailing the extensive expansion of features and capabilities. The Orabuntu-LXC v6.0-beta "AMIDE" edition software is already in dev branch. Creating a wiki, user manual, and better documentation is a major Orabuntu-LXC roadmap item for 2018.  For now, the anylinux-services.sh file has an extensive header explaining how to use the software. 
 
-For installs beyond the first install including adding multiple GRE-connected physical hosts, rhe main variables that need to be set are shown below. The additional installs are ALL also done with the one simple command: ./anylinux-services.sh and configuration of a few simple variables in anylinux-services.sh listed below.
+For installs beyond the first install including adding multiple GRE-connected physical hosts, rhe main variables that need to be set are shown below. The additional installs are ALL also done with the one simple command: 
+```
+"./anylinux-services.sh"
+```
+and configuration of a few simple variables in anylinux-services.sh listed below.
 ```
 SudoPassword
 GRE
