@@ -2,7 +2,22 @@
 
 Begin Update:  January 16, 2018
 
-Orabuntu-LXC announces the upcoming release of Orabuntu-LXC v6.0-beta "AMIDE" edition.  A blog post will be forthcoming detailing the extensive expansion of features and capabilities. The Orabuntu-LXC v6.0-beta "AMIDE" edition software is already in dev branch. Creating a wiki, user manual, and better documentation is a major Orabuntu-LXC roadmap item for 2018.  For now, the anylinux-services.sh file has an extensive header explaining how to use the software.  The main variables that need to be set are:
+Orabuntu-LXC announces the upcoming release of Orabuntu-LXC v6.0-beta "AMIDE" edition (already in dev branch).  
+
+Want to quickly test Orabuntu-LXC v6.0-beta AMIDE edition?  Easy!
+```
+1.  Create an "ubuntu" linux account with "SUDO ALL" privileges on a VM or physical host (VM is recommended for testing).
+2.  This can be on any of our supported OS including: Ubuntu 16/17, RedHat 7, Oracle Linux 7, CentOS 7, Fedora27
+2.  Download the Orabuntu-LXC archive https://github.com/gstanden/orabuntu-lxc/archive/master.zip to "/home/ubuntu/Downloads"
+3.  Unzip the archive
+4.  cd to /home/ubuntu/Downloads/orabuntu-lxc-master/anylinux
+5.  ./anylinux-services.sh
+```
+That's it!  Orabuntu-LXC takes care of all the rest of the work.  When the v6.0-beta AMIDE is released in github, you will be able to use any linux account with SUDO ALL privilege as the dependence of "ubuntu" user will be removed in the release.
+
+A blog post will be forthcoming detailing the extensive expansion of features and capabilities. The Orabuntu-LXC v6.0-beta "AMIDE" edition software is already in dev branch. Creating a wiki, user manual, and better documentation is a major Orabuntu-LXC roadmap item for 2018.  For now, the anylinux-services.sh file has an extensive header explaining how to use the software.  
+
+The main variables that need to be set are:
 ```
 SudoPassword
 GRE
