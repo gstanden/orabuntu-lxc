@@ -2,7 +2,14 @@
 
 Begin Update:  January 16, 2018
 
-Orabuntu-LXC announces the upcoming release of Orabuntu-LXC v6.0-beta "AMIDE" edition.  A blog post will be forthcoming detailing the extensive expansion of features and capabilities. The Orabuntu-LXC v6.0-beta "AMIDE" edition software is already in dev branch.
+Orabuntu-LXC announces the upcoming release of Orabuntu-LXC v6.0-beta "AMIDE" edition.  A blog post will be forthcoming detailing the extensive expansion of features and capabilities. The Orabuntu-LXC v6.0-beta "AMIDE" edition software is already in dev branch. Creating a wiki, user manual, and better documentation is a major Orabuntu-LXC roadmap item for 2018.  For now, the anylinux-services.sh file has an extensive header explaining how to use the software.  The main variables that need to be set are:
+
+SudoPassword
+GRE
+Set subnet IP ranges
+MultiHost
+
+Use of these variables is explained operationally in anylinux-services.sh file.  As mentioned, documentation is coming!
 
 Begin Update:  January 11, 2018
 
