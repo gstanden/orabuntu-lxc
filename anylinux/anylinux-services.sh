@@ -125,7 +125,7 @@ DistDir=$(GetDistDir)
 # echo "=============================================="
 
 SudoPassword=ubuntu
-GRE=Y
+GRE=N
 
 # GLS 20180112
 # User-settable subnets added
@@ -426,7 +426,7 @@ then
 	# First Orabuntu-LXC host (physical or virtual):
 	# (Note:  values for first Orabuntu-LXC host should normally not be changed from the following except possibly for MTU 9000 instead of 1500)
 
-	#MultiHost="new:N:1:$SudoPassword:X:X:1500:X:X:$GRE"         # <-- default value for first Orabuntu-LXC host install ("hub" host).
+	 MultiHost="new:N:1:$SudoPassword:X:X:1500:X:X:$GRE"         # <-- default value for first Orabuntu-LXC host install ("hub" host).
 	#MultiHost="reinstall:N:1:$SudoPassword:X:X:1500:X:X:$GRE"
 
 	# Additional Orabuntu-LXC physical hosts (physical or virtual  hosts over GRE):
@@ -435,7 +435,7 @@ then
 	# (Note: for now, you MUST use the "ubuntu" user on the remote GRE host with password "ubuntu" also).
 
 	#MultiHost="new:Y:X:$SudoPassword:192.168.1.10:192.168.1.16:1420:ubuntu:ubuntu:$GRE"
-	 MultiHost="reinstall:Y:X:$SudoPassword:192.168.7.32:192.168.7.37:1420:ubuntu:ubuntu:$GRE"
+	#MultiHost="reinstall:Y:X:$SudoPassword:192.168.7.32:192.168.7.37:1420:ubuntu:ubuntu:$GRE"
 
 	# Additional Orabuntu-LXC virtual hosts (VM is on an Orabuntu-LXC physical host AND VM is on the Orabuntu-LXC OpenvSwitch network):
 
