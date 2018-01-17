@@ -6,14 +6,18 @@ Orabuntu-LXC announces the upcoming release of Orabuntu-LXC v6.0-beta "AMIDE" ed
 
 Want to quickly test Orabuntu-LXC v6.0-beta AMIDE edition?  Easy!
 ```
-1.  Create an "ubuntu" linux account with "SUDO ALL" privileges on a VM or physical host (VM is recommended for testing).
-2.  This can be on any of our supported OS including: Ubuntu 16/17, RedHat 7, Oracle Linux 7, CentOS 7, Fedora27
-2.  Download the Orabuntu-LXC archive https://github.com/gstanden/orabuntu-lxc/archive/master.zip to "/home/ubuntu/Downloads"
-3.  Unzip the archive
+1.  Create "ubuntu" OS account w/"SUDO ALL" privs on VM or physical host (VM recommended for 1st test).
+2.  Supported OS include: Ubuntu 16/17, RedHat 7, Oracle Linux 7, CentOS 7, Fedora27
+2.  Download https://github.com/gstanden/orabuntu-lxc/archive/master.zip to "/home/ubuntu/Downloads"
+3.  Unzip archive
 4.  cd to /home/ubuntu/Downloads/orabuntu-lxc-master/anylinux
 5.  ./anylinux-services.sh
 ```
-That's it!  Orabuntu-LXC takes care of all the rest of the work.  When the v6.0-beta AMIDE is released in github, you will be able to use any linux account with SUDO ALL privilege as the dependence of "ubuntu" user will be removed in the release.
+That's it!  Orabuntu-LXC takes care of all the rest of the work!  
+
+Orabuntu-LXC is powerful infrastructure deployment software. Highly-flexible, it can build networks of physical hosts connected over GRE tunnels, LXC and Docker containers on those physical hosts, as well as VMs on the physical hosts, and even Docker and LXC containers in the VM's on the physical hosts, all FULLY-NETWORKED right out of the box over the included OpenvSwitch software defined network (SDN).
+
+When the v6.0-beta AMIDE is released in github, you will be able to use ANY linux account with SUDO ALL privilege as the dependence of "ubuntu" user will be removed in the release.
 
 A blog post will be forthcoming detailing the extensive expansion of features and capabilities. The Orabuntu-LXC v6.0-beta "AMIDE" edition software is already in dev branch. Creating a wiki, user manual, and better documentation is a major Orabuntu-LXC roadmap item for 2018.  For now, the anylinux-services.sh file has an extensive header explaining how to use the software.  
 
