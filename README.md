@@ -17,7 +17,7 @@ That's it!  Orabuntu-LXC takes care of all the rest of the work!
 
 Orabuntu-LXC is powerful infrastructure deployment software. Highly-flexible, it can build networks of physical hosts connected over GRE tunnels, LXC and Docker containers on those physical hosts, as well as VMs on the physical hosts, and even Docker and LXC containers in the VM's on the physical hosts, all FULLY-NETWORKED right out of the box over the included OpenvSwitch software defined network (SDN).
 
-When the v6.0-beta AMIDE is released in github, you will be able to use ANY linux account with SUDO ALL privilege as the dependence of "ubuntu" user will be removed in the release.
+When the v6.0-beta AMIDE is released in github, you will be able to use ANY linux account with SUDO ALL privilege as the dependence of "ubuntu" user will be removed in this release.
 
 A blog post will be forthcoming detailing the extensive expansion of features and capabilities. The Orabuntu-LXC v6.0-beta "AMIDE" edition software is already in dev branch. Creating a wiki, user manual, and better documentation is a major Orabuntu-LXC roadmap item for 2018.  For now, the anylinux-services.sh file has an extensive header explaining how to use the software.  
 
