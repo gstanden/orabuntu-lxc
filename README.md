@@ -19,7 +19,7 @@ Orabuntu-LXC is powerful infrastructure deployment software. Highly-flexible, it
 
 On RedHat-based Linuxes, Orabuntu-LXC builds your choice (version is configurable in anylinux-services.sh) of LXC and OpenvSwitch version from source code as RPM packages and installs them.
 
-When the v6.0-beta AMIDE is released in github, you will be able to use ANY linux account with SUDO ALL privilege as the dependence of "ubuntu" user will be removed in this release.
+When the v6.0-beta AMIDE is released in github, you will be able to use ANY linux account with SUDO ALL privilege as the dependence of "ubuntu" user will be removed in this release.  Planned security enhancements are coming which will remove the current "SUDO ALL" requirement and reduce the SUDO privileges to only those commands needed.
 
 A blog post will be forthcoming detailing the extensive expansion of features and capabilities. The Orabuntu-LXC v6.0-beta "AMIDE" edition software is already in dev branch. Creating a wiki, user manual, and better documentation is a major Orabuntu-LXC roadmap item for 2018.  For now, the anylinux-services.sh file has an extensive header explaining how to use the software. 
 
