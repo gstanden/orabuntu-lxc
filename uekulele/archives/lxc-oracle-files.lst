@@ -1,5 +1,3 @@
-COPYING
-GNU3
 rootfs/etc/NetworkManager/dnsmasq.d/local
 rootfs/etc/nsswitch.conf
 rootfs/etc/ntp.conf
@@ -30,7 +28,7 @@ rootfs/root/packages.sh
 rootfs/etc/dhcp/dhclient.conf
 rootfs/etc/fstab
 rootfs/etc/security/limits.conf
-config.asm.flex.cluster
-config.oracle.bak.oel5
-config.oracle.bak.oel6
-config.oracle.bak.oel7
+rootfs/config.asm.flex.cluster
+rootfs/config.oracle.bak.oel5
+rootfs/config.oracle.bak.oel6
+rootfs/config.oracle.bak.oel7

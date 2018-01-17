@@ -16,18 +16,20 @@
 #    You should have received a copy of the GNU General Public License
 #    along with Orabuntu-LXC.  If not, see <http://www.gnu.org/licenses/>.
 
-#    v2.4 	GLS 20151224
-#    v2.8 	GLS 20151231
-#    v3.0 	GLS 20160710 Updates for Ubuntu 16.04
-#    v4.0 	GLS 20161025 DNS DHCP services moved into an LXC container
-#    v5.0 	GLS 20170909 Orabuntu-LXC MultiHost
-#    v5.33-beta	GLS 20180106 Orabuntu-LXC EE MultiHost Docker AWS S3
+#    v2.4 		GLS 20151224
+#    v2.8 		GLS 20151231
+#    v3.0 		GLS 20160710 Updates for Ubuntu 16.04
+#    v4.0 		GLS 20161025 DNS DHCP services moved into an LXC container
+#    v5.0 		GLS 20170909 Orabuntu-LXC Multi-Host
+#    v6.0-AMIDE-beta	GLS 20180106 Orabuntu-LXC AmazonS3 Multi-Host Docker Enterprise Edition (AMIDE)
 
 #    Note that this software builds a containerized DNS DHCP solution (bind9 / isc-dhcp-server).
 #    The nameserver should NOT be the name of an EXISTING nameserver but an arbitrary name because this software is CREATING a new LXC-containerized nameserver.
 #    The domain names can be arbitrary fictional names or they can be a domain that you actually own and operate.
 #    There are two domains and two networks because the "seed" LXC containers are on a separate network from the production LXC containers.
-#    If the domain is an actual domain, you will need to change the subnet though (a feature this software does not yet support - it's on the roadmap) to match your subnet manually.
+#    If the domain is an actual domain, you will need to change the subnet using the subnets feature of Orabuntu-LXC
+#
+#!/bin/bash
 
 clear
 
@@ -53,6 +55,7 @@ Domain1=$3
 Domain2=$4
 MultiHost=$5
 NameServer=$6
+DistDir=$7
 
 function SoftwareVersion { echo "$@" | awk -F. '{ printf("%d%03d%03d%03d\n", $1,$2,$3,$4); }'; }
 
@@ -141,7 +144,8 @@ echo "Extracting oracle-specific files to container."
 echo "=============================================="
 echo ''
 
-sudo tar -xvf /home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/lxc-oracle-files.tar -C /var/lib/lxc/oel$OracleRelease$SeedPostfix --touch
+cd /tmp/"$DistDir"/orabuntu/archives
+sudo tar -xvf /tmp/"$DistDir"/orabuntu/archives/lxc-oracle-files.tar -C /var/lib/lxc/oel$OracleRelease$SeedPostfix --touch
 
 sudo chown root:root /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/root/hugepages_setting.sh
 sudo chmod 755 /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/root/hugepages_setting.sh
@@ -188,12 +192,12 @@ echo ''
 sudo cp /var/lib/lxc/oel$OracleRelease$SeedPostfix/config /var/lib/lxc/oel$OracleRelease$SeedPostfix/config.original.bak
 
 function GetOriginalHwaddr {
-sudo cat /var/lib/lxc/oel$OracleRelease$SeedPostfix/config | grep hwaddr | tail -1 | sed 's/\./\\\./g'
+	sudo cat /var/lib/lxc/oel$OracleRelease$SeedPostfix/config | grep hwaddr | tail -1 | sed 's/\./\\\./g'
 }
 OriginalHwaddr=$(GetOriginalHwaddr)
 echo $OriginalHwaddr | sed 's/\\//g'
 
-sudo cp -p /var/lib/lxc/oel$OracleRelease$SeedPostfix/config.oracle.bak.oel$MajorRelease /var/lib/lxc/oel$OracleRelease$SeedPostfix/config.oracle
+sudo cp -p /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/config.oracle.bak.oel$MajorRelease /var/lib/lxc/oel$OracleRelease$SeedPostfix/config.oracle
 
 sudo sed -i "s/lxc\.network\.hwaddr.*/$OriginalHwaddr/" /var/lib/lxc/oel$OracleRelease$SeedPostfix/config.oracle
 sudo cp -p /var/lib/lxc/oel$OracleRelease$SeedPostfix/config.oracle /var/lib/lxc/oel$OracleRelease$SeedPostfix/config

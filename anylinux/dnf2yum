@@ -1,4 +1,5 @@
 #!/bin/bash
+
 sudo sed -i "s/dnf -y install/yum -y install/g" 			/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/uekulele-services-[012345].sh
 sudo sed -i "s/dnf -y erase/yum -y erase/g" 				/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/uekulele-services-[012345].sh
 sudo sed -i "s/dnf -y localinstall/yum -y localinstall/g" 		/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/uekulele-services-[012345].sh

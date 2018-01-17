@@ -1,5 +1,3 @@
-GNU3
-COPYING
 /etc/network/if-down.d/openvswitch/nsa-pub-ifdown-sw1
 /etc/network/if-down.d/openvswitch/nsa-pub-ifdown-sx1
 /etc/network/if-up.d/orabuntu-lxc-net
@@ -14,12 +12,13 @@ COPYING
 /etc/network/openvswitch/del-bridges.sh
 /etc/network/openvswitch/strt_nsa.sh
 /etc/network/openvswitch/veth_cleanups.sh
-/var/lib/lxc/nsa/config
 /etc/network/if-up.d/openvswitch/nsa-pub-ifup-sx1
 /etc/network/if-up.d/openvswitch/nsa-pub-ifup-sw1
 /etc/network/openvswitch/crt_ovs_sw2.sh
 /etc/network/openvswitch/crt_ovs_sw3.sh
 /etc/network/openvswitch/crt_ovs_sx1.sh
 /etc/network/openvswitch/setup_gre_and_routes.sh
-/etc/network/openvswitch/crt_ovs_sw1.sh
 /etc/network/openvswitch/ns_restore.sh
+/etc/network/openvswitch/crt_ovs_sw1.sh
+/etc/GNU3
+/etc/COPYING

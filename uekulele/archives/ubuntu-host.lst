@@ -1,5 +1,4 @@
 COPYING
-GNU3
 /etc/multipath.conf.example
 /etc/network/if-down.d/openvswitch/lxcora00-asm1-ifdown-sw8
 /etc/network/if-down.d/openvswitch/lxcora00-asm2-ifdown-sw9

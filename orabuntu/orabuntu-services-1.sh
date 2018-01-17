@@ -1,4 +1,5 @@
 #!/bin/bash
+
 #    Copyright 2015-2018 Gilbert Standen
 #    This file is part of Orabuntu-LXC.
 
@@ -15,18 +16,20 @@
 #    You should have received a copy of the GNU General Public License
 #    along with Orabuntu-LXC.  If not, see <http://www.gnu.org/licenses/>.
 
-#    v2.4 	GLS 20151224
-#    v2.8 	GLS 20151231
-#    v3.0 	GLS 20160710 Updates for Ubuntu 16.04
-#    v4.0 	GLS 20161025 DNS DHCP services moved into an LXC container
-#    v5.0 	GLS 20170909 Orabuntu-LXC MultiHost
-#    v5.33-beta	GLS 20180106 Orabuntu-LXC EE MultiHost Docker AWS S3
+#    v2.4 		GLS 20151224
+#    v2.8 		GLS 20151231
+#    v3.0 		GLS 20160710 Updates for Ubuntu 16.04
+#    v4.0 		GLS 20161025 DNS DHCP services moved into an LXC container
+#    v5.0 		GLS 20170909 Orabuntu-LXC Multi-Host
+#    v6.0-AMIDE-beta	GLS 20180106 Orabuntu-LXC AmazonS3 Multi-Host Docker Enterprise Edition (AMIDE)
 
 #    Note that this software builds a containerized DNS DHCP solution (bind9 / isc-dhcp-server).
 #    The nameserver should NOT be the name of an EXISTING nameserver but an arbitrary name because this software is CREATING a new LXC-containerized nameserver.
 #    The domain names can be arbitrary fictional names or they can be a domain that you actually own and operate.
 #    There are two domains and two networks because the "seed" LXC containers are on a separate network from the production LXC containers.
-#    If the domain is an actual domain, you will need to change the subnet though (a feature this software does not yet support - it's on the roadmap) to match your subnet manually.
+#    If the domain is an actual domain, you will need to change the subnet using the subnets feature of Orabuntu-LXC
+#
+#!/bin/bash
 
 MajorRelease=$1
 PointRelease=$2
@@ -37,6 +40,7 @@ Domain2=$4
 NameServer=$5
 OSMemRes=$6
 MultiHost=$7
+DistDir=$8
 
 function SoftwareVersion { echo "$@" | awk -F. '{ printf("%d%03d%03d%03d\n", $1,$2,$3,$4); }'; }
 
@@ -298,14 +302,14 @@ then
 		sudo rm -f  /etc/network/if-up.d/openvswitch/*
 		sudo rm -f  /etc/network/if-down.d/openvswitch/*
 
-		sudo systemctl disable sw4
-		sudo systemctl disable sw5
-		sudo systemctl disable sw6
-		sudo systemctl disable sw7
-		sudo systemctl disable sw8
-		sudo systemctl disable sw9
-		sudo systemctl disable sx1
-		sudo systemctl disable $NameServer
+		sudo systemctl disable sw4 > /dev/null 2>&1
+		sudo systemctl disable sw5 > /dev/null 2>&1
+		sudo systemctl disable sw6 > /dev/null 2>&1
+		sudo systemctl disable sw7 > /dev/null 2>&1
+		sudo systemctl disable sw8 > /dev/null 2>&1
+		sudo systemctl disable sw9 > /dev/null 2>&1
+		sudo systemctl disable sx1 > /dev/null 2>&1
+		sudo systemctl disable $NameServer > /dev/null 2>&1
 
 		sudo rm -f /etc/network/openvswitch/crt_ovs_sw4.sh
 		sudo rm -f /etc/network/openvswitch/crt_ovs_sw5.sh
@@ -321,12 +325,12 @@ then
 		sudo rm -f /etc/systemd/system/sx1.service
 		sudo rm -f /etc/systemd/system/$NameServer.service
 
-		sudo ip link del a1
-		sudo ip link del a2
-		sudo ip link del a3
-		sudo ip link del a4
-		sudo ip link del a5
-		sudo ip link del a6
+		sudo ip link del a1 > /dev/null 2>&1
+		sudo ip link del a2 > /dev/null 2>&1
+		sudo ip link del a3 > /dev/null 2>&1
+		sudo ip link del a4 > /dev/null 2>&1
+		sudo ip link del a5 > /dev/null 2>&1
+		sudo ip link del a6 > /dev/null 2>&1
 
 		echo ''
 		echo "=============================================="
@@ -719,7 +723,7 @@ echo "Extracting backup scripts...                  "
 echo "==============================================" 
 echo ''
 
-sudo tar -vP --extract --file=/home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/ubuntu-host.tar /etc/orabuntu-lxc-scripts/ubuntu-host-backup.sh --touch
+sudo tar -v --extract --file=/tmp/"$DistDir"/orabuntu/archives/ubuntu-host.tar -C / etc/orabuntu-lxc-scripts/ubuntu-host-backup.sh --touch
 sudo /etc/orabuntu-lxc-scripts/ubuntu-host-backup.sh
 
 echo ''
@@ -894,7 +898,7 @@ echo "Unpack G1 host files for $LF Linux $RL...     "
 echo "=============================================="
 echo ''
 
-sudo tar -P -xvf /home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/ubuntu-host.tar --touch
+sudo tar -xvf /tmp/"$DistDir"/orabuntu/archives/ubuntu-host.tar -C / --touch
 
 if	[ $SystemdResolvedInstalled -eq 0 ]
 then
@@ -921,7 +925,7 @@ echo "Unpack G2 host files for $LF Linux $RL...     "
 echo "=============================================="
 echo ''
 
-sudo tar -P -xvf /home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/dns-dhcp-host.tar --touch
+sudo tar -xvf /tmp/"$DistDir"/orabuntu/archives/dns-dhcp-host.tar -C / --touch
 sudo chmod +x /etc/network/openvswitch/crt_ovs_s*.sh
 
 if [ $MultiHostVar2 = 'Y' ]
@@ -1143,7 +1147,7 @@ then
 		echo "=============================================="
 		echo ''
 	
-		sudo tar -P -xvf /home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/dns-dhcp-cont.tar --touch
+		sudo tar -xvf /tmp/"$DistDir"/orabuntu/archives/dns-dhcp-cont.tar -C / --touch
 
 		echo ''
 		echo "=============================================="
@@ -1225,11 +1229,11 @@ then
 			sudo mv /etc/network/if-up.d/openvswitch/nsa-pub-ifup-sx1 /etc/network/if-up.d/openvswitch/$NameServer-pub-ifup-sx1
 			sudo mv /etc/network/if-down.d/openvswitch/nsa-pub-ifdown-sx1 /etc/network/if-down.d/openvswitch/$NameServer-pub-ifdown-sx1
 			sudo mv /etc/network/openvswitch/strt_nsa.sh /etc/network/openvswitch/strt_$NameServer.sh
-			echo "/var/lib/lxc/$NameServer"						 > /home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/nameserver.lst
-			echo "/etc/network/if-up.d/openvswitch/$NameServer-pub-ifup-sw1" 	>> /home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/nameserver.lst
-			echo "/etc/network/if-down.d/openvswitch/$NameServer-pub-ifdown-sw1" 	>> /home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/nameserver.lst
-			echo "/etc/network/if-up.d/openvswitch/$NameServer-pub-ifup-sx1" 	>> /home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/nameserver.lst
-			echo "/etc/network/if-down.d/openvswitch/$NameServer-pub-ifdown-sx1" 	>> /home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/nameserver.lst
+			echo "/var/lib/lxc/$NameServer"						 > /tmp/"$DistDir"/orabuntu/archives/nameserver.lst
+			echo "/etc/network/if-up.d/openvswitch/$NameServer-pub-ifup-sw1" 	>> /tmp/"$DistDir"/orabuntu/archives/nameserver.lst
+			echo "/etc/network/if-down.d/openvswitch/$NameServer-pub-ifdown-sw1" 	>> /tmp/"$DistDir"/orabuntu/archives/nameserver.lst
+			echo "/etc/network/if-up.d/openvswitch/$NameServer-pub-ifup-sx1" 	>> /tmp/"$DistDir"/orabuntu/archives/nameserver.lst
+			echo "/etc/network/if-down.d/openvswitch/$NameServer-pub-ifdown-sx1" 	>> /tmp/"$DistDir"/orabuntu/archives/nameserver.lst
 		fi
 
 		if [ -n $Domain1 ]
@@ -1418,7 +1422,7 @@ fi
 
 sudo chmod 755 /etc/network/openvswitch/*.sh
 
-if [ $MultiHostVar3 = 'X' ]
+if   [ $MultiHostVar3 = 'X' ]
 then
         echo ''
         echo "=============================================="
@@ -1426,7 +1430,7 @@ then
         echo "=============================================="
         echo ''
 
-        Sx1Index=10
+        Sx1Index=101
         function CheckHighestSx1IndexHit {
                 sshpass -p ubuntu ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 nslookup -timeout=1 10.207.29.$Sx1Index | grep 'name =' | wc -l
         }
@@ -1448,7 +1452,7 @@ then
         echo "=============================================="
         echo ''
 
-        Sw1Index=10
+        Sw1Index=101
         function CheckHighestSw1IndexHit {
                 sshpass -p ubuntu ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 nslookup -timeout=1 10.207.39.$Sw1Index | grep 'name =' | wc -l
         }
@@ -1463,9 +1467,20 @@ then
         sleep 5
 
         clear
+elif [ $MultiHostVar3 = 'X' ] && [ $MultiHostVar2 = 'Y' ] && [ $GRE = 'N' ]
+then
+        function GetSx1Index {
+                sudo cat /etc/network/openvswitch/sx1.info | cut -f2 -d':' | cut -f4 -d'.'
+        }
+        Sx1Index=$(GetSx1Index)
+
+        function GetSw1Index {
+                sudo cat /etc/network/openvswitch/sw1.info | cut -f2 -d':' | cut -f4 -d'.'
+        }
+        Sw1Index=$(GetSw1Index)
 else
-        Sw1Index=$Sw1Index
-        Sx1Index=$Sw1Index
+        Sw1Index=$MultiHostVar3
+        Sx1Index=$MultiHostVar3
 fi
 
 sleep 5
@@ -1717,7 +1732,7 @@ then
 		sudo sh -c "echo 'WantedBy=multi-user.target'       				>> /etc/systemd/system/$NameServer.service"
 		sudo chmod 644 /etc/systemd/system/$NameServer.service
 
-		echo "/etc/systemd/system/$NameServer.service" >> /home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/nameserver.lst
+		echo "/etc/systemd/system/$NameServer.service" >> /tmp/"$DistDir"/orabuntu/archives/nameserver.lst
  
 		sudo systemctl enable $NameServer
 
@@ -1872,9 +1887,10 @@ then
 	echo "=============================================="
 	echo ''
 
-	sudo tar -P -xvf /home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/scst-files.tar --touch -C /home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives
+	sudo tar -xvf /tmp/"$DistDir"/orabuntu/archives/scst-files.tar -C /tmp --touch
+#	sudo tar -xvf /tmp/"$DistDir"/orabuntu/archives/scst-files.tar -C /    --touch
 	sleep 2
-	sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/scst-files/create-scst-oracle.sh
+	sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /tmp/"$DistDir"/orabuntu/archives/scst-files/create-scst-oracle.sh
 		
 	echo ''
 	echo "=============================================="
@@ -1915,10 +1931,18 @@ then
 	sudo lxc-attach -n $NameServer -- crontab -l
 	sudo lxc-attach -n $NameServer -- mkdir -p /root/backup-lxc-container/olive/updates
 	sudo lxc-attach -n $NameServer -- tar -cvzPf /root/backup-lxc-container/olive/updates/backup_olive_ns_update.tar.gz /root/ns_backup_update.lst
-        sudo tar -vP --extract --file=/home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/dns-dhcp-cont.tar /var/lib/lxc/nsa/rootfs/etc/systemd/system/dns-sync.service
+ 
+        sudo tar -v --extract --file=/tmp/"$DistDir"/orabuntu/archives/dns-dhcp-cont.tar -C / var/lib/lxc/nsa/rootfs/etc/systemd/system/dns-sync.service
         sudo mv /var/lib/lxc/nsa/rootfs/etc/systemd/system/dns-sync.service /var/lib/lxc/$NameServer/rootfs/etc/systemd/system/dns-sync.service
+
 	sudo lxc-attach -n $NameServer -- systemctl enable dns-sync
-	
+        sudo lxc-attach -n $NameServer -- chown bind:bind /var/lib/bind/fwd.$Domain1
+        sudo lxc-attach -n $NameServer -- chown bind:bind /var/lib/bind/rev.$Domain1
+        sudo lxc-attach -n $NameServer -- chown bind:bind /var/lib/bind/fwd.$Domain2
+        sudo lxc-attach -n $NameServer -- chown bind:bind /var/lib/bind/rev.$Domain2
+        sudo lxc-attach -n $NameServer -- chown root:bind /var/lib/bind
+        sudo lxc-attach -n $NameServer -- chmod 775 /var/lib/bind
+
 	echo ''
 	echo "=============================================="
 	echo "Done: Configure jobs in $NameServer.          "
@@ -1948,8 +1972,10 @@ then
 	echo "=============================================="
 	echo ''
 
-	sudo tar -P -xvf /home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/scst-files.tar -C /home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives	
-	sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/scst-files/create-scst-oracle.sh
+	sudo tar -xvf /tmp/"$DistDir"/orabuntu/archives/scst-files.tar -C /tmp --touch
+#	sudo tar -xvf /tmp/"$DistDir"/orabuntu/archives/scst-files.tar -C /    --touch
+
+	sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /tmp/"$DistDir"/orabuntu/archives/scst-files/create-scst-oracle.sh
 		
 	echo ''
 	echo "=============================================="

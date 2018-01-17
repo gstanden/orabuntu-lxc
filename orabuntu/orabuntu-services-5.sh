@@ -16,18 +16,20 @@
 #    You should have received a copy of the GNU General Public License
 #    along with Orabuntu-LXC.  If not, see <http://www.gnu.org/licenses/>.
 
-#    v2.4 	GLS 20151224
-#    v2.8 	GLS 20151231
-#    v3.0 	GLS 20160710 Updates for Ubuntu 16.04
-#    v4.0 	GLS 20161025 DNS DHCP services moved into an LXC container
-#    v5.0 	GLS 20170909 Orabuntu-LXC MultiHost
-#    v5.33-beta	GLS 20180106 Orabuntu-LXC EE MultiHost Docker AWS S3
+#    v2.4 		GLS 20151224
+#    v2.8 		GLS 20151231
+#    v3.0 		GLS 20160710 Updates for Ubuntu 16.04
+#    v4.0 		GLS 20161025 DNS DHCP services moved into an LXC container
+#    v5.0 		GLS 20170909 Orabuntu-LXC Multi-Host
+#    v6.0-AMIDE-beta	GLS 20180106 Orabuntu-LXC AmazonS3 Multi-Host Docker Enterprise Edition (AMIDE)
 
 #    Note that this software builds a containerized DNS DHCP solution (bind9 / isc-dhcp-server).
 #    The nameserver should NOT be the name of an EXISTING nameserver but an arbitrary name because this software is CREATING a new LXC-containerized nameserver.
 #    The domain names can be arbitrary fictional names or they can be a domain that you actually own and operate.
 #    There are two domains and two networks because the "seed" LXC containers are on a separate network from the production LXC containers.
-#    If the domain is an actual domain, you will need to change the subnet though (a feature this software does not yet support - it's on the roadmap) to match your subnet manually.
+#    If the domain is an actual domain, you will need to change the subnet using the subnets feature of Orabuntu-LXC
+#
+#!/bin/bash
 
 clear
 
@@ -38,6 +40,8 @@ Domain1=$3
 Domain2=$4
 NameServer=$5
 MultiHost=$6
+DistDir=$7
+
 OR=$OracleRelease
 Config=/var/lib/lxc/$SeedContainerName/config
 
@@ -134,7 +138,7 @@ then
 
 	if [ $UbuntuMajorVersion -ge 16 ]
 	then
-		/home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/docker_install_orabuntu.sh
+		/tmp/"$DistDir"/orabuntu/archives/docker_install_orabuntu.sh
 	fi
 
 	echo ''
@@ -368,7 +372,7 @@ then
 	echo ''
 	
 	sudo touch /etc/orabuntu-lxc-release
-	sudo sh -c "echo 'Orabuntu-LXC v5.35-beta' > /etc/orabuntu-lxc-release"
+	sudo sh -c "echo 'Orabuntu-LXC v6.0-AMIDE-beta' > /etc/orabuntu-lxc-release"
 	sudo ls -l /etc/orabuntu-lxc-release
 	echo ''
 	sudo cat /etc/orabuntu-lxc-release
@@ -621,7 +625,7 @@ then
 
         clear
 
-        sudo tar -P --extract --file=/home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/dns-dhcp-host.tar /etc/network/openvswitch/ns_restore.sh
+        sudo tar --extract --file=/tmp/"$DistDir"/orabuntu/archives/dns-dhcp-host.tar /etc/network/openvswitch/ns_restore.sh
         sudo sed -i "s/NAMESERVER/$NameServer/g" /etc/network/openvswitch/ns_restore.sh
 
         if [ $NameServerExists -eq 1 ] && [ $GRE = 'N' ] && [ $MultiHostVar2 = 'N' ]
@@ -667,7 +671,8 @@ then
                 echo "=============================================="
                 echo ''
 
-                /home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/nameserver_copy.sh $MultiHostVar5 $MultiHostVar6 $NameServer
+		sudo chmod 775 /tmp/"$DistDir"/orabuntu/archives/nameserver_copy.sh
+                /tmp/"$DistDir"/orabuntu/archives/nameserver_copy.sh $MultiHostVar5 $MultiHostVar6 $NameServer
 
                 echo ''
                 echo "=============================================="

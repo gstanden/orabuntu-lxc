@@ -16,18 +16,20 @@
 #    You should have received a copy of the GNU General Public License
 #    along with Orabuntu-LXC.  If not, see <http://www.gnu.org/licenses/>.
 
-#    v2.4 	GLS 20151224
-#    v2.8 	GLS 20151231
-#    v3.0 	GLS 20160710 Updates for Ubuntu 16.04
-#    v4.0 	GLS 20161025 DNS DHCP services moved into an LXC container
-#    v5.0 	GLS 20170909 Orabuntu-LXC MultiHost
-#    v5.33-beta	GLS 20180106 Orabuntu-LXC EE MultiHost Docker AWS S3
+#    v2.4 		GLS 20151224
+#    v2.8 		GLS 20151231
+#    v3.0 		GLS 20160710 Updates for Ubuntu 16.04
+#    v4.0 		GLS 20161025 DNS DHCP services moved into an LXC container
+#    v5.0 		GLS 20170909 Orabuntu-LXC Multi-Host
+#    v6.0-AMIDE-beta	GLS 20180106 Orabuntu-LXC AmazonS3 Multi-Host Docker Enterprise Edition (AMIDE)
 
 #    Note that this software builds a containerized DNS DHCP solution (bind9 / isc-dhcp-server).
 #    The nameserver should NOT be the name of an EXISTING nameserver but an arbitrary name because this software is CREATING a new LXC-containerized nameserver.
 #    The domain names can be arbitrary fictional names or they can be a domain that you actually own and operate.
 #    There are two domains and two networks because the "seed" LXC containers are on a separate network from the production LXC containers.
-#    If the domain is an actual domain, you will need to change the subnet though (a feature this software does not yet support - it's on the roadmap) to match your subnet manually.
+#    If the domain is an actual domain, you will need to change the subnet using the subnets feature of Orabuntu-LXC
+#
+#!/bin/bash
 
 clear
 
@@ -38,7 +40,10 @@ Domain1=$3
 Domain2=$4
 NameServer=$5
 MultiHost=$6
+DistDir=$7
+
 OR=$OracleRelease
+
 Config=/var/lib/lxc/$SeedContainerName/config
 
 function GetMultiHostVar1 {
@@ -213,7 +218,7 @@ then
 	
 	if [ $Release -eq 7 ]
 	then
-		/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/archives/docker_install_uekulele.sh
+		/tmp/"$DistDir"/uekulele/archives/docker_install_uekulele.sh
 	fi
 	
 	echo ''
@@ -446,7 +451,7 @@ then
 	echo ''
 
         sudo touch /etc/orabuntu-lxc-release
-        sudo sh -c "echo 'Orabuntu-LXC v5.35-beta' > /etc/orabuntu-lxc-release"
+        sudo sh -c "echo 'Orabuntu-LXC v6.0-AMIDE-beta' > /etc/orabuntu-lxc-release"
 	sudo ls -l /etc/orabuntu-lxc-release
 	echo ''
 	sudo cat /etc/orabuntu-lxc-release
@@ -695,7 +700,7 @@ then
 	
 	clear
 
-	sudo tar -P --extract --file=/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/archives/dns-dhcp-host.tar /etc/network/openvswitch/ns_restore.sh
+	sudo tar --extract --file=/tmp/"$DistDir"/uekulele/archives/dns-dhcp-host.tar -C / etc/network/openvswitch/ns_restore.sh
 	sudo sed -i "s/NAMESERVER/$NameServer/g" /etc/network/openvswitch/ns_restore.sh
 
 	if [ $NameServerExists -eq 1 ] && [ $GRE = 'N' ] && [ $MultiHostVar2 = 'N' ]
@@ -719,7 +724,7 @@ then
 			sudo mkdir -p /home/ubuntu/Manage-Orabuntu
 		fi
 		
-		sudo tar -P -czf ~/Manage-Orabuntu/$NameServer.tar.gz -T ~/Downloads/orabuntu-lxc-master/uekulele/archives/nameserver.lst --checkpoint=10000 --totals
+		sudo tar -P -czf ~/Manage-Orabuntu/$NameServer.tar.gz -T /tmp/"$DistDir"/uekulele/archives/nameserver.lst --checkpoint=10000 --totals
 		sudo lxc-start -n $NameServer
 		
 		echo ''
@@ -741,7 +746,7 @@ then
   		echo "=============================================="
   		echo ''
   		
-		/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/archives/nameserver_copy.sh $MultiHostVar5 $MultiHostVar6 $NameServer
+		/tmp/"$DistDir"/uekulele/archives/nameserver_copy.sh $MultiHostVar5 $MultiHostVar6 $NameServer
 	
   		echo ''
   		echo "=============================================="
@@ -823,42 +828,43 @@ then
 		echo "=============================================="
 		echo ''
 	
-		mkdir -p /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/selinux
-		touch /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/selinux/selinux-lxc.sh
-		ls -l /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/selinux/selinux-lxc.sh
-		sudo chmod 775 /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/selinux/selinux-lxc.sh
-		cd /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/selinux
+		sudo mkdir -p /tmp/"$DistDir"/uekulele/selinux
+		sudo chmod 777 /tmp/"$DistDir"/uekulele/selinux
+		touch /tmp/"$DistDir"/uekulele/selinux/selinux-lxc.sh
+		ls -l /tmp/"$DistDir"/uekulele/selinux/selinux-lxc.sh
+		sudo chmod 777 /tmp/"$DistDir"/uekulele/selinux/selinux-lxc.sh
+		cd /tmp/"$DistDir"/uekulele/selinux
 	
-		echo 'sudo ausearch -c 'lxcattach' --raw | audit2allow -M my-lxcattach'			>  /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/selinux/selinux-lxc.sh
-		echo 'sudo semodule -i my-lxcattach.pp'							>> /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/selinux/selinux-lxc.sh
-		echo 'sudo ausearch -c 'dhclient' --raw | audit2allow -M my-dhclient'			>> /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/selinux/selinux-lxc.sh
-		echo 'sudo semodule -i my-dhclient.pp'							>> /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/selinux/selinux-lxc.sh
-		echo 'sudo ausearch -c 'passwd' --raw | audit2allow -M my-passwd'			>> /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/selinux/selinux-lxc.sh
-		echo 'sudo semodule -i my-passwd.pp'							>> /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/selinux/selinux-lxc.sh
-		echo 'sudo ausearch -c 'sedispatch' --raw | audit2allow -M my-sedispatch'		>> /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/selinux/selinux-lxc.sh
-		echo 'sudo semodule -i my-sedispatch.pp'						>> /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/selinux/selinux-lxc.sh
-		echo 'sudo ausearch -c 'systemd-sysctl' --raw | audit2allow -M my-systemdsysctl'	>> /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/selinux/selinux-lxc.sh
-		echo 'sudo semodule -i my-systemdsysctl.pp'						>> /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/selinux/selinux-lxc.sh
-		echo 'sudo ausearch -c 'ovs-vsctl' --raw | audit2allow -M my-ovsvsctl'			>> /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/selinux/selinux-lxc.sh
-		echo 'sudo semodule -i my-ovsvsctl.pp'							>> /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/selinux/selinux-lxc.sh
-		echo 'sudo ausearch -c 'sshd' --raw | audit2allow -M my-sshd'				>> /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/selinux/selinux-lxc.sh
-		echo 'sudo semodule -i my-sshd.pp'							>> /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/selinux/selinux-lxc.sh
-		echo 'sudo ausearch -c 'gdm-session-wor' --raw | audit2allow -M my-gdmsessionwor'	>> /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/selinux/selinux-lxc.sh
-		echo 'sudo semodule -i my-gdmsessionwor.pp'						>> /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/selinux/selinux-lxc.sh
-		echo 'sudo ausearch -c 'pickup' --raw | audit2allow -M my-pickup'			>> /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/selinux/selinux-lxc.sh
-		echo 'sudo semodule -i my-pickup.pp'							>> /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/selinux/selinux-lxc.sh
-		echo 'sudo ausearch -c 'sedispatch' --raw | audit2allow -M my-sedispatch'		>> /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/selinux/selinux-lxc.sh
-		echo 'sudo semodule -i my-sedispatch.pp'						>> /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/selinux/selinux-lxc.sh
-		echo 'sudo ausearch -c 'iscsid' --raw | audit2allow -M my-iscsid'			>> /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/selinux/selinux-lxc.sh
-		echo 'sudo semodule -i my-iscsid.pp'							>> /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/selinux/selinux-lxc.sh
-		echo 'sudo ausearch -c 'dhclient' --raw | audit2allow -M my-dhclient'			>> /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/selinux/selinux-lxc.sh
-		echo 'sudo semodule -i my-dhclient.pp'							>> /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/selinux/selinux-lxc.sh
-		echo 'sudo ausearch -c 'ovs-vsctl' --raw | audit2allow -M my-ovsvsctl'			>> /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/selinux/selinux-lxc.sh
-		echo 'sudo semodule -i my-ovsvsctl.pp'							>> /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/selinux/selinux-lxc.sh
-		echo 'sudo ausearch -c 'chpasswd' --raw | audit2allow -M my-chpasswd'			>> /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/selinux/selinux-lxc.sh
-		echo 'sudo semodule -i my-chpasswd.pp'							>> /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/selinux/selinux-lxc.sh
-		echo 'sudo ausearch -c 'colord' --raw | audit2allow -M my-colord'			>> /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/selinux/selinux-lxc.sh
-		echo 'sudo semodule -i my-colord.pp'							>> /home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/selinux/selinux-lxc.sh
+		echo 'sudo ausearch -c 'lxcattach' --raw | audit2allow -M my-lxcattach'			>  /tmp/"$DistDir"/uekulele/selinux/selinux-lxc.sh
+		echo 'sudo semodule -i my-lxcattach.pp'							>> /tmp/"$DistDir"/uekulele/selinux/selinux-lxc.sh
+		echo 'sudo ausearch -c 'dhclient' --raw | audit2allow -M my-dhclient'			>> /tmp/"$DistDir"/uekulele/selinux/selinux-lxc.sh
+		echo 'sudo semodule -i my-dhclient.pp'							>> /tmp/"$DistDir"/uekulele/selinux/selinux-lxc.sh
+		echo 'sudo ausearch -c 'passwd' --raw | audit2allow -M my-passwd'			>> /tmp/"$DistDir"/uekulele/selinux/selinux-lxc.sh
+		echo 'sudo semodule -i my-passwd.pp'							>> /tmp/"$DistDir"/uekulele/selinux/selinux-lxc.sh
+		echo 'sudo ausearch -c 'sedispatch' --raw | audit2allow -M my-sedispatch'		>> /tmp/"$DistDir"/uekulele/selinux/selinux-lxc.sh
+		echo 'sudo semodule -i my-sedispatch.pp'						>> /tmp/"$DistDir"/uekulele/selinux/selinux-lxc.sh
+		echo 'sudo ausearch -c 'systemd-sysctl' --raw | audit2allow -M my-systemdsysctl'	>> /tmp/"$DistDir"/uekulele/selinux/selinux-lxc.sh
+		echo 'sudo semodule -i my-systemdsysctl.pp'						>> /tmp/"$DistDir"/uekulele/selinux/selinux-lxc.sh
+		echo 'sudo ausearch -c 'ovs-vsctl' --raw | audit2allow -M my-ovsvsctl'			>> /tmp/"$DistDir"/uekulele/selinux/selinux-lxc.sh
+		echo 'sudo semodule -i my-ovsvsctl.pp'							>> /tmp/"$DistDir"/uekulele/selinux/selinux-lxc.sh
+		echo 'sudo ausearch -c 'sshd' --raw | audit2allow -M my-sshd'				>> /tmp/"$DistDir"/uekulele/selinux/selinux-lxc.sh
+		echo 'sudo semodule -i my-sshd.pp'							>> /tmp/"$DistDir"/uekulele/selinux/selinux-lxc.sh
+		echo 'sudo ausearch -c 'gdm-session-wor' --raw | audit2allow -M my-gdmsessionwor'	>> /tmp/"$DistDir"/uekulele/selinux/selinux-lxc.sh
+		echo 'sudo semodule -i my-gdmsessionwor.pp'						>> /tmp/"$DistDir"/uekulele/selinux/selinux-lxc.sh
+		echo 'sudo ausearch -c 'pickup' --raw | audit2allow -M my-pickup'			>> /tmp/"$DistDir"/uekulele/selinux/selinux-lxc.sh
+		echo 'sudo semodule -i my-pickup.pp'							>> /tmp/"$DistDir"/uekulele/selinux/selinux-lxc.sh
+		echo 'sudo ausearch -c 'sedispatch' --raw | audit2allow -M my-sedispatch'		>> /tmp/"$DistDir"/uekulele/selinux/selinux-lxc.sh
+		echo 'sudo semodule -i my-sedispatch.pp'						>> /tmp/"$DistDir"/uekulele/selinux/selinux-lxc.sh
+		echo 'sudo ausearch -c 'iscsid' --raw | audit2allow -M my-iscsid'			>> /tmp/"$DistDir"/uekulele/selinux/selinux-lxc.sh
+		echo 'sudo semodule -i my-iscsid.pp'							>> /tmp/"$DistDir"/uekulele/selinux/selinux-lxc.sh
+		echo 'sudo ausearch -c 'dhclient' --raw | audit2allow -M my-dhclient'			>> /tmp/"$DistDir"/uekulele/selinux/selinux-lxc.sh
+		echo 'sudo semodule -i my-dhclient.pp'							>> /tmp/"$DistDir"/uekulele/selinux/selinux-lxc.sh
+		echo 'sudo ausearch -c 'ovs-vsctl' --raw | audit2allow -M my-ovsvsctl'			>> /tmp/"$DistDir"/uekulele/selinux/selinux-lxc.sh
+		echo 'sudo semodule -i my-ovsvsctl.pp'							>> /tmp/"$DistDir"/uekulele/selinux/selinux-lxc.sh
+		echo 'sudo ausearch -c 'chpasswd' --raw | audit2allow -M my-chpasswd'			>> /tmp/"$DistDir"/uekulele/selinux/selinux-lxc.sh
+		echo 'sudo semodule -i my-chpasswd.pp'							>> /tmp/"$DistDir"/uekulele/selinux/selinux-lxc.sh
+		echo 'sudo ausearch -c 'colord' --raw | audit2allow -M my-colord'			>> /tmp/"$DistDir"/uekulele/selinux/selinux-lxc.sh
+		echo 'sudo semodule -i my-colord.pp'							>> /tmp/"$DistDir"/uekulele/selinux/selinux-lxc.sh
 	
 		echo ''
 		echo "=============================================="
