@@ -32,3 +32,5 @@ rootfs/config.asm.flex.cluster
 rootfs/config.oracle.bak.oel5
 rootfs/config.oracle.bak.oel6
 rootfs/config.oracle.bak.oel7
+rootfs/GNU3
+rootfs/COPYING

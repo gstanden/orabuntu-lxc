@@ -1,41 +1,5 @@
 # Orabuntu-LXC Updates
 
-Begin Update:  January 17, 2018
-
-Orabuntu-LXC announces the upcoming release of Orabuntu-LXC v6.0-beta "AMIDE" edition (already in dev branch).  
-
-Want to quickly test Orabuntu-LXC v6.0-beta AMIDE edition?  Easy!
-```
-1.  Create "ubuntu" OS account w/"SUDO ALL" privs on VM or physical host (VM recommended for 1st test).
-2.  Supported OS include: Ubuntu 16/17, RedHat 7, Oracle Linux 7, CentOS 7, Fedora27
-2.  Download https://github.com/gstanden/orabuntu-lxc/archive/master.zip to "/home/ubuntu/Downloads"
-3.  Unzip archive
-4.  cd to /home/ubuntu/Downloads/orabuntu-lxc-master/anylinux
-5.  ./anylinux-services.sh
-```
-That's it!  Orabuntu-LXC takes care of all the rest of the work!  
-
-Orabuntu-LXC is powerful infrastructure deployment software. Highly-flexible, it can span your container and VM networks across multiple physical hosts over GRE tunnels that it builds for you, running LXC and Docker containers on the physical hosts, as well as VMs on the physical hosts, and even Docker and LXC containers in the VM's on the physical hosts, all FULLY-NETWORKED (LAN and WAN) right out of the box over the OpenvSwitch software defined network (SDN) which it builds for you in just minutes all fully-automated.  Orabuntu-LXC also provides an optional fully-automated deployer that has been engineered to provide container-friendly SCST Linux SAN storage providing a full range of enterprise-grade storage options.
-
-On RedHat-based Linuxes, Orabuntu-LXC builds your choice (version is configurable in anylinux-services.sh) of LXC and OpenvSwitch version from source code as RPM packages and installs them.
-
-When the v6.0-beta AMIDE is released in github, you will be able to use ANY linux account with SUDO ALL privilege as the dependence of "ubuntu" user will be removed in this release.  Planned security enhancements are coming which will remove the current "SUDO ALL" requirement and reduce the SUDO privileges to only those commands needed.
-
-A blog post will be forthcoming detailing the extensive expansion of features and capabilities. The Orabuntu-LXC v6.0-beta "AMIDE" edition software is already in dev branch. Creating a wiki, user manual, and better documentation is a major Orabuntu-LXC roadmap item for 2018.  For now, the anylinux-services.sh file has an extensive header explaining how to use the software. 
-
-For installs beyond the first install including adding multiple GRE-connected physical hosts, rhe main variables that need to be set are shown below. The additional installs are ALL also done with the one simple command: 
-```
-./anylinux-services.sh
-```
-and configuration of a few simple variables in anylinux-services.sh listed below.
-```
-SudoPassword
-GRE
-Set subnet IP ranges
-MultiHost
-```
-Use of these variables is explained operationally in anylinux-services.sh file.  As mentioned, documentation is coming!
-
 Begin Update:  January 11, 2018
 
 Orabuntu-LXC adds support for Fedora 27 (tested). Orabuntu-LXC v5.4-beta should also install OK on Fedora 22+ but has only been tested on Fedora 27 so far.  Testing is coming.

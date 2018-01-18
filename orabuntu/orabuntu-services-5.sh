@@ -138,7 +138,8 @@ then
 
 	if [ $UbuntuMajorVersion -ge 16 ]
 	then
-		/tmp/"$DistDir"/orabuntu/archives/docker_install_orabuntu.sh
+		sudo chmod 775 /opt/olxc/"$DistDir"/orabuntu/archives/docker_install_orabuntu.sh
+		/opt/olxc/"$DistDir"/orabuntu/archives/docker_install_orabuntu.sh
 	fi
 
 	echo ''
@@ -349,7 +350,7 @@ do
        	echo "=============================================="
        	echo ''
 
-	ssh-keygen -f "/home/ubuntu/.ssh/known_hosts" -R $j
+	ssh-keygen -R $j
 	sshpass -p oracle ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no oracle@$j "uname -a; cat /etc/oracle-release"
 
        	echo ''
@@ -505,7 +506,7 @@ then
 	       	echo "=============================================="
 		echo ''
 	
-		ssh-keygen -f "/home/ubuntu/.ssh/known_hosts" -R 10.207.39.2
+		ssh-keygen -R 10.207.39.2
 		sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.39.2 "sudo -S <<< "ubuntu" mkdir -p ~/Downloads"
 		sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.39.2 "sudo -S <<< "ubuntu" chown ubuntu:ubuntu Downloads"
 		sshpass -p ubuntu scp    -o CheckHostIP=no -o StrictHostKeyChecking=no -p /etc/network/openvswitch/nsupdate_domain1_add_$ShortHost.sh ubuntu@10.207.39.2:~/Downloads/.
@@ -531,7 +532,7 @@ then
 	       	echo "=============================================="
 		echo ''
 	
-		ssh-keygen -f "/home/ubuntu/.ssh/known_hosts" -R 10.207.29.2
+		ssh-keygen -R 10.207.29.2
 		sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.39.2 "sudo -S <<< "ubuntu" mkdir -p ~/Downloads"
 		sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.39.2 "sudo -S <<< "ubuntu" chown ubuntu:ubuntu Downloads"
 		sshpass -p ubuntu scp    -o CheckHostIP=no -o StrictHostKeyChecking=no -p /etc/network/openvswitch/nsupdate_domain2_add_$ShortHost.sh ubuntu@10.207.39.2:~/Downloads/.
@@ -625,7 +626,7 @@ then
 
         clear
 
-        sudo tar --extract --file=/tmp/"$DistDir"/orabuntu/archives/dns-dhcp-host.tar /etc/network/openvswitch/ns_restore.sh
+        sudo tar --extract --file=/opt/olxc/"$DistDir"/orabuntu/archives/dns-dhcp-host.tar /etc/network/openvswitch/ns_restore.sh
         sudo sed -i "s/NAMESERVER/$NameServer/g" /etc/network/openvswitch/ns_restore.sh
 
         if [ $NameServerExists -eq 1 ] && [ $GRE = 'N' ] && [ $MultiHostVar2 = 'N' ]
@@ -644,9 +645,9 @@ then
                         sudo lxc-copy  -n $NameServer -N "$NameServer"-bk0
                 fi
 	
-		if [ ! -e /home/ubuntu/Manage-Orabuntu ]
+		if [ ! -e ~/Manage-Orabuntu ]
 		then
-			sudo mkdir -p /home/ubuntu/Manage-Orabuntu
+			sudo mkdir -p ~/Manage-Orabuntu
 		fi
 	
                 sudo tar -P -czf ~/Manage-Orabuntu/$NameServer.tar.gz -T ~/Downloads/orabuntu-lxc-master/orabuntu/archives/nameserver.lst --checkpoint=10000 --totals
@@ -671,8 +672,8 @@ then
                 echo "=============================================="
                 echo ''
 
-		sudo chmod 775 /tmp/"$DistDir"/orabuntu/archives/nameserver_copy.sh
-                /tmp/"$DistDir"/orabuntu/archives/nameserver_copy.sh $MultiHostVar5 $MultiHostVar6 $NameServer
+		sudo chmod 775 /opt/olxc/"$DistDir"/orabuntu/archives/nameserver_copy.sh
+                /opt/olxc/"$DistDir"/orabuntu/archives/nameserver_copy.sh $MultiHostVar5 $MultiHostVar6 $NameServer
 
                 echo ''
                 echo "=============================================="
@@ -689,9 +690,9 @@ then
                 echo "=============================================="
                 echo ''
 
-                ssh-keygen -f "/home/ubuntu/.ssh/known_hosts" -R 10.207.39.2
-                ssh-keygen -f "/home/ubuntu/.ssh/known_hosts" -R $NameServer
-		sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ubuntu@10.207.39.2 "sudo -S <<< "ubuntu" echo $HOSTNAME > /home/ubuntu/new_gre_host.txt"
+                ssh-keygen -R 10.207.39.2
+                ssh-keygen -R $NameServer
+		sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ubuntu@10.207.39.2 "sudo -S <<< "ubuntu" echo $HOSTNAME > ~/new_gre_host.txt"
 
                 sleep 5
         
@@ -790,17 +791,17 @@ then
 	echo "Management links directory creation...        "
 	echo "=============================================="
 	
-	if [ ! -e /home/ubuntu/Manage-Orabuntu ]
+	if [ ! -e ~/Manage-Orabuntu ]
 	then
-		sudo mkdir -p /home/ubuntu/Manage-Orabuntu
+		sudo mkdir -p ~/Manage-Orabuntu
 	fi
 	
-	cd /home/ubuntu/Manage-Orabuntu
+	cd ~/Manage-Orabuntu
 	sudo chmod 755 /etc/orabuntu-lxc-scripts/crt_links.sh 
 	sudo /etc/orabuntu-lxc-scripts/crt_links.sh
 	
 	echo ''
-	sudo ls -l /home/ubuntu/Manage-Orabuntu | tail -5
+	sudo ls -l ~/Manage-Orabuntu | tail -5
 	echo '...'
 	
 	echo ''
@@ -811,7 +812,7 @@ then
 	echo "=============================================="
 	echo "Note that deployment management links are in: "
 	echo "                                              "
-	echo "     /home/ubuntu/Manage-Orabuntu             "
+	echo "     ~/Manage-Orabuntu                        "
 	echo "                                              "
 	echo "Learn and manage Orabuntu-LXC configurations  "
 	echo "from that directory of pointers.              "

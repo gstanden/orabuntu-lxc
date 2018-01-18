@@ -480,6 +480,10 @@ then
 
         sudo lxc-update-config -c /var/lib/lxc/$SeedContainerName/config
 
+	sleep 5
+
+	clear
+
         echo ''
         echo "=============================================="
         echo "Done: Update config for LXC 2.1.0+            "

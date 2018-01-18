@@ -332,11 +332,8 @@ then
 
 	sudo lxc-attach -n $SeedContainerName -- chmod +x /etc/systemd/system/ntp.service
 	sudo lxc-attach -n $SeedContainerName -- systemctl enable ntp.service
-	echo ''
 	sudo lxc-attach -n $SeedContainerName -- service ntp start
-	echo ''
 	sudo lxc-attach -n $SeedContainerName -- service ntpd start
-	echo ''
 #	sudo lxc-attach -n $SeedContainerName -- service ntp status
 #	echo ''
 	sudo lxc-attach -n $SeedContainerName -- chkconfig ntp on

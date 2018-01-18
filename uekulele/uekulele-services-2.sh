@@ -278,8 +278,9 @@ echo "Extracting oracle-specific files to container."
 echo "=============================================="
 echo ''
 
-cd /tmp/"$DistDir"/uekulele/archives
-sudo tar -xvf /tmp/"$DistDir"/uekulele/archives/lxc-oracle-files.tar -C /var/lib/lxc/oel$OracleRelease$SeedPostfix --touch
+sudo mkdir -p /var/lib/lxc/oel$OracleRelease$SeedPostfix
+cd /opt/olxc/"$DistDir"/uekulele/archives
+sudo tar -xvf /opt/olxc/"$DistDir"/uekulele/archives/lxc-oracle-files.tar -C /var/lib/lxc/oel$OracleRelease$SeedPostfix --touch
 
 sudo chown root:root /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/root/hugepages_setting.sh
 sudo chmod 755 /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/root/hugepages_setting.sh
@@ -507,7 +508,7 @@ sudo chmod 755 /etc/network/openvswitch/veth_cleanups.sh
 # echo "=============================================="
 # echo ''
 
-# /tmp/"$DistDir"/uekulele/archives/nameserver_copy.sh $MultiHostVar5 $MultiHostVar6 $NameServer
+# /opt/olxc/"$DistDir"/uekulele/archives/nameserver_copy.sh $MultiHostVar5 $MultiHostVar6 $NameServer
 
 # echo ''
 # echo "=============================================="

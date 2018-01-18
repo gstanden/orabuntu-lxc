@@ -11,6 +11,7 @@ rootfs/COPYING
 /var/lib/lxc/nsa/rootfs/var/lib/bind/fwd.orabuntu-lxc.com
 /var/lib/lxc/nsa/rootfs/var/lib/bind/rev.orabuntu-lxc.com
 /home/ubuntu/Downloads/orabuntu-lxc-master/anylinux/vercomp
+/home/ubuntu/Downloads/orabuntu-lxc-master/anylinux/anylinux-services-0.sh
 /home/ubuntu/Downloads/orabuntu-lxc-master/anylinux/anylinux-services-1.sh
 /home/ubuntu/Downloads/orabuntu-lxc-master/anylinux/dnf2yum
 /home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/nameserver_copy.sh

@@ -1,4 +1,3 @@
-COPYING
 /etc/multipath.conf.example
 /etc/network/if-down.d/openvswitch/lxcora00-asm1-ifdown-sw8
 /etc/network/if-down.d/openvswitch/lxcora00-asm2-ifdown-sw9
@@ -20,3 +19,5 @@ COPYING
 /etc/systemd/resolved.conf
 /etc/resolv.dnsmasq
 /etc/dnsmasq.conf
+/etc/GNU3
+/etc/COPYING

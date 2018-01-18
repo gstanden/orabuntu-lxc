@@ -144,8 +144,9 @@ echo "Extracting oracle-specific files to container."
 echo "=============================================="
 echo ''
 
-cd /tmp/"$DistDir"/orabuntu/archives
-sudo tar -xvf /tmp/"$DistDir"/orabuntu/archives/lxc-oracle-files.tar -C /var/lib/lxc/oel$OracleRelease$SeedPostfix --touch
+sudo mkdir -p /var/lib/lxc/oel$OracleRelease$SeedPostfix 
+cd /opt/olxc/"$DistDir"/orabuntu/archives
+sudo tar -xvf /opt/olxc/"$DistDir"/orabuntu/archives/lxc-oracle-files.tar -C /var/lib/lxc/oel$OracleRelease$SeedPostfix --touch
 
 sudo chown root:root /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/root/hugepages_setting.sh
 sudo chmod 755 /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/root/hugepages_setting.sh

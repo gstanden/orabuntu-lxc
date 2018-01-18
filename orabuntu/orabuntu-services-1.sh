@@ -368,7 +368,7 @@ then
 	echo "=============================================="
 	echo ''
 
-	sudo apt-get install -y lxc facter iptables
+	sudo apt-get -y install lxc facter iptables
 
 	echo ''
 	echo "=============================================="
@@ -430,7 +430,7 @@ then
 	echo "=============================================="
 	echo ''
 
-	sudo apt-get install -y lxc facter iptables
+	sudo apt-get -y install lxc facter iptables
 
 	echo ''
 	echo "=============================================="
@@ -723,7 +723,7 @@ echo "Extracting backup scripts...                  "
 echo "==============================================" 
 echo ''
 
-sudo tar -v --extract --file=/tmp/"$DistDir"/orabuntu/archives/ubuntu-host.tar -C / etc/orabuntu-lxc-scripts/ubuntu-host-backup.sh --touch
+sudo tar -v --extract --file=/opt/olxc/"$DistDir"/orabuntu/archives/ubuntu-host.tar -C / etc/orabuntu-lxc-scripts/ubuntu-host-backup.sh --touch
 sudo /etc/orabuntu-lxc-scripts/ubuntu-host-backup.sh
 
 echo ''
@@ -898,7 +898,7 @@ echo "Unpack G1 host files for $LF Linux $RL...     "
 echo "=============================================="
 echo ''
 
-sudo tar -xvf /tmp/"$DistDir"/orabuntu/archives/ubuntu-host.tar -C / --touch
+sudo tar -xvf /opt/olxc/"$DistDir"/orabuntu/archives/ubuntu-host.tar -C / --touch
 
 if	[ $SystemdResolvedInstalled -eq 0 ]
 then
@@ -925,7 +925,7 @@ echo "Unpack G2 host files for $LF Linux $RL...     "
 echo "=============================================="
 echo ''
 
-sudo tar -xvf /tmp/"$DistDir"/orabuntu/archives/dns-dhcp-host.tar -C / --touch
+sudo tar -xvf /opt/olxc/"$DistDir"/orabuntu/archives/dns-dhcp-host.tar -C / --touch
 sudo chmod +x /etc/network/openvswitch/crt_ovs_s*.sh
 
 if [ $MultiHostVar2 = 'Y' ]
@@ -1147,7 +1147,7 @@ then
 		echo "=============================================="
 		echo ''
 	
-		sudo tar -xvf /tmp/"$DistDir"/orabuntu/archives/dns-dhcp-cont.tar -C / --touch
+		sudo tar -xvf /opt/olxc/"$DistDir"/orabuntu/archives/dns-dhcp-cont.tar -C / --touch
 
 		echo ''
 		echo "=============================================="
@@ -1229,11 +1229,11 @@ then
 			sudo mv /etc/network/if-up.d/openvswitch/nsa-pub-ifup-sx1 /etc/network/if-up.d/openvswitch/$NameServer-pub-ifup-sx1
 			sudo mv /etc/network/if-down.d/openvswitch/nsa-pub-ifdown-sx1 /etc/network/if-down.d/openvswitch/$NameServer-pub-ifdown-sx1
 			sudo mv /etc/network/openvswitch/strt_nsa.sh /etc/network/openvswitch/strt_$NameServer.sh
-			echo "/var/lib/lxc/$NameServer"						 > /tmp/"$DistDir"/orabuntu/archives/nameserver.lst
-			echo "/etc/network/if-up.d/openvswitch/$NameServer-pub-ifup-sw1" 	>> /tmp/"$DistDir"/orabuntu/archives/nameserver.lst
-			echo "/etc/network/if-down.d/openvswitch/$NameServer-pub-ifdown-sw1" 	>> /tmp/"$DistDir"/orabuntu/archives/nameserver.lst
-			echo "/etc/network/if-up.d/openvswitch/$NameServer-pub-ifup-sx1" 	>> /tmp/"$DistDir"/orabuntu/archives/nameserver.lst
-			echo "/etc/network/if-down.d/openvswitch/$NameServer-pub-ifdown-sx1" 	>> /tmp/"$DistDir"/orabuntu/archives/nameserver.lst
+			echo "/var/lib/lxc/$NameServer"						 > /opt/olxc/"$DistDir"/orabuntu/archives/nameserver.lst
+			echo "/etc/network/if-up.d/openvswitch/$NameServer-pub-ifup-sw1" 	>> /opt/olxc/"$DistDir"/orabuntu/archives/nameserver.lst
+			echo "/etc/network/if-down.d/openvswitch/$NameServer-pub-ifdown-sw1" 	>> /opt/olxc/"$DistDir"/orabuntu/archives/nameserver.lst
+			echo "/etc/network/if-up.d/openvswitch/$NameServer-pub-ifup-sx1" 	>> /opt/olxc/"$DistDir"/orabuntu/archives/nameserver.lst
+			echo "/etc/network/if-down.d/openvswitch/$NameServer-pub-ifdown-sx1" 	>> /opt/olxc/"$DistDir"/orabuntu/archives/nameserver.lst
 		fi
 
 		if [ -n $Domain1 ]
@@ -1430,7 +1430,7 @@ then
         echo "=============================================="
         echo ''
 
-        Sx1Index=101
+        Sx1Index=201
         function CheckHighestSx1IndexHit {
                 sshpass -p ubuntu ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 nslookup -timeout=1 10.207.29.$Sx1Index | grep 'name =' | wc -l
         }
@@ -1452,7 +1452,7 @@ then
         echo "=============================================="
         echo ''
 
-        Sw1Index=101
+        Sw1Index=201
         function CheckHighestSw1IndexHit {
                 sshpass -p ubuntu ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 nslookup -timeout=1 10.207.39.$Sw1Index | grep 'name =' | wc -l
         }
@@ -1732,7 +1732,7 @@ then
 		sudo sh -c "echo 'WantedBy=multi-user.target'       				>> /etc/systemd/system/$NameServer.service"
 		sudo chmod 644 /etc/systemd/system/$NameServer.service
 
-		echo "/etc/systemd/system/$NameServer.service" >> /tmp/"$DistDir"/orabuntu/archives/nameserver.lst
+		echo "/etc/systemd/system/$NameServer.service" >> /opt/olxc/"$DistDir"/orabuntu/archives/nameserver.lst
  
 		sudo systemctl enable $NameServer
 
@@ -1887,10 +1887,10 @@ then
 	echo "=============================================="
 	echo ''
 
-	sudo tar -xvf /tmp/"$DistDir"/orabuntu/archives/scst-files.tar -C /tmp --touch
-#	sudo tar -xvf /tmp/"$DistDir"/orabuntu/archives/scst-files.tar -C /    --touch
+	sudo tar -xvf /opt/olxc/"$DistDir"/orabuntu/archives/scst-files.tar -C /opt/olxc --touch
+#	sudo tar -xvf /opt/olxc/"$DistDir"/orabuntu/archives/scst-files.tar -C /         --touch
 	sleep 2
-	sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /tmp/"$DistDir"/orabuntu/archives/scst-files/create-scst-oracle.sh
+	sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /opt/olxc/"$DistDir"/orabuntu/archives/scst-files/create-scst-oracle.sh
 		
 	echo ''
 	echo "=============================================="
@@ -1909,7 +1909,7 @@ then
 	echo ''
 
 	sudo lxc-attach -n $NameServer -- usermod --password `perl -e "print crypt('ubuntu','ubuntu');"` ubuntu
-	ssh-keygen -f "/home/ubuntu/.ssh/known_hosts" -R 10.207.39.2
+	ssh-keygen -R 10.207.39.2
 	sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ubuntu@10.207.39.2 "date; uname -a"
 	
 	echo ''
@@ -1932,7 +1932,7 @@ then
 	sudo lxc-attach -n $NameServer -- mkdir -p /root/backup-lxc-container/olive/updates
 	sudo lxc-attach -n $NameServer -- tar -cvzPf /root/backup-lxc-container/olive/updates/backup_olive_ns_update.tar.gz /root/ns_backup_update.lst
  
-        sudo tar -v --extract --file=/tmp/"$DistDir"/orabuntu/archives/dns-dhcp-cont.tar -C / var/lib/lxc/nsa/rootfs/etc/systemd/system/dns-sync.service
+        sudo tar -v --extract --file=/opt/olxc/"$DistDir"/orabuntu/archives/dns-dhcp-cont.tar -C / var/lib/lxc/nsa/rootfs/etc/systemd/system/dns-sync.service
         sudo mv /var/lib/lxc/nsa/rootfs/etc/systemd/system/dns-sync.service /var/lib/lxc/$NameServer/rootfs/etc/systemd/system/dns-sync.service
 
 	sudo lxc-attach -n $NameServer -- systemctl enable dns-sync
@@ -1972,10 +1972,10 @@ then
 	echo "=============================================="
 	echo ''
 
-	sudo tar -xvf /tmp/"$DistDir"/orabuntu/archives/scst-files.tar -C /tmp --touch
-#	sudo tar -xvf /tmp/"$DistDir"/orabuntu/archives/scst-files.tar -C /    --touch
+	sudo tar -xvf /opt/olxc/"$DistDir"/orabuntu/archives/scst-files.tar -C /opt/olxc --touch
+#	sudo tar -xvf /opt/olxc/"$DistDir"/orabuntu/archives/scst-files.tar -C /    --touch
 
-	sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /tmp/"$DistDir"/orabuntu/archives/scst-files/create-scst-oracle.sh
+	sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /opt/olxc/"$DistDir"/orabuntu/archives/scst-files/create-scst-oracle.sh
 		
 	echo ''
 	echo "=============================================="
@@ -2062,7 +2062,7 @@ then
 #               sudo service sw1 restart
 #               sudo service sx1 restart
 
-                ssh-keygen -f "/home/ubuntu/.ssh/known_hosts" -R $MultiHostVar5
+                ssh-keygen -R $MultiHostVar5
                 sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 date
                 if [ $? -eq 0 ]
                 then
@@ -2101,27 +2101,46 @@ then
                         echo "=============================================="
                         echo ''
 
-                        sudo sh -c "echo 'echo \"server 10.207.39.2'                                                                            >  /etc/network/openvswitch/nsupdate_domain1_add_$ShortHost.sh"
-                        sudo sh -c "echo 'update add $ShortHost.orabuntu-lxc.com 3600 IN A 10.207.39.$Sw1Index'                                 >> /etc/network/openvswitch/nsupdate_domain1_add_$ShortHost.sh"
-                        sudo sh -c "echo 'send'                                                                                                 >> /etc/network/openvswitch/nsupdate_domain1_add_$ShortHost.sh"
-                        sudo sh -c "echo 'update add $Sw1Index.39.207.10.in-addr.arpa 3600 IN PTR $ShortHost.orabuntu-lxc.com'                  >> /etc/network/openvswitch/nsupdate_domain1_add_$ShortHost.sh"
-                        sudo sh -c "echo 'send'                                                                                                 >> /etc/network/openvswitch/nsupdate_domain1_add_$ShortHost.sh"
-                        sudo sh -c "echo 'quit'                                                                                                 >> /etc/network/openvswitch/nsupdate_domain1_add_$ShortHost.sh"
-                        sudo sh -c "echo '\" | nsupdate -k /etc/bind/rndc.key'                                                                  >> /etc/network/openvswitch/nsupdate_domain1_add_$ShortHost.sh"
+                        sudo sh -c "echo 'echo \"server 10.207.39.2'								>  /etc/network/openvswitch/nsupdate_domain1_add_$ShortHost.sh"
+                        sudo sh -c "echo 'update add $ShortHost.orabuntu-lxc.com 3600 IN A 10.207.39.$Sw1Index'			>> /etc/network/openvswitch/nsupdate_domain1_add_$ShortHost.sh"
+                        sudo sh -c "echo 'send'											>> /etc/network/openvswitch/nsupdate_domain1_add_$ShortHost.sh"
+                        sudo sh -c "echo 'update add $Sw1Index.39.207.10.in-addr.arpa 3600 IN PTR $ShortHost.orabuntu-lxc.com'	>> /etc/network/openvswitch/nsupdate_domain1_add_$ShortHost.sh"
+                        sudo sh -c "echo 'send'											>> /etc/network/openvswitch/nsupdate_domain1_add_$ShortHost.sh"
+                        sudo sh -c "echo 'quit'											>> /etc/network/openvswitch/nsupdate_domain1_add_$ShortHost.sh"
+                        sudo sh -c "echo '\" | nsupdate -k /etc/bind/rndc.key'							>> /etc/network/openvswitch/nsupdate_domain1_add_$ShortHost.sh"
 
                         sudo chmod 777                                          /etc/network/openvswitch/nsupdate_domain1_add_$ShortHost.sh
                         sudo ls -l                                              /etc/network/openvswitch/nsupdate_domain1_add_$ShortHost.sh
                         sudo sed -i "s/orabuntu-lxc\.com/$Domain1/g"            /etc/network/openvswitch/nsupdate_domain1_add_$ShortHost.sh
 
-                        ssh-keygen -f "/home/ubuntu/.ssh/known_hosts" -R 10.207.39.2
+                        echo ''
+                        echo "=============================================="
+                        echo "Create DEL DNS $ShortHost.$Domain1...         "
+                        echo "=============================================="
+                        echo ''
+
+                        sudo sh -c "echo 'echo \"server 10.207.39.2'					>  /etc/network/openvswitch/nsupdate_domain1_del_$ShortHost.sh"
+                        sudo sh -c "echo 'update delete $ShortHost.orabuntu-lxc.com. A'			>> /etc/network/openvswitch/nsupdate_domain1_del_$ShortHost.sh"
+                        sudo sh -c "echo 'send'								>> /etc/network/openvswitch/nsupdate_domain1_del_$ShortHost.sh"
+                        sudo sh -c "echo 'update delete $Sw1Index.39.207.10.in-addr.arpa. PTR'		>> /etc/network/openvswitch/nsupdate_domain1_del_$ShortHost.sh"
+                        sudo sh -c "echo 'send'								>> /etc/network/openvswitch/nsupdate_domain1_del_$ShortHost.sh"
+                        sudo sh -c "echo 'quit'								>> /etc/network/openvswitch/nsupdate_domain1_del_$ShortHost.sh"
+                        sudo sh -c "echo '\" | nsupdate -k /etc/bind/rndc.key'				>> /etc/network/openvswitch/nsupdate_domain1_del_$ShortHost.sh"
+
+                        sudo chmod 777                                          /etc/network/openvswitch/nsupdate_domain1_del_$ShortHost.sh
+                        sudo ls -l                                              /etc/network/openvswitch/nsupdate_domain1_del_$ShortHost.sh
+                        sudo sed -i "s/orabuntu-lxc\.com/$Domain1/g"            /etc/network/openvswitch/nsupdate_domain1_del_$ShortHost.sh
+
+                        ssh-keygen -R 10.207.39.2
                         sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.39.2 "sudo -S <<< "ubuntu" mkdir -p ~/Downloads"
                         sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.39.2 "sudo -S <<< "ubuntu" chown ubuntu:ubuntu Downloads"
                         sshpass -p ubuntu scp    -o CheckHostIP=no -o StrictHostKeyChecking=no -p /etc/network/openvswitch/nsupdate_domain1_add_$ShortHost.sh ubuntu@10.207.39.2:~/Downloads/.
+			sshpass -p ubuntu scp    -o CheckHostIP=no -o StrictHostKeyChecking=no -p /etc/network/openvswitch/nsupdate_domain1_del_$ShortHost.sh ubuntu@10.207.39.2:~/Downloads/.
                         sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.39.2 "sudo -S <<< "ubuntu" ~/Downloads/nsupdate_domain1_add_$ShortHost.sh"
 
                         echo ''
                         echo "=============================================="
-                        echo "Done: Create ADD DNS $ShortHost.$Domain1      "
+                        echo "Done: Create ADD/DEL DNS $ShortHost.$Domain1  "
                         echo "=============================================="
                         echo ''
 
@@ -2140,27 +2159,45 @@ then
                         echo "=============================================="
                         echo ''
 
-                        sudo sh -c "echo 'echo \"server 10.207.29.2'                                                                            >  /etc/network/openvswitch/nsupdate_domain2_add_$ShortHost.sh"
-                        sudo sh -c "echo 'update add $ShortHost.consultingcommandos.us 3600 IN A 10.207.29.$Sx1Index'                           >> /etc/network/openvswitch/nsupdate_domain2_add_$ShortHost.sh"
-                        sudo sh -c "echo 'send'                                                                                                 >> /etc/network/openvswitch/nsupdate_domain2_add_$ShortHost.sh"
-                        sudo sh -c "echo 'update add $Sx1Index.29.207.10.in-addr.arpa 3600 IN PTR $ShortHost.consultingcommandos.us'            >> /etc/network/openvswitch/nsupdate_domain2_add_$ShortHost.sh"
-                        sudo sh -c "echo 'send'                                                                                                 >> /etc/network/openvswitch/nsupdate_domain2_add_$ShortHost.sh"
-                        sudo sh -c "echo 'quit'                                                                                                 >> /etc/network/openvswitch/nsupdate_domain2_add_$ShortHost.sh"
-                        sudo sh -c "echo '\" | nsupdate -k /etc/bind/rndc.key'                                                                  >> /etc/network/openvswitch/nsupdate_domain2_add_$ShortHost.sh"
+                        sudo sh -c "echo 'echo \"server 10.207.29.2'									>  /etc/network/openvswitch/nsupdate_domain2_add_$ShortHost.sh"
+                        sudo sh -c "echo 'update add $ShortHost.consultingcommandos.us 3600 IN A 10.207.29.$Sx1Index'			>> /etc/network/openvswitch/nsupdate_domain2_add_$ShortHost.sh"
+                        sudo sh -c "echo 'send'												>> /etc/network/openvswitch/nsupdate_domain2_add_$ShortHost.sh"
+                        sudo sh -c "echo 'update add $Sx1Index.29.207.10.in-addr.arpa 3600 IN PTR $ShortHost.consultingcommandos.us'	>> /etc/network/openvswitch/nsupdate_domain2_add_$ShortHost.sh"
+                        sudo sh -c "echo 'send'												>> /etc/network/openvswitch/nsupdate_domain2_add_$ShortHost.sh"
+                        sudo sh -c "echo 'quit'												>> /etc/network/openvswitch/nsupdate_domain2_add_$ShortHost.sh"
+                        sudo sh -c "echo '\" | nsupdate -k /etc/bind/rndc.key'								>> /etc/network/openvswitch/nsupdate_domain2_add_$ShortHost.sh"
 
                         sudo chmod 777                                          /etc/network/openvswitch/nsupdate_domain2_add_$ShortHost.sh
                         sudo ls -l                                              /etc/network/openvswitch/nsupdate_domain2_add_$ShortHost.sh
                         sudo sed -i "s/consultingcommandos\.us/$Domain2/g"      /etc/network/openvswitch/nsupdate_domain2_add_$ShortHost.sh
 
-                        ssh-keygen -f "/home/ubuntu/.ssh/known_hosts" -R 10.207.29.2
+                        echo ''
+                        echo "=============================================="
+                        echo "Create DEL DNS $ShortHost.$Domain2...         "
+                        echo "=============================================="
+                        echo ''
+
+                        sudo sh -c "echo 'echo \"server 10.207.29.2'					>  /etc/network/openvswitch/nsupdate_domain2_del_$ShortHost.sh"
+                        sudo sh -c "echo 'update delete $ShortHost.consultingcommandos.us. A'		>> /etc/network/openvswitch/nsupdate_domain2_del_$ShortHost.sh"
+                        sudo sh -c "echo 'send'								>> /etc/network/openvswitch/nsupdate_domain2_del_$ShortHost.sh"
+                        sudo sh -c "echo 'update delete $Sx1Index.29.207.10.in-addr.arpa. PTR'		>> /etc/network/openvswitch/nsupdate_domain2_del_$ShortHost.sh"
+                        sudo sh -c "echo 'send'								>> /etc/network/openvswitch/nsupdate_domain2_del_$ShortHost.sh"
+                        sudo sh -c "echo 'quit'								>> /etc/network/openvswitch/nsupdate_domain2_del_$ShortHost.sh"
+                        sudo sh -c "echo '\" | nsupdate -k /etc/bind/rndc.key'				>> /etc/network/openvswitch/nsupdate_domain2_del_$ShortHost.sh"
+
+                        sudo chmod 777                                          /etc/network/openvswitch/nsupdate_domain2_del_$ShortHost.sh
+                        sudo ls -l                                              /etc/network/openvswitch/nsupdate_domain2_del_$ShortHost.sh
+                        sudo sed -i "s/orabuntu-lxc\.com/$Domain1/g"            /etc/network/openvswitch/nsupdate_domain2_del_$ShortHost.sh
+                        ssh-keygen -R 10.207.29.2
                         sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.29.2 "sudo -S <<< "ubuntu" mkdir -p ~/Downloads"
                         sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.29.2 "sudo -S <<< "ubuntu" chown ubuntu:ubuntu Downloads"
                         sshpass -p ubuntu scp    -o CheckHostIP=no -o StrictHostKeyChecking=no -p /etc/network/openvswitch/nsupdate_domain2_add_$ShortHost.sh ubuntu@10.207.29.2:~/Downloads/.
+			sshpass -p ubuntu scp    -o CheckHostIP=no -o StrictHostKeyChecking=no -p /etc/network/openvswitch/nsupdate_domain2_del_$ShortHost.sh ubuntu@10.207.29.2:~/Downloads/.
                         sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.29.2 "sudo -S <<< "ubuntu" ~/Downloads/nsupdate_domain2_add_$ShortHost.sh"
 
                         echo ''
                         echo "=============================================="
-                        echo "Done: Create ADD DNS $ShortHost.$Domain2      "
+                        echo "Done: Create ADD/DEL DNS $ShortHost.$Domain2  "
                         echo "=============================================="
                         echo ''
 

@@ -218,7 +218,8 @@ then
 	
 	if [ $Release -eq 7 ]
 	then
-		/tmp/"$DistDir"/uekulele/archives/docker_install_uekulele.sh
+		sudo chmod 775 /opt/olxc/"$DistDir"/uekulele/archives/docker_install_uekulele.sh
+		/opt/olxc/"$DistDir"/uekulele/archives/docker_install_uekulele.sh
 	fi
 	
 	echo ''
@@ -428,7 +429,7 @@ do
         echo "=============================================="
         echo ''
 	
-	ssh-keygen -f "/home/ubuntu/.ssh/known_hosts" -R $j
+	ssh-keygen -R $j
         sshpass -p oracle ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no oracle@$j "uname -a; cat /etc/oracle-release"
 
         echo ''
@@ -580,7 +581,7 @@ then
 	        echo "=============================================="
 	        echo ''
 	
-	        ssh-keygen -f "/home/ubuntu/.ssh/known_hosts" -R 10.207.39.2
+	        ssh-keygen -R 10.207.39.2
 	        sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.39.2 "sudo -S <<< "ubuntu" mkdir -p ~/Downloads"
 	        sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.39.2 "sudo -S <<< "ubuntu" chown ubuntu:ubuntu Downloads"
 	        sshpass -p ubuntu scp    -o CheckHostIP=no -o StrictHostKeyChecking=no -p /etc/network/openvswitch/nsupdate_domain1_add_$ShortHost.sh ubuntu@10.207.39.2:~/Downloads/.
@@ -606,7 +607,7 @@ then
 	        echo "=============================================="
 	        echo ''
 	
-	        ssh-keygen -f "/home/ubuntu/.ssh/known_hosts" -R 10.207.29.2
+	        ssh-keygen -R 10.207.29.2
 	        sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.29.2 "sudo -S <<< "ubuntu" mkdir -p ~/Downloads"
 	        sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.29.2 "sudo -S <<< "ubuntu" chown ubuntu:ubuntu Downloads"
 	        sshpass -p ubuntu scp    -o CheckHostIP=no -o StrictHostKeyChecking=no -p /etc/network/openvswitch/nsupdate_domain2_add_$ShortHost.sh ubuntu@10.207.29.2:~/Downloads/.
@@ -700,7 +701,7 @@ then
 	
 	clear
 
-	sudo tar --extract --file=/tmp/"$DistDir"/uekulele/archives/dns-dhcp-host.tar -C / etc/network/openvswitch/ns_restore.sh
+	sudo tar --extract --file=/opt/olxc/"$DistDir"/uekulele/archives/dns-dhcp-host.tar -C / etc/network/openvswitch/ns_restore.sh
 	sudo sed -i "s/NAMESERVER/$NameServer/g" /etc/network/openvswitch/ns_restore.sh
 
 	if [ $NameServerExists -eq 1 ] && [ $GRE = 'N' ] && [ $MultiHostVar2 = 'N' ]
@@ -719,12 +720,12 @@ then
 			sudo lxc-copy  -n $NameServer -N "$NameServer"-bk0
 		fi
 		
-		if [ ! -e /home/ubuntu/Manage-Orabuntu ]
+		if [ ! -e $HOME/Manage-Orabuntu ]
 		then
-			sudo mkdir -p /home/ubuntu/Manage-Orabuntu
+			sudo mkdir -p $HOME/Manage-Orabuntu
 		fi
 		
-		sudo tar -P -czf ~/Manage-Orabuntu/$NameServer.tar.gz -T /tmp/"$DistDir"/uekulele/archives/nameserver.lst --checkpoint=10000 --totals
+		sudo tar -P -czf $HOME/Manage-Orabuntu/$NameServer.tar.gz -T /opt/olxc/"$DistDir"/uekulele/archives/nameserver.lst --checkpoint=10000 --totals
 		sudo lxc-start -n $NameServer
 		
 		echo ''
@@ -746,7 +747,7 @@ then
   		echo "=============================================="
   		echo ''
   		
-		/tmp/"$DistDir"/uekulele/archives/nameserver_copy.sh $MultiHostVar5 $MultiHostVar6 $NameServer
+		/opt/olxc/"$DistDir"/uekulele/archives/nameserver_copy.sh $MultiHostVar5 $MultiHostVar6 $NameServer
 	
   		echo ''
   		echo "=============================================="
@@ -764,9 +765,9 @@ then
                 echo "=============================================="
                 echo ''
 
-                ssh-keygen -f "/home/ubuntu/.ssh/known_hosts" -R 10.207.39.2
-                ssh-keygen -f "/home/ubuntu/.ssh/known_hosts" -R $NameServer
-		sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.39.2 "sudo -S <<< "ubuntu" echo $HOSTNAME > /home/ubuntu/new_gre_host.txt"
+                ssh-keygen -R 10.207.39.2
+                ssh-keygen -R $NameServer
+		sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.39.2 "sudo -S <<< "ubuntu" echo $HOSTNAME > ~/new_gre_host.txt"
 		sleep 5
 	
 		if   [ $SystemdResolvedInstalled -ge 1 ]
@@ -828,43 +829,43 @@ then
 		echo "=============================================="
 		echo ''
 	
-		sudo mkdir -p /tmp/"$DistDir"/uekulele/selinux
-		sudo chmod 777 /tmp/"$DistDir"/uekulele/selinux
-		touch /tmp/"$DistDir"/uekulele/selinux/selinux-lxc.sh
-		ls -l /tmp/"$DistDir"/uekulele/selinux/selinux-lxc.sh
-		sudo chmod 777 /tmp/"$DistDir"/uekulele/selinux/selinux-lxc.sh
-		cd /tmp/"$DistDir"/uekulele/selinux
+		sudo mkdir -p /opt/olxc/"$DistDir"/uekulele/selinux
+		sudo chmod 777 /opt/olxc/"$DistDir"/uekulele/selinux
+		touch /opt/olxc/"$DistDir"/uekulele/selinux/selinux-lxc.sh
+		ls -l /opt/olxc/"$DistDir"/uekulele/selinux/selinux-lxc.sh
+		sudo chmod 777 /opt/olxc/"$DistDir"/uekulele/selinux/selinux-lxc.sh
+		cd /opt/olxc/"$DistDir"/uekulele/selinux
 	
-		echo 'sudo ausearch -c 'lxcattach' --raw | audit2allow -M my-lxcattach'			>  /tmp/"$DistDir"/uekulele/selinux/selinux-lxc.sh
-		echo 'sudo semodule -i my-lxcattach.pp'							>> /tmp/"$DistDir"/uekulele/selinux/selinux-lxc.sh
-		echo 'sudo ausearch -c 'dhclient' --raw | audit2allow -M my-dhclient'			>> /tmp/"$DistDir"/uekulele/selinux/selinux-lxc.sh
-		echo 'sudo semodule -i my-dhclient.pp'							>> /tmp/"$DistDir"/uekulele/selinux/selinux-lxc.sh
-		echo 'sudo ausearch -c 'passwd' --raw | audit2allow -M my-passwd'			>> /tmp/"$DistDir"/uekulele/selinux/selinux-lxc.sh
-		echo 'sudo semodule -i my-passwd.pp'							>> /tmp/"$DistDir"/uekulele/selinux/selinux-lxc.sh
-		echo 'sudo ausearch -c 'sedispatch' --raw | audit2allow -M my-sedispatch'		>> /tmp/"$DistDir"/uekulele/selinux/selinux-lxc.sh
-		echo 'sudo semodule -i my-sedispatch.pp'						>> /tmp/"$DistDir"/uekulele/selinux/selinux-lxc.sh
-		echo 'sudo ausearch -c 'systemd-sysctl' --raw | audit2allow -M my-systemdsysctl'	>> /tmp/"$DistDir"/uekulele/selinux/selinux-lxc.sh
-		echo 'sudo semodule -i my-systemdsysctl.pp'						>> /tmp/"$DistDir"/uekulele/selinux/selinux-lxc.sh
-		echo 'sudo ausearch -c 'ovs-vsctl' --raw | audit2allow -M my-ovsvsctl'			>> /tmp/"$DistDir"/uekulele/selinux/selinux-lxc.sh
-		echo 'sudo semodule -i my-ovsvsctl.pp'							>> /tmp/"$DistDir"/uekulele/selinux/selinux-lxc.sh
-		echo 'sudo ausearch -c 'sshd' --raw | audit2allow -M my-sshd'				>> /tmp/"$DistDir"/uekulele/selinux/selinux-lxc.sh
-		echo 'sudo semodule -i my-sshd.pp'							>> /tmp/"$DistDir"/uekulele/selinux/selinux-lxc.sh
-		echo 'sudo ausearch -c 'gdm-session-wor' --raw | audit2allow -M my-gdmsessionwor'	>> /tmp/"$DistDir"/uekulele/selinux/selinux-lxc.sh
-		echo 'sudo semodule -i my-gdmsessionwor.pp'						>> /tmp/"$DistDir"/uekulele/selinux/selinux-lxc.sh
-		echo 'sudo ausearch -c 'pickup' --raw | audit2allow -M my-pickup'			>> /tmp/"$DistDir"/uekulele/selinux/selinux-lxc.sh
-		echo 'sudo semodule -i my-pickup.pp'							>> /tmp/"$DistDir"/uekulele/selinux/selinux-lxc.sh
-		echo 'sudo ausearch -c 'sedispatch' --raw | audit2allow -M my-sedispatch'		>> /tmp/"$DistDir"/uekulele/selinux/selinux-lxc.sh
-		echo 'sudo semodule -i my-sedispatch.pp'						>> /tmp/"$DistDir"/uekulele/selinux/selinux-lxc.sh
-		echo 'sudo ausearch -c 'iscsid' --raw | audit2allow -M my-iscsid'			>> /tmp/"$DistDir"/uekulele/selinux/selinux-lxc.sh
-		echo 'sudo semodule -i my-iscsid.pp'							>> /tmp/"$DistDir"/uekulele/selinux/selinux-lxc.sh
-		echo 'sudo ausearch -c 'dhclient' --raw | audit2allow -M my-dhclient'			>> /tmp/"$DistDir"/uekulele/selinux/selinux-lxc.sh
-		echo 'sudo semodule -i my-dhclient.pp'							>> /tmp/"$DistDir"/uekulele/selinux/selinux-lxc.sh
-		echo 'sudo ausearch -c 'ovs-vsctl' --raw | audit2allow -M my-ovsvsctl'			>> /tmp/"$DistDir"/uekulele/selinux/selinux-lxc.sh
-		echo 'sudo semodule -i my-ovsvsctl.pp'							>> /tmp/"$DistDir"/uekulele/selinux/selinux-lxc.sh
-		echo 'sudo ausearch -c 'chpasswd' --raw | audit2allow -M my-chpasswd'			>> /tmp/"$DistDir"/uekulele/selinux/selinux-lxc.sh
-		echo 'sudo semodule -i my-chpasswd.pp'							>> /tmp/"$DistDir"/uekulele/selinux/selinux-lxc.sh
-		echo 'sudo ausearch -c 'colord' --raw | audit2allow -M my-colord'			>> /tmp/"$DistDir"/uekulele/selinux/selinux-lxc.sh
-		echo 'sudo semodule -i my-colord.pp'							>> /tmp/"$DistDir"/uekulele/selinux/selinux-lxc.sh
+		echo 'sudo ausearch -c 'lxcattach' --raw | audit2allow -M my-lxcattach'			>  /opt/olxc/"$DistDir"/uekulele/selinux/selinux-lxc.sh
+		echo 'sudo semodule -i my-lxcattach.pp'							>> /opt/olxc/"$DistDir"/uekulele/selinux/selinux-lxc.sh
+		echo 'sudo ausearch -c 'dhclient' --raw | audit2allow -M my-dhclient'			>> /opt/olxc/"$DistDir"/uekulele/selinux/selinux-lxc.sh
+		echo 'sudo semodule -i my-dhclient.pp'							>> /opt/olxc/"$DistDir"/uekulele/selinux/selinux-lxc.sh
+		echo 'sudo ausearch -c 'passwd' --raw | audit2allow -M my-passwd'			>> /opt/olxc/"$DistDir"/uekulele/selinux/selinux-lxc.sh
+		echo 'sudo semodule -i my-passwd.pp'							>> /opt/olxc/"$DistDir"/uekulele/selinux/selinux-lxc.sh
+		echo 'sudo ausearch -c 'sedispatch' --raw | audit2allow -M my-sedispatch'		>> /opt/olxc/"$DistDir"/uekulele/selinux/selinux-lxc.sh
+		echo 'sudo semodule -i my-sedispatch.pp'						>> /opt/olxc/"$DistDir"/uekulele/selinux/selinux-lxc.sh
+		echo 'sudo ausearch -c 'systemd-sysctl' --raw | audit2allow -M my-systemdsysctl'	>> /opt/olxc/"$DistDir"/uekulele/selinux/selinux-lxc.sh
+		echo 'sudo semodule -i my-systemdsysctl.pp'						>> /opt/olxc/"$DistDir"/uekulele/selinux/selinux-lxc.sh
+		echo 'sudo ausearch -c 'ovs-vsctl' --raw | audit2allow -M my-ovsvsctl'			>> /opt/olxc/"$DistDir"/uekulele/selinux/selinux-lxc.sh
+		echo 'sudo semodule -i my-ovsvsctl.pp'							>> /opt/olxc/"$DistDir"/uekulele/selinux/selinux-lxc.sh
+		echo 'sudo ausearch -c 'sshd' --raw | audit2allow -M my-sshd'				>> /opt/olxc/"$DistDir"/uekulele/selinux/selinux-lxc.sh
+		echo 'sudo semodule -i my-sshd.pp'							>> /opt/olxc/"$DistDir"/uekulele/selinux/selinux-lxc.sh
+		echo 'sudo ausearch -c 'gdm-session-wor' --raw | audit2allow -M my-gdmsessionwor'	>> /opt/olxc/"$DistDir"/uekulele/selinux/selinux-lxc.sh
+		echo 'sudo semodule -i my-gdmsessionwor.pp'						>> /opt/olxc/"$DistDir"/uekulele/selinux/selinux-lxc.sh
+		echo 'sudo ausearch -c 'pickup' --raw | audit2allow -M my-pickup'			>> /opt/olxc/"$DistDir"/uekulele/selinux/selinux-lxc.sh
+		echo 'sudo semodule -i my-pickup.pp'							>> /opt/olxc/"$DistDir"/uekulele/selinux/selinux-lxc.sh
+		echo 'sudo ausearch -c 'sedispatch' --raw | audit2allow -M my-sedispatch'		>> /opt/olxc/"$DistDir"/uekulele/selinux/selinux-lxc.sh
+		echo 'sudo semodule -i my-sedispatch.pp'						>> /opt/olxc/"$DistDir"/uekulele/selinux/selinux-lxc.sh
+		echo 'sudo ausearch -c 'iscsid' --raw | audit2allow -M my-iscsid'			>> /opt/olxc/"$DistDir"/uekulele/selinux/selinux-lxc.sh
+		echo 'sudo semodule -i my-iscsid.pp'							>> /opt/olxc/"$DistDir"/uekulele/selinux/selinux-lxc.sh
+		echo 'sudo ausearch -c 'dhclient' --raw | audit2allow -M my-dhclient'			>> /opt/olxc/"$DistDir"/uekulele/selinux/selinux-lxc.sh
+		echo 'sudo semodule -i my-dhclient.pp'							>> /opt/olxc/"$DistDir"/uekulele/selinux/selinux-lxc.sh
+		echo 'sudo ausearch -c 'ovs-vsctl' --raw | audit2allow -M my-ovsvsctl'			>> /opt/olxc/"$DistDir"/uekulele/selinux/selinux-lxc.sh
+		echo 'sudo semodule -i my-ovsvsctl.pp'							>> /opt/olxc/"$DistDir"/uekulele/selinux/selinux-lxc.sh
+		echo 'sudo ausearch -c 'chpasswd' --raw | audit2allow -M my-chpasswd'			>> /opt/olxc/"$DistDir"/uekulele/selinux/selinux-lxc.sh
+		echo 'sudo semodule -i my-chpasswd.pp'							>> /opt/olxc/"$DistDir"/uekulele/selinux/selinux-lxc.sh
+		echo 'sudo ausearch -c 'colord' --raw | audit2allow -M my-colord'			>> /opt/olxc/"$DistDir"/uekulele/selinux/selinux-lxc.sh
+		echo 'sudo semodule -i my-colord.pp'							>> /opt/olxc/"$DistDir"/uekulele/selinux/selinux-lxc.sh
 	
 		echo ''
 		echo "=============================================="
@@ -1008,17 +1009,17 @@ then
 	echo "Management links directory creation...        "
 	echo "=============================================="
 	
-	if [ ! -e /home/ubuntu/Manage-Orabuntu ]
+	if [ ! -e $HOME/Manage-Orabuntu ]
 	then
-		sudo mkdir -p /home/ubuntu/Manage-Orabuntu
+		sudo mkdir -p $HOME/Manage-Orabuntu
 	fi
 		
-	cd /home/ubuntu/Manage-Orabuntu
+	cd $HOME/Manage-Orabuntu
 	sudo chmod 755 /etc/orabuntu-lxc-scripts/crt_links.sh
 	sudo /etc/orabuntu-lxc-scripts/crt_links.sh
 	
 	echo ''
-	sudo ls -l /home/ubuntu/Manage-Orabuntu | tail -5
+	sudo ls -l $HOME/Manage-Orabuntu | tail -5
 	echo '...'
 	
 	echo ''
@@ -1029,7 +1030,7 @@ then
 	echo "=============================================="
 	echo "Note that deployment management links are in: "
 	echo "                                              "
-	echo "     /home/ubuntu/Manage-Orabuntu             "
+	echo "     $HOME/Manage-Orabuntu                        "
 	echo "                                              "
 	echo "Learn and manage Orabuntu-LXC configurations  "
 	echo "from that directory of pointers.              "

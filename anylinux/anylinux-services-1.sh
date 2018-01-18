@@ -203,38 +203,68 @@ echo "Verify networking up...                       "
 echo "=============================================="
 echo ''
 
-ping -c 3 yum.oracle.com
-
+n=1
 function CheckNetworkUp {
-ping -c 3 yum.oracle.com | grep packet | cut -f3 -d',' | sed 's/ //g'
+	ping -c 3 yum.oracle.com > /dev/null 2>&1
+	echo $?
 }
 NetworkUp=$(CheckNetworkUp)
-
-while [ "$NetworkUp" !=  "0%packetloss" ] && [ "$n" -lt 5 ]
-do
-	NetworkUp=$(CheckNetworkUp)
-	let n=$n+1
-done
-
-if [ "$NetworkUp" != '0%packetloss' ]
+if [ "$NetworkUp" -ne 0 ]
 then
-	echo ''
-	echo "=============================================="
-	echo "Networking is not up or is hiccuping badly:   "
-	echo "archive.ubuntu.com ping test must succeed.    "
-	echo "Exiting script...                             "
-	echo "Address network issues/hiccups & rerun script."
-	echo "=============================================="
+        echo ''
+        echo "=============================================="
+        echo "Networking is not up or is hiccuping badly:   "
+        echo "yum.oracle.com ping test must succeed.        "
+        echo "=============================================="
 
-	sleep 15
+        sleep 1
 
-	exit
+        if [ $MultiHostVar1 = 'reinstall' ]
+        then
+		echo ''
+                echo "=============================================="
+                echo "Networking is not up or site is not pinging.  "
+                echo "yum.oracle.com ping test must succeed.        "
+                echo "Backing up:                                   "
+                echo "                                              "
+                echo "/etc/resolv.conf                              "
+                echo "to                                            "
+                echo "/etc/resolv.conf.orabuntu-lxc.reinstall.bak   "
+                echo "                                              "
+                echo "and attempting basic reconfiguration and      "
+                echo "retrying network verification test            "
+                echo "=============================================="
+
+                sudo cp -p /etc/resolv.conf /etc/resolv.conf.orabuntu-lxc.reinstall.bak
+		sudo sed -i 's/^/#/' /etc/resolv.conf
+                sudo sh -c "echo 'nameserver 8.8.8.8' >> /etc/resolv.conf"
+
+                while [ "$NetworkUp" -ne 0 ] && [ "$n" -lt 5 ]
+                do
+                        NetworkUp=$(CheckNetworkUp)
+                        let n=$n+1
+                done
+		n=1
+		echo ''
+		ping -c 3 yum.oracle.com
+		echo ''
+		echo "=============================================="
+	        echo "Network ping test verification complete.      "
+		echo "=============================================="
+		echo ''
+
+        elif [ $MultiHostVar1 = 'new' ]
+        then
+                echo "=============================================="
+                echo "Networking is not up or is hiccuping badly:   "
+                echo "yum.oracle.com ping test must succeed.        "
+                echo "Exiting script...                             "
+                echo "Address network issues/hiccups & rerun script."
+                echo "=============================================="
+                exit
+        fi
 else
-	echo ''
-	echo "=============================================="
-	echo "Network ping test verification complete.      "
-	echo "=============================================="
-	echo ''
+	ping -c 3 yum.oracle.com
 fi
 
 sleep 5 
@@ -254,7 +284,7 @@ uname -a
 # GLS 20160924 If the kernel version is lower than 2.6.30 and if you use the options SCST Linux SAN archive it will be necessary to compile a custom kernel.
 
 function VersionKernelPassFail () {
-    /tmp/"$DistDir"/anylinux/vercomp | cut -f1 -d':'
+    /opt/olxc/"$DistDir"/anylinux/vercomp | cut -f1 -d':'
 }
 KernelPassFail=$(VersionKernelPassFail)
 
@@ -418,8 +448,8 @@ then
 
 				sleep 5
 
-				mkdir -p /tmp/"$DistDir"/uekulele/facter
-				cd /tmp/"$DistDir"/uekulele/facter
+				mkdir -p /opt/olxc/"$DistDir"/uekulele/facter
+				cd /opt/olxc/"$DistDir"/uekulele/facter
 				curl -s http://downloads.puppetlabs.com/facter/facter-2.4.4.tar.gz | sudo tar xz; sudo ruby facter*/install.rb
 
 				echo ''
@@ -527,35 +557,35 @@ then
 
 					if [ $MultiHostVar1 = 'addrelease' ]
 					then
- 						/tmp/"$DistDir"/uekulele/uekulele-services-2.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $MultiHost $DistDir
- 						/tmp/"$DistDir"/uekulele/uekulele-services-3.sh $MajorRelease $PointRelease $Domain2 $MultiHost $DistDir
-						/tmp/"$DistDir"/uekulele/uekulele-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer $MultiHost $DistDir
-						/tmp/"$DistDir"/uekulele/uekulele-services-5.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $MultiHost $DistDir
+ 						/opt/olxc/"$DistDir"/uekulele/uekulele-services-2.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $MultiHost $DistDir
+ 						/opt/olxc/"$DistDir"/uekulele/uekulele-services-3.sh $MajorRelease $PointRelease $Domain2 $MultiHost $DistDir
+						/opt/olxc/"$DistDir"/uekulele/uekulele-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer $MultiHost $DistDir
+						/opt/olxc/"$DistDir"/uekulele/uekulele-services-5.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $MultiHost $DistDir
 					fi # OK 8
 
 					if [ $MultiHostVar1 = 'new' ] || [ $MultiHostVar1 = 'reinstall' ] # 8
 					then
- 						/tmp/"$DistDir"/uekulele/uekulele-services-1.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $OSMemRes $MultiHost $LxcOvsVersion $DistDir
- 						/tmp/"$DistDir"/uekulele/uekulele-services-2.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $MultiHost $DistDir
- 						/tmp/"$DistDir"/uekulele/uekulele-services-3.sh $MajorRelease $PointRelease $Domain2 $MultiHost $DistDir
-						/tmp/"$DistDir"/uekulele/uekulele-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer $MultiHost $DistDir 
-						/tmp/"$DistDir"/uekulele/uekulele-services-5.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $MultiHost $DistDir
+ 						/opt/olxc/"$DistDir"/uekulele/uekulele-services-1.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $OSMemRes $MultiHost $LxcOvsVersion $DistDir
+ 						/opt/olxc/"$DistDir"/uekulele/uekulele-services-2.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $MultiHost $DistDir
+ 						/opt/olxc/"$DistDir"/uekulele/uekulele-services-3.sh $MajorRelease $PointRelease $Domain2 $MultiHost $DistDir
+						/opt/olxc/"$DistDir"/uekulele/uekulele-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer $MultiHost $DistDir 
+						/opt/olxc/"$DistDir"/uekulele/uekulele-services-5.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $MultiHost $DistDir
 					fi # OK 8
 
 					if [ $MultiHostVar1 = 'addclones' ] # 9
 					then
-						/tmp/"$DistDir"/uekulele/uekulele-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer $MultiHost $DistDir
-						/tmp/"$DistDir"/uekulele/uekulele-services-5.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $MultiHost $DistDir
+						/opt/olxc/"$DistDir"/uekulele/uekulele-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer $MultiHost $DistDir
+						/opt/olxc/"$DistDir"/uekulele/uekulele-services-5.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $MultiHost $DistDir
 					fi # OK 9
 				fi # OK 7
 
 				if [ ! -f /etc/orabuntu-lxc-release ] # 10
 				then
-					/tmp/"$DistDir"/uekulele/uekulele-services-1.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $OSMemRes $MultiHost $LxcOvsVersion $DistDir
-					/tmp/"$DistDir"/uekulele/uekulele-services-2.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $MultiHost $DistDir
-					/tmp/"$DistDir"/uekulele/uekulele-services-3.sh $MajorRelease $PointRelease $Domain2 $MultiHost $DistDir
-					/tmp/"$DistDir"/uekulele/uekulele-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer $MultiHost $DistDir
-					/tmp/"$DistDir"/uekulele/uekulele-services-5.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $MultiHost $DistDir
+					/opt/olxc/"$DistDir"/uekulele/uekulele-services-1.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $OSMemRes $MultiHost $LxcOvsVersion $DistDir
+					/opt/olxc/"$DistDir"/uekulele/uekulele-services-2.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $MultiHost $DistDir
+					/opt/olxc/"$DistDir"/uekulele/uekulele-services-3.sh $MajorRelease $PointRelease $Domain2 $MultiHost $DistDir
+					/opt/olxc/"$DistDir"/uekulele/uekulele-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer $MultiHost $DistDir
+					/opt/olxc/"$DistDir"/uekulele/uekulele-services-5.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $MultiHost $DistDir
 				fi # OK 10
 
  				echo ''
@@ -602,35 +632,35 @@ then
 
 					if [ $MultiHostVar1 = 'addrelease' ]
 					then
- 						/tmp/"$DistDir"/uekulele/uekulele-services-2.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $MultiHost $DistDir
- 						/tmp/"$DistDir"/uekulele/uekulele-services-3.sh $MajorRelease $PointRelease $Domain2 $MultiHost $DistDir
-						/tmp/"$DistDir"/uekulele/uekulele-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer $MultiHost $DistDir
-						/tmp/"$DistDir"/uekulele/uekulele-services-5.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $MultiHost $DistDir 
+ 						/opt/olxc/"$DistDir"/uekulele/uekulele-services-2.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $MultiHost $DistDir
+ 						/opt/olxc/"$DistDir"/uekulele/uekulele-services-3.sh $MajorRelease $PointRelease $Domain2 $MultiHost $DistDir
+						/opt/olxc/"$DistDir"/uekulele/uekulele-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer $MultiHost $DistDir
+						/opt/olxc/"$DistDir"/uekulele/uekulele-services-5.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $MultiHost $DistDir 
 					fi # OK 8
 
 					if [ $MultiHostVar1 = 'new' ] || [ $MultiHostVar1 = 'reinstall' ] # 8
 					then
- 						/tmp/"$DistDir"/uekulele/uekulele-services-1.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $OSMemRes $MultiHost $LxcOvsVersion $DistDir
- 						/tmp/"$DistDir"/uekulele/uekulele-services-2.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $MultiHost $DistDir
- 						/tmp/"$DistDir"/uekulele/uekulele-services-3.sh $MajorRelease $PointRelease $Domain2 $MultiHost $DistDir
-						/tmp/"$DistDir"/uekulele/uekulele-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer $MultiHost $DistDir
-						/tmp/"$DistDir"/uekulele/uekulele-services-5.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $MultiHost $DistDir 
+ 						/opt/olxc/"$DistDir"/uekulele/uekulele-services-1.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $OSMemRes $MultiHost $LxcOvsVersion $DistDir
+ 						/opt/olxc/"$DistDir"/uekulele/uekulele-services-2.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $MultiHost $DistDir
+ 						/opt/olxc/"$DistDir"/uekulele/uekulele-services-3.sh $MajorRelease $PointRelease $Domain2 $MultiHost $DistDir
+						/opt/olxc/"$DistDir"/uekulele/uekulele-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer $MultiHost $DistDir
+						/opt/olxc/"$DistDir"/uekulele/uekulele-services-5.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $MultiHost $DistDir 
 					fi # OK 8
 
 					if [ $MultiHostVar1 = 'addclones' ] # 9
 					then
-						/tmp/"$DistDir"/uekulele/uekulele-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer $MultiHost $DistDir
-						/tmp/"$DistDir"/uekulele/uekulele-services-5.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $MultiHost $DistDir
+						/opt/olxc/"$DistDir"/uekulele/uekulele-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer $MultiHost $DistDir
+						/opt/olxc/"$DistDir"/uekulele/uekulele-services-5.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $MultiHost $DistDir
 					fi # OK 9
 				fi # OK 11
 		
 				if [ ! -f /etc/orabuntu-lxc-release ] # 14
 				then
-					/tmp/"$DistDir"/uekulele/uekulele-services-1.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $OSMemRes $MultiHost $LxcOvsVersion $DistDir
-					/tmp/"$DistDir"/uekulele/uekulele-services-2.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $MultiHost $DistDir
-					/tmp/"$DistDir"/uekulele/uekulele-services-3.sh $MajorRelease $PointRelease $Domain2 $MultiHost $DistDir
-					/tmp/"$DistDir"/uekulele/uekulele-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer $MultiHost $DistDir
-					/tmp/"$DistDir"/uekulele/uekulele-services-5.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $MultiHost $DistDir
+					/opt/olxc/"$DistDir"/uekulele/uekulele-services-1.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $OSMemRes $MultiHost $LxcOvsVersion $DistDir
+					/opt/olxc/"$DistDir"/uekulele/uekulele-services-2.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $MultiHost $DistDir
+					/opt/olxc/"$DistDir"/uekulele/uekulele-services-3.sh $MajorRelease $PointRelease $Domain2 $MultiHost $DistDir
+					/opt/olxc/"$DistDir"/uekulele/uekulele-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer $MultiHost $DistDir
+					/opt/olxc/"$DistDir"/uekulele/uekulele-services-5.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $MultiHost $DistDir
 				fi # OK 14
 
 				sleep 5
@@ -894,36 +924,36 @@ then
 
 					if [ $MultiHostVar1 = 'addrelease' ]
 					then	
- 						/tmp/"$DistDir"/orabuntu/orabuntu-services-2.sh $MajorRelease $PointRelease $Domain1 $Domain2 $MultiHost $NameServer $DistDir
- 						/tmp/"$DistDir"/orabuntu/orabuntu-services-3.sh $MajorRelease $PointRelease $Domain2 $DistDir
-						/tmp/"$DistDir"/orabuntu/orabuntu-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer $MultiHost $DistDir
-						/tmp/"$DistDir"/orabuntu/orabuntu-services-5.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $MultiHost $DistDir
+ 						/opt/olxc/"$DistDir"/orabuntu/orabuntu-services-2.sh $MajorRelease $PointRelease $Domain1 $Domain2 $MultiHost $NameServer $DistDir
+ 						/opt/olxc/"$DistDir"/orabuntu/orabuntu-services-3.sh $MajorRelease $PointRelease $Domain2 $DistDir
+						/opt/olxc/"$DistDir"/orabuntu/orabuntu-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer $MultiHost $DistDir
+						/opt/olxc/"$DistDir"/orabuntu/orabuntu-services-5.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $MultiHost $DistDir
 					fi
 
 					if [ $MultiHostVar1 = 'new' ] || [ $MultiHostVar1 = 'reinstall' ] # 8
 					then
- 						/tmp/"$DistDir"/orabuntu/orabuntu-services-1.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $OSMemRes $MultiHost $DistDir
- 						/tmp/"$DistDir"/orabuntu/orabuntu-services-2.sh $MajorRelease $PointRelease $Domain1 $Domain2 $MultiHost $NameServer $DistDir
- 						/tmp/"$DistDir"/orabuntu/orabuntu-services-3.sh $MajorRelease $PointRelease $Domain2 $DistDir
-						/tmp/"$DistDir"/orabuntu/orabuntu-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer $MultiHost $DistDir
-						/tmp/"$DistDir"/orabuntu/orabuntu-services-5.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $MultiHost $DistDir
+ 						/opt/olxc/"$DistDir"/orabuntu/orabuntu-services-1.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $OSMemRes $MultiHost $DistDir
+ 						/opt/olxc/"$DistDir"/orabuntu/orabuntu-services-2.sh $MajorRelease $PointRelease $Domain1 $Domain2 $MultiHost $NameServer $DistDir
+ 						/opt/olxc/"$DistDir"/orabuntu/orabuntu-services-3.sh $MajorRelease $PointRelease $Domain2 $DistDir
+						/opt/olxc/"$DistDir"/orabuntu/orabuntu-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer $MultiHost $DistDir
+						/opt/olxc/"$DistDir"/orabuntu/orabuntu-services-5.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $MultiHost $DistDir
 					fi # OK 8
 
 					if [ $MultiHostVar1 = 'addclones' ] # 9
 					then
-						/tmp/"$DistDir"/orabuntu/orabuntu-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer $MultiHost $DistDir
-						/tmp/"$DistDir"/orabuntu/orabuntu-services-5.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $MultiHost $DistDir
+						/opt/olxc/"$DistDir"/orabuntu/orabuntu-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer $MultiHost $DistDir
+						/opt/olxc/"$DistDir"/orabuntu/orabuntu-services-5.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $MultiHost $DistDir
 					fi # OK 9
 
 				fi # OK 7
 		
 				if [ ! -f /etc/orabuntu-lxc-release ] # 10
 				then
-					/tmp/"$DistDir"/orabuntu/orabuntu-services-1.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $OSMemRes $MultiHost $DistDir
-					/tmp/"$DistDir"/orabuntu/orabuntu-services-2.sh $MajorRelease $PointRelease $Domain1 $Domain2 $MultiHost $NameServer $DistDir
-					/tmp/"$DistDir"/orabuntu/orabuntu-services-3.sh $MajorRelease $PointRelease $Domain2 $DistDir
-					/tmp/"$DistDir"/orabuntu/orabuntu-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer $MultiHost $DistDir
-					/tmp/"$DistDir"/orabuntu/orabuntu-services-5.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $MultiHost $DistDir
+					/opt/olxc/"$DistDir"/orabuntu/orabuntu-services-1.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $OSMemRes $MultiHost $DistDir
+					/opt/olxc/"$DistDir"/orabuntu/orabuntu-services-2.sh $MajorRelease $PointRelease $Domain1 $Domain2 $MultiHost $NameServer $DistDir
+					/opt/olxc/"$DistDir"/orabuntu/orabuntu-services-3.sh $MajorRelease $PointRelease $Domain2 $DistDir
+					/opt/olxc/"$DistDir"/orabuntu/orabuntu-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer $MultiHost $DistDir
+					/opt/olxc/"$DistDir"/orabuntu/orabuntu-services-5.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $MultiHost $DistDir
 				fi # OK 10
 
 				clear
@@ -973,36 +1003,36 @@ then
 
 					if [ $MultiHostVar1 = 'addrelease' ]
 					then	
- 						/tmp/"$DistDir"/orabuntu/orabuntu-services-2.sh $MajorRelease $PointRelease $Domain1 $Domain2 $MultiHost $NameServer $DistDir
- 						/tmp/"$DistDir"/orabuntu/orabuntu-services-3.sh $MajorRelease $PointRelease $Domain2 $DistDir
-						/tmp/"$DistDir"/orabuntu/orabuntu-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer $MultiHost $DistDir
-						/tmp/"$DistDir"/orabuntu/orabuntu-services-5.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $MultiHost $DistDir
+ 						/opt/olxc/"$DistDir"/orabuntu/orabuntu-services-2.sh $MajorRelease $PointRelease $Domain1 $Domain2 $MultiHost $NameServer $DistDir
+ 						/opt/olxc/"$DistDir"/orabuntu/orabuntu-services-3.sh $MajorRelease $PointRelease $Domain2 $DistDir
+						/opt/olxc/"$DistDir"/orabuntu/orabuntu-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer $MultiHost $DistDir
+						/opt/olxc/"$DistDir"/orabuntu/orabuntu-services-5.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $MultiHost $DistDir
 					fi
 
 					if [ $MultiHostVar1 = 'new' ] || [ $MultiHostVar1 = 'reinstall' ] # 12
 					then
- 						/tmp/"$DistDir"/orabuntu/orabuntu-services-1.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $OSMemRes $MultiHost $DistDir
- 						/tmp/"$DistDir"/orabuntu/orabuntu-services-2.sh $MajorRelease $PointRelease $Domain1 $Domain2 $MultiHost $NameServer $DistDir
- 						/tmp/"$DistDir"/orabuntu/orabuntu-services-3.sh $MajorRelease $PointRelease $Domain2 $DistDir
-						/tmp/"$DistDir"/orabuntu/orabuntu-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer $MultiHost $DistDir
-						/tmp/"$DistDir"/orabuntu/orabuntu-services-5.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $MultiHost $DistDir
+ 						/opt/olxc/"$DistDir"/orabuntu/orabuntu-services-1.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $OSMemRes $MultiHost $DistDir
+ 						/opt/olxc/"$DistDir"/orabuntu/orabuntu-services-2.sh $MajorRelease $PointRelease $Domain1 $Domain2 $MultiHost $NameServer $DistDir
+ 						/opt/olxc/"$DistDir"/orabuntu/orabuntu-services-3.sh $MajorRelease $PointRelease $Domain2 $DistDir
+						/opt/olxc/"$DistDir"/orabuntu/orabuntu-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer $MultiHost $DistDir
+						/opt/olxc/"$DistDir"/orabuntu/orabuntu-services-5.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $MultiHost $DistDir
 					fi # OK 12
 
 					if [ $MultiHostVar1 = 'addclones' ] # 13
 					then
-						/tmp/"$DistDir"/orabuntu/orabuntu-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer $MultiHost $DistDir
-						/tmp/"$DistDir"/orabuntu/orabuntu-services-5.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $MultiHost $DistDir
+						/opt/olxc/"$DistDir"/orabuntu/orabuntu-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer $MultiHost $DistDir
+						/opt/olxc/"$DistDir"/orabuntu/orabuntu-services-5.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $MultiHost $DistDir
 					fi # OK 13
 
 				fi # OK 11
 		
 				if [ ! -f /etc/orabuntu-lxc-release ] # 14
 				then
-					/tmp/"$DistDir"/orabuntu/orabuntu-services-1.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $OSMemRes $MultiHost $DistDir
-					/tmp/"$DistDir"/orabuntu/orabuntu-services-2.sh $MajorRelease $PointRelease $Domain1 $Domain2 $MultiHost $NameServer $DistDir
-					/tmp/"$DistDir"/orabuntu/orabuntu-services-3.sh $MajorRelease $PointRelease $Domain2 $DistDir
-					/tmp/"$DistDir"/orabuntu/orabuntu-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer $MultiHost $DistDir
-					/tmp/"$DistDir"/orabuntu/orabuntu-services-5.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $MultiHost $DistDir
+					/opt/olxc/"$DistDir"/orabuntu/orabuntu-services-1.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $OSMemRes $MultiHost $DistDir
+					/opt/olxc/"$DistDir"/orabuntu/orabuntu-services-2.sh $MajorRelease $PointRelease $Domain1 $Domain2 $MultiHost $NameServer $DistDir
+					/opt/olxc/"$DistDir"/orabuntu/orabuntu-services-3.sh $MajorRelease $PointRelease $Domain2 $DistDir
+					/opt/olxc/"$DistDir"/orabuntu/orabuntu-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer $MultiHost $DistDir
+					/opt/olxc/"$DistDir"/orabuntu/orabuntu-services-5.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $MultiHost $DistDir
 				fi # OK 14
 
 				sleep 5

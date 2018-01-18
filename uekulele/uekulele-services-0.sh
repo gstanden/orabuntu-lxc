@@ -29,12 +29,12 @@
 #    There are two domains and two networks because the "seed" LXC containers are on a separate network from the production LXC containers.
 #    If the domain is an actual domain, you will need to change the subnet using the subnets feature of Orabuntu-LXC
 #
-#!/bin/bash
+#    You can change the name of the username in this script from 'ubuntu' to whatever username is preferred.
 
 adduser ubuntu
 passwd ubuntu
 usermod -aG wheel ubuntu
-cd /home/ubuntu
+cd ~
 mkdir -p  Desktop  Documents  Downloads  Music  Pictures  Public  Templates  Videos
 chown ubuntu:ubuntu Desktop  Documents  Downloads  Music  Pictures  Public  Templates  Videos
 

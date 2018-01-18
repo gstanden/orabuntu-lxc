@@ -36,8 +36,8 @@
 #    Usage:
 #    Passing parameters in from the command line is possible but is not described herein. The supported usage is to configure this file as described below.
 
-#    Create an "ubuntu" linux user account that has "SUDO ALL" full administrative privileges
-#    Unpack the distribution from github in the "/home/ubuntu/Downloads" directory.
+#    Create a non-root linux user account that has "SUDO ALL" full administrative privileges
+#    Unpack the distribution from github in the "~/Downloads" directory of th user with 'SUDO ALL' privilege.
 #    Configure this script and then run "./anylinux-services.sh"
 
 #    All of the following parameters are user-settable.
@@ -125,7 +125,7 @@ DistDir=$(GetDistDir)
 # echo "=============================================="
 
 SudoPassword=ubuntu
-GRE=N
+GRE=Y
 
 # GLS 20180112
 # User-settable subnets added
@@ -426,7 +426,7 @@ then
 	# First Orabuntu-LXC host (physical or virtual):
 	# (Note:  values for first Orabuntu-LXC host should normally not be changed from the following except possibly for MTU 9000 instead of 1500)
 
-	 MultiHost="new:N:1:$SudoPassword:X:X:1500:X:X:$GRE"         # <-- default value for first Orabuntu-LXC host install ("hub" host).
+	#MultiHost="new:N:1:$SudoPassword:X:X:1500:X:X:$GRE"         # <-- default value for first Orabuntu-LXC host install ("hub" host).
 	#MultiHost="reinstall:N:1:$SudoPassword:X:X:1500:X:X:$GRE"
 
 	# Additional Orabuntu-LXC physical hosts (physical or virtual  hosts over GRE):
@@ -435,7 +435,7 @@ then
 	# (Note: for now, you MUST use the "ubuntu" user on the remote GRE host with password "ubuntu" also).
 
 	#MultiHost="new:Y:X:$SudoPassword:192.168.1.10:192.168.1.16:1420:ubuntu:ubuntu:$GRE"
-	#MultiHost="reinstall:Y:X:$SudoPassword:192.168.7.32:192.168.7.37:1420:ubuntu:ubuntu:$GRE"
+	 MultiHost="reinstall:Y:X:$SudoPassword:192.168.7.32:192.168.7.21:1420:ubuntu:ubuntu:$GRE"
 
 	# Additional Orabuntu-LXC virtual hosts (VM is on an Orabuntu-LXC physical host AND VM is on the Orabuntu-LXC OpenvSwitch network):
 
@@ -655,6 +655,10 @@ then
         	done
 	done
 
+	sleep 5
+
+	clear
+
 	echo ''
 	echo "=============================================="
 	echo "Done:  Set Interface MTU...                   "
@@ -678,8 +682,10 @@ then
 
 	cd "$DistDir"/"$SubDirName"/archives
 
-	rm -f pattern-matches.10207.txt
-	rm -f pattern-matches.10207.msd
+	if [ -f pattern-matches.10207.msd ]
+	then
+		rm -f pattern-matches.10207.msd
+	fi
 
 	function GetNets {
 		echo "$SeedNet1 $BaseNet1 $StorNet1 $StorNet2"
@@ -816,12 +822,12 @@ echo ''
 sleep 5
 
 cd "$DistDir"/anylinux
-"$DistDir"/anylinux/anylinux-services-0.sh
+"$DistDir"/anylinux/anylinux-services-0.sh $SubDirName
 cd "$DistDir"/"$SubDirName"/archives
 
 echo ''	
 echo "=============================================="
-echo "Update GNU3 and COPYING in archives...        "
+echo "Done: Update GNU3 and COPYING in archives.    "
 echo "=============================================="
 echo ''
 
@@ -835,18 +841,17 @@ echo "Prepare Orabuntu-LXC Files & Archives...      "
 echo "=============================================="
 echo ''
 
-if [ ! -d /tmp ]
+if [ ! -d /opt/olxc ]
 then
-	sudo mkdir -p  /tmp
-	sudo chmod 777 /tmp
-	ls -l /
+	sudo mkdir -p  /opt/olxc
+	sudo chmod 777 /opt/olxc
 	sleep 5
 fi
 
-sudo rm  -f /tmp/GNU3
-sudo rm -rf /tmp/home
+sudo rm  -f /opt/olxc/GNU3
+sudo rm -rf /opt/olxc/home
 
-cp -p $DistDir/anylinux/GNU3 /tmp/GNU3
+cp -p $DistDir/anylinux/GNU3 /opt/olxc/GNU3
 
 sleep 5
 
@@ -875,7 +880,7 @@ function GetArchiveNames {
 ArchiveNames=$(GetArchiveNames)
 echo $ArchiveNames
 
-cp -p GNU3 /tmp/GNU3
+cp -p GNU3 /opt/olxc/GNU3
 	
 for i in $ArchiveNames
 do
@@ -896,26 +901,26 @@ do
 # 	cat "$DistDir"/"$SubDirName"/archives/$ArchiveShortName.lst
 #	echo '###1###'
 
-	sudo cp -p "$DistDir"/"$SubDirName"/archives/$ArchiveShortName.lst /tmp/$ArchiveShortName.lst	
+	sudo cp -p "$DistDir"/"$SubDirName"/archives/$ArchiveShortName.lst /opt/olxc/$ArchiveShortName.lst	
 
 	if [ $i != 'lxc-oracle-files.tar' ]
 	then	
 		function GetTAR {
-			cat /tmp/$ArchiveShortName.lst | cut -f2 -d'/' | sort -u
+			cat /opt/olxc/$ArchiveShortName.lst | cut -f2 -d'/' | sort -u
 		}
 	else
 		function GetTAR {
-			cat /tmp/$ArchiveShortName.lst | cut -f1 -d'/' | sort -u
+			cat /opt/olxc/$ArchiveShortName.lst | cut -f1 -d'/' | sort -u
 		}
 	fi
 	TAR=$(GetTAR)
 
-	sudo rm -rf /tmp/"$TAR"
+	sudo rm -rf /opt/olxc/"$TAR"
 
-# 	ls -l /tmp/$ArchiveShortName.lst
+# 	ls -l /opt/olxc/$ArchiveShortName.lst
 # 	echo ''
 # 	echo '###2###'
-#	cat /tmp/$ArchiveShortName.lst
+#	cat /opt/olxc/$ArchiveShortName.lst
 	
         sudo tar -P -tvf $i | sed 's/  */ /g' | cut -f6 -d' ' > $ArchiveShortName.lst
 
@@ -940,23 +945,23 @@ do
 	do
 		if   [ ! -d $j ]
 		then
-			sudo tar -v --extract --file=$i -C /tmp $j > /dev/null 2>&1
+			sudo tar -v --extract --file=$i -C /opt/olxc $j > /dev/null 2>&1
 
 			grep $j file-exceptions.txt
 			if [ $? -ne 0 ]
 			then
-				sudo sh -c "cat /tmp/GNU3 /tmp/$j > /tmp/$j.gnu3"
-				sudo chmod --reference /tmp/$j /tmp/$j.gnu3
-				sudo chown --reference /tmp/$j /tmp/$j.gnu3
-				sudo mv /tmp/$j.gnu3 /tmp/$j
-				filename=/tmp/$j
+				sudo sh -c "cat /opt/olxc/GNU3 /opt/olxc/$j > /opt/olxc/$j.gnu3"
+				sudo chmod --reference /opt/olxc/$j /opt/olxc/$j.gnu3
+				sudo chown --reference /opt/olxc/$j /opt/olxc/$j.gnu3
+				sudo mv /opt/olxc/$j.gnu3 /opt/olxc/$j
+				filename=/opt/olxc/$j
 			else
-				filename=/tmp/$j
+				filename=/opt/olxc/$j
 			fi
 
 			if [ $SetNets = 'Y' ] 
 			then
-				sudo grep 207 $filename      >> pattern-matches.10207.txt
+#				sudo grep 207 $filename      >> pattern-matches.10207.txt
  				sudo sed -i "s/10.207.41/$StorNet2F/g"		$filename
 				sudo sed -i "s/10.207.40/$StorNet1F/g"		$filename
 				sudo sed -i "s/10.207.39/$BaseNet1F/g"		$filename
@@ -974,11 +979,11 @@ do
 				sudo sed -i "s/192.211.39/$ExtrNet4/g"		$filename
 				sudo sed -i "s/192.212.39/$ExtrNet5/g"		$filename
 				sudo sed -i "s/192.213.39/$ExtrNet6/g"		$filename
-				sudo grep '207'  $filename   >> pattern-matches.10207.msd
-				sudo grep '\.41' $filename   >> pattern-matches.10207.msd
-				sudo grep '\.40' $filename   >> pattern-matches.10207.msd
-				sudo grep '\.39' $filename   >> pattern-matches.10207.msd
-				sudo grep '\.29' $filename   >> pattern-matches.10207.msd
+				sudo grep '207'  $filename | grep -v 'dnsmasq'  >> pattern-matches.10207.msd
+				sudo grep '\.41' $filename   			>> pattern-matches.10207.msd
+				sudo grep '\.40' $filename   			>> pattern-matches.10207.msd
+				sudo grep '\.39' $filename			>> pattern-matches.10207.msd
+				sudo grep '\.29' $filename   			>> pattern-matches.10207.msd
 			fi
 			if [ $LinuxFlavor = 'Fedora' ] && [ $RedHatVersion -ge 22 ] && [ $i = "$SubDirName-services.tar" ]
 			then
@@ -1009,7 +1014,7 @@ do
 	echo "=============================================="
 	echo ''
 
-	cd /tmp
+	cd /opt/olxc
 
 	if [ $i != 'scst-files.tar' ] && [ $i != 'tgt-files.tar' ]
 	then
@@ -1049,12 +1054,12 @@ do
 	sleep 1
 done
 
-cd /tmp
+cd /opt/olxc
 
 # sleep 5
 
-sudo cp -p *.lst /tmp/"$DistDir"/"$SubDirName"/archives/.
-sudo cp -p *.tar /tmp/"$DistDir"/"$SubDirName"/archives/.
+sudo cp -p *.lst /opt/olxc/"$DistDir"/"$SubDirName"/archives/.
+sudo cp -p *.tar /opt/olxc/"$DistDir"/"$SubDirName"/archives/.
 
 function GetGroup {
 	id | cut -f2 -d' ' | cut -f2 -d'(' | cut -f1 -d')'
@@ -1069,25 +1074,25 @@ Owner=$(GetOwner)
 clear
 
 sudo chown -R $Group:$Owner home
-sudo tar -xf /tmp/"$DistDir"/"$SubDirName"/archives/"$SubDirName"-services.tar -C /tmp
+sudo tar -xf /opt/olxc/"$DistDir"/"$SubDirName"/archives/"$SubDirName"-services.tar -C /opt/olxc
 sudo chown -R $Group:$Owner home
-sudo chmod 775 /tmp/"$DistDir"/"$SubDirName"/"$SubDirName"-services-*.sh
-sudo chmod 775 /tmp/"$DistDir"/anylinux/*
+sudo chmod 775 /opt/olxc/"$DistDir"/"$SubDirName"/"$SubDirName"-services-*.sh
+sudo chmod 775 /opt/olxc/"$DistDir"/anylinux/*
 sleep 5
 
 echo ''
 echo "=============================================="
-echo "Show permissions on /tmp Staging Area ...     "
+echo "Show permissions on /opt/olxc Staging Area ...     "
 echo "=============================================="
 echo ''
 
 sleep 5
 
-ls -lR /tmp/"$DistDir"/"$SubDirName"
+ls -lR /opt/olxc/"$DistDir"/"$SubDirName"
 
 echo ''
 echo "=============================================="
-echo "Done: Show permissions on /tmp Staging Area   "
+echo "Done: Show permissions on /opt/olxc Staging Area   "
 echo "=============================================="
 echo ''
 
@@ -1095,8 +1100,8 @@ sleep 5
 
 clear
 
-/tmp/"$DistDir"/anylinux/anylinux-services-1.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $OSMemRes $NumCon $MultiHost $LxcOvsVersion $DistDir
+/opt/olxc/"$DistDir"/anylinux/anylinux-services-1.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $OSMemRes $NumCon $MultiHost $LxcOvsVersion $DistDir
 	
-sudo rm -f /tmp/*.lst /tmp/*.tar
+sudo rm -f /opt/olxc/*.lst /opt/olxc/*.tar
 
 exit

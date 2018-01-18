@@ -373,6 +373,10 @@ then
 	echo ''
 
 	sudo lxc-update-config -c /var/lib/lxc/$SeedContainerName/config
+
+	sleep 5
+
+	clear
 	
 	echo ''
 	echo "=============================================="

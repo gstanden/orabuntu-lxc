@@ -355,7 +355,7 @@ then
 		sudo rm -f /etc/network/openvswitch/strt_ora*c*.sh
 		sudo rm -f /etc/network/if-up.d/openvswitch/*
 		sudo rm -f /etc/network/if-down.d/openvswitch/*
-		cd /tmp/"$DistDir"/uekulele
+		cd /opt/olxc/"$DistDir"/uekulele
 		sudo rm -rf facter openvswitch lxc selinux
 		if [ $LinuxFlavor != 'Fedora' ]
 		then
@@ -421,8 +421,8 @@ then
 	sudo yum -y install wget tar gzip
 	if [ $LinuxFlavor != 'Fedora' ]
 	then
- 		mkdir -p /tmp/"$DistDir"/uekulele/epel
-  		cd /tmp/"$DistDir"/uekulele/epel
+ 		mkdir -p /opt/olxc/"$DistDir"/uekulele/epel
+  		cd /opt/olxc/"$DistDir"/uekulele/epel
 		if   [ $Release -eq 7 ]
 		then
   			wget --timeout=3 --tries=3 https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
@@ -435,7 +435,7 @@ then
 		sudo yum provides lxc | sed '/^\s*$/d' | grep Repo | sort -u
 	fi
 
-	cd /tmp/"$DistDir"
+	cd /opt/olxc/"$DistDir"
 
 	sudo yum -y install debootstrap perl bash-completion bash-completion-extras dnsmasq libvirt
 	sudo yum -y install lxc libcap-devel libcgroup wget bridge-utils lsb
@@ -534,8 +534,8 @@ then
 	sudo yum -y install wget tar gzip libtool
 	if [ $LinuxFlavor != 'Fedora' ]
 	then
- 		mkdir -p /tmp/"$DistDir"/uekulele/epel
-  		cd /tmp/"$DistDir"/uekulele/epel
+ 		mkdir -p /opt/olxc/"$DistDir"/uekulele/epel
+  		cd /opt/olxc/"$DistDir"/uekulele/epel
 		if [ $Release -eq 7 ] 
 		then
   			wget --timeout=3 --tries=3 https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
@@ -547,7 +547,7 @@ then
 		fi
 	fi
 	sudo yum provides lxc | sed '/^\s*$/d' | grep Repo | sort -u
-	cd /tmp/"$DistDir"
+	cd /opt/olxc/"$DistDir"
 
 	sudo yum -y install debootstrap perl bash-completion bash-completion-extras dnsmasq libvirt
 	sudo yum -y install lxc libcap-devel libcgroup wget bridge-utils lsb
@@ -677,8 +677,8 @@ then
 
 			sudo touch /etc/rpm/macros
 			sudo yum -y install rpm-build wget openssl-devel gcc make docbook2X xmlto docbook automake graphviz libtool
-			mkdir -p /tmp/"$DistDir"/uekulele/lxc
-			cd /tmp/"$DistDir"/uekulele/lxc
+			mkdir -p /opt/olxc/"$DistDir"/uekulele/lxc
+			cd /opt/olxc/"$DistDir"/uekulele/lxc
 			
 			echo ''
 			echo "=============================================="
@@ -698,12 +698,12 @@ then
 			sleep 5
 			
 			wget --timeout=3 --tries=3 https://linuxcontainers.org/downloads/lxc/lxc-"$LxcVersion".tar.gz
-			mkdir -p /tmp/"$DistDir"/uekulele/lxc/rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
-			cp -p lxc-"$LxcVersion".tar.gz /tmp/"$DistDir"/uekulele/lxc/rpmbuild/SOURCES/.
+			mkdir -p /opt/olxc/"$DistDir"/uekulele/lxc/rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
+			cp -p lxc-"$LxcVersion".tar.gz /opt/olxc/"$DistDir"/uekulele/lxc/rpmbuild/SOURCES/.
 			tar -zxvf lxc-"$LxcVersion".tar.gz
-			cp -p lxc-"$LxcVersion"/lxc.spec /tmp/"$DistDir"/uekulele/lxc/.
-			sudo sed -i '/bash_completion/d' /tmp/"$DistDir"/uekulele/lxc/lxc.spec
-			cd /tmp/"$DistDir"/uekulele/lxc
+			cp -p lxc-"$LxcVersion"/lxc.spec /opt/olxc/"$DistDir"/uekulele/lxc/.
+			sudo sed -i '/bash_completion/d' /opt/olxc/"$DistDir"/uekulele/lxc/lxc.spec
+			cd /opt/olxc/"$DistDir"/uekulele/lxc
 
 			function CheckMacrosFile {
 				cat /etc/rpm/macros | grep _unpackaged_files_terminate_build | sort -u | grep -c 0
@@ -714,7 +714,7 @@ then
 			then
 				sudo sh -c "echo '%_unpackaged_files_terminate_build 0' >> /etc/rpm/macros"
 			fi
-			rpmbuild --define "_topdir /tmp/"$DistDir"/uekulele/lxc/rpmbuild" -ba lxc.spec
+			rpmbuild --define "_topdir /opt/olxc/"$DistDir"/uekulele/lxc/rpmbuild" -ba lxc.spec
 			
 			echo ''
 			echo "=============================================="
@@ -731,14 +731,14 @@ then
 			echo "=============================================="
 			echo ''
 
-			cd /tmp/"$DistDir"/uekulele/lxc/rpmbuild/RPMS/x86_64
+			cd /opt/olxc/"$DistDir"/uekulele/lxc/rpmbuild/RPMS/x86_64
 			if [ $LinuxFlavor = 'CentOS' ]
 			then
 				sudo yum -y erase lxc-libs
 			fi
 			sleep 5
 			sudo yum -y localinstall *.rpm
-			cd /tmp/"$DistDir"/uekulele/lxc
+			cd /opt/olxc/"$DistDir"/uekulele/lxc
 
 			echo ''
 			echo "=============================================="
@@ -761,15 +761,15 @@ then
 
 			sudo touch /etc/rpm/macros
 			sudo yum -y install rpm-build wget openssl-devel gcc make docbook2X xmlto docbook automake graphviz
-			mkdir -p /tmp/"$DistDir"/uekulele/lxc
-			cd /tmp/"$DistDir"/uekulele/lxc
+			mkdir -p /opt/olxc/"$DistDir"/uekulele/lxc
+			cd /opt/olxc/"$DistDir"/uekulele/lxc
 			wget --timeout=3 --tries=3 https://linuxcontainers.org/downloads/lxc/lxc-"$LxcVersion".tar.gz
-			mkdir -p /tmp/"$DistDir"/uekulele/lxc/rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
-			cp -p lxc-"$LxcVersion".tar.gz /tmp/"$DistDir"/uekulele/lxc/rpmbuild/SOURCES/.
+			mkdir -p /opt/olxc/"$DistDir"/uekulele/lxc/rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
+			cp -p lxc-"$LxcVersion".tar.gz /opt/olxc/"$DistDir"/uekulele/lxc/rpmbuild/SOURCES/.
 			tar -zxvf lxc-"$LxcVersion".tar.gz
-			cp -p lxc-"$LxcVersion"/lxc.spec /tmp/"$DistDir"/uekulele/lxc/.
-			sudo sed -i '/bash_completion/d' /tmp/"$DistDir"/uekulele/lxc/lxc.spec
-			cd /tmp/"$DistDir"/uekulele/lxc
+			cp -p lxc-"$LxcVersion"/lxc.spec /opt/olxc/"$DistDir"/uekulele/lxc/.
+			sudo sed -i '/bash_completion/d' /opt/olxc/"$DistDir"/uekulele/lxc/lxc.spec
+			cd /opt/olxc/"$DistDir"/uekulele/lxc
 
 			function CheckMacrosFile {
 				cat /etc/rpm/macros | grep _unpackaged_files_terminate_build | sort -u | grep -c 0
@@ -780,10 +780,10 @@ then
 			then
 				sudo sh -c "echo '%_unpackaged_files_terminate_build 0' >> /etc/rpm/macros"
 			fi
-			rpmbuild --define "_topdir /tmp/"$DistDir"/uekulele/lxc/rpmbuild" -ba lxc.spec
-			cd /tmp/"$DistDir"/uekulele/lxc/rpmbuild/RPMS/x86_64
+			rpmbuild --define "_topdir /opt/olxc/"$DistDir"/uekulele/lxc/rpmbuild" -ba lxc.spec
+			cd /opt/olxc/"$DistDir"/uekulele/lxc/rpmbuild/RPMS/x86_64
 			sudo yum -y localinstall lxc* > /dev/null 2>&1
-			cd /tmp/"$DistDir"/uekulele/lxc
+			cd /opt/olxc/"$DistDir"/uekulele/lxc
 		fi
 		
 		LXCVersion=$(GetLXCVersion)	
@@ -895,7 +895,7 @@ echo ''
 
 sleep 5
 
-cd /tmp/"$DistDir"
+cd /opt/olxc/"$DistDir"
 
 sudo yum -y install curl ruby tar which 
 sudo yum -y install wget tar gzip
@@ -1040,8 +1040,8 @@ then
 
 	clear
 
-	mkdir -p /tmp/"$DistDir"/uekulele/openvswitch/rpmbuild/RPMS/x86_64
-	cd /tmp/"$DistDir"/uekulele/openvswitch/rpmbuild/RPMS/x86_64
+	mkdir -p /opt/olxc/"$DistDir"/uekulele/openvswitch/rpmbuild/RPMS/x86_64
+	cd /opt/olxc/"$DistDir"/uekulele/openvswitch/rpmbuild/RPMS/x86_64
 	touch marker-2.rpm
 
 	function GetOVSPackageCount {
@@ -1073,17 +1073,17 @@ then
 			sudo sed -i -e '/\[public_ol6_software_collections\]/,/^\[/s/enabled=1/enabled=0/' /etc/yum.repos.d/public-yum-ol6.repo
 			sleep 5
 			wget --timeout=3 --tries=3 http://openvswitch.org/releases/openvswitch-"$OvsVersion".tar.gz
-			mkdir -p /tmp/"$DistDir"/uekulele/openvswitch/rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
-			cp -p openvswitch-"$OvsVersion".tar.gz /tmp/"$DistDir"/uekulele/openvswitch/rpmbuild/SOURCES/.
+			mkdir -p /opt/olxc/"$DistDir"/uekulele/openvswitch/rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
+			cp -p openvswitch-"$OvsVersion".tar.gz /opt/olxc/"$DistDir"/uekulele/openvswitch/rpmbuild/SOURCES/.
 
 		elif [ $Release -eq 7 ]
 		then
 			sudo yum -y install rpm-build wget openssl-devel gcc make
-			mkdir -p /tmp/"$DistDir"/uekulele/openvswitch
-			cd /tmp/"$DistDir"/uekulele/openvswitch
+			mkdir -p /opt/olxc/"$DistDir"/uekulele/openvswitch
+			cd /opt/olxc/"$DistDir"/uekulele/openvswitch
 			wget --timeout=3 --tries=3 http://openvswitch.org/releases/openvswitch-"$OvsVersion".tar.gz
-			mkdir -p /tmp/"$DistDir"/uekulele/openvswitch/rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
-			cp -p openvswitch-"$OvsVersion".tar.gz /tmp/"$DistDir"/uekulele/openvswitch/rpmbuild/SOURCES/.
+			mkdir -p /opt/olxc/"$DistDir"/uekulele/openvswitch/rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
+			cp -p openvswitch-"$OvsVersion".tar.gz /opt/olxc/"$DistDir"/uekulele/openvswitch/rpmbuild/SOURCES/.
 		fi
 
 		echo ''
@@ -1105,14 +1105,14 @@ then
 
 		if    [ $Release -eq 6 ]
 		then
-			cd /tmp/"$DistDir"/uekulele/openvswitch/rpmbuild/SOURCES
+			cd /opt/olxc/"$DistDir"/uekulele/openvswitch/rpmbuild/SOURCES
 			tar -xzvf openvswitch-"$OvsVersion".tar.gz
 			cd openvswitch-"$OvsVersion"
-			sudo sed -i '/python >= 2\.7/s/python >= 2\.7/python27/g' /tmp/"$DistDir"/uekulele/openvswitch/rpmbuild/SOURCES/openvswitch-"$OvsVersion"/rhel/openvswitch.spec
+			sudo sed -i '/python >= 2\.7/s/python >= 2\.7/python27/g' /opt/olxc/"$DistDir"/uekulele/openvswitch/rpmbuild/SOURCES/openvswitch-"$OvsVersion"/rhel/openvswitch.spec
 			sleep 5
 			sudo sed -i '/python >= 2\.7/s/python >= 2\.7/python27/' openvswitch.spec
-			rpmbuild --define "_topdir /tmp/"$DistDir"/uekulele/openvswitch/rpmbuild" -bb rhel/openvswitch.spec
-			cd /tmp/"$DistDir"/uekulele/openvswitch/rpmbuild/RPMS/x86_64
+			rpmbuild --define "_topdir /opt/olxc/"$DistDir"/uekulele/openvswitch/rpmbuild" -bb rhel/openvswitch.spec
+			cd /opt/olxc/"$DistDir"/uekulele/openvswitch/rpmbuild/RPMS/x86_64
 		
 			sleep 5
 
@@ -1137,16 +1137,16 @@ then
 
 			sudo yum -y localinstall openvswitch* > /dev/null 2>&1
 			OVSPackageCount=$(GetOVSPackageCount)
-			cd /tmp/"$DistDir"/uekulele/openvswitch
+			cd /opt/olxc/"$DistDir"/uekulele/openvswitch
 
 		elif [ $Release -eq 7 ]
 		then
-			cd /tmp/"$DistDir"/uekulele/openvswitch/rpmbuild/SOURCES
+			cd /opt/olxc/"$DistDir"/uekulele/openvswitch/rpmbuild/SOURCES
 			tar -zxvf openvswitch-"$OvsVersion".tar.gz
-			cp -p openvswitch-"$OvsVersion"/rhel/*.spec /tmp/"$DistDir"/uekulele/openvswitch/.
-			cd /tmp/"$DistDir"/uekulele/openvswitch
-			rpmbuild --define "_topdir /tmp/"$DistDir"/uekulele/openvswitch/rpmbuild" -ba openvswitch.spec
-			cd /tmp/"$DistDir"/uekulele/openvswitch/rpmbuild/RPMS/x86_64
+			cp -p openvswitch-"$OvsVersion"/rhel/*.spec /opt/olxc/"$DistDir"/uekulele/openvswitch/.
+			cd /opt/olxc/"$DistDir"/uekulele/openvswitch
+			rpmbuild --define "_topdir /opt/olxc/"$DistDir"/uekulele/openvswitch/rpmbuild" -ba openvswitch.spec
+			cd /opt/olxc/"$DistDir"/uekulele/openvswitch/rpmbuild/RPMS/x86_64
 
 			sleep 5
 
@@ -1171,7 +1171,7 @@ then
 
 			sudo yum -y localinstall openvswitch* > /dev/null 2>&1
 			OVSPackageCount=$(GetOVSPackageCount)
-			cd /tmp/"$DistDir"/uekulele/openvswitch
+			cd /opt/olxc/"$DistDir"/uekulele/openvswitch
 		fi
 	done
 
@@ -1195,7 +1195,7 @@ then
 
 	sleep 5
 
-	cd /tmp/"$DistDir"/uekulele/openvswitch/rpmbuild/RPMS/x86_64
+	cd /opt/olxc/"$DistDir"/uekulele/openvswitch/rpmbuild/RPMS/x86_64
 	sudo yum -y localinstall openvswitch*
 
 	echo ''
@@ -1311,7 +1311,7 @@ echo "Extracting backup scripts...                  "
 echo "==============================================" 
 echo ''
 
-sudo tar -v --extract --file=/tmp/"$DistDir"/uekulele/archives/ubuntu-host.tar -C / etc/orabuntu-lxc-scripts/ubuntu-host-backup.sh --touch
+sudo tar -v --extract --file=/opt/olxc/"$DistDir"/uekulele/archives/ubuntu-host.tar -C / etc/orabuntu-lxc-scripts/ubuntu-host-backup.sh --touch
 sudo /etc/orabuntu-lxc-scripts/ubuntu-host-backup.sh
 
 echo ''
@@ -1537,7 +1537,7 @@ echo "Unpack G1 files $LF Linux $RL                 "
 echo "=============================================="
 echo ''
 
-sudo tar -xvf /tmp/"$DistDir"/uekulele/archives/ubuntu-host.tar -C / --touch
+sudo tar -xvf /opt/olxc/"$DistDir"/uekulele/archives/ubuntu-host.tar -C / --touch
 
 echo ''
 echo "=============================================="
@@ -1554,12 +1554,15 @@ echo "Unpack G2 files for $LF Linux $RL...          "
 echo "=============================================="
 echo ''
 
-sudo tar -xvf /tmp/"$DistDir"/uekulele/archives/dns-dhcp-host.tar -C / --touch
+sudo tar -xvf /opt/olxc/"$DistDir"/uekulele/archives/dns-dhcp-host.tar -C / --touch
 sudo chmod +x /etc/network/openvswitch/crt_ovs_s*.sh
 
 if [ $MultiHostVar2 = 'Y' ]
 then
-	sudo rm /var/lib/lxc/nsa/config
+	if [ -f /var/lib/lxc/nsa/config ]
+	then
+		sudo rm /var/lib/lxc/nsa/config
+	fi
 fi
 
 echo ''
@@ -1770,8 +1773,8 @@ then
 		echo "=============================================="
 		echo ''
 	
-		sudo tar -xvf /tmp/"$DistDir"/uekulele/archives/dns-dhcp-cont.tar -C / --touch
-		sudo sed -i '/nameserver/d' /etc/resolv.conf
+		sudo tar -xvf /opt/olxc/"$DistDir"/uekulele/archives/dns-dhcp-cont.tar -C / --touch
+#		sudo sed -i '/nameserver/d' /etc/resolv.conf
 
 		echo ''
 		echo "=============================================="
@@ -1848,11 +1851,11 @@ then
 			sudo mv /etc/network/if-up.d/openvswitch/nsa-pub-ifup-sx1 /etc/network/if-up.d/openvswitch/$NameServer-pub-ifup-sx1
 			sudo mv /etc/network/if-down.d/openvswitch/nsa-pub-ifdown-sx1 /etc/network/if-down.d/openvswitch/$NameServer-pub-ifdown-sx1
 			sudo mv /etc/network/openvswitch/strt_nsa.sh /etc/network/openvswitch/strt_$NameServer.sh
-                        echo "/var/lib/lxc/$NameServer"                                          > /tmp/"$DistDir"/uekulele/archives/nameserver.lst
-                        echo "/etc/network/if-up.d/openvswitch/$NameServer-pub-ifup-sw1"        >> /tmp/"$DistDir"/uekulele/archives/nameserver.lst
-                        echo "/etc/network/if-down.d/openvswitch/$NameServer-pub-ifdown-sw1"    >> /tmp/"$DistDir"/uekulele/archives/nameserver.lst
-                        echo "/etc/network/if-up.d/openvswitch/$NameServer-pub-ifup-sx1"        >> /tmp/"$DistDir"/uekulele/archives/nameserver.lst
-                        echo "/etc/network/if-down.d/openvswitch/$NameServer-pub-ifdown-sx1"    >> /tmp/"$DistDir"/uekulele/archives/nameserver.lst
+                        echo "/var/lib/lxc/$NameServer"                                          > /opt/olxc/"$DistDir"/uekulele/archives/nameserver.lst
+                        echo "/etc/network/if-up.d/openvswitch/$NameServer-pub-ifup-sw1"        >> /opt/olxc/"$DistDir"/uekulele/archives/nameserver.lst
+                        echo "/etc/network/if-down.d/openvswitch/$NameServer-pub-ifdown-sw1"    >> /opt/olxc/"$DistDir"/uekulele/archives/nameserver.lst
+                        echo "/etc/network/if-up.d/openvswitch/$NameServer-pub-ifup-sx1"        >> /opt/olxc/"$DistDir"/uekulele/archives/nameserver.lst
+                        echo "/etc/network/if-down.d/openvswitch/$NameServer-pub-ifdown-sx1"    >> /opt/olxc/"$DistDir"/uekulele/archives/nameserver.lst
 		fi
 
 		if [ -n $Domain1 ]
@@ -1913,9 +1916,9 @@ then
 	echo "=============================================="
 	echo ''
 
-	Sx1Index=101
+	Sx1Index=201
 	function CheckHighestSx1IndexHit {
-		sshpass -p ubuntu ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 nslookup -timeout=1 10.207.29.$Sx1Index | grep 'name =' | wc -l
+		sshpass -p ubuntu ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 nslookup -timeout=3 10.207.29.$Sx1Index | grep 'name =' | wc -l
 	}
 	HighestSx1IndexHit=$(CheckHighestSx1IndexHit)
 
@@ -1935,9 +1938,9 @@ then
 	echo "=============================================="
 	echo ''
 
-	Sw1Index=101
+	Sw1Index=201
 	function CheckHighestSw1IndexHit {
-		sshpass -p ubuntu ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 nslookup -timeout=1 10.207.39.$Sw1Index | grep 'name =' | wc -l
+		sshpass -p ubuntu ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 nslookup -timeout=3 10.207.39.$Sw1Index | grep 'name =' | wc -l
 	}
 	HighestSw1IndexHit=$(CheckHighestSw1IndexHit)
 
@@ -2236,7 +2239,7 @@ then
 		echo "=============================================="
 	fi
 
-	echo "/etc/systemd/system/$NameServer.service" >> /tmp/"$DistDir"/uekulele/archives/nameserver.lst
+	echo "/etc/systemd/system/$NameServer.service" >> /opt/olxc/"$DistDir"/uekulele/archives/nameserver.lst
 fi
 
 sleep 5
@@ -2377,10 +2380,10 @@ then
 	echo "=============================================="
 	echo ''
 
-	sudo tar -xvf /tmp/"$DistDir"/uekulele/archives/scst-files.tar -C /tmp	--touch
-#	sudo tar -xvf /tmp/"$DistDir"/uekulele/archives/scst-files.tar -C /	--touch
+	sudo tar -xvf /opt/olxc/"$DistDir"/uekulele/archives/scst-files.tar -C /opt/olxc	--touch
+#	sudo tar -xvf /opt/olxc/"$DistDir"/uekulele/archives/scst-files.tar -C /	--touch
 	sleep 2
-	sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /tmp/"$DistDir"/uekulele/archives/scst-files/create-scst-oracle.sh
+	sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /opt/olxc/"$DistDir"/uekulele/archives/scst-files/create-scst-oracle.sh
 		
 	echo ''
 	echo "=============================================="
@@ -2399,7 +2402,7 @@ then
 	echo ''
 
 	sudo lxc-attach -n $NameServer -- usermod --password `perl -e "print crypt('ubuntu','ubuntu');"` ubuntu
-	ssh-keygen -f "/home/ubuntu/.ssh/known_hosts" -R 10.207.39.2
+	ssh-keygen -R 10.207.39.2
 #	sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ubuntu@10.207.39.2 "ssh-keygen -f ~/.ssh/id_rsa -t rsa -N ''"
 	sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ubuntu@10.207.39.2 "date; uname -a"
 	
@@ -2423,7 +2426,7 @@ then
 	sudo lxc-attach -n $NameServer -- mkdir -p /root/backup-lxc-container/olive/updates
 	sudo lxc-attach -n $NameServer -- tar -cvzPf /root/backup-lxc-container/olive/updates/backup_olive_ns_update.tar.gz /root/ns_backup_update.lst
 
-	sudo tar -v --extract --file=/tmp/"$DistDir"/uekulele/archives/dns-dhcp-cont.tar -C / var/lib/lxc/nsa/rootfs/etc/systemd/system/dns-sync.service
+	sudo tar -v --extract --file=/opt/olxc/"$DistDir"/uekulele/archives/dns-dhcp-cont.tar -C / var/lib/lxc/nsa/rootfs/etc/systemd/system/dns-sync.service
 	sudo mv /var/lib/lxc/nsa/rootfs/etc/systemd/system/dns-sync.service /var/lib/lxc/$NameServer/rootfs/etc/systemd/system/dns-sync.service
 
 	sudo lxc-attach -n $NameServer -- systemctl enable dns-sync
@@ -2463,9 +2466,9 @@ then
 	echo "=============================================="
 	echo ''
 
-	sudo tar -xvf /tmp/"$DistDir"/uekulele/archives/scst-files.tar -C /tmp	--touch
-#	sudo tar -xvf /tmp/"$DistDir"/uekulele/archives/scst-files.tar -C /	--touch
-	sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /tmp/"$DistDir"/uekulele/archives/scst-files/create-scst-oracle.sh
+	sudo tar -xvf /opt/olxc/"$DistDir"/uekulele/archives/scst-files.tar -C /opt/olxc	--touch
+#	sudo tar -xvf /opt/olxc/"$DistDir"/uekulele/archives/scst-files.tar -C /	--touch
+	sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /opt/olxc/"$DistDir"/uekulele/archives/scst-files/create-scst-oracle.sh
 		
 	echo ''
 	echo "=============================================="
@@ -2545,16 +2548,16 @@ then
 #		sudo service sw1 restart
 #		sudo service sx1 restart
 
-		ssh-keygen -f "/home/ubuntu/.ssh/known_hosts" -R $MultiHostVar5
+		ssh-keygen -R $MultiHostVar5
 		sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 date
 		if [ $? -eq 0 ]
 		then
-			sshpass -p ubuntu scp -p /etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh ubuntu@$MultiHostVar5:~/.
+			sshpass -p ubuntu scp -p /etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh ubuntu@$MultiHostVar5:$HOME/.
 		fi
-		sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 "sudo -S <<< "ubuntu" ls -l ~/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh"
+		sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 "sudo -S <<< "ubuntu" ls -l $HOME/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh"
 		if [ $? -eq 0 ]
 		then
-			sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 "sudo -S <<< "ubuntu" ~/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh"
+			sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 "sudo -S <<< "ubuntu" $HOME/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh"
 		fi
 
                 echo ''
@@ -2584,27 +2587,46 @@ then
 			echo "=============================================="
 			echo ''
 
-			sudo sh -c "echo 'echo \"server 10.207.39.2'								    		>  /etc/network/openvswitch/nsupdate_domain1_add_$ShortHost.sh"
-			sudo sh -c "echo 'update add $ShortHost.orabuntu-lxc.com 3600 IN A 10.207.39.$Sw1Index'		    			>> /etc/network/openvswitch/nsupdate_domain1_add_$ShortHost.sh"
-			sudo sh -c "echo 'send'											    		>> /etc/network/openvswitch/nsupdate_domain1_add_$ShortHost.sh"
-			sudo sh -c "echo 'update add $Sw1Index.39.207.10.in-addr.arpa 3600 IN PTR $ShortHost.orabuntu-lxc.com' 			>> /etc/network/openvswitch/nsupdate_domain1_add_$ShortHost.sh"
-			sudo sh -c "echo 'send'											    		>> /etc/network/openvswitch/nsupdate_domain1_add_$ShortHost.sh"
-			sudo sh -c "echo 'quit'											    		>> /etc/network/openvswitch/nsupdate_domain1_add_$ShortHost.sh"
-			sudo sh -c "echo '\" | nsupdate -k /etc/bind/rndc.key'							    		>> /etc/network/openvswitch/nsupdate_domain1_add_$ShortHost.sh"
+			sudo sh -c "echo 'echo \"server 10.207.39.2'								    	>  /etc/network/openvswitch/nsupdate_domain1_add_$ShortHost.sh"
+			sudo sh -c "echo 'update add $ShortHost.orabuntu-lxc.com 3600 IN A 10.207.39.$Sw1Index'		    		>> /etc/network/openvswitch/nsupdate_domain1_add_$ShortHost.sh"
+			sudo sh -c "echo 'send'											    	>> /etc/network/openvswitch/nsupdate_domain1_add_$ShortHost.sh"
+			sudo sh -c "echo 'update add $Sw1Index.39.207.10.in-addr.arpa 3600 IN PTR $ShortHost.orabuntu-lxc.com' 		>> /etc/network/openvswitch/nsupdate_domain1_add_$ShortHost.sh"
+			sudo sh -c "echo 'send'											    	>> /etc/network/openvswitch/nsupdate_domain1_add_$ShortHost.sh"
+			sudo sh -c "echo 'quit'											    	>> /etc/network/openvswitch/nsupdate_domain1_add_$ShortHost.sh"
+			sudo sh -c "echo '\" | nsupdate -k /etc/bind/rndc.key'							    	>> /etc/network/openvswitch/nsupdate_domain1_add_$ShortHost.sh"
 
 			sudo chmod 777 						/etc/network/openvswitch/nsupdate_domain1_add_$ShortHost.sh
 			sudo ls -l     						/etc/network/openvswitch/nsupdate_domain1_add_$ShortHost.sh
 			sudo sed -i "s/orabuntu-lxc\.com/$Domain1/g"		/etc/network/openvswitch/nsupdate_domain1_add_$ShortHost.sh
 
-		        ssh-keygen -f "/home/ubuntu/.ssh/known_hosts" -R 10.207.39.2
+			echo ''
+			echo "=============================================="
+			echo "Create DEL DNS $ShortHost.$Domain1...         "
+			echo "=============================================="
+			echo ''
+
+			sudo sh -c "echo 'echo \"server 10.207.39.2'								    	>  /etc/network/openvswitch/nsupdate_domain1_del_$ShortHost.sh"
+			sudo sh -c "echo 'update delete $ShortHost.orabuntu-lxc.com. A'					    		>> /etc/network/openvswitch/nsupdate_domain1_del_$ShortHost.sh"
+			sudo sh -c "echo 'send'											    	>> /etc/network/openvswitch/nsupdate_domain1_del_$ShortHost.sh"
+			sudo sh -c "echo 'update delete $Sw1Index.39.207.10.in-addr.arpa. PTR'				 		>> /etc/network/openvswitch/nsupdate_domain1_del_$ShortHost.sh"
+			sudo sh -c "echo 'send'											    	>> /etc/network/openvswitch/nsupdate_domain1_del_$ShortHost.sh"
+			sudo sh -c "echo 'quit'											    	>> /etc/network/openvswitch/nsupdate_domain1_del_$ShortHost.sh"
+			sudo sh -c "echo '\" | nsupdate -k /etc/bind/rndc.key'							    	>> /etc/network/openvswitch/nsupdate_domain1_del_$ShortHost.sh"
+
+			sudo chmod 777 						/etc/network/openvswitch/nsupdate_domain1_del_$ShortHost.sh
+			sudo ls -l     						/etc/network/openvswitch/nsupdate_domain1_del_$ShortHost.sh
+			sudo sed -i "s/orabuntu-lxc\.com/$Domain1/g"		/etc/network/openvswitch/nsupdate_domain1_del_$ShortHost.sh
+
+		        ssh-keygen -R 10.207.39.2
 		        sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.39.2 "sudo -S <<< "ubuntu" mkdir -p ~/Downloads"
 		        sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.39.2 "sudo -S <<< "ubuntu" chown ubuntu:ubuntu Downloads"
 		        sshpass -p ubuntu scp    -o CheckHostIP=no -o StrictHostKeyChecking=no -p /etc/network/openvswitch/nsupdate_domain1_add_$ShortHost.sh ubuntu@10.207.39.2:~/Downloads/.
+		        sshpass -p ubuntu scp    -o CheckHostIP=no -o StrictHostKeyChecking=no -p /etc/network/openvswitch/nsupdate_domain1_del_$ShortHost.sh ubuntu@10.207.39.2:~/Downloads/.
 		        sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.39.2 "sudo -S <<< "ubuntu" ~/Downloads/nsupdate_domain1_add_$ShortHost.sh"
 	
 		        echo ''
 		        echo "=============================================="
-		        echo "Done: Create ADD DNS $ShortHost.$Domain1      "
+		        echo "Done: Create ADD/DEL DNS $ShortHost.$Domain1  "
 		        echo "=============================================="
 		        echo ''
 	
@@ -2623,27 +2645,46 @@ then
 			echo "=============================================="
 			echo ''
 
-			sudo sh -c "echo 'echo \"server 10.207.29.2'								    		>  /etc/network/openvswitch/nsupdate_domain2_add_$ShortHost.sh"
-			sudo sh -c "echo 'update add $ShortHost.consultingcommandos.us 3600 IN A 10.207.29.$Sx1Index'		    		>> /etc/network/openvswitch/nsupdate_domain2_add_$ShortHost.sh"
-			sudo sh -c "echo 'send'											    		>> /etc/network/openvswitch/nsupdate_domain2_add_$ShortHost.sh"
-			sudo sh -c "echo 'update add $Sx1Index.29.207.10.in-addr.arpa 3600 IN PTR $ShortHost.consultingcommandos.us' 		>> /etc/network/openvswitch/nsupdate_domain2_add_$ShortHost.sh"
-			sudo sh -c "echo 'send'											    		>> /etc/network/openvswitch/nsupdate_domain2_add_$ShortHost.sh"
-			sudo sh -c "echo 'quit'											    		>> /etc/network/openvswitch/nsupdate_domain2_add_$ShortHost.sh"
-			sudo sh -c "echo '\" | nsupdate -k /etc/bind/rndc.key'							    		>> /etc/network/openvswitch/nsupdate_domain2_add_$ShortHost.sh"
+			sudo sh -c "echo 'echo \"server 10.207.29.2'								    	>  /etc/network/openvswitch/nsupdate_domain2_add_$ShortHost.sh"
+			sudo sh -c "echo 'update add $ShortHost.consultingcommandos.us 3600 IN A 10.207.29.$Sx1Index'		    	>> /etc/network/openvswitch/nsupdate_domain2_add_$ShortHost.sh"
+			sudo sh -c "echo 'send'											    	>> /etc/network/openvswitch/nsupdate_domain2_add_$ShortHost.sh"
+			sudo sh -c "echo 'update add $Sx1Index.29.207.10.in-addr.arpa 3600 IN PTR $ShortHost.consultingcommandos.us' 	>> /etc/network/openvswitch/nsupdate_domain2_add_$ShortHost.sh"
+			sudo sh -c "echo 'send'											    	>> /etc/network/openvswitch/nsupdate_domain2_add_$ShortHost.sh"
+			sudo sh -c "echo 'quit'											    	>> /etc/network/openvswitch/nsupdate_domain2_add_$ShortHost.sh"
+			sudo sh -c "echo '\" | nsupdate -k /etc/bind/rndc.key'							    	>> /etc/network/openvswitch/nsupdate_domain2_add_$ShortHost.sh"
 
 			sudo chmod 777 						/etc/network/openvswitch/nsupdate_domain2_add_$ShortHost.sh
 			sudo ls -l     						/etc/network/openvswitch/nsupdate_domain2_add_$ShortHost.sh
 			sudo sed -i "s/consultingcommandos\.us/$Domain2/g"	/etc/network/openvswitch/nsupdate_domain2_add_$ShortHost.sh
 
-		        ssh-keygen -f "/home/ubuntu/.ssh/known_hosts" -R 10.207.29.2
+			echo ''
+			echo "=============================================="
+			echo "Create DEL DNS $ShortHost.$Domain2...         "
+			echo "=============================================="
+			echo ''
+
+			sudo sh -c "echo 'echo \"server 10.207.29.2'				    		>  /etc/network/openvswitch/nsupdate_domain2_del_$ShortHost.sh"
+			sudo sh -c "echo 'update delete $ShortHost.consultingcommandos.us. A'  			>> /etc/network/openvswitch/nsupdate_domain2_del_$ShortHost.sh"
+			sudo sh -c "echo 'send'							    		>> /etc/network/openvswitch/nsupdate_domain2_del_$ShortHost.sh"
+			sudo sh -c "echo 'update delete $Sx1Index.29.207.10.in-addr.arpa. PTR' 			>> /etc/network/openvswitch/nsupdate_domain2_del_$ShortHost.sh"
+			sudo sh -c "echo 'send'							    		>> /etc/network/openvswitch/nsupdate_domain2_del_$ShortHost.sh"
+			sudo sh -c "echo 'quit'							    		>> /etc/network/openvswitch/nsupdate_domain2_del_$ShortHost.sh"
+			sudo sh -c "echo '\" | nsupdate -k /etc/bind/rndc.key'			    		>> /etc/network/openvswitch/nsupdate_domain2_del_$ShortHost.sh"
+
+			sudo chmod 777 						/etc/network/openvswitch/nsupdate_domain2_del_$ShortHost.sh
+			sudo ls -l     						/etc/network/openvswitch/nsupdate_domain2_del_$ShortHost.sh
+			sudo sed -i "s/orabuntu-lxc\.com/$Domain1/g"		/etc/network/openvswitch/nsupdate_domain2_del_$ShortHost.sh
+
+		        ssh-keygen -R 10.207.29.2
 		        sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.29.2 "sudo -S <<< "ubuntu" mkdir -p ~/Downloads"
 		        sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.29.2 "sudo -S <<< "ubuntu" chown ubuntu:ubuntu Downloads"
 		        sshpass -p ubuntu scp    -o CheckHostIP=no -o StrictHostKeyChecking=no -p /etc/network/openvswitch/nsupdate_domain2_add_$ShortHost.sh ubuntu@10.207.29.2:~/Downloads/.
+		        sshpass -p ubuntu scp    -o CheckHostIP=no -o StrictHostKeyChecking=no -p /etc/network/openvswitch/nsupdate_domain2_del_$ShortHost.sh ubuntu@10.207.29.2:~/Downloads/.
 		        sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.29.2 "sudo -S <<< "ubuntu" ~/Downloads/nsupdate_domain2_add_$ShortHost.sh"
 	
 		        echo ''
 		        echo "=============================================="
-		        echo "Done: Create ADD DNS $ShortHost.$Domain2      "
+		        echo "Done: Create ADD/DEL DNS $ShortHost.$Domain2  "
 		        echo "=============================================="
 		        echo ''
 	
@@ -2714,6 +2755,20 @@ echo "=============================================="
 sleep 5
 
 clear
+
+SystemdResolvedInstalled=$(CheckSystemdResolvedInstalled)
+NetworkManagerRunning=$(CheckNetworkManagerRunning)
+
+# echo 'SystemdResolvedInstalled =  '$SystemdResolvedInstalled
+# echo 'Trigger Value            =  0'
+# echo 'NetworkManagerRunning    =  '$NetworkManagerRunning
+# echo 'Trigger Value            >= 1'
+# echo 'GRE                      =  '$GRE
+# echo 'Trigger Value            =  Y'
+# echo 'MultiHostVar2            =  '$MultiHostVar2
+# echo 'Trigger Value            =  N'
+
+# sleep 10
 
 if [ $SystemdResolvedInstalled -eq 0 ] && [ $NetworkManagerRunning -ge 1 ]
 then
@@ -2859,23 +2914,23 @@ echo "Create RSA key if it does not already exist   "
 echo "=============================================="
 echo ''
 
-if [ ! -e ~/.ssh/id_rsa.pub ]
+if [ ! -e $HOME/.ssh/id_rsa.pub ]
 then
 # ssh-keygen -t rsa
-ssh-keygen -f ~/.ssh/id_rsa -t rsa -N ''
+ssh-keygen -f $HOME/.ssh/id_rsa -t rsa -N ''
 fi
 
-if [ -e ~/.ssh/authorized_keys ]
+if [ -e $HOME/.ssh/authorized_keys ]
 then
-rm ~/.ssh/authorized_keys
+rm $HOME/.ssh/authorized_keys
 fi
 
-touch ~/.ssh/authorized_keys
+touch $HOME/.ssh/authorized_keys
 
-if [ -e ~/.ssh/id_rsa.pub ]
+if [ -e $HOME/.ssh/id_rsa.pub ]
 then
 function GetAuthorizedKey {
-cat ~/.ssh/id_rsa.pub
+cat $HOME/.ssh/id_rsa.pub
 }
 AuthorizedKey=$(GetAuthorizedKey)
 
@@ -2886,7 +2941,7 @@ echo ''
 fi
 
 function CheckAuthorizedKeys {
-grep -c "$AuthorizedKey" ~/.ssh/authorized_keys
+grep -c "$AuthorizedKey" $HOME/.ssh/authorized_keys
 }
 AuthorizedKeys=$(CheckAuthorizedKeys)
 
@@ -2894,13 +2949,13 @@ echo "Results of grep = $AuthorizedKeys"
 
 if [ "$AuthorizedKeys" -eq 0 ]
 then
-cat  ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
+cat  $HOME/.ssh/id_rsa.pub >> $HOME/.ssh/authorized_keys
 fi
 
 echo ''
 echo 'cat of authorized_keys'
 echo ''
-cat ~/.ssh/authorized_keys
+cat $HOME/.ssh/authorized_keys
 
 echo ''
 echo "=============================================="
