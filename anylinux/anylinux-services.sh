@@ -466,10 +466,16 @@ echo 'MultiHost                 = '$MultiHost
 # GLS 20170924 Currently Orabuntu-LXC for Oracle Linux does build LXC from source.  You can use this parameter to set what version it will build.
 
 LxcOvsVersion=$9
-if [ -z $9 ]
+if [ -z $9 ] && [ $LinuxFlavor = 'Fedora' ]
 then
-	LxcOvsVersion="2.1.1:2.5.4"
+        if   [ $RedHatVersion -eq 27 ]
+        then
+                LxcOvsVersion="2.0.9:2.5.4"
+        else
+                LxcOvsVersion="2.1.1:2.5.4"
+        fi
 fi
+
 if   [ $LinuxFlavor = 'RedHat' ] || [ $LinuxFlavor = 'CentOS' ] || [ $LinuxFlavor = 'Fedora' ]
 then
 	echo 'LxcOvsVersion             = '$LxcOvsVersion
@@ -995,7 +1001,7 @@ do
 				sudo sed -i "s/yum-utils/dnf-utils/g" 					$filename
 				sudo sed -i "s/yum -y install/dnf -y install/g"				$filename
 				sudo sed -i "s/yum-utils/dnf-utils/g"					$filename
-				sudo sed -i "s/yum-complete-transaction/dnf-complete-transaction/g"	$filename
+				sudo sed -i "s/yum-complete-transaction//g"				$filename
 			fi
 		fi
 	

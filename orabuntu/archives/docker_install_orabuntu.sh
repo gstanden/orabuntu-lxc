@@ -17,35 +17,27 @@ echo "=============================================="
 echo "Install Docker...                             "
 echo "=============================================="
 echo ''
-echo "=============================================="
-echo "Install required packages...                  "
-echo "=============================================="
-echo ''
 
-sudo apt-get -y update
-sudo apt-get -y install apt-transport-https ca-certificates curl software-properties-common
-
-echo ''
-echo "=============================================="
-echo "Done: Install required packages.              "
-echo "=============================================="
-echo ''
-echo "=============================================="
-echo "Configure required repository...              "
-echo "=============================================="
-echo ''
-
-if   [ $UbuntuMajorVersion -eq 16 ]
+if   [ $UbuntuVersion = '16.04' ]
 then
+	sudo apt-get -y update
+	sudo apt-get -y install apt-transport-https ca-certificates curl software-properties-common
 	curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
 	sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+	sudo apt-get -y install docker-ce
 
-elif [ $UbuntuMajorVersion -eq 17 ]
+elif [ $UbuntuVersion = '16.10' ]
 then
+	sudo apt-get install docker.io
+elif [ $UbuntuVersion = '17.04' ] || [ $UbuntuVersion = '17.10' ]
+then
+	sudo apt-get -y update
+	sudo apt-get -y install apt-transport-https ca-certificates curl software-properties-common
 	curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
 	sudo apt-key fingerprint 0EBFCD88
 	sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu zesty stable"
 	sudo apt-get -y update
+	sudo apt-get -y install docker-ce
 fi
 
 echo ''
@@ -58,7 +50,6 @@ echo "Install docker-ce...                          "
 echo "=============================================="
 echo ''
 
-sudo apt-get -y install docker-ce
 
 echo ''
 echo "=============================================="
