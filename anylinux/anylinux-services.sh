@@ -1088,13 +1088,10 @@ do
 				sudo sed -i "s/192.211.39/$ExtrNet4/g"			$filename
 				sudo sed -i "s/192.212.39/$ExtrNet5/g"			$filename
 				sudo sed -i "s/192.213.39/$ExtrNet6/g"			$filename
-				if [ $filename = '/opt/olxc/etc/systemd/resolved.conf' ] || [ $filename = '/opt/olxc/etc/network/openvswitch/ns_restore.sh' ]
+				if [ $filename = '/opt/olxc/etc/systemd/resolved.conf' ]
 				then
 					sudo sed -i "s/orabuntu-lxc.com/$Domain1/g"		$filename
 					sudo sed -i "s/consultingcommandos.us/$Domain2/g"	$filename
-					echo ''
-					sudo cat /opt/olxc/etc/systemd/resolved.conf
-					echo ''
 				fi
 				sudo grep '207' $filename | grep -v '#|dnsmasq' >> pattern-matches.10207.msd
 				sudo grep '\.41' $filename   			>> pattern-matches.10207.msd
