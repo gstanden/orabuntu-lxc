@@ -916,8 +916,6 @@ then
 else
 	sudo sed -i "s/orabuntu-lxc\.com/$Domain1/g"		/etc/systemd/resolved.conf
 	sudo sed -i "s/consultingcommandos\.us/$Domain2/g"	/etc/systemd/resolved.conf
-	sudo sed -i "s/orabuntu-lxc\.com/$Domain1/g"		/run/systemd/resolve/stub-resolv.conf
-	sudo sed -i "s/consultingcommandos\.us/$Domain2/g"	/run/systemd/resolve/stub-resolv.conf
 fi
 
 echo ''
@@ -1678,6 +1676,7 @@ then
 
 	sudo systemctl daemon-reload
 	sudo systemctl enable systemd-resolved-helper
+	sudo service systemd-resolved-helper stop
 	sudo service systemd-resolved-helper start
 
 	echo ''
