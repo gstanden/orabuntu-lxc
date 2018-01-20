@@ -28,8 +28,6 @@
 #    The domain names can be arbitrary fictional names or they can be a domain that you actually own and operate.
 #    There are two domains and two networks because the "seed" LXC containers are on a separate network from the production LXC containers.
 #    If the domain is an actual domain, you will need to change the subnet using the subnets feature of Orabuntu-LXC
-#
-#!/bin/bash
 
 clear
 
@@ -44,6 +42,16 @@ OSMemRes=$6
 MultiHost=$7
 LxcOvsVersion=$8
 DistDir=$9
+
+function GetGroup {
+        id | cut -f2 -d' ' | cut -f2 -d'(' | cut -f1 -d')'
+}
+Group=$(GetGroup)
+
+function GetOwner {
+        id | cut -f1 -d' ' | cut -f2 -d'(' | cut -f1 -d')'
+}
+Owner=$(GetOwner)
 
 function GetLxcVersion {
 	echo $LxcOvsVersion | cut -f1 -d':'
@@ -417,6 +425,10 @@ then
 	echo "=============================================="
 	echo ''
 
+	if [ -f /etc/dnsmasq.conf ]
+	then
+		sudo mv /etc/dnsmasq.conf /etc/dnsmasq.olxc.1
+	fi
 	sudo yum clean all
 	sudo yum -y install wget tar gzip
 	if [ $LinuxFlavor != 'Fedora' ]
@@ -531,6 +543,10 @@ then
 	echo "=============================================="
 	echo ''
 
+	if [ -f /etc/dnsmasq.conf ]
+	then
+		sudo mv /etc/dnsmasq.conf /etc/dnsmasq.olxc.1
+	fi
 	sudo yum -y install wget tar gzip libtool
 	if [ $LinuxFlavor != 'Fedora' ]
 	then
@@ -1097,7 +1113,7 @@ then
 
 		echo ''
 		echo "=============================================="
-		echo "Untar source code and build openvswitch rpm..."
+		echo "Untar source code and build openvswitch RPM..."
 		echo "=============================================="
 		echo ''
 
@@ -1189,7 +1205,7 @@ then
 
 	echo ''
 	echo "=============================================="
-	echo "Install OpenvSwitch RPM...                    "
+	echo "Install OpenvSwitch RPMs...                   "
 	echo "=============================================="
 	echo ''
 
@@ -1275,11 +1291,11 @@ then
 	if [ $LinuxFlavor != 'Fedora' ]
 	then
 		function CheckPackageInstalled {
-			echo 'automake bind-utils bridge-utils curl debootstrap docbook docbook2X facter gawk gcc graphviz gzip iotop iptables libcap-devel libcgroup lsb lxc lxc-2 lxc-debug lxc-devel lxc-libs make net-tools ntp openssh-server openssl-devel openvswitch-2 openvswitch-debug perl rpm rpm-build ruby sshpass tar uuid wget which xmlto yum-utils'
+			echo 'automake bind-utils bridge-utils curl debootstrap docbook docbook2X facter gawk gcc graphviz gzip iotop iptables libcap-devel libcgroup lsb-core lxc lxc-2 lxc-debug lxc-devel lxc-libs make net-tools ntp openssh-server openssl-devel openvswitch-2 openvswitch-debug perl rpm rpm-build ruby sshpass tar uuid wget which xmlto yum-utils'
 		}
 	else
 		function CheckPackageInstalled {
-			echo 'automake bind-utils bridge-utils curl debootstrap docbook docbook2X facter gawk gcc graphviz gzip iotop iptables libcap-devel libcgroup lsb lxc lxc-2 lxc-debug lxc-devel lxc-libs make net-tools ntp openssh-server openssl-devel openvswitch-2 openvswitch-debug perl rpm rpm-build ruby sshpass tar uuid wget which xmlto yum-utils'
+			echo 'automake bind-utils bridge-utils curl debootstrap docbook docbook2X facter gawk gcc graphviz gzip iotop iptables libcap-devel libcgroup lsb-core lxc lxc-2 lxc-debug lxc-devel lxc-libs make net-tools ntp openssh-server openssl-devel openvswitch-2 openvswitch-debug perl rpm rpm-build ruby sshpass tar uuid wget which xmlto yum-utils'
 		}
 	fi
 fi
@@ -1537,6 +1553,8 @@ echo "Unpack G1 files $LF Linux $RL                 "
 echo "=============================================="
 echo ''
 
+sudo cp -p /etc/dnsmasq.conf /etc/dnsmasq.conf.olxc.2
+sudo rm -f /etc/dnsmasq.conf
 sudo tar -xvf /opt/olxc/"$DistDir"/uekulele/archives/ubuntu-host.tar -C / --touch
 
 echo ''
@@ -1557,12 +1575,9 @@ echo ''
 sudo tar -xvf /opt/olxc/"$DistDir"/uekulele/archives/dns-dhcp-host.tar -C / --touch
 sudo chmod +x /etc/network/openvswitch/crt_ovs_s*.sh
 
-if [ $MultiHostVar2 = 'Y' ]
+if [ $MultiHostVar2 = 'Y' ] && [ -f /var/lib/lxc/nsa/config ]
 then
-	if [ -f /var/lib/lxc/nsa/config ]
-	then
-		sudo rm /var/lib/lxc/nsa/config
-	fi
+	sudo rm /var/lib/lxc/nsa/config
 fi
 
 echo ''
@@ -1918,7 +1933,9 @@ then
 
 	Sx1Index=201
 	function CheckHighestSx1IndexHit {
-		sshpass -p ubuntu ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 nslookup -timeout=3 10.207.29.$Sx1Index | grep 'name =' | wc -l
+		sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service systemd-resolved restart > /dev/null 2>&1"
+		sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service lxc-net restart > /dev/null 2>&1"
+		sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 nslookup -timeout=3 10.207.29.$Sx1Index | grep 'name =' | wc -l
 	}
 	HighestSx1IndexHit=$(CheckHighestSx1IndexHit)
 
@@ -1940,7 +1957,9 @@ then
 
 	Sw1Index=201
 	function CheckHighestSw1IndexHit {
-		sshpass -p ubuntu ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 nslookup -timeout=3 10.207.39.$Sw1Index | grep 'name =' | wc -l
+		sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service systemd-resolved restart > /dev/null 2>&1"
+		sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service lxc-net restart > /dev/null 2>&1"
+		sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 nslookup -timeout=3 10.207.39.$Sw1Index | grep 'name =' | wc -l
 	}
 	HighestSw1IndexHit=$(CheckHighestSw1IndexHit)
 
@@ -2381,8 +2400,10 @@ then
 	echo ''
 
 	sudo tar -xvf /opt/olxc/"$DistDir"/uekulele/archives/scst-files.tar -C /opt/olxc	--touch
-#	sudo tar -xvf /opt/olxc/"$DistDir"/uekulele/archives/scst-files.tar -C /	--touch
+#	sudo tar -xvf /opt/olxc/"$DistDir"/uekulele/archives/scst-files.tar -C /		--touch
 	sleep 2
+	sudo mv /opt/olxc/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/archives/scst-files /opt/olxc/home/"$Owner"/Downloads/orabuntu-lxc-master/uekulele/archives/scst-files
+	sudo chown $Owner:$Group /opt/olxc/home/orabuntu/Downloads/orabuntu-lxc-master/uekulele/archives/
 	sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /opt/olxc/"$DistDir"/uekulele/archives/scst-files/create-scst-oracle.sh
 		
 	echo ''
@@ -2467,8 +2488,8 @@ then
 	echo ''
 
 	sudo tar -xvf /opt/olxc/"$DistDir"/uekulele/archives/scst-files.tar -C /opt/olxc	--touch
-#	sudo tar -xvf /opt/olxc/"$DistDir"/uekulele/archives/scst-files.tar -C /	--touch
-	sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /opt/olxc/"$DistDir"/uekulele/archives/scst-files/create-scst-oracle.sh
+#	sudo tar -xvf /opt/olxc/"$DistDir"/uekulele/archives/scst-files.tar -C /		--touch
+#	sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /opt/olxc/"$DistDir"/uekulele/archives/scst-files/create-scst-oracle.sh
 		
 	echo ''
 	echo "=============================================="
@@ -2549,15 +2570,16 @@ then
 #		sudo service sx1 restart
 
 		ssh-keygen -R $MultiHostVar5
-		sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 date
+		sshpass -p $MultiHostVar9 ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 date
 		if [ $? -eq 0 ]
 		then
-			sshpass -p ubuntu scp -p /etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh ubuntu@$MultiHostVar5:$HOME/.
+			sshpass -p $MultiHostVar9 scp -p /etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh $MultiHostVar8@$MultiHostVar5:$HOME/.
 		fi
-		sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 "sudo -S <<< "ubuntu" ls -l $HOME/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh"
+
+		sshpass -p $MultiHostVar9 ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" ls -l $HOME/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh"
 		if [ $? -eq 0 ]
 		then
-			sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 "sudo -S <<< "ubuntu" $HOME/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh"
+		sshpass -p $MultiHostVar9 ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" $HOME/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh"
 		fi
 
                 echo ''
@@ -2673,7 +2695,7 @@ then
 
 			sudo chmod 777 						/etc/network/openvswitch/nsupdate_domain2_del_$ShortHost.sh
 			sudo ls -l     						/etc/network/openvswitch/nsupdate_domain2_del_$ShortHost.sh
-			sudo sed -i "s/orabuntu-lxc\.com/$Domain1/g"		/etc/network/openvswitch/nsupdate_domain2_del_$ShortHost.sh
+			sudo sed -i "s/consultingcommandos\.us/$Domain2/g"	/etc/network/openvswitch/nsupdate_domain2_del_$ShortHost.sh
 
 		        ssh-keygen -R 10.207.29.2
 		        sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.29.2 "sudo -S <<< "ubuntu" mkdir -p ~/Downloads"
@@ -2726,6 +2748,12 @@ then
         echo "=============================================="
         echo ''
 
+	function GetDhcpRange {
+        	cat /etc/sysconfig/lxc-net | grep LXC_DHCP_RANGE | cut -f2 -d'=' | sed 's/"//g' 
+	}       
+	DhcpRange=$(GetDhcpRange)
+	DHR="$DhcpRange"
+	sudo sed -i "s/DHCP-RANGE-OLXC/dhcp-range=$DHR/" /etc/dnsmasq.conf
         sudo service lxc-net restart 
         sleep 2
         sudo service lxc-net status
@@ -2806,8 +2834,6 @@ then
 		sudo sed -i '/plugins=ifcfg-rh/a dns=none' /etc/NetworkManager/NetworkManager.conf
 		sudo sed -i '$!N; /^\(.*\)\n\1$/!P; D' /etc/NetworkManager/NetworkManager.conf
 		sudo yum -y install dnsmasq
-#		sudo tar -vP --extract --file=ubuntu-host.tar /etc/dnsmasq.conf
-#		sudo tar -vP --extract --file=ubuntu-host.tar /etc/resolv.dnsmasq
 		sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /etc/dnsmasq.conf
 		sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /etc/dnsmasq.conf
 		sudo sed -i '/LXC_DHCP_CONFILE/s/#//' /etc/sysconfig/lxc-net
@@ -2820,9 +2846,16 @@ then
 		sudo rm -f /etc/resolv.conf
 		sudo sh -c "echo 'nameserver 127.0.0.1' 			>  /etc/resolv.conf"
 		sudo sh -c "echo 'search $Domain1 $Domain2 gns1.$Domain1' 	>> /etc/resolv.conf"
+		function GetDhcpRange {
+        		cat /etc/sysconfig/lxc-net | grep LXC_DHCP_RANGE | cut -f2 -d'=' | sed 's/"//g' 
+		}       
+		DhcpRange=$(GetDhcpRange)
+		DHR="$DhcpRange"
+		sudo sed -i "s/DHCP-RANGE-OLXC/dhcp-range=$DHR/" /etc/dnsmasq.conf
 		sudo service lxc-net restart
  		sudo service lxc-net status
-		sleep 5
+		echo ''
+		sleep 2
 		nslookup $NameServer
 #		nslookup 10.207.39.2
 #		nslookup 10.207.29.2

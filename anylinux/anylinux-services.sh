@@ -120,13 +120,6 @@ function GetDistDir {
 }
 DistDir=$(GetDistDir)
 
-# echo "=============================================="
-# echo "Set Parameters                                "
-# echo "=============================================="
-
-SudoPassword=ubuntu
-GRE=N
-
 # GLS 20180112
 # User-settable subnets added
 # Set numeric values to valid ip address triplets.  
@@ -144,10 +137,10 @@ GRE=N
 # Custom Subnets Begin
 # Uncomment if using custom subnets other than the default subnets
 
-SeedNet1='SeedNet1Fwd:172.16.38'	# UNCOMMENT LINE IF USING CUSTOM SUBNETS
-BaseNet1='BaseNet1Fwd:172.16.48'	# UNCOMMENT LINE IF USING CUSTOM SUBNETS
-StorNet1='StorNet1Fwd:172.16.49'	# UNCOMMENT LINE IF USING CUSTOM SUBNETS
-StorNet2='StorNet2Fwd:172.16.50'	# UNCOMMENT LINE IF USING CUSTOM SUBNETS
+SeedNet1='SeedNet1Fwd:184.168.221'	# UNCOMMENT LINE IF USING CUSTOM SUBNETS
+BaseNet1='BaseNet1Fwd:104.16.88'	# UNCOMMENT LINE IF USING CUSTOM SUBNETS
+StorNet1='StorNet1Fwd:104.16.89'	# UNCOMMENT LINE IF USING CUSTOM SUBNETS
+StorNet2='StorNet2Fwd:104.16.90'	# UNCOMMENT LINE IF USING CUSTOM SUBNETS
 
 ExtrNet1='172.216.11'			# UNCOMMENT LINE IF USING CUSTOM SUBNETS
 ExtrNet2='172.217.11'			# UNCOMMENT LINE IF USING CUSTOM SUBNETS
@@ -362,8 +355,8 @@ else
 	echo 'Linux Host Base Release   = '$UbuntuMajorVersion
 fi
 
-MajorRelease=$1
-if [ -z $1 ]
+MajorRelease=$8
+if [ -z $8 ]
 then
 	MajorRelease=7
 fi
@@ -386,14 +379,14 @@ echo 'Oracle Container Count    = '$NumCon
 Domain1=$4
 if [ -z $4 ]
 then
-	Domain1=urdomain1.com
+	Domain1=uekulele.com
 fi
 echo 'Domain1                   = '$Domain1
 
 Domain2=$5
 if [ -z $5 ]
 then
-	Domain2=urdomain2.com
+	Domain2=orabuntu-lxc.com
 fi
 echo 'Domain2                   = '$Domain2
 
@@ -415,20 +408,16 @@ echo 'OSMemRes                  = '$OSMemRes
 # echo "Set Parameters                                "
 # echo "=============================================="
 
-MultiHost=$8
-if [ -z $8 ]
+MultiHost=$1
+if [ -z $1 ]
 then
-	# In this section below you uncomment the MultiHost parameter for the specific use case as described below.
-	# Better documentation is coming soon.
+	# First Orabuntu-LXC host (physical or virtual):
+
+	GRE=N
+	MultiHost="new:N:1:X:X:X:1500:X:X:$GRE"				# <-- default value for first Orabuntu-LXC host install ("hub" host).
+	# MultiHost="reinstall:N:1:$SudoPassword:X:X:1500:X:X:$GRE"	# <-- reinstall value for first Orabuntu-LXC host install ("hub" host).
 
 	# ('X' means value is not used so just leave it set to 'X')
-
-	# First Orabuntu-LXC host (physical or virtual):
-	# (Note:  values for first Orabuntu-LXC host should normally not be changed from the following except possibly for MTU 9000 instead of 1500)
-
-	 MultiHost="new:N:1:$SudoPassword:X:X:1500:X:X:$GRE"         # <-- default value for first Orabuntu-LXC host install ("hub" host).
-	#MultiHost="reinstall:N:1:$SudoPassword:X:X:1500:X:X:$GRE"
-
 	# Additional Orabuntu-LXC physical hosts (physical or virtual  hosts over GRE):
 	# (Note: reading from left to right the first IP is the First Orabuntu-LXC host (MTU 1500) and the second IP is the Orabuntu-LXC GRE host (MTU 1420)
 	# (Note: the passwords in the 8 and 9 fields are the "ubuntu" user with password "ubuntu" on the remote GRE host).
@@ -466,14 +455,17 @@ echo 'MultiHost                 = '$MultiHost
 # GLS 20170924 Currently Orabuntu-LXC for Oracle Linux does build LXC from source.  You can use this parameter to set what version it will build.
 
 LxcOvsVersion=$9
+if [ -z $9 ] && [ $LinuxFlavor != 'Fedora' ]
+then
+                LxcOvsVersion="2.1.1:2.5.4"
+fi
+
 if [ -z $9 ] && [ $LinuxFlavor = 'Fedora' ]
 then
-        if   [ $RedHatVersion -eq 27 ]
-        then
-                LxcOvsVersion="2.0.9:2.5.4"
-        else
-                LxcOvsVersion="2.1.1:2.5.4"
-        fi
+	if [ $RedHatVersion -eq 27 ]
+	then
+		LxcOvsVersion="2.0.9:2.5.4"
+	fi
 fi
 
 if   [ $LinuxFlavor = 'RedHat' ] || [ $LinuxFlavor = 'CentOS' ] || [ $LinuxFlavor = 'Fedora' ]
@@ -487,7 +479,12 @@ then
 	echo 'LxcOvsVersion             = Latest Canonical Repository Version (via apt-get)'
 fi
 
-echo 'GRE                       = '$GRE
+function GetGREValue {
+	echo $MultiHost | cut -f10 -d':'
+}
+GREValue=$(GetGREValue)
+
+echo 'GRE                       = '$GREValue
 
 # GLS 20180112 The SeedNet1 net value is used to trigger the Subnets subroutine.
 # GLS 20180112 If it is set to a new value then be sure ALL OTHER nets above are set to new values as well
@@ -564,6 +561,9 @@ then
 else
 	echo 'ExtrNet6                  = '$ExtrNet6
 fi
+
+	echo 'DistDir                   = '$DistDir
+	echo 'SubDirName                = '$SubDirName
 
 echo ''
 echo "=============================================="
@@ -872,6 +872,8 @@ echo "$DistDir/$SubDirName/$SubDirName-services-2.sh"	 			>> "$DistDir"/"$SubDir
 echo "$DistDir/$SubDirName/$SubDirName-services-3.sh"	 			>> "$DistDir"/"$SubDirName"/archives/"$SubDirName"-services.lst
 echo "$DistDir/$SubDirName/$SubDirName-services-4.sh"	 			>> "$DistDir"/"$SubDirName"/archives/"$SubDirName"-services.lst
 echo "$DistDir/$SubDirName/$SubDirName-services-5.sh"	 			>> "$DistDir"/"$SubDirName"/archives/"$SubDirName"-services.lst
+echo "$DistDir/$SubDirName/GNU3"                                                >> "$DistDir"/"$SubDirName"/archives/"$SubDirName"-services.lst
+echo "$DistDir/$SubDirName/COPYING"                                             >> "$DistDir"/"$SubDirName"/archives/"$SubDirName"-services.lst
 
 cd "$DistDir"/"$SubDirName"/archives
 
@@ -961,33 +963,32 @@ do
 				sudo chown --reference /opt/olxc/$j /opt/olxc/$j.gnu3
 				sudo mv /opt/olxc/$j.gnu3 /opt/olxc/$j
 				filename=/opt/olxc/$j
-			else
-				filename=/opt/olxc/$j
 			fi
+			filename=/opt/olxc/$j
 
 			if [ $SetNets = 'Y' ] 
 			then
 #				sudo grep 207 $filename      >> pattern-matches.10207.txt
- 				sudo sed -i "s/10.207.41/$StorNet2F/g"		$filename
-				sudo sed -i "s/10.207.40/$StorNet1F/g"		$filename
-				sudo sed -i "s/10.207.39/$BaseNet1F/g"		$filename
-				sudo sed -i "s/10.207.29/$SeedNet1F/g"		$filename
-				sudo sed -i "s/39.207.10/$BaseNet1R/g"		$filename
-				sudo sed -i "s/29.207.10/$SeedNet1R/g"		$filename
-				sudo sed -i "s/1020729/$SeedNet13/g"		$filename
-				sudo sed -i "s/1020739/$BaseNet13/g"		$filename
-				sudo sed -i "s/10207/$BaseNet12/g"		$filename
-				sudo sed -i "s/10\\\.207\\\.29/$SeedNet1E/g"	$filename
-				sudo sed -i "s/10\\\.207\\\.39/$BaseNet1E/g"	$filename
-				sudo sed -i "s/172.220.40/$ExtrNet1/g"		$filename
-				sudo sed -i "s/172.221.40/$ExtrNet2/g"		$filename
-				sudo sed -i "s/192.210.39/$ExtrNet3/g"		$filename
-				sudo sed -i "s/192.211.39/$ExtrNet4/g"		$filename
-				sudo sed -i "s/192.212.39/$ExtrNet5/g"		$filename
-				sudo sed -i "s/192.213.39/$ExtrNet6/g"		$filename
-				sudo grep '207'  $filename | grep -v 'dnsmasq'  >> pattern-matches.10207.msd
+ 				sudo sed -i "s/10.207.41/$StorNet2F/g"			$filename
+				sudo sed -i "s/10.207.40/$StorNet1F/g"			$filename
+				sudo sed -i "s/10.207.39/$BaseNet1F/g"			$filename
+				sudo sed -i "s/10.207.29/$SeedNet1F/g"			$filename
+				sudo sed -i "s/39.207.10/$BaseNet1R/g"			$filename
+				sudo sed -i "s/29.207.10/$SeedNet1R/g"			$filename
+				sudo sed -i "s/1020729/$SeedNet13/g"			$filename
+				sudo sed -i "s/1020739/$BaseNet13/g"			$filename
+				sudo sed -i "s/10207/$BaseNet12/g"			$filename
+				sudo sed -i "s/10\\\.207\\\.29/$SeedNet1E/g"		$filename
+				sudo sed -i "s/10\\\.207\\\.39/$BaseNet1E/g"		$filename
+				sudo sed -i "s/172.220.40/$ExtrNet1/g"			$filename
+				sudo sed -i "s/172.221.40/$ExtrNet2/g"			$filename
+				sudo sed -i "s/192.210.39/$ExtrNet3/g"			$filename
+				sudo sed -i "s/192.211.39/$ExtrNet4/g"			$filename
+				sudo sed -i "s/192.212.39/$ExtrNet5/g"			$filename
+				sudo sed -i "s/192.213.39/$ExtrNet6/g"			$filename
+				sudo grep '207' $filename | grep -v '#|dnsmasq' >> pattern-matches.10207.msd
 				sudo grep '\.41' $filename   			>> pattern-matches.10207.msd
-				sudo grep '\.40' $filename   			>> pattern-matches.10207.msd
+				sudo grep '\.40' $filename | grep -v '#'	>> pattern-matches.10207.msd
 				sudo grep '\.39' $filename			>> pattern-matches.10207.msd
 				sudo grep '\.29' $filename   			>> pattern-matches.10207.msd
 			fi
@@ -1108,6 +1109,4 @@ clear
 
 /opt/olxc/"$DistDir"/anylinux/anylinux-services-1.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $OSMemRes $NumCon $MultiHost $LxcOvsVersion $DistDir
 	
-sudo rm -f /opt/olxc/*.lst /opt/olxc/*.tar
-
 exit

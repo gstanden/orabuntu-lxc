@@ -172,16 +172,31 @@ sleep 5
 
 clear
 
+function SoftwareVersion { echo "$@" | awk -F. '{ printf("%d%03d%03d%03d\n", $1,$2,$3,$4); }'; }
+
+function GetLXCVersion {
+        lxc-create --version
+}
+LXCVersion=$(GetLXCVersion)
+
+function CheckSystemdResolvedInstalled {
+                sudo netstat -ulnp | grep 53 | sed 's/  */ /g' | rev | cut -f1 -d'/' | rev | sort -u | grep systemd- | wc -l
+        }
+SystemdResolvedInstalled=$(CheckSystemdResolvedInstalled)
+
+sleep 5
+
+clear
 echo ''
 echo "=============================================="
-echo "Ping google.com test...                       "
+echo "Ping yum.oracle.com test...               "
 echo "=============================================="
 echo ''
 
-ping -c 3 google.com
+ping -c 3 yum.oracle.com
 
 function CheckNetworkUp {
-ping -c 3 google.com | grep packet | cut -f3 -d',' | sed 's/ //g'
+	ping -c 3 yum.oracle.com | grep packet | cut -f3 -d',' | sed 's/ //g'
 }
 NetworkUp=$(CheckNetworkUp)
 n=1
@@ -195,7 +210,7 @@ if [ "$NetworkUp" != '0%packetloss' ]
 then
 echo ''
 echo "=============================================="
-echo "Ping google.com not reliable.                 "
+echo "Ping yum.oracle.com not reliable.                 "
 echo "Script exiting.                               "
 echo "=============================================="
 exit
@@ -221,15 +236,25 @@ cd /etc/network/if-up.d/openvswitch
 # GLS 20151222 I don't think this step does anything anymore.  Commenting for now, removal pending.
 # sudo sed -i "s/lxcora01/oel$OracleRelease$SeedPostfix/" /var/lib/lxc/oel$OracleRelease$SeedPostfix/config
 
+function GetSeedPostfix {
+	sudo lxc-ls -f | grep oel"$OracleRelease"c | cut -f1 -d' ' | cut -f2 -d'c' | sed 's/^/c/'
+}
+SeedPostfix=$(GetSeedPostfix)
+
 function CheckContainerUp {
-sudo lxc-ls -f | grep oel$OracleRelease | sed 's/  */ /g' | egrep 'RUNNING|STOPPED'  | cut -f2 -d' '
+	sudo lxc-ls -f | grep oel$OracleRelease | sed 's/  */ /g' | egrep 'RUNNING|STOPPED'  | cut -f2 -d' '
 }
 ContainerUp=$(CheckContainerUp)
 
 function CheckPublicIP {
-sudo lxc-ls -f | sed 's/  */ /g' | grep oel$OracleRelease | cut -f3 -d' ' | sed 's/,//' | cut -f1-3 -d'.' | sed 's/\.//g'
+	sudo lxc-info -n oel$OracleRelease$SeedPostfix -iH | cut -f1-3 -d'.' | sed 's/\.//g'
 }
 PublicIP=$(CheckPublicIP)
+
+function GetSeedContainerName {
+	sudo lxc-ls -f | grep oel$OracleRelease | cut -f1 -d' '	
+}
+SeedContainerName=$(GetSeedContainerName)
 
 echo ''
 echo "=============================================="
@@ -271,12 +296,11 @@ then
 
 		RedHatVersion=$(GetRedHatVersion)
                 
-		# GLS 20160707
                 if [ $Release -eq 7 ] || [ $Release -eq 6 ]
                 then
-                function CheckPublicIPIterative {
-		sudo lxc-ls -f | sed 's/  */ /g' | grep $j | grep RUNNING | cut -f2 -d'-' | sed 's/^[ \t]*//;s/[ \t]*$//' | cut -f1 -d' ' | cut -f1-2 -d'.' | sed 's/\.//g'
-                }
+                	function CheckPublicIPIterative {
+				sudo lxc-info -n oel$OracleRelease$SeedPostfix -iH | cut -f1-3 -d'.' | sed 's/\.//g'
+                	}
                 fi
 		PublicIPIterative=$(CheckPublicIPIterative)
 		echo "Starting container $j ..."
@@ -287,7 +311,7 @@ then
 		fi
 		sudo lxc-start -n $j > /dev/null 2>&1
 		i=1
-		while [ "$PublicIPIterative" != 10207 ] && [ "$i" -le 10 ]
+		while [ "$PublicIPIterative" != 1020729 ] && [ "$i" -le 10 ]
 		do
 			echo "Waiting for $j Public IP to come up..."
 			echo ''
@@ -295,16 +319,16 @@ then
 			PublicIPIterative=$(CheckPublicIPIterative)
 			if [ $i -eq 5 ]
 			then
-			echo ''
-			sudo lxc-stop -n $j > /dev/null 2>&1
-			sudo /etc/network/openvswitch/veth_cleanups.sh $SeedContainerName
-			echo ''
-			if [ $MultiHostVar2 = 'Y' ]
-			then
-				ls -l /var/lib/lxc/$j/config
-				sudo sed -i "s/MtuSetting/$MultiHostVar7/g" /var/lib/lxc/$j/config
-			fi
-			sudo lxc-start -n $j > /dev/null 2>&1
+				echo ''
+				sudo lxc-stop -n $j > /dev/null 2>&1
+				sudo /etc/network/openvswitch/veth_cleanups.sh $SeedContainerName
+				echo ''
+				if [ $MultiHostVar2 = 'Y' ]
+				then
+					ls -l /var/lib/lxc/$j/config
+					sudo sed -i "s/MtuSetting/$MultiHostVar7/g" /var/lib/lxc/$j/config
+				fi
+				sudo lxc-start -n $j > /dev/null 2>&1
 			fi
 		sleep 1
 		i=$((i+1))
@@ -339,6 +363,12 @@ echo "Container $SeedContainerName ping test...     "
 echo "=============================================="
 echo ''
 
+function GetDhcpRange {
+	cat /etc/sysconfig/lxc-net | grep LXC_DHCP_RANGE | cut -f2 -d'=' | sed 's/"//g' 
+}
+DhcpRange=$(GetDhcpRange)
+DHR="$DhcpRange"
+sudo sed -i "s/DHCP-RANGE-OLXC/dhcp-range=$DHR/" /etc/dnsmasq.conf
 sudo service lxc-net restart
 
 ping -c 3 $SeedContainerName

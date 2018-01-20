@@ -306,6 +306,11 @@ echo "=============================================="
 echo "Starting LXC cloned containers for Oracle...  "
 echo "=============================================="
 
+function GetSeedPostfix {
+	sudo lxc-ls -f | grep ora"$OracleRelease"c | cut -f1 -d' ' | cut -f2 -d'c' | sed 's/^/c/'
+}
+SeedPostfix=$(GetSeedPostfix)
+
 function CheckClonedContainersExist {
 	sudo ls /var/lib/lxc | grep "ora$OracleRelease" | sort -V | sed 's/$/ /' | tr -d '\n' 
 }
@@ -325,7 +330,7 @@ do
 	if [ $Release -ge 6 ]
 	then
 		function CheckPublicIPIterative {
-			sudo lxc-ls -f | sed 's/  */ /g' | grep $j | grep RUNNING | cut -f2 -d'-' | sed 's/^[ \t]*//;s/[ \t]*$//' | cut -f1 -d' ' | cut -f1-2 -d'.' | sed 's/\.//g'
+			sudo lxc-info -n ora$OracleRelease$SeedPostfix -iH | cut -f1-3 -d'.' | sed 's/\.//g'
 		}
 	fi
 	PublicIPIterative=$(CheckPublicIPIterative)
@@ -337,7 +342,7 @@ do
 	sudo lxc-start -n $j > /dev/null 2>&1
 	sleep 5
 	i=1
-	while [ "$PublicIPIterative" != 10207 ] && [ "$i" -le 10 ]
+	while [ "$PublicIPIterative" != 1020739 ] && [ "$i" -le 10 ]
 	do
 		echo "Waiting for $j Public IP to come up..."
 		sleep 20
@@ -405,6 +410,13 @@ then
         echo "Restart service lxc-net...                    "
         echo "=============================================="
         echo ''
+
+	function GetDhcpRange {
+        	cat /etc/sysconfig/lxc-net | grep LXC_DHCP_RANGE | cut -f2 -d'=' | sed 's/"//g' 
+	}       
+	DhcpRange=$(GetDhcpRange)
+	DHR="$DhcpRange"
+	sudo sed -i "s/DHCP-RANGE-OLXC/dhcp-range=$DHR/" /etc/dnsmasq.conf
 
         sudo service lxc-net restart
         sleep 2
@@ -654,6 +666,13 @@ then
 		echo "=============================================="
 		echo ''
 
+		function GetDhcpRange {
+        		cat /etc/sysconfig/lxc-net | grep LXC_DHCP_RANGE | cut -f2 -d'=' | sed 's/"//g' 
+		}       
+		DhcpRange=$(GetDhcpRange)
+		DHR="$DhcpRange"
+		sudo sed -i "s/DHCP-RANGE-OLXC/dhcp-range=$DHR/" /etc/dnsmasq.conf
+
 		sudo service lxc-net restart
 		sleep 2
 		sudo service lxc-net status
@@ -797,6 +816,13 @@ then
 			echo "Restart service lxc-net...                    "
 			echo "=============================================="
 			echo ''
+
+			function GetDhcpRange {
+        			cat /etc/sysconfig/lxc-net | grep LXC_DHCP_RANGE | cut -f2 -d'=' | sed 's/"//g' 
+			}       
+			DhcpRange=$(GetDhcpRange)
+			DHR="$DhcpRange"
+			sudo sed -i "s/DHCP-RANGE-OLXC/dhcp-range=$DHR/" /etc/dnsmasq.conf
 
 			sudo service lxc-net restart
 			sleep 2
@@ -1048,4 +1074,20 @@ then
 	echo ''
 	
 	sleep 5
-fi	
+fi
+
+# Set permissions on scst-files and cleanup staging area
+
+function GetGroup {
+	id | cut -f2 -d' ' | cut -f2 -d'(' | cut -f1 -d')'
+}
+Group=$(GetGroup)
+
+function GetOwner {
+	id | cut -f1 -d' ' | cut -f2 -d'(' | cut -f1 -d')'
+}
+Owner=$(GetOwner)
+
+sudo chown -R $Group:$Owner /opt/olxc/"$DistDir"/uekulele/archives/scst-files
+sudo rm -f /opt/olxc/*.lst /opt/olxc/*.tar
+

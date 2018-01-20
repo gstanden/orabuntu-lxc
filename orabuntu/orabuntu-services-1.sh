@@ -42,6 +42,16 @@ OSMemRes=$6
 MultiHost=$7
 DistDir=$8
 
+function GetGroup {
+        id | cut -f2 -d' ' | cut -f2 -d'(' | cut -f1 -d')'
+}
+Group=$(GetGroup)
+
+function GetOwner {
+        id | cut -f1 -d' ' | cut -f2 -d'(' | cut -f1 -d')'
+}
+Owner=$(GetOwner)
+
 function SoftwareVersion { echo "$@" | awk -F. '{ printf("%d%03d%03d%03d\n", $1,$2,$3,$4); }'; }
 
 function GetMultiHostVar1 {
@@ -928,7 +938,7 @@ echo ''
 sudo tar -xvf /opt/olxc/"$DistDir"/orabuntu/archives/dns-dhcp-host.tar -C / --touch
 sudo chmod +x /etc/network/openvswitch/crt_ovs_s*.sh
 
-if [ $MultiHostVar2 = 'Y' ]
+if [ $MultiHostVar2 = 'Y' ] && [ -f /var/lib/lxc/nsa/config ]
 then
 	sudo rm /var/lib/lxc/nsa/config
 fi
@@ -1380,10 +1390,10 @@ then
 	sudo service dnsmasq stop
 	sleep 5
 	
-	sudo sed -i '0,/.*#listen-address.*/s/.*#listen-address.*/listen-address=127.0.0.1\n&/'                                                 /etc/dnsmasq.conf
-	sudo sed -i '0,/.*#server=\/localnet.*/s/.*#server=\/localnet.*/server=\/urdomain1\.com\/10.207.39.2\n&/'                               /etc/dnsmasq.conf
-	sudo sed -i '0,/.*#server=\/localnet.*/s/.*#server=\/localnet.*/server=\/urdomain2\.com\/10.207.29.2\n&/'                               /etc/dnsmasq.conf
-	sudo sed -i '0,/.*#server=\/localnet.*/s/.*#server=\/localnet.*/server=\/gns1\.urdomain1\.com\/10.207.39.2\n&/'                         /etc/dnsmasq.conf
+	sudo sed -i '0,/.*#listen-address.*/s/.*#listen-address.*/listen-address=127.0.0.1\n&/'							/etc/dnsmasq.conf
+	sudo sed -i '0,/.*#server=\/localnet.*/s/.*#server=\/localnet.*/server=\/$Domain1\/10.207.39.2\n&/'					/etc/dnsmasq.conf
+	sudo sed -i '0,/.*#server=\/localnet.*/s/.*#server=\/localnet.*/server=\/$Domain2\.com\/10.207.29.2\n&/'				/etc/dnsmasq.conf
+	sudo sed -i '0,/.*#server=\/localnet.*/s/.*#server=\/localnet.*/server=\/gns1\.$Domain1\/10.207.39.2\n&/'				/etc/dnsmasq.conf
 	sudo sed -i '0,/.*#server=\/3\.168\.192.*/s/.*#server=\/3\.168\.192.*/server=\/39\.207\.10\.in-addr\.arpa\/10\.207\.39\.2\n&/'          /etc/dnsmasq.conf
 	sudo sed -i '0,/.*#server=\/3\.168\.192.*/s/.*#server=\/3\.168\.192.*/server=\/29\.207\.10\.in-addr\.arpa\/10\.207\.29\.2\n&/'          /etc/dnsmasq.conf
 
@@ -1391,7 +1401,7 @@ then
 
 	sudo service dnsmasq start
 
-	sudo sh -c "echo 'search urdomain1.com urdomain2.com gns1.urdomain1.com' >> /etc/resolv.conf"
+	sudo sh -c "echo 'search $Domain1 $Domain2 gns1.$Domain1' >> /etc/resolv.conf"
 
 	echo ''	
 	echo "=============================================="
@@ -1432,7 +1442,9 @@ then
 
         Sx1Index=201
         function CheckHighestSx1IndexHit {
-                sshpass -p ubuntu ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 nslookup -timeout=1 10.207.29.$Sx1Index | grep 'name =' | wc -l
+                sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service systemd-resolved restart > /dev/null 2>&1"
+                sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service lxc-net restart > /dev/null 2>&1"
+                sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 nslookup -timeout=1 10.207.29.$Sx1Index | grep 'name =' | wc -l
         }
         HighestSx1IndexHit=$(CheckHighestSx1IndexHit)
 
@@ -1454,7 +1466,9 @@ then
 
         Sw1Index=201
         function CheckHighestSw1IndexHit {
-                sshpass -p ubuntu ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 nslookup -timeout=1 10.207.39.$Sw1Index | grep 'name =' | wc -l
+                sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service systemd-resolved restart > /dev/null 2>&1"
+                sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service lxc-net restart > /dev/null 2>&1"
+                sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 nslookup -timeout=1 10.207.39.$Sw1Index | grep 'name =' | wc -l
         }
         HighestSw1IndexHit=$(CheckHighestSw1IndexHit)
 
@@ -1890,7 +1904,9 @@ then
 	sudo tar -xvf /opt/olxc/"$DistDir"/orabuntu/archives/scst-files.tar -C /opt/olxc --touch
 #	sudo tar -xvf /opt/olxc/"$DistDir"/orabuntu/archives/scst-files.tar -C /         --touch
 	sleep 2
-	sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /opt/olxc/"$DistDir"/orabuntu/archives/scst-files/create-scst-oracle.sh
+        sudo mv /opt/olxc/home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/scst-files /opt/olxc/home/"$Owner"/Downloads/orabuntu-lxc-master/orabuntu/archives/scst-files
+        sudo chown $Owner:$Group /opt/olxc/home/orabuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/
+        sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /opt/olxc/"$DistDir"/orabuntu/archives/scst-files/create-scst-oracle.sh
 		
 	echo ''
 	echo "=============================================="
@@ -1988,12 +2004,12 @@ then
 	clear
 
 	function GetMultiHostVar5 {
-	echo $MultiHost | cut -f5 -d':'
+		echo $MultiHost | cut -f5 -d':'
 	}
 	MultiHostVar5=$(GetMultiHostVar5)
 
 	function GetMultiHostVar6 {
-	echo $MultiHost | cut -f6 -d':'
+		echo $MultiHost | cut -f6 -d':'
 	}
 	MultiHostVar6=$(GetMultiHostVar6)
 
@@ -2063,15 +2079,15 @@ then
 #               sudo service sx1 restart
 
                 ssh-keygen -R $MultiHostVar5
-                sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 date
+                sshpass -p $MultiHostVar9 ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 date
                 if [ $? -eq 0 ]
                 then
-                        sshpass -p ubuntu scp -p /etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh ubuntu@$MultiHostVar5:~/.
+                  sshpass -p $MultiHostVar9 scp -p /etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh $MultiHostVar8@$MultiHostVar5:~/.
                 fi
-                sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 "sudo -S <<< "ubuntu" ls -l ~/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh"
+                sshpass -p $MultiHostVar9 ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" ls -l ~/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh"
                 if [ $? -eq 0 ]
                 then
-                        sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$MultiHostVar5 "sudo -S <<< "ubuntu" ~/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh"
+                  sshpass -p $MultiHostVar9 ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" ~/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh"
                 fi
 
                 echo ''
@@ -2185,9 +2201,10 @@ then
                         sudo sh -c "echo 'quit'								>> /etc/network/openvswitch/nsupdate_domain2_del_$ShortHost.sh"
                         sudo sh -c "echo '\" | nsupdate -k /etc/bind/rndc.key'				>> /etc/network/openvswitch/nsupdate_domain2_del_$ShortHost.sh"
 
-                        sudo chmod 777                                          /etc/network/openvswitch/nsupdate_domain2_del_$ShortHost.sh
-                        sudo ls -l                                              /etc/network/openvswitch/nsupdate_domain2_del_$ShortHost.sh
-                        sudo sed -i "s/orabuntu-lxc\.com/$Domain1/g"            /etc/network/openvswitch/nsupdate_domain2_del_$ShortHost.sh
+                        sudo chmod 777						/etc/network/openvswitch/nsupdate_domain2_del_$ShortHost.sh
+                        sudo ls -l						/etc/network/openvswitch/nsupdate_domain2_del_$ShortHost.sh
+                        sudo sed -i "s/consultingcommandos\.us/$Domain2/g"	/etc/network/openvswitch/nsupdate_domain2_del_$ShortHost.sh
+
                         ssh-keygen -R 10.207.29.2
                         sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.29.2 "sudo -S <<< "ubuntu" mkdir -p ~/Downloads"
                         sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.29.2 "sudo -S <<< "ubuntu" chown ubuntu:ubuntu Downloads"

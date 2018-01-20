@@ -497,6 +497,23 @@ clear
 
 echo ''
 echo "=============================================="
+echo "Start Seed Container $SeedContainerName...    "
+echo "=============================================="
+echo ''
+
+sudo lxc-start -n $SeedContainerName > /dev/null 2>&1
+
+echo ''
+echo "=============================================="
+echo "Start Seed Container $SeedContainerName...    "
+echo "=============================================="
+
+sleep 5
+
+clear
+
+echo ''
+echo "=============================================="
 echo "Next script to run: uekulele-services-5.sh    "
 echo "=============================================="
 

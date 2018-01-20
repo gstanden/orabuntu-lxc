@@ -402,7 +402,7 @@ then
 		if [ $UbuntuVersion = '16.04' ] || [ $UbuntuVersion = '16.10' ] || [ $UbuntuVersion = '17.04' ] || [ $UbuntuVersion = '17.10' ]
         	then
         		function CheckPublicIPIterative {
-				sudo lxc-ls -f | sed 's/  */ /g' | grep $j | grep RUNNING | cut -f2 -d'-' | sed 's/^[ \t]*//;s/[ \t]*$//' | cut -f1 -d' ' | cut -f1-2 -d'.' | sed 's/\.//g'
+				sudo lxc-info -n oel$OracleRelease$SeedPostfix -iH | cut -f1-3 -d'.' | sed 's/\.//g'	
         		}
         	fi
 		PublicIPIterative=$(CheckPublicIPIterative)
@@ -410,7 +410,7 @@ then
 		echo ''
 		sudo lxc-start -n $j > /dev/null 2>&1
 		i=1
-		while [ "$PublicIPIterative" != 10207 ] && [ "$i" -le 10 ]
+		while [ "$PublicIPIterative" != 1020729 ] && [ "$i" -le 10 ]
 		do
 			echo "Waiting for $j Public IP to come up..."
 			echo ''

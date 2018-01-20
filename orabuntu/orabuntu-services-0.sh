@@ -33,7 +33,7 @@
 
 USERNAME=orabuntu
 PASSWORD=balihigh
-sudo useradd -m -p $(openssl passwd -1 ${PASSWORD}) -s /bin/bash -G wheel ${USERNAME}
+sudo useradd -m -p $(openssl passwd -1 ${PASSWORD}) -s /bin/bash -G sudo ${USERNAME}
 sudo mkdir -p  /home/${USERNAME}/Downloads
 sudo chown orabuntu:orabuntu /home/${USERNAME}/Downloads
 

@@ -29,11 +29,51 @@
 #    There are two domains and two networks because the "seed" LXC containers are on a separate network from the production LXC containers.
 #    If the domain is an actual domain, you will need to change the subnet using the subnets feature of Orabuntu-LXC
 #
-#    You can change the name of the username in this script from 'ubuntu' to whatever username is preferred.
+#    Controlling script for Orabuntu-LXC
 
-USERNAME=orabuntu
-PASSWORD=balihigh
-sudo useradd -m -p $(openssl passwd -1 ${PASSWORD}) -s /bin/bash -G wheel ${USERNAME}
-sudo mkdir -p  /home/${USERNAME}/Downloads
-sudo chown orabuntu:orabuntu /home/${USERNAME}/Downloads
+#    Host OS Supported: Oracle Linux 7, RedHat 7, CentOS 7, Fedora 27, Ubuntu 16/17
+
+#    Usage:
+#    Passing parameters in from the command line is possible but is not described herein. The supported usage is to configure this file as described below.
+#    Capital 'X' means 'not used' do not replace leave as is.
+
+trap "exit" INT TERM; trap "kill 0" EXIT; sudo -v || exit $?; sleep 1; while true; do sleep 60; sudo -nv; done 2>/dev/null &
+
+GRE=N
+
+clear
+
+if [ -z $1 ]
+then
+        echo ''
+        echo "=============================================="
+        echo "                                              "
+        echo "If you doing a fresh Orabuntu-LXC install     "
+        echo "on this host then take default 'new'          "
+        echo "                                              "
+        echo "If you are doing a complete Orabuntu-LXC      "
+        echo "reinstall then answer 'reinstall'             "
+        echo "                                              "
+        echo "=============================================="
+        echo "                                              "
+        read -e -p "Install Type New or Reinstall [new/rei] " -i "new" OpType
+        echo "                                              "
+        echo "=============================================="
+else
+        OpType=$1
+fi
+
+if   [ $OpType = 'rei' ]
+then
+        Operation=reinstall
+elif [ $OpType = 'new' ]
+then
+        Operation=new
+fi
+
+MultiHost="$Operation:Y:X:X:X:X:1420:X:X:$GRE"
+
+./anylinux-services.sh $MultiHost
+
+exit
 

@@ -28,8 +28,6 @@
 #    The domain names can be arbitrary fictional names or they can be a domain that you actually own and operate.
 #    There are two domains and two networks because the "seed" LXC containers are on a separate network from the production LXC containers.
 #    If the domain is an actual domain, you will need to change the subnet using the subnets feature of Orabuntu-LXC
-#
-#!/bin/bash
 
 clear
 
@@ -491,7 +489,7 @@ sudo lxc-ls -f | grep oel$OracleRelease$SeedPostfix | sed 's/  */ /g' | egrep 'R
 ContainerUp=$(CheckContainerUp)
 
 function CheckPublicIP {
-sudo lxc-ls -f | sed 's/  */ /g' | grep oel$OracleRelease$SeedPostfix | cut -f3 -d' ' | sed 's/,//' | cut -f1-3 -d'.' | sed 's/\.//g'
+	sudo lxc-info -n oel$OracleRelease$SeedPostfix -iH | cut -f1-3 -d'.' | sed 's/\.//g'
 }
 PublicIP=$(CheckPublicIP)
 
@@ -550,7 +548,7 @@ then
         	if [ $Release -eq 7 ] || [ $Release -eq 6 ]
         	then
         	function CheckPublicIPIterative {
-		sudo lxc-ls -f | sed 's/  */ /g' | grep $j | grep RUNNING | cut -f2 -d'-' | sed 's/^[ \t]*//;s/[ \t]*$//' | cut -f1 -d' ' | cut -f1-2 -d'.' | sed 's/\.//g'
+			sudo lxc-info -n oel$OracleRelease$SeedPostfix -iH | cut -f1-3 -d'.' | sed 's/\.//g'
         	}
         	fi
 		PublicIPIterative=$(CheckPublicIPIterative)
@@ -558,7 +556,7 @@ then
 		echo ''
 		sudo lxc-start -n $j > /dev/null 2>&1
 		i=1
-		while [ "$PublicIPIterative" != 10207 ] && [ "$i" -le 10 ]
+		while [ "$PublicIPIterative" != 1020729 ] && [ "$i" -le 10 ]
 		do
 			echo "Waiting for $j Public IP to come up..."
 			echo ''
@@ -626,6 +624,13 @@ echo "=============================================="
 echo "Container oel$OracleRelease$SeedPostfix ping test..."
 echo "=============================================="
 echo ''
+
+function GetDhcpRange {
+        cat /etc/sysconfig/lxc-net | grep LXC_DHCP_RANGE | cut -f2 -d'=' | sed 's/"//g' 
+}       
+DhcpRange=$(GetDhcpRange)
+DHR="$DhcpRange"
+sudo sed -i "s/DHCP-RANGE-OLXC/dhcp-range=$DHR/" /etc/dnsmasq.conf
 
 sudo service lxc-net restart
 
