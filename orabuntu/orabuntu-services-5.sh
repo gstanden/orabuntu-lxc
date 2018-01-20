@@ -633,6 +633,9 @@ then
 
         sudo tar --extract --file=/opt/olxc/"$DistDir"/orabuntu/archives/dns-dhcp-host.tar -C / etc/network/openvswitch/ns_restore.sh
         sudo sed -i "s/NAMESERVER/$NameServer/g" /etc/network/openvswitch/ns_restore.sh
+        sudo sed -i "s/DOMAIN1/$Domain1/g"       /etc/network/openvswitch/ns_restore.sh
+        sudo sed -i "s/DOMAIN2/$Domain2/g"       /etc/network/openvswitch/ns_restore.sh
+
 
         if [ $NameServerExists -eq 1 ] && [ $GRE = 'N' ] && [ $MultiHostVar2 = 'N' ]
         then
