@@ -109,7 +109,6 @@ then
 	sudo service lxc-net restart > /dev/null 2>&1
 fi
 
-echo ''
 echo "=============================================="
 echo "Done: Copy nameserver $NameServer.            "
 echo "=============================================="

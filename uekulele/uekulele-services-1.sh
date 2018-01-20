@@ -1925,53 +1925,56 @@ sudo chmod 755 /etc/network/openvswitch/*.sh
 
 if   [ $MultiHostVar3 = 'X' ]
 then
-	echo ''
-	echo "=============================================="
-	echo "Get sx1 IP address...                         "
-	echo "=============================================="
-	echo ''
+	if [ $GRE = 'Y' ]
+	then 
+		echo ''
+		echo "=============================================="
+		echo "Get sx1 IP address...                         "
+		echo "=============================================="
+		echo ''
 
-	Sx1Index=201
-	function CheckHighestSx1IndexHit {
-		sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service systemd-resolved restart > /dev/null 2>&1"
-		sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service lxc-net restart > /dev/null 2>&1"
-		sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 nslookup -timeout=3 10.207.29.$Sx1Index | grep 'name =' | wc -l
-	}
-	HighestSx1IndexHit=$(CheckHighestSx1IndexHit)
+		Sx1Index=201
+		function CheckHighestSx1IndexHit {
+			sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service systemd-resolved restart > /dev/null 2>&1"
+			sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service lxc-net restart > /dev/null 2>&1"
+			sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 nslookup -timeout=3 10.207.29.$Sx1Index | grep 'name =' | wc -l
+		}
+		HighestSx1IndexHit=$(CheckHighestSx1IndexHit)
 
-	while [ $HighestSx1IndexHit = 1 ]
-	do
-        	Sx1Index=$((Sx1Index+1))
-        	HighestSx1IndexHit=$(CheckHighestSx1IndexHit)
-	done
+		while [ $HighestSx1IndexHit = 1 ]
+		do
+       		 	Sx1Index=$((Sx1Index+1))
+       		 	HighestSx1IndexHit=$(CheckHighestSx1IndexHit)
+		done
 
-	sleep 5
+		sleep 5
 
-	clear
+		clear
 
-	echo ''
-	echo "=============================================="
-	echo "Get sw1 IP address.                           "
-	echo "=============================================="
-	echo ''
+		echo ''
+		echo "=============================================="
+		echo "Get sw1 IP address.                           "
+		echo "=============================================="
+		echo ''
 
-	Sw1Index=201
-	function CheckHighestSw1IndexHit {
-		sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service systemd-resolved restart > /dev/null 2>&1"
-		sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service lxc-net restart > /dev/null 2>&1"
-		sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 nslookup -timeout=3 10.207.39.$Sw1Index | grep 'name =' | wc -l
-	}
-	HighestSw1IndexHit=$(CheckHighestSw1IndexHit)
+		Sw1Index=201
+		function CheckHighestSw1IndexHit {
+			sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service systemd-resolved restart > /dev/null 2>&1"
+			sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service lxc-net restart > /dev/null 2>&1"
+			sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 nslookup -timeout=3 10.207.39.$Sw1Index | grep 'name =' | wc -l
+		}
+		HighestSw1IndexHit=$(CheckHighestSw1IndexHit)
 
-	while [ $HighestSw1IndexHit = 1 ]
-	do
-        	Sw1Index=$((Sw1Index+1))
-        	HighestSw1IndexHit=$(CheckHighestSw1IndexHit)
-	done
+		while [ $HighestSw1IndexHit = 1 ]
+		do
+       		 	Sw1Index=$((Sw1Index+1))
+       		 	HighestSw1IndexHit=$(CheckHighestSw1IndexHit)
+		done
 
-	sleep 5
+		sleep 5
 
-	clear
+		clear
+	fi
 elif [ $MultiHostVar3 = 'X' ] && [ $MultiHostVar2 = 'Y' ] && [ $GRE = 'N' ]
 then
 	function GetSx1Index {
@@ -2597,8 +2600,8 @@ then
 		}
 		ShortHost=$(GetShortHost)
 
-		sudo ifconfig sw1 mtu 1420
-		sudo ifconfig sx1 mtu 1420
+		sudo ifconfig sw1 mtu $MultiHostVar7
+		sudo ifconfig sx1 mtu $MultiHostVar7
 
 		nslookup -timeout=1 $HOSTNAME.$Domain1 > /dev/null 2>&1
 		if [ $? -eq 1 ]

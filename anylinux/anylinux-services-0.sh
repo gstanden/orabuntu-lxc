@@ -94,6 +94,10 @@ do
 		sudo chown root:root /etc/COPYING
 		tar -vP --append --file=$i /etc/GNU3
 		tar -vP --append --file=$i /etc/COPYING
+	elif [ $i = 'scst-files.tar' ] || [ $i = 'tgt-files.tar' ]
+	then
+		tar -vP --append --file=$i "$DistDir"/"$SubDirName"/archives/GNU3 	--numeric-owner
+		tar -vP --append --file=$i "$DistDir"/"$SubDirName"/archives/COPYING 	--numeric-owner
 	elif [ $i = 'dns-dhcp-cont.tar' ]
 	then
 		sudo chown root:root /var/GNU3
@@ -106,6 +110,10 @@ do
 		sudo chown root:root rootfs/COPYING
 		sudo tar -vP --append --file=$i rootfs/GNU3
 		sudo tar -vP --append --file=$i rootfs/COPYING
+	elif [ $i = "$SubDirName-services.tar" ]
+	then
+		tar -vP --append --file=$i "$DistDir"/"$SubDirName"/archives/GNU3	--numeric-owner
+		tar -vP --append --file=$i "$DistDir"/"$SubDirName"/archives/COPYING	--numeric-owner
 	else
 		tar -vP --append --file=$i "$DistDir"/"$SubDirName"/archives/GNU3
 		tar -vP --append --file=$i "$DistDir"/"$SubDirName"/archives/COPYING

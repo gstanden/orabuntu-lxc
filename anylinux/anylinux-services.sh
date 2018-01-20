@@ -120,6 +120,16 @@ function GetDistDir {
 }
 DistDir=$(GetDistDir)
 
+function GetGroup {
+	id | cut -f2 -d' ' | cut -f2 -d'(' | cut -f1 -d')'
+}
+Group=$(GetGroup)
+
+function GetOwner {
+	id | cut -f1 -d' ' | cut -f2 -d'(' | cut -f1 -d')'
+}
+Owner=$(GetOwner)
+
 # GLS 20180112
 # User-settable subnets added
 # Set numeric values to valid ip address triplets.  
@@ -492,19 +502,19 @@ echo 'GRE                       = '$GREValue
 # GLS 20180112 For now, recommend to either use ALL NEW SUBNET values or use ALL DEFAULT SUBNET values.  
 # GLS 20180112 If you don't uncomment any of the Net values above, then ALL DEFAULT SUBNET values will be used.
 
-if [ -z $SeedNet1 ]
-then
-	echo 'SeedNet1                  = 10.207.29.0'
-else
-	echo 'SeedNet1                  = '$SeedNet1 | cut -f2 -d':' | sed 's/^/SeedNet1                  = /'
-fi
+# if [ -z $SeedNet1 ]
+# then
+# 	echo 'SeedNet1                  = 10.207.29.0'
+# else
+# 	echo 'SeedNet1                  = '$SeedNet1 | cut -f2 -d':' | sed 's/^/SeedNet1                  = /'
+# fi
 	
-if [ -z $BaseNet1 ]
-then
-	echo 'BaseNet1                  = 10.207.39.0'
-else
-	echo 'BaseNet1                  = '$BaseNet1 | cut -f2 -d':' | sed 's/^/BaseNet1                  = /'
-fi
+# if [ -z $BaseNet1 ]
+# then
+# 	echo 'BaseNet1                  = 10.207.39.0'
+# else
+# 	echo 'BaseNet1                  = '$BaseNet1 | cut -f2 -d':' | sed 's/^/BaseNet1                  = /'
+# fi
 
 if [ -z $StorNet1 ]
 then
@@ -562,6 +572,90 @@ else
 	echo 'ExtrNet6                  = '$ExtrNet6
 fi
 
+function GetMultiHostVar3 {
+	echo $MultiHost | cut -f3 -d':'
+}
+MultiHostVar3=$(GetMultiHostVar3)
+
+if   [ $MultiHostVar3 = 'X' ] && [ $GREValue = 'Y' ]
+then
+	function GetMultiHostVar5 {
+		echo $MultiHost | cut -f5 -d':'
+	}
+	MultiHostVar5=$(GetMultiHostVar5)
+
+	function GetMultiHostVar8 {
+		echo $MultiHost | cut -f8 -d':'
+	}
+	MultiHostVar8=$(GetMultiHostVar8)
+
+	function GetMultiHostVar9 {
+		echo $MultiHost | cut -f9 -d':'
+	}
+	MultiHostVar9=$(GetMultiHostVar9)
+
+	function GetSw1Net {
+		echo $BaseNet1 | cut -f2 -d':'
+	}
+	Sw1Net=$(GetSw1Net)
+	
+	function GetSx1Net {
+		echo $SeedNet1 | cut -f2 -d':'
+	}
+	Sx1Net=$(GetSx1Net)
+
+        sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service systemd-resolved restart > /dev/null 2>&1"
+        sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service lxc-net restart > /dev/null 2>&1"
+        
+	Sx1Index=201
+        function CheckHighestSx1IndexHit {
+                sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 nslookup -timeout=1 $Sx1Net.$Sx1Index | grep 'name =' | wc -l
+        }
+        HighestSx1IndexHit=$(CheckHighestSx1IndexHit)
+
+        while [ $HighestSx1IndexHit = 1 ]
+        do
+                Sx1Index=$((Sx1Index+1))
+                HighestSx1IndexHit=$(CheckHighestSx1IndexHit)
+        done
+
+        Sw1Index=201
+        function CheckHighestSw1IndexHit {
+                sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 nslookup -timeout=1 $Sw1Net.$Sw1Index | grep 'name =' | wc -l
+        }
+        HighestSw1IndexHit=$(CheckHighestSw1IndexHit)
+
+        while [ $HighestSw1IndexHit = 1 ]
+        do
+                Sw1Index=$((Sw1Index+1))
+                HighestSw1IndexHit=$(CheckHighestSw1IndexHit)
+        done
+fi
+
+if [ -z $SeedNet1 ]
+then
+	echo 'SeedNet1                  = 10.207.29.0'
+else
+	echo 'SeedNet1                  = '$SeedNet1 | cut -f2 -d':' | sed 's/^/SeedNet1                  = /'
+fi
+	
+if   [ $MultiHostVar3 = 'X' ] && [ $GREValue = 'Y' ]
+then
+	echo 'Switch IP (sx1)           = '$Sx1Net.$Sx1Index
+fi
+
+if [ -z $BaseNet1 ]
+then
+	echo 'BaseNet1                  = 10.207.39.0'
+else
+	echo 'BaseNet1                  = '$BaseNet1 | cut -f2 -d':' | sed 's/^/BaseNet1                  = /'
+fi
+
+if   [ $MultiHostVar3 = 'X' ] && [ $GREValue = 'Y' ]
+then
+	echo 'Switch IP (sw1)           = '$Sw1Net.$Sw1Index
+fi
+
 	echo 'DistDir                   = '$DistDir
 	echo 'SubDirName                = '$SubDirName
 
@@ -574,12 +668,22 @@ sleep 10
 
 clear
 
+function GetMultiHostVar2 {
+	echo $MultiHost | cut -f2 -d':'
+}
+MultiHostVar2=$(GetMultiHostVar2)
+
+function GetMultiHostVar3 {
+	echo $MultiHost | cut -f3 -d':'
+}
+MultiHostVar3=$(GetMultiHostVar3)
+
 function GetMultiHostVar7 {
 	echo $MultiHost | cut -f7 -d':'
 }
 MultiHostVar7=$(GetMultiHostVar7)
 
-if [ $MultiHostVar7 -ne 1500 ]
+if [ $MultiHostVar2 = 'Y' ] && [ $MultiHostVar3 = 'X' ] && [ $GREValue = 'N' ]
 then
 	echo ''
 	echo "=============================================="
@@ -588,33 +692,35 @@ then
 	echo ''
 
 	function GetVirtualInterfaces {
-       		ifconfig | grep enp | cut -f1 -d':' | cut -f1 -d' ' | sed 's/$/ /' | tr -d '\n' | sed 's/^[ \t]*//;s/[ \t]*$//'
+		ifconfig | grep enp | cut -f1 -d':' | cut -f1 -d' ' | sed 's/$/ /' | tr -d '\n' | sed 's/^[ \t]*//;s/[ \t]*$//'
 	}
 	VirtualInterfaces=$(GetVirtualInterfaces)
-	subnet="10.207.29 10.207.39"
+
+	subnet="$sw1Net $Sx1Net"
+
 	for j in $subnet
 	do
-       		for i in $VirtualInterfaces
+		for i in $VirtualInterfaces
        		do
-                	function CheckVirtualInterfaceMtu {
-                        	ifconfig $i | grep -B1 "$j" | grep mtu | cut -f5 -d' '
-                	}
-                	VirtualInterfaceMtu=$(CheckVirtualInterfaceMtu)
-                	function GetCharCount {
-                        	echo $VirtualInterfaceMtu | wc -c
-                	}
-                	CharCount=$(GetCharCount)
-                	if [ $CharCount -eq 5 ]
-                	then
-#                        	if [ $VirtualInterfaceMtu -ne 1420 ]
-#                        	then
+       	        	function CheckVirtualInterfaceMtu {
+       	                	ifconfig $i | grep -B1 "$j" | grep mtu | cut -f5 -d' '
+       	        	}
+       	        	VirtualInterfaceMtu=$(CheckVirtualInterfaceMtu)
+       	        	function GetCharCount {
+       	                	echo $VirtualInterfaceMtu | wc -c
+       	        	}
+       	        	CharCount=$(GetCharCount)
+       	        	if [ $CharCount -eq 5 ]
+       	        	then
+       	                	if [ $VirtualInterfaceMtu -ne $MultiHostVar7 ]
+       	                	then
 					echo ''
 					echo "=============================================="
 					echo "Set NIC $i to MTU $MultiHostVar7...           "
 					echo "=============================================="
 					echo ''
-
-                                	sudo ifconfig $i mtu 1420
+	
+       	                        	sudo ifconfig $i mtu $MultiHostVar7
 					ifconfig $i
 
 					echo "=============================================="
@@ -631,34 +737,34 @@ then
 					echo "=============================================="
 					echo ''
 
-					sudo sh -c "echo '[Unit]'					 > /etc/systemd/system/$i-mtu.service"
-					sudo sh -c "echo 'Description=$i-mtu'				>> /etc/systemd/system/$i-mtu.service"
-					sudo sh -c "echo 'After=network-online.target'			>> /etc/systemd/system/$i-mtu.service"
-					sudo sh -c "echo ''						>> /etc/systemd/system/$i-mtu.service"
-					sudo sh -c "echo '[Service]'					>> /etc/systemd/system/$i-mtu.service"
-					sudo sh -c "echo 'Type=idle'					>> /etc/systemd/system/$i-mtu.service"
-					sudo sh -c "echo 'User=root'					>> /etc/systemd/system/$i-mtu.service"
-					sudo sh -c "echo 'RemainAfterExit=yes'				>> /etc/systemd/system/$i-mtu.service"
-					sudo sh -c "echo 'ExecStart=/usr/sbin/ifconfig $i mtu 1420'	>> /etc/systemd/system/$i-mtu.service"
-					sudo sh -c "echo 'ExecStop=/usr/sbin/ifconfig $i mtu 1500'	>> /etc/systemd/system/$i-mtu.service"
-					sudo sh -c "echo ''						>> /etc/systemd/system/$i-mtu.service"
-					sudo sh -c "echo '[Install]'					>> /etc/systemd/system/$i-mtu.service"
-					sudo sh -c "echo 'WantedBy=network-online.target'		>> /etc/systemd/system/$i-mtu.service"
+					sudo sh -c "echo '[Unit]'						 > /etc/systemd/system/$i-mtu.service"
+					sudo sh -c "echo 'Description=$i-mtu'					>> /etc/systemd/system/$i-mtu.service"
+					sudo sh -c "echo 'After=network-online.target'				>> /etc/systemd/system/$i-mtu.service"
+					sudo sh -c "echo ''							>> /etc/systemd/system/$i-mtu.service"
+					sudo sh -c "echo '[Service]'						>> /etc/systemd/system/$i-mtu.service"
+					sudo sh -c "echo 'Type=idle'						>> /etc/systemd/system/$i-mtu.service"
+					sudo sh -c "echo 'User=root'						>> /etc/systemd/system/$i-mtu.service"
+					sudo sh -c "echo 'RemainAfterExit=yes'					>> /etc/systemd/system/$i-mtu.service"
+					sudo sh -c "echo 'ExecStart=/usr/sbin/ifconfig $i mtu $MultiHostVar7'	>> /etc/systemd/system/$i-mtu.service"
+					sudo sh -c "echo 'ExecStop=/usr/sbin/ifconfig $i mtu 1500'		>> /etc/systemd/system/$i-mtu.service"
+					sudo sh -c "echo ''							>> /etc/systemd/system/$i-mtu.service"
+					sudo sh -c "echo '[Install]'						>> /etc/systemd/system/$i-mtu.service"
+					sudo sh -c "echo 'WantedBy=network-online.target'			>> /etc/systemd/system/$i-mtu.service"
 					sudo systemctl enable $i-mtu.service
 					sudo systemctl daemon-reload
 					sudo cat /etc/systemd/system/$i-mtu.service
-
+	
 					echo ''
 					echo "=============================================="
 					echo "Done: Create $i-mtu manager systemd service.  "
 					echo "=============================================="
-
+	
 					sleep 5
 
 					clear
-#                        	fi
-                	fi
-        	done
+       	                	fi
+       	        	fi
+       		done
 	done
 
 	sleep 5
@@ -877,8 +983,10 @@ echo "$DistDir/$SubDirName/COPYING"                                             
 
 cd "$DistDir"/"$SubDirName"/archives
 
-tar -cvPf "$DistDir"/"$SubDirName"/archives/"$SubDirName"-services.tar -T "$DistDir"/"$SubDirName"/archives/"$SubDirName"-services.lst
+tar -cPf "$DistDir"/"$SubDirName"/archives/"$SubDirName"-services.tar -T "$DistDir"/"$SubDirName"/archives/"$SubDirName"-services.lst --numeric-owner
 tar -tvPf "$DistDir"/"$SubDirName"/archives/"$SubDirName"-services.tar
+
+sleep 5
 
 # ArchiveNames="dns-dhcp-cont.tar dns-dhcp-host.tar lxc-oracle-files.tar ubuntu-host.tar scst-files.tar tgt-files.tar $SubDirName-services.tar"
 
@@ -886,7 +994,7 @@ function GetArchiveNames {
 	ls *.tar | more | sed 's/$/ /' | tr -d '\n' | sed 's/^[ \t]*//;s/[ \t]*$//'
 }
 ArchiveNames=$(GetArchiveNames)
-echo $ArchiveNames
+# echo $ArchiveNames
 
 cp -p GNU3 /opt/olxc/GNU3
 	
@@ -904,11 +1012,6 @@ do
 	}
 	ArchiveFileList=$(GetArchiveFileList)
 
-# 	ls -l "$DistDir"/"$SubDirName"/archives/$ArchiveShortName.lst
-# 	echo ''
-# 	cat "$DistDir"/"$SubDirName"/archives/$ArchiveShortName.lst
-#	echo '###1###'
-
 	sudo cp -p "$DistDir"/"$SubDirName"/archives/$ArchiveShortName.lst /opt/olxc/$ArchiveShortName.lst	
 
 	if [ $i != 'lxc-oracle-files.tar' ]
@@ -925,24 +1028,23 @@ do
 
 	sudo rm -rf /opt/olxc/"$TAR"
 
-# 	ls -l /opt/olxc/$ArchiveShortName.lst
-# 	echo ''
-# 	echo '###2###'
-#	cat /opt/olxc/$ArchiveShortName.lst
-	
         sudo tar -P -tvf $i | sed 's/  */ /g' | cut -f6 -d' ' > $ArchiveShortName.lst
 
-# 	ls -l "$DistDir"/"$SubDirName"/archives/$ArchiveShortName.lst
-# 	echo ''
-# 	cat "$DistDir"/"$SubDirName"/archives/$ArchiveShortName.lst
-#	echo '###3###'
-
-#	echo '### tar 0 ###'
 	function GetArchiveFileVar {
 		sudo tar -P -tvf $i | sed 's/  */ /g' | cut -f6 -d' ' | sed 's/$/ /' | tr -d '\n' | sed 's/^[ \t]*//;s/[ \t]*$//'
 	}
 	ArchiveFileVar=$(GetArchiveFileVar)
-	
+
+	if [ ! -f /opt/olxc/"$DistDir"/"$SubDirName"/archives/file-exceptions.txt ]
+	then	
+		sudo mkdir -p /opt/olxc
+		sudo chown $Owner:$Group /opt/olxc
+		sudo mkdir -p /opt/olxc/"$DistDir"/"$SubDirName"/archives/
+		sudo chown $Owner:$Group /opt/olxc/"$DistDir"/"$SubDirName"/archives/
+		sudo cp -p "$DistDir"/"$SubDirName"/archives/file-exceptions.txt /opt/olxc/"$DistDir"/"$SubDirName"/archives/file-exceptions.txt
+		sudo sed -i "s/OWNER/$Owner/g" /opt/olxc/"$DistDir"/"$SubDirName"/archives/file-exceptions.txt
+	fi
+
 	echo ''	
 	echo "=============================================="
 	echo "List GNU3 Header Exemptions...                "
@@ -955,7 +1057,7 @@ do
 		then
 			sudo tar -v --extract --file=$i -C /opt/olxc $j > /dev/null 2>&1
 
-			grep $j file-exceptions.txt
+			grep $j /opt/olxc/"$DistDir"/"$SubDirName"/archives/file-exceptions.txt
 			if [ $? -ne 0 ]
 			then
 				sudo sh -c "cat /opt/olxc/GNU3 /opt/olxc/$j > /opt/olxc/$j.gnu3"
@@ -986,6 +1088,14 @@ do
 				sudo sed -i "s/192.211.39/$ExtrNet4/g"			$filename
 				sudo sed -i "s/192.212.39/$ExtrNet5/g"			$filename
 				sudo sed -i "s/192.213.39/$ExtrNet6/g"			$filename
+				if [ $filename = '/opt/olxc/etc/systemd/resolved.conf' ]
+				then
+					sudo sed -i "s/orabuntu-lxc.com/$Domain1/g"		$filename
+					sudo sed -i "s/consultingcommandos.us/$Domain2/g"	$filename
+					echo ''
+					sudo cat /opt/olxc/etc/systemd/resolved.conf
+					echo ''
+				fi
 				sudo grep '207' $filename | grep -v '#|dnsmasq' >> pattern-matches.10207.msd
 				sudo grep '\.41' $filename   			>> pattern-matches.10207.msd
 				sudo grep '\.40' $filename | grep -v '#'	>> pattern-matches.10207.msd
@@ -1033,8 +1143,8 @@ do
 #			TAR=$(TweakTAR)
 #		fi
 
-		sudo tar -cf $i $TAR --numeric-owner
-		sudo tar -tvf $i
+		sudo tar -cf $i $TAR 	--numeric-owner
+		sudo tar -tvf $i 	--numeric-owner
 	
 		echo ''
 		echo "=============================================="
@@ -1047,8 +1157,8 @@ do
 			sudo rm -rf $TAR
 		fi
 	else
-		sudo tar -cf $i $TAR
-		sudo tar -tvf $i
+		sudo tar -cf $i $TAR	--numeric-owner
+		sudo tar -tvf $i	--numeric-owner
 	
 		echo ''
 		echo "=============================================="
@@ -1058,7 +1168,7 @@ do
 
 	cd "$DistDir"/"$SubDirName"/archives
 
-	sleep 1
+	sleep 5
 done
 
 cd /opt/olxc
@@ -1067,16 +1177,6 @@ cd /opt/olxc
 
 sudo cp -p *.lst /opt/olxc/"$DistDir"/"$SubDirName"/archives/.
 sudo cp -p *.tar /opt/olxc/"$DistDir"/"$SubDirName"/archives/.
-
-function GetGroup {
-	id | cut -f2 -d' ' | cut -f2 -d'(' | cut -f1 -d')'
-}
-Group=$(GetGroup)
-
-function GetOwner {
-	id | cut -f1 -d' ' | cut -f2 -d'(' | cut -f1 -d')'
-}
-Owner=$(GetOwner)
 
 clear
 
