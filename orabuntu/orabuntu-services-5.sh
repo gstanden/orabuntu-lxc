@@ -852,4 +852,4 @@ Owner=$(GetOwner)
 
 sudo chown -R $Group:$Owner /opt/olxc/"$DistDir"/orabuntu/archives/scst-files
 sudo rm -f /opt/olxc/*.lst /opt/olxc/*.tar
-
+sudo rm -rf /opt/olxc/home/ubuntu
