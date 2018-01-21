@@ -794,11 +794,6 @@ then
 
 	cd "$DistDir"/"$SubDirName"/archives
 
-	if [ -f pattern-matches.10207.msd ]
-	then
-		rm -f pattern-matches.10207.msd
-	fi
-
 	function GetNets {
 		echo "$SeedNet1 $BaseNet1 $StorNet1 $StorNet2"
 	}
@@ -1070,7 +1065,6 @@ do
 
 			if [ $SetNets = 'Y' ] 
 			then
-#				sudo grep 207 $filename      >> pattern-matches.10207.txt
  				sudo sed -i "s/10.207.41/$StorNet2F/g"			$filename
 				sudo sed -i "s/10.207.40/$StorNet1F/g"			$filename
 				sudo sed -i "s/10.207.39/$BaseNet1F/g"			$filename
@@ -1088,11 +1082,6 @@ do
 				sudo sed -i "s/192.211.39/$ExtrNet4/g"			$filename
 				sudo sed -i "s/192.212.39/$ExtrNet5/g"			$filename
 				sudo sed -i "s/192.213.39/$ExtrNet6/g"			$filename
-				sudo grep '207' $filename | grep -v '#|dnsmasq' >> pattern-matches.10207.msd
-				sudo grep '\.41' $filename   			>> pattern-matches.10207.msd
-				sudo grep '\.40' $filename | grep -v '#'	>> pattern-matches.10207.msd
-				sudo grep '\.39' $filename			>> pattern-matches.10207.msd
-				sudo grep '\.29' $filename   			>> pattern-matches.10207.msd
 			fi
 			if [ $LinuxFlavor = 'Fedora' ] && [ $RedHatVersion -ge 22 ] && [ $i = "$SubDirName-services.tar" ]
 			then

@@ -44,6 +44,16 @@ DistDir=$7
 
 OR=$OracleRelease
 
+function GetGroup {
+	id | cut -f2 -d' ' | cut -f2 -d'(' | cut -f1 -d')'
+}
+Group=$(GetGroup)
+
+function GetOwner {
+	id | cut -f1 -d' ' | cut -f2 -d'(' | cut -f1 -d')'
+}
+Owner=$(GetOwner)
+
 Config=/var/lib/lxc/$SeedContainerName/config
 
 function GetMultiHostVar1 {
@@ -767,7 +777,9 @@ then
   		echo "Replicate nameserver $NameServer...           "
   		echo "=============================================="
   		echo ''
-  		
+  	
+                sudo chown $Owner:$Group /home/$Owner/Manage-Orabuntu
+                sudo chmod 775 /opt/olxc/"$DistDir"/orabuntu/archives/nameserver_copy.sh
 		/opt/olxc/"$DistDir"/uekulele/archives/nameserver_copy.sh $MultiHostVar5 $MultiHostVar6 $NameServer
 	
   		echo ''
@@ -1079,16 +1091,6 @@ then
 fi
 
 # Set permissions on scst-files and cleanup staging area
-
-function GetGroup {
-	id | cut -f2 -d' ' | cut -f2 -d'(' | cut -f1 -d')'
-}
-Group=$(GetGroup)
-
-function GetOwner {
-	id | cut -f1 -d' ' | cut -f2 -d'(' | cut -f1 -d')'
-}
-Owner=$(GetOwner)
 
 sudo chown -R $Group:$Owner /opt/olxc/"$DistDir"/uekulele/archives/scst-files
 sudo rm -f /opt/olxc/*.lst /opt/olxc/*.tar

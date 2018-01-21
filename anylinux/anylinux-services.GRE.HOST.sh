@@ -72,7 +72,7 @@ then
 	Operation=new
 fi
 
-SPOKEIP=192.168.7.27
+SPOKEIP=192.168.7.37
 
 HUBIP=192.168.7.32
 HubUserAct=orabuntu
