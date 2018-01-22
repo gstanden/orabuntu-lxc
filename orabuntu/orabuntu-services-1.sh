@@ -892,24 +892,6 @@ then
 	sleep 5 
 
 	clear
-elif [ $NameServerExists -eq 0 ] && [ $MultiHostVar2 = 'Y' ]
-then
-        echo ''
-        echo "=============================================="
-        echo "Replicate nameserver $NameServer...           "
-        echo "=============================================="
-        echo ''
-
-        sudo chown $Owner:$Group /home/$Owner/Manage-Orabuntu
-        sudo chmod 775 /opt/olxc/"$DistDir"/orabuntu/archives/nameserver_copy.sh
-        /opt/olxc/"$DistDir"/uekulele/archives/nameserver_copy.sh $MultiHostVar5 $MultiHostVar6 $NameServer
-        sudo lxc-copy -n olive -N olive-bk0
-
-        echo ''
-        echo "=============================================="
-        echo "Done: Replicate nameserver $NameServer.       "
-        echo "=============================================="
-        echo ''
 fi
 
 # Unpack customized OS host files for Oracle on LXC host server
@@ -1881,6 +1863,7 @@ then
 		sudo service sw1 restart
 		sudo service sx1 restart
 		sudo lxc-stop  -n $NameServer >/dev/null 2>&1
+		sudo lxc-copy  -n $NameServer -N $NameServer-bk0 > /dev/null 2>&1
 		sudo lxc-start -n $NameServer >/dev/null 2>&1
 		if [ $SystemdResolvedInstalled -eq 1 ]
 		then
@@ -1901,6 +1884,26 @@ fi
 sleep 5
 
 clear
+
+if [ $NameServerExists -eq 0 ] && [ $MultiHostVar2 = 'Y' ] && [ $GRE = 'Y' ]
+then
+        echo ''
+        echo "=============================================="
+        echo "Replicate nameserver $NameServer...           "
+        echo "=============================================="
+        echo ''
+
+        sudo chown $Owner:$Group /home/$Owner/Manage-Orabuntu
+        sudo chmod 775 /opt/olxc/"$DistDir"/orabuntu/archives/nameserver_copy.sh
+        /opt/olxc/"$DistDir"/orabuntu/archives/nameserver_copy.sh $MultiHostVar5 $MultiHostVar6 $NameServer
+        sudo lxc-copy -n $NameServer -N $NameServer-bk0
+
+        echo ''
+        echo "=============================================="
+        echo "Done: Replicate nameserver $NameServer.       "
+        echo "=============================================="
+        echo ''
+fi
 
 echo ''
 echo "=============================================="
@@ -1969,8 +1972,8 @@ then
 
 	sudo lxc-attach -n $NameServer -- crontab /root/crontab.txt
 	sudo lxc-attach -n $NameServer -- crontab -l
-	sudo lxc-attach -n $NameServer -- mkdir -p /root/backup-lxc-container/olive/updates
-	sudo lxc-attach -n $NameServer -- tar -cvzPf /root/backup-lxc-container/olive/updates/backup_olive_ns_update.tar.gz /root/ns_backup_update.lst
+	sudo lxc-attach -n $NameServer -- mkdir -p /root/backup-lxc-container/$NameServer/updates
+	sudo lxc-attach -n $NameServer -- tar -cvzPf /root/backup-lxc-container/$NameServer/updates/backup_"$NameServer"_ns_update.tar.gz /root/ns_backup_update.lst
  
         sudo tar -v --extract --file=/opt/olxc/"$DistDir"/orabuntu/archives/dns-dhcp-cont.tar -C / var/lib/lxc/nsa/rootfs/etc/systemd/system/dns-sync.service
         sudo mv /var/lib/lxc/nsa/rootfs/etc/systemd/system/dns-sync.service /var/lib/lxc/$NameServer/rootfs/etc/systemd/system/dns-sync.service

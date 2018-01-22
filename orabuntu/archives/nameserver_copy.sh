@@ -26,7 +26,7 @@ function CheckScpProgress {
 	ps -ef | grep sshpass | grep scp | grep -v grep | wc -l
 }
 
-sshpass -p ubuntu ssh -tt -o CheckHostIP=no -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ubuntu@$MultiHostVar5 "sudo -S <<< "ubuntu" echo '(Do NOT type a password...backup will start in a moment)'; sudo -S <<< "ubuntu" tar -P -czf ~/Manage-Orabuntu/$NameServer.tar.gz -T ~/Downloads/orabuntu-lxc-master/uekulele/archives/nameserver.lst --checkpoint=10000 --totals"
+sshpass -p ubuntu ssh -tt -o CheckHostIP=no -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ubuntu@$MultiHostVar5 "sudo -S <<< "ubuntu" echo '(Do NOT type a password...backup will start in a moment)'; sudo -S <<< "ubuntu" tar -P -czf ~/Manage-Orabuntu/$NameServer.tar.gz -T ~/Downloads/orabuntu-lxc-master/orabuntu/archives/nameserver.lst --checkpoint=10000 --totals"
 sleep 5
 rsync -hP --rsh="sshpass -p ubuntu ssh -l ubuntu" $MultiHostVar5:~/Manage-Orabuntu/$NameServer.tar.gz ~/Manage-Orabuntu/.
 

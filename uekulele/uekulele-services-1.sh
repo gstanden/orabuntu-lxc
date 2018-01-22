@@ -1537,24 +1537,6 @@ then
 	sleep 5 
 
 	clear
-elif [ $NameServerExists -eq 0 ] && [ $MultiHostVar2 = 'Y' ] && [ $GRE = 'Y' ]
-then
-	echo ''
-	echo "=============================================="
-	echo "Replicate nameserver $NameServer...           "
-	echo "=============================================="
-	echo ''
-
-	sudo chown $Owner:$Group /home/$Owner/Manage-Orabuntu
-	sudo chmod 775 /opt/olxc/"$DistDir"/orabuntu/archives/nameserver_copy.sh
-	/opt/olxc/"$DistDir"/uekulele/archives/nameserver_copy.sh $MultiHostVar5 $MultiHostVar6 $NameServer
-	sudo lxc-copy -n $NameServer -N $NameServer-bk0
-
-	echo ''
-	echo "=============================================="
-	echo "Done: Replicate nameserver $NameServer.       "
-	echo "=============================================="
-	echo ''
 fi
 
 # Unpack customized OS host files for Oracle on LXC host server
@@ -2387,7 +2369,7 @@ then
  		sudo service sw1 restart
  		sudo service sx1 restart
 		sudo lxc-stop  -n $NameServer > /dev/null 2>&1
-		sudo lxc-copy  -n $NameServer -N $NameServer-bk0
+		sudo lxc-copy  -n $NameServer -N $NameServer-bk0 > /dev/null 2>&1
 		sudo lxc-start -n $NameServer > /dev/null 2>&1
 	fi
 
@@ -2400,6 +2382,26 @@ fi
 sleep 5
 
 clear
+
+if [ $NameServerExists -eq 0 ] && [ $MultiHostVar2 = 'Y' ] && [ $GRE = 'Y' ]
+then
+        echo ''
+        echo "=============================================="
+        echo "Replicate nameserver $NameServer...           "
+        echo "=============================================="
+        echo ''
+
+        sudo chown $Owner:$Group /home/$Owner/Manage-Orabuntu
+        sudo chmod 775 /opt/olxc/"$DistDir"/orabuntu/archives/nameserver_copy.sh
+        /opt/olxc/"$DistDir"/uekulele/archives/nameserver_copy.sh $MultiHostVar5 $MultiHostVar6 $NameServer
+        sudo lxc-copy -n $NameServer -N $NameServer-bk0
+
+        echo ''
+        echo "=============================================="
+        echo "Done: Replicate nameserver $NameServer.       "
+        echo "=============================================="
+        echo ''
+fi
 
 echo ''
 echo "=============================================="
