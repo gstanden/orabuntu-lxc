@@ -86,8 +86,12 @@ then
 	exit
 fi
 
-MultiHost="$Operation:Y:X:X:$HUBIP:$SPOKEIP:1420:$HubUserAct:$HubSudoPwd:$GRE"
-
-./anylinux-services.sh $MultiHost
-
-exit
+sshpass -p $HubSudoPwd ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no $HubUserAct@$HubIP "sudo -S <<< "$HubSudoPwd" lxc-ls -f"
+if [ $? -eq 0 ]
+then
+	MultiHost="$Operation:Y:X:X:$HUBIP:$SPOKEIP:1420:$HubUserAct:$HubSudoPwd:$GRE"
+	./anylinux-services.sh $MultiHost
+else
+	echo "The sshpass to the Orabuntu-LXC HUB host at $HUBIP failed. Recheck settings in this file and re-run."
+	exit
+fi
