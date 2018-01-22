@@ -35,8 +35,10 @@ clear
 
 MultiHostVar5=$1
 MultiHostVar6=$2
-NameServer=$3
-DistDir=$4
+MultiHostVar8=$3
+MultiHostVar9=$4
+NameServer=$5
+DistDir=$5
 
 function CheckSystemdResolvedInstalled {
 	sudo netstat -ulnp | grep 53 | sed 's/  */ /g' | rev | cut -f1 -d'/' | rev | sort -u | grep systemd- | wc -l
@@ -58,7 +60,7 @@ function CheckScpProgress {
 	ps -ef | grep sshpass | grep scp | grep -v grep | wc -l
 }
 
-sshpass -p ubuntu ssh -tt -o CheckHostIP=no -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ubuntu@$MultiHostVar5 "sudo -S <<< "ubuntu" echo '(Do NOT type a password...backup will start in a moment)'; sudo -S <<< "ubuntu" tar -P -czf ~/Manage-Orabuntu/$NameServer.tar.gz -T "$DistDir"/anylinux/nameserver.lst --checkpoint=10000 --totals"
+sshpass -p $MultiHostVar9 ssh -tt -o CheckHostIP=no -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" echo '(Do NOT type a password...backup will start in a moment)'; sudo -S <<< "$MultiHostVar9" tar -P -czf ~/Manage-Orabuntu/$NameServer.tar.gz -T $DistDir/anylinux/nameserver.lst --checkpoint=10000 --totals"
 sleep 5
 rsync -hP --rsh="sshpass -p ubuntu ssh -l ubuntu" $MultiHostVar5:~/Manage-Orabuntu/$NameServer.tar.gz ~/Manage-Orabuntu/.
 
