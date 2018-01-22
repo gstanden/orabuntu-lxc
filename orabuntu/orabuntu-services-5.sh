@@ -662,7 +662,7 @@ then
                 sudo lxc-info -n "$NameServer"-bk0 > /dev/null 2>&1
                 if [ $? -eq 1 ]
                 then
-                        sudo lxc-copy  -n $NameServer -N "$NameServer"-bk0
+                        sudo lxc-copy  -n $NameServer -N "$NameServer"-bk1
                 fi
 	
 		if [ ! -e ~/Manage-Orabuntu ]
@@ -695,6 +695,9 @@ then
 		sudo chown $Owner:$Group /home/$Owner/Manage-Orabuntu
 		sudo chmod 775 /opt/olxc/"$DistDir"/orabuntu/archives/nameserver_copy.sh
                 /opt/olxc/"$DistDir"/orabuntu/archives/nameserver_copy.sh $MultiHostVar5 $MultiHostVar6 $MultiHostVar8 $MultiHostVar9 $NameServer $DistDir
+                sudo lxc-stop  -n $NameServer
+                sudo lxc-copy  -n $NameServer -N $NameServer-bk1
+                sudo lxc-start -n $NameServer
 
                 echo ''
                 echo "=============================================="
