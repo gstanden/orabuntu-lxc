@@ -658,12 +658,7 @@ then
                 echo ''
 
                 sudo lxc-stop  -n $NameServer
-
-                sudo lxc-info -n "$NameServer"-bk0 > /dev/null 2>&1
-                if [ $? -eq 1 ]
-                then
-                        sudo lxc-copy  -n $NameServer -N "$NameServer"-bk1
-                fi
+                sudo lxc-copy  -n $NameServer -N "$NameServer"-bk1
 	
 		if [ ! -e ~/Manage-Orabuntu ]
 		then
