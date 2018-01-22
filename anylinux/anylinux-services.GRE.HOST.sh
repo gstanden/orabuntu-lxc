@@ -87,12 +87,29 @@ then
 fi
 
 echo ''
+echo "=============================================="
+echo "Test sshpass to HUB Host $HUBIP               "
+echo "=============================================="
+echo ''
+
 sshpass -p $HubSudoPwd ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $HubUserAct@$HUBIP "sudo -S <<< "$HubSudoPwd" uname -a;echo '';sudo -S <<< "$HubSudoPwd" lxc-ls -f"
 if [ $? -eq 0 ]
 then
+	echo ''
+	echo "=============================================="
+	echo "Done: Test sshpass to HUB Host $HUBIP         "
+	echo "=============================================="
+	echo ''
+	sleep 5
         MultiHost="$Operation:Y:X:X:$HUBIP:$SPOKEIP:1420:$HubUserAct:$HubSudoPwd:$GRE"
         ./anylinux-services.sh $MultiHost
 else
         echo "The sshpass to the Orabuntu-LXC HUB host at $HUBIP failed. Recheck settings in this file and re-run."
+	echo ''
+	echo "=============================================="
+	echo "Fail: Test sshpass to HUB Host $HUBIP         "
+	echo "=============================================="
+	echo ''
+	sleep 5
         exit
 fi
