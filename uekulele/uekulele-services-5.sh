@@ -262,8 +262,8 @@ then
 		echo "Create systemd OpenvSwitch $k service...      "
 		echo "=============================================="
 
-        	if [ ! -f /etc/systemd/system/$k.service ]
-        	then
+         	if [ ! -f /etc/systemd/system/$k.service ]
+         	then
                		sudo sh -c "echo '[Unit]'						 > /etc/systemd/system/$k.service"
                 	sudo sh -c "echo 'Description=$k Service'				>> /etc/systemd/system/$k.service"
                 	sudo sh -c "echo 'After=network-online.target'				>> /etc/systemd/system/$k.service"
@@ -276,28 +276,29 @@ then
                 	sudo sh -c "echo ''							>> /etc/systemd/system/$k.service"
                 	sudo sh -c "echo '[Install]'						>> /etc/systemd/system/$k.service"
                 	sudo sh -c "echo 'WantedBy=multi-user.target'				>> /etc/systemd/system/$k.service"
+ 		fi
 	
-			echo ''
-			echo "=============================================="
-			echo "Start OpenvSwitch $k ...                      "
-			echo "=============================================="
-			echo ''
+		echo ''
+		echo "=============================================="
+		echo "Start OpenvSwitch $k ...                      "
+		echo "=============================================="
+		echo ''
 
-			sudo chmod 644 /etc/systemd/system/$k.service
-			sudo systemctl enable $k.service
-			sudo service $k stop
-			sudo service $k start
-			sudo service $k status
+		sudo chmod 644 /etc/systemd/system/$k.service
+		sudo systemctl enable $k.service
+		sudo service $k stop
+		sudo service $k start
+		sudo service $k status
 
-			echo ''
-			echo "=============================================="
-			echo "OpenvSwitch $k is up.                         "
-			echo "=============================================="
-		fi
+		echo ''
+		echo "=============================================="
+		echo "OpenvSwitch $k is up.                         "
+		echo "=============================================="
 	
 		sleep 3
 
 		clear
+
 	done
 
 	echo ''
@@ -340,7 +341,7 @@ do
 	if [ $Release -ge 6 ]
 	then
 		function CheckPublicIPIterative {
-			sudo lxc-info -n ora$OracleRelease$SeedPostfix -iH | cut -f1-3 -d'.' | sed 's/\.//g'
+			sudo lxc-info -n $j -iH | cut -f1-3 -d'.' | sed 's/\.//g'
 		}
 	fi
 	PublicIPIterative=$(CheckPublicIPIterative)
@@ -357,11 +358,16 @@ do
 		echo "Waiting for $j Public IP to come up..."
 		sleep 20
 		PublicIPIterative=$(CheckPublicIPIterative)
+		SeedPostfix=$(GetSeedPostfix)
 		if [ $i -eq 5 ]
 		then
 			sudo lxc-stop -n $j
 			sleep 2
-			echo ''
+                        echo ''
+                        echo 'Attempting OpenvSwitch veth pair cleanup procedures...'
+                        echo 'Messages Cannot file device are normal in this procedure.'
+                        echo 'Orabuntu-LXC will re-attempt container startup after cleanup procedure.'
+                        echo ''
 			sudo /etc/network/openvswitch/veth_cleanups.sh $j
 			echo ''
 			sleep 2
@@ -452,6 +458,17 @@ do
         echo ''
 	
 	ssh-keygen -R $j
+       	sshpass -p oracle ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no oracle@$j "uname -a; cat /etc/oracle-release"
+	ConnectStatus=$?
+	while [ $ConnectStatus -eq 255 ]
+	do
+        	echo 'Waiting 5 seconds for sshd to become active in container and retrying test connection...'
+        	sleep 5
+        	sshpass -p oracle ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no oracle@$j "uname -a; cat /etc/oracle-release"
+        	ConnectStatus=$?
+	done
+
+
         sshpass -p oracle ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no oracle@$j "uname -a; cat /etc/oracle-release"
 
         echo ''
@@ -1044,6 +1061,11 @@ then
         echo "=============================================="
         echo "Done: List Containers.                        "
         echo "=============================================="
+
+	sleep 5
+
+	clear
+
 	echo ''
 	echo "=============================================="
 	echo "Management links directory creation...        "
@@ -1094,4 +1116,5 @@ fi
 
 sudo chown -R $Group:$Owner /opt/olxc/"$DistDir"/uekulele/archives/scst-files
 sudo rm -f /opt/olxc/*.lst /opt/olxc/*.tar
-sudo rm -rf /opt/olxc/home/ubuntu
+sudo rm -r /opt/olxc/home/ubuntu
+

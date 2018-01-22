@@ -1350,7 +1350,7 @@ function CheckNameServerExists {
 }
 NameServerExists=$(CheckNameServerExists)
 
-if [ $NameServerExists -eq 0 ] && [ $MultiHostVar2 = 'N' ]
+if   [ $NameServerExists -eq 0 ] && [ $MultiHostVar2 = 'N' ]
 then
 	echo ''
 	echo "=============================================="
@@ -1537,6 +1537,24 @@ then
 	sleep 5 
 
 	clear
+elif [ $NameServerExists -eq 0 ] && [ $MultiHostVar2 = 'Y' ] && [ $GRE = 'Y' ]
+then
+	echo ''
+	echo "=============================================="
+	echo "Replicate nameserver $NameServer...           "
+	echo "=============================================="
+	echo ''
+
+	sudo chown $Owner:$Group /home/$Owner/Manage-Orabuntu
+	sudo chmod 775 /opt/olxc/"$DistDir"/orabuntu/archives/nameserver_copy.sh
+	/opt/olxc/"$DistDir"/uekulele/archives/nameserver_copy.sh $MultiHostVar5 $MultiHostVar6 $NameServer
+	sudo lxc-copy -n $NameServer -N $NameServer-bk0
+
+	echo ''
+	echo "=============================================="
+	echo "Done: Replicate nameserver $NameServer.       "
+	echo "=============================================="
+	echo ''
 fi
 
 # Unpack customized OS host files for Oracle on LXC host server
@@ -1923,59 +1941,56 @@ clear
 
 sudo chmod 755 /etc/network/openvswitch/*.sh
 
-if   [ $MultiHostVar3 = 'X' ]
+if   [ $MultiHostVar3 = 'X' ] && [ $GRE = 'Y' ] && [ $MultiHostVar2 = 'Y' ]
 then
-	if [ $GRE = 'Y' ]
-	then 
-		echo ''
-		echo "=============================================="
-		echo "Get sx1 IP address...                         "
-		echo "=============================================="
-		echo ''
+	echo ''
+	echo "=============================================="
+	echo "Get sx1 IP address...                         "
+	echo "=============================================="
+	echo ''
 
-		Sx1Index=201
-		function CheckHighestSx1IndexHit {
-			sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service systemd-resolved restart > /dev/null 2>&1"
-			sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service lxc-net restart > /dev/null 2>&1"
-			sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 nslookup -timeout=3 10.207.29.$Sx1Index | grep 'name =' | wc -l
-		}
-		HighestSx1IndexHit=$(CheckHighestSx1IndexHit)
+	Sx1Index=201
+	function CheckHighestSx1IndexHit {
+		sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service systemd-resolved restart > /dev/null 2>&1"
+		sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service lxc-net restart > /dev/null 2>&1"
+		sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 nslookup -timeout=3 10.207.29.$Sx1Index | grep 'name =' | wc -l
+	}
+	HighestSx1IndexHit=$(CheckHighestSx1IndexHit)
 
-		while [ $HighestSx1IndexHit = 1 ]
-		do
-       		 	Sx1Index=$((Sx1Index+1))
-       		 	HighestSx1IndexHit=$(CheckHighestSx1IndexHit)
-		done
+	while [ $HighestSx1IndexHit = 1 ]
+	do
+       	 	Sx1Index=$((Sx1Index+1))
+       	 	HighestSx1IndexHit=$(CheckHighestSx1IndexHit)
+	done
 
-		sleep 5
+	sleep 5
 
-		clear
+	clear
 
-		echo ''
-		echo "=============================================="
-		echo "Get sw1 IP address.                           "
-		echo "=============================================="
-		echo ''
+	echo ''
+	echo "=============================================="
+	echo "Get sw1 IP address.                           "
+	echo "=============================================="
+	echo ''
 
-		Sw1Index=201
-		function CheckHighestSw1IndexHit {
-			sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service systemd-resolved restart > /dev/null 2>&1"
-			sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service lxc-net restart > /dev/null 2>&1"
-			sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 nslookup -timeout=3 10.207.39.$Sw1Index | grep 'name =' | wc -l
-		}
-		HighestSw1IndexHit=$(CheckHighestSw1IndexHit)
+	Sw1Index=201
+	function CheckHighestSw1IndexHit {
+		sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service systemd-resolved restart > /dev/null 2>&1"
+		sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service lxc-net restart > /dev/null 2>&1"
+		sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 nslookup -timeout=3 10.207.39.$Sw1Index | grep 'name =' | wc -l
+	}
+	HighestSw1IndexHit=$(CheckHighestSw1IndexHit)
 
-		while [ $HighestSw1IndexHit = 1 ]
-		do
-       		 	Sw1Index=$((Sw1Index+1))
-       		 	HighestSw1IndexHit=$(CheckHighestSw1IndexHit)
-		done
+	while [ $HighestSw1IndexHit = 1 ]
+	do
+       	 	Sw1Index=$((Sw1Index+1))
+       	 	HighestSw1IndexHit=$(CheckHighestSw1IndexHit)
+	done
 
-		sleep 5
+	sleep 5
 
-		clear
-	fi
-elif [ $MultiHostVar3 = 'X' ] && [ $MultiHostVar2 = 'Y' ] && [ $GRE = 'N' ]
+	clear
+elif [ $MultiHostVar3 = 'X' ]  && [ $GRE = 'N' ] && [ $MultiHostVar2 = 'Y' ]
 then
 	function GetSx1Index {
 		sudo cat /etc/network/openvswitch/sx1.info | cut -f2 -d':' | cut -f4 -d'.'
@@ -1995,11 +2010,19 @@ sleep 5
 
 clear
 
+sudo sed -i "s/SWITCH_IP/$Sx1Index/g" /etc/network/openvswitch/crt_ovs_sx1.sh
+sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw1.sh
+sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw2.sh
+sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw3.sh
+sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw4.sh
+sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw5.sh
+sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw6.sh
+sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw7.sh
+sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw8.sh
+sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw9.sh
+
 if   [ $Release -eq 7 ]
 then
-	sudo sed -i "s/SWITCH_IP/$Sx1Index/g" /etc/network/openvswitch/crt_ovs_sx1.sh
-	sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw1.sh
-
 	SwitchList='sw1 sx1'
 	for k in $SwitchList
 	do
@@ -2123,7 +2146,7 @@ then
 
 	echo ''
 	echo "=============================================="
-	echo "Ensure 10.207.39.0/24 & 10.207.29.0/24 up...  "
+	echo "Ensure Networks up...                         "
 	echo "=============================================="
 	echo ''
 
@@ -2364,6 +2387,7 @@ then
  		sudo service sw1 restart
  		sudo service sx1 restart
 		sudo lxc-stop  -n $NameServer > /dev/null 2>&1
+		sudo lxc-copy  -n $NameServer -N $NameServer-bk0
 		sudo lxc-start -n $NameServer > /dev/null 2>&1
 	fi
 
@@ -2447,8 +2471,8 @@ then
 
 	sudo lxc-attach -n $NameServer -- crontab /root/crontab.txt
 	sudo lxc-attach -n $NameServer -- crontab -l
-	sudo lxc-attach -n $NameServer -- mkdir -p /root/backup-lxc-container/olive/updates
-	sudo lxc-attach -n $NameServer -- tar -cvzPf /root/backup-lxc-container/olive/updates/backup_olive_ns_update.tar.gz /root/ns_backup_update.lst
+	sudo lxc-attach -n $NameServer -- mkdir -p /root/backup-lxc-container/$NameServer/updates
+	sudo lxc-attach -n $NameServer -- tar -cvzPf /root/backup-lxc-container/$NameServer/updates/backup_"$NameServer"_ns_update.tar.gz /root/ns_backup_update.lst
 
 	sudo tar -v --extract --file=/opt/olxc/"$DistDir"/uekulele/archives/dns-dhcp-cont.tar -C / var/lib/lxc/nsa/rootfs/etc/systemd/system/dns-sync.service
 	sudo mv /var/lib/lxc/nsa/rootfs/etc/systemd/system/dns-sync.service /var/lib/lxc/$NameServer/rootfs/etc/systemd/system/dns-sync.service

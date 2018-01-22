@@ -382,7 +382,7 @@ echo 'Oracle Container Version  = '$MajorRelease.$PointRelease
 NumCon=$3
 if [ -z $3 ]
 then
-	NumCon=2
+	NumCon=3
 fi
 echo 'Oracle Container Count    = '$NumCon
 
@@ -403,7 +403,7 @@ echo 'Domain2                   = '$Domain2
 NameServer=$6
 if [ -z $6 ]
 then
-	NameServer=olive
+	NameServer=rainman
 fi
 echo 'NameServer                = '$NameServer
 
@@ -696,7 +696,17 @@ then
 	}
 	VirtualInterfaces=$(GetVirtualInterfaces)
 
-	subnet="$sw1Net $Sx1Net"
+	function GetSw1Net {
+		echo $BaseNet1 | cut -f2 -d':'
+	}
+	Sw1Net=$(GetSw1Net)
+	
+	function GetSx1Net {
+		echo $SeedNet1 | cut -f2 -d':'
+	}
+	Sx1Net=$(GetSx1Net)
+
+	subnet="$Sw1Net $Sx1Net"
 
 	for j in $subnet
 	do
@@ -1056,10 +1066,14 @@ do
 			if [ $? -ne 0 ]
 			then
 				sudo sh -c "cat /opt/olxc/GNU3 /opt/olxc/$j > /opt/olxc/$j.gnu3"
-				sudo chmod --reference /opt/olxc/$j /opt/olxc/$j.gnu3
-				sudo chown --reference /opt/olxc/$j /opt/olxc/$j.gnu3
+				sudo chmod --reference /opt/olxc/$j /opt/olxc/$j.gnu3 > /dev/null 2>&1
+				sudo chown --reference /opt/olxc/$j /opt/olxc/$j.gnu3 > /dev/null 2>&1
 				sudo mv /opt/olxc/$j.gnu3 /opt/olxc/$j
 				filename=/opt/olxc/$j
+			fi
+			if [ $i != 'dns-dhcp-cont.tar' ] && [ $i != 'dns-dhcp-host.tar' ] && [ $i != 'lxc-oracle-files.tar' ] && [ $i != 'ubuntu-host.tar' ]
+			then
+				sudo chown $Owner:$Group $filename > /dev/null 2>&1
 			fi
 			filename=/opt/olxc/$j
 

@@ -502,6 +502,8 @@ echo "=============================================="
 echo ''
 
 sudo lxc-start -n $SeedContainerName > /dev/null 2>&1
+sleep 2
+sudo lxc-ls -f
 
 echo ''
 echo "=============================================="

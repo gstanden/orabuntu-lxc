@@ -251,7 +251,7 @@ do
 	if [ $UbuntuMajorVersion -ge 16 ]
 	then
 		function CheckPublicIPIterative {
-			sudo lxc-info -n ora$OracleRelease$SeedPostfix -iH | cut -f1-3 -d'.' | sed 's/\.//g'
+			sudo lxc-info -n $j -iH | cut -f1-3 -d'.' | sed 's/\.//g'
 		}
 	fi
 	PublicIPIterative=$(CheckPublicIPIterative)
@@ -272,6 +272,10 @@ do
 		then
 			sudo lxc-stop -n $j
 			sleep 2
+			echo ''
+			echo 'Attempting OpenvSwitch veth pair cleanup procedures...'
+			echo 'Messages Cannot file device are normal in this procedure.'
+			echo 'Orabuntu-LXC will re-attempt container startup after cleanup procedure.'
 			echo ''
 			sudo /etc/network/openvswitch/veth_cleanups.sh $j
 			echo ''
@@ -356,7 +360,15 @@ do
        	echo ''
 
 	ssh-keygen -R $j
-	sshpass -p oracle ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no oracle@$j "uname -a; cat /etc/oracle-release"
+       	sshpass -p oracle ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no oracle@$j "uname -a; cat /etc/oracle-release"
+	ConnectStatus=$?
+	while [ $ConnectStatus -eq 255 ]
+	do
+        	echo 'Waiting 5 seconds for sshd to become active in container and retrying test connection...'
+        	sleep 5
+        	sshpass -p oracle ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no oracle@$j "uname -a; cat /etc/oracle-release"
+       		ConnectStatus=$?
+	done
 
        	echo ''
         echo "=============================================="
@@ -856,4 +868,4 @@ Owner=$(GetOwner)
 
 sudo chown -R $Group:$Owner /opt/olxc/"$DistDir"/orabuntu/archives/scst-files
 sudo rm -f /opt/olxc/*.lst /opt/olxc/*.tar
-sudo rm -rf /opt/olxc/home/ubuntu
+sudo rm -f /opt/olxc/home/ubuntu

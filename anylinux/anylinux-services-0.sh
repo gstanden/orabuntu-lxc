@@ -34,7 +34,7 @@ clear
 
 SubDirName=$1
 
-ArchiveList="dns-dhcp-cont.tar dns-dhcp-host.tar lxc-oracle-files.tar orabuntu-services.tar scst-files.tar tgt-files.tar ubuntu-host.tar"
+ArchiveList="dns-dhcp-cont.tar dns-dhcp-host.tar lxc-oracle-files.tar $SubDirName-files.tar scst-files.tar tgt-files.tar ubuntu-host.tar"
 
 function GetDistDir {
 	pwd | rev | cut -f2-20 -d'/' | rev
@@ -61,6 +61,12 @@ cd "$DistDir"/"$SubDirName"/archives
 
 for i in $ArchiveList
 do
+	function GetStripFiles {
+		tar -P -tvf $i | egrep 'GNU3|COPYING' | sed 's/  */ /g' | cut -f6 -d' ' | sed 's/$/ /' | tr -d '\n' | sed 's/^[ \t]*//;s/[ \t]*$//'
+	}
+	StripFiles=$(GetStripFiles)
+	echo $StripFiles
+
 	clear
 
 	echo ''
@@ -68,30 +74,16 @@ do
 	echo "Archive $i                                  "
 	echo '############################################'
 	echo ''
-	tar -tvPf $i | grep GNU3
-	if [ $? -eq 0 ]
-	then
-		tar -vP --delete --file=$i GNU3 > /dev/null 2>&1
-		tar -vP --delete --file=$i /var/GNU3 > /dev/null 2>&1
-		tar -vP --delete --file=$i /etc/GNU3 > /dev/null 2>&1
-		tar -vP --delete --file=$i rootfs/GNU3 > /dev/null 2>&1
-		tar -vP --delete --file=$i "$DistDir"/"$SubDirName"/archives/GNU3 > /dev/null 2>&1
-	fi
 
-	tar -tvPf $i | grep COPYING
-	if [ $? -eq 0 ]
-	then
-		tar -vP --delete --file=$i COPYING > /dev/null 2>&1
-		tar -vP --delete --file=$i /var/COPYING > /dev/null 2>&1
-		tar -vP --delete --file=$i /etc/COPYING > /dev/null 2>&1
-		tar -vP --delete --file=$i rootfs/COPYING > /dev/null 2>&1
-		tar -vP --delete --file=$i "$DistDir"/"$SubDirName"/archives/COPYING > /dev/null 2>&1
-	fi
+	for j in $StripFiles
+	do
+		tar -vP --delete --file=$i $j
+	done
 
 	if   [ $i = 'dns-dhcp-host.tar' ] || [ $i = 'ubuntu-host.tar' ]
 	then
-		sudo chown root:root /etc/GNU3
-		sudo chown root:root /etc/COPYING
+		sudo chown root:root /etc/GNU3 > /dev/null 2>&1
+		sudo chown root:root /etc/COPYING > /dev/null 2>&1
 		tar -vP --append --file=$i /etc/GNU3
 		tar -vP --append --file=$i /etc/COPYING
 	elif [ $i = 'scst-files.tar' ] || [ $i = 'tgt-files.tar' ]
@@ -100,14 +92,14 @@ do
 		tar -vP --append --file=$i "$DistDir"/"$SubDirName"/archives/COPYING 	--numeric-owner
 	elif [ $i = 'dns-dhcp-cont.tar' ]
 	then
-		sudo chown root:root /var/GNU3
-		sudo chown root:root /var/COPYING
+		sudo chown root:root /var/GNU3 > /dev/null 2>&1
+		sudo chown root:root /var/COPYING > /dev/null 2>&1
 		tar -vP --append --file=$i /var/GNU3 --numeric-owner
 		tar -vP --append --file=$i /var/COPYING --numeric-owner
 	elif [ $i = 'lxc-oracle-files.tar' ]
 	then
-		sudo chown root:root rootfs/GNU3
-		sudo chown root:root rootfs/COPYING
+		sudo chown root:root rootfs/GNU3 > /dev/null 2>&1
+		sudo chown root:root rootfs/COPYING > /dev/null 2>&1
 		sudo tar -vP --append --file=$i rootfs/GNU3
 		sudo tar -vP --append --file=$i rootfs/COPYING
 	elif [ $i = "$SubDirName-services.tar" ]

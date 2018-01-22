@@ -892,6 +892,24 @@ then
 	sleep 5 
 
 	clear
+elif [ $NameServerExists -eq 0 ] && [ $MultiHostVar2 = 'Y' ]
+then
+        echo ''
+        echo "=============================================="
+        echo "Replicate nameserver $NameServer...           "
+        echo "=============================================="
+        echo ''
+
+        sudo chown $Owner:$Group /home/$Owner/Manage-Orabuntu
+        sudo chmod 775 /opt/olxc/"$DistDir"/orabuntu/archives/nameserver_copy.sh
+        /opt/olxc/"$DistDir"/uekulele/archives/nameserver_copy.sh $MultiHostVar5 $MultiHostVar6 $NameServer
+        sudo lxc-copy -n olive -N olive-bk0
+
+        echo ''
+        echo "=============================================="
+        echo "Done: Replicate nameserver $NameServer.       "
+        echo "=============================================="
+        echo ''
 fi
 
 # Unpack customized OS host files for Oracle on LXC host server
@@ -1502,6 +1520,14 @@ if   [ $UbuntuMajorVersion -ge 16 ]
 then
 	sudo sed -i "s/SWITCH_IP/$Sx1Index/g" /etc/network/openvswitch/crt_ovs_sx1.sh
 	sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw1.sh
+	sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw2.sh
+	sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw3.sh
+	sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw4.sh
+	sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw5.sh
+	sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw6.sh
+	sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw7.sh
+	sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw8.sh
+	sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw9.sh
 
 	SwitchList='sw1 sx1'
 	for k in $SwitchList
