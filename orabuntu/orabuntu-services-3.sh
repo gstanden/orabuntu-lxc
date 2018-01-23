@@ -190,14 +190,14 @@ clear
 
 echo ''
 echo "=============================================="
-echo "Ping archive.ubuntu.com test...                       "
+echo "Ping yum.oracle.com test...                       "
 echo "=============================================="
 echo ''
 
-ping -c 3 archive.ubuntu.com
+ping -c 3 yum.oracle.com
 
 function CheckNetworkUp {
-	ping -c 3 archive.ubuntu.com | grep packet | cut -f3 -d',' | sed 's/ //g'
+	ping -c 3 yum.oracle.com | grep packet | cut -f3 -d',' | sed 's/ //g'
 }
 NetworkUp=$(CheckNetworkUp)
 n=1
@@ -211,14 +211,14 @@ if [ "$NetworkUp" != '0%packetloss' ]
 then
 echo ''
 echo "=============================================="
-echo "Ping archive.ubuntu.com not reliable.                 "
+echo "Ping yum.oracle.com not reliable.                 "
 echo "Script exiting.                               "
 echo "=============================================="
 exit
 else
 echo ''
 echo "=============================================="
-echo "Ping archive.ubuntu.com is reliable.                  "
+echo "Ping yum.oracle.com is reliable.                  "
 echo "=============================================="
 echo ''
 fi
