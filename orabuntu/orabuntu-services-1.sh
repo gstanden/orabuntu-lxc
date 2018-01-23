@@ -1455,7 +1455,7 @@ then
                 HighestSx1IndexHit=$(CheckHighestSx1IndexHit)
         done
 
-#       sleep 5
+        sleep 5
 
 #       clear
 
@@ -1465,6 +1465,9 @@ then
 #       echo "=============================================="
 #       echo ''
 
+        sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service systemd-resolved restart > /dev/null 2>&1"
+        sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service lxc-net restart > /dev/null 2>&1"
+        
         Sw1Index=201
         function CheckHighestSw1IndexHit {
                 sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 nslookup -timeout=1 10.207.39.$Sw1Index | grep 'name =' | wc -l
