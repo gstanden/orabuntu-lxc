@@ -802,15 +802,15 @@ then
 #  		echo "=============================================="
 #  		echo ''
 	
-#  		sleep 5
+   		sleep 5
 
-#  		clear
+   		clear
 
-#               echo ''
-#               echo "=============================================="
-#               echo "Configure replica nameserver $NameServer...   "
-#               echo "=============================================="
-#               echo ''
+                echo ''
+                echo "=============================================="
+                echo "Configure replica nameserver $NameServer...   "
+                echo "=============================================="
+                echo ''
 
                 ssh-keygen -R 10.207.39.2
                 ssh-keygen -R $NameServer

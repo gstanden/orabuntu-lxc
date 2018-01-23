@@ -1434,11 +1434,11 @@ sudo chmod 755 /etc/network/openvswitch/*.sh
 
 if   [ $MultiHostVar3 = 'X' ]
 then
-        echo ''
-        echo "=============================================="
-        echo "Get sx1 IP address...                         "
-        echo "=============================================="
-        echo ''
+#       echo ''
+#       echo "=============================================="
+#       echo "Get sx1 IP address...                         "
+#       echo "=============================================="
+#       echo ''
 
         sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service systemd-resolved restart > /dev/null 2>&1"
         sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service lxc-net restart > /dev/null 2>&1"
@@ -1455,15 +1455,15 @@ then
                 HighestSx1IndexHit=$(CheckHighestSx1IndexHit)
         done
 
-        sleep 5
+#       sleep 5
 
-        clear
+#       clear
 
-        echo ''
-        echo "=============================================="
-        echo "Get sw1 IP address.                           "
-        echo "=============================================="
-        echo ''
+#       echo ''
+#       echo "=============================================="
+#       echo "Get sw1 IP address.                           "
+#       echo "=============================================="
+#       echo ''
 
         Sw1Index=201
         function CheckHighestSw1IndexHit {
@@ -1477,9 +1477,9 @@ then
                 HighestSw1IndexHit=$(CheckHighestSw1IndexHit)
         done
 
-        sleep 5
+#       sleep 5
 
-        clear
+#       clear
 elif [ $MultiHostVar3 = 'X' ] && [ $MultiHostVar2 = 'Y' ] && [ $GRE = 'N' ]
 then
         function GetSx1Index {
@@ -1496,23 +1496,19 @@ else
         Sx1Index=$MultiHostVar3
 fi
 
-sleep 5
-
-clear
+sudo sed -i "s/SWITCH_IP/$Sx1Index/g" /etc/network/openvswitch/crt_ovs_sx1.sh
+sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw1.sh
+sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw2.sh
+sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw3.sh
+sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw4.sh
+sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw5.sh
+sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw6.sh
+sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw7.sh
+sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw8.sh
+sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw9.sh
 
 if   [ $UbuntuMajorVersion -ge 16 ]
 then
-	sudo sed -i "s/SWITCH_IP/$Sx1Index/g" /etc/network/openvswitch/crt_ovs_sx1.sh
-	sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw1.sh
-	sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw2.sh
-	sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw3.sh
-	sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw4.sh
-	sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw5.sh
-	sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw6.sh
-	sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw7.sh
-	sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw8.sh
-	sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw9.sh
-
 	SwitchList='sw1 sx1'
 	for k in $SwitchList
 	do

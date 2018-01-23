@@ -1553,8 +1553,11 @@ echo "Unpack G1 files $LF Linux $RL                 "
 echo "=============================================="
 echo ''
 
-sudo cp -p /etc/dnsmasq.conf /etc/dnsmasq.conf.olxc.2
-sudo rm -f /etc/dnsmasq.conf
+if [ -f /etc/dnsmasq.conf ]
+then
+	sudo cp -p /etc/dnsmasq.conf /etc/dnsmasq.conf.olxc.2
+	sudo rm -f /etc/dnsmasq.conf
+fi
 sudo tar -xvf /opt/olxc/"$DistDir"/uekulele/archives/ubuntu-host.tar -C / --touch
 
 echo ''
@@ -1927,16 +1930,17 @@ sudo chmod 755 /etc/network/openvswitch/*.sh
 
 if   [ $MultiHostVar3 = 'X' ] && [ $GRE = 'Y' ] && [ $MultiHostVar2 = 'Y' ]
 then
-	echo ''
-	echo "=============================================="
-	echo "Get sx1 IP address...                         "
-	echo "=============================================="
-	echo ''
+#	echo ''
+#	echo "=============================================="
+#	echo "Get sx1 IP address...                         "
+#	echo "=============================================="
+#	echo ''
+
+	sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service systemd-resolved restart > /dev/null 2>&1"
+	sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service lxc-net restart > /dev/null 2>&1"
 
 	Sx1Index=201
 	function CheckHighestSx1IndexHit {
-		sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service systemd-resolved restart > /dev/null 2>&1"
-		sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service lxc-net restart > /dev/null 2>&1"
 		sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 nslookup -timeout=3 10.207.29.$Sx1Index | grep 'name =' | wc -l
 	}
 	HighestSx1IndexHit=$(CheckHighestSx1IndexHit)
@@ -1947,20 +1951,18 @@ then
        	 	HighestSx1IndexHit=$(CheckHighestSx1IndexHit)
 	done
 
-	sleep 5
+#	sleep 5
 
-	clear
+#	clear
 
-	echo ''
-	echo "=============================================="
-	echo "Get sw1 IP address.                           "
-	echo "=============================================="
-	echo ''
+#	echo ''
+#	echo "=============================================="
+#	echo "Get sw1 IP address.                           "
+#	echo "=============================================="
+#	echo ''
 
 	Sw1Index=201
 	function CheckHighestSw1IndexHit {
-		sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service systemd-resolved restart > /dev/null 2>&1"
-		sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service lxc-net restart > /dev/null 2>&1"
 		sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 nslookup -timeout=3 10.207.39.$Sw1Index | grep 'name =' | wc -l
 	}
 	HighestSw1IndexHit=$(CheckHighestSw1IndexHit)
@@ -1971,9 +1973,9 @@ then
        	 	HighestSw1IndexHit=$(CheckHighestSw1IndexHit)
 	done
 
-	sleep 5
+#	sleep 5
 
-	clear
+#	clear
 elif [ $MultiHostVar3 = 'X' ]  && [ $GRE = 'N' ] && [ $MultiHostVar2 = 'Y' ]
 then
 	function GetSx1Index {
@@ -1989,10 +1991,6 @@ else
 	Sw1Index=$MultiHostVar3
 	Sx1Index=$MultiHostVar3
 fi
-
-sleep 5
-
-clear
 
 sudo sed -i "s/SWITCH_IP/$Sx1Index/g" /etc/network/openvswitch/crt_ovs_sx1.sh
 sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw1.sh
