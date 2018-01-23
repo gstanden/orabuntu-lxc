@@ -713,7 +713,11 @@ then
 			echo ''
 
 			sleep 5
-			
+	
+			ping -c 10 linuxcontainers.org
+			echo ''
+			nslookup linuxcontainers.org
+			echo ''
 			wget --timeout=3 --tries=3 https://linuxcontainers.org/downloads/lxc/lxc-"$LxcVersion".tar.gz
 			mkdir -p /opt/olxc/"$DistDir"/uekulele/lxc/rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
 			cp -p lxc-"$LxcVersion".tar.gz /opt/olxc/"$DistDir"/uekulele/lxc/rpmbuild/SOURCES/.
