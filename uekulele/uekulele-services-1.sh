@@ -2609,13 +2609,13 @@ then
 		sshpass -p $MultiHostVar9 ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 date
 		if [ $? -eq 0 ]
 		then
-			sshpass -p $MultiHostVar9 scp -p /etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh $MultiHostVar8@$MultiHostVar5:$HOME/.
+			sshpass -p $MultiHostVar9 scp -p /etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh $MultiHostVar8@$MultiHostVar5:~/.
 		fi
 
-		sshpass -p $MultiHostVar9 ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" ls -l $HOME/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh"
+		sshpass -p $MultiHostVar9 ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" ls -l ~/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh"
 		if [ $? -eq 0 ]
 		then
-		sshpass -p $MultiHostVar9 ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" $HOME/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh"
+		sshpass -p $MultiHostVar9 ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" ~/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh"
 		fi
 
                 echo ''
@@ -2983,23 +2983,23 @@ echo "Create RSA key if it does not already exist   "
 echo "=============================================="
 echo ''
 
-if [ ! -e $HOME/.ssh/id_rsa.pub ]
+if [ ! -e ~/.ssh/id_rsa.pub ]
 then
 # ssh-keygen -t rsa
-ssh-keygen -f $HOME/.ssh/id_rsa -t rsa -N ''
+ssh-keygen -f ~/.ssh/id_rsa -t rsa -N ''
 fi
 
-if [ -e $HOME/.ssh/authorized_keys ]
+if [ -e ~/.ssh/authorized_keys ]
 then
-rm $HOME/.ssh/authorized_keys
+rm ~/.ssh/authorized_keys
 fi
 
-touch $HOME/.ssh/authorized_keys
+touch ~/.ssh/authorized_keys
 
-if [ -e $HOME/.ssh/id_rsa.pub ]
+if [ -e ~/.ssh/id_rsa.pub ]
 then
 function GetAuthorizedKey {
-cat $HOME/.ssh/id_rsa.pub
+cat ~/.ssh/id_rsa.pub
 }
 AuthorizedKey=$(GetAuthorizedKey)
 
@@ -3010,7 +3010,7 @@ echo ''
 fi
 
 function CheckAuthorizedKeys {
-grep -c "$AuthorizedKey" $HOME/.ssh/authorized_keys
+grep -c "$AuthorizedKey" ~/.ssh/authorized_keys
 }
 AuthorizedKeys=$(CheckAuthorizedKeys)
 
@@ -3018,13 +3018,13 @@ echo "Results of grep = $AuthorizedKeys"
 
 if [ "$AuthorizedKeys" -eq 0 ]
 then
-cat  $HOME/.ssh/id_rsa.pub >> $HOME/.ssh/authorized_keys
+cat  ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
 fi
 
 echo ''
 echo 'cat of authorized_keys'
 echo ''
-cat $HOME/.ssh/authorized_keys
+cat ~/.ssh/authorized_keys
 
 echo ''
 echo "=============================================="
