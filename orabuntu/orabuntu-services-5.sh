@@ -70,6 +70,16 @@ function GetMultiHostVar7 {
 }
 MultiHostVar7=$(GetMultiHostVar7)
 
+function GetMultiHostVar8 {
+	echo $MultiHost | cut -f8 -d':'
+}
+MultiHostVar8=$(GetMultiHostVar8)
+
+function GetMultiHostVar9 {
+	echo $MultiHost | cut -f9 -d':'
+}
+MultiHostVar9=$(GetMultiHostVar9)
+
 function GetMultiHostVar10 {
 	echo $MultiHost | cut -f10 -d':'
 }
@@ -237,6 +247,8 @@ function CheckClonedContainersExist {
 }
 ClonedContainersExist=$(CheckClonedContainersExist)
 
+sudo service systemd-resolved restart > /dev/null 2>&1
+
 for j in $ClonedContainersExist
 do
 	# GLS 20160707 updated to use lxc-copy instead of lxc-clone for Ubuntu 16.04
@@ -279,6 +291,7 @@ do
 			echo ''
 			sudo /etc/network/openvswitch/veth_cleanups.sh $j
 			echo ''
+			sudo service systemd-resolved restart > /dev/null 2>&1
 			sleep 2
 			sudo lxc-start -n $j
 			sleep 5
