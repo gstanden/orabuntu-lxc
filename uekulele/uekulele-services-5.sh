@@ -795,7 +795,6 @@ then
         	/opt/olxc/"$DistDir"/uekulele/archives/nameserver_copy.sh $MultiHostVar5 $MultiHostVar6 $MultiHostVar8 $MultiHostVar9 $NameServer
 		sudo lxc-stop  -n $NameServer
 		sudo lxc-copy  -n $NameServer -N $NameServer-bk1
-		sudo lxc-start -n $NameServer
 	
   		echo ''
   		echo "=============================================="

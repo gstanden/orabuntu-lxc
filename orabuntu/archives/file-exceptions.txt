@@ -10,6 +10,7 @@ rootfs/COPYING
 /var/lib/lxc/nsa/rootfs/var/lib/bind/rev.consultingcommandos.us
 /var/lib/lxc/nsa/rootfs/var/lib/bind/fwd.orabuntu-lxc.com
 /var/lib/lxc/nsa/rootfs/var/lib/bind/rev.orabuntu-lxc.com
+/var/lib/lxc/nsa/rootfs/root/ns_backup_update.lst
 /home/OWNER/Downloads/orabuntu-lxc-master/anylinux/vercomp
 /home/OWNER/Downloads/orabuntu-lxc-master/anylinux/anylinux-services-0.sh
 /home/OWNER/Downloads/orabuntu-lxc-master/anylinux/anylinux-services-1.sh
