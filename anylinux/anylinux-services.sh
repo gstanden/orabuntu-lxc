@@ -792,7 +792,7 @@ then
 	clear
 fi
 
-if [ $GREValue = 'Y' ]
+if [ $GREValue = 'Y' ] || [ $MultiHostVar3 = 'X' ]
 then
 	sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" lxc-info -n $NameServer-$HOSTNAME" > /dev/null 2>&1
 	if [ $? -eq 1 ]
