@@ -792,6 +792,27 @@ then
 	clear
 fi
 
+echo ''
+echo "=============================================="
+echo "Pre-Install $NameServer backup at HUB...      "
+echo "=============================================="
+echo ''
+
+sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" lxc-stop -n $NameServer;echo '(Do NOT enter a password.  Wait...)'; echo ''; sudo -S <<< "$MultiHostVar9" lxc-copy -n $NameServer -N $NameServer-$HOSTNAME; sudo -S <<< "$MultiHostVar9" lxc-start -n $NameServer; sleep 5; sudo -S <<< "$MultiHostVar9" lxc-ls -f"
+echo ''
+echo "$NameServer-$HOSTNAME has been created on the Orabuntu-LXC HUB host at $MultiHostVar5"
+echo "$NameServer-$HOSTNAME can be restored to $NameServer if necessary using lxc-copy command."
+
+echo ''
+echo "=============================================="
+echo "Done: Pre-Install $NameServer backup at HUB.  "
+echo "=============================================="
+echo ''
+
+sleep 5
+
+clear
+
 SetNets=Y
 
 if [ $SetNets = 'Y' ]
