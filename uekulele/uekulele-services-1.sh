@@ -455,7 +455,25 @@ then
 			sudo yum provides lxc | sed '/^\s*$/d' | grep Repo | sort -u
 		fi
 
-	DocBook2X=$(VerifyDocBook2X)
+		DocBook2X=$(VerifyDocBook2X)
+
+		if [ $DocBook2X -eq 0 ]
+		then
+			echo ''
+			echo "=============================================="
+			echo 'epel configuration and installs successful.   '
+			echo "=============================================="
+			echo ''
+			sleep 5
+		elif [ $DocBook2X -ne 0 ]
+		then
+			echo ''
+			echo "=============================================="
+			echo 'epel failure ... retrying epel configuration. '
+			echo "=============================================="
+			echo ''
+			sleep 5
+		fi
 	done
 
 	cd /opt/olxc/"$DistDir"
