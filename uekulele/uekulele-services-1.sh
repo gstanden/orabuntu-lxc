@@ -586,6 +586,7 @@ then
 
 	if [ $Release -eq 7 ] 
 	then
+		sudo systemctl daemon-reload
 		sudo systemctl start lxc.service
 		sudo systemctl status lxc.service
 		echo ''
