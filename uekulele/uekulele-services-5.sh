@@ -784,33 +784,33 @@ then
 
  	if [ $GRE = 'Y' ]
  	then
-  		echo ''
-  		echo "=============================================="
-  		echo "Replicate nameserver $NameServer...           "
-  		echo "=============================================="
-  		echo ''
+# 		echo ''
+# 		echo "=============================================="
+# 		echo "Replicate nameserver $NameServer...           "
+# 		echo "=============================================="
+# 		echo ''
   	
-                sudo chown $Owner:$Group /home/$Owner/Manage-Orabuntu
-		sudo chmod 775 /opt/olxc/"$DistDir"/orabuntu/archives/nameserver_copy.sh
-        	/opt/olxc/"$DistDir"/uekulele/archives/nameserver_copy.sh $MultiHostVar5 $MultiHostVar6 $MultiHostVar8 $MultiHostVar9 $NameServer
-		sudo lxc-stop  -n $NameServer
-		sudo lxc-copy  -n $NameServer -N $NameServer-bk1
+#               sudo chown $Owner:$Group /home/$Owner/Manage-Orabuntu
+#		sudo chmod 775 /opt/olxc/"$DistDir"/orabuntu/archives/nameserver_copy.sh
+#        	/opt/olxc/"$DistDir"/uekulele/archives/nameserver_copy.sh $MultiHostVar5 $MultiHostVar6 $MultiHostVar8 $MultiHostVar9 $NameServer
+#		sudo lxc-stop  -n $NameServer
+#		sudo lxc-copy  -n $NameServer -N $NameServer-bk1
 	
-  		echo ''
-  		echo "=============================================="
-  		echo "Done: Replicate nameserver $NameServer.       "
-  		echo "=============================================="
-  		echo ''
+#  		echo ''
+#  		echo "=============================================="
+#  		echo "Done: Replicate nameserver $NameServer.       "
+#  		echo "=============================================="
+#  		echo ''
 	
-  		sleep 5
+#  		sleep 5
 
-  		clear
+#  		clear
 
-                echo ''
-                echo "=============================================="
-                echo "Configure replica nameserver $NameServer...   "
-                echo "=============================================="
-                echo ''
+#               echo ''
+#               echo "=============================================="
+#               echo "Configure replica nameserver $NameServer...   "
+#               echo "=============================================="
+#               echo ''
 
                 ssh-keygen -R 10.207.39.2
                 ssh-keygen -R $NameServer
