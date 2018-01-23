@@ -370,10 +370,7 @@ do
                         echo ''
 			sudo /etc/network/openvswitch/veth_cleanups.sh $j
 			echo ''
-			sleep 2
-			sudo lxc-start -n $j
-			sleep 2
-			sudo lxc-stop  -n $j
+			sudo service lxc-net restart > /dev/null 2>&1
 			sleep 2
 			sudo lxc-start -n $j
 			sleep 2
