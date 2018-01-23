@@ -722,7 +722,7 @@ then
        	        	CharCount=$(GetCharCount)
        	        	if [ $CharCount -eq 5 ]
        	        	then
-       	                	if [ $VirtualInterfaceMtu -ne $MultiHostVar7 ]
+       	                	if [ $MultiHostVar7 -ne 1500 ]
        	                	then
 					echo ''
 					echo "=============================================="
