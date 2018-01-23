@@ -431,21 +431,32 @@ then
 	fi
 	sudo yum clean all
 	sudo yum -y install wget tar gzip
-	if [ $LinuxFlavor != 'Fedora' ]
-	then
- 		mkdir -p /opt/olxc/"$DistDir"/uekulele/epel
-  		cd /opt/olxc/"$DistDir"/uekulele/epel
-		if   [ $Release -eq 7 ]
+
+	function VerifyDocBook2X {
+		yum provides docbook2X | grep docbook2X
+	}
+	DocBook2X=$(VerifyDocBook2X)
+
+	while [ $DocBook2X -ne 0 ]
+	do
+		if [ $LinuxFlavor != 'Fedora' ]
 		then
-  			wget --timeout=3 --tries=3 https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
-  			sudo rpm -ivh epel-release-latest-7.noarch.rpm 
- 		elif [ $Release -eq 6 ] 
-		then
-  			wget --timeout=3 --tries=3 https://dl.fedoraproject.org/pub/epel/epel-release-latest-6.noarch.rpm
-  			sudo rpm -ivh epel-release-latest-6.noarch.rpm 
+ 			mkdir -p /opt/olxc/"$DistDir"/uekulele/epel
+  			cd /opt/olxc/"$DistDir"/uekulele/epel
+			if   [ $Release -eq 7 ]
+			then
+  				wget --timeout=5 --tries=10 https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+  				sudo rpm -ivh epel-release-latest-7.noarch.rpm 
+ 			elif [ $Release -eq 6 ] 
+			then
+  				wget --timeout=5 --tries=10 https://dl.fedoraproject.org/pub/epel/epel-release-latest-6.noarch.rpm
+  				sudo rpm -ivh epel-release-latest-6.noarch.rpm 
+			fi
+			sudo yum provides lxc | sed '/^\s*$/d' | grep Repo | sort -u
 		fi
-		sudo yum provides lxc | sed '/^\s*$/d' | grep Repo | sort -u
-	fi
+
+	DocBook2X=$(VerifyDocBook2X)
+	done
 
 	cd /opt/olxc/"$DistDir"
 
@@ -554,11 +565,11 @@ then
   		cd /opt/olxc/"$DistDir"/uekulele/epel
 		if [ $Release -eq 7 ] 
 		then
-  			wget --timeout=3 --tries=3 https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+  			wget --timeout=5 --tries=10 https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
   			sudo rpm -ivh epel-release-latest-7.noarch.rpm 
  		elif [ $Release -eq 6 ] 
 		then
-  			wget --timeout=3 --tries=3 https://dl.fedoraproject.org/pub/epel/epel-release-latest-6.noarch.rpm
+  			wget --timeout=5 --tries=10 https://dl.fedoraproject.org/pub/epel/epel-release-latest-6.noarch.rpm
   			sudo rpm -ivh epel-release-latest-6.noarch.rpm 
 		fi
 	fi
@@ -718,7 +729,7 @@ then
 			echo ''
 			nslookup linuxcontainers.org
 			echo ''
-			wget --timeout=3 --tries=3 https://linuxcontainers.org/downloads/lxc/lxc-"$LxcVersion".tar.gz
+			wget --timeout=5 --tries=10 https://linuxcontainers.org/downloads/lxc/lxc-"$LxcVersion".tar.gz
 			mkdir -p /opt/olxc/"$DistDir"/uekulele/lxc/rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
 			cp -p lxc-"$LxcVersion".tar.gz /opt/olxc/"$DistDir"/uekulele/lxc/rpmbuild/SOURCES/.
 			tar -zxvf lxc-"$LxcVersion".tar.gz
@@ -784,7 +795,7 @@ then
 			sudo yum -y install rpm-build wget openssl-devel gcc make docbook2X xmlto docbook automake graphviz
 			mkdir -p /opt/olxc/"$DistDir"/uekulele/lxc
 			cd /opt/olxc/"$DistDir"/uekulele/lxc
-			wget --timeout=3 --tries=3 https://linuxcontainers.org/downloads/lxc/lxc-"$LxcVersion".tar.gz
+			wget --timeout=5 --tries=10 https://linuxcontainers.org/downloads/lxc/lxc-"$LxcVersion".tar.gz
 			mkdir -p /opt/olxc/"$DistDir"/uekulele/lxc/rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
 			cp -p lxc-"$LxcVersion".tar.gz /opt/olxc/"$DistDir"/uekulele/lxc/rpmbuild/SOURCES/.
 			tar -zxvf lxc-"$LxcVersion".tar.gz
@@ -1093,7 +1104,7 @@ then
 			python -V
 			sudo sed -i -e '/\[public_ol6_software_collections\]/,/^\[/s/enabled=1/enabled=0/' /etc/yum.repos.d/public-yum-ol6.repo
 			sleep 5
-			wget --timeout=3 --tries=3 http://openvswitch.org/releases/openvswitch-"$OvsVersion".tar.gz
+			wget --timeout=5 --tries=10 http://openvswitch.org/releases/openvswitch-"$OvsVersion".tar.gz
 			mkdir -p /opt/olxc/"$DistDir"/uekulele/openvswitch/rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
 			cp -p openvswitch-"$OvsVersion".tar.gz /opt/olxc/"$DistDir"/uekulele/openvswitch/rpmbuild/SOURCES/.
 
@@ -1102,7 +1113,7 @@ then
 			sudo yum -y install rpm-build wget openssl-devel gcc make
 			mkdir -p /opt/olxc/"$DistDir"/uekulele/openvswitch
 			cd /opt/olxc/"$DistDir"/uekulele/openvswitch
-			wget --timeout=3 --tries=3 http://openvswitch.org/releases/openvswitch-"$OvsVersion".tar.gz
+			wget --timeout=5 --tries=10 http://openvswitch.org/releases/openvswitch-"$OvsVersion".tar.gz
 			mkdir -p /opt/olxc/"$DistDir"/uekulele/openvswitch/rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
 			cp -p openvswitch-"$OvsVersion".tar.gz /opt/olxc/"$DistDir"/uekulele/openvswitch/rpmbuild/SOURCES/.
 		fi
@@ -1946,7 +1957,7 @@ then
 
 	Sx1Index=201
 	function CheckHighestSx1IndexHit {
-		sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 nslookup -timeout=3 10.207.29.$Sx1Index | grep 'name =' | wc -l
+		sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 nslookup -timeout=5 10.207.29.$Sx1Index | grep 'name =' | wc -l
 	}
 	HighestSx1IndexHit=$(CheckHighestSx1IndexHit)
 
@@ -1971,7 +1982,7 @@ then
 
 	Sw1Index=201
 	function CheckHighestSw1IndexHit {
-		sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 nslookup -timeout=3 10.207.39.$Sw1Index | grep 'name =' | wc -l
+		sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 nslookup -timeout=5 10.207.39.$Sw1Index | grep 'name =' | wc -l
 	}
 	HighestSw1IndexHit=$(CheckHighestSw1IndexHit)
 
@@ -2642,7 +2653,7 @@ then
 		sudo ifconfig sw1 mtu $MultiHostVar7
 		sudo ifconfig sx1 mtu $MultiHostVar7
 
-		nslookup -timeout=1 $HOSTNAME.$Domain1 > /dev/null 2>&1
+		nslookup -timeout=5 $HOSTNAME.$Domain1 > /dev/null 2>&1
 		if [ $? -eq 1 ]
 		then		
 			echo ''
@@ -2700,7 +2711,7 @@ then
 
 		fi
 
-		nslookup -timeout=1 $HOSTNAME.$Domain2 > /dev/null 2>&1
+		nslookup -timeout=5 $HOSTNAME.$Domain2 > /dev/null 2>&1
 		if [ $? -eq 1 ]
 		then		
 			echo ''

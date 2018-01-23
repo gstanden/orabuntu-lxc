@@ -1445,7 +1445,7 @@ then
         
 	Sx1Index=201
         function CheckHighestSx1IndexHit {
-                sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 nslookup -timeout=1 10.207.29.$Sx1Index | grep 'name =' | wc -l
+                sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 nslookup -timeout=2 10.207.29.$Sx1Index | grep 'name =' | wc -l
         }
         HighestSx1IndexHit=$(CheckHighestSx1IndexHit)
 
@@ -1470,7 +1470,7 @@ then
         
         Sw1Index=201
         function CheckHighestSw1IndexHit {
-                sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 nslookup -timeout=1 10.207.39.$Sw1Index | grep 'name =' | wc -l
+                sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 nslookup -timeout=2 10.207.39.$Sw1Index | grep 'name =' | wc -l
         }
         HighestSw1IndexHit=$(CheckHighestSw1IndexHit)
 
@@ -1871,7 +1871,7 @@ then
 		then
 			sudo service systemd-resolved restart
 		fi
-		nslookup -timeout=1 $NameServer
+		nslookup -timeout=3 $NameServer
 		if [ $? -ne 0 ]
 		then
 			echo "DNS is NOT RUNNING with correct status!"
@@ -2141,7 +2141,7 @@ then
 		sudo ifconfig sw1 mtu $MultiHostVar7
 		sudo ifconfig sx1 mtu $MultiHostVar7
 
-                nslookup -timeout=1 $HOSTNAME.$Domain1 > /dev/null 2>&1
+                nslookup -timeout=5 $HOSTNAME.$Domain1 > /dev/null 2>&1
                 if [ $? -eq 1 ]
                 then
                         echo ''
@@ -2199,7 +2199,7 @@ then
 
                 fi
 
-                nslookup -timeout=1 $HOSTNAME.$Domain2 > /dev/null 2>&1
+                nslookup -timeout=5 $HOSTNAME.$Domain2 > /dev/null 2>&1
                 if [ $? -eq 1 ]
                 then
                         echo ''

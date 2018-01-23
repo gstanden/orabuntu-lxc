@@ -372,7 +372,11 @@ do
 			echo ''
 			sleep 2
 			sudo lxc-start -n $j
-			sleep 5
+			sleep 2
+			sudo lxc-stop  -n $j
+			sleep 2
+			sudo lxc-start -n $j
+			sleep 2
 			if [ $MajorRelease -eq 6 ] || [ $MajorRelease -eq 5 ]
 			then
 				sudo lxc-attach -n $j -- ntpd -x
