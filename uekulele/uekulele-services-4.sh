@@ -491,24 +491,24 @@ then
         echo ''
 fi
 
-# sleep 5
+sleep 5
 
-# clear
+clear
 
-# echo ''
-# echo "=============================================="
-# echo "Start Seed Container $SeedContainerName...    "
-# echo "=============================================="
-# echo ''
+echo ''
+echo "=============================================="
+echo "Start Seed Container $SeedContainerName...    "
+echo "=============================================="
+echo ''
 
-# sudo lxc-start -n $SeedContainerName > /dev/null 2>&1
-# sleep 2
-# sudo lxc-ls -f
+sudo lxc-start -n $SeedContainerName > /dev/null 2>&1
+sleep 2
+sudo lxc-ls -f
 
-# echo ''
-# echo "=============================================="
-# echo "Start Seed Container $SeedContainerName...    "
-# echo "=============================================="
+echo ''
+echo "=============================================="
+echo "Start Seed Container $SeedContainerName...    "
+echo "=============================================="
 
 sleep 5
 
