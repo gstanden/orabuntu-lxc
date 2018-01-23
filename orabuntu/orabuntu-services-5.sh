@@ -679,7 +679,7 @@ then
                 clear
         fi
 
-        if [ $NameServerExists -eq 0 ] && [ $GRE = 'Y' ]
+        if [ $GRE = 'Y' ]
         then
                 echo ''
                 echo "=============================================="
@@ -689,7 +689,7 @@ then
 
 		sudo chown $Owner:$Group /home/$Owner/Manage-Orabuntu
 		sudo chmod 775 /opt/olxc/"$DistDir"/orabuntu/archives/nameserver_copy.sh
-                /opt/olxc/"$DistDir"/orabuntu/archives/nameserver_copy.sh $MultiHostVar5 $MultiHostVar6 $MultiHostVar8 $MultiHostVar9 $NameServer $DistDir
+                /opt/olxc/"$DistDir"/orabuntu/archives/nameserver_copy.sh $MultiHostVar5 $MultiHostVar6 $MultiHostVar8 $MultiHostVar9 $NameServer
                 sudo lxc-stop  -n $NameServer
                 sudo lxc-copy  -n $NameServer -N $NameServer-bk1
                 sudo lxc-start -n $NameServer
@@ -866,4 +866,3 @@ Owner=$(GetOwner)
 
 sudo chown -R $Group:$Owner /opt/olxc/"$DistDir"/orabuntu/archives/scst-files
 sudo rm -f /opt/olxc/*.lst /opt/olxc/*.tar
-sudo rm -f /opt/olxc/home/ubuntu

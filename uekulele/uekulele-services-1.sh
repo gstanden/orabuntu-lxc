@@ -2267,7 +2267,7 @@ then
 	fi
 
 	echo "/etc/systemd/system/$NameServer.service" >> /opt/olxc/"$DistDir"/uekulele/archives/nameserver.lst
-	sudo cp -p /opt/olxc/"$DistDir"/uekulele/archives/nameserver.lst "$DistDir"/anylinux/nameserver.lst
+	sudo cp -p /opt/olxc/"$DistDir"/uekulele/archives/nameserver.lst ~/nameserver.lst
 fi
 
 sleep 5
@@ -2394,7 +2394,7 @@ then
 
         sudo chown $Owner:$Group /home/$Owner/Manage-Orabuntu
         sudo chmod 775 /opt/olxc/"$DistDir"/orabuntu/archives/nameserver_copy.sh
-        /opt/olxc/"$DistDir"/uekulele/archives/nameserver_copy.sh $MultiHostVar5 $MultiHostVar6 $MultiHostVar8 $MultiHostVar9 $NameServer $DistDir
+        /opt/olxc/"$DistDir"/uekulele/archives/nameserver_copy.sh $MultiHostVar5 $MultiHostVar6 $MultiHostVar8 $MultiHostVar9 $NameServer
         sudo lxc-copy -n $NameServer -N $NameServer-bk0
 
         echo ''
@@ -2403,6 +2403,10 @@ then
         echo "=============================================="
         echo ''
 fi
+
+sleep 5
+
+clear
 
 echo ''
 echo "=============================================="

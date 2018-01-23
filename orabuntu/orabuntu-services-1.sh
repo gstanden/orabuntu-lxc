@@ -1753,7 +1753,7 @@ then
 		sudo chmod 644 /etc/systemd/system/$NameServer.service
 
 		echo "/etc/systemd/system/$NameServer.service" >> /opt/olxc/"$DistDir"/orabuntu/archives/nameserver.lst
-        	sudo cp -p /opt/olxc/"$DistDir"/orabuntu/archives/nameserver.lst "$DistDir"/anylinux/nameserver.lst
+        	sudo cp -p /opt/olxc/"$DistDir"/orabuntu/archives/nameserver.lst ~/nameserver.lst
  
 		sudo systemctl enable $NameServer
 
@@ -1896,7 +1896,7 @@ then
 
         sudo chown $Owner:$Group /home/$Owner/Manage-Orabuntu
         sudo chmod 775 /opt/olxc/"$DistDir"/orabuntu/archives/nameserver_copy.sh
-        /opt/olxc/"$DistDir"/orabuntu/archives/nameserver_copy.sh $MultiHostVar5 $MultiHostVar6 $MultiHostVar8 $MultiHostVar9 $NameServer $DistDir
+        /opt/olxc/"$DistDir"/orabuntu/archives/nameserver_copy.sh $MultiHostVar5 $MultiHostVar6 $MultiHostVar8 $MultiHostVar9 $NameServer
         sudo lxc-copy -n $NameServer -N $NameServer-bk0
 
         echo ''
@@ -1905,6 +1905,10 @@ then
         echo "=============================================="
         echo ''
 fi
+
+sleep 5
+
+clear
 
 echo ''
 echo "=============================================="

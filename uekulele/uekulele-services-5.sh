@@ -782,7 +782,7 @@ then
 		clear
 	fi
 
- 	if [ $NameServerExists -eq 0 ] && [ $GRE = 'Y' ]
+ 	if [ $GRE = 'Y' ]
  	then
   		echo ''
   		echo "=============================================="
@@ -791,8 +791,8 @@ then
   		echo ''
   	
                 sudo chown $Owner:$Group /home/$Owner/Manage-Orabuntu
-                sudo chmod 775 /opt/olxc/"$DistDir"/orabuntu/archives/nameserver_copy.sh
-		/opt/olxc/"$DistDir"/uekulele/archives/nameserver_copy.sh $MultiHostVar5 $MultiHostVar6 $MultiHostVar8 $MultiHostVar9 $NameServer $DistDir
+		sudo chmod 775 /opt/olxc/"$DistDir"/orabuntu/archives/nameserver_copy.sh
+        	/opt/olxc/"$DistDir"/uekulele/archives/nameserver_copy.sh $MultiHostVar5 $MultiHostVar6 $MultiHostVar8 $MultiHostVar9 $NameServer
 		sudo lxc-stop  -n $NameServer
 		sudo lxc-copy  -n $NameServer -N $NameServer-bk1
 		sudo lxc-start -n $NameServer

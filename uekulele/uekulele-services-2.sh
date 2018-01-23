@@ -500,24 +500,6 @@ sudo chmod 755 /etc/network/openvswitch/veth_cleanups.sh
 
 # GLS 20151217 Veth Pair Cleanups Scripts Create End
 
-# echo ''
-# echo "=============================================="
-# echo "Copy nameserver from hub...                   "
-# echo "=============================================="
-# echo ''
-
-# /opt/olxc/"$DistDir"/uekulele/archives/nameserver_copy.sh $MultiHostVar5 $MultiHostVar6 $NameServer
-
-# echo ''
-# echo "=============================================="
-# echo "Done:  Copy nameserver from hub.              "
-# echo "=============================================="
-# echo ''
-
-# sleep 5
-
-# clear
-
 echo ''
 echo "=============================================="
 echo "Starting LXC Seed Container for Oracle        "
