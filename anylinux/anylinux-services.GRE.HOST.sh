@@ -100,7 +100,8 @@ then
 	echo "Done: Test sshpass to HUB Host $HUBIP         "
 	echo "=============================================="
 	echo ''
-	sleep 5
+	sleep 10
+	echo ''
         MultiHost="$Operation:Y:X:X:$HUBIP:$SPOKEIP:1420:$HubUserAct:$HubSudoPwd:$GRE"
         ./anylinux-services.sh $MultiHost
 else
