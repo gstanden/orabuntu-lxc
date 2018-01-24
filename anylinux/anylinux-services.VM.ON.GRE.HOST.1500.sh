@@ -43,7 +43,7 @@ clear
 
 echo ''
 echo "=============================================="
-echo "anylinux-services.VM.ON.GRE.HOST.1420.sh      "
+echo "anylinux-services.VM.ON.GRE.HOST.1500.sh      "
 echo "=============================================="
 
 sleep 5
@@ -349,7 +349,7 @@ then
 	echo ''
 	sleep 5
 	echo ''
-        MultiHost="$Operation:Y:X:X:$HUBIP:X:1420:$HubUserAct:$HubSudoPwd:$GRE"
+        MultiHost="$Operation:Y:X:X:$HUBIP:X:1500:$HubUserAct:$HubSudoPwd:$GRE"
 	cd "$DistDir"/anylinux
         ./anylinux-services.sh $MultiHost
 else
