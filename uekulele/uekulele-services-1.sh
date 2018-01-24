@@ -442,7 +442,7 @@ then
                 then
                         sudo yum -y install wget
                         sudo mkdir -p /opt/olxc/"$DistDir"/uekulele/epel
-                        sudo chown -R ubuntu:ubuntu /opt/olxc
+                        sudo chown -R $Owner:$Group /opt/olxc
                         cd /opt/olxc/"$DistDir"/uekulele/epel
                         if   [ $Release -eq 7 ]
                         then
@@ -474,7 +474,6 @@ then
                         echo 'epel configuration and installs successful.   '
                         echo "=============================================="
                         echo ''
-                        sleep 1
                 elif [ $DocBook2X -eq 0 ] || [ $DocBook2XInstalled -eq 0 ]
                 then
                         echo ''
@@ -482,7 +481,6 @@ then
                         echo 'epel failure ... retrying epel configuration. '
                         echo "=============================================="
                         echo ''
-                        sleep 1
                 fi
                 m=$((m+1))
         done
@@ -599,7 +597,7 @@ then
                 then
                         sudo yum -y install wget
                         sudo mkdir -p /opt/olxc/"$DistDir"/uekulele/epel
-                        sudo chown -R ubuntu:ubuntu /opt/olxc
+                        sudo chown -R $Owner:$Group /opt/olxc
                         cd /opt/olxc/"$DistDir"/uekulele/epel
                         if   [ $Release -eq 7 ]
                         then
@@ -775,7 +773,8 @@ then
 
 			sudo touch /etc/rpm/macros
 			sudo yum -y install rpm-build wget openssl-devel gcc make docbook2X xmlto docbook automake graphviz libtool
-			mkdir -p /opt/olxc/"$DistDir"/uekulele/lxc
+			sudo mkdir -p /opt/olxc/"$DistDir"/uekulele/lxc
+			sudo chown -R $Owner:$Group /opt/olxc
 			cd /opt/olxc/"$DistDir"/uekulele/lxc
 			
 			echo ''
@@ -863,7 +862,8 @@ then
 
 			sudo touch /etc/rpm/macros
 			sudo yum -y install rpm-build wget openssl-devel gcc make docbook2X xmlto docbook automake graphviz
-			mkdir -p /opt/olxc/"$DistDir"/uekulele/lxc
+			sudo mkdir -p /opt/olxc/"$DistDir"/uekulele/lxc
+			sudo chown $Owner:$Group /opt/olxc/"$DistDir"/uekulele/lxc
 			cd /opt/olxc/"$DistDir"/uekulele/lxc
 			wget --timeout=5 --tries=10 https://linuxcontainers.org/downloads/lxc/lxc-"$LxcVersion".tar.gz
 			mkdir -p /opt/olxc/"$DistDir"/uekulele/lxc/rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
