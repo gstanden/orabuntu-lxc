@@ -39,9 +39,18 @@
 
 trap "exit" INT TERM; trap "kill 0" EXIT; sudo -v || exit $?; sleep 1; while true; do sleep 60; sudo -nv; done 2>/dev/null &
 
-GRE=N
+clear
+
+echo ''
+echo "=============================================="
+echo "anylinux-services.VM.ON.GRE.HOST.1500.sh      "
+echo "=============================================="
+
+sleep 5
 
 clear
+
+GRE=N
 
 if [ -z $1 ]
 then
@@ -66,14 +75,292 @@ fi
 if   [ $OpType = 'rei' ]
 then
         Operation=reinstall
+
 elif [ $OpType = 'new' ]
 then
         Operation=new
 fi
 
-MultiHost="$Operation:Y:X:X:X:X:1500:X:X:$GRE"
+if [ -z $2 ]
+then
+        SPOKEIP='lan.ip.this.host'
+#       SPOKEIP=192.168.7.27
+else
+        SPOKEIP=$2
+fi
 
-./anylinux-services.sh $MultiHost
+if [ -z $3 ]
+then
+        HUBIP='lan.ip.hub.host'
+#       HUBIP=192.168.7.32
+else
+        HUBIP=$3
+fi
+
+if [ -z $4 ]
+then
+        HubUserAct=username
+#       HubUserAct=orabuntu
+else
+        HubUserAct=$4
+fi
+
+if [ -z $4 ]
+then
+        HubSudoPwd=password
+#       HubSudoPwd=balihigh
+else
+        HubSudoPwd=$5
+fi
+
+if [ $SPOKEIP = 'lan.ip.this.host' ] || [ $HUBIP = 'lan.ip.hub.host' ] || [ $HubUserAct = 'username' ] || [ $HubSudoPwd = 'password' ]
+then
+        echo 'You must edit this file first and set the SPOKEIIP, HUBIP, HubUserAct, and the HubSudoPwd'
+        echo 'After setting these in this file re-run the script'
+        echo 'Also ... be SURE to verify these values carefully before running Orabuntu-LXC install !'
+        exit
+fi
+
+function GetDistDir {
+        pwd | rev | cut -f2-20 -d'/' | rev
+}
+DistDir=$(GetDistDir)
+
+function GetGroup {
+        id | cut -f2 -d' ' | cut -f2 -d'(' | cut -f1 -d')'
+}
+Group=$(GetGroup)
+
+function GetOwner {
+        id | cut -f1 -d' ' | cut -f2 -d'(' | cut -f1 -d')'
+}
+Owner=$(GetOwner)
+
+GetLinuxFlavors(){
+if   [[ -e /etc/oracle-release ]]
+then
+        LinuxFlavors=$(cat /etc/oracle-release | cut -f1 -d' ')
+elif [[ -e /etc/redhat-release ]]
+then
+        LinuxFlavors=$(cat /etc/redhat-release | cut -f1 -d' ')
+elif [[ -e /usr/bin/lsb_release ]]
+then
+        LinuxFlavors=$(lsb_release -d | awk -F ':' '{print $2}' | cut -f1 -d' ')
+elif [[ -e /etc/issue ]]
+then
+        LinuxFlavors=$(cat /etc/issue | cut -f1 -d' ')
+else
+        LinuxFlavors=$(cat /proc/version | cut -f1 -d' ')
+fi
+}
+GetLinuxFlavors
+
+function TrimLinuxFlavors {
+echo $LinuxFlavors | sed 's/^[ \t]//;s/[ \t]$//'
+}
+LinuxFlavor=$(TrimLinuxFlavors)
+
+if   [ $LinuxFlavor = 'Oracle' ]
+then
+	CutIndex=7
+        function GetRedHatVersion {
+                sudo cat /etc/redhat-release | cut -f"$CutIndex" -d' ' | cut -f1 -d'.'
+        }
+        RedHatVersion=$(GetRedHatVersion)
+        function GetOracleDistroRelease {
+                sudo cat /etc/oracle-release | cut -f5 -d' ' | cut -f1 -d'.'
+        }
+        OracleDistroRelease=$(GetOracleDistroRelease)
+        Release=$OracleDistroRelease
+        LF=$LinuxFlavor
+        RL=$Release
+	SubDirName=uekulele
+elif [ $LinuxFlavor = 'Red' ] || [ $LinuxFlavor = 'CentOS' ]
+then
+        if   [ $LinuxFlavor = 'Red' ]
+        then
+                CutIndex=7
+        elif [ $LinuxFlavor = 'CentOS' ]
+        then
+                CutIndex=4
+        fi
+        function GetRedHatVersion {
+                sudo cat /etc/redhat-release | cut -f"$CutIndex" -d' ' | cut -f1 -d'.'
+        }
+        RedHatVersion=$(GetRedHatVersion)
+        Release=$RedHatVersion
+        LF=$LinuxFlavor
+        RL=$Release
+	SubDirName=uekulele
+elif [ $LinuxFlavor = 'Fedora' ]
+then
+        CutIndex=3
+        function GetRedHatVersion {
+                sudo cat /etc/redhat-release | cut -f"$CutIndex" -d' ' | cut -f1 -d'.'
+        }
+        RedHatVersion=$(GetRedHatVersion)
+        if [ $RedHatVersion -ge 19 ]
+        then
+                Release=7
+        elif [ $RedHatVersion -ge 12 ] && [ $RedHatVersion -le 18 ]
+        then
+                Release=6
+        fi
+        LF=$LinuxFlavor
+        RL=$Release
+	SubDirName=uekulele
+elif [ $LinuxFlavor = 'Ubuntu' ]
+then
+        function GetUbuntuVersion {
+                cat /etc/lsb-release | grep DISTRIB_RELEASE | cut -f2 -d'='
+        }
+        UbuntuVersion=$(GetUbuntuVersion)
+        LF=$LinuxFlavor
+        RL=$UbuntuVersion
+        function GetUbuntuMajorVersion {
+                cat /etc/lsb-release | grep DISTRIB_RELEASE | cut -f2 -d'=' | cut -f1 -d'.'
+        }
+        UbuntuMajorVersion=$(GetUbuntuMajorVersion)
+	SubDirName=orabuntu
+fi
+
+clear
+
+if [ $LinuxFlavor != 'Ubuntu' ] && [ $LinuxFlavor != 'Fedora' ]
+then
+	echo ''
+	echo "=============================================="
+	echo "Configure epel for $LinuxFlavor...            "
+	echo "=============================================="
+	echo ''
+
+	DocBook2X=0
+	DocBook2XInstalled=0
+	m=1
+	while [ $DocBook2X -eq 0 ] || [ $DocBook2XInstalled -eq 0 ] && [ $m -le 5 ]
+	do
+       		if [ $LinuxFlavor != 'Fedora' ]
+        	then
+                        echo ''
+                        echo "=============================================="
+                        echo 'Configure epel...                             '
+                        echo "=============================================="
+                        echo ''
+
+                	sudo yum -y install wget
+                	sudo mkdir -p /opt/olxc/"$DistDir"/uekulele/epel
+                	sudo chown -R $Owner:$Group /opt/olxc
+                	cd /opt/olxc/"$DistDir"/uekulele/epel
+                	if   [ $Release -eq 7 ]
+                	then
+                        	wget --timeout=5 --tries=10 https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+                        	sudo rpm -ivh epel-release-latest-7.noarch.rpm
+                	elif [ $Release -eq 6 ]
+                	then
+                        	wget --timeout=5 --tries=10 https://dl.fedoraproject.org/pub/epel/epel-release-latest-6.noarch.rpm
+                        	sudo rpm -ivh epel-release-latest-6.noarch.rpm
+                	fi
+                	sudo yum provides lxc | sed '/^\s*$/d' | grep Repo | sort -u
+                	sudo yum -y install docbook2X
+        	fi
+
+        	function VerifyDocBook2X {
+                	yum provides docbook2X | grep -c docbook2X
+       		}
+        	DocBook2X=$(VerifyDocBook2X)
+
+        	function CheckDocBook2XInstalled {
+                	rpm -qa | grep -c docbook2X
+        	}
+        	DocBook2XInstalled=$(CheckDocBook2XInstalled)
+
+        	if [ $DocBook2X -gt 0 ] && [ $DocBook2XInstalled -gt 0 ]
+        	then
+                	echo ''
+                	echo "=============================================="
+                	echo 'Done: Configure epel.                         '
+                	echo "=============================================="
+                	echo ''
+        	elif [ $DocBook2X -eq 0 ] || [ $DocBook2XInstalled -eq 0 ]
+        	then
+                	echo ''
+                	echo "=============================================="
+                	echo 'epel failure ... retrying epel configuration. '
+                	echo "=============================================="
+                	echo ''
+        	fi
+        	m=$((m+1))
+	
+		echo ''
+		echo "=============================================="
+		echo "Done: Configure epel for $LinuxFlavor...      "
+		echo "=============================================="
+		echo ''
+	done
+	
+	sudo yum -y install sshpass
+
+elif [ $LinuxFlavor = 'Ubuntu' ]
+then
+        echo ''
+        echo "=============================================="
+        echo 'Install sshpass package...                    '
+        echo "=============================================="
+        echo ''
+
+        sudo yum -y install sshpass
+
+        echo ''
+        echo "=============================================="
+        echo 'Done: Install sshpass package.                '
+        echo "=============================================="
+
+elif [ $LinuxFlavor = 'Fedora' ]
+then
+        echo ''
+        echo "=============================================="
+        echo 'Install sshpass package...                    '
+        echo "=============================================="
+        echo ''
+
+        sudo dnf -y install sshpass
+
+        echo ''
+        echo "=============================================="
+        echo 'Done: Install sshpass package.                '
+        echo "=============================================="
+fi
+
+sleep 5
+
+echo ''
+echo "=============================================="
+echo "Test sshpass to HUB Host $HUBIP               "
+echo "=============================================="
+echo ''
+
+sshpass -p $HubSudoPwd ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $HubUserAct@$HUBIP "sudo -S <<< "$HubSudoPwd" uname -a;echo '';sudo -S <<< "$HubSudoPwd" lxc-ls -f"
+if [ $? -eq 0 ]
+then
+	echo ''
+	echo "=============================================="
+	echo "Done: Test sshpass to HUB Host $HUBIP         "
+	echo "=============================================="
+	echo ''
+	sleep 5
+	echo ''
+        MultiHost="$Operation:Y:X:X:$HUBIP:X:1500:$HubUserAct:$HubSudoPwd:$GRE"
+	cd "$DistDir"/anylinux
+        ./anylinux-services.sh $MultiHost
+else
+        echo "The sshpass to the Orabuntu-LXC HUB host at $HUBIP failed. Recheck settings in this file and re-run."
+	echo ''
+	echo "=============================================="
+	echo "Fail: Test sshpass to HUB Host $HUBIP         "
+	echo "=============================================="
+	echo ''
+	sleep 5
+        exit
+fi
 
 exit
-
