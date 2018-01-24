@@ -248,6 +248,7 @@ fi
 echo ''
 echo "=============================================="
 echo "Create the LXC oracle container...            "
+echo "(takes a few seconds to queue up ... patience)"
 echo "=============================================="
 echo ''
 
