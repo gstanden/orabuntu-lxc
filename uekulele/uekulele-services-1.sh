@@ -430,51 +430,62 @@ then
 		sudo mv /etc/dnsmasq.conf /etc/dnsmasq.olxc.1
 	fi
 	sudo yum clean all
-	sudo yum -y install wget tar gzip
 
-	function VerifyDocBook2X {
-		yum provides docbook2X | grep docbook2X
-	}
-	DocBook2X=$(VerifyDocBook2X)
+	sudo yum -y install wget tar gzip libtool
 
-	while [ $DocBook2X -ne 0 ]
-	do
-		if [ $LinuxFlavor != 'Fedora' ]
-		then
- 			mkdir -p /opt/olxc/"$DistDir"/uekulele/epel
-  			cd /opt/olxc/"$DistDir"/uekulele/epel
-			if   [ $Release -eq 7 ]
-			then
-  				wget --timeout=5 --tries=10 https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
-  				sudo rpm -ivh epel-release-latest-7.noarch.rpm 
- 			elif [ $Release -eq 6 ] 
-			then
-  				wget --timeout=5 --tries=10 https://dl.fedoraproject.org/pub/epel/epel-release-latest-6.noarch.rpm
-  				sudo rpm -ivh epel-release-latest-6.noarch.rpm 
-			fi
-			sudo yum provides lxc | sed '/^\s*$/d' | grep Repo | sort -u
-		fi
+        DocBook2X=0
+        DocBook2XInstalled=0
+        m=1
+        while [ $DocBook2X -eq 0 ] || [ $DocBook2XInstalled -eq 0 ] && [ $m -le 5 ]
+        do
+                if [ $LinuxFlavor != 'Fedora' ]
+                then
+                        sudo yum -y install wget
+                        sudo mkdir -p /opt/olxc/"$DistDir"/uekulele/epel
+                        sudo chown -R ubuntu:ubuntu /opt/olxc
+                        cd /opt/olxc/"$DistDir"/uekulele/epel
+                        if   [ $Release -eq 7 ]
+                        then
+                                wget --timeout=5 --tries=10 https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+                                sudo rpm -ivh epel-release-latest-7.noarch.rpm
+                        elif [ $Release -eq 6 ]
+                        then
+                                wget --timeout=5 --tries=10 https://dl.fedoraproject.org/pub/epel/epel-release-latest-6.noarch.rpm
+                                sudo rpm -ivh epel-release-latest-6.noarch.rpm
+                        fi
+                        sudo yum provides lxc | sed '/^\s*$/d' | grep Repo | sort -u
+                        sudo yum -y install docbook2X
+                fi
 
-		DocBook2X=$(VerifyDocBook2X)
+                function VerifyDocBook2X {
+                        yum provides docbook2X | grep -c docbook2X
+                }
+                DocBook2X=$(VerifyDocBook2X)
 
-		if [ $DocBook2X -eq 0 ]
-		then
-			echo ''
-			echo "=============================================="
-			echo 'epel configuration and installs successful.   '
-			echo "=============================================="
-			echo ''
-			sleep 5
-		elif [ $DocBook2X -ne 0 ]
-		then
-			echo ''
-			echo "=============================================="
-			echo 'epel failure ... retrying epel configuration. '
-			echo "=============================================="
-			echo ''
-			sleep 5
-		fi
-	done
+                function CheckDocBook2XInstalled {
+                        rpm -qa | grep -c docbook2X
+                }
+                DocBook2XInstalled=$(CheckDocBook2XInstalled)
+
+                if [ $DocBook2X -gt 0 ] && [ $DocBook2XInstalled -gt 0 ]
+                then
+                        echo ''
+                        echo "=============================================="
+                        echo 'epel configuration and installs successful.   '
+                        echo "=============================================="
+                        echo ''
+                        sleep 1
+                elif [ $DocBook2X -eq 0 ] || [ $DocBook2XInstalled -eq 0 ]
+                then
+                        echo ''
+                        echo "=============================================="
+                        echo 'epel failure ... retrying epel configuration. '
+                        echo "=============================================="
+                        echo ''
+                        sleep 1
+                fi
+                m=$((m+1))
+        done
 
 	cd /opt/olxc/"$DistDir"
 
@@ -577,21 +588,62 @@ then
 		sudo mv /etc/dnsmasq.conf /etc/dnsmasq.olxc.1
 	fi
 	sudo yum -y install wget tar gzip libtool
-	if [ $LinuxFlavor != 'Fedora' ]
-	then
- 		mkdir -p /opt/olxc/"$DistDir"/uekulele/epel
-  		cd /opt/olxc/"$DistDir"/uekulele/epel
-		if [ $Release -eq 7 ] 
-		then
-  			wget --timeout=5 --tries=10 https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
-  			sudo rpm -ivh epel-release-latest-7.noarch.rpm 
- 		elif [ $Release -eq 6 ] 
-		then
-  			wget --timeout=5 --tries=10 https://dl.fedoraproject.org/pub/epel/epel-release-latest-6.noarch.rpm
-  			sudo rpm -ivh epel-release-latest-6.noarch.rpm 
-		fi
-	fi
-	sudo yum provides lxc | sed '/^\s*$/d' | grep Repo | sort -u
+
+        DocBook2X=0
+        DocBook2XInstalled=0
+        m=1
+
+        while [ $DocBook2X -eq 0 ] || [ $DocBook2XInstalled -eq 0 ] && [ $m -le 5 ]
+        do
+                if [ $LinuxFlavor != 'Fedora' ]
+                then
+                        sudo yum -y install wget
+                        sudo mkdir -p /opt/olxc/"$DistDir"/uekulele/epel
+                        sudo chown -R ubuntu:ubuntu /opt/olxc
+                        cd /opt/olxc/"$DistDir"/uekulele/epel
+                        if   [ $Release -eq 7 ]
+                        then
+                                wget --timeout=5 --tries=10 https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+                                sudo rpm -ivh epel-release-latest-7.noarch.rpm
+                        elif [ $Release -eq 6 ]
+                        then
+                                wget --timeout=5 --tries=10 https://dl.fedoraproject.org/pub/epel/epel-release-latest-6.noarch.rpm
+                                sudo rpm -ivh epel-release-latest-6.noarch.rpm
+                        fi
+                        sudo yum provides lxc | sed '/^\s*$/d' | grep Repo | sort -u
+                        sudo yum -y install docbook2X
+                fi
+
+                function VerifyDocBook2X {
+                        yum provides docbook2X | grep -c docbook2X
+                }
+                DocBook2X=$(VerifyDocBook2X)
+
+                function CheckDocBook2XInstalled {
+                        rpm -qa | grep -c docbook2X
+                }
+                DocBook2XInstalled=$(CheckDocBook2XInstalled)
+
+                if [ $DocBook2X -gt 0 ] && [ $DocBook2XInstalled -gt 0 ]
+                then
+                        echo ''
+                        echo "=============================================="
+                        echo 'epel configuration and installs successful.   '
+                        echo "=============================================="
+                        echo ''
+                        sleep 1
+                elif [ $DocBook2X -eq 0 ] || [ $DocBook2XInstalled -eq 0 ]
+                then
+                        echo ''
+                        echo "=============================================="
+                        echo 'epel failure ... retrying epel configuration. '
+                        echo "=============================================="
+                        echo ''
+                        sleep 1
+                fi
+                m=$((m+1))
+        done
+
 	cd /opt/olxc/"$DistDir"
 
 	sudo yum -y install debootstrap perl bash-completion bash-completion-extras dnsmasq libvirt
