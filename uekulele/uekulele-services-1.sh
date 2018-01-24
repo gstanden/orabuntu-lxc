@@ -772,7 +772,7 @@ then
 			sleep 5
 
 			sudo touch /etc/rpm/macros
-			sudo yum -y install rpm-build wget openssl-devel gcc make docbook2X xmlto docbook automake graphviz libtool
+			sudo yum -y install rpm-build wget openssl-devel gcc make docbook2X xmlto automake graphviz libtool
 			sudo mkdir -p /opt/olxc/"$DistDir"/uekulele/lxc
 			sudo chown -R $Owner:$Group /opt/olxc
 			cd /opt/olxc/"$DistDir"/uekulele/lxc
@@ -862,7 +862,7 @@ then
 			sleep 5
 
 			sudo touch /etc/rpm/macros
-			sudo yum -y install rpm-build wget openssl-devel gcc make docbook2X xmlto docbook automake graphviz
+			sudo yum -y install rpm-build wget openssl-devel gcc make docbook2X xmlto automake graphviz
 			sudo mkdir -p /opt/olxc/"$DistDir"/uekulele/lxc
 			sudo chown -R $Owner:$Group /opt/olxc
 			cd /opt/olxc/"$DistDir"/uekulele/lxc
