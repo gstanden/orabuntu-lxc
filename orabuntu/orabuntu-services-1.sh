@@ -1938,8 +1938,8 @@ then
 #	sudo tar -xvf /opt/olxc/"$DistDir"/orabuntu/archives/scst-files.tar -C /         --touch
 	sleep 2
         sudo mv /opt/olxc/home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/scst-files /opt/olxc/home/"$Owner"/Downloads/orabuntu-lxc-master/orabuntu/archives/scst-files
-        sudo chown $Owner:$Group /opt/olxc/home/orabuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/
-        sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /opt/olxc/"$DistDir"/orabuntu/archives/scst-files/create-scst-oracle.sh
+        sudo chown -R $Owner:$Group /opt/olxc/home/"$Owner"/Downloads/orabuntu-lxc-master/orabuntu/archives/scst-files
+        sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /opt/olxc/home/"$Owner"/Downloads/orabuntu-lxc-master/orabuntu/archives/scst-files/create-scst-oracle.sh
 		
 	echo ''
 	echo "=============================================="
