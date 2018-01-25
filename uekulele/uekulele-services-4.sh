@@ -503,7 +503,7 @@ echo "=============================================="
 echo ''
 
 sudo lxc-start -n $SeedContainerName > /dev/null 2>&1
-sleep 2
+sleep 5
 sudo lxc-ls -f
 
 echo ''

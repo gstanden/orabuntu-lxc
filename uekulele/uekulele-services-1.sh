@@ -920,7 +920,7 @@ then
 
 	echo ''
 	echo "=============================================="
-	echo "Display Bridge for LXC ...                    "
+	echo "Display Legacy Bridge for LXC ...             "
 	echo "=============================================="
 	echo ''
 
@@ -2602,9 +2602,13 @@ then
 	echo "=============================================="
 	echo ''
 
-	sudo tar -xvf /opt/olxc/"$DistDir"/uekulele/archives/scst-files.tar -C /opt/olxc	--touch
-#	sudo tar -xvf /opt/olxc/"$DistDir"/uekulele/archives/scst-files.tar -C /		--touch
-#	sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /opt/olxc/"$DistDir"/uekulele/archives/scst-files/create-scst-oracle.sh
+        sudo tar -xvf /opt/olxc/"$DistDir"/uekulele/archives/scst-files.tar -C /opt/olxc --touch
+        sudo tar -xf  /opt/olxc/"$DistDir"/uekulele/archives/tgt-files.tar  -C /opt/olxc --touch
+        sleep 5
+        sudo mv /opt/olxc/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/archives/scst-files /opt/olxc/home/"$Owner"/Downloads/orabuntu-lxc-master/uekulele/archives/.
+        sudo mv /opt/olxc/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/archives/tgt-files  /opt/olxc/home/"$Owner"/Downloads/orabuntu-lxc-master/uekulele/archives/.
+        sudo chown -R $Owner:$Group                                                              /opt/olxc/home/"$Owner"/Downloads/orabuntu-lxc-master/uekulele/archives/.
+        sudo sed -i "s/SWITCH_IP/$Sw1Index/g"                                                    /opt/olxc/home/"$Owner"/Downloads/orabuntu-lxc-master/uekulele/archives/scst-files/create-scst-oracle.sh
 		
 	echo ''
 	echo "=============================================="

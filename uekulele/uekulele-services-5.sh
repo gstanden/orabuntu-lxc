@@ -342,6 +342,7 @@ function CheckClonedContainersExist {
 }
 ClonedContainersExist=$(CheckClonedContainersExist)
 
+k=1
 for j in $ClonedContainersExist
 do
 	# GLS 20160707 updated to use lxc-copy instead of lxc-clone for Ubuntu 16.04
@@ -366,7 +367,7 @@ do
 		sudo bash -c "cat $Config|grep ipv4|cut -f2 -d'='|sed 's/^[ \t]*//;s/[ \t]*$//'|cut -f4 -d'.'|sed 's/^/\./'|xargs -I '{}' sed -i "/ipv4/s/\{}/\.1$OR/g" $Config"
 	fi
 	sudo lxc-start -n $j > /dev/null 2>&1
-	sleep 10
+	sleep 5
 	i=1
 	while [ "$PublicIPIterative" != 1020739 ] && [ "$i" -le 10 ]
 	do
@@ -536,6 +537,10 @@ then
 	                /etc/orabuntu-lxc-scripts/stop_containers.sh
 	                /etc/orabuntu-lxc-scripts/start_containers.sh
 	        fi
+
+		sleep 5
+
+		clear
 	
 	        echo ''
 	        echo "=============================================="
