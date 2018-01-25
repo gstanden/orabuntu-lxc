@@ -784,8 +784,6 @@ then
 	
 			ping -c 10 linuxcontainers.org
 			echo ''
-			nslookup linuxcontainers.org
-			echo ''
 			wget --timeout=5 --tries=10 https://linuxcontainers.org/downloads/lxc/lxc-"$LxcVersion".tar.gz
 			sudo mkdir -p /opt/olxc/"$DistDir"/uekulele/lxc/rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
 			sudo chown -R $Owner:$Group /opt/olxc/
