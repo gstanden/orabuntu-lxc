@@ -1120,6 +1120,5 @@ fi
 
 # Set permissions on scst-files and cleanup staging area
 
-sudo chown -R $Group:$Owner /opt/olxc/"$DistDir"/uekulele/archives/scst-files
 sudo rm -f /opt/olxc/*.lst /opt/olxc/*.tar
 sudo rm -r /opt/olxc/home/ubuntu

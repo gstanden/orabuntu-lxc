@@ -1937,12 +1937,13 @@ then
 	echo "=============================================="
 	echo ''
 
-	sudo tar -xvf /opt/olxc/"$DistDir"/orabuntu/archives/scst-files.tar -C /opt/olxc --touch
-#	sudo tar -xvf /opt/olxc/"$DistDir"/orabuntu/archives/scst-files.tar -C /         --touch
+	sudo tar -xf /opt/olxc/"$DistDir"/orabuntu/archives/scst-files.tar -C /opt/olxc --touch
+	sudo tar -xf /opt/olxc/"$DistDir"/orabuntu/archives/tgt-files.tar -C /opt/olxc --touch
 	sleep 2
-        sudo mv /opt/olxc/home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/scst-files /opt/olxc/home/"$Owner"/Downloads/orabuntu-lxc-master/orabuntu/archives/scst-files
-        sudo chown -R $Owner:$Group /opt/olxc/home/"$Owner"/Downloads/orabuntu-lxc-master/orabuntu/archives/scst-files
-        sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /opt/olxc/home/"$Owner"/Downloads/orabuntu-lxc-master/orabuntu/archives/scst-files/create-scst-oracle.sh
+	sudo mv /opt/olxc/home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/scst-files /opt/olxc/home/"$Owner"/Downloads/orabuntu-lxc-master/orabuntu/archives/.
+	sudo mv /opt/olxc/home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/tgt-files  /opt/olxc/home/"$Owner"/Downloads/orabuntu-lxc-master/orabuntu/archives/.
+        sudo chown -R $Owner:$Group                                                              /opt/olxc/home/"$Owner"/Downloads/orabuntu-lxc-master/orabuntu/archives/.
+        sudo sed -i "s/SWITCH_IP/$Sw1Index/g"                                                    /opt/olxc/home/"$Owner"/Downloads/orabuntu-lxc-master/orabuntu/archives/scst-files/create-scst-oracle.sh
 		
 	echo ''
 	echo "=============================================="
