@@ -346,6 +346,7 @@ then
 	echo ''
 	sleep 5
 	echo ''
+	cd "$DistDir"/anylinux
         MultiHost="$Operation:Y:X:X:$HUBIP:$SPOKEIP:1420:$HubUserAct:$HubSudoPwd:$GRE"
         ./anylinux-services.sh $MultiHost
 else
