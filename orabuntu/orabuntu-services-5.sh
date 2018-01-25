@@ -275,7 +275,7 @@ do
 		sudo bash -c "cat $Config|grep ipv4|cut -f2 -d'='|sed 's/^[ \t]*//;s/[ \t]*$//'|cut -f4 -d'.'|sed 's/^/\./'|xargs -I '{}' sed -i "/ipv4/s/\{}/\.1$OR/g" $Config"
 	fi
 	sudo lxc-start -n $j > /dev/null 2>&1
-	sleep 5
+	sleep 10
 	i=1
 	while [ "$PublicIPIterative" != 1020739 ] && [ "$i" -le 10 ]
 	do
