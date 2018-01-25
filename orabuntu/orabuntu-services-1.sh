@@ -255,7 +255,7 @@ then
 		echo "=============================================="
 		echo '' 
 		echo "=============================================="
-		echo "Re-run anylinux-services.sh after reboot...   "
+		echo "Re-run anylinux-services after reboot...      "
 		echo "=============================================="
 
 		sudo /etc/orabuntu-lxc-scripts/stop_containers.sh
@@ -360,7 +360,7 @@ then
 		echo "=============================================="
 		echo '' 
 		echo "=============================================="
-		echo "Re-run anylinux-services.sh after reboot...   "
+		echo "Re-run anylinux-services after reboot...      "
 		echo "=============================================="
 
 		sleep 5

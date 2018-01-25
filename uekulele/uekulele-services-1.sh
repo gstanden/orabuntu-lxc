@@ -304,7 +304,7 @@ then
 		echo "=============================================="
 		echo '' 
 		echo "=============================================="
-		echo "Re-run anylinux-services.sh after reboot...   "
+		echo "Re-run anylinux-services after reboot...      "
 		echo "=============================================="
 		echo ''
 
@@ -408,7 +408,7 @@ then
 		echo "=============================================="
 		echo '' 
 		echo "=============================================="
-		echo "Re-run anylinux-services.sh after reboot...   "
+		echo "Re-run anylinux-services after reboot...      "
 		echo "=============================================="
 
 		sleep 5
