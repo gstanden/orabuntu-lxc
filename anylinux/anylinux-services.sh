@@ -572,10 +572,55 @@ else
 	echo 'ExtrNet6                  = '$ExtrNet6
 fi
 
+function GetMultiHostVar1 {
+	echo $MultiHost | cut -f1 -d':'
+}
+MultiHostVar1=$(GetMultiHostVar1)
+ 
+function GetMultiHostVar2 {
+        echo $MultiHost | cut -f2 -d':'
+}
+MultiHostVar2=$(GetMultiHostVar2)
+
 function GetMultiHostVar3 {
-	echo $MultiHost | cut -f3 -d':'
+        echo $MultiHost | cut -f3 -d':'
 }
 MultiHostVar3=$(GetMultiHostVar3)
+
+function GetMultiHostVar4 {
+        echo $MultiHost | cut -f4 -d':'
+}
+MultiHostVar4=$(GetMultiHostVar4)
+
+function GetMultiHostVar5 {
+        echo $MultiHost | cut -f5 -d':'
+}
+MultiHostVar5=$(GetMultiHostVar5)
+
+function GetMultiHostVar6 {
+        echo $MultiHost | cut -f6 -d':'
+}
+MultiHostVar6=$(GetMultiHostVar6)
+
+function GetMultiHostVar7 {
+        echo $MultiHost | cut -f7 -d':'
+}
+MultiHostVar7=$(GetMultiHostVar7)
+
+function GetMultiHostVar8 {
+        echo $MultiHost | cut -f8 -d':'
+}
+MultiHostVar8=$(GetMultiHostVar8)
+
+function GetMultiHostVar9 {
+        echo $MultiHost | cut -f9 -d':'
+}
+MultiHostVar9=$(GetMultiHostVar9)
+
+function GetMultiHostVar10 {
+        echo $MultiHost | cut -f10 -d':'
+}
+MultiHostVar10=$(GetMultiHostVar10)
 
 if   [ $MultiHostVar3 = 'X' ] && [ $GREValue = 'Y' ]
 then

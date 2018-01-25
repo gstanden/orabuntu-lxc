@@ -433,10 +433,9 @@ then
 
 	sudo yum -y install wget tar gzip libtool
 
-        DocBook2X=0
         DocBook2XInstalled=0
         m=1
-        while [ $DocBook2X -eq 0 ] || [ $DocBook2XInstalled -eq 0 ] && [ $m -le 5 ]
+        while [ $DocBook2XInstalled -eq 0 ] && [ $m -le 5 ]
         do
                 if [ $LinuxFlavor != 'Fedora' ]
                 then
@@ -457,24 +456,19 @@ then
                         sudo yum -y install docbook2X
                 fi
 
-                function VerifyDocBook2X {
-                        yum provides docbook2X | grep -c docbook2X
-                }
-                DocBook2X=$(VerifyDocBook2X)
-
                 function CheckDocBook2XInstalled {
                         rpm -qa | grep -c docbook2X
                 }
                 DocBook2XInstalled=$(CheckDocBook2XInstalled)
 
-                if [ $DocBook2X -gt 0 ] && [ $DocBook2XInstalled -gt 0 ]
+                if   [ $DocBook2XInstalled -gt 0 ]
                 then
                         echo ''
                         echo "=============================================="
                         echo 'epel configuration and installs successful.   '
                         echo "=============================================="
                         echo ''
-                elif [ $DocBook2X -eq 0 ] || [ $DocBook2XInstalled -eq 0 ]
+                elif [ $DocBook2XInstalled -eq 0 ]
                 then
                         echo ''
                         echo "=============================================="
@@ -587,11 +581,10 @@ then
 	fi
 	sudo yum -y install wget tar gzip libtool
 
-        DocBook2X=0
         DocBook2XInstalled=0
         m=1
 
-        while [ $DocBook2X -eq 0 ] || [ $DocBook2XInstalled -eq 0 ] && [ $m -le 5 ]
+        while [ $DocBook2XInstalled -eq 0 ] && [ $m -le 5 ]
         do
                 if [ $LinuxFlavor != 'Fedora' ]
                 then
@@ -612,17 +605,12 @@ then
                         sudo yum -y install docbook2X
                 fi
 
-                function VerifyDocBook2X {
-                        yum provides docbook2X | grep -c docbook2X
-                }
-                DocBook2X=$(VerifyDocBook2X)
-
                 function CheckDocBook2XInstalled {
                         rpm -qa | grep -c docbook2X
                 }
                 DocBook2XInstalled=$(CheckDocBook2XInstalled)
 
-                if [ $DocBook2X -gt 0 ] && [ $DocBook2XInstalled -gt 0 ]
+                if  [ $DocBook2XInstalled -gt 0 ]
                 then
                         echo ''
                         echo "=============================================="
@@ -630,7 +618,7 @@ then
                         echo "=============================================="
                         echo ''
                         sleep 1
-                elif [ $DocBook2X -eq 0 ] || [ $DocBook2XInstalled -eq 0 ]
+                elif  [ $DocBook2XInstalled -eq 0 ]
                 then
                         echo ''
                         echo "=============================================="
@@ -2425,7 +2413,7 @@ sleep 5
 
 clear
 
-if [ $GRE = 'Y' ] || [ $MultiHostVar3 -eq 1 ]
+if [ $GRE = 'Y' ] || [ $MultiHostVar3 != 'X' ]
 then
 	echo ''
 	echo "=============================================="
@@ -2882,7 +2870,8 @@ then
 	DhcpRange=$(GetDhcpRange)
 	DHR="$DhcpRange"
 	sudo sed -i "s/DHCP-RANGE-OLXC/dhcp-range=$DHR/" /etc/dnsmasq.conf
-        sudo service lxc-net restart 
+	sudo systemctl daemon-reload
+        sudo service lxc-net restart > /dev/null 2>&1
         sleep 2
         sudo service lxc-net status
 
@@ -2980,7 +2969,7 @@ then
 		DhcpRange=$(GetDhcpRange)
 		DHR="$DhcpRange"
 		sudo sed -i "s/DHCP-RANGE-OLXC/dhcp-range=$DHR/" /etc/dnsmasq.conf
-		sudo service lxc-net restart
+		sudo service lxc-net restart> /dev/null 2>&1
  		sudo service lxc-net status
 		echo ''
 		sleep 2

@@ -1829,23 +1829,26 @@ sleep 5
 
 clear
 
-echo ''
-echo "=============================================="
-echo "Verify iptables rules are set correctly...    "
-echo "=============================================="
-echo ''
+if [ $GRE = 'Y' ] || [ $MultiHostVar3 != 'X' ]
+then
+	echo ''
+	echo "=============================================="
+	echo "Verify iptables rules are set correctly...    "
+	echo "=============================================="
+	echo ''
 
-sudo iptables -S | egrep 'sw1|sx1'
+	sudo iptables -S | egrep 'sw1|sx1'
 
-echo ''
-echo "=============================================="
-echo "Verification of iptables rules complete.      "
-echo "=============================================="
-echo ''
+	echo ''
+	echo "=============================================="
+	echo "Verification of iptables rules complete.      "
+	echo "=============================================="
+	echo ''
 
-sleep 5
+	sleep 5
 
-clear
+	clear
+fi
 
 if [ $(SoftwareVersion $LXCVersion) -ge $(SoftwareVersion "2.1.0") ] && [ $MultiHostVar2 = 'N' ]
 then

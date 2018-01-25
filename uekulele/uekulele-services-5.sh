@@ -81,6 +81,16 @@ function GetMultiHostVar7 {
 }
 MultiHostVar7=$(GetMultiHostVar7)
 
+function GetMultiHostVar8 {
+	echo $MultiHost | cut -f8 -d':'
+}
+MultiHostVar8=$(GetMultiHostVar8)
+
+function GetMultiHostVar9 {
+	echo $MultiHost | cut -f9 -d':'
+}
+MultiHostVar9=$(GetMultiHostVar9)
+
 function GetMultiHostVar10 {
 	echo $MultiHost | cut -f10 -d':'
 }
@@ -312,6 +322,11 @@ then
 	clear
 fi
 
+sudo systemctl daemon-reload
+sudo service lxc-net restart > /dev/null 2>&1
+sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service lxc-net restart > /dev/null 2>&1"
+sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service systemd-resolved restart > /dev/null 2>&1"
+
 echo ''
 echo "=============================================="
 echo "Starting LXC cloned containers for Oracle...  "
@@ -370,6 +385,7 @@ do
                         echo ''
 			sudo /etc/network/openvswitch/veth_cleanups.sh $j
 			echo ''
+			sudo systemctl daemon-reload
 			sudo service lxc-net restart > /dev/null 2>&1
 			sleep 2
 			sudo lxc-start -n $j
@@ -435,7 +451,8 @@ then
 	DHR="$DhcpRange"
 	sudo sed -i "s/DHCP-RANGE-OLXC/dhcp-range=$DHR/" /etc/dnsmasq.conf
 
-        sudo service lxc-net restart
+	sudo systemctl daemon-reload
+        sudo service lxc-net restart > /dev/null 2>&1
         sleep 2
         sudo service lxc-net status
 
@@ -701,7 +718,8 @@ then
 		DHR="$DhcpRange"
 		sudo sed -i "s/DHCP-RANGE-OLXC/dhcp-range=$DHR/" /etc/dnsmasq.conf
 
-		sudo service lxc-net restart
+		sudo systemctl daemon-reload
+		sudo service lxc-net restart > /dev/null 2>&1
 		sleep 2
 		sudo service lxc-net status
 
@@ -853,7 +871,8 @@ then
 			DHR="$DhcpRange"
 			sudo sed -i "s/DHCP-RANGE-OLXC/dhcp-range=$DHR/" /etc/dnsmasq.conf
 
-			sudo service lxc-net restart
+			sudo systemctl daemon-reload
+			sudo service lxc-net restart > /dev/null 2>&1
 			sleep 2
 			sudo service lxc-net status
 

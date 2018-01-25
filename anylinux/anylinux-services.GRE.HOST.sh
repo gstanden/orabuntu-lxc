@@ -84,7 +84,7 @@ fi
 if [ -z $2 ]
 then
 	SPOKEIP='lan.ip.this.host'
-#	SPOKEIP=192.168.7.27
+ 	SPOKEIP=192.168.7.27
 else
 	SPOKEIP=$2
 fi
@@ -92,7 +92,7 @@ fi
 if [ -z $3 ]
 then
 	HUBIP='lan.ip.hub.host'
-#	HUBIP=192.168.7.32
+ 	HUBIP=192.168.7.32
 else
 	HUBIP=$3
 fi
@@ -100,7 +100,7 @@ fi
 if [ -z $4 ]
 then
 	HubUserAct=username
-#	HubUserAct=orabuntu
+ 	HubUserAct=orabuntu
 else
 	HubUserAct=$4
 fi
@@ -108,7 +108,7 @@ fi
 if [ -z $4 ]
 then
 	HubSudoPwd=password
-#	HubSudoPwd=balihigh
+ 	HubSudoPwd=balihigh
 else
 	HubSudoPwd=$5
 fi
@@ -224,29 +224,20 @@ then
         SubDirName=orabuntu
 fi
 
-if   [ $LinuxFlavor != 'Ubuntu' ] && [ $LinuxFlavor != 'Fedora' ]
+if [ $LinuxFlavor != 'Ubuntu' ] && [ $LinuxFlavor != 'Fedora' ]
 then
         echo ''
         echo "=============================================="
-        echo "Configure epel for $LinuxFlavor...            "
+        echo "Configure epel for $LinuxFlavor Linux...      "
         echo "=============================================="
         echo ''
 
-	sleep 5
-
-        DocBook2X=0
         DocBook2XInstalled=0
         m=1
-        while [ $DocBook2X -eq 0 ] || [ $DocBook2XInstalled -eq 0 ] && [ $m -le 5 ]
+        while [ $DocBook2XInstalled -eq 0 ] && [ $m -le 5 ]
         do
                 if [ $LinuxFlavor != 'Fedora' ]
                 then
-                        echo ''
-                        echo "=============================================="
-                        echo 'Configure epel...                             '
-                        echo "=============================================="
-                        echo ''
-
                         sudo yum -y install wget
                         sudo mkdir -p /opt/olxc/"$DistDir"/uekulele/epel
                         sudo chown -R $Owner:$Group /opt/olxc
@@ -264,84 +255,80 @@ then
                         sudo yum -y install docbook2X
                 fi
 
-                function VerifyDocBook2X {
-                        yum provides docbook2X | grep -c docbook2X
-                }
-                DocBook2X=$(VerifyDocBook2X)
-
                 function CheckDocBook2XInstalled {
                         rpm -qa | grep -c docbook2X
                 }
                 DocBook2XInstalled=$(CheckDocBook2XInstalled)
 
-                if [ $DocBook2X -gt 0 ] && [ $DocBook2XInstalled -gt 0 ]
+                if   [ $DocBook2XInstalled -gt 0 ]
                 then
                         echo ''
                         echo "=============================================="
-                        echo 'Done: Configure epel.                         '
+                        echo "Done: Configure epel for $LinuxFlavor Linux.  "
                         echo "=============================================="
-                elif [ $DocBook2X -eq 0 ] || [ $DocBook2XInstalled -eq 0 ]
+                        echo ''
+                        sleep 5
+                        clear
+                elif [ $DocBook2XInstalled -eq 0 ]
                 then
                         echo ''
                         echo "=============================================="
                         echo 'epel failure ... retrying epel configuration. '
                         echo "=============================================="
+                        echo ''
+                        sleep 5
+                        clear
                 fi
                 m=$((m+1))
-        
-		echo ''
-	        echo "=============================================="
-        	echo "Done: Configure epel for $LinuxFlavor...      "
-        	echo "=============================================="
         done
 
-	echo ''
-	echo "=============================================="
-	echo 'Install sshpass package...                    '
-	echo "=============================================="
-	echo ''
+        echo ''
+        echo "=============================================="
+        echo 'Install sshpass package...                    '
+        echo "=============================================="
+        echo ''
 
         sudo yum -y install sshpass
 
-	echo ''
-	echo "=============================================="
-	echo 'Done: Install sshpass package.                '
-	echo "=============================================="
-
+        echo ''
+        echo "=============================================="
+        echo 'Done: Install sshpass package.                '
+        echo "=============================================="
+        sleep 5
+        clear
 elif [ $LinuxFlavor = 'Ubuntu' ]
 then
-	echo ''
-	echo "=============================================="
-	echo 'Install sshpass package...                    '
-	echo "=============================================="
-	echo ''
+        echo ''
+        echo "=============================================="
+        echo 'Install sshpass package...                    '
+        echo "=============================================="
+        echo ''
 
-	sudo apt-get -y install sshpass
+        sudo yum -y install sshpass
 
-	echo ''
-	echo "=============================================="
-	echo 'Done: Install sshpass package.                '
-	echo "=============================================="
-
+        echo ''
+        echo "=============================================="
+        echo 'Done: Install sshpass package.                '
+        echo "=============================================="
+        sleep 5
+        clear
 elif [ $LinuxFlavor = 'Fedora' ]
 then
-	echo ''
-	echo "=============================================="
-	echo 'Install sshpass package...                    '
-	echo "=============================================="
-	echo ''
+        echo ''
+        echo "=============================================="
+        echo 'Install sshpass package...                    '
+        echo "=============================================="
+        echo ''
 
-	sudo dnf -y install sshpass
-	
-	echo ''
-	echo "=============================================="
-	echo 'Done: Install sshpass package.                '
-	echo "=============================================="
+        sudo dnf -y install sshpass
+
+        echo ''
+        echo "=============================================="
+        echo 'Done: Install sshpass package.                '
+        echo "=============================================="
+        sleep 5
+        clear
 fi
-
-sleep 5
-
-clear
 
 echo ''
 echo "=============================================="
@@ -349,7 +336,7 @@ echo "Test sshpass to HUB Host $HUBIP               "
 echo "=============================================="
 echo ''
 
-sshpass -p $HubSudoPwd ssh -qtt -o CheckHostIP=no -o StrictHostKeyChecking=no $HubUserAct@$HUBIP "sudo -S <<< "$HubSudoPwd" uname -a;echo '';sudo -S <<< "$HubSudoPwd" lxc-ls -f"
+sshpass -p $HubSudoPwd ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $HubUserAct@$HUBIP "sudo -S <<< "$HubSudoPwd" uname -a;echo '';sudo -S <<< "$HubSudoPwd" lxc-ls -f"
 if [ $? -eq 0 ]
 then
 	echo ''
