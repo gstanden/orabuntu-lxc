@@ -371,7 +371,7 @@ do
 	while [ "$PublicIPIterative" != 1020739 ] && [ "$i" -le 10 ]
 	do
 		echo "Waiting for $j Public IP to come up..."
-		sleep 20
+		sleep 5
 		PublicIPIterative=$(CheckPublicIPIterative)
 		SeedPostfix=$(GetSeedPostfix)
 		if [ $i -eq 5 ]
@@ -477,17 +477,6 @@ do
 	
 	ssh-keygen -R $j
        	sshpass -p oracle ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no oracle@$j "uname -a; cat /etc/oracle-release"
-	ConnectStatus=$?
-	while [ $ConnectStatus -eq 255 ]
-	do
-        	echo 'Waiting 5 seconds for sshd to become active in container and retrying test connection...'
-        	sleep 5
-        	sshpass -p oracle ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no oracle@$j "uname -a; cat /etc/oracle-release"
-        	ConnectStatus=$?
-	done
-
-
-        sshpass -p oracle ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no oracle@$j "uname -a; cat /etc/oracle-release"
 
         echo ''
         echo "=============================================="
