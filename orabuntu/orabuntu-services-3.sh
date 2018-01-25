@@ -467,36 +467,38 @@ sleep 5
 
 clear
 
-if [ $MajorRelease -eq 7 ]
-then
-	echo ''
-	echo "=============================================="
-	echo "Enabling LXC NTP service...                   "
-	echo "=============================================="
-	echo ''
+# if [ $MajorRelease -eq 7 ]
+# then
+ 	echo ''
+ 	echo "=============================================="
+ 	echo "Start NTP service...                          "
+ 	echo "=============================================="
+ 	echo ''
 
-	sudo lxc-attach -n $SeedContainerName -- chmod +x /etc/systemd/system/ntp.service
-	sudo lxc-attach -n $SeedContainerName -- systemctl enable ntp.service
-	sudo lxc-attach -n $SeedContainerName -- service ntp start
-	sudo lxc-attach -n $SeedContainerName -- service ntpd start
+#	sudo lxc-attach -n $SeedContainerName -- chmod +x /etc/systemd/system/ntp.service
+#	sudo lxc-attach -n $SeedContainerName -- systemctl enable ntp.service
+#	sudo lxc-attach -n $SeedContainerName -- service ntp start
+#	sudo lxc-attach -n $SeedContainerName -- service ntpd start
 #	sudo lxc-attach -n $SeedContainerName -- service ntp status
 #	echo ''
-	sudo lxc-attach -n $SeedContainerName -- chkconfig ntp on
-	sudo lxc-attach -n $SeedContainerName -- chkconfig ntpd on
+#	sudo lxc-attach -n $SeedContainerName -- chkconfig ntp on
+#	sudo lxc-attach -n $SeedContainerName -- chkconfig ntpd on
+
+	sudo lxc-attach -n $SeedContainerName -- ntpd -x
 
 	echo ''
 	echo "=============================================="
-	echo "Enabled LXC NTP service.                      "
+	echo "Done: Start NTP service.                      "
 	echo "=============================================="
 
-	sleep 5
+#	sleep 5
 
-	clear
-elif [ $MajorRelease -eq 6 ] || [ $MajorRelease -eq 5 ]
-then
-	sudo lxc-attach -n $SeedContainerName -- ntpd -x
-#	sudo lxc-attach -n $SeedContainerName -- dhcpcd -k
-fi
+#	clear
+#elif [ $MajorRelease -eq 6 ] || [ $MajorRelease -eq 5 ]
+#then
+#	sudo lxc-attach -n $SeedContainerName -- ntpd -x
+##	sudo lxc-attach -n $SeedContainerName -- dhcpcd -k
+#fi
 
 echo ''
 echo "=============================================="
