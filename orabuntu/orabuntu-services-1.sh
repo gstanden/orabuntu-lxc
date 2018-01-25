@@ -255,7 +255,7 @@ then
 		echo "=============================================="
 		echo '' 
 		echo "=============================================="
-		echo "Re-run anylinux-services after reboot...      "
+		echo "Re-run anylinux-services.sh after reboot...   "
 		echo "=============================================="
 
 		sudo /etc/orabuntu-lxc-scripts/stop_containers.sh
@@ -360,7 +360,7 @@ then
 		echo "=============================================="
 		echo '' 
 		echo "=============================================="
-		echo "Re-run anylinux-services after reboot...      "
+		echo "Re-run anylinux-services.sh after reboot...   "
 		echo "=============================================="
 
 		sleep 5
@@ -1937,8 +1937,8 @@ then
 	echo "=============================================="
 	echo ''
 
-	sudo tar -xf /opt/olxc/"$DistDir"/orabuntu/archives/scst-files.tar -C /opt/olxc --touch
-	sudo tar -xf /opt/olxc/"$DistDir"/orabuntu/archives/tgt-files.tar -C /opt/olxc --touch
+	sudo tar -xvf /opt/olxc/"$DistDir"/orabuntu/archives/scst-files.tar -C /opt/olxc --touch
+	sudo tar -xf  /opt/olxc/"$DistDir"/orabuntu/archives/tgt-files.tar  -C /opt/olxc --touch
 	sleep 2
 	sudo mv /opt/olxc/home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/scst-files /opt/olxc/home/"$Owner"/Downloads/orabuntu-lxc-master/orabuntu/archives/.
 	sudo mv /opt/olxc/home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/tgt-files  /opt/olxc/home/"$Owner"/Downloads/orabuntu-lxc-master/orabuntu/archives/.

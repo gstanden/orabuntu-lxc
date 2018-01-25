@@ -304,7 +304,7 @@ then
 		echo "=============================================="
 		echo '' 
 		echo "=============================================="
-		echo "Re-run anylinux-services after reboot...      "
+		echo "Re-run anylinux-services.sh after reboot...   "
 		echo "=============================================="
 		echo ''
 
@@ -408,7 +408,7 @@ then
 		echo "=============================================="
 		echo '' 
 		echo "=============================================="
-		echo "Re-run anylinux-services after reboot...      "
+		echo "Re-run anylinux-services.sh after reboot...   "
 		echo "=============================================="
 
 		sleep 5
@@ -2513,13 +2513,13 @@ then
 	echo "=============================================="
 	echo ''
 
-        sudo tar -xf /opt/olxc/"$DistDir"/orabuntu/archives/scst-files.tar -C /opt/olxc --touch
-        sudo tar -xf /opt/olxc/"$DistDir"/orabuntu/archives/tgt-files.tar -C /opt/olxc --touch
-        sleep 2
-        sudo mv /opt/olxc/home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/scst-files /opt/olxc/home/"$Owner"/Downloads/orabuntu-lxc-master/orabuntu/archives/.
-        sudo mv /opt/olxc/home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/tgt-files  /opt/olxc/home/"$Owner"/Downloads/orabuntu-lxc-master/orabuntu/archives/.
-        sudo chown -R $Owner:$Group                                                              /opt/olxc/home/"$Owner"/Downloads/orabuntu-lxc-master/orabuntu/archives/.
-        sudo sed -i "s/SWITCH_IP/$Sw1Index/g"                                                    /opt/olxc/home/"$Owner"/Downloads/orabuntu-lxc-master/orabuntu/archives/scst-files/create-scst-oracle.sh
+        sudo tar -xvf /opt/olxc/"$DistDir"/uekulele/archives/scst-files.tar -C /opt/olxc --touch
+        sudo tar -xf  /opt/olxc/"$DistDir"/uekulele/archives/tgt-files.tar  -C /opt/olxc --touch
+        sleep 5
+        sudo mv /opt/olxc/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/archives/scst-files /opt/olxc/home/"$Owner"/Downloads/orabuntu-lxc-master/uekulele/archives/.
+        sudo mv /opt/olxc/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/archives/tgt-files  /opt/olxc/home/"$Owner"/Downloads/orabuntu-lxc-master/uekulele/archives/.
+        sudo chown -R $Owner:$Group                                                              /opt/olxc/home/"$Owner"/Downloads/orabuntu-lxc-master/uekulele/archives/.
+        sudo sed -i "s/SWITCH_IP/$Sw1Index/g"                                                    /opt/olxc/home/"$Owner"/Downloads/orabuntu-lxc-master/uekulele/archives/scst-files/create-scst-oracle.sh
 
 	echo ''
 	echo "=============================================="
