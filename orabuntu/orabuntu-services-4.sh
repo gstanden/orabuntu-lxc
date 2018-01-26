@@ -349,6 +349,10 @@ function GetFirstClonedContainer {
 FirstClonedContainer=$(GetFirstClonedContainer)
 
 sudo lxc-start -n $FirstClonedContainer 
+sleep 5
+sudo lxc-stop -n $FirstCloneContainer
+sudo /etc/network/openvswitch/veth_cleanups.sh $FirstClonedContainer > /dev/null 2>&1
+sudo lxc-start -n $FirstClonedContainer
 
 sleep 5
 
