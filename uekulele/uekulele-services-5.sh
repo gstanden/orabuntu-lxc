@@ -372,7 +372,7 @@ do
 	while [ "$PublicIPIterative" != 1020739 ] && [ "$i" -le 10 ]
 	do
 		echo "Waiting for $j Public IP to come up..."
-		sleep 5
+		sleep 10
 		PublicIPIterative=$(CheckPublicIPIterative)
 		SeedPostfix=$(GetSeedPostfix)
 		if [ $i -eq 5 ]

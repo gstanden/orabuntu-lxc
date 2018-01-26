@@ -490,28 +490,34 @@ clear
 
 echo ''
 echo "=============================================="
-echo "Start First Clone Container...                "
+echo "Try Clone Container Quick Starts...           "
 echo "=============================================="
 echo ''
 
-function GetFirstClonedContainer {
-        sudo ls /var/lib/lxc | grep "ora$OracleRelease" | sort -V | head -1 | sed 's/$/ /' | tr -d '\n' | sed 's/^[ \t]*//;s/[ \t]*$//'
+function ClonedContainers {
+	sudo ls /var/lib/lxc | grep "ora$OracleRelease" | sort -V | sed 's/$/ /' | tr -d '\n' | sed 's/^[ \t]*//;s/[ \t]*$//'
 }
-FirstClonedContainer=$(GetFirstClonedContainer)
+ClonedContainers=$(GetClonedContainers)
 
-sudo rm -f /var/lib/lxc/$FirstClonedContainer/rootfs/var/run/dhclient.pid
-
-sudo lxc-start -n $FirstClonedContainer
+for j in $ClonedContainers
+do
+	if [ -e /var/lib/lxc/$j/rootfs/var/run/dhclient.pid ]
+	then
+		sudo rm -f /var/lib/lxc/$j/rootfs/var/run/dhclient.pid
+	fi
+	sudo lxc-start -n $j
+	sleep 10
+	sudo lxc-ls -f
+done
 
 echo ''
 echo "=============================================="
-echo "Done: Start First Clone Container.            "
+echo "Done: Try Clone Container Quick Starts...     "
 echo "=============================================="
 
 sleep 5
 
 clear
-
 
 echo ''
 echo "=============================================="
