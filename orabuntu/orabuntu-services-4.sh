@@ -390,6 +390,30 @@ clear
 
 echo ''
 echo "=============================================="
+echo "Start First Clone Container...                "
+echo "=============================================="
+echo ''
+
+function GetFirstClonedContainer {
+	sudo ls /var/lib/lxc | grep "ora$OracleRelease" | sort -V | head -1 | sed 's/$/ /' | tr -d '\n' | sed 's/^[ \t]*//;s/[ \t]*$//'
+}
+FirstClonedContainer=$(GetFirstClonedContainer)
+
+sudo rm -f /var/lib/lxc/$FirstClonedContainer/rootfs/var/run/dhclient.pid
+
+sudo lxc-start -n $FirstClonedContainer
+
+echo ''
+echo "=============================================="
+echo "Done: Start First Clone Container.            "
+echo "=============================================="
+
+sleep 5
+
+clear
+
+echo ''
+echo "=============================================="
 echo "Next script to run: orabuntu-services-5.sh    "
 echo "=============================================="
 
