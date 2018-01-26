@@ -394,7 +394,7 @@ echo "Try Clone Container Quick Starts...           "
 echo "=============================================="
 echo ''
 
-function ClonedContainers {
+function GetClonedContainers {
 	sudo ls /var/lib/lxc | grep "ora$OracleRelease" | sort -V | sed 's/$/ /' | tr -d '\n' | sed 's/^[ \t]*//;s/[ \t]*$//'
 }
 ClonedContainers=$(GetClonedContainers)
