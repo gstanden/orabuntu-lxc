@@ -440,47 +440,9 @@ echo "=============================================="
 echo "Creating OpenvSwitch files complete.          "
 echo "=============================================="
 
-# GLS 20180125
-# Pre-Start first cloned container to give switch time to learn routes before script 5
-
-# function GetFirstClonedContainer {
-# 	sudo ls /var/lib/lxc | grep "ora$OracleRelease" | sort -V | head -1 | sed 's/$/ /' | tr -d '\n' | sed 's/^[ \t]*//;s/[ \t]*$//'
-# }
-# FirstClonedContainer=$(GetFirstClonedContainer)
-
-# sudo lxc-start -n $FirstClonedContainer
-
 sleep 5
 
 clear
-
-# echo ''
-# echo "=============================================="
-# echo "   Reset config file for $SeedContainerName.  "
-# echo "Removes ASM and RAC private network interfaces"
-# echo "    from seed container $SeedContainerName    "
-# echo "(cloned containers are not affected by reset) "
-# echo "=============================================="
-# echo ''
-
-# ResetSingleDHCPInterface=Y
-# # read -e -p "Reset Seed Container $SeedContainerName to single DHCP interface ? [Y/N]   " -i "Y" ResetSingleDHCPInterface
-
-# if [ $ResetSingleDHCPInterface = 'y' ] || [ $ResetSingleDHCPInterface = 'Y' ]
-# then
-# sudo cp -p /var/lib/lxc/$SeedContainerName/config.oracle /var/lib/lxc/$SeedContainerName/config
-# sudo sed -i "s/ContainerName/$SeedContainerName/g" /var/lib/lxc/$SeedContainerName/config
-# sudo sed -i 's/sw1/sx1/g' /var/lib/lxc/$SeedContainerName/config
-# fi
-
-# echo ''
-# echo "=============================================="
-# echo "Config file reset successful.                 "
-# echo "=============================================="
-
-# sleep 5
-
-# clear
 
 if [ $(SoftwareVersion $LXCVersion) -ge $(SoftwareVersion "2.1.0") ]
 then
