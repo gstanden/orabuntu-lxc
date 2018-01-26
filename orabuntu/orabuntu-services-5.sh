@@ -243,7 +243,7 @@ function GetSeedPostfix {
 SeedPostfix=$(GetSeedPostfix)
 
 function CheckClonedContainersExist {
-	sudo ls /var/lib/lxc | grep "ora$OracleRelease" | sort -V | sed 's/$/ /' | tr -d '\n'
+	sudo ls /var/lib/lxc | grep "ora$OracleRelease" | sort -V | sed 's/$/ /' | tr -d '\n' | sed 's/^[ \t]*//;s/[ \t]*$//'
 }
 ClonedContainersExist=$(CheckClonedContainersExist)
 

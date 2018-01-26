@@ -338,7 +338,7 @@ function GetSeedPostfix {
 SeedPostfix=$(GetSeedPostfix)
 
 function CheckClonedContainersExist {
-	sudo ls /var/lib/lxc | grep "ora$OracleRelease" | sort -V | sed 's/$/ /' | tr -d '\n' 
+	sudo ls /var/lib/lxc | grep "ora$OracleRelease" | sort -V | sed 's/$/ /' | tr -d '\n' | sed 's/^[ \t]*//;s/[ \t]*$//'
 }
 ClonedContainersExist=$(CheckClonedContainersExist)
 
@@ -381,7 +381,7 @@ do
 			sleep 2
                         echo ''
                         echo 'Attempting OpenvSwitch veth pair cleanup procedures...'
-                        echo 'Messages Cannot file device are normal in this procedure.'
+                        echo "Messages 'Cannot find device...' are normal in this procedure."
                         echo 'Orabuntu-LXC will re-attempt container startup after cleanup procedure.'
                         echo ''
 			sudo /etc/network/openvswitch/veth_cleanups.sh $j

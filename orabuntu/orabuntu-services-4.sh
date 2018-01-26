@@ -340,6 +340,16 @@ echo "=============================================="
 echo "Creating OpenvSwitch files complete.          "
 echo "=============================================="
 
+# GLS 20180125
+# Pre-Start first cloned container to give switch time to learn routes before script 5
+
+function GetFirstClonedContainer {
+        sudo ls /var/lib/lxc | grep "ora$OracleRelease" | sort -V | head -1 | sed 's/$/ /' | tr -d '\n' | sed 's/^[ \t]*//;s/[ \t]*$//'
+}
+FirstClonedContainer=$(GetFirstClonedContainer)
+
+sudo lxc-start -n $FirstClonedContainer 
+
 sleep 5
 
 clear
