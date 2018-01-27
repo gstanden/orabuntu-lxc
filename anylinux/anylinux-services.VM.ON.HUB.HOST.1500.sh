@@ -313,6 +313,7 @@ then
 	do
 		echo 'Waiting for running apt update process(es) to finish...sleeping for 10 seconds'
 		sleep 10
+		AptProcessRunning=$(CheckAptProcessRunning)
 	done
 
         sudo apt-get -y install sshpass
