@@ -304,7 +304,7 @@ then
         echo "=============================================="
         echo ''
 
-        sudo yum -y install sshpass
+        sudo apt-get -y install sshpass
 
         echo ''
         echo "=============================================="
