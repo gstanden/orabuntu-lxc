@@ -329,10 +329,14 @@ clear
 
 #	sudo sed -i -e '/OPTIONS/{ s/.*/OPTIONS="-g -x"/ }' /etc/sysconfig/ntpd
  	sudo sed -i -e '/OPTIONS/{ s/.*/OPTIONS="-g -x"/ }' /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/etc/sysconfig/ntpd
+
+	sleep 5
+
+	clear
 	
  	echo ''
  	echo "=============================================="
- 	echo "Set NTP '-x' option in ntpd completed.        "
+ 	echo "Done: Set NTP '-x' option in ntpd file.       "
  	echo "=============================================="
 
 # fi

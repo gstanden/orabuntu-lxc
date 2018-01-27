@@ -520,6 +520,10 @@ clear
 # 	sudo lxc-attach -n $SeedContainerName -- chkconfig ntp on
 # 	sudo lxc-attach -n $SeedContainerName -- chkconfig ntpd on
 
+	sleep 5
+
+	clear
+
  	echo ''
  	echo "=============================================="
  	echo "Done: Start NTP service.                      "
@@ -532,6 +536,10 @@ clear
 # then
 # 	sudo lxc-attach -n $SeedContainerName -- ntpd -x
 # fi
+
+sleep 5
+
+clear
 
 echo ''
 echo "=============================================="
