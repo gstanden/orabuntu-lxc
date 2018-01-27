@@ -407,10 +407,10 @@ do
 	fi
 	sudo lxc-start -n $j
 	sleep 10
+	sudo lxc-ls -f
+	echo ''
 done
-sudo lxc-ls -f
 
-echo ''
 echo "=============================================="
 echo "Done: Try Clone Container Quick Starts...     "
 echo "=============================================="
