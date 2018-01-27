@@ -495,7 +495,7 @@ echo "=============================================="
 echo ''
 
 function GetClonedContainers {
-	sudo ls /var/lib/lxc | grep "ora$OracleRelease" | sort -V | sed 's/$/ /' | tr -d '\n' | sed 's/^[ \t]*//;s/[ \t]*$//'
+	sudo ls /var/lib/lxc | grep "ora$OracleRelease" | sort -V | head -1 | sed 's/$/ /' | tr -d '\n' | sed 's/^[ \t]*//;s/[ \t]*$//'
 }
 ClonedContainers=$(GetClonedContainers)
 
