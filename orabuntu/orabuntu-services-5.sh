@@ -870,4 +870,7 @@ function GetOwner {
 Owner=$(GetOwner)
 
 sudo rm -f /opt/olxc/*.lst /opt/olxc/*.tar
-sudo rm -r /opt/olxc/home/ubuntu
+if ( $Owner != 'ubuntu' ]
+then
+	sudo rm -r /opt/olxc/home/ubuntu
+fi

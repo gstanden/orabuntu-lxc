@@ -1125,4 +1125,7 @@ fi
 # Set permissions on scst-files and cleanup staging area
 
 sudo rm -f /opt/olxc/*.lst /opt/olxc/*.tar
-sudo rm -r /opt/olxc/home/ubuntu
+if [ $Owner != 'ubuntu' ]
+then
+	sudo rm -r /opt/olxc/home/ubuntu
+fi
