@@ -418,7 +418,7 @@ then
 		do
 			echo "Waiting for $j Public IP to come up..."
 			echo ''
-			sleep 5
+			sleep 10
 			PublicIPIterative=$(CheckPublicIPIterative)
 			if [ $i -eq 5 ]
 			then
