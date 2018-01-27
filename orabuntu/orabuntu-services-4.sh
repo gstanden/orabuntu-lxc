@@ -407,8 +407,8 @@ do
 	fi
 	sudo lxc-start -n $j
 	sleep 10
-	sudo lxc-ls -f
 done
+sudo lxc-ls -f
 
 echo ''
 echo "=============================================="

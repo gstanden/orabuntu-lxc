@@ -331,6 +331,7 @@ echo ''
 echo "=============================================="
 echo "Starting LXC cloned containers for Oracle...  "
 echo "=============================================="
+echo ''
 
 function GetSeedPostfix {
 	sudo lxc-ls -f | grep ora"$OracleRelease"c | cut -f1 -d' ' | cut -f2 -d'c' | sed 's/^/c/'
@@ -350,9 +351,7 @@ do
 
 #	sudo /etc/network/openvswitch/veth_cleanups.sh $j > /dev/null 2>&1
 
-	echo ''
 	echo "Starting container $j ..."
-	echo ''
 	
 	if [ $Release -ge 6 ]
 	then
