@@ -304,6 +304,17 @@ then
         echo "=============================================="
         echo ''
 
+	function CheckAptProcessRunning {
+		ps -ef | grep apt | grep -v grep | wc -l
+	}
+	AptProcessRunning=$(CheckAptProcessRunning)
+
+	while [ $AptProcessRunning -gt 0 ]
+	do
+		echo 'Waiting for running apt update process(es) to finish...sleeping for 10 seconds'
+		sleep 10
+	done
+
         sudo apt-get -y install sshpass
 
         echo ''
