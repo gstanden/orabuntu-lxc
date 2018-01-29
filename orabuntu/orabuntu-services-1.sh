@@ -42,6 +42,11 @@ OSMemRes=$6
 MultiHost=$7
 DistDir=$8
 
+function GetNameServerBase {
+	echo $NameServer | cut -f1 -d'-'
+}
+NameServerBase=$(GetNameServerBase)
+
 function GetGroup {
         id | cut -f2 -d' ' | cut -f2 -d'(' | cut -f1 -d')'
 }
@@ -280,7 +285,7 @@ then
 				do
 					sudo lxc-stop -n $j
 					sleep 2
-					sudo lxc-destroy -n $j -f 
+					sudo lxc-destroy -n $j -f -s
 					sudo rm -rf /var/lib/lxc/$j
 				done
 
@@ -945,9 +950,9 @@ sudo tar -xvf /opt/olxc/"$DistDir"/orabuntu/archives/ubuntu-host.tar -C / --touc
 if	[ $SystemdResolvedInstalled -eq 0 ]
 then
 	sudo rm /etc/systemd/resolved.conf
-else
-	sudo sed -i "s/orabuntu-lxc\.com/$Domain1/g"		/etc/systemd/resolved.conf
-	sudo sed -i "s/consultingcommandos\.us/$Domain2/g"	/etc/systemd/resolved.conf
+# else
+# 	sudo sed -i "s/orabuntu-lxc\.com/$Domain1/g"		/etc/systemd/resolved.conf
+# 	sudo sed -i "s/consultingcommandos\.us/$Domain2/g"	/etc/systemd/resolved.conf
 fi
 
 echo ''
@@ -1250,10 +1255,10 @@ then
 			# GLS 20151223 Settable Nameserver feature added
 			# GLS 20161022 Settable Nameserver feature moved into DNS DHCP LXC container.
 			# GLS 20162011 Settable Nameserver feature expanded to include nameserver and both domains.
-			sudo sed -i "/nsa/s/nsa/$NameServer/g" /var/lib/lxc/nsa/rootfs/var/lib/bind/fwd.orabuntu-lxc.com
-			sudo sed -i "/nsa/s/nsa/$NameServer/g" /var/lib/lxc/nsa/rootfs/var/lib/bind/rev.orabuntu-lxc.com
-			sudo sed -i "/nsa/s/nsa/$NameServer/g" /var/lib/lxc/nsa/rootfs/var/lib/bind/fwd.consultingcommandos.us
-			sudo sed -i "/nsa/s/nsa/$NameServer/g" /var/lib/lxc/nsa/rootfs/var/lib/bind/rev.consultingcommandos.us
+			sudo sed -i "/nsa/s/nsa/$NameServerBase/g" /var/lib/lxc/nsa/rootfs/var/lib/bind/fwd.orabuntu-lxc.com
+			sudo sed -i "/nsa/s/nsa/$NameServerBase/g" /var/lib/lxc/nsa/rootfs/var/lib/bind/rev.orabuntu-lxc.com
+			sudo sed -i "/nsa/s/nsa/$NameServerBase/g" /var/lib/lxc/nsa/rootfs/var/lib/bind/fwd.consultingcommandos.us
+			sudo sed -i "/nsa/s/nsa/$NameServerBase/g" /var/lib/lxc/nsa/rootfs/var/lib/bind/rev.consultingcommandos.us
 			sudo sed -i "/nsa/s/nsa/$NameServer/g" /var/lib/lxc/nsa/config
 			sudo sed -i "/nsa/s/nsa/$NameServer/g" /var/lib/lxc/nsa/rootfs/etc/hostname
 			sudo sed -i "/nsa/s/nsa/$NameServer/g" /var/lib/lxc/nsa/rootfs/etc/hosts
@@ -1264,16 +1269,21 @@ then
 			sudo sed -i "/nsa/s/nsa/$NameServer/g" /var/lib/lxc/nsa/rootfs/root/dns-sync.sh
 			sudo sed -i "/nsa/s/nsa/$NameServer/g" /etc/network/openvswitch/strt_nsa.sh
 			sudo mv /var/lib/lxc/nsa /var/lib/lxc/$NameServer
-			sudo mv /etc/network/if-up.d/openvswitch/nsa-pub-ifup-sw1 /etc/network/if-up.d/openvswitch/$NameServer-pub-ifup-sw1
-			sudo mv /etc/network/if-down.d/openvswitch/nsa-pub-ifdown-sw1 /etc/network/if-down.d/openvswitch/$NameServer-pub-ifdown-sw1
-			sudo mv /etc/network/if-up.d/openvswitch/nsa-pub-ifup-sx1 /etc/network/if-up.d/openvswitch/$NameServer-pub-ifup-sx1
-			sudo mv /etc/network/if-down.d/openvswitch/nsa-pub-ifdown-sx1 /etc/network/if-down.d/openvswitch/$NameServer-pub-ifdown-sx1
-			sudo mv /etc/network/openvswitch/strt_nsa.sh /etc/network/openvswitch/strt_$NameServer.sh
-			echo "/var/lib/lxc/$NameServer"						 > /opt/olxc/"$DistDir"/orabuntu/archives/nameserver.lst
-			echo "/etc/network/if-up.d/openvswitch/$NameServer-pub-ifup-sw1" 	>> /opt/olxc/"$DistDir"/orabuntu/archives/nameserver.lst
-			echo "/etc/network/if-down.d/openvswitch/$NameServer-pub-ifdown-sw1" 	>> /opt/olxc/"$DistDir"/orabuntu/archives/nameserver.lst
-			echo "/etc/network/if-up.d/openvswitch/$NameServer-pub-ifup-sx1" 	>> /opt/olxc/"$DistDir"/orabuntu/archives/nameserver.lst
-			echo "/etc/network/if-down.d/openvswitch/$NameServer-pub-ifdown-sx1" 	>> /opt/olxc/"$DistDir"/orabuntu/archives/nameserver.lst
+			sudo cp -p /etc/network/if-up.d/openvswitch/nsa-pub-ifup-sw1 		/etc/network/if-up.d/openvswitch/$NameServer-pub-ifup-sw1
+			sudo cp -p /etc/network/if-down.d/openvswitch/nsa-pub-ifdown-sw1 	/etc/network/if-down.d/openvswitch/$NameServer-pub-ifdown-sw1
+			sudo cp -p /etc/network/if-up.d/openvswitch/nsa-pub-ifup-sx1 		/etc/network/if-up.d/openvswitch/$NameServer-pub-ifup-sx1
+			sudo cp -p /etc/network/if-down.d/openvswitch/nsa-pub-ifdown-sx1 	/etc/network/if-down.d/openvswitch/$NameServer-pub-ifdown-sx1
+			sudo cp -p /etc/network/if-up.d/openvswitch/nsa-pub-ifup-sw1 		/etc/network/if-up.d/openvswitch/$NameServerBase-pub-ifup-sw1
+			sudo cp -p /etc/network/if-down.d/openvswitch/nsa-pub-ifdown-sw1 	/etc/network/if-down.d/openvswitch/$NameServerBase-pub-ifdown-sw1
+			sudo cp -p /etc/network/if-up.d/openvswitch/nsa-pub-ifup-sx1 		/etc/network/if-up.d/openvswitch/$NameServerBase-pub-ifup-sx1
+			sudo cp -p /etc/network/if-down.d/openvswitch/nsa-pub-ifdown-sx1 	/etc/network/if-down.d/openvswitch/$NameServerBase-pub-ifdown-sx1
+			sudo cp -p /etc/network/openvswitch/strt_nsa.sh 			/etc/network/openvswitch/strt_$NameServerBase.sh
+			sudo cp -p /etc/network/openvswitch/strt_nsa.sh 			/etc/network/openvswitch/strt_$NameServer.sh
+		
+			echo "/etc/network/if-up.d/openvswitch/$NameServerBase-pub-ifup-sw1" 		>> /opt/olxc/"$DistDir"/orabuntu/archives/nameserver.lst
+			echo "/etc/network/if-down.d/openvswitch/$NameServerBase-pub-ifdown-sw1" 	>> /opt/olxc/"$DistDir"/orabuntu/archives/nameserver.lst
+			echo "/etc/network/if-up.d/openvswitch/$NameServerBase-pub-ifup-sx1" 		>> /opt/olxc/"$DistDir"/orabuntu/archives/nameserver.lst
+			echo "/etc/network/if-down.d/openvswitch/$NameServerBase-pub-ifdown-sx1" 	>> /opt/olxc/"$DistDir"/orabuntu/archives/nameserver.lst
 		fi
 
 		if [ -n $Domain1 ]
@@ -1288,7 +1298,7 @@ then
 			fi
 			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /etc/network/openvswitch/crt_ovs_sw1.sh
 			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /etc/systemd/resolved.conf
-			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /run/systemd/resolve/stub-resolv.conf
+#			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /run/systemd/resolve/stub-resolv.conf
 			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/etc/bind/named.conf.local
 			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/etc/dhcp/dhcpd.conf
 			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/etc/network/interfaces
@@ -1309,7 +1319,7 @@ then
 			fi
 			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /etc/network/openvswitch/crt_ovs_sw1.sh
 			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /etc/systemd/resolved.conf
-			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /run/systemd/resolve/stub-resolv.conf
+#			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /run/systemd/resolve/stub-resolv.conf
 			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /var/lib/lxc/$NameServer/rootfs/etc/bind/named.conf.local
 			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /var/lib/lxc/$NameServer/rootfs/etc/dhcp/dhcpd.conf
 			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /var/lib/lxc/$NameServer/rootfs/etc/network/interfaces
@@ -1900,8 +1910,10 @@ then
 		sudo service sw1 restart
 		sudo service sx1 restart
 		sudo lxc-stop  -n $NameServer >/dev/null 2>&1
-		sudo lxc-copy  -n $NameServer -N $NameServer-bk0 > /dev/null 2>&1
-		sudo lxc-start -n $NameServer >/dev/null 2>&1
+		sudo lxc-copy  -n $NameServer -N $NameServerBase -B overlayfs -s
+		NameServer=$NameServerBase
+		sudo lxc-start -n $NameServer
+
 		if [ $SystemdResolvedInstalled -eq 1 ]
 		then
 			sudo service systemd-resolved restart
@@ -1929,11 +1941,10 @@ then
         echo "Replicate nameserver $NameServer...           "
         echo "=============================================="
         echo ''
-
+ 
         sudo chown $Owner:$Group /home/$Owner/Manage-Orabuntu
         sudo chmod 775 /opt/olxc/"$DistDir"/orabuntu/archives/nameserver_copy.sh
-        /opt/olxc/"$DistDir"/orabuntu/archives/nameserver_copy.sh $MultiHostVar5 $MultiHostVar6 $MultiHostVar8 $MultiHostVar9 $NameServer
-        sudo lxc-copy -n $NameServer -N $NameServer-bk0
+        /opt/olxc/"$DistDir"/orabuntu/archives/nameserver_copy.sh $MultiHostVar5 $MultiHostVar6 $MultiHostVar8 $MultiHostVar9 $NameServerBase
 
         echo ''
         echo "=============================================="
@@ -2021,7 +2032,7 @@ then
 	sudo lxc-attach -n $NameServer -- tar -cvzPf /root/backup-lxc-container/$NameServer/updates/backup_"$NameServer"_ns_update.tar.gz /root/ns_backup_update.lst
  
         sudo tar -v --extract --file=/opt/olxc/"$DistDir"/orabuntu/archives/dns-dhcp-cont.tar -C / var/lib/lxc/nsa/rootfs/etc/systemd/system/dns-sync.service
-        sudo mv /var/lib/lxc/nsa/rootfs/etc/systemd/system/dns-sync.service /var/lib/lxc/$NameServer/rootfs/etc/systemd/system/dns-sync.service
+        sudo mv /var/lib/lxc/nsa/rootfs/etc/systemd/system/dns-sync.service /var/lib/lxc/"$NameServer"-base/rootfs/etc/systemd/system/dns-sync.service
 
 	sudo lxc-attach -n $NameServer -- systemctl enable dns-sync
         sudo lxc-attach -n $NameServer -- chown bind:bind /var/lib/bind/fwd.$Domain1

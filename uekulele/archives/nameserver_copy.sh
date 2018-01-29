@@ -55,8 +55,6 @@ echo "Copy nameserver $NameServer...                "
 echo "=============================================="
 echo ''
 
-sshpass -p $MultiHostVar9 ssh -tt -o CheckHostIP=no -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" echo '(Do NOT type a password...backup will start in a moment)'; sudo -S <<< "$MultiHostVar9" tar -P -czf ~/Manage-Orabuntu/$NameServer.tar.gz -T nameserver.lst --checkpoint=10000 --totals"
-sleep 5
 rsync -hP --rsh="sshpass -p $MultiHostVar9 ssh -l $MultiHostVar8" $MultiHostVar5:~/Manage-Orabuntu/$NameServer.tar.gz ~/Manage-Orabuntu/.
 
 echo ''
@@ -71,7 +69,7 @@ echo "=============================================="
 echo "Unpack tar file...                            "
 echo "=============================================="
 echo ''
-sudo tar -P -xzf ~/Manage-Orabuntu/$NameServer.tar.gz --checkpoint=10000 --totals
+sudo tar -P -xvzf ~/Manage-Orabuntu/$NameServer.tar.gz --checkpoint=10000 --totals
 echo ''
 echo "=============================================="
 echo "Done: Copy nameserver container $NameServer.  "

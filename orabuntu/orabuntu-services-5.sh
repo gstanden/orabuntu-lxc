@@ -51,9 +51,19 @@ function GetMultiHostVar1 {
 MultiHostVar1=$(GetMultiHostVar1)
 
 function GetMultiHostVar2 {
-	echo $MultiHost | cut -f1 -d':'
+	echo $MultiHost | cut -f2 -d':'
 }
 MultiHostVar2=$(GetMultiHostVar2)
+
+function GetMultiHostVar3 {
+	echo $MultiHost | cut -f3 -d':'
+}
+MultiHostVar3=$(GetMultiHostVar3)
+
+function GetMultiHostVar4 {
+	echo $MultiHost | cut -f4 -d':'
+}
+MultiHostVar4=$(GetMultiHostVar4)
 
 function GetMultiHostVar5 {
 	echo $MultiHost | cut -f5 -d':'
@@ -663,15 +673,21 @@ then
                 echo "=============================================="
                 echo ''
 
-                sudo lxc-stop  -n $NameServer
-                sudo lxc-copy  -n $NameServer -N "$NameServer"-bk1
-	
-		if [ ! -e ~/Manage-Orabuntu ]
-		then
-			sudo mkdir -p ~/Manage-Orabuntu
-		fi
-	
-                sudo tar -P -czf ~/Manage-Orabuntu/$NameServer.tar.gz -T ~/Downloads/orabuntu-lxc-master/orabuntu/archives/nameserver.lst --checkpoint=10000 --totals
+                sudo lxc-stop -n $NameServer
+                echo 'hub nameserver post-install snapshot' > snap-comment
+                sudo lxc-snapshot -n $NameServer -c snap-comment
+		sudo rm -f snap-comment
+                sudo lxc-snapshot -n $NameServer -L -C
+                sleep 5
+
+                if [ ! -e ~/Manage-Orabuntu ]
+                then
+                        sudo mkdir -p ~/Manage-Orabuntu
+                fi
+
+                echo "/var/lib/lxc/$NameServer" 	>> /opt/olxc/"$DistDir"/orabuntu/archives/nameserver.lst
+                echo "/var/lib/lxc/$NameServer-base" 	>> /opt/olxc/"$DistDir"/orabuntu/archives/nameserver.lst
+                sudo tar -P -czf ~/Manage-Orabuntu/$NameServer.tar.gz -T /opt/olxc/"$DistDir"/orabuntu/archives/nameserver.lst --checkpoint=10000 --totals
                 sudo lxc-start -n $NameServer
 
                 echo ''
@@ -687,28 +703,6 @@ then
 
         if [ $GRE = 'Y' ]
         then
-#               echo ''
-#               echo "=============================================="
-#               echo "Replicate nameserver $NameServer...           "
-#               echo "=============================================="
-#               echo ''
-
-#		sudo chown $Owner:$Group /home/$Owner/Manage-Orabuntu
-#		sudo chmod 775 /opt/olxc/"$DistDir"/orabuntu/archives/nameserver_copy.sh
-#               /opt/olxc/"$DistDir"/orabuntu/archives/nameserver_copy.sh $MultiHostVar5 $MultiHostVar6 $MultiHostVar8 $MultiHostVar9 $NameServer
-#               sudo lxc-stop  -n $NameServer
-#               sudo lxc-copy  -n $NameServer -N $NameServer-bk1
-
-#               echo ''
-#               echo "=============================================="
-#               echo "Done: Replicate nameserver $NameServer.       "
-#               echo "=============================================="
-#               echo ''
-
-                sleep 5
-
-                clear
-
 		echo ''
                 echo "=============================================="
                 echo "Configure replica nameserver $NameServer...   "
@@ -870,7 +864,11 @@ function GetOwner {
 Owner=$(GetOwner)
 
 sudo rm -f /opt/olxc/*.lst /opt/olxc/*.tar
-if ( $Owner != 'ubuntu' ]
+if [ $Owner != 'ubuntu' ]
 then
 	sudo rm -r /opt/olxc/home/ubuntu
 fi
+
+cd $DistDir/orabuntu/archives
+rm -f orabuntu-services.lst orabuntu-files.lst orabuntu-services.tar orabuntu-files.tar
+cd $DistDir/anylinux

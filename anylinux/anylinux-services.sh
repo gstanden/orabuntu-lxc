@@ -839,8 +839,35 @@ fi
 
 if [ $GREValue = 'Y' ] || [ $MultiHostVar3 = 'X' ]
 then
-	sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" lxc-info -n $NameServer-$HOSTNAME" > /dev/null 2>&1
-	if [ $? -eq 1 ]
+	function GetHubFileSystemType {
+		sshpass -p $MultiHostVar9 ssh -q -t -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 stat --file-system --format=%T /var/lib/lxc | grep -c xfs
+	}
+	HubFileSystemType=$(GetHubFileSystemType)
+
+        if [ $HubFileSystemType -eq 0 ]
+        then
+		echo ''
+		echo "=============================================="
+		echo "Snapshot Nameserver $NameServer at HUB...     "
+		echo "=============================================="
+		echo ''
+
+		sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" lxc-stop -n $NameServer;echo '(Do NOT enter a password.  Wait...)'; echo '$HOSTNAME pre-install nameserver snapshot' > snap_comment; echo ''; sudo -S <<< "$MultiHostVar9" lxc-snapshot -n $NameServer -c snap_comment; sudo -S <<< "$MultiHostVar9" lxc-start -n $NameServer; sleep 5; sudo -S <<< "$MultiHostVar9" lxc-snapshot -L -n $NameServer"
+		echo ''
+		echo "Snapshot of $NameServer created on the Orabuntu-LXC HUB host at $MultiHostVar5."
+		echo "Snapshot of $NameServer can be restored to $NameServer if necessary using 'lxc-snapshot -r SnapX -N $NameServer' command."
+		sudo rm -f snap_comment
+
+		echo ''
+		echo "=============================================="
+		echo "Done: Snapshot Nameserver $NameServer at HUB. "
+		echo "=============================================="
+		echo ''
+
+		sleep 10
+
+		clear
+	elif [ $HubFileSystemType -eq 1 ]
 	then
 		echo ''
 		echo "=============================================="

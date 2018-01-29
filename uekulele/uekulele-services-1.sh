@@ -1938,11 +1938,18 @@ then
 
 			sudo sed -i "/nsa/s/nsa/$NameServer/g" /etc/network/openvswitch/strt_nsa.sh
 			sudo mv /var/lib/lxc/nsa /var/lib/lxc/$NameServer
-			sudo mv /etc/network/if-up.d/openvswitch/nsa-pub-ifup-sw1 /etc/network/if-up.d/openvswitch/$NameServer-pub-ifup-sw1
-			sudo mv /etc/network/if-down.d/openvswitch/nsa-pub-ifdown-sw1 /etc/network/if-down.d/openvswitch/$NameServer-pub-ifdown-sw1
-			sudo mv /etc/network/if-up.d/openvswitch/nsa-pub-ifup-sx1 /etc/network/if-up.d/openvswitch/$NameServer-pub-ifup-sx1
-			sudo mv /etc/network/if-down.d/openvswitch/nsa-pub-ifdown-sx1 /etc/network/if-down.d/openvswitch/$NameServer-pub-ifdown-sx1
-			sudo mv /etc/network/openvswitch/strt_nsa.sh /etc/network/openvswitch/strt_$NameServer.sh
+			sudo cp -p /etc/network/if-up.d/openvswitch/nsa-pub-ifup-sw1 		/etc/network/if-up.d/openvswitch/$NameServer-pub-ifup-sw1
+			sudo cp -p /etc/network/if-down.d/openvswitch/nsa-pub-ifdown-sw1 	/etc/network/if-down.d/openvswitch/$NameServer-pub-ifdown-sw1
+			sudo cp -p /etc/network/if-up.d/openvswitch/nsa-pub-ifup-sx1 		/etc/network/if-up.d/openvswitch/$NameServer-pub-ifup-sx1
+			sudo cp -p /etc/network/if-down.d/openvswitch/nsa-pub-ifdown-sx1 	/etc/network/if-down.d/openvswitch/$NameServer-pub-ifdown-sx1
+                        sudo cp -p /etc/network/if-up.d/openvswitch/nsa-pub-ifup-sw1            /etc/network/if-up.d/openvswitch/$NameServer-base-pub-ifup-sw1
+                        sudo cp -p /etc/network/if-down.d/openvswitch/nsa-pub-ifdown-sw1        /etc/network/if-down.d/openvswitch/$NameServer-base-pub-ifdown-sw1
+                        sudo cp -p /etc/network/if-up.d/openvswitch/nsa-pub-ifup-sx1            /etc/network/if-up.d/openvswitch/$NameServer-base-pub-ifup-sx1
+                        sudo cp -p /etc/network/if-down.d/openvswitch/nsa-pub-ifdown-sx1        /etc/network/if-down.d/openvswitch/$NameServer-base-pub-ifdown-sx1
+
+			sudo cp -p /etc/network/openvswitch/strt_nsa.sh 			/etc/network/openvswitch/strt_$NameServer.sh
+			sudo cp -p /etc/network/openvswitch/strt_nsa.sh 			/etc/network/openvswitch/strt_$NameServer-base.sh
+
                         echo "/var/lib/lxc/$NameServer"                                          > /opt/olxc/"$DistDir"/uekulele/archives/nameserver.lst
                         echo "/etc/network/if-up.d/openvswitch/$NameServer-pub-ifup-sw1"        >> /opt/olxc/"$DistDir"/uekulele/archives/nameserver.lst
                         echo "/etc/network/if-down.d/openvswitch/$NameServer-pub-ifdown-sw1"    >> /opt/olxc/"$DistDir"/uekulele/archives/nameserver.lst
@@ -2449,9 +2456,9 @@ then
 	then
  		sudo service sw1 restart
  		sudo service sx1 restart
-		sudo lxc-stop  -n $NameServer > /dev/null 2>&1
-		sudo lxc-copy  -n $NameServer -N $NameServer-bk0 > /dev/null 2>&1
-		sudo lxc-start -n $NameServer > /dev/null 2>&1
+		sudo lxc-stop  -n $NameServer
+		sudo lxc-copy  -n $NameServer -N $NameServer-base
+		sudo lxc-start -n $NameServer
 	fi
 
 	echo ''
@@ -2475,7 +2482,6 @@ then
         sudo chown $Owner:$Group /home/$Owner/Manage-Orabuntu
         sudo chmod 775 /opt/olxc/"$DistDir"/orabuntu/archives/nameserver_copy.sh
         /opt/olxc/"$DistDir"/uekulele/archives/nameserver_copy.sh $MultiHostVar5 $MultiHostVar6 $MultiHostVar8 $MultiHostVar9 $NameServer
-        sudo lxc-copy -n $NameServer -N $NameServer-bk0
 
         echo ''
         echo "=============================================="

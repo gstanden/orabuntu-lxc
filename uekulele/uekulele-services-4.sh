@@ -490,7 +490,7 @@ clear
 
 echo ''
 echo "=============================================="
-echo "Try Clone Container Quick Starts...           "
+echo "Start Clone Containers...                     "
 echo "=============================================="
 echo ''
 
@@ -512,7 +512,7 @@ do
 done
 
 echo "=============================================="
-echo "Done: Try Clone Container Quick Starts...     "
+echo "Done: Start Clone Containers...               "
 echo "=============================================="
 
 sleep 5
