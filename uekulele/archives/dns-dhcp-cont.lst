@@ -13,6 +13,7 @@
 /var/lib/lxc/nsa/rootfs/root/ns_backup.start.sh
 /var/lib/lxc/nsa/config
 /var/lib/lxc/nsa/rootfs/etc/dhcp/dhcpd.conf
+/var/lib/lxc/nsa/rootfs/etc/rc.local
 /var/lib/lxc/nsa/rootfs/root/ns_backup_update.lst
 /var/GNU3
 /var/COPYING

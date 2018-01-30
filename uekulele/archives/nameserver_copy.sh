@@ -69,7 +69,7 @@ echo "=============================================="
 echo "Unpack tar file...                            "
 echo "=============================================="
 echo ''
-sudo tar -P -xvzf ~/Manage-Orabuntu/$NameServer.tar.gz --checkpoint=10000 --totals
+sudo tar -P -xzf ~/Manage-Orabuntu/$NameServer.tar.gz --checkpoint=10000 --totals
 echo ''
 echo "=============================================="
 echo "Done: Copy nameserver container $NameServer.  "

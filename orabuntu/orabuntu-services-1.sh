@@ -950,9 +950,6 @@ sudo tar -xvf /opt/olxc/"$DistDir"/orabuntu/archives/ubuntu-host.tar -C / --touc
 if	[ $SystemdResolvedInstalled -eq 0 ]
 then
 	sudo rm /etc/systemd/resolved.conf
-# else
-# 	sudo sed -i "s/orabuntu-lxc\.com/$Domain1/g"		/etc/systemd/resolved.conf
-# 	sudo sed -i "s/consultingcommandos\.us/$Domain2/g"	/etc/systemd/resolved.conf
 fi
 
 echo ''
@@ -1280,10 +1277,14 @@ then
 			sudo cp -p /etc/network/openvswitch/strt_nsa.sh 			/etc/network/openvswitch/strt_$NameServerBase.sh
 			sudo cp -p /etc/network/openvswitch/strt_nsa.sh 			/etc/network/openvswitch/strt_$NameServer.sh
 		
-			echo "/etc/network/if-up.d/openvswitch/$NameServerBase-pub-ifup-sw1" 		>> /opt/olxc/"$DistDir"/orabuntu/archives/nameserver.lst
+			echo "/etc/network/if-up.d/openvswitch/$NameServerBase-pub-ifup-sw1" 		 > /opt/olxc/"$DistDir"/orabuntu/archives/nameserver.lst
 			echo "/etc/network/if-down.d/openvswitch/$NameServerBase-pub-ifdown-sw1" 	>> /opt/olxc/"$DistDir"/orabuntu/archives/nameserver.lst
 			echo "/etc/network/if-up.d/openvswitch/$NameServerBase-pub-ifup-sx1" 		>> /opt/olxc/"$DistDir"/orabuntu/archives/nameserver.lst
 			echo "/etc/network/if-down.d/openvswitch/$NameServerBase-pub-ifdown-sx1" 	>> /opt/olxc/"$DistDir"/orabuntu/archives/nameserver.lst
+			echo "/etc/network/if-up.d/openvswitch/$NameServer-pub-ifup-sw1" 		>> /opt/olxc/"$DistDir"/orabuntu/archives/nameserver.lst
+			echo "/etc/network/if-down.d/openvswitch/$NameServer-pub-ifdown-sw1" 		>> /opt/olxc/"$DistDir"/orabuntu/archives/nameserver.lst
+			echo "/etc/network/if-up.d/openvswitch/$NameServer-pub-ifup-sx1" 		>> /opt/olxc/"$DistDir"/orabuntu/archives/nameserver.lst
+			echo "/etc/network/if-down.d/openvswitch/$NameServer-pub-ifdown-sx1" 		>> /opt/olxc/"$DistDir"/orabuntu/archives/nameserver.lst
 		fi
 
 		if [ -n $Domain1 ]
@@ -1327,14 +1328,16 @@ then
 			sudo mv /var/lib/lxc/$NameServer/rootfs/var/lib/bind/fwd.consultingcommandos.us /var/lib/lxc/$NameServer/rootfs/var/lib/bind/fwd.$Domain2
 			sudo mv /var/lib/lxc/$NameServer/rootfs/var/lib/bind/rev.consultingcommandos.us /var/lib/lxc/$NameServer/rootfs/var/lib/bind/rev.$Domain2
 		fi
+	elif [ $MultiHostVar2 = 'Y' ]
+	then
+			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /etc/systemd/resolved.conf
+			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /etc/systemd/resolved.conf
 	fi
 
 	# Cleanup duplicate search lines in /etc/resolv.conf if Orabuntu-LXC has been re-run
 	if [ $NetworkManagerInstalled -eq 1 ]
 	then
 		sudo sed -i '$!N; /^\(.*\)\n\1$/!P; D'	/etc/resolv.conf
-#		sudo sed -i '/orabuntu/d'		/etc/resolv.conf
-#		sudo sed -i '/consultingcommandos/d'	/etc/resolv.conf
 	fi
 
 	sudo cat /etc/resolv.conf
@@ -1345,6 +1348,8 @@ then
 	echo "=============================================="
 	echo "Done:  Customize and display.                 "
 	echo "=============================================="
+			
+	sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /etc/systemd/resolved.conf
 fi
 
 sleep 5
@@ -1916,7 +1921,8 @@ then
 
 		if [ $SystemdResolvedInstalled -eq 1 ]
 		then
-			sudo service systemd-resolved restart
+			sudo service systemd-resolved-helper restart
+#			sudo service systemd-resolved restart
 		fi
 		nslookup -timeout=3 $NameServer
 		if [ $? -ne 0 ]

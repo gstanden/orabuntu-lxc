@@ -99,7 +99,7 @@
 #
 #	MultiHost Note 1:  MultiHost default value:	MultiHost="new:N:1:$SudoPassword:X:X:1500:X:X:$GRE" (this value is uncommented in the default distribution of Orabuntu-LXC)
 			
-#Subnets (See subnets section below for more information)
+#	Subnets (See subnets section below for more information)
 #
 #    D	SeedNet1
 #    D	BaseNet1
@@ -139,26 +139,31 @@ Owner=$(GetOwner)
 #             The nets SeedNet1, BaseNet1, etc. should ALL BE DIFFERENT subnets.
 #             Not all possible combinations have been tested; some could be non-complimentary
 #             DO NOT USE well-known multicast subnets such as 224.x.x.x and also probably best to not use 169.x.x.x
+#	      Any subnet triplets will be allowed, but in general these are typically private ipv4 address spaces as defined here: https://en.wikipedia.org/wiki/Private_network
 # GLS 20180112
 
 # Set these (optional) before running anylinux-serivces.sh 
-# If left commented, defaults will be used.
 
 # Custom Subnets Begin
-# Uncomment if using custom subnets other than the default subnets
 
-SeedNet1='SeedNet1Fwd:172.29.108'	# UNCOMMENT LINE IF USING CUSTOM SUBNETS
-BaseNet1='BaseNet1Fwd:10.209.53'	# UNCOMMENT LINE IF USING CUSTOM SUBNETS
-StorNet1='StorNet1Fwd:10.210.107'	# UNCOMMENT LINE IF USING CUSTOM SUBNETS
-StorNet2='StorNet2Fwd:10.211.107'	# UNCOMMENT LINE IF USING CUSTOM SUBNETS
+# pgroup1 begin
+# user-settable parameters group 1 begin
+# set the values for the subnet triplets (e.g. 172.29.108)
 
-ExtrNet1='172.26.11'			# UNCOMMENT LINE IF USING CUSTOM SUBNETS
-ExtrNet2='172.27.11'			# UNCOMMENT LINE IF USING CUSTOM SUBNETS
-ExtrNet3='192.168.19'			# UNCOMMENT LINE IF USING CUSTOM SUBNETS
-ExtrNet4='192.168.20'			# UNCOMMENT LINE IF USING CUSTOM SUBNETS
-ExtrNet5='192.168.21'			# UNCOMMENT LINE IF USING CUSTOM SUBNETS
-ExtrNet6='192.168.22'			# UNCOMMENT LINE IF USING CUSTOM SUBNETS
+	SeedNet1='SeedNet1Fwd:172.29.108'	# UNCOMMENT LINE IF USING CUSTOM SUBNETS
+	BaseNet1='BaseNet1Fwd:10.209.53'	# UNCOMMENT LINE IF USING CUSTOM SUBNETS
+	StorNet1='StorNet1Fwd:10.210.107'	# UNCOMMENT LINE IF USING CUSTOM SUBNETS
+	StorNet2='StorNet2Fwd:10.211.107'	# UNCOMMENT LINE IF USING CUSTOM SUBNETS
 
+	ExtrNet1='172.26.11'			# UNCOMMENT LINE IF USING CUSTOM SUBNETS
+	ExtrNet2='172.27.11'			# UNCOMMENT LINE IF USING CUSTOM SUBNETS
+	ExtrNet3='192.168.19'			# UNCOMMENT LINE IF USING CUSTOM SUBNETS
+	ExtrNet4='192.168.20'			# UNCOMMENT LINE IF USING CUSTOM SUBNETS
+	ExtrNet5='192.168.21'			# UNCOMMENT LINE IF USING CUSTOM SUBNETS
+	ExtrNet6='192.168.22'			# UNCOMMENT LINE IF USING CUSTOM SUBNETS
+
+# pgroup1 end
+# user-settable parameters group 1 end
 # Custom Subnets End
 
 clear
@@ -365,58 +370,61 @@ else
 	echo 'Linux Host Base Release   = '$UbuntuMajorVersion
 fi
 
-MajorRelease=$8
-if [ -z $8 ]
-then
-	MajorRelease=7
-fi
-# echo 'Oracle Container Release  = '$MajorRelease
+# pgroup2 begin
+# user-settable parameters group 2 begin
+# set the value between 'then' and 'fi'
 
-PointRelease=$2
-if [ -z $2 ]
-then
-	PointRelease=3
-fi
-echo 'Oracle Container Version  = '$MajorRelease.$PointRelease
+	MajorRelease=$8
+	if [ -z $8 ]
+	then
+		MajorRelease=7
+	fi
+	# echo 'Oracle Container Release  = '$MajorRelease
 
-NumCon=$3
-if [ -z $3 ]
-then
-	NumCon=3
-fi
-echo 'Oracle Container Count    = '$NumCon
+	PointRelease=$2
+	if [ -z $2 ]
+	then
+		PointRelease=3
+	fi
+	echo 'Oracle Container Version  = '$MajorRelease.$PointRelease
 
-Domain1=$4
-if [ -z $4 ]
-then
-	Domain1=uekulele.com
-fi
-echo 'Domain1                   = '$Domain1
+	NumCon=$3
+	if [ -z $3 ]
+	then
+		NumCon=3
+	fi
+	echo 'Oracle Container Count    = '$NumCon
 
-Domain2=$5
-if [ -z $5 ]
-then
-	Domain2=orabuntu-lxc.com
-fi
-echo 'Domain2                   = '$Domain2
+	Domain1=$4
+	if [ -z $4 ]
+	then
+		Domain1=mackietown.com
+	fi
+	echo 'Domain1                   = '$Domain1
 
-NameServer=$6
-if [ -z $6 ]
-then
-	NameServer=rainman
-fi
-echo 'NameServer                = '$NameServer
+	Domain2=$5
+	if [ -z $5 ]
+	then
+		Domain2=flapjacknow.com
+	fi
+	echo 'Domain2                   = '$Domain2
 
-OSMemRes=$7
-if [ -z $7 ]
-then
-	OSMemRes=1024
-fi
-echo 'OSMemRes                  = '$OSMemRes 
+	NameServer=$6
+	if [ -z $6 ]
+	then
+		NameServer=sandusky
+	fi
+	echo 'NameServer                = '$NameServer
 
-# echo "=============================================="
-# echo "Set Parameters                                "
-# echo "=============================================="
+	OSMemRes=$7
+	if [ -z $7 ]
+	then
+		OSMemRes=1024
+	fi
+	echo 'OSMemRes                  = '$OSMemRes 
+
+# pgroup2 end
+# user-settable parameters group 2 end
 
 MultiHost=$1
 if [ -z $1 ]
@@ -464,19 +472,28 @@ echo 'MultiHost                 = '$MultiHost
 # GLS 20170924 Including an option to upgrade LXC from source over the Canonical LXC packages on Ubuntu Linux is on the roadmap but not yet available.
 # GLS 20170924 Currently Orabuntu-LXC for Oracle Linux does build LXC from source.  You can use this parameter to set what version it will build.
 
-LxcOvsVersion=$9
-if [ -z $9 ] && [ $LinuxFlavor != 'Fedora' ]
-then
-                LxcOvsVersion="2.1.1:2.5.4"
-fi
+# pgroup3 begin
+# user-settable parameter group 3 begin
+# set the value between 'then' and 'fi'
 
-if [ -z $9 ] && [ $LinuxFlavor = 'Fedora' ]
-then
-	if [ $RedHatVersion -eq 27 ]
+	LxcOvsVersion=$9
+	if [ -z $9 ] && [ $LinuxFlavor != 'Fedora' ]
 	then
-		LxcOvsVersion="2.0.9:2.5.4"
+                	LxcOvsVersion="2.1.1:2.5.4"
 	fi
-fi
+
+	# Fedora MUST leave Lxc version at 2.0.9 but can change Ovs version.
+
+	if [ -z $9 ] && [ $LinuxFlavor = 'Fedora' ]
+	then
+		if [ $RedHatVersion -eq 27 ]
+		then
+			LxcOvsVersion="2.0.9:2.5.4"  # Do NOT change 2.0.9 version of LXC here.  Must use 2.0.9 for now.
+		fi
+	fi
+
+# pgroup3 end
+# user-settable parameters group 3 end
 
 if   [ $LinuxFlavor = 'RedHat' ] || [ $LinuxFlavor = 'CentOS' ] || [ $LinuxFlavor = 'Fedora' ]
 then
@@ -495,26 +512,6 @@ function GetGREValue {
 GREValue=$(GetGREValue)
 
 echo 'GRE                       = '$GREValue
-
-# GLS 20180112 The SeedNet1 net value is used to trigger the Subnets subroutine.
-# GLS 20180112 If it is set to a new value then be sure ALL OTHER nets above are set to new values as well
-# GLS 20180112 As of this comment date I have not even begun to try out all the possible combos of leaving some nets default but some set to new values, etc.
-# GLS 20180112 For now, recommend to either use ALL NEW SUBNET values or use ALL DEFAULT SUBNET values.  
-# GLS 20180112 If you don't uncomment any of the Net values above, then ALL DEFAULT SUBNET values will be used.
-
-# if [ -z $SeedNet1 ]
-# then
-# 	echo 'SeedNet1                  = 10.207.29.0'
-# else
-# 	echo 'SeedNet1                  = '$SeedNet1 | cut -f2 -d':' | sed 's/^/SeedNet1                  = /'
-# fi
-	
-# if [ -z $BaseNet1 ]
-# then
-# 	echo 'BaseNet1                  = 10.207.39.0'
-# else
-# 	echo 'BaseNet1                  = '$BaseNet1 | cut -f2 -d':' | sed 's/^/BaseNet1                  = /'
-# fi
 
 if [ -z $StorNet1 ]
 then
@@ -875,10 +872,12 @@ then
 		echo "=============================================="
 		echo ''
 
-		sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" lxc-stop -n $NameServer;echo '(Do NOT enter a password.  Wait...)'; echo ''; sudo -S <<< "$MultiHostVar9" lxc-copy -n $NameServer -N $NameServer-$HOSTNAME; sudo -S <<< "$MultiHostVar9" lxc-start -n $NameServer; sleep 5; sudo -S <<< "$MultiHostVar9" lxc-ls -f"
-		echo ''
-		echo "$NameServer-$HOSTNAME has been created on the Orabuntu-LXC HUB host at $MultiHostVar5"
-		echo "$NameServer-$HOSTNAME can be restored to $NameServer if necessary using lxc-copy command."
+		sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" lxc-stop -n $NameServer;echo '(Do NOT enter passwords...Wait...)'"
+		sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" lxc-copy -n $NameServer -N $NameServer-$HOSTNAME" >/dev/null 2>&1
+		sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" lxc-start -n $NameServer; echo ''; sudo -S <<< "$MultiHostVar9" lxc-ls -f"
+ 		echo ''
+ 		echo "$NameServer-$HOSTNAME has been created on the Orabuntu-LXC HUB host at $MultiHostVar5"
+ 		echo "$NameServer-$HOSTNAME can be restored to $NameServer if necessary using lxc-copy command."
 
 		echo ''
 		echo "=============================================="

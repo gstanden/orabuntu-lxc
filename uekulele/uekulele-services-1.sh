@@ -329,7 +329,7 @@ then
 				do
 					sudo lxc-stop -n $j
 					sleep 2
-					sudo lxc-destroy -n $j -f 
+					sudo lxc-destroy -n $j -f -s
 					sudo rm -rf /var/lib/lxc/$j
 				done
 
@@ -1950,11 +1950,15 @@ then
 			sudo cp -p /etc/network/openvswitch/strt_nsa.sh 			/etc/network/openvswitch/strt_$NameServer.sh
 			sudo cp -p /etc/network/openvswitch/strt_nsa.sh 			/etc/network/openvswitch/strt_$NameServer-base.sh
 
-                        echo "/var/lib/lxc/$NameServer"                                          > /opt/olxc/"$DistDir"/uekulele/archives/nameserver.lst
-                        echo "/etc/network/if-up.d/openvswitch/$NameServer-pub-ifup-sw1"        >> /opt/olxc/"$DistDir"/uekulele/archives/nameserver.lst
-                        echo "/etc/network/if-down.d/openvswitch/$NameServer-pub-ifdown-sw1"    >> /opt/olxc/"$DistDir"/uekulele/archives/nameserver.lst
-                        echo "/etc/network/if-up.d/openvswitch/$NameServer-pub-ifup-sx1"        >> /opt/olxc/"$DistDir"/uekulele/archives/nameserver.lst
-                        echo "/etc/network/if-down.d/openvswitch/$NameServer-pub-ifdown-sx1"    >> /opt/olxc/"$DistDir"/uekulele/archives/nameserver.lst
+                        echo "/var/lib/lxc/$NameServer"							 > /opt/olxc/"$DistDir"/uekulele/archives/nameserver.lst
+                        echo "/etc/network/if-up.d/openvswitch/$NameServer-pub-ifup-sw1"		>> /opt/olxc/"$DistDir"/uekulele/archives/nameserver.lst
+                        echo "/etc/network/if-down.d/openvswitch/$NameServer-pub-ifdown-sw1"		>> /opt/olxc/"$DistDir"/uekulele/archives/nameserver.lst
+                        echo "/etc/network/if-up.d/openvswitch/$NameServer-pub-ifup-sx1"		>> /opt/olxc/"$DistDir"/uekulele/archives/nameserver.lst
+                        echo "/etc/network/if-down.d/openvswitch/$NameServer-pub-ifdown-sx1"		>> /opt/olxc/"$DistDir"/uekulele/archives/nameserver.lst
+                        echo "/etc/network/if-up.d/openvswitch/$NameServer-base-pub-ifup-sw1"		>> /opt/olxc/"$DistDir"/uekulele/archives/nameserver.lst
+                        echo "/etc/network/if-down.d/openvswitch/$NameServer-base-pub-ifdown-sw1"	>> /opt/olxc/"$DistDir"/uekulele/archives/nameserver.lst
+                        echo "/etc/network/if-up.d/openvswitch/$NameServer-base-pub-ifup-sx1"		>> /opt/olxc/"$DistDir"/uekulele/archives/nameserver.lst
+                        echo "/etc/network/if-down.d/openvswitch/$NameServer-base-pub-ifdown-sx1"	>> /opt/olxc/"$DistDir"/uekulele/archives/nameserver.lst
 		fi
 
 		if [ -n $Domain1 ]
@@ -2457,7 +2461,7 @@ then
  		sudo service sw1 restart
  		sudo service sx1 restart
 		sudo lxc-stop  -n $NameServer
-		sudo lxc-copy  -n $NameServer -N $NameServer-base
+ 		sudo lxc-copy  -n $NameServer -N $NameServer-base
 		sudo lxc-start -n $NameServer
 	fi
 
@@ -2480,7 +2484,7 @@ then
         echo ''
 
         sudo chown $Owner:$Group /home/$Owner/Manage-Orabuntu
-        sudo chmod 775 /opt/olxc/"$DistDir"/orabuntu/archives/nameserver_copy.sh
+        sudo chmod 775 /opt/olxc/"$DistDir"/uekulele/archives/nameserver_copy.sh
         /opt/olxc/"$DistDir"/uekulele/archives/nameserver_copy.sh $MultiHostVar5 $MultiHostVar6 $MultiHostVar8 $MultiHostVar9 $NameServer
 
         echo ''

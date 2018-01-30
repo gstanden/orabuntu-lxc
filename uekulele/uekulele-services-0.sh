@@ -31,8 +31,8 @@
 #
 #    You can change the name of the username in this script from 'ubuntu' to whatever username is preferred.
 
-USERNAME=orabuntu
-PASSWORD=howfast1
+USERNAME=amide
+PASSWORD=bonds
 sudo useradd -m -p $(openssl passwd -1 ${PASSWORD}) -s /bin/bash -G wheel ${USERNAME}
 sudo mkdir -p  /home/${USERNAME}/Downloads /home/${USERNAME}/Manage-Orabuntu
 sudo chown ${USERNAME}:${USERNAME} /home/${USERNAME}/Downloads /home/${USERNAME}/Manage-Orabuntu
