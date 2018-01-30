@@ -353,6 +353,20 @@ then
 		echo "=============================================="
 		echo ''
 
+		function CheckAptProcessRunning {
+			ps -ef | grep -v '_apt' | grep apt | grep -v grep | wc -l
+		}
+		AptProcessRunning=$(CheckAptProcessRunning)
+
+		while [ $AptProcessRunning -gt 0 ]
+		do
+			echo 'Waiting for running apt update process(es) to finish...sleeping for 10 seconds'
+			echo ''
+			ps -ef | grep -v '_apt' | grep apt | grep -v grep
+			sleep 10
+			AptProcessRunning=$(CheckAptProcessRunning)
+		done
+
 		sudo apt-get -y purge lxc lxc-common lxc-templates lxc1 lxcfs python3-lxc liblxc1 dnsmasq
 	
 		echo ''

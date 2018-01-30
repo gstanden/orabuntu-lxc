@@ -84,7 +84,7 @@ fi
 if [ -z $2 ]
 then
 	SPOKEIP='lan.ip.this.host'
-#	SPOKEIP=192.168.7.27
+ 	SPOKEIP=192.168.7.27
 else
 	SPOKEIP=$2
 fi
@@ -92,7 +92,7 @@ fi
 if [ -z $3 ]
 then
 	HUBIP='lan.ip.hub.host'
-#	HUBIP=192.168.7.37
+ 	HUBIP=192.168.7.37
 else
 	HUBIP=$3
 fi
@@ -100,7 +100,7 @@ fi
 if [ -z $4 ]
 then
 	HubUserAct=username
-#	HubUserAct=amide
+ 	HubUserAct=amide
 else
 	HubUserAct=$4
 fi
@@ -108,7 +108,7 @@ fi
 if [ -z $4 ]
 then
 	HubSudoPwd=password
-#	HubSudoPwd=bonds
+ 	HubSudoPwd=bonds
 else
 	HubSudoPwd=$5
 fi
@@ -312,6 +312,8 @@ then
 	while [ $AptProcessRunning -gt 0 ]
 	do
 		echo 'Waiting for running apt update process(es) to finish...sleeping for 10 seconds'
+                echo ''
+                ps -ef | grep -v '_apt' | grep apt | grep -v grep
 		sleep 10
 		AptProcessRunning=$(CheckAptProcessRunning)
 	done
