@@ -566,7 +566,7 @@ sleep 5
 
 sudo apt-get install -y uml-utilities openvswitch-switch openvswitch-common hugepages ntp
 sudo apt-get install -y bind9utils dnsutils apparmor-utils openssh-server uuid rpm yum
-sudo apt-get install -y iotop sshpass facter iptables
+sudo apt-get install -y iotop sshpass facter iptables xfsprogs
 
 if [ $NetworkManagerInstalled -eq 1 ] && [ $SystemdResolvedInstalled -eq 0 ]
 then
@@ -1278,8 +1278,10 @@ then
 			sudo sed -i "/nsa/s/nsa/$NameServer/g" /var/lib/lxc/nsa/rootfs/root/ns_backup_update.sh
 			sudo sed -i "/nsa/s/nsa/$NameServer/g" /var/lib/lxc/nsa/rootfs/root/ns_backup.start.sh
 			sudo sed -i "/nsa/s/nsa/$NameServer/g" /var/lib/lxc/nsa/rootfs/root/dns-sync.sh
+
 			sudo sed -i "/nsa/s/nsa/$NameServer/g" /etc/network/openvswitch/strt_nsa.sh
 			sudo mv /var/lib/lxc/nsa /var/lib/lxc/$NameServer
+
 			sudo cp -p /etc/network/if-up.d/openvswitch/nsa-pub-ifup-sw1 		/etc/network/if-up.d/openvswitch/$NameServer-pub-ifup-sw1
 			sudo cp -p /etc/network/if-down.d/openvswitch/nsa-pub-ifdown-sw1 	/etc/network/if-down.d/openvswitch/$NameServer-pub-ifdown-sw1
 			sudo cp -p /etc/network/if-up.d/openvswitch/nsa-pub-ifup-sx1 		/etc/network/if-up.d/openvswitch/$NameServer-pub-ifup-sx1
@@ -1924,26 +1926,52 @@ then
 	echo "=============================================="
 	echo ''
 
-	if [ -n $NameServer ]
-	then
-		sudo service sw1 restart
-		sudo service sx1 restart
-		sudo lxc-stop  -n $NameServer >/dev/null 2>&1
-		sudo lxc-copy  -n $NameServer -N $NameServerBase -B overlayfs -s
-		NameServer=$NameServerBase
-		sudo lxc-start -n $NameServer
+        if [ -n $NameServer ]
+        then
+                sudo service sw1 restart
+                sudo service sx1 restart
 
-		if [ $SystemdResolvedInstalled -eq 1 ]
-		then
-			sudo service systemd-resolved-helper restart
-#			sudo service systemd-resolved restart
-		fi
-		nslookup -timeout=3 $NameServer
-		if [ $? -ne 0 ]
-		then
-			echo "DNS is NOT RUNNING with correct status!"
-		fi
-	fi
+                function CheckFileSystemTypeXfs {
+                        stat --file-system --format=%T /var/lib/lxc | grep -c xfs
+                }
+                FileSystemTypeXfs=$(CheckFileSystemTypeXfs)
+
+                function CheckFileSystemTypeExt {
+                        stat --file-system --format=%T /var/lib/lxc | grep -c ext
+                }
+                FileSystemTypeExt=$(CheckFileSystemTypeExt)
+
+                if [ $FileSystemTypeXfs -eq 1 ]
+                then
+                        function GetFtype {
+                                xfs_info / | grep -c ftype=1
+                        }
+                        Ftype=$(GetFtype)
+
+                        if   [ $Ftype -eq 0 ]
+                        then
+                                sudo lxc-stop  -n $NameServer > /dev/null 2>&1
+                                sudo lxc-copy  -n $NameServer -N $NameServerBase
+                                NameServer=$NameServerBase
+                                sudo lxc-start -n $NameServer
+
+                        elif [ $Ftype -eq 1 ]
+                        then
+                                sudo lxc-stop  -n $NameServer > /dev/null 2>&1
+                                sudo lxc-copy  -n $NameServer -N $NameServerBase -B overlayfs -s
+                                NameServer=$NameServerBase
+                                sudo lxc-start -n $NameServer
+                        fi
+                fi
+
+                if [ $FileSystemTypeExt -eq 1 ]
+                then
+                        sudo lxc-stop  -n $NameServer > /dev/null 2>&1
+                        sudo lxc-copy  -n $NameServer -N $NameServerBase -B overlayfs -s
+                        NameServer=$NameServerBase
+                        sudo lxc-start -n $NameServer
+                fi
+        fi
 
 	echo "=============================================="
 	echo "Done: Start LXC DNS DHCP container.           "

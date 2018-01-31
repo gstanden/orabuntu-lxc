@@ -43,6 +43,11 @@ MultiHost=$7
 LxcOvsVersion=$8
 DistDir=$9
 
+function GetNameServerBase {
+        echo $NameServer | cut -f1 -d'-'
+}
+NameServerBase=$(GetNameServerBase)
+
 function GetGroup {
         id | cut -f2 -d' ' | cut -f2 -d'(' | cut -f1 -d')'
 }
@@ -433,51 +438,56 @@ then
 
 	sudo yum -y install wget tar gzip libtool
 
-        DocBook2XInstalled=0
-        m=1
-        while [ $DocBook2XInstalled -eq 0 ] && [ $m -le 5 ]
-        do
-                if [ $LinuxFlavor != 'Fedora' ]
-                then
+	if [ $LinuxFlavor != 'Fedora' ]
+	then
+		DocBook2XInstalled=0
+		m=1
+
+		while [ $DocBook2XInstalled -eq 0 ] && [ $m -le 5 ]
+		do
                         sudo yum -y install wget
                         sudo mkdir -p /opt/olxc/"$DistDir"/uekulele/epel
                         sudo chown -R $Owner:$Group /opt/olxc
                         cd /opt/olxc/"$DistDir"/uekulele/epel
+
                         if   [ $Release -eq 7 ]
                         then
                                 wget --timeout=5 --tries=10 https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
                                 sudo rpm -ivh epel-release-latest-7.noarch.rpm
+
                         elif [ $Release -eq 6 ]
                         then
                                 wget --timeout=5 --tries=10 https://dl.fedoraproject.org/pub/epel/epel-release-latest-6.noarch.rpm
                                 sudo rpm -ivh epel-release-latest-6.noarch.rpm
                         fi
+
                         sudo yum provides lxc | sed '/^\s*$/d' | grep Repo | sort -u
                         sudo yum -y install docbook2X
-                fi
 
-                function CheckDocBook2XInstalled {
-                        rpm -qa | grep -c docbook2X
-                }
-                DocBook2XInstalled=$(CheckDocBook2XInstalled)
+			function CheckDocBook2XInstalled {
+				rpm -qa | grep -c docbook2X
+			}
+			DocBook2XInstalled=$(CheckDocBook2XInstalled)
 
-                if   [ $DocBook2XInstalled -gt 0 ]
-                then
-                        echo ''
-                        echo "=============================================="
-                        echo 'epel configuration and installs successful.   '
-                        echo "=============================================="
-                        echo ''
-                elif [ $DocBook2XInstalled -eq 0 ]
-                then
-                        echo ''
-                        echo "=============================================="
-                        echo 'epel failure ... retrying epel configuration. '
-                        echo "=============================================="
-                        echo ''
-                fi
-                m=$((m+1))
-        done
+			if   [ $DocBook2XInstalled -gt 0 ]
+			then
+				echo ''
+				echo "=============================================="
+				echo 'epel configuration and installs successful.   '
+				echo "=============================================="
+				echo ''
+
+			elif [ $DocBook2XInstalled -eq 0 ]
+				then
+				echo ''
+				echo "=============================================="
+				echo 'epel failure ... retrying epel configuration. '
+				echo "=============================================="
+				echo ''
+			fi
+			m=$((m+1))
+	        done
+	fi
 
 	cd /opt/olxc/"$DistDir"
 
@@ -581,54 +591,56 @@ then
 	fi
 	sudo yum -y install wget tar gzip libtool
 
-        DocBook2XInstalled=0
-        m=1
+	if [ $LinuxFlavor != 'Fedora' ]
+	then
+		DocBook2XInstalled=0
+		m=1
 
-        while [ $DocBook2XInstalled -eq 0 ] && [ $m -le 5 ]
-        do
-                if [ $LinuxFlavor != 'Fedora' ]
-                then
+		while [ $DocBook2XInstalled -eq 0 ] && [ $m -le 5 ]
+		do
                         sudo yum -y install wget
                         sudo mkdir -p /opt/olxc/"$DistDir"/uekulele/epel
                         sudo chown -R $Owner:$Group /opt/olxc
                         cd /opt/olxc/"$DistDir"/uekulele/epel
+
                         if   [ $Release -eq 7 ]
                         then
                                 wget --timeout=5 --tries=10 https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
                                 sudo rpm -ivh epel-release-latest-7.noarch.rpm
+
                         elif [ $Release -eq 6 ]
                         then
                                 wget --timeout=5 --tries=10 https://dl.fedoraproject.org/pub/epel/epel-release-latest-6.noarch.rpm
                                 sudo rpm -ivh epel-release-latest-6.noarch.rpm
                         fi
+
                         sudo yum provides lxc | sed '/^\s*$/d' | grep Repo | sort -u
                         sudo yum -y install docbook2X
-                fi
 
-                function CheckDocBook2XInstalled {
-                        rpm -qa | grep -c docbook2X
-                }
-                DocBook2XInstalled=$(CheckDocBook2XInstalled)
+			function CheckDocBook2XInstalled {
+				rpm -qa | grep -c docbook2X
+			}
+			DocBook2XInstalled=$(CheckDocBook2XInstalled)
 
-                if  [ $DocBook2XInstalled -gt 0 ]
-                then
-                        echo ''
-                        echo "=============================================="
-                        echo 'epel configuration and installs successful.   '
-                        echo "=============================================="
-                        echo ''
-                        sleep 1
-                elif  [ $DocBook2XInstalled -eq 0 ]
-                then
-                        echo ''
-                        echo "=============================================="
-                        echo 'epel failure ... retrying epel configuration. '
-                        echo "=============================================="
-                        echo ''
-                        sleep 1
-                fi
-                m=$((m+1))
-        done
+			if   [ $DocBook2XInstalled -gt 0 ]
+			then
+				echo ''
+				echo "=============================================="
+				echo 'epel configuration and installs successful.   '
+				echo "=============================================="
+				echo ''
+
+			elif [ $DocBook2XInstalled -eq 0 ]
+				then
+				echo ''
+				echo "=============================================="
+				echo 'epel failure ... retrying epel configuration. '
+				echo "=============================================="
+				echo ''
+			fi
+			m=$((m+1))
+	        done
+	fi
 
 	cd /opt/olxc/"$DistDir"
 
@@ -1923,10 +1935,10 @@ then
 			# GLS 20151223 Settable Nameserver feature added
 			# GLS 20161022 Settable Nameserver feature moved into DNS DHCP LXC container.
 			# GLS 20162011 Settable Nameserver feature expanded to include nameserver and both domains.
-			sudo sed -i "/nsa/s/nsa/$NameServer/g" /var/lib/lxc/nsa/rootfs/var/lib/bind/fwd.orabuntu-lxc.com
-			sudo sed -i "/nsa/s/nsa/$NameServer/g" /var/lib/lxc/nsa/rootfs/var/lib/bind/rev.orabuntu-lxc.com
-			sudo sed -i "/nsa/s/nsa/$NameServer/g" /var/lib/lxc/nsa/rootfs/var/lib/bind/fwd.consultingcommandos.us
-			sudo sed -i "/nsa/s/nsa/$NameServer/g" /var/lib/lxc/nsa/rootfs/var/lib/bind/rev.consultingcommandos.us
+			sudo sed -i "/nsa/s/nsa/$NameServerBase/g" /var/lib/lxc/nsa/rootfs/var/lib/bind/fwd.orabuntu-lxc.com
+			sudo sed -i "/nsa/s/nsa/$NameServerBase/g" /var/lib/lxc/nsa/rootfs/var/lib/bind/rev.orabuntu-lxc.com
+			sudo sed -i "/nsa/s/nsa/$NameServerBase/g" /var/lib/lxc/nsa/rootfs/var/lib/bind/fwd.consultingcommandos.us
+			sudo sed -i "/nsa/s/nsa/$NameServerBase/g" /var/lib/lxc/nsa/rootfs/var/lib/bind/rev.consultingcommandos.us
 			sudo sed -i "/nsa/s/nsa/$NameServer/g" /var/lib/lxc/nsa/config
 			sudo sed -i "/nsa/s/nsa/$NameServer/g" /var/lib/lxc/nsa/rootfs/etc/hostname
 			sudo sed -i "/nsa/s/nsa/$NameServer/g" /var/lib/lxc/nsa/rootfs/etc/hosts
@@ -1938,27 +1950,26 @@ then
 
 			sudo sed -i "/nsa/s/nsa/$NameServer/g" /etc/network/openvswitch/strt_nsa.sh
 			sudo mv /var/lib/lxc/nsa /var/lib/lxc/$NameServer
-			sudo cp -p /etc/network/if-up.d/openvswitch/nsa-pub-ifup-sw1 		/etc/network/if-up.d/openvswitch/$NameServer-pub-ifup-sw1
-			sudo cp -p /etc/network/if-down.d/openvswitch/nsa-pub-ifdown-sw1 	/etc/network/if-down.d/openvswitch/$NameServer-pub-ifdown-sw1
-			sudo cp -p /etc/network/if-up.d/openvswitch/nsa-pub-ifup-sx1 		/etc/network/if-up.d/openvswitch/$NameServer-pub-ifup-sx1
-			sudo cp -p /etc/network/if-down.d/openvswitch/nsa-pub-ifdown-sx1 	/etc/network/if-down.d/openvswitch/$NameServer-pub-ifdown-sx1
-                        sudo cp -p /etc/network/if-up.d/openvswitch/nsa-pub-ifup-sw1            /etc/network/if-up.d/openvswitch/$NameServer-base-pub-ifup-sw1
-                        sudo cp -p /etc/network/if-down.d/openvswitch/nsa-pub-ifdown-sw1        /etc/network/if-down.d/openvswitch/$NameServer-base-pub-ifdown-sw1
-                        sudo cp -p /etc/network/if-up.d/openvswitch/nsa-pub-ifup-sx1            /etc/network/if-up.d/openvswitch/$NameServer-base-pub-ifup-sx1
-                        sudo cp -p /etc/network/if-down.d/openvswitch/nsa-pub-ifdown-sx1        /etc/network/if-down.d/openvswitch/$NameServer-base-pub-ifdown-sx1
 
-			sudo cp -p /etc/network/openvswitch/strt_nsa.sh 			/etc/network/openvswitch/strt_$NameServer.sh
-			sudo cp -p /etc/network/openvswitch/strt_nsa.sh 			/etc/network/openvswitch/strt_$NameServer-base.sh
+                        sudo cp -p /etc/network/if-up.d/openvswitch/nsa-pub-ifup-sw1            /etc/network/if-up.d/openvswitch/$NameServer-pub-ifup-sw1
+                        sudo cp -p /etc/network/if-down.d/openvswitch/nsa-pub-ifdown-sw1        /etc/network/if-down.d/openvswitch/$NameServer-pub-ifdown-sw1
+                        sudo cp -p /etc/network/if-up.d/openvswitch/nsa-pub-ifup-sx1            /etc/network/if-up.d/openvswitch/$NameServer-pub-ifup-sx1
+                        sudo cp -p /etc/network/if-down.d/openvswitch/nsa-pub-ifdown-sx1        /etc/network/if-down.d/openvswitch/$NameServer-pub-ifdown-sx1
+                        sudo cp -p /etc/network/if-up.d/openvswitch/nsa-pub-ifup-sw1            /etc/network/if-up.d/openvswitch/$NameServerBase-pub-ifup-sw1
+                        sudo cp -p /etc/network/if-down.d/openvswitch/nsa-pub-ifdown-sw1        /etc/network/if-down.d/openvswitch/$NameServerBase-pub-ifdown-sw1
+                        sudo cp -p /etc/network/if-up.d/openvswitch/nsa-pub-ifup-sx1            /etc/network/if-up.d/openvswitch/$NameServerBase-pub-ifup-sx1
+                        sudo cp -p /etc/network/if-down.d/openvswitch/nsa-pub-ifdown-sx1        /etc/network/if-down.d/openvswitch/$NameServerBase-pub-ifdown-sx1
+                        sudo cp -p /etc/network/openvswitch/strt_nsa.sh                         /etc/network/openvswitch/strt_$NameServerBase.sh
+                        sudo cp -p /etc/network/openvswitch/strt_nsa.sh                         /etc/network/openvswitch/strt_$NameServer.sh
 
-                        echo "/var/lib/lxc/$NameServer"							 > /opt/olxc/"$DistDir"/uekulele/archives/nameserver.lst
-                        echo "/etc/network/if-up.d/openvswitch/$NameServer-pub-ifup-sw1"		>> /opt/olxc/"$DistDir"/uekulele/archives/nameserver.lst
-                        echo "/etc/network/if-down.d/openvswitch/$NameServer-pub-ifdown-sw1"		>> /opt/olxc/"$DistDir"/uekulele/archives/nameserver.lst
-                        echo "/etc/network/if-up.d/openvswitch/$NameServer-pub-ifup-sx1"		>> /opt/olxc/"$DistDir"/uekulele/archives/nameserver.lst
-                        echo "/etc/network/if-down.d/openvswitch/$NameServer-pub-ifdown-sx1"		>> /opt/olxc/"$DistDir"/uekulele/archives/nameserver.lst
-                        echo "/etc/network/if-up.d/openvswitch/$NameServer-base-pub-ifup-sw1"		>> /opt/olxc/"$DistDir"/uekulele/archives/nameserver.lst
-                        echo "/etc/network/if-down.d/openvswitch/$NameServer-base-pub-ifdown-sw1"	>> /opt/olxc/"$DistDir"/uekulele/archives/nameserver.lst
-                        echo "/etc/network/if-up.d/openvswitch/$NameServer-base-pub-ifup-sx1"		>> /opt/olxc/"$DistDir"/uekulele/archives/nameserver.lst
-                        echo "/etc/network/if-down.d/openvswitch/$NameServer-base-pub-ifdown-sx1"	>> /opt/olxc/"$DistDir"/uekulele/archives/nameserver.lst
+                        echo "/etc/network/if-up.d/openvswitch/$NameServerBase-pub-ifup-sw1"             > /opt/olxc/"$DistDir"/uekulele/archives/nameserver.lst
+                        echo "/etc/network/if-down.d/openvswitch/$NameServerBase-pub-ifdown-sw1"        >> /opt/olxc/"$DistDir"/uekulele/archives/nameserver.lst
+                        echo "/etc/network/if-up.d/openvswitch/$NameServerBase-pub-ifup-sx1"            >> /opt/olxc/"$DistDir"/uekulele/archives/nameserver.lst
+                        echo "/etc/network/if-down.d/openvswitch/$NameServerBase-pub-ifdown-sx1"        >> /opt/olxc/"$DistDir"/uekulele/archives/nameserver.lst
+                        echo "/etc/network/if-up.d/openvswitch/$NameServer-pub-ifup-sw1"                >> /opt/olxc/"$DistDir"/uekulele/archives/nameserver.lst
+                        echo "/etc/network/if-down.d/openvswitch/$NameServer-pub-ifdown-sw1"            >> /opt/olxc/"$DistDir"/uekulele/archives/nameserver.lst
+                        echo "/etc/network/if-up.d/openvswitch/$NameServer-pub-ifup-sx1"                >> /opt/olxc/"$DistDir"/uekulele/archives/nameserver.lst
+                        echo "/etc/network/if-down.d/openvswitch/$NameServer-pub-ifdown-sx1"            >> /opt/olxc/"$DistDir"/uekulele/archives/nameserver.lst
 		fi
 
 		if [ -n $Domain1 ]
@@ -2233,65 +2244,6 @@ then
 	clear
 fi
 
-# if [ $SystemdResolvedInstalled -eq 0 ] && [ $NMResolv -eq 0 ] && [ $GNS1 -eq 0 ]
-# then
-# 	echo ''
-#  	echo "=============================================="
-#  	echo "Activating NetworkManager dnsmasq service ... "
-#  	echo "=============================================="
-#  	echo ''
-
-#  	# So that settings in /etc/NetworkManager/dnsmasq.d/local & /etc/NetworkManager/NetworkManager.conf take effect.
-
-#  	sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g"			/etc/resolv.conf
-#  	sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g"	/etc/resolv.conf
-#  	sudo cat /etc/resolv.conf
-#  	sudo sed -i '/plugins=ifcfg-rh/a dns=none' /etc/NetworkManager/NetworkManager.conf
-#  	sudo sed -i '$!N; /^\(.*\)\n\1$/!P; D' /etc/NetworkManager/NetworkManager.conf
-#  	echo ''
-
-#  	sudo service NetworkManager restart
-#  	sudo service sw1 restart	
-
-#  	function CheckResolvReady {
-#  		sudo cat /etc/resolv.conf | grep -c 'nameserver 127\.0\.0\.1'
-#  	}
-#  	ResolvReady=$(CheckResolvReady)
-#  	echo ''
-#  	NumResolvReadyTries=0
-#  	while [ $ResolvReady -ne 1 ] && [ $NumResolvReadyTries -lt 60 ]
-#   	do
-#  		ResolvReady=$(CheckResolvReady)
-#  		((NumResolvReadyTries=NumResolvReadyTries+1))
-#  		sleep 1
-#  		echo 'NumResolvReadyTries = '$NumResolvReadyTries
-#  	done
-
-#  	if [ $ResolvReady -eq 1 ]
-#  	then
-#  		echo ''
-#  		sudo service sw1 restart
-#  	else
-#  		echo ''
-#  		echo "=============================================="
-#  		echo "NetworkManager didn't set nameserver 127.0.0.1"
-#  		echo "which is the setting required for NM dnsmasq. "
-#  		echo "=============================================="
-#  	fi
-
-#  	# sudo sh -c "echo 'search $Domain1 $Domain2 gns1.$Domain1' >> /etc/resolv.conf"
-#  	sudo cat /etc/resolv.conf
-#  	echo ''
-
-#  	echo "=============================================="
-#  	echo "NetworkManager dnsmasq activated.             "
-#  	echo "=============================================="
-#  fi
-
-# sleep 5
-
-# clear
-
 if [ $MultiHostVar2 = 'N' ]
 then
 	echo ''
@@ -2460,9 +2412,47 @@ then
 	then
  		sudo service sw1 restart
  		sudo service sx1 restart
-		sudo lxc-stop  -n $NameServer
- 		sudo lxc-copy  -n $NameServer -N $NameServer-base
-		sudo lxc-start -n $NameServer
+
+	        function CheckFileSystemTypeXfs {
+			stat --file-system --format=%T /var/lib/lxc | grep -c xfs
+       		}
+        	FileSystemTypeXfs=$(CheckFileSystemTypeXfs)
+
+	        function CheckFileSystemTypeExt {
+			stat --file-system --format=%T /var/lib/lxc | grep -c ext
+       		}
+        	FileSystemTypeExt=$(CheckFileSystemTypeExt)
+
+		if [ $FileSystemTypeXfs -eq 1 ]
+		then
+        		function GetFtype {
+                		xfs_info / | grep -c ftype=1
+        		}
+        		Ftype=$(GetFtype)
+
+			if   [ $Ftype -eq 0 ]
+			then
+				sudo lxc-stop  -n $NameServer > /dev/null 2>&1
+ 				sudo lxc-copy  -n $NameServer -N $NameServerBase
+				NameServer=$NameServerBase
+				sudo lxc-start -n $NameServer
+
+			elif [ $Ftype -eq 1 ]
+			then
+	                	sudo lxc-stop  -n $NameServer > /dev/null 2>&1
+				sudo lxc-copy  -n $NameServer -N $NameServerBase -B overlayfs -s
+				NameServer=$NameServerBase
+				sudo lxc-start -n $NameServer
+			fi
+		fi
+
+		if [ $FileSystemTypeExt -eq 1 ]
+		then
+			sudo lxc-stop  -n $NameServer > /dev/null 2>&1
+			sudo lxc-copy  -n $NameServer -N $NameServerBase -B overlayfs -s
+			NameServer=$NameServerBase
+			sudo lxc-start -n $NameServer
+		fi
 	fi
 
 	echo ''

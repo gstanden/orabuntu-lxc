@@ -76,8 +76,7 @@ SystemdResolvedInstalled=$(CheckSystemdResolvedInstalled)
 
 if [ $SystemdResolvedInstalled -gt 0 ]
 then
-	sudo service systemd-resolved-helper restart
-#	sudo service systemd-resolved restart
+ 	sudo service systemd-resolved restart
 fi
 
 SeedIndex=10

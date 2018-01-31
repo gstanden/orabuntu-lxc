@@ -673,12 +673,43 @@ then
                 echo "=============================================="
                 echo ''
 
-                sudo lxc-stop -n $NameServer
-                echo 'hub nameserver post-install snapshot' > snap-comment
-                sudo lxc-snapshot -n $NameServer -c snap-comment
-		sudo rm -f snap-comment
-                sudo lxc-snapshot -n $NameServer -L -C
-                sleep 5
+                function CheckFileSystemTypeXfs {
+                        stat --file-system --format=%T /var/lib/lxc | grep -c xfs
+                }
+                FileSystemTypeXfs=$(CheckFileSystemTypeXfs)
+
+                function CheckFileSystemTypeExt {
+                        stat --file-system --format=%T /var/lib/lxc | grep -c ext
+                }
+                FileSystemTypeExt=$(CheckFileSystemTypeExt)
+
+                if [ $FileSystemTypeXfs -eq 1 ]
+                then
+                        function GetFtype {
+                                xfs_info / | grep -c ftype=1
+                        }
+                        Ftype=$(GetFtype)
+
+                        if   [ $Ftype -eq 1 ]
+                        then
+                                sudo lxc-stop -n $NameServer > /dev/null 2>&1
+                                echo 'hub nameserver post-install snapshot' > snap-comment
+                                sudo lxc-snapshot -n $NameServer -c snap-comment
+                                sudo rm -f snap-comment
+                                sudo lxc-snapshot -n $NameServer -L -C
+                                sleep 5
+                        fi
+                fi
+
+                if [ $FileSystemTypeExt -eq 1 ]
+                then
+                        sudo lxc-stop -n $NameServer > /dev/null 2>&1
+                        echo 'hub nameserver post-install snapshot' > snap-comment
+                        sudo lxc-snapshot -n $NameServer -c snap-comment
+                        sudo rm -f snap-comment
+                        sudo lxc-snapshot -n $NameServer -L -C
+                        sleep 5
+                fi
 
                 if [ ! -e ~/Manage-Orabuntu ]
                 then

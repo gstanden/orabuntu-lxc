@@ -567,7 +567,7 @@ then
 
 					if [ $MultiHostVar1 = 'new' ] || [ $MultiHostVar1 = 'reinstall' ] # 8
 					then
- 						/opt/olxc/"$DistDir"/uekulele/uekulele-services-1.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $OSMemRes $MultiHost $LxcOvsVersion $DistDir
+ 						/opt/olxc/"$DistDir"/uekulele/uekulele-services-1.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServerBase $OSMemRes $MultiHost $LxcOvsVersion $DistDir
  						/opt/olxc/"$DistDir"/uekulele/uekulele-services-2.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $MultiHost $DistDir
  						/opt/olxc/"$DistDir"/uekulele/uekulele-services-3.sh $MajorRelease $PointRelease $Domain2 $MultiHost $DistDir
 						/opt/olxc/"$DistDir"/uekulele/uekulele-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer $MultiHost $DistDir 
@@ -583,7 +583,7 @@ then
 
 				if [ ! -f /etc/orabuntu-lxc-release ] # 10
 				then
-					/opt/olxc/"$DistDir"/uekulele/uekulele-services-1.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $OSMemRes $MultiHost $LxcOvsVersion $DistDir
+					/opt/olxc/"$DistDir"/uekulele/uekulele-services-1.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServerBase $OSMemRes $MultiHost $LxcOvsVersion $DistDir
 					/opt/olxc/"$DistDir"/uekulele/uekulele-services-2.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $MultiHost $DistDir
 					/opt/olxc/"$DistDir"/uekulele/uekulele-services-3.sh $MajorRelease $PointRelease $Domain2 $MultiHost $DistDir
 					/opt/olxc/"$DistDir"/uekulele/uekulele-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer $MultiHost $DistDir
@@ -642,7 +642,7 @@ then
 
 					if [ $MultiHostVar1 = 'new' ] || [ $MultiHostVar1 = 'reinstall' ] # 8
 					then
- 						/opt/olxc/"$DistDir"/uekulele/uekulele-services-1.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $OSMemRes $MultiHost $LxcOvsVersion $DistDir
+ 						/opt/olxc/"$DistDir"/uekulele/uekulele-services-1.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServerBase $OSMemRes $MultiHost $LxcOvsVersion $DistDir
  						/opt/olxc/"$DistDir"/uekulele/uekulele-services-2.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $MultiHost $DistDir
  						/opt/olxc/"$DistDir"/uekulele/uekulele-services-3.sh $MajorRelease $PointRelease $Domain2 $MultiHost $DistDir
 						/opt/olxc/"$DistDir"/uekulele/uekulele-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer $MultiHost $DistDir
@@ -658,7 +658,7 @@ then
 		
 				if [ ! -f /etc/orabuntu-lxc-release ] # 14
 				then
-					/opt/olxc/"$DistDir"/uekulele/uekulele-services-1.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $OSMemRes $MultiHost $LxcOvsVersion $DistDir
+					/opt/olxc/"$DistDir"/uekulele/uekulele-services-1.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServerBase $OSMemRes $MultiHost $LxcOvsVersion $DistDir
 					/opt/olxc/"$DistDir"/uekulele/uekulele-services-2.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $MultiHost $DistDir
 					/opt/olxc/"$DistDir"/uekulele/uekulele-services-3.sh $MajorRelease $PointRelease $Domain2 $MultiHost $DistDir
 					/opt/olxc/"$DistDir"/uekulele/uekulele-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer $MultiHost $DistDir

@@ -841,7 +841,12 @@ then
 	}
 	HubFileSystemType=$(GetHubFileSystemType)
 
-        if [ $HubFileSystemType -eq 0 ]
+	function GetFtype {
+		sshpass -p $MultiHostVar9 ssh -q -t -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 xfs_info / | grep -c ftype=1
+	}
+	Ftype=$(GetFtype)
+
+        if [ $HubFileSystemType -eq 0 ] || [ $Ftype -eq 1 ]
         then
 		echo ''
 		echo "=============================================="
@@ -864,7 +869,7 @@ then
 		sleep 10
 
 		clear
-	elif [ $HubFileSystemType -eq 1 ]
+	elif [ $HubFileSystemType -eq 1 ] && [ $Ftype -eq 0 ]
 	then
 		echo ''
 		echo "=============================================="
