@@ -2483,6 +2483,7 @@ then
         echo "=============================================="
         echo ''
 
+	sudo mkdir -p /home/$Owner/Manage-Orabuntu
         sudo chown $Owner:$Group /home/$Owner/Manage-Orabuntu
         sudo chmod 775 /opt/olxc/"$DistDir"/uekulele/archives/nameserver_copy.sh
         /opt/olxc/"$DistDir"/uekulele/archives/nameserver_copy.sh $MultiHostVar5 $MultiHostVar6 $MultiHostVar8 $MultiHostVar9 $NameServer
