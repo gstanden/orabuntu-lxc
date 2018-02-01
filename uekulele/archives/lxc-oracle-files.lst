@@ -29,7 +29,7 @@ rootfs/config.oracle.bak.oel7
 rootfs/config.asm.flex.cluster
 rootfs/etc/dhcp/dhclient.conf
 rootfs/root/lxc-services.sh
-rootfs/etc/sysctl.conf
 rootfs/etc/rc.d/rc.local
+rootfs/etc/sysctl.conf
 rootfs/GNU3
 rootfs/COPYING
