@@ -496,7 +496,7 @@ then
 
 	if [ $LinuxFlavor = 'Fedora' ]
 	then
-		sudo yum -y install lxc-templates lxc-extra libvirt gpg
+		sudo dnf install lxc lxc-templates lxc-extra debootstrap libvirt perl gpg
 	fi
 
 	echo ''
@@ -938,7 +938,7 @@ then
 
 	sleep 5
 
-	if [ $LinuxFlavor != 'CentOS' ]
+	if [ $LinuxFlavor != 'CentOS' ] || [ $LinuxFlavor != 'Fedora' ]
 	then
 		sudo ifconfig lxcbr0
 	else
@@ -2465,7 +2465,10 @@ sleep 5
 
 clear
 
-if [ $NameServerExists -eq 0 ] && [ $MultiHostVar2 = 'Y' ] && [ $GRE = 'Y' ]
+# if [ $NameServerExists -eq 0 ] && [ $MultiHostVar2 = 'Y' ] && [ $GRE = 'Y' ]
+# GLS 20180202 Allow VMs to get a copy of the NameServer container(s).
+
+if [ $NameServerExists -eq 0 ] && [ $MultiHostVar2 = 'Y' ]
 then
         echo ''
         echo "=============================================="
@@ -2484,6 +2487,22 @@ then
         echo "Done: Replicate nameserver $NameServer.       "
         echo "=============================================="
         echo ''
+
+	function CheckNameServerConfigFormat {
+		grep -c lxc.net.0 /var/lib/lxc/$NameServer/config
+	}
+	NameServerConfigFormat=$(CheckNameServerConfigFormat)
+
+	if [ $(SoftwareVersion $LXCVersion) -lt $(SoftwareVersion 2.1.0) ] && [ $NameServerConfigFormat -gt 0 ]
+	then
+		sudo sed -i 's/lxc.net.0/lxc.network/g' 	/var/lib/lxc/$NameServer/config
+		sudo sed -i 's/lxc.net.1/lxc.network/g' 	/var/lib/lxc/$NameServer/config
+		sudo sed -i 's/lxc.uts.name/lxc.utsname/g' 	/var/lib/lxc/$NameServer/config
+		
+		sudo sed -i 's/lxc.net.0/lxc.network/g' 	/var/lib/lxc/$NameServer-base/config
+		sudo sed -i 's/lxc.net.1/lxc.network/g' 	/var/lib/lxc/$NameServer-base/config
+		sudo sed -i 's/lxc.uts.name/lxc.utsname/g' 	/var/lib/lxc/$NameServer-base/config
+	fi
 fi
 
 sleep 5
