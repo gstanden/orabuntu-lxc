@@ -455,7 +455,6 @@ sudo lxc-attach -n $SeedContainerName -- chown grid:oinstall /home/grid/.bashrc
 sudo lxc-attach -n $SeedContainerName -- chown grid:oinstall /home/grid/.kshrc
 sudo lxc-attach -n $SeedContainerName -- chown grid:oinstall /home/grid/.bash_logout
 sudo lxc-attach -n $SeedContainerName -- chown grid:oinstall /home/grid/.
-sudo lxc-attach -n $SeedContainerName -- yum -y install net-tools bind-utils ntp
 
 echo ''  
 echo "=============================================="

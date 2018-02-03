@@ -105,6 +105,7 @@ then
                 sudo cat /etc/redhat-release | cut -f"$CutIndex" -d' ' | cut -f1 -d'.'
         }
         RedHatVersion=$(GetRedHatVersion)
+	RHV=$RedHatVersion
         function GetOracleDistroRelease {
                 sudo cat /etc/oracle-release | cut -f5 -d' ' | cut -f1 -d'.'
         }
@@ -129,6 +130,7 @@ then
                 sudo cat /etc/redhat-release | cut -f"$CutIndex" -d' ' | cut -f1 -d'.'
         }
         RedHatVersion=$(GetRedHatVersion)
+	RHV=$RedHatVersion
         Release=$RedHatVersion
         RL=$Release
 elif [ $LinuxFlavor = 'Fedora' ]
@@ -138,6 +140,7 @@ then
                 sudo cat /etc/redhat-release | cut -f"$CutIndex" -d' ' | cut -f1 -d'.'
         }
         RedHatVersion=$(GetRedHatVersion)
+	RHV=$RedHatVersion
         if [ $RedHatVersion -ge 19 ]
         then
                 Release=7
@@ -387,8 +390,8 @@ then
 				echo "Check if install user is root...              "
 				echo "=============================================="
 				echo ''
-				echo "For $LF Linux $RL user must be ubuntu.        "
-				echo "Connect as ubuntu and run the scripts again.  "
+				echo "For $LF Linux $RHV user must be non-root user."
+				echo "Connect as non-root and run scripts again.    "
 				echo ''
 				echo "=============================================="
 				echo "Install user check completed.                 "
@@ -431,7 +434,11 @@ then
        			 	echo ''
 	
        			 	sudo yum -y install which ruby curl tar yum-utils
-				sudo yum-complete-transaction
+
+				if [ $LinuxFlavor != 'Fedora' ]
+				then
+					sudo yum-complete-transaction
+				fi
        	 	
 				echo ''
        			 	echo "=============================================="
@@ -527,7 +534,7 @@ then
 
  				echo ''
 				echo "=============================================="
-				echo "Orabuntu-LXC $LFA Linux $RL on $Facter.       "
+				echo "Orabuntu-LXC $LFA Linux $RHV on $Facter.      "
 				echo "=============================================="
 				echo ''
 
@@ -592,7 +599,7 @@ then
 
  				echo ''
 				echo "=============================================="
-				echo "Orabuntu-LXC for $LFA Linux $RL complete.     "
+				echo "Orabuntu-LXC for $LFA Linux $RHV complete.    "
 				echo "=============================================="
 	
 				sleep 5
@@ -601,7 +608,7 @@ then
 
 				echo ''
 				echo "=============================================="
-				echo "Orabuntu-LXC $LFA Linux $RL on $Facter.       " 
+				echo "Orabuntu-LXC $LFA Linux $RHV on $Facter.      " 
 				echo "=============================================="
 				echo ''
 
@@ -671,7 +678,7 @@ then
 			
 				echo ''
 				echo "=============================================="
-				echo "Orabuntu-LXC for $LFA Linux $RL complete.     "
+				echo "Orabuntu-LXC for $LFA Linux $RHV complete.    "
 				echo "=============================================="
 
 			fi # OK 6
@@ -768,9 +775,8 @@ then
 				echo "Check if install user is root...              "
 				echo "=============================================="
 				echo ''
-				echo "For $LF Linux $RL user CANNOT be root.        "
-				echo "Connect as the linux ubuntu user and rerun    "
-				echo "installer.                                    "
+				echo "For $LF Linux $RHV user must be non-root user."
+				echo "Connect as non-root and run scripts again.    "
 				echo ''
 				echo "=============================================="
 				echo "Install user check completed.                 "

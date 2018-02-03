@@ -155,6 +155,7 @@ then
                 sudo cat /etc/redhat-release | cut -f"$CutIndex" -d' ' | cut -f1 -d'.'
         }
         RedHatVersion=$(GetRedHatVersion)
+	RHV=$RedHatVersion
         function GetOracleDistroRelease {
                 sudo cat /etc/oracle-release | cut -f5 -d' ' | cut -f1 -d'.'
         }
@@ -175,6 +176,7 @@ then
                 sudo cat /etc/redhat-release | cut -f"$CutIndex" -d' ' | cut -f1 -d'.'
         }
         RedHatVersion=$(GetRedHatVersion)
+	RHV=$RedHatVersion
         Release=$RedHatVersion
         LF=$LinuxFlavor
         RL=$Release
@@ -185,6 +187,7 @@ then
                 sudo cat /etc/redhat-release | cut -f"$CutIndex" -d' ' | cut -f1 -d'.'
         }
         RedHatVersion=$(GetRedHatVersion)
+	RHV=$RedHatVersion
         if [ $RedHatVersion -ge 19 ]
         then
                 Release=7
@@ -323,7 +326,14 @@ then
 fi
 
 sudo systemctl daemon-reload
-sudo service lxc-net restart > /dev/null 2>&1
+
+if [ $LinuxFlavor != 'Fedora' ]
+then
+	sudo service lxc-net restart > /dev/null 2>&1
+else
+	sudo service dnsmasq restart > /dev/null 2>&1
+fi
+
 # sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service lxc-net restart > /dev/null 2>&1"
 # sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service systemd-resolved restart > /dev/null 2>&1"
 
@@ -386,7 +396,14 @@ do
 			sudo /etc/network/openvswitch/veth_cleanups.sh $j
 			echo ''
 			sudo systemctl daemon-reload
-			sudo service lxc-net restart > /dev/null 2>&1
+
+			if [ $LinuxFlavor != 'Fedora' ]
+			then
+				sudo service lxc-net restart > /dev/null 2>&1
+			else
+				sudo service dnsmasq restart > /dev/null 2>&1
+			fi
+
 			sleep 2
 			sudo lxc-start -n $j
 			sleep 2
@@ -440,25 +457,34 @@ elif [ $LxcNetRunning -ge 1 ]
 then
         echo ''
         echo "=============================================="
-        echo "Restart service lxc-net...                    "
+        echo "Restart Resolution Servies...                 "
         echo "=============================================="
         echo ''
 
-	function GetDhcpRange {
-        	cat /etc/sysconfig/lxc-net | grep LXC_DHCP_RANGE | cut -f2 -d'=' | sed 's/"//g' 
-	}       
-	DhcpRange=$(GetDhcpRange)
-	DHR="$DhcpRange"
-	sudo sed -i "s/DHCP-RANGE-OLXC/dhcp-range=$DHR/" /etc/dnsmasq.conf
+	if [ $LinuxFlavor != 'Fedora' ]
+	then
+		function GetDhcpRange {
+       	 		cat /etc/sysconfig/lxc-net | grep LXC_DHCP_RANGE | cut -f2 -d'=' | sed 's/"//g' 
+		}       
+		DhcpRange=$(GetDhcpRange)
+		DHR="$DhcpRange"
+		sudo sed -i "s/DHCP-RANGE-OLXC/dhcp-range=$DHR/" /etc/dnsmasq.conf
+		sudo systemctl daemon-reload
+        	sudo service lxc-net restart > /dev/null 2>&1
+		sleep 2
+        	sudo service lxc-net status
+	else
+		sudo systemctl daemon-reload
+		sudo service dnsmasq restart > /dev/null 2>&1
+		sleep 2
+		sudo service dnsmasq status
+	fi
 
-	sudo systemctl daemon-reload
-        sudo service lxc-net restart > /dev/null 2>&1
         sleep 2
-        sudo service lxc-net status
 
         echo ''
         echo "=============================================="
-        echo "Done: Restart service lxc-net.                "
+        echo "Done: Restart Resolution Services.            "
         echo "=============================================="
         echo ''
 
@@ -700,25 +726,34 @@ then
 	then
 		echo ''
 		echo "=============================================="
-		echo "Restart service lxc-net...                    "
+		echo "Restart Resolution Servies...                 "
 		echo "=============================================="
 		echo ''
 
-		function GetDhcpRange {
-        		cat /etc/sysconfig/lxc-net | grep LXC_DHCP_RANGE | cut -f2 -d'=' | sed 's/"//g' 
-		}       
-		DhcpRange=$(GetDhcpRange)
-		DHR="$DhcpRange"
-		sudo sed -i "s/DHCP-RANGE-OLXC/dhcp-range=$DHR/" /etc/dnsmasq.conf
+		if [ $LinuxFlavor != 'Fedora' ]
+		then
+			function GetDhcpRange {
+				cat /etc/sysconfig/lxc-net | grep LXC_DHCP_RANGE | cut -f2 -d'=' | sed 's/"//g' 
+			}       
+			DhcpRange=$(GetDhcpRange)
+			DHR="$DhcpRange"
+			sudo sed -i "s/DHCP-RANGE-OLXC/dhcp-range=$DHR/" /etc/dnsmasq.conf
+			sudo systemctl daemon-reload
+			sudo service lxc-net restart > /dev/null 2>&1
+			sleep 2
+			sudo service lxc-net status
+		else
+			sudo systemctl daemon-reload
+			sudo service dnsmasq restart > /dev/null 2>&1
+			sleep 2
+			sudo service dnsmasq status
+		fi
 
-		sudo systemctl daemon-reload
-		sudo service lxc-net restart > /dev/null 2>&1
 		sleep 2
-		sudo service lxc-net status
 
 		echo ''
 		echo "=============================================="
-		echo "Done: Restart service lxc-net.                "
+		echo "Done: Restart Resolution Services.            "
 		echo "=============================================="
 		echo ''
 
@@ -831,7 +866,10 @@ then
 		clear
 	fi
 
- 	if [ $GRE = 'Y' ]
+#	if [ $GRE = 'Y' ]
+#	GLS 20180202 Include VMs too.
+
+ 	if [ $MultiHostVar2 = 'Y' ] && [ $MultiHostVar1 = 'new' ]
  	then
                 echo ''
                 echo "=============================================="
@@ -868,25 +906,34 @@ then
 		then
 			echo ''
 			echo "=============================================="
-			echo "Restart service lxc-net...                    "
+			echo "Restart Resolution Servies...                 "
 			echo "=============================================="
 			echo ''
 
-			function GetDhcpRange {
-        			cat /etc/sysconfig/lxc-net | grep LXC_DHCP_RANGE | cut -f2 -d'=' | sed 's/"//g' 
-			}       
-			DhcpRange=$(GetDhcpRange)
-			DHR="$DhcpRange"
-			sudo sed -i "s/DHCP-RANGE-OLXC/dhcp-range=$DHR/" /etc/dnsmasq.conf
+			if [ $LinuxFlavor != 'Fedora' ]
+			then
+				function GetDhcpRange {
+					cat /etc/sysconfig/lxc-net | grep LXC_DHCP_RANGE | cut -f2 -d'=' | sed 's/"//g' 
+				}       
+				DhcpRange=$(GetDhcpRange)
+				DHR="$DhcpRange"
+				sudo sed -i "s/DHCP-RANGE-OLXC/dhcp-range=$DHR/" /etc/dnsmasq.conf
+				sudo systemctl daemon-reload
+				sudo service lxc-net restart > /dev/null 2>&1
+				sleep 2
+				sudo service lxc-net status
+			else
+				sudo systemctl daemon-reload
+				sudo service dnsmasq restart > /dev/null 2>&1
+				sleep 2
+				sudo service dnsmasq status
+			fi
 
-			sudo systemctl daemon-reload
-			sudo service lxc-net restart > /dev/null 2>&1
 			sleep 2
-			sudo service lxc-net status
 
 			echo ''
 			echo "=============================================="
-			echo "Done: Restart service lxc-net.                "
+			echo "Done: Restart Resolution Services.            "
 			echo "=============================================="
 			echo ''
 

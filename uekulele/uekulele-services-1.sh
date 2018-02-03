@@ -160,6 +160,7 @@ then
                 sudo cat /etc/redhat-release | cut -f"$CutIndex" -d' ' | cut -f1 -d'.'
         }
         RedHatVersion=$(GetRedHatVersion)
+	RHV=$RedHatVersion
         function GetOracleDistroRelease {
                 sudo cat /etc/oracle-release | cut -f5 -d' ' | cut -f1 -d'.'
         }
@@ -180,6 +181,7 @@ then
                 sudo cat /etc/redhat-release | cut -f"$CutIndex" -d' ' | cut -f1 -d'.'
         }
         RedHatVersion=$(GetRedHatVersion)
+	RHV=$RedHatVersion
         Release=$RedHatVersion
         LF=$LinuxFlavor
         RL=$Release
@@ -190,6 +192,7 @@ then
                 sudo cat /etc/redhat-release | cut -f"$CutIndex" -d' ' | cut -f1 -d'.'
         }
         RedHatVersion=$(GetRedHatVersion)
+	RHV=$RedHatVersion
         if [ $RedHatVersion -ge 19 ]
         then
                 Release=7
@@ -496,7 +499,7 @@ then
 
 	if [ $LinuxFlavor = 'Fedora' ]
 	then
-		sudo dnf install lxc lxc-templates lxc-extra debootstrap libvirt perl gpg
+		sudo dnf -y install lxc lxc-templates lxc-extra debootstrap libvirt perl gpg
 	fi
 
 	echo ''
@@ -647,6 +650,11 @@ then
 	sudo yum -y install debootstrap perl bash-completion bash-completion-extras dnsmasq libvirt
 	sudo yum -y install lxc libcap-devel libcgroup wget bridge-utils lsb
 
+	if [ $LinuxFlavor = 'Fedora' ]
+	then
+		sudo dnf -y install lxc lxc-templates lxc-extra debootstrap libvirt perl gpg
+	fi
+
 	echo ''
 	echo "=============================================="
 	echo "LXC and prerequisite packages completed.      "
@@ -744,7 +752,7 @@ then
 
 	echo ''
 	echo "=============================================="
-	echo "Upgrade LXC from Source on $LF Linux $RL      "
+	echo "Upgrade LXC from Source on $LF Linux $RHV     "
 	echo "=============================================="
 
 	sleep 5
@@ -895,7 +903,7 @@ then
 	then
 		echo ''
 		echo "=============================================="
-		echo "LXC RPMs built on $LF Linux $RL.              "
+		echo "LXC RPMs built on $LF Linux $RHV.             "
 		echo "=============================================="
 	fi
 
@@ -907,7 +915,7 @@ then
 	then
 		echo ''
 		echo "=============================================="
-		echo "LXC RPMs built on $LF Linux $RL.              " 
+		echo "LXC RPMs built on $LF Linux $RHV.             " 
 		echo "=============================================="
 	fi
 
@@ -938,7 +946,7 @@ then
 
 	sleep 5
 
-	if [ $LinuxFlavor != 'CentOS' ] || [ $LinuxFlavor != 'Fedora' ]
+	if [ $LinuxFlavor != 'CentOS' ] && [ $LinuxFlavor != 'Fedora' ]
 	then
 		sudo ifconfig lxcbr0
 	else
@@ -988,6 +996,36 @@ then
 fi
 
 # GLS 20170919 Ubuntu Specific Code Block 2 END
+
+echo ''
+echo "=============================================="
+echo "Display Linux Bridge for LXC (non-OvS)...     "
+echo "=============================================="
+echo ''
+
+sleep 5
+
+if [ $LinuxFlavor != 'CentOS' ] && [ $LinuxFlavor != 'Fedora' ]
+then
+	sudo ifconfig lxcbr0
+fi
+
+if [ $LinuxFlavor = 'CentOS' ] || [ $LinuxFlavor = 'Fedora' ]
+then
+	sudo ifconfig virbr0
+	if [ $? -eq 0 ]
+	then
+		sudo sed -i "s/lxcbr0/virbr0/g" /etc/lxc/default.conf
+	fi
+fi
+
+echo "=============================================="
+echo "Done: Display Linux Bridge for LXC (non-OvS). "
+echo "=============================================="
+
+sleep 5
+
+clear
 
 echo ''
 echo "=============================================="
@@ -1281,7 +1319,7 @@ then
 	then
 		echo ''
 		echo "=============================================="
-		echo "OpenvSwitch RPMs built on $LF Linux $RL       " 
+		echo "OpenvSwitch RPMs built on $LF Linux $RHV      " 
 		echo "=============================================="
 	fi
 
@@ -1635,7 +1673,7 @@ FirstRunNsa=$NsaExists
 
 echo ''
 echo "=============================================="
-echo "Unpack G1 files $LF Linux $RL                 "
+echo "Unpack G1 files $LF Linux $RHV                "
 echo "=============================================="
 echo ''
 
@@ -1648,7 +1686,7 @@ sudo tar -xvf /opt/olxc/"$DistDir"/uekulele/archives/ubuntu-host.tar -C / --touc
 
 echo ''
 echo "=============================================="
-echo "Done: Unpack G1 files $LF Linux $RL           "
+echo "Done: Unpack G1 files $LF Linux $RHV          "
 echo "=============================================="
 
 sleep 5
@@ -1657,7 +1695,7 @@ clear
 
 echo ''
 echo "=============================================="
-echo "Unpack G2 files for $LF Linux $RL...          "
+echo "Unpack G2 files for $LF Linux $RHV...         "
 echo "=============================================="
 echo ''
 
@@ -1671,7 +1709,7 @@ fi
 
 echo ''
 echo "=============================================="
-echo "Done: Unpack G2 files for $LF Linux $RL.      "
+echo "Done: Unpack G2 files for $LF Linux $RHV.     "
 echo "=============================================="
 
 sleep 5
@@ -2489,7 +2527,7 @@ then
         echo ''
 
 	function CheckNameServerConfigFormat {
-		grep -c lxc.net.0 /var/lib/lxc/$NameServer/config
+		sudo grep -c lxc.net.0 /var/lib/lxc/$NameServer/config
 	}
 	NameServerConfigFormat=$(CheckNameServerConfigFormat)
 
@@ -2503,6 +2541,8 @@ then
 		sudo sed -i 's/lxc.net.1/lxc.network/g' 	/var/lib/lxc/$NameServer-base/config
 		sudo sed -i 's/lxc.uts.name/lxc.utsname/g' 	/var/lib/lxc/$NameServer-base/config
 	fi
+
+	sudo lxc-ls -f
 fi
 
 sleep 5
@@ -2586,8 +2626,8 @@ then
 	sudo lxc-attach -n $NameServer -- mkdir -p /root/backup-lxc-container/$NameServer/updates
 	sudo lxc-attach -n $NameServer -- tar -cvzPf /root/backup-lxc-container/$NameServer/updates/backup_"$NameServer"_ns_update.tar.gz /root/ns_backup_update.lst
 
-	sudo tar -v --extract --file=/opt/olxc/"$DistDir"/uekulele/archives/dns-dhcp-cont.tar -C / var/lib/lxc/nsa/rootfs/etc/systemd/system/dns-sync.service
-	sudo mv /var/lib/lxc/nsa/rootfs/etc/systemd/system/dns-sync.service /var/lib/lxc/$NameServer/rootfs/etc/systemd/system/dns-sync.service
+ 	sudo tar -v --extract --file=/opt/olxc/"$DistDir"/uekulele/archives/dns-dhcp-cont.tar -C / var/lib/lxc/nsa/rootfs/etc/systemd/system/dns-sync.service
+ 	sudo mv /var/lib/lxc/nsa/rootfs/etc/systemd/system/dns-sync.service /var/lib/lxc/$NameServer/rootfs/etc/systemd/system/dns-sync.service > /dev/null 2>&1
 
 	sudo lxc-attach -n $NameServer -- systemctl enable dns-sync
 	sudo lxc-attach -n $NameServer -- chown bind:bind /var/lib/bind/fwd.$Domain1
@@ -2955,21 +2995,23 @@ then
 		echo "=============================================="
 		echo ''
 
-		function GetDhcpRange {
-			cat /etc/sysconfig/lxc-net | grep LXC_DHCP_RANGE | cut -f2 -d'=' | sed 's/"//g' 
-		}
-		DhcpRange=$(GetDhcpRange)
+		if [ $LinuxFlavor != 'Fedora' ]
+		then
+			function GetDhcpRange {
+				cat /etc/sysconfig/lxc-net | grep LXC_DHCP_RANGE | cut -f2 -d'=' | sed 's/"//g' 
+			}
+			DhcpRange=$(GetDhcpRange)
 
-		function GetListenAddress {
-			cat /etc/sysconfig/lxc-net | grep LXC_ADDR | cut -f2 -d'=' | sed 's/"//g'
-		}
-		ListenAddress=$(GetListenAddress)
+			function GetListenAddress {
+				cat /etc/sysconfig/lxc-net | grep LXC_ADDR | cut -f2 -d'=' | sed 's/"//g'
+			}
+			ListenAddress=$(GetListenAddress)
+		fi
 
-		function GetDnsmasqPid {
-			ps -eo pid,comm | grep dnsmasq | sed 's/^[ \t]*//;s/[ \t]*$//' | cut -f1 -d' '
-		}
-		DnsmasqPid=$(GetDnsmasqPid)
-
+#		function GetDnsmasqPid {
+#			ps -eo pid,comm | grep dnsmasq | sed 's/^[ \t]*//;s/[ \t]*$//' | cut -f1 -d' '
+#		}
+#		DnsmasqPid=$(GetDnsmasqPid)
 #		sudo kill -9 $DnsmasqPid > /dev/null 2>&1
 
 		DHR="$DhcpRange"
@@ -2983,32 +3025,39 @@ then
 		sudo yum -y install dnsmasq
 		sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /etc/dnsmasq.conf
 		sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /etc/dnsmasq.conf
-		sudo sed -i '/LXC_DHCP_CONFILE/s/#//' /etc/sysconfig/lxc-net
-		sudo sed -i 's/^[ \t]*//' /etc/dnsmasq.conf
-		sudo sed -i "/LXC_DHCP_CONFILE/s/LXC_DHCP_CONFILE=\/etc\/lxc\/dnsmasq.conf/LXC_DHCP_CONFILE=\/etc\/dnsmasq.conf/" /etc/sysconfig/lxc-net
-		sudo sed -i "s/DHCP-RANGE-OLXC/dhcp-range=$DHR/" /etc/dnsmasq.conf
+
+		if [ $LinuxFlavor != 'Fedora' ]
+		then
+			sudo sed -i '/LXC_DHCP_CONFILE/s/#//' /etc/sysconfig/lxc-net
+			sudo sed -i 's/^[ \t]*//' /etc/dnsmasq.conf
+			sudo sed -i "/LXC_DHCP_CONFILE/s/LXC_DHCP_CONFILE=\/etc\/lxc\/dnsmasq.conf/LXC_DHCP_CONFILE=\/etc\/dnsmasq.conf/" /etc/sysconfig/lxc-net
+			sudo sed -i "s/DHCP-RANGE-OLXC/dhcp-range=$DHR/" /etc/dnsmasq.conf
+		else
+			sudo sed -i '/lxcbr0/d'			/etc/dnsmasq.conf
+			sudo sed -i '/DHCP-RANGE-OLXC/d'	/etc/dnsmasq.conf
+		fi
+			
 		sudo service NetworkManager restart
 		sleep 5
 		sudo systemctl daemon-reload
 		sudo rm -f /etc/resolv.conf
+
 		sudo sh -c "echo 'nameserver 127.0.0.1' 			>  /etc/resolv.conf"
 		sudo sh -c "echo 'search $Domain1 $Domain2 gns1.$Domain1' 	>> /etc/resolv.conf"
-		function GetDhcpRange {
-        		cat /etc/sysconfig/lxc-net | grep LXC_DHCP_RANGE | cut -f2 -d'=' | sed 's/"//g' 
-		}       
-		DhcpRange=$(GetDhcpRange)
-		DHR="$DhcpRange"
-		sudo sed -i "s/DHCP-RANGE-OLXC/dhcp-range=$DHR/" /etc/dnsmasq.conf
-		sudo service lxc-net restart> /dev/null 2>&1
- 		sudo service lxc-net status
+
+		if [ $LinuxFlavor != 'Fedora' ]
+		then
+			sudo sed -i "s/DHCP-RANGE-OLXC/dhcp-range=$DHR/" /etc/dnsmasq.conf
+			sudo service lxc-net restart> /dev/null 2>&1
+ 			sudo service lxc-net status
+		else
+			sudo service dnsmasq start
+		fi
+
 		echo ''
 		sleep 2
 		nslookup $NameServer
-#		nslookup 10.207.39.2
-#		nslookup 10.207.29.2
-#		nslookup yum.oracle.com
 		ping -c 3 $NameServer
-#		ping -c 3 yum.oracle.com
 	
 		echo ''
 		echo "=============================================="

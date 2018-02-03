@@ -608,15 +608,20 @@ echo "Container oel$OracleRelease$SeedPostfix ping test..."
 echo "=============================================="
 echo ''
 
-function GetDhcpRange {
-        cat /etc/sysconfig/lxc-net | grep LXC_DHCP_RANGE | cut -f2 -d'=' | sed 's/"//g' 
-}       
-DhcpRange=$(GetDhcpRange)
-DHR="$DhcpRange"
-sudo sed -i "s/DHCP-RANGE-OLXC/dhcp-range=$DHR/" /etc/dnsmasq.conf
+if [ $LinuxFlavor != 'Fedora' ]
+then
+	function GetDhcpRange {
+	        cat /etc/sysconfig/lxc-net | grep LXC_DHCP_RANGE | cut -f2 -d'=' | sed 's/"//g' 
+	}       
+	DhcpRange=$(GetDhcpRange)
+	DHR="$DhcpRange"
+	sudo sed -i "s/DHCP-RANGE-OLXC/dhcp-range=$DHR/" /etc/dnsmasq.conf
 
-sudo systemctl daemon-reload
-sudo service lxc-net restart > /dev/null 2>&1
+	sudo systemctl daemon-reload
+	sudo service lxc-net restart > /dev/null 2>&1
+else
+	sudo service dnsmasq restart
+fi
 
 function CheckNetworkUp {
 ping -c 3 oel$OracleRelease$SeedPostfix | grep packet | cut -f3 -d',' | sed 's/ //g'

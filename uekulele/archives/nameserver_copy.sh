@@ -78,13 +78,6 @@ echo ''
 echo "=============================================="
 echo "LXC containers for Oracle Status...           "
 echo "=============================================="
-echo ''
-
-sudo lxc-ls -f
-
-echo ''
-echo "=============================================="
-echo ''
 
 if [ $SystemdResolvedInstalled -ge 1 ]
 then
@@ -95,9 +88,4 @@ if [ $LxcNetInstalled -ge 1 ]
 then
 	sudo service lxc-net restart > /dev/null 2>&1
 fi
-
-echo "=============================================="
-echo "Done: Copy nameserver $NameServer.            "
-echo "=============================================="
-echo ''
 

@@ -98,6 +98,7 @@ then
                 sudo cat /etc/redhat-release | cut -f"$CutIndex" -d' ' | cut -f1 -d'.'
         }
         RedHatVersion=$(GetRedHatVersion)
+	RHV=$RedHatVersion
         function GetOracleDistroRelease {
                 sudo cat /etc/oracle-release | cut -f5 -d' ' | cut -f1 -d'.'
         }
@@ -118,6 +119,7 @@ then
                 sudo cat /etc/redhat-release | cut -f"$CutIndex" -d' ' | cut -f1 -d'.'
         }
         RedHatVersion=$(GetRedHatVersion)
+	RHV=$RedHatVersion
         Release=$RedHatVersion
         LF=$LinuxFlavor
         RL=$Release
@@ -128,6 +130,7 @@ then
                 sudo cat /etc/redhat-release | cut -f"$CutIndex" -d' ' | cut -f1 -d'.'
         }
         RedHatVersion=$(GetRedHatVersion)
+	RHV=$RedHatVersion
         if [ $RedHatVersion -ge 19 ]
         then
                 Release=7
@@ -489,7 +492,6 @@ fi
 	sudo lxc-attach -n $SeedContainerName -- chown grid:oinstall /home/grid/.kshrc
 	sudo lxc-attach -n $SeedContainerName -- chown grid:oinstall /home/grid/.bash_logout
 	sudo lxc-attach -n $SeedContainerName -- chown grid:oinstall /home/grid/.
-	sudo lxc-attach -n $SeedContainerName -- yum -y install net-tools bind-utils ntp
 
 echo ''  
 echo "=============================================="
