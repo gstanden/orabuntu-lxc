@@ -836,25 +836,83 @@ fi
 
 if [ $GREValue = 'Y' ] || [ $MultiHostVar3 = 'X' ]
 then
-	function GetHubFileSystemType {
+	function CheckHubFileSystemTypeExt {
+		sshpass -p $MultiHostVar9 ssh -q -t -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 stat --file-system --format=%T /var/lib/lxc | grep -c ext
+	}
+	HubFileSystemTypeExt=$(CheckHubFileSystemTypeExt)
+
+	function CheckHubFileSystemTypeXfs {
 		sshpass -p $MultiHostVar9 ssh -q -t -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 stat --file-system --format=%T /var/lib/lxc | grep -c xfs
 	}
-	HubFileSystemType=$(GetHubFileSystemType)
+	HubFileSystemTypeXfs=$(CheckHubFileSystemTypeXfs)
 
-	function GetFtype {
-		sshpass -p $MultiHostVar9 ssh -q -t -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 xfs_info / | grep -c ftype=1
-	}
-	Ftype=$(GetFtype)
-
-        if [ $HubFileSystemType -eq 0 ] || [ $Ftype -eq 1 ]
+        if [ $HubFileSystemTypeXfs -eq 1 ]
         then
+		function GetHubFtype {
+			sshpass -p $MultiHostVar9 ssh -q -t -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" xfs_info / | grep -c ftype=1 | grep '0'" | cut -f2 -d':'
+		}
+		HubFtype=$(GetHubFtype)
+
+		if   [ ! -z $HubFtype ]
+		then
+			echo ''
+			echo "=============================================="
+			echo "NS $NameServer full backup at HUB...          "
+			echo "=============================================="
+			echo ''
+
+			sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" lxc-stop -n $NameServer;echo '(Do NOT enter passwords...Wait...)'"
+			sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" lxc-copy -n $NameServer -N $NameServer-$HOSTNAME" >/dev/null 2>&1
+			sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" lxc-start -n $NameServer; echo ''; sudo -S <<< "$MultiHostVar9" lxc-ls -f"
+ 			
+			echo ''
+ 			echo "$NameServer-$HOSTNAME has been created on the Orabuntu-LXC HUB host at $MultiHostVar5"
+ 			echo "$NameServer-$HOSTNAME can be restored to $NameServer if necessary using lxc-copy command."
+
+			echo ''
+			echo "=============================================="
+			echo "Done: NS $NameServer backup at HUB.           "
+			echo "=============================================="
+			echo ''
+
+			sleep 5
+
+			clear
+		elif [ -z $Ftype ]
+		then
+			echo ''
+			echo "=============================================="
+			echo "Snapshot Nameserver $NameServer at HUB...     "
+			echo "=============================================="
+			echo ''
+
+			sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" lxc-stop -n $NameServer;echo '(Do NOT enter a password.  Wait...)'; echo '$HOSTNAME pre-install nameserver snapshot' > snap_comment; echo ''; sudo -S <<< "$MultiHostVar9" lxc-snapshot -n $NameServer -c snap_comment; sudo -S <<< "$MultiHostVar9" lxc-start -n $NameServer; echo ''; sleep 5; sudo -S <<< "$MultiHostVar9" lxc-snapshot -n $NameServer -L -C"
+			echo ''
+			echo "Snapshot of $NameServer created on the Orabuntu-LXC HUB host at $MultiHostVar5."
+			echo "Snapshot of $NameServer can be restored to $NameServer if necessary using 'lxc-snapshot -r SnapX -N $NameServer' command."
+			sudo rm -f snap_comment
+
+			echo ''
+			echo "=============================================="
+			echo "Done: Snapshot Nameserver $NameServer at HUB. "
+			echo "=============================================="
+			echo ''
+
+			sleep 5
+
+			clear
+		fi
+	fi
+
+	if [ $HubFileSystemTypeExt -eq 1 ]
+	then
 		echo ''
 		echo "=============================================="
 		echo "Snapshot Nameserver $NameServer at HUB...     "
 		echo "=============================================="
 		echo ''
 
-		sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" lxc-stop -n $NameServer;echo '(Do NOT enter a password.  Wait...)'; echo '$HOSTNAME pre-install nameserver snapshot' > snap_comment; echo ''; sudo -S <<< "$MultiHostVar9" lxc-snapshot -n $NameServer -c snap_comment; sudo -S <<< "$MultiHostVar9" lxc-start -n $NameServer; sleep 5; sudo -S <<< "$MultiHostVar9" lxc-snapshot -L -n $NameServer"
+		sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" lxc-stop -n $NameServer;echo '(Do NOT enter a password.  Wait...)'; echo '$HOSTNAME pre-install nameserver snapshot' > snap_comment; echo ''; sudo -S <<< "$MultiHostVar9" lxc-snapshot -n $NameServer -c snap_comment; sudo -S <<< "$MultiHostVar9" lxc-start -n $NameServer; echo ''; sleep 5; sudo -S <<< "$MultiHostVar9" lxc-snapshot -n $NameServer -L -C"
 		echo ''
 		echo "Snapshot of $NameServer created on the Orabuntu-LXC HUB host at $MultiHostVar5."
 		echo "Snapshot of $NameServer can be restored to $NameServer if necessary using 'lxc-snapshot -r SnapX -N $NameServer' command."
@@ -866,31 +924,7 @@ then
 		echo "=============================================="
 		echo ''
 
-		sleep 10
-
-		clear
-	elif [ $HubFileSystemType -eq 1 ] && [ $Ftype -eq 0 ]
-	then
-		echo ''
-		echo "=============================================="
-		echo "Nameserver $NameServer backup at HUB...      "
-		echo "=============================================="
-		echo ''
-
-		sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" lxc-stop -n $NameServer;echo '(Do NOT enter passwords...Wait...)'"
-		sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" lxc-copy -n $NameServer -N $NameServer-$HOSTNAME" >/dev/null 2>&1
-		sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" lxc-start -n $NameServer; echo ''; sudo -S <<< "$MultiHostVar9" lxc-ls -f"
- 		echo ''
- 		echo "$NameServer-$HOSTNAME has been created on the Orabuntu-LXC HUB host at $MultiHostVar5"
- 		echo "$NameServer-$HOSTNAME can be restored to $NameServer if necessary using lxc-copy command."
-
-		echo ''
-		echo "=============================================="
-		echo "Done: Nameserver $NameServer backup at HUB.   "
-		echo "=============================================="
-		echo ''
-
-		sleep 10
+		sleep 5
 
 		clear
 	fi

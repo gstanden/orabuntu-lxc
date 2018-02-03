@@ -2526,12 +2526,14 @@ then
         echo "=============================================="
         echo ''
 
+	# Case 1 importing nameserver from an 2.1+ LXC enviro into a 2.0- LXC enviro.
+
 	function CheckNameServerConfigFormat {
 		sudo grep -c lxc.net.0 /var/lib/lxc/$NameServer/config
 	}
 	NameServerConfigFormat=$(CheckNameServerConfigFormat)
 
-	if [ $(SoftwareVersion $LXCVersion) -lt $(SoftwareVersion 2.1.0) ] && [ $NameServerConfigFormat -gt 0 ]
+	if   [ $(SoftwareVersion $LXCVersion) -lt $(SoftwareVersion 2.1.0) ] && [ $NameServerConfigFormat -gt 0 ]
 	then
 		sudo sed -i 's/lxc.net.0/lxc.network/g' 	/var/lib/lxc/$NameServer/config
 		sudo sed -i 's/lxc.net.1/lxc.network/g' 	/var/lib/lxc/$NameServer/config
@@ -2540,6 +2542,14 @@ then
 		sudo sed -i 's/lxc.net.0/lxc.network/g' 	/var/lib/lxc/$NameServer-base/config
 		sudo sed -i 's/lxc.net.1/lxc.network/g' 	/var/lib/lxc/$NameServer-base/config
 		sudo sed -i 's/lxc.uts.name/lxc.utsname/g' 	/var/lib/lxc/$NameServer-base/config
+	fi
+
+	# Case 2 importing nameserver from an 2.0- LXC enviro into a 2.1+ LXC enviro.
+
+	if [ $(SoftwareVersion $LXCVersion) -ge $(SoftwareVersion 2.1.0) ] && [ $NameServerConfigFormat -eq 0 ]
+	then
+		sudo lxc-update-config -c /var/lib/lxc/$NameServer/config
+		sudo lxc-update-config -c /var/lib/lxc/$NameServer-base/config
 	fi
 
 	sudo lxc-ls -f
