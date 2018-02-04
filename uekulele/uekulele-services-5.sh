@@ -327,7 +327,7 @@ fi
 
 sudo systemctl daemon-reload
 
-if [ $LinuxFlavor != 'Fedora' ]
+if [ $LinuxFlavor != 'Fedora' ] && [ $LinuxFlavor != 'CentOS' ]
 then
 	sudo service lxc-net restart > /dev/null 2>&1
 else
@@ -336,6 +336,7 @@ fi
 
 # sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service lxc-net restart > /dev/null 2>&1"
 # sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service systemd-resolved restart > /dev/null 2>&1"
+# sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service dnsmasq restart > /dev/null 2>&1"
 
 echo ''
 echo "=============================================="
@@ -397,7 +398,7 @@ do
 			echo ''
 			sudo systemctl daemon-reload
 
-			if [ $LinuxFlavor != 'Fedora' ]
+			if [ $LinuxFlavor != 'Fedora' ] && [ $LinuxFlavor != 'CentOS' ]
 			then
 				sudo service lxc-net restart > /dev/null 2>&1
 			else
@@ -461,7 +462,7 @@ then
         echo "=============================================="
         echo ''
 
-	if [ $LinuxFlavor != 'Fedora' ]
+	if [ $LinuxFlavor != 'Fedora' ] && [ $LinuxFlavor != 'CentOS' ]
 	then
 		function GetDhcpRange {
        	 		cat /etc/sysconfig/lxc-net | grep LXC_DHCP_RANGE | cut -f2 -d'=' | sed 's/"//g' 
@@ -730,7 +731,7 @@ then
 		echo "=============================================="
 		echo ''
 
-		if [ $LinuxFlavor != 'Fedora' ]
+		if [ $LinuxFlavor != 'Fedora' ] && [ $LinuxFlavor != 'CentOS' ]
 		then
 			function GetDhcpRange {
 				cat /etc/sysconfig/lxc-net | grep LXC_DHCP_RANGE | cut -f2 -d'=' | sed 's/"//g' 
@@ -910,7 +911,7 @@ then
 			echo "=============================================="
 			echo ''
 
-			if [ $LinuxFlavor != 'Fedora' ]
+			if [ $LinuxFlavor != 'Fedora' ] && [ $LinuxFlavor != 'CentOS' ]
 			then
 				function GetDhcpRange {
 					cat /etc/sysconfig/lxc-net | grep LXC_DHCP_RANGE | cut -f2 -d'=' | sed 's/"//g' 

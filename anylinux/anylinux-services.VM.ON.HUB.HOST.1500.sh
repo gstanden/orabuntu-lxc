@@ -350,6 +350,7 @@ echo "Test sshpass to HUB Host $HUBIP               "
 echo "=============================================="
 echo ''
 
+ssh-keygen -R $HUBIP
 sshpass -p $HubSudoPwd ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $HubUserAct@$HUBIP "sudo -S <<< "$HubSudoPwd" uname -a;echo '';sudo -S <<< "$HubSudoPwd" lxc-ls -f"
 if [ $? -eq 0 ]
 then

@@ -2070,8 +2070,10 @@ then
 #	echo "=============================================="
 #	echo ''
 
+	ssh-keygen -R $MultiHostVar5 > /dev/null 2>&1
 	sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service systemd-resolved restart > /dev/null 2>&1"
 	sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service lxc-net restart > /dev/null 2>&1"
+	sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service dnsmasq restart > /dev/null 2>&1"
 
 	Sx1Index=201
 	function CheckHighestSx1IndexHit {
@@ -2097,6 +2099,7 @@ then
 
 	sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service systemd-resolved restart > /dev/null 2>&1"
 	sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service lxc-net restart > /dev/null 2>&1"
+	sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service dnsmasq restart > /dev/null 2>&1"
 
 	Sw1Index=201
 	function CheckHighestSw1IndexHit {
@@ -3016,7 +3019,7 @@ then
 		echo "=============================================="
 		echo ''
 
-		if [ $LinuxFlavor != 'Fedora' ]
+		if [ $LinuxFlavor != 'Fedora' ] && [ $LinuxFlavor != 'CentOS' ]
 		then
 			function GetDhcpRange {
 				cat /etc/sysconfig/lxc-net | grep LXC_DHCP_RANGE | cut -f2 -d'=' | sed 's/"//g' 
@@ -3047,7 +3050,7 @@ then
 		sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /etc/dnsmasq.conf
 		sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /etc/dnsmasq.conf
 
-		if [ $LinuxFlavor != 'Fedora' ]
+		if [ $LinuxFlavor != 'Fedora' ] && [ $LinuxFlavor != 'CentOS' ]
 		then
 			sudo sed -i '/LXC_DHCP_CONFILE/s/#//' /etc/sysconfig/lxc-net
 			sudo sed -i 's/^[ \t]*//' /etc/dnsmasq.conf
@@ -3066,7 +3069,7 @@ then
 		sudo sh -c "echo 'nameserver 127.0.0.1' 			>  /etc/resolv.conf"
 		sudo sh -c "echo 'search $Domain1 $Domain2 gns1.$Domain1' 	>> /etc/resolv.conf"
 
-		if [ $LinuxFlavor != 'Fedora' ]
+		if [ $LinuxFlavor != 'Fedora' ] && [ $LinuxFlavor != 'CentOS' ]
 		then
 			sudo sed -i "s/DHCP-RANGE-OLXC/dhcp-range=$DHR/" /etc/dnsmasq.conf
 			sudo service lxc-net restart> /dev/null 2>&1

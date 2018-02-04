@@ -608,7 +608,7 @@ echo "Container oel$OracleRelease$SeedPostfix ping test..."
 echo "=============================================="
 echo ''
 
-if [ $LinuxFlavor != 'Fedora' ]
+if [ $LinuxFlavor != 'Fedora' ] && [ $LinuxFlavor != 'CentOS' ]
 then
 	function GetDhcpRange {
 	        cat /etc/sysconfig/lxc-net | grep LXC_DHCP_RANGE | cut -f2 -d'=' | sed 's/"//g' 
