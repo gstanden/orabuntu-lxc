@@ -84,7 +84,7 @@ fi
 if [ -z $2 ]
 then
 	SPOKEIP='lan.ip.this.host'
- 	SPOKEIP=192.168.7.27
+ 	SPOKEIP=192.168.7.37
 else
 	SPOKEIP=$2
 fi
@@ -305,7 +305,7 @@ then
         echo ''
 
 	function CheckAptProcessRunning {
-		ps -ef | grep apt | grep -v grep | wc -l
+		ps -ef | grep apt | grep -v '_apt' | grep -v grep | wc -l
 	}
 	AptProcessRunning=$(CheckAptProcessRunning)
 
@@ -313,7 +313,6 @@ then
 	do
 		echo 'Waiting for running apt update process(es) to finish...sleeping for 10 seconds'
                 echo ''
-                ps -ef | grep -v '_apt' | grep apt | grep -v grep
 		sleep 10
 		AptProcessRunning=$(CheckAptProcessRunning)
 	done
@@ -350,6 +349,7 @@ echo "Test sshpass to HUB Host $HUBIP               "
 echo "=============================================="
 echo ''
 
+ssh-keygen -R $HUBIP
 sshpass -p $HubSudoPwd ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $HubUserAct@$HUBIP "sudo -S <<< "$HubSudoPwd" uname -a;echo '';sudo -S <<< "$HubSudoPwd" lxc-ls -f"
 if [ $? -eq 0 ]
 then

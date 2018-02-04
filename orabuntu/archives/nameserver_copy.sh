@@ -49,11 +49,6 @@ echo "LXC containers for Oracle Status...           "
 echo "=============================================="
 echo ''
 
-sudo lxc-ls -f
-
-echo ''
-echo "=============================================="
-
 if [ $SystemdResolvedInstalled -ge 1 ]
 then
 	sudo service systemd-resolved restart
