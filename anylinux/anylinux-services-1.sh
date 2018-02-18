@@ -43,6 +43,8 @@ NumCon=$7
 MultiHost=$8
 LxcOvsVersion=$9
 DistDir=${10}
+Product=${11}
+SubDirName=${12}
 
 NameServerBase="$NameServer"-base
 
@@ -544,30 +546,31 @@ then
 
 				if [ -f /etc/orabuntu-lxc-release ] # 7
 				then
-					echo ''
-					echo "=============================================="
-					echo "                                              "
-					echo "If you already have an Orabuntu-LXC install   "
-					echo "on this host and just want to add more        "
-					echo "containers then answer 'Y' to this.           "
-					echo "                                              "
-					echo "If you are doing a complete Orabuntu-LXC      "
-					echo "reinstall then answer 'N' to this.            "
-					echo "                                              "
-					echo "=============================================="
-					echo "                                              " 
-				read -e -p   "Adding Orabuntu-LXC containers? [Y/N]         " -i "N" CloningAdditional
-					echo "                                              "
-					echo "=============================================="
-					
-					sleep 5
-	
-					clear
+#					echo ''
+#					echo "=============================================="
+#					echo "                                              "
+#					echo "If you already have an Orabuntu-LXC install   "
+#					echo "on this host and just want to add more        "
+#					echo "containers then answer 'Y' to this.           "
+#					echo "                                              "
+#					echo "If you are doing a complete Orabuntu-LXC      "
+#					echo "reinstall then answer 'N' to this.            "
+#					echo "                                              "
+#					echo "=============================================="
+#					echo "                                              " 
+#				read -e -p   "Adding Orabuntu-LXC containers? [Y/N]         " -i "N" CloningAdditional
+#					echo "                                              "
+#					echo "=============================================="
+#					
+#					sleep 5
+#	
+#					clear
 
 					if [ $MultiHostVar1 = 'addrelease' ]
 					then
  						/opt/olxc/"$DistDir"/uekulele/uekulele-services-2.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $MultiHost $DistDir
- 						/opt/olxc/"$DistDir"/uekulele/uekulele-services-3.sh $MajorRelease $PointRelease $Domain2 $MultiHost $DistDir
+ 						/opt/olxc/"$DistDir"/uekulele/uekulele-services-3.sh $MajorRelease $PointRelease $Domain2 $MultiHost $DistDir $Product
+ 						/opt/olxc/"$DistDir"/products/$Product $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $OSMemRes $MultiHost $LxcOvsVersion $DistDir $SubDirName
 						/opt/olxc/"$DistDir"/uekulele/uekulele-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer $MultiHost $DistDir
 						/opt/olxc/"$DistDir"/uekulele/uekulele-services-5.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $MultiHost $DistDir
 					fi # OK 8
@@ -576,7 +579,8 @@ then
 					then
  						/opt/olxc/"$DistDir"/uekulele/uekulele-services-1.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServerBase $OSMemRes $MultiHost $LxcOvsVersion $DistDir
  						/opt/olxc/"$DistDir"/uekulele/uekulele-services-2.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $MultiHost $DistDir
- 						/opt/olxc/"$DistDir"/uekulele/uekulele-services-3.sh $MajorRelease $PointRelease $Domain2 $MultiHost $DistDir
+ 						/opt/olxc/"$DistDir"/uekulele/uekulele-services-3.sh $MajorRelease $PointRelease $Domain2 $MultiHost $DistDir $Product
+ 						/opt/olxc/"$DistDir"/products/$Product $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $OSMemRes $MultiHost $LxcOvsVersion $DistDir $SubDirName
 						/opt/olxc/"$DistDir"/uekulele/uekulele-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer $MultiHost $DistDir 
 						/opt/olxc/"$DistDir"/uekulele/uekulele-services-5.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $MultiHost $DistDir
 					fi # OK 8
@@ -592,7 +596,8 @@ then
 				then
 					/opt/olxc/"$DistDir"/uekulele/uekulele-services-1.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServerBase $OSMemRes $MultiHost $LxcOvsVersion $DistDir
 					/opt/olxc/"$DistDir"/uekulele/uekulele-services-2.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $MultiHost $DistDir
-					/opt/olxc/"$DistDir"/uekulele/uekulele-services-3.sh $MajorRelease $PointRelease $Domain2 $MultiHost $DistDir
+					/opt/olxc/"$DistDir"/uekulele/uekulele-services-3.sh $MajorRelease $PointRelease $Domain2 $MultiHost $DistDir $Product
+ 					/opt/olxc/"$DistDir"/products/$Product $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $OSMemRes $MultiHost $LxcOvsVersion $DistDir $SubDirName
 					/opt/olxc/"$DistDir"/uekulele/uekulele-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer $MultiHost $DistDir
 					/opt/olxc/"$DistDir"/uekulele/uekulele-services-5.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $MultiHost $DistDir
 				fi # OK 10
@@ -642,7 +647,8 @@ then
 					if [ $MultiHostVar1 = 'addrelease' ]
 					then
  						/opt/olxc/"$DistDir"/uekulele/uekulele-services-2.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $MultiHost $DistDir
- 						/opt/olxc/"$DistDir"/uekulele/uekulele-services-3.sh $MajorRelease $PointRelease $Domain2 $MultiHost $DistDir
+ 						/opt/olxc/"$DistDir"/uekulele/uekulele-services-3.sh $MajorRelease $PointRelease $Domain2 $MultiHost $DistDir $Product
+ 						/opt/olxc/"$DistDir"/products/$Product $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $OSMemRes $MultiHost $LxcOvsVersion $DistDir $SubDirName
 						/opt/olxc/"$DistDir"/uekulele/uekulele-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer $MultiHost $DistDir
 						/opt/olxc/"$DistDir"/uekulele/uekulele-services-5.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $MultiHost $DistDir 
 					fi # OK 8
@@ -651,7 +657,8 @@ then
 					then
  						/opt/olxc/"$DistDir"/uekulele/uekulele-services-1.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServerBase $OSMemRes $MultiHost $LxcOvsVersion $DistDir
  						/opt/olxc/"$DistDir"/uekulele/uekulele-services-2.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $MultiHost $DistDir
- 						/opt/olxc/"$DistDir"/uekulele/uekulele-services-3.sh $MajorRelease $PointRelease $Domain2 $MultiHost $DistDir
+ 						/opt/olxc/"$DistDir"/uekulele/uekulele-services-3.sh $MajorRelease $PointRelease $Domain2 $MultiHost $DistDir $Product
+ 						/opt/olxc/"$DistDir"/products/$Product $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $OSMemRes $MultiHost $LxcOvsVersion $DistDir $SubDirName
 						/opt/olxc/"$DistDir"/uekulele/uekulele-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer $MultiHost $DistDir
 						/opt/olxc/"$DistDir"/uekulele/uekulele-services-5.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $MultiHost $DistDir 
 					fi # OK 8
@@ -667,7 +674,8 @@ then
 				then
 					/opt/olxc/"$DistDir"/uekulele/uekulele-services-1.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServerBase $OSMemRes $MultiHost $LxcOvsVersion $DistDir
 					/opt/olxc/"$DistDir"/uekulele/uekulele-services-2.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $MultiHost $DistDir
-					/opt/olxc/"$DistDir"/uekulele/uekulele-services-3.sh $MajorRelease $PointRelease $Domain2 $MultiHost $DistDir
+					/opt/olxc/"$DistDir"/uekulele/uekulele-services-3.sh $MajorRelease $PointRelease $Domain2 $MultiHost $DistDir $Product
+ 					/opt/olxc/"$DistDir"/products/$Product $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $OSMemRes $MultiHost $LxcOvsVersion $DistDir $SubDirName
 					/opt/olxc/"$DistDir"/uekulele/uekulele-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer $MultiHost $DistDir
 					/opt/olxc/"$DistDir"/uekulele/uekulele-services-5.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $MultiHost $DistDir
 				fi # OK 14
@@ -933,7 +941,8 @@ then
 					if [ $MultiHostVar1 = 'addrelease' ]
 					then	
  						/opt/olxc/"$DistDir"/orabuntu/orabuntu-services-2.sh $MajorRelease $PointRelease $Domain1 $Domain2 $MultiHost $NameServer $DistDir
- 						/opt/olxc/"$DistDir"/orabuntu/orabuntu-services-3.sh $MajorRelease $PointRelease $Domain2 $DistDir
+ 						/opt/olxc/"$DistDir"/orabuntu/orabuntu-services-3.sh $MajorRelease $PointRelease $Domain2 $MultiHost $DistDir $Product
+ 						/opt/olxc/"$DistDir"/products/$Product $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $OSMemRes $MultiHost $LxcOvsVersion $DistDir $SubDirName
 						/opt/olxc/"$DistDir"/orabuntu/orabuntu-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer $MultiHost $DistDir
 						/opt/olxc/"$DistDir"/orabuntu/orabuntu-services-5.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $MultiHost $DistDir
 					fi
@@ -942,7 +951,8 @@ then
 					then
  						/opt/olxc/"$DistDir"/orabuntu/orabuntu-services-1.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServerBase $OSMemRes $MultiHost $DistDir
  						/opt/olxc/"$DistDir"/orabuntu/orabuntu-services-2.sh $MajorRelease $PointRelease $Domain1 $Domain2 $MultiHost $NameServer $DistDir
- 						/opt/olxc/"$DistDir"/orabuntu/orabuntu-services-3.sh $MajorRelease $PointRelease $Domain2 $DistDir
+ 						/opt/olxc/"$DistDir"/orabuntu/orabuntu-services-3.sh $MajorRelease $PointRelease $Domain2 $MultiHost $DistDir $Product
+ 						/opt/olxc/"$DistDir"/products/$Product $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $OSMemRes $MultiHost $LxcOvsVersion $DistDir $SubDirName
 						/opt/olxc/"$DistDir"/orabuntu/orabuntu-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer $MultiHost $DistDir
 						/opt/olxc/"$DistDir"/orabuntu/orabuntu-services-5.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $MultiHost $DistDir
 					fi # OK 8
@@ -959,7 +969,8 @@ then
 				then
 					/opt/olxc/"$DistDir"/orabuntu/orabuntu-services-1.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServerBase $OSMemRes $MultiHost $DistDir
 					/opt/olxc/"$DistDir"/orabuntu/orabuntu-services-2.sh $MajorRelease $PointRelease $Domain1 $Domain2 $MultiHost $NameServer $DistDir
-					/opt/olxc/"$DistDir"/orabuntu/orabuntu-services-3.sh $MajorRelease $PointRelease $Domain2 $DistDir
+					/opt/olxc/"$DistDir"/orabuntu/orabuntu-services-3.sh $MajorRelease $PointRelease $Domain2 $MultiHost $DistDir $Product
+ 					/opt/olxc/"$DistDir"/products/$Product $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $OSMemRes $MultiHost $LxcOvsVersion $DistDir $SubDirName
 					/opt/olxc/"$DistDir"/orabuntu/orabuntu-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer $MultiHost $DistDir
 					/opt/olxc/"$DistDir"/orabuntu/orabuntu-services-5.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $MultiHost $DistDir
 				fi # OK 10
@@ -1012,7 +1023,8 @@ then
 					if [ $MultiHostVar1 = 'addrelease' ]
 					then	
  						/opt/olxc/"$DistDir"/orabuntu/orabuntu-services-2.sh $MajorRelease $PointRelease $Domain1 $Domain2 $MultiHost $NameServer $DistDir
- 						/opt/olxc/"$DistDir"/orabuntu/orabuntu-services-3.sh $MajorRelease $PointRelease $Domain2 $DistDir
+ 						/opt/olxc/"$DistDir"/orabuntu/orabuntu-services-3.sh $MajorRelease $PointRelease $Domain2 $MultiHost $DistDir $Product
+ 						/opt/olxc/"$DistDir"/products/$Product $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $OSMemRes $MultiHost $LxcOvsVersion $DistDir $SubDirName
 						/opt/olxc/"$DistDir"/orabuntu/orabuntu-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer $MultiHost $DistDir
 						/opt/olxc/"$DistDir"/orabuntu/orabuntu-services-5.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $MultiHost $DistDir
 					fi
@@ -1021,7 +1033,8 @@ then
 					then
  						/opt/olxc/"$DistDir"/orabuntu/orabuntu-services-1.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServerBase $OSMemRes $MultiHost $DistDir
  						/opt/olxc/"$DistDir"/orabuntu/orabuntu-services-2.sh $MajorRelease $PointRelease $Domain1 $Domain2 $MultiHost $NameServer $DistDir
- 						/opt/olxc/"$DistDir"/orabuntu/orabuntu-services-3.sh $MajorRelease $PointRelease $Domain2 $DistDir
+ 						/opt/olxc/"$DistDir"/orabuntu/orabuntu-services-3.sh $MajorRelease $PointRelease $Domain2 $MultiHost $DistDir $Product
+ 						/opt/olxc/"$DistDir"/products/$Product $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $OSMemRes $MultiHost $LxcOvsVersion $DistDir $SubDirName
 						/opt/olxc/"$DistDir"/orabuntu/orabuntu-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer $MultiHost $DistDir
 						/opt/olxc/"$DistDir"/orabuntu/orabuntu-services-5.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $MultiHost $DistDir
 					fi # OK 12
@@ -1038,7 +1051,8 @@ then
 				then
 					/opt/olxc/"$DistDir"/orabuntu/orabuntu-services-1.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServerBase $OSMemRes $MultiHost $DistDir
 					/opt/olxc/"$DistDir"/orabuntu/orabuntu-services-2.sh $MajorRelease $PointRelease $Domain1 $Domain2 $MultiHost $NameServer $DistDir
-					/opt/olxc/"$DistDir"/orabuntu/orabuntu-services-3.sh $MajorRelease $PointRelease $Domain2 $DistDir
+					/opt/olxc/"$DistDir"/orabuntu/orabuntu-services-3.sh $MajorRelease $PointRelease $Domain2 $MultiHost $DistDir $Product
+ 					/opt/olxc/"$DistDir"/products/$Product $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $OSMemRes $MultiHost $LxcOvsVersion $DistDir $SubDirName
 					/opt/olxc/"$DistDir"/orabuntu/orabuntu-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer $MultiHost $DistDir
 					/opt/olxc/"$DistDir"/orabuntu/orabuntu-services-5.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $MultiHost $DistDir
 				fi # OK 14

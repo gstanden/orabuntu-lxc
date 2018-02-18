@@ -55,6 +55,15 @@ MultiHostVar7=$(GetMultiHostVar7)
 
 echo ''
 echo "=============================================="
+echo "Next script to run: orabuntu-services-4.sh    "
+echo "=============================================="
+
+sleep 5
+
+clear
+
+echo ''
+echo "=============================================="
 echo "Script:  orabuntu-services-4.sh NumCon        "
 echo "=============================================="
 echo ''

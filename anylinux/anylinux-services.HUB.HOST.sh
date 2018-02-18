@@ -71,8 +71,23 @@ then
 	Operation=new
 fi
 
-MultiHost="$Operation:N:1:X:X:X:1500:X:X:$GRE"
+if [ -z $2 ]
+then
+        Product=product
+	Product=oracle
+        Product=workspaces
+else
+        Product=$2
+fi
 
-./anylinux-services.sh $MultiHost
+function GetDistDir {
+        pwd | rev | cut -f2-20 -d'/' | rev
+}
+DistDir=$(GetDistDir)
+
+MultiHost="$Operation:N:1:X:X:X:1500:X:X:$GRE:$Product"
+
+sudo mkdir -p "$DistDir"/installs/logs
+./anylinux-services.sh $MultiHost | tee "$DistDir/installs/logs/orabuntu-lxc.install.$(date +%F_%R).log"
 
 exit

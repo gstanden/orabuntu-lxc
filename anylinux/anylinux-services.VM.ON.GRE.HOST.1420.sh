@@ -105,12 +105,20 @@ else
         HubUserAct=$4
 fi
 
-if [ -z $4 ]
+if [ -z $5 ]
 then
         HubSudoPwd=password
-#       HubSudoPwd=ubuntu
+        HubSudoPwd=ubuntu
 else
         HubSudoPwd=$5
+fi
+
+if [ -z $6 ]
+then
+        Product=product
+        Product=oracle-db
+else
+        Product=$6
 fi
 
 if [ $SPOKEIP = 'lan.ip.this.host' ] || [ $HUBIP = 'lan.ip.hub.host' ] || [ $HubUserAct = 'username' ] || [ $HubSudoPwd = 'password' ]
@@ -361,9 +369,10 @@ then
 	echo ''
 	sleep 5
 	echo ''
-        MultiHost="$Operation:Y:X:X:$HUBIP:X:1420:$HubUserAct:$HubSudoPwd:$GRE"
+        MultiHost="$Operation:Y:X:X:$HUBIP:X:1420:$HubUserAct:$HubSudoPwd:$GRE:$Product"
 	cd "$DistDir"/anylinux
-        ./anylinux-services.sh $MultiHost
+	sudo mkdir -p "$DistDir"/installs/logs
+	./anylinux-services.sh $MultiHost | tee "$DistDir/installs/logs/orabuntu-lxc.install.$(date +%F_%R).log"
 else
         echo "The sshpass to the Orabuntu-LXC HUB host at $HUBIP failed. Recheck settings in this file and re-run."
 	echo ''

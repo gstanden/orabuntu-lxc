@@ -39,6 +39,7 @@ OracleVersion=$1.$2
 Domain2=$3
 MultiHost=$4
 DistDir=$5
+Product=$6
 
 echo ''
 echo "=============================================="
@@ -446,6 +447,13 @@ then
 	echo "=============================================="
 	exit
 else
+	# GLS 20180204 Make sure MTU is set correctly in container.
+
+	if [ $MultiHostVar2 = 'Y' ]
+	then
+		sudo lxc-attach -n $SeedContainerName -- ip link set eth0 mtu $MultiHostVar7
+	fi
+
 	echo ''
 	echo "=============================================="
 	echo "lxc-attach $SeedContainerName successful.     "
@@ -457,61 +465,56 @@ sleep 5
 
 clear
 
-echo ''
-echo "=============================================="
-echo "Configuring $SeedContainerName for Oracle...  "
-echo "=============================================="
-echo ''
-echo "=============================================="
-echo "Note: sendmail install takes awhile (patience)"
-echo "The install may seem to hang at sendmail...   "
-echo "Give it a minute or two...it's working        "
-echo "=============================================="
-echo ''
+# echo ''
+# echo "=============================================="
+# echo "Configuring $SeedContainerName for Oracle...  "
+# echo "=============================================="
+# echo ''
+# echo "=============================================="
+# echo "Note: sendmail install takes awhile (patience)"
+# echo "The install may seem to hang at sendmail...   "
+# echo "Give it a minute or two...it's working        "
+# echo "=============================================="
+# echo ''
 
-sleep 5
+# sleep 5
 
-if [ $MultiHostVar2 = 'Y' ]
-then
-	sudo lxc-attach -n $SeedContainerName -- ip link set eth0 mtu $MultiHostVar7
-fi
+# sudo lxc-attach -n $SeedContainerName -- /root/packages.sh
+# sudo lxc-attach -n $SeedContainerName -- /root/create_users.sh
+# sudo lxc-attach -n $SeedContainerName -- /root/lxc-services.sh
+# sudo lxc-attach -n $SeedContainerName -- usermod --password `perl -e "print crypt('grid','grid');"` grid
+# sudo lxc-attach -n $SeedContainerName -- usermod --password `perl -e "print crypt('oracle','oracle');"` oracle
+# sudo lxc-attach -n $SeedContainerName -- usermod -g oinstall oracle
+# sudo lxc-attach -n $SeedContainerName -- chown oracle:oinstall /home/oracle/.bash_profile
+# sudo lxc-attach -n $SeedContainerName -- chown oracle:oinstall /home/oracle/.bashrc
+# sudo lxc-attach -n $SeedContainerName -- chown oracle:oinstall /home/oracle/.kshrc
+# sudo lxc-attach -n $SeedContainerName -- chown oracle:oinstall /home/oracle/.bash_logout
+# sudo lxc-attach -n $SeedContainerName -- chown oracle:oinstall /home/oracle/.
+# sudo lxc-attach -n $SeedContainerName -- chown grid:oinstall /home/grid/.bash_profile
+# sudo lxc-attach -n $SeedContainerName -- chown grid:oinstall /home/grid/.bashrc
+# sudo lxc-attach -n $SeedContainerName -- chown grid:oinstall /home/grid/.kshrc
+# sudo lxc-attach -n $SeedContainerName -- chown grid:oinstall /home/grid/.bash_logout
+# sudo lxc-attach -n $SeedContainerName -- chown grid:oinstall /home/grid/.
 
-	sudo lxc-attach -n $SeedContainerName -- /root/packages.sh
-	sudo lxc-attach -n $SeedContainerName -- /root/create_users.sh
-	sudo lxc-attach -n $SeedContainerName -- /root/lxc-services.sh
-	sudo lxc-attach -n $SeedContainerName -- usermod --password `perl -e "print crypt('grid','grid');"` grid
-	sudo lxc-attach -n $SeedContainerName -- usermod --password `perl -e "print crypt('oracle','oracle');"` oracle
-	sudo lxc-attach -n $SeedContainerName -- usermod -g oinstall oracle
-	sudo lxc-attach -n $SeedContainerName -- chown oracle:oinstall /home/oracle/.bash_profile
-	sudo lxc-attach -n $SeedContainerName -- chown oracle:oinstall /home/oracle/.bashrc
-	sudo lxc-attach -n $SeedContainerName -- chown oracle:oinstall /home/oracle/.kshrc
-	sudo lxc-attach -n $SeedContainerName -- chown oracle:oinstall /home/oracle/.bash_logout
-	sudo lxc-attach -n $SeedContainerName -- chown oracle:oinstall /home/oracle/.
-	sudo lxc-attach -n $SeedContainerName -- chown grid:oinstall /home/grid/.bash_profile
-	sudo lxc-attach -n $SeedContainerName -- chown grid:oinstall /home/grid/.bashrc
-	sudo lxc-attach -n $SeedContainerName -- chown grid:oinstall /home/grid/.kshrc
-	sudo lxc-attach -n $SeedContainerName -- chown grid:oinstall /home/grid/.bash_logout
-	sudo lxc-attach -n $SeedContainerName -- chown grid:oinstall /home/grid/.
+# echo ''  
+# echo "=============================================="
+# echo "$SeedContainerName configured for Oracle.     "
+# echo "=============================================="
+# echo ''
 
-echo ''  
-echo "=============================================="
-echo "$SeedContainerName configured for Oracle.     "
-echo "=============================================="
-echo ''
+# sleep 5
 
-sleep 5
-
-clear
+# clear
 
 # if [ $MajorRelease -eq 7 ]
 # then
- 	echo ''
- 	echo "=============================================="
- 	echo "Start NTP service...                          "
- 	echo "=============================================="
- 	echo ''
+# 	echo ''
+# 	echo "=============================================="
+# 	echo "Start NTP service...                          "
+# 	echo "=============================================="
+# 	echo ''
 
-  	sudo lxc-attach -n $SeedContainerName -- ntpd -x
+#  	sudo lxc-attach -n $SeedContainerName -- ntpd -x
 
 # 	sudo lxc-attach -n $SeedContainerName -- ntpd -x
 # 	sudo lxc-attach -n $SeedContainerName -- chmod +x /etc/systemd/system/ntp.service
@@ -522,14 +525,14 @@ clear
 # 	sudo lxc-attach -n $SeedContainerName -- chkconfig ntp on
 # 	sudo lxc-attach -n $SeedContainerName -- chkconfig ntpd on
 
-	sleep 5
+#	sleep 5
 
-	clear
+#	clear
 
- 	echo ''
- 	echo "=============================================="
- 	echo "Done: Start NTP service.                      "
- 	echo "=============================================="
+# 	echo ''
+# 	echo "=============================================="
+# 	echo "Done: Start NTP service.                      "
+# 	echo "=============================================="
 
 # 	sleep 5
 
@@ -545,7 +548,7 @@ clear
 
 echo ''
 echo "=============================================="
-echo "Next script to run: uekulele-services-4.sh    "
+echo "Next script to run: $Product                  "
 echo "=============================================="
 
 sleep 5

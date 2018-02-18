@@ -1194,5 +1194,5 @@ then
 fi
 
 cd $DistDir/uekulele/archives
-rm -f uekulele-services.lst uekulele-files.lst uekulele-services.tar uekulele-files.tar
+rm -f uekulele-services.lst uekulele-files.lst uekulele-services.tar uekulele-files.tar product.tar
 cd $DistDir/anylinux 

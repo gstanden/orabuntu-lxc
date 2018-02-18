@@ -273,7 +273,7 @@ clear
 
 echo ''
 echo "=============================================="
-echo "Extracting oracle-specific files to container."
+echo "Extract network files to container...        "
 echo "=============================================="
 echo ''
 
@@ -281,16 +281,6 @@ sudo mkdir -p /var/lib/lxc/oel$OracleRelease$SeedPostfix
 cd /opt/olxc/"$DistDir"/uekulele/archives
 sudo tar -xvf /opt/olxc/"$DistDir"/uekulele/archives/lxc-oracle-files.tar -C /var/lib/lxc/oel$OracleRelease$SeedPostfix --touch
 
-sudo chown root:root /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/root/hugepages_setting.sh
-sudo chmod 755 /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/root/hugepages_setting.sh
-sudo chown root:root /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/root/packages.sh
-sudo chmod 755 /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/root/packages.sh
-sudo chown root:root /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/root/create_directories.sh
-sudo chmod 755 /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/root/create_directories.sh
-sudo chown root:root /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/root/lxc-services.sh
-sudo chmod 755 /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/root/lxc-services.sh
-sudo chown root:root /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/root/create_users.sh
-sudo chmod 755 /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/root/create_users.sh
 sudo chown root:root /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/etc/dhcp/dhclient.conf
 sudo chmod 644 /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/etc/dhcp/dhclient.conf
 sudo sed -i "s/HOSTNAME=ContainerName/HOSTNAME=oel$OracleRelease$SeedPostfix/g" /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/etc/sysconfig/network
@@ -310,7 +300,7 @@ fi
 
 echo ''
 echo "=============================================="
-echo "Extraction container-specific files complete  "
+echo "Done: Extract network files to container.     "
 echo "=============================================="
 
 sleep 5

@@ -45,7 +45,8 @@ Operation=addrelease
 
 MultiHost="$Operation:Y:X:X:X:X:1420:X:X:$GRE"
 
-./anylinux-services.sh $MultiHost
+sudo mkdir -p "$DistDir"/installs/logs
+./anylinux-services.sh $MultiHost | tee "$DistDir/installs/logs/orabuntu-lxc.install.$(date +%F_%R).log"
 
 exit
 

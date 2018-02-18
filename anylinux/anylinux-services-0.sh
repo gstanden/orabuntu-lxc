@@ -33,8 +33,7 @@
 clear
 
 SubDirName=$1
-
-ArchiveList="dns-dhcp-cont.tar dns-dhcp-host.tar lxc-oracle-files.tar $SubDirName-files.tar scst-files.tar tgt-files.tar ubuntu-host.tar"
+Product=$2
 
 function GetDistDir {
 	pwd | rev | cut -f2-20 -d'/' | rev
@@ -58,6 +57,11 @@ sudo cp -p GNU3    "$DistDir"/"$SubDirName"/.
 sudo cp -p GNU3    "$DistDir"/"$SubDirName"/archives/.
 
 cd "$DistDir"/"$SubDirName"/archives
+
+cp -p "$DistDir"/products/"$Product".tar "$DistDir"/"$SubDirName"/archives/product.tar
+cp -p "$DistDir"/products/"$Product".lst "$DistDir"/"$SubDirName"/archives/product.lst
+
+ArchiveList="dns-dhcp-cont.tar dns-dhcp-host.tar lxc-oracle-files.tar product.tar $SubDirName-files.tar scst-files.tar tgt-files.tar ubuntu-host.tar"
 
 for i in $ArchiveList
 do
@@ -96,7 +100,7 @@ do
 		sudo chown root:root /var/COPYING > /dev/null 2>&1
 		tar -vP --append --file=$i /var/GNU3 --numeric-owner
 		tar -vP --append --file=$i /var/COPYING --numeric-owner
-	elif [ $i = 'lxc-oracle-files.tar' ]
+	elif [ $i = 'lxc-oracle-files.tar' ] || [ $i = 'product.tar' ]
 	then
 		sudo chown root:root rootfs/GNU3 > /dev/null 2>&1
 		sudo chown root:root rootfs/COPYING > /dev/null 2>&1

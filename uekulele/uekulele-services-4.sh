@@ -145,6 +145,17 @@ then
         UbuntuMajorVersion=$(GetUbuntuMajorVersion)
 fi
 
+clear
+
+echo ''
+echo "=============================================="
+echo "Next script to run: uekulele-services-4.sh    "
+echo "=============================================="
+
+sleep 5
+
+clear
+
 echo ''
 echo "=============================================="
 echo "Script:  uekulele-services-4.sh NumCon        "

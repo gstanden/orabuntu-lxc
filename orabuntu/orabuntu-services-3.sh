@@ -39,6 +39,7 @@ OracleVersion=$1.$2
 Domain2=$3
 MultiHost=$4
 DistDir=$5
+Product=$6
 
 echo ''
 echo "=============================================="
@@ -417,8 +418,8 @@ if [ $? -ne 0 ]
 then
 echo ''
 echo "=============================================="
-echo "No-password $SeedContainerName ssh has issue. "
-echo "No-password $SeedContainerName must succeed.  "
+echo "lxc-attach $SeedContainerName has issue.      "
+echo "lxc-attach $SeedContainerName must succeed.   "
 echo "Fix issues retry script.                      "
 echo "Script exiting.                               "
 echo "=============================================="
@@ -426,53 +427,53 @@ exit
 fi
 echo ''
 echo "=============================================="
-echo "No-password $SeedContainerName ssh successful."
+echo "lxc-attach $SeedContainerName successful.     "
 echo "=============================================="
 
 sleep 5
 
 clear
 
-echo ''
-echo "=============================================="
-echo "Configuring $SeedContainerName for Oracle...  "
-echo "=============================================="
-echo ''
+# echo ''
+# echo "=============================================="
+# echo "Configuring $SeedContainerName for Oracle...  "
+# echo "=============================================="
+# echo ''
 
-sudo lxc-attach -n $SeedContainerName -- /root/packages.sh
-sudo lxc-attach -n $SeedContainerName -- /root/create_users.sh
-sudo lxc-attach -n $SeedContainerName -- /root/lxc-services.sh
-sudo lxc-attach -n $SeedContainerName -- usermod --password `perl -e "print crypt('grid','grid');"` grid
-sudo lxc-attach -n $SeedContainerName -- usermod --password `perl -e "print crypt('oracle','oracle');"` oracle
-sudo lxc-attach -n $SeedContainerName -- usermod -g oinstall oracle
-sudo lxc-attach -n $SeedContainerName -- chown oracle:oinstall /home/oracle/.bash_profile
-sudo lxc-attach -n $SeedContainerName -- chown oracle:oinstall /home/oracle/.bashrc
-sudo lxc-attach -n $SeedContainerName -- chown oracle:oinstall /home/oracle/.kshrc
-sudo lxc-attach -n $SeedContainerName -- chown oracle:oinstall /home/oracle/.bash_logout
-sudo lxc-attach -n $SeedContainerName -- chown oracle:oinstall /home/oracle/.
-sudo lxc-attach -n $SeedContainerName -- chown grid:oinstall /home/grid/.bash_profile
-sudo lxc-attach -n $SeedContainerName -- chown grid:oinstall /home/grid/.bashrc
-sudo lxc-attach -n $SeedContainerName -- chown grid:oinstall /home/grid/.kshrc
-sudo lxc-attach -n $SeedContainerName -- chown grid:oinstall /home/grid/.bash_logout
-sudo lxc-attach -n $SeedContainerName -- chown grid:oinstall /home/grid/.
+# sudo lxc-attach -n $SeedContainerName -- /root/packages.sh
+# sudo lxc-attach -n $SeedContainerName -- /root/create_users.sh
+# sudo lxc-attach -n $SeedContainerName -- /root/lxc-services.sh
+# sudo lxc-attach -n $SeedContainerName -- usermod --password `perl -e "print crypt('grid','grid');"` grid
+# sudo lxc-attach -n $SeedContainerName -- usermod --password `perl -e "print crypt('oracle','oracle');"` oracle
+# sudo lxc-attach -n $SeedContainerName -- usermod -g oinstall oracle
+# sudo lxc-attach -n $SeedContainerName -- chown oracle:oinstall /home/oracle/.bash_profile
+# sudo lxc-attach -n $SeedContainerName -- chown oracle:oinstall /home/oracle/.bashrc
+# sudo lxc-attach -n $SeedContainerName -- chown oracle:oinstall /home/oracle/.kshrc
+# sudo lxc-attach -n $SeedContainerName -- chown oracle:oinstall /home/oracle/.bash_logout
+# sudo lxc-attach -n $SeedContainerName -- chown oracle:oinstall /home/oracle/.
+# sudo lxc-attach -n $SeedContainerName -- chown grid:oinstall /home/grid/.bash_profile
+# sudo lxc-attach -n $SeedContainerName -- chown grid:oinstall /home/grid/.bashrc
+# sudo lxc-attach -n $SeedContainerName -- chown grid:oinstall /home/grid/.kshrc
+# sudo lxc-attach -n $SeedContainerName -- chown grid:oinstall /home/grid/.bash_logout
+# sudo lxc-attach -n $SeedContainerName -- chown grid:oinstall /home/grid/.
 
-echo ''  
-echo "=============================================="
-echo "$SeedContainerName configured for Oracle.     "
-echo "=============================================="
-echo ''
+# echo ''  
+# echo "=============================================="
+# echo "$SeedContainerName configured for Oracle.     "
+# echo "=============================================="
+# echo ''
 
-sleep 5
+# sleep 5
 
-clear
+# clear
 
 # if [ $MajorRelease -eq 7 ]
 # then
- 	echo ''
- 	echo "=============================================="
- 	echo "Start NTP service...                          "
- 	echo "=============================================="
- 	echo ''
+# 	echo ''
+# 	echo "=============================================="
+# 	echo "Start NTP service...                          "
+# 	echo "=============================================="
+# 	echo ''
 
 #	sudo lxc-attach -n $SeedContainerName -- chmod +x /etc/systemd/system/ntp.service
 #	sudo lxc-attach -n $SeedContainerName -- systemctl enable ntp.service
@@ -483,16 +484,16 @@ clear
 #	sudo lxc-attach -n $SeedContainerName -- chkconfig ntp on
 #	sudo lxc-attach -n $SeedContainerName -- chkconfig ntpd on
 
-	sudo lxc-attach -n $SeedContainerName -- ntpd -x
+#	sudo lxc-attach -n $SeedContainerName -- ntpd -x
 
-	sleep 5
+#	sleep 5
 
-	clear
+#	clear
 
-	echo ''
-	echo "=============================================="
-	echo "Done: Start NTP service.                      "
-	echo "=============================================="
+#	echo ''
+#	echo "=============================================="
+#	echo "Done: Start NTP service.                      "
+#	echo "=============================================="
 
 #	sleep 5
 
@@ -503,13 +504,13 @@ clear
 ##	sudo lxc-attach -n $SeedContainerName -- dhcpcd -k
 #fi
 
-sleep 5
+# sleep 5
 
-clear
+# clear
 
 echo ''
 echo "=============================================="
-echo "Next script to run: orabuntu-services-4.sh    "
+echo "Next script to run: $Product                  "
 echo "=============================================="
 
 sleep 5

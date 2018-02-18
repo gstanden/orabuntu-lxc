@@ -377,42 +377,42 @@ fi
 	MajorRelease=$8
 	if [ -z $8 ]
 	then
-		MajorRelease=7
+		MajorRelease=6
 	fi
 	# echo 'Oracle Container Release  = '$MajorRelease
 
 	PointRelease=$2
 	if [ -z $2 ]
 	then
-		PointRelease=3
+		PointRelease=6
 	fi
 	echo 'Oracle Container Version  = '$MajorRelease.$PointRelease
 
 	NumCon=$3
 	if [ -z $3 ]
 	then
-		NumCon=3
+		NumCon=6
 	fi
 	echo 'Oracle Container Count    = '$NumCon
 
 	Domain1=$4
 	if [ -z $4 ]
 	then
-		Domain1=mackietown.com
+		Domain1=uekulele.com
 	fi
 	echo 'Domain1                   = '$Domain1
 
 	Domain2=$5
 	if [ -z $5 ]
 	then
-		Domain2=flapjacknow.com
+		Domain2=blackberry.com
 	fi
 	echo 'Domain2                   = '$Domain2
 
 	NameServer=$6
 	if [ -z $6 ]
 	then
-		NameServer=sandusky
+		NameServer=afns1
 	fi
 	echo 'NameServer                = '$NameServer
 
@@ -619,6 +619,12 @@ function GetMultiHostVar10 {
 }
 MultiHostVar10=$(GetMultiHostVar10)
 
+function GetMultiHostVar11 {
+        echo $MultiHost | cut -f11 -d':'
+}
+MultiHostVar11=$(GetMultiHostVar11)
+Product=$MultiHostVar11
+
 if   [ $MultiHostVar3 = 'X' ] && [ $GREValue = 'Y' ]
 then
 	function GetMultiHostVar5 {
@@ -649,11 +655,7 @@ then
 	ssh-keygen -R $MultiHostVar5 > /dev/null 2>&1
         sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service systemd-resolved restart > /dev/null 2>&1"
         sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service lxc-net restart > /dev/null 2>&1"
-
-	if [ $LinuxFlavor = 'Fedora' ] || [ $LinuxFlavor = 'CentOS' ]
-	then
-        	sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service dnsmasq restart > /dev/null 2>&1"
-	fi
+       	sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service dnsmasq restart > /dev/null 2>&1"
         
 	Sx1Index=201
         function CheckHighestSx1IndexHit {
@@ -706,6 +708,7 @@ fi
 
 	echo 'DistDir                   = '$DistDir
 	echo 'SubDirName                = '$SubDirName
+	echo 'Product                   = '$Product
 
 echo ''
 echo "=============================================="
@@ -1083,7 +1086,7 @@ echo ''
 sleep 5
 
 cd "$DistDir"/anylinux
-"$DistDir"/anylinux/anylinux-services-0.sh $SubDirName
+"$DistDir"/anylinux/anylinux-services-0.sh $SubDirName $Product
 cd "$DistDir"/"$SubDirName"/archives
 
 echo ''	
@@ -1098,7 +1101,7 @@ clear
 
 echo ''	
 echo "=============================================="
-echo "Prepare Orabuntu-LXC Files & Archives...      "
+echo "Archive Orabuntu-LXC scripts...               "
 echo "=============================================="
 echo ''
 
@@ -1106,15 +1109,12 @@ if [ ! -d /opt/olxc ]
 then
 	sudo mkdir -p  /opt/olxc
 	sudo chmod 777 /opt/olxc
-	sleep 5
 fi
 
 sudo rm  -f /opt/olxc/GNU3
 sudo rm -rf /opt/olxc/home
 
 cp -p $DistDir/anylinux/GNU3 /opt/olxc/GNU3
-
-sleep 5
 
 echo "$DistDir/anylinux/vercomp" 						>  "$DistDir"/"$SubDirName"/archives/"$SubDirName"-services.lst
 echo "$DistDir/anylinux/anylinux-services-1.sh" 				>> "$DistDir"/"$SubDirName"/archives/"$SubDirName"-services.lst
@@ -1129,15 +1129,31 @@ echo "$DistDir/$SubDirName/$SubDirName-services-4.sh"	 			>> "$DistDir"/"$SubDir
 echo "$DistDir/$SubDirName/$SubDirName-services-5.sh"	 			>> "$DistDir"/"$SubDirName"/archives/"$SubDirName"-services.lst
 echo "$DistDir/$SubDirName/GNU3"                                                >> "$DistDir"/"$SubDirName"/archives/"$SubDirName"-services.lst
 echo "$DistDir/$SubDirName/COPYING"                                             >> "$DistDir"/"$SubDirName"/archives/"$SubDirName"-services.lst
+echo "$DistDir/products/$Product"						>> "$DistDir"/"$SubDirName"/archives/"$SubDirName"-services.lst
 
 cd "$DistDir"/"$SubDirName"/archives
 
-tar -cPf "$DistDir"/"$SubDirName"/archives/"$SubDirName"-services.tar -T "$DistDir"/"$SubDirName"/archives/"$SubDirName"-services.lst --numeric-owner
+tar -cPf  "$DistDir"/"$SubDirName"/archives/"$SubDirName"-services.tar -T "$DistDir"/"$SubDirName"/archives/"$SubDirName"-services.lst --numeric-owner
 tar -tvPf "$DistDir"/"$SubDirName"/archives/"$SubDirName"-services.tar
+
+echo ''	
+echo "=============================================="
+echo "Done: Archive Orabuntu-LXC scripts.           "
+echo "=============================================="
+echo ''
 
 sleep 5
 
-# ArchiveNames="dns-dhcp-cont.tar dns-dhcp-host.tar lxc-oracle-files.tar ubuntu-host.tar scst-files.tar tgt-files.tar $SubDirName-services.tar"
+clear
+
+echo ''	
+echo "=============================================="
+echo "Prepare Orabuntu-LXC Files & Archives...      "
+echo "=============================================="
+echo ''
+
+# GLS 20180204 Replaced by function GetArchiveNames
+# ArchiveNames="dns-dhcp-cont.tar dns-dhcp-host.tar lxc-oracle-files.tar product.tar ubuntu-host.tar scst-files.tar tgt-files.tar $SubDirName-services.tar"
 
 function GetArchiveNames {
 	ls *.tar | more | sed 's/$/ /' | tr -d '\n' | sed 's/^[ \t]*//;s/[ \t]*$//'
@@ -1163,7 +1179,7 @@ do
 
 	sudo cp -p "$DistDir"/"$SubDirName"/archives/$ArchiveShortName.lst /opt/olxc/$ArchiveShortName.lst	
 
-	if [ $i != 'lxc-oracle-files.tar' ]
+	if [ $i != 'lxc-oracle-files.tar' ] && [ $i != 'product.tar' ]
 	then	
 		function GetTAR {
 			cat /opt/olxc/$ArchiveShortName.lst | cut -f2 -d'/' | sort -u
@@ -1215,7 +1231,7 @@ do
 				sudo mv /opt/olxc/$j.gnu3 /opt/olxc/$j
 				filename=/opt/olxc/$j
 			fi
-			if [ $i != 'dns-dhcp-cont.tar' ] && [ $i != 'dns-dhcp-host.tar' ] && [ $i != 'lxc-oracle-files.tar' ] && [ $i != 'ubuntu-host.tar' ]
+			if [ $i != 'dns-dhcp-cont.tar' ] && [ $i != 'dns-dhcp-host.tar' ] && [ $i != 'lxc-oracle-files.tar' ] && [ $i != 'product.tar' ] && [ $i != 'ubuntu-host.tar' ]
 			then
 				sudo chown $Owner:$Group $filename > /dev/null 2>&1
 			fi
@@ -1324,6 +1340,7 @@ sudo tar -xf /opt/olxc/"$DistDir"/"$SubDirName"/archives/"$SubDirName"-services.
 sudo chown -R $Group:$Owner home
 sudo chmod 775 /opt/olxc/"$DistDir"/"$SubDirName"/"$SubDirName"-services-*.sh
 sudo chmod 775 /opt/olxc/"$DistDir"/anylinux/*
+sudo chmod 775 /opt/olxc/"$DistDir"/products/$Product
 sleep 5
 
 echo ''
@@ -1346,6 +1363,6 @@ sleep 5
 
 clear
 
-/opt/olxc/"$DistDir"/anylinux/anylinux-services-1.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $OSMemRes $NumCon $MultiHost $LxcOvsVersion $DistDir
+/opt/olxc/"$DistDir"/anylinux/anylinux-services-1.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $OSMemRes $NumCon $MultiHost $LxcOvsVersion $DistDir $Product $SubDirName
 	
 exit

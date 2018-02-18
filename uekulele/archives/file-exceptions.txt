@@ -23,3 +23,4 @@ rootfs/COPYING
 /home/OWNER/Downloads/orabuntu-lxc-master/uekulele/uekulele-services-3.sh
 /home/OWNER/Downloads/orabuntu-lxc-master/uekulele/uekulele-services-4.sh
 /home/OWNER/Downloads/orabuntu-lxc-master/uekulele/uekulele-services-5.sh
+/home/OWNER/Downloads/orabuntu-lxc-master/products/oracle-db

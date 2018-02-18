@@ -76,7 +76,11 @@ SystemdResolvedInstalled=$(CheckSystemdResolvedInstalled)
 
 if [ $SystemdResolvedInstalled -gt 0 ]
 then
- 	sudo service systemd-resolved restart
+	sudo service systemd-resolved-helper restart
+	sleep 5
+	sudo service systemd-resolved status
+	sleep 5
+	sudo service systemd resolved-helper status
 fi
 
 SeedIndex=10
@@ -148,16 +152,6 @@ sudo mkdir -p /var/lib/lxc/oel$OracleRelease$SeedPostfix
 cd /opt/olxc/"$DistDir"/orabuntu/archives
 sudo tar -xvf /opt/olxc/"$DistDir"/orabuntu/archives/lxc-oracle-files.tar -C /var/lib/lxc/oel$OracleRelease$SeedPostfix --touch
 
-sudo chown root:root /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/root/hugepages_setting.sh
-sudo chmod 755 /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/root/hugepages_setting.sh
-sudo chown root:root /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/root/packages.sh
-sudo chmod 755 /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/root/packages.sh
-sudo chown root:root /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/root/create_directories.sh
-sudo chmod 755 /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/root/create_directories.sh
-sudo chown root:root /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/root/lxc-services.sh
-sudo chmod 755 /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/root/lxc-services.sh
-sudo chown root:root /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/root/create_users.sh
-sudo chmod 755 /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/root/create_users.sh
 sudo chown root:root /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/etc/dhcp/dhclient.conf
 sudo chmod 644 /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/etc/dhcp/dhclient.conf
 sudo sed -i "s/HOSTNAME=ContainerName/HOSTNAME=oel$OracleRelease$SeedPostfix/g" /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/etc/sysconfig/network

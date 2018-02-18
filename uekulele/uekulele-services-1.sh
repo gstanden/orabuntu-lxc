@@ -326,7 +326,7 @@ then
 			ContainersExist=$(CheckContainersExist)
 
 			echo "=============================================="
-		read -e -p   "Delete All LXC  Containers? [ Y/N ]     " -i "Y" DestroyAllContainers
+			read -e -p   "Delete All LXC  Containers? [ Y/N ]   " -i "Y" DestroyAllContainers
 			echo "=============================================="
 			echo ''
 
@@ -367,40 +367,92 @@ then
 		echo "=============================================="
 		echo ''
 
-		sudo rm -f /etc/systemd/system/ora*c*.service
-		sudo rm -f /etc/network/openvswitch/strt_ora*c*.sh
-		sudo rm -f /etc/network/if-up.d/openvswitch/*
-		sudo rm -f /etc/network/if-down.d/openvswitch/*
-		cd /opt/olxc/"$DistDir"/uekulele
-		sudo rm -rf facter openvswitch lxc selinux
-		if [ $LinuxFlavor != 'Fedora' ]
-		then
-			sudo rm -rf epel
-		fi
-		sudo rm -f /etc/orabuntu-lxc-release
+                sudo rm -f  /etc/network/if-up.d/openvswitch/*
+                sudo rm -f  /etc/network/if-down.d/openvswitch/*
+
+                sudo systemctl disable sw4 > /dev/null 2>&1
+                sudo systemctl disable sw5 > /dev/null 2>&1
+                sudo systemctl disable sw6 > /dev/null 2>&1
+                sudo systemctl disable sw7 > /dev/null 2>&1
+                sudo systemctl disable sw8 > /dev/null 2>&1
+                sudo systemctl disable sw9 > /dev/null 2>&1
+                sudo systemctl disable sx1 > /dev/null 2>&1
+                sudo systemctl disable $NameServer > /dev/null 2>&1
+
+                sudo rm -f /etc/network/openvswitch/crt_ovs_sw4.sh
+                sudo rm -f /etc/network/openvswitch/crt_ovs_sw5.sh
+                sudo rm -f /etc/network/openvswitch/crt_ovs_sw6.sh
+                sudo rm -f /etc/network/openvswitch/crt_ovs_sw7.sh
+                sudo rm -f /etc/network/openvswitch/crt_ovs_sw8.sh
+                sudo rm -f /etc/network/openvswitch/crt_ovs_sw9.sh
+                sudo rm -f /etc/network/openvswitch/crt_ovs_sx1.sh
+
+                sudo rm -f /etc/systemd/system/ora*c*.service
+                sudo rm -f /etc/systemd/system/oel*c*.service
+                sudo rm -f /etc/network/openvswitch/strt_ora*c*.sh
+                sudo rm -f /etc/network/if-up.d/openvswitch/*
+                sudo rm -f /etc/network/if-down.d/openvswitch/*
+                sudo rm -f /etc/systemd/system/sw[456789].service
+                sudo rm -f /etc/systemd/system/sx1.service
+                sudo rm -f /etc/systemd/system/$NameServer.service
+
+                sudo ip link del a1 > /dev/null 2>&1
+                sudo ip link del a2 > /dev/null 2>&1
+                sudo ip link del a3 > /dev/null 2>&1
+                sudo ip link del a4 > /dev/null 2>&1
+                sudo ip link del a5 > /dev/null 2>&1
+                sudo ip link del a6 > /dev/null 2>&1
 
 		# GLS 20170925 Oracle Linux OVS and LXC are built from source.    This step deletes the source build directories.
 		# GLS 20170925 Ubuntu Linux OVS and LXC are build from packages.  This step is not necessary on Ubuntu Linux.
+		# GLS 20180206 begin uekulele branch only.
 
-		echo "=============================================="
-		echo "Remove dns=none parameter from NM conf...     "
-		echo "=============================================="
+			cd /opt/olxc/"$DistDir"/uekulele
+			sudo rm -rf facter openvswitch lxc selinux
+	
+			if [ $LinuxFlavor != 'Fedora' ]
+			then
+				sudo rm -rf epel
+			fi
 
-		sudo sed -i '/dns=none/d' /etc/NetworkManager/NetworkManager.conf
-		sudo systemctl daemon-reload
+			sudo rm -f /etc/orabuntu-lxc-release
 
-		echo ''
-		echo "=============================================="
-		echo "Done Remove dns=none parameter from NM conf.  "
-		echo "=============================================="
-		echo ''
+			echo "=============================================="
+			echo "Remove dns=none parameter from NM conf...     "
+			echo "=============================================="
 
+			sudo sed -i '/dns=none/d' /etc/NetworkManager/NetworkManager.conf
+			sudo systemctl daemon-reload
+
+			echo ''
+			echo "=============================================="
+			echo "Done Remove dns=none parameter from NM conf.  "
+			echo "=============================================="
+			echo ''
+
+		# GLS 20180206 end uekulele branch only.
+		
 		echo "=============================================="
 		echo "Uninstall lxc packages...                     "
 		echo "=============================================="
 		echo ''
 
 		sudo systemctl disable dnsmasq
+
+                function CheckYumProcessRunning {
+                        ps -ef | grep yum | grep -v grep | wc -l
+                }
+                AptProcessRunning=$(CheckAptProcessRunning)
+
+                while [ $YumProcessRunning -gt 0 ]
+                do
+                        echo 'Waiting for running yum update process(es) to finish...sleeping for 10 seconds'
+                        echo ''
+                        ps -ef | grep yum | grep -v grep
+                        sleep 10
+                        AptProcessRunning=$(CheckAptProcessRunning)
+                done
+
 		sudo yum -y erase lxc lxc-libs dnsmasq
 		sudo rm -f /etc/sysconfig/lxc-net	> /dev/null 2>&1
 		sudo rm -f /etc/dnsmasq.conf		> /dev/null 2>&1
@@ -424,8 +476,6 @@ then
 		sudo reboot
 		exit
 	fi
-
-# GLS 20170919 Oracle Linux Specific Code Block 1 BEGIN
 
 	echo ''
 	echo "=============================================="
@@ -494,12 +544,16 @@ then
 
 	cd /opt/olxc/"$DistDir"
 
-	sudo yum -y install debootstrap perl bash-completion bash-completion-extras dnsmasq libvirt
+	sudo yum -y install debootstrap perl bash-completion bash-completion-extras dnsmasq
 	sudo yum -y install lxc libcap-devel libcgroup wget bridge-utils lsb
 
 	if [ $LinuxFlavor = 'Fedora' ]
 	then
-		sudo dnf -y install lxc lxc-templates lxc-extra debootstrap libvirt perl gpg
+		sudo dnf -y install lxc lxc-templates debootstrap qemu-kvm libvirt virt-install bridge-utils perl gpg
+
+	elif [ $LinuxFlavor = 'CentOS' ]
+	then
+		sudo yum -y install qemu-kvm libvirt virt-install bridge-utils
 	fi
 
 	echo ''
@@ -524,8 +578,13 @@ then
 		sudo systemctl start lxc.service
 		sudo systemctl status lxc.service
 		echo ''
-		sudo systemctl start libvirtd 
-		sudo systemctl status libvirtd
+		
+		if [ $LinuxFlavor = 'Fedora' ] || [ $LinuxFlavor = 'CentOS' ]
+		then
+			sudo setenforce permissive
+			sudo systemctl start libvirtd 
+			sudo systemctl status libvirtd
+		fi
 	fi
 
 	echo ''
@@ -938,32 +997,32 @@ then
 
 	clear
 
-	echo ''
-	echo "=============================================="
-	echo "Display Legacy Bridge for LXC ...             "
-	echo "=============================================="
-	echo ''
+#	echo ''
+#	echo "=============================================="
+#	echo "Display Legacy Bridge for LXC ...             "
+#	echo "=============================================="
+#	echo ''
 
-	sleep 5
+#	sleep 5
 
 	if [ $LinuxFlavor != 'CentOS' ] && [ $LinuxFlavor != 'Fedora' ]
 	then
-		sudo ifconfig lxcbr0
+		sudo ifconfig lxcbr0 > /dev/null 2>&1
 	else
-		sudo ifconfig virbr0
+		sudo ifconfig virbr0 > /dev/null 2>&1
 		if [ $? -eq 0 ]
 		then
 			sudo sed -i "s/lxcbr0/virbr0/g" /etc/lxc/default.conf
 		fi
 	fi
 
-	echo "=============================================="
-	echo "Done: Display Bridge for LXC                  "
-	echo "=============================================="
+#	echo "=============================================="
+#	echo "Done: Display Bridge for LXC                  "
+#	echo "=============================================="
 
-	sleep 5
+#	sleep 5
 
-	clear
+#	clear
 
 	echo ''
 	echo "=============================================="
@@ -995,11 +1054,9 @@ then
 	clear
 fi
 
-# GLS 20170919 Ubuntu Specific Code Block 2 END
-
 echo ''
 echo "=============================================="
-echo "Display Linux Bridge for LXC (non-OvS)...     "
+echo "Display AUX Bridge for LXC (non-OvS)...     "
 echo "=============================================="
 echo ''
 
@@ -1020,7 +1077,7 @@ then
 fi
 
 echo "=============================================="
-echo "Done: Display Linux Bridge for LXC (non-OvS). "
+echo "Done: Display AUX Bridge for LXC (non-OvS).   "
 echo "=============================================="
 
 sleep 5
@@ -1069,9 +1126,9 @@ then
 	SwitchList='sw1 sx1'
 	for k in $SwitchList
 	do
-		sleep 5
+	#	sleep 5
 
-		clear
+	#	clear
 
 		echo ''
 		echo "=============================================="
@@ -1716,54 +1773,54 @@ sleep 5
 
 clear
 
-echo ''
-echo "=============================================="
-echo "Creating /etc/sysctl.d/60-oracle.conf file ..."
-echo "=============================================="
-echo ''
-echo "=============================================="
-echo "These values are set automatically based on   "
-echo "Oracle best practice guidelines.              "
-echo "You can adjust them after installation.       "
-echo "=============================================="
-echo ''
+# echo ''
+# echo "=============================================="
+# echo "Creating /etc/sysctl.d/60-oracle.conf file ..."
+# echo "=============================================="
+# echo ''
+# echo "=============================================="
+# echo "These values are set automatically based on   "
+# echo "Oracle best practice guidelines.              "
+# echo "You can adjust them after installation.       "
+# echo "=============================================="
+# echo ''
 
 if [ -r /etc/sysctl.d/60-oracle.conf ]
 then
-sudo cp -p /etc/sysctl.d/60-oracle.conf /etc/sysctl.d/60-oracle.conf.pre.orabuntu-lxc.bak
-sudo rm /etc/sysctl.d/60-oracle.conf
+	sudo cp -p /etc/sysctl.d/60-oracle.conf /etc/sysctl.d/60-oracle.conf.pre.orabuntu-lxc.bak
+	sudo rm /etc/sysctl.d/60-oracle.conf
 fi
 
 sudo touch /etc/sysctl.d/60-oracle.conf
-sudo cat /etc/sysctl.d/60-oracle.conf
+# sudo cat /etc/sysctl.d/60-oracle.conf 
 sudo chmod +x /etc/sysctl.d/60-oracle.conf
 
-echo 'Linux OS Memory Reservation (in Kb) ... '$OSMemRes 
+# echo 'Linux OS Memory Reservation (in Kb) ... '$OSMemRes 
 function GetMemTotal {
-sudo cat /proc/meminfo | grep MemTotal | cut -f2 -d':' |  sed 's/  *//g' | cut -f1 -d'k'
+	sudo cat /proc/meminfo | grep MemTotal | cut -f2 -d':' |  sed 's/  *//g' | cut -f1 -d'k'
 }
 MemTotal=$(GetMemTotal)
-echo 'Memory (in Kb) ........................ '$MemTotal
+# echo 'Memory (in Kb) ........................ '$MemTotal
 
 ((MemOracleKb = MemTotal - OSMemRes))
-echo 'Memory for Oracle (in Kb) ............. '$MemOracleKb
+# echo 'Memory for Oracle (in Kb) ............. '$MemOracleKb
 
 ((MemOracleBytes = MemOracleKb * 1024))
-echo 'Memory for Oracle (in bytes) .......... '$MemOracleBytes
+# echo 'Memory for Oracle (in bytes) .......... '$MemOracleBytes
 
 function GetPageSize {
-sudo getconf PAGE_SIZE
+	sudo getconf PAGE_SIZE
 }
 PageSize=$(GetPageSize)
-echo 'Page Size (in bytes) .................. '$PageSize
+# echo 'Page Size (in bytes) .................. '$PageSize
 
 ((shmall = MemOracleBytes / 4096))
-echo 'shmall (in 4Kb pages) ................. '$shmall
-sudo sysctl -w kernel.shmall=$shmall
+# echo 'shmall (in 4Kb pages) ................. '$shmall
+sudo sysctl -w kernel.shmall=$shmall > /dev/null 2>&1
 
 ((shmmax = MemOracleBytes / 2))
-echo 'shmmax (in bytes) ..................... '$shmmax
-sudo sysctl -w kernel.shmmax=$shmmax
+# echo 'shmmax (in bytes) ..................... '$shmmax
+sudo sysctl -w kernel.shmmax=$shmmax > /dev/null 2>&1
 
 sudo sh -c "echo '# New Stack Settings'                       > /etc/sysctl.d/60-oracle.conf"
 sudo sh -c "echo ''                                          >> /etc/sysctl.d/60-oracle.conf"
@@ -1786,124 +1843,123 @@ sudo sh -c "echo 'net.core.wmem_default = 262144'            >> /etc/sysctl.d/60
 sudo sh -c "echo 'net.core.wmem_max = 1048576'               >> /etc/sysctl.d/60-oracle.conf"
 sudo sh -c "echo 'kernel.panic_on_oops = 1'                  >> /etc/sysctl.d/60-oracle.conf"
 
-echo ''
-echo "=============================================="
-echo "Created /etc/sysctl.d/60-oracle.conf file ... "
-echo "=============================================="
+# echo ''
+# echo "=============================================="
+# echo "Created /etc/sysctl.d/60-oracle.conf file ... "
+# echo "=============================================="
 
-sleep 5
+# sleep 5
 
-clear
+# clear
 
-echo ''
-echo "=============================================="
-echo "Display /etc/sysctl.d/60-oracle.conf          "
-echo "=============================================="
-echo ''
+# echo ''
+# echo "=============================================="
+# echo "Display /etc/sysctl.d/60-oracle.conf          "
+# echo "=============================================="
+# echo ''
 
-sudo sysctl -p /etc/sysctl.d/60-oracle.conf
+sudo sysctl -p /etc/sysctl.d/60-oracle.conf > /dev/null 2>&1
 
-echo ''
-echo "=============================================="
-echo "Displayed /etc/sysctl.d/60-oracle.conf file.  "
-echo "=============================================="
+# echo ''
+# echo "=============================================="
+# echo "Displayed /etc/sysctl.d/60-oracle.conf file.  "
+# echo "=============================================="
 
-sleep 5
+# sleep 5
 
-clear
+# clear
 
-echo ''
-echo "=============================================="
-echo "Create 60-oracle.service in systemd...        "
-echo "=============================================="
-echo ''
+# echo ''
+# echo "=============================================="
+# echo "Create 60-oracle.service in systemd...        "
+# echo "=============================================="
+# echo ''
 
 if [ ! -f /etc/systemd/system/60-oracle.service ]
 then
-sudo sh -c "echo '[Unit]'                                    			 > /etc/systemd/system/60-oracle.service"
-sudo sh -c "echo 'Description=60-oracle Service'            			>> /etc/systemd/system/60-oracle.service"
-sudo sh -c "echo 'After=network.target'                     			>> /etc/systemd/system/60-oracle.service"
-sudo sh -c "echo ''                                         			>> /etc/systemd/system/60-oracle.service"
-sudo sh -c "echo '[Service]'                                			>> /etc/systemd/system/60-oracle.service"
-sudo sh -c "echo 'Type=oneshot'                             			>> /etc/systemd/system/60-oracle.service"
-sudo sh -c "echo 'User=root'                                			>> /etc/systemd/system/60-oracle.service"
-sudo sh -c "echo 'RemainAfterExit=yes'                      			>> /etc/systemd/system/60-oracle.service"
-sudo sh -c "echo 'ExecStart=/usr/sbin/sysctl -p /etc/sysctl.d/60-oracle.conf'	>> /etc/systemd/system/60-oracle.service"
-sudo sh -c "echo ''                                         			>> /etc/systemd/system/60-oracle.service"
-sudo sh -c "echo '[Install]'                                			>> /etc/systemd/system/60-oracle.service"
-sudo sh -c "echo 'WantedBy=multi-user.target'               			>> /etc/systemd/system/60-oracle.service"
-
-sudo chmod 644 /etc/systemd/system/60-oracle.service
-sudo systemctl enable 60-oracle
+	sudo sh -c "echo '[Unit]'                                    			 > /etc/systemd/system/60-oracle.service"
+	sudo sh -c "echo 'Description=60-oracle Service'            			>> /etc/systemd/system/60-oracle.service"
+	sudo sh -c "echo 'After=network.target'                     			>> /etc/systemd/system/60-oracle.service"
+	sudo sh -c "echo ''                                         			>> /etc/systemd/system/60-oracle.service"
+	sudo sh -c "echo '[Service]'                                			>> /etc/systemd/system/60-oracle.service"
+	sudo sh -c "echo 'Type=oneshot'                             			>> /etc/systemd/system/60-oracle.service"
+	sudo sh -c "echo 'User=root'                                			>> /etc/systemd/system/60-oracle.service"
+	sudo sh -c "echo 'RemainAfterExit=yes'                      			>> /etc/systemd/system/60-oracle.service"
+	sudo sh -c "echo 'ExecStart=/usr/sbin/sysctl -p /etc/sysctl.d/60-oracle.conf'	>> /etc/systemd/system/60-oracle.service"
+	sudo sh -c "echo ''                                         			>> /etc/systemd/system/60-oracle.service"
+	sudo sh -c "echo '[Install]'                                			>> /etc/systemd/system/60-oracle.service"
+	sudo sh -c "echo 'WantedBy=multi-user.target'               			>> /etc/systemd/system/60-oracle.service"
+	sudo chmod 644 /etc/systemd/system/60-oracle.service
+	sudo systemctl enable 60-oracle
 fi
 
-sudo cat /etc/systemd/system/60-oracle.service
+# sudo cat /etc/systemd/system/60-oracle.service
 
-echo ''
-echo "=============================================="
-echo "Created 60-oracle.service in systemd.         "
-echo "=============================================="
+# echo ''
+# echo "=============================================="
+# echo "Created 60-oracle.service in systemd.         "
+# echo "=============================================="
 
-sleep 5
+# sleep 5
 
-clear
+# clear
 
-echo ''
-echo "=============================================="
-echo "Creating /etc/security/limits.d/70-oracle.conf"
-echo "=============================================="
-echo ''
-echo "=============================================="
-echo "These values are set automatically based on   "
-echo "Oracle best practice guidelines.              "
-echo "You can adjust them after installation.       "
-echo "=============================================="
-echo ''
+# echo ''
+# echo "=============================================="
+# echo "Creating /etc/security/limits.d/70-oracle.conf"
+# echo "=============================================="
+# echo ''
+# echo "=============================================="
+# echo "These values are set automatically based on   "
+# echo "Oracle best practice guidelines.              "
+# echo "You can adjust them after installation.       "
+# echo "=============================================="
+# echo ''
 
-sudo touch /etc/security/limits.d/70-oracle.conf
-sudo chmod +x /etc/security/limits.d/70-oracle.conf
+# sudo touch /etc/security/limits.d/70-oracle.conf
+# sudo chmod +x /etc/security/limits.d/70-oracle.conf
 
 # Oracle Kernel Parameters
 
-sudo sh -c "echo '#                                        '  > /etc/security/limits.d/70-oracle.conf"
-sudo sh -c "echo '# Oracle DB Parameters                   ' >> /etc/security/limits.d/70-oracle.conf"
-sudo sh -c "echo '#                                        ' >> /etc/security/limits.d/70-oracle.conf"
-sudo sh -c "echo 'oracle	soft	nproc       2047   ' >> /etc/security/limits.d/70-oracle.conf"
-sudo sh -c "echo 'oracle	hard	nproc      16384   ' >> /etc/security/limits.d/70-oracle.conf"
-sudo sh -c "echo 'oracle	soft	nofile      1024   ' >> /etc/security/limits.d/70-oracle.conf"
-sudo sh -c "echo 'oracle	hard	nofile     65536   ' >> /etc/security/limits.d/70-oracle.conf"
-sudo sh -c "echo 'oracle	soft	stack      10240   ' >> /etc/security/limits.d/70-oracle.conf"
-sudo sh -c "echo 'oracle	hard	stack      10240   ' >> /etc/security/limits.d/70-oracle.conf"
-sudo sh -c "echo '* 	soft 	memlock  9873408           ' >> /etc/security/limits.d/70-oracle.conf"
-sudo sh -c "echo '* 	hard 	memlock  9873408           ' >> /etc/security/limits.d/70-oracle.conf"
+# sudo sh -c "echo '#                                        	'  > /etc/security/limits.d/70-oracle.conf"
+# sudo sh -c "echo '# Oracle DB Parameters                   	' >> /etc/security/limits.d/70-oracle.conf"
+# sudo sh -c "echo '#                                        	' >> /etc/security/limits.d/70-oracle.conf"
+# sudo sh -c "echo 'oracle	soft	nproc       2047   	' >> /etc/security/limits.d/70-oracle.conf"
+# sudo sh -c "echo 'oracle	hard	nproc      16384   	' >> /etc/security/limits.d/70-oracle.conf"
+# sudo sh -c "echo 'oracle	soft	nofile      1024   	' >> /etc/security/limits.d/70-oracle.conf"
+# sudo sh -c "echo 'oracle	hard	nofile     65536   	' >> /etc/security/limits.d/70-oracle.conf"
+# sudo sh -c "echo 'oracle	soft	stack      10240   	' >> /etc/security/limits.d/70-oracle.conf"
+# sudo sh -c "echo 'oracle	hard	stack      10240   	' >> /etc/security/limits.d/70-oracle.conf"
+# sudo sh -c "echo '* 	soft 	memlock  9873408           	' >> /etc/security/limits.d/70-oracle.conf"
+# sudo sh -c "echo '* 	hard 	memlock  9873408           	' >> /etc/security/limits.d/70-oracle.conf"
 
 # Oracle Grid Infrastructure Kernel Parameters
 	
-sudo sh -c "echo '#                                        ' >> /etc/security/limits.d/70-oracle.conf"
-sudo sh -c "echo '# Oracle GI Parameters                   ' >> /etc/security/limits.d/70-oracle.conf"
-sudo sh -c "echo '#                                        ' >> /etc/security/limits.d/70-oracle.conf"
-sudo sh -c "echo 'grid	soft	nproc       2047           ' >> /etc/security/limits.d/70-oracle.conf"
-sudo sh -c "echo 'grid	hard	nproc      16384           ' >> /etc/security/limits.d/70-oracle.conf"
-sudo sh -c "echo 'grid	soft	nofile      1024           ' >> /etc/security/limits.d/70-oracle.conf"
-sudo sh -c "echo 'grid	hard	nofile     65536           ' >> /etc/security/limits.d/70-oracle.conf"
-sudo sh -c "echo 'grid	soft	stack      10240           ' >> /etc/security/limits.d/70-oracle.conf"
-sudo sh -c "echo 'grid	hard	stack      10240           ' >> /etc/security/limits.d/70-oracle.conf"
+# sudo sh -c "echo '#                                        	' >> /etc/security/limits.d/70-oracle.conf"
+# sudo sh -c "echo '# Oracle GI Parameters                   	' >> /etc/security/limits.d/70-oracle.conf"
+# sudo sh -c "echo '#                                        	' >> /etc/security/limits.d/70-oracle.conf"
+# sudo sh -c "echo 'grid	soft	nproc       2047        ' >> /etc/security/limits.d/70-oracle.conf"
+# sudo sh -c "echo 'grid	hard	nproc      16384        ' >> /etc/security/limits.d/70-oracle.conf"
+# sudo sh -c "echo 'grid	soft	nofile      1024        ' >> /etc/security/limits.d/70-oracle.conf"
+# sudo sh -c "echo 'grid	hard	nofile     65536        ' >> /etc/security/limits.d/70-oracle.conf"
+# sudo sh -c "echo 'grid	soft	stack      10240        ' >> /etc/security/limits.d/70-oracle.conf"
+# sudo sh -c "echo 'grid	hard	stack      10240        ' >> /etc/security/limits.d/70-oracle.conf"
 
-echo "=============================================="
-echo "Display /etc/security/limits.d/70-oracle.conf "
-echo "=============================================="
-echo ''
-sudo cat /etc/security/limits.d/70-oracle.conf
-echo ''
-echo "=============================================="
-echo "Created /etc/security/limits.d/70-oracle.conf "
-echo "Sleeping 10 seconds for settings review ...   "
-echo "=============================================="
-echo ''
+# echo "=============================================="
+# echo "Display /etc/security/limits.d/70-oracle.conf "
+# echo "=============================================="
+# echo ''
+# sudo cat /etc/security/limits.d/70-oracle.conf
+# echo ''
+# echo "=============================================="
+# echo "Created /etc/security/limits.d/70-oracle.conf "
+# echo "Sleeping 10 seconds for settings review ...   "
+# echo "=============================================="
+# echo ''
 
-sleep 10
+# sleep 10
 
-clear
+# clear
 
 if [ $NameServerExists -eq 0  ]
 then
@@ -2626,7 +2682,7 @@ then
 	echo ''
 
 	sudo lxc-attach -n $NameServer -- usermod --password `perl -e "print crypt('ubuntu','ubuntu');"` ubuntu
-	ssh-keygen -R 10.207.39.2
+	ssh-keygen -q -R 10.207.39.2
 #	sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ubuntu@10.207.39.2 "ssh-keygen -f ~/.ssh/id_rsa -t rsa -N ''"
 	sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ubuntu@10.207.39.2 "date; uname -a"
 	
@@ -3138,28 +3194,28 @@ sleep 5
 
 clear
 
-echo ''
-echo "=============================================="
-echo "Verify existence of Oracle and Grid users...  "
-echo "=============================================="
-echo ''
+# echo ''
+# echo "=============================================="
+# echo "Verify existence of Oracle and Grid users...  "
+# echo "=============================================="
+# echo ''
 
-sudo useradd -u 1098 grid 		>/dev/null 2>&1
-sudo useradd -u 500 oracle 		>/dev/null 2>&1
-sudo groupadd -g 1100 asmadmin		>/dev/null 2>&1
-sudo usermod -a -G asmadmin grid	>/dev/null 2>&1
+# sudo useradd -u 1098 grid 		>/dev/null 2>&1
+# sudo useradd -u 500 oracle 		>/dev/null 2>&1
+# sudo groupadd -g 1100 asmadmin		>/dev/null 2>&1
+# sudo usermod -a -G asmadmin grid	>/dev/null 2>&1
 
-id grid
-id oracle
+# id grid
+# id oracle
 
-echo ''
-echo "=============================================="
-echo "Existence of Oracle and Grid users verified.  "
-echo "=============================================="
+# echo ''
+# echo "=============================================="
+# echo "Existence of Oracle and Grid users verified.  "
+# echo "=============================================="
 
-sleep 5
+# sleep 5
 
-clear
+# clear
 
 echo ''
 echo "=============================================="
