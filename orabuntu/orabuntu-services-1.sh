@@ -1791,46 +1791,7 @@ then
 	sleep 5
 
 	clear
-
-	if [ ! -f /etc/systemd/system/$NameServer.service ]
-	then
-		echo ''
-		echo "=============================================="
-		echo "Create $NameServer Onboot Service...          "
-		echo "=============================================="
-		echo ''
-
-		sudo sh -c "echo '[Unit]'             	         				 > /etc/systemd/system/$NameServer.service"
-		sudo sh -c "echo 'Description=$NameServer Service'  				>> /etc/systemd/system/$NameServer.service"
-		sudo sh -c "echo 'Wants=network-online.target sw1.service sx1.service'		>> /etc/systemd/system/$NameServer.service"
-		sudo sh -c "echo 'After=network-online.target sw1.service sx1.service'		>> /etc/systemd/system/$NameServer.service"
-		sudo sh -c "echo ''                                 				>> /etc/systemd/system/$NameServer.service"
-		sudo sh -c "echo '[Service]'                        				>> /etc/systemd/system/$NameServer.service"
-		sudo sh -c "echo 'Type=oneshot'                     				>> /etc/systemd/system/$NameServer.service"
-		sudo sh -c "echo 'User=root'                        				>> /etc/systemd/system/$NameServer.service"
-		sudo sh -c "echo 'RemainAfterExit=yes'              				>> /etc/systemd/system/$NameServer.service"
-		sudo sh -c "echo 'ExecStart=/etc/network/openvswitch/strt_$NameServer.sh start'	>> /etc/systemd/system/$NameServer.service"
-		sudo sh -c "echo 'ExecStop=/etc/network/openvswitch/strt_$NameServer.sh stop'	>> /etc/systemd/system/$NameServer.service"
-		sudo sh -c "echo ''                                 				>> /etc/systemd/system/$NameServer.service"
-		sudo sh -c "echo '[Install]'                        				>> /etc/systemd/system/$NameServer.service"
-		sudo sh -c "echo 'WantedBy=multi-user.target'       				>> /etc/systemd/system/$NameServer.service"
-		sudo chmod 644 /etc/systemd/system/$NameServer.service
-
-		echo "/etc/systemd/system/$NameServer.service" >> /opt/olxc/"$DistDir"/orabuntu/archives/nameserver.lst
-        	sudo cp -p /opt/olxc/"$DistDir"/orabuntu/archives/nameserver.lst ~/nameserver.lst
- 
-		sudo systemctl enable $NameServer
-
-		echo ''
-		echo "=============================================="
-		echo "Created $NameServer Onboot Service.           "
-		echo "=============================================="
-	fi
 fi
-
-sleep 5
-
-clear
 
 echo ''
 echo "=============================================="
@@ -1976,6 +1937,45 @@ then
 	echo "=============================================="
 	echo "Done: Start LXC DNS DHCP container.           "
 	echo "=============================================="
+
+	sleep 5
+
+	clear
+
+	if [ ! -f /etc/systemd/system/$NameServer.service ]
+	then
+		echo ''
+		echo "=============================================="
+		echo "Create $NameServer Onboot Service...          "
+		echo "=============================================="
+		echo ''
+
+		sudo sh -c "echo '[Unit]'             	         				 > /etc/systemd/system/$NameServer.service"
+		sudo sh -c "echo 'Description=$NameServer Service'  				>> /etc/systemd/system/$NameServer.service"
+		sudo sh -c "echo 'Wants=network-online.target sw1.service sx1.service'		>> /etc/systemd/system/$NameServer.service"
+		sudo sh -c "echo 'After=network-online.target sw1.service sx1.service'		>> /etc/systemd/system/$NameServer.service"
+		sudo sh -c "echo ''                                 				>> /etc/systemd/system/$NameServer.service"
+		sudo sh -c "echo '[Service]'                        				>> /etc/systemd/system/$NameServer.service"
+		sudo sh -c "echo 'Type=oneshot'                     				>> /etc/systemd/system/$NameServer.service"
+		sudo sh -c "echo 'User=root'                        				>> /etc/systemd/system/$NameServer.service"
+		sudo sh -c "echo 'RemainAfterExit=yes'              				>> /etc/systemd/system/$NameServer.service"
+		sudo sh -c "echo 'ExecStart=/etc/network/openvswitch/strt_$NameServer.sh start'	>> /etc/systemd/system/$NameServer.service"
+		sudo sh -c "echo 'ExecStop=/etc/network/openvswitch/strt_$NameServer.sh stop'	>> /etc/systemd/system/$NameServer.service"
+		sudo sh -c "echo ''                                 				>> /etc/systemd/system/$NameServer.service"
+		sudo sh -c "echo '[Install]'                        				>> /etc/systemd/system/$NameServer.service"
+		sudo sh -c "echo 'WantedBy=multi-user.target'       				>> /etc/systemd/system/$NameServer.service"
+		sudo chmod 644 /etc/systemd/system/$NameServer.service
+
+		echo "/etc/systemd/system/$NameServer.service" >> /opt/olxc/"$DistDir"/orabuntu/archives/nameserver.lst
+        	sudo cp -p /opt/olxc/"$DistDir"/orabuntu/archives/nameserver.lst ~/nameserver.lst
+ 
+		sudo systemctl enable $NameServer
+
+		echo ''
+		echo "=============================================="
+		echo "Created $NameServer Onboot Service.           "
+		echo "=============================================="
+	fi
 fi
 
 sleep 5
@@ -2070,7 +2070,7 @@ then
 
 	sudo tar -xvf /opt/olxc/"$DistDir"/orabuntu/archives/scst-files.tar -C /opt/olxc --touch
 	sudo tar -xf  /opt/olxc/"$DistDir"/orabuntu/archives/tgt-files.tar  -C /opt/olxc --touch
-	sleep 2
+
 	if [ $Owner != 'ubuntu' ]
 	then
 		sudo mv /opt/olxc/home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/scst-files /opt/olxc/home/"$Owner"/Downloads/orabuntu-lxc-master/orabuntu/archives/.

@@ -259,8 +259,9 @@ sleep 5
 
 clear
 
+echo ''
 echo "=============================================="
-echo "Create Workspace Directories...               "
+echo "Create Workspace Directories and Mounts...    "
 echo "=============================================="
 echo ''
 
@@ -268,10 +269,36 @@ sudo lxc-attach -n $SeedContainerName -- mkdir -p /mnt/database
 sudo lxc-attach -n $SeedContainerName -- mkdir -p /opt/watchdox/upgrade
 sudo lxc-attach -n $SeedContainerName -- mkdir -p /opt/watchdox/storage/filespace
 sudo lxc-attach -n $SeedContainerName -- mkdir -p /opt/watchdox/storage/fs_cache
+sudo lxc-attach -n $SeedContainerName -- ls -lR /mnt/database /opt/watchdox
 
 echo ''
 echo "=============================================="
-echo "Done: Create Workspace Directories.           "
+echo "Done: Create Workspace Directories and Mounts."
+echo "=============================================="
+
+sleep 5
+
+clear
+
+echo ''
+echo "=============================================="
+echo "Create Workspace File:  /etc/fstab            "
+echo "=============================================="
+echo ''
+
+sudo sh -c "echo '# tmpfs                              /dev/shm                        tmpfs   rw,exec,size=3500m      0 0'	>  /var/lib/lxc/$SeedContainerName/rootfs/etc/fstab"
+sudo sh -c "echo ''														>> /var/lib/lxc/$SeedContainerName/rootfs/etc/fstab"
+sudo sh -c "echo '# Mount points for BlackBerry Workspaces Filesystems' 						   	>> /var/lib/lxc/$SeedContainerName/rootfs/etc/fstab"
+sudo sh -c "echo ''														>> /var/lib/lxc/$SeedContainerName/rootfs/etc/fstab"
+sudo sh -c "echo '# /dev/salt-master/wdx_data1_00      /mnt/database                   xfs     defaults                0 0'	>> /var/lib/lxc/$SeedContainerName/rootfs/etc/fstab"
+sudo sh -c "echo '# /dev/salt-master/wdx_fspa1_00      /opt/watchdox/storage/filespace xfs     defaults                0 0'	>> /var/lib/lxc/$SeedContainerName/rootfs/etc/fstab"
+sudo sh -c "echo '# /dev/salt-master/wdx_fcac1_00      /opt/watchdox/storage/fs_cache  xfs     defaults                0 0'	>> /var/lib/lxc/$SeedContainerName/rootfs/etc/fstab"
+
+sudo lxc-attach -n $SeedContainerName -- cat /etc/fstab
+
+echo ''
+echo "=============================================="
+echo "Done: Create Workspace File:  /etc/fstab      "
 echo "=============================================="
 
 sleep 5
@@ -286,13 +313,35 @@ echo ''
 
 sleep 5
 
-sudo lxc-attach -n $SeedContainerName -- yum -y install createrepo sudo which man
-sudo lxc-attach -n $SeedContainerName -- /root/packages.sh
-sudo lxc-attach -n $SeedContainerName -- /root/lxc-services.sh
+sudo lxc-attach -n $SeedContainerName -- yum -y install createrepo sudo which man tar gcc gcc-c++ glibc glibc-devel ksh libgcc libstdc++ libstdc++-devel libaio libaio-devel libXext libXtst libX11 libXau libxcb libXi make
+sudo lxc-attach -n $SeedContainerName -- yum -y install sysstat unixODBC unixODBC-devel xdpyinfo xorg-x11-apps pdksh libicu ntp sg3-utils xauth xorg-x11-fonts* unzip nfs-utils
+sudo lxc-attach -n $SeedContainerName -- yum -y install binutils compat-libcap1 compat-libstdc++-33 perl bash bind-utils net-tools
+sudo lxc-attach -n $SeedContainerName -- yum -y remove  compat-libstdc++-33.i686 glibc.i686 glibc-devel.i686 libgcc.i686 libstdc++.i686 libstdc++-devel.i686 
+sudo lxc-attach -n $SeedContainerName -- yum -y remove  libaio.i686 libaio-devel.i686 libXext.i686 libXtst.i686 libX11.i686 libXau.i686 libxcb.i686 elfutils-libelf-devel.i386
 
 echo ''
 echo "=============================================="
 echo "Done: $SeedContainerName Workspaces Prep.     "
+echo "=============================================="
+echo ''
+
+sleep 5
+
+clear
+
+echo ''
+echo "=============================================="
+echo "$SeedContainerName Install Custom Files...    "
+echo "=============================================="
+echo ''
+
+sudo tar -xvf /opt/olxc/"$DistDir"/"$SubDirName"/archives/product.tar -C /var/lib/lxc/oel$OracleRelease$SeedPostfix --touch
+
+sudo lxc-attach -n $SeedContainerName -- ls -l /root
+
+echo ''
+echo "=============================================="
+echo "Done: $SeedContainerName Install Custom Files."
 echo "=============================================="
 echo ''
 

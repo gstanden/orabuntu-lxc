@@ -117,7 +117,7 @@ if [ -z $6 ]
 then
 	Product=product
  	Product=oracle-db
-	Product=workspaces
+#	Product=workspaces
 else
 	Product=$6
 fi

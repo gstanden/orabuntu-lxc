@@ -76,11 +76,26 @@ SystemdResolvedInstalled=$(CheckSystemdResolvedInstalled)
 
 if [ $SystemdResolvedInstalled -gt 0 ]
 then
+	echo ''
+	echo "=============================================="
+	echo "Restart Systemd-Resolved ...                  "
+	echo "=============================================="
+	echo ''
+
 	sudo service systemd-resolved-helper restart
 	sleep 5
 	sudo service systemd-resolved status
 	sleep 5
 	sudo service systemd resolved-helper status
+	
+	echo ''
+	echo "=============================================="
+	echo "Done: Restart Systemd-Resolved.               "
+	echo "=============================================="
+
+	sleep 5
+
+	clear
 fi
 
 SeedIndex=10
