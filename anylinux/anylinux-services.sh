@@ -391,21 +391,21 @@ fi
 	NumCon=$3
 	if [ -z $3 ]
 	then
-		NumCon=6
+		NumCon=3
 	fi
 	echo 'Oracle Container Count    = '$NumCon
 
 	Domain1=$4
 	if [ -z $4 ]
 	then
-		Domain1=uekulele.com
+		Domain1=urdomain2.com
 	fi
 	echo 'Domain1                   = '$Domain1
 
 	Domain2=$5
 	if [ -z $5 ]
 	then
-		Domain2=blackberry.com
+		Domain2=urdomain2.com
 	fi
 	echo 'Domain2                   = '$Domain2
 
