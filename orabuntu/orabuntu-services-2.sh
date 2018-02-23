@@ -86,7 +86,7 @@ then
 	sleep 5
 	sudo service systemd-resolved status
 	sleep 5
-	sudo service systemd resolved-helper status
+	sudo service systemd-resolved-helper status
 	
 	echo ''
 	echo "=============================================="

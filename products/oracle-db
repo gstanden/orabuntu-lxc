@@ -518,6 +518,7 @@ sudo lxc-attach -n $SeedContainerName -- /root/create_users.sh
 sudo lxc-attach -n $SeedContainerName -- /root/lxc-services.sh
 sudo lxc-attach -n $SeedContainerName -- usermod --password `perl -e "print crypt('grid','grid');"` grid
 sudo lxc-attach -n $SeedContainerName -- usermod --password `perl -e "print crypt('oracle','oracle');"` oracle
+sudo lxc-attach -n $SeedContainerName -- usermod --password `perl -e "print crypt('root','root');"` root 
 sudo lxc-attach -n $SeedContainerName -- usermod -g oinstall oracle
 sudo lxc-attach -n $SeedContainerName -- chown oracle:oinstall /home/oracle/.bash_profile
 sudo lxc-attach -n $SeedContainerName -- chown oracle:oinstall /home/oracle/.bashrc

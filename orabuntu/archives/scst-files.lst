@@ -8,9 +8,9 @@
 /home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/scst-files/create-scst-oracle.sh
 /home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/scst-files/create-scst-multipath.sh
 /home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/scst-files/create-scst.sh
-/home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/scst-files/99-StorageOwner.rules.template
 /home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/scst-files/create-scst-mpath-oracle.sh
 /home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/scst-files/create-scst-workspaces.sh
 /home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/scst-files/create-scst-mpath-workspaces.sh
-/home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/GNU3
-/home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/COPYING
+/home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/scst-files/99-StorageOwner.rules.template
+/home/lxc4oracle/Downloads/orabuntu-lxc-master/orabuntu/archives/GNU3
+/home/lxc4oracle/Downloads/orabuntu-lxc-master/orabuntu/archives/COPYING

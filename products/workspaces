@@ -318,6 +318,7 @@ sudo lxc-attach -n $SeedContainerName -- yum -y install sysstat unixODBC unixODB
 sudo lxc-attach -n $SeedContainerName -- yum -y install binutils compat-libcap1 compat-libstdc++-33 perl bash bind-utils net-tools
 sudo lxc-attach -n $SeedContainerName -- yum -y remove  compat-libstdc++-33.i686 glibc.i686 glibc-devel.i686 libgcc.i686 libstdc++.i686 libstdc++-devel.i686 
 sudo lxc-attach -n $SeedContainerName -- yum -y remove  libaio.i686 libaio-devel.i686 libXext.i686 libXtst.i686 libX11.i686 libXau.i686 libxcb.i686 elfutils-libelf-devel.i386
+sudo lxc-attach -n $SeedContainerName -- usermod --password `perl -e "print crypt('root','root');"` root
 
 echo ''
 echo "=============================================="
