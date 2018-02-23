@@ -1969,6 +1969,7 @@ then
 
 		echo "/etc/systemd/system/$NameServer.service" >> /opt/olxc/"$DistDir"/orabuntu/archives/nameserver.lst
         	sudo cp -p /opt/olxc/"$DistDir"/orabuntu/archives/nameserver.lst ~/nameserver.lst
+		sudo sed -i "s/-base//g" /etc/network/openvswitch/strt_$NameServer.sh
  
 		sudo systemctl enable $NameServer
 
