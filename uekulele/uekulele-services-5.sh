@@ -1193,6 +1193,6 @@ then
 	sudo rm -r /opt/olxc/home/ubuntu
 fi
 
-cd $DistDir/uekulele/archives
-rm -f uekulele-services.lst uekulele-files.lst uekulele-services.tar uekulele-files.tar product.tar
+cd "$DistDir"/uekulele/archives
+rm -f uekulele-services.lst uekulele-files.lst product.lst uekulele-services.tar uekulele-files.tar product.tar
 cd $DistDir/anylinux 

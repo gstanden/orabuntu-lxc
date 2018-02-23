@@ -902,6 +902,6 @@ then
 	sudo rm -r /opt/olxc/home/ubuntu
 fi
 
-cd $DistDir/orabuntu/archives
-rm -f orabuntu-services.lst orabuntu-files.lst orabuntu-services.tar orabuntu-files.tar
+cd "$DistDir"/orabuntu/archives
+rm -f orabuntu-services.lst orabuntu-files.lst product.lst orabuntu-services.tar orabuntu-files.tar product.tar
 cd $DistDir/anylinux

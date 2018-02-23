@@ -398,7 +398,7 @@ fi
 	Domain1=$4
 	if [ -z $4 ]
 	then
-		Domain1=urdomain2.com
+		Domain1=urdomain1.com
 	fi
 	echo 'Domain1                   = '$Domain1
 

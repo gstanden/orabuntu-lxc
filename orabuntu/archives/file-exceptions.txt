@@ -24,3 +24,4 @@ rootfs/COPYING
 /home/OWNER/Downloads/orabuntu-lxc-master/orabuntu/orabuntu-services-4.sh
 /home/OWNER/Downloads/orabuntu-lxc-master/orabuntu/orabuntu-services-5.sh
 /home/OWNER/Downloads/orabuntu-lxc-master/products/oracle-db
+/home/OWNER/Downloads/orabuntu-lxc-master/orabuntu/archives/scst-files/99-StorageOwner.rules.template

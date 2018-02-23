@@ -1773,136 +1773,136 @@ sleep 5
 
 clear
 
-# echo ''
-# echo "=============================================="
-# echo "Creating /etc/sysctl.d/60-oracle.conf file ..."
-# echo "=============================================="
-# echo ''
-# echo "=============================================="
-# echo "These values are set automatically based on   "
-# echo "Oracle best practice guidelines.              "
-# echo "You can adjust them after installation.       "
-# echo "=============================================="
-# echo ''
+echo ''
+echo "=============================================="
+echo "Creating /etc/sysctl.d/60-olxc.conf file ..."
+echo "=============================================="
+echo ''
+echo "=============================================="
+echo "These values are set automatically based on   "
+echo "Oracle best practice guidelines.              "
+echo "You can adjust them after installation.       "
+echo "=============================================="
+echo ''
 
-if [ -r /etc/sysctl.d/60-oracle.conf ]
+if [ -r /etc/sysctl.d/60-olxc.conf ]
 then
-	sudo cp -p /etc/sysctl.d/60-oracle.conf /etc/sysctl.d/60-oracle.conf.pre.orabuntu-lxc.bak
-	sudo rm /etc/sysctl.d/60-oracle.conf
+	sudo cp -p /etc/sysctl.d/60-olxc.conf /etc/sysctl.d/60-olxc.conf.pre.orabuntu-lxc.bak
+	sudo rm /etc/sysctl.d/60-olxc.conf
 fi
 
-sudo touch /etc/sysctl.d/60-oracle.conf
-# sudo cat /etc/sysctl.d/60-oracle.conf 
-sudo chmod +x /etc/sysctl.d/60-oracle.conf
+sudo touch /etc/sysctl.d/60-olxc.conf
+sudo cat /etc/sysctl.d/60-olxc.conf 
+sudo chmod +x /etc/sysctl.d/60-olxc.conf
 
-# echo 'Linux OS Memory Reservation (in Kb) ... '$OSMemRes 
+echo 'Linux OS Memory Reservation (in Kb) ... '$OSMemRes 
 function GetMemTotal {
 	sudo cat /proc/meminfo | grep MemTotal | cut -f2 -d':' |  sed 's/  *//g' | cut -f1 -d'k'
 }
 MemTotal=$(GetMemTotal)
-# echo 'Memory (in Kb) ........................ '$MemTotal
+echo 'Memory (in Kb) ........................ '$MemTotal
 
 ((MemOracleKb = MemTotal - OSMemRes))
-# echo 'Memory for Oracle (in Kb) ............. '$MemOracleKb
+echo 'Memory for Oracle (in Kb) ............. '$MemOracleKb
 
 ((MemOracleBytes = MemOracleKb * 1024))
-# echo 'Memory for Oracle (in bytes) .......... '$MemOracleBytes
+echo 'Memory for Oracle (in bytes) .......... '$MemOracleBytes
 
 function GetPageSize {
 	sudo getconf PAGE_SIZE
 }
 PageSize=$(GetPageSize)
-# echo 'Page Size (in bytes) .................. '$PageSize
+echo 'Page Size (in bytes) .................. '$PageSize
 
 ((shmall = MemOracleBytes / 4096))
-# echo 'shmall (in 4Kb pages) ................. '$shmall
+echo 'shmall (in 4Kb pages) ................. '$shmall
 sudo sysctl -w kernel.shmall=$shmall > /dev/null 2>&1
 
 ((shmmax = MemOracleBytes / 2))
-# echo 'shmmax (in bytes) ..................... '$shmmax
+echo 'shmmax (in bytes) ..................... '$shmmax
 sudo sysctl -w kernel.shmmax=$shmmax > /dev/null 2>&1
 
-sudo sh -c "echo '# New Stack Settings'                       > /etc/sysctl.d/60-oracle.conf"
-sudo sh -c "echo ''                                          >> /etc/sysctl.d/60-oracle.conf"
-sudo sh -c "echo 'net.ipv4.conf.default.rp_filter=0'         >> /etc/sysctl.d/60-oracle.conf"
-sudo sh -c "echo 'net.ipv4.conf.all.rp_filter=0'             >> /etc/sysctl.d/60-oracle.conf"
-sudo sh -c "echo 'net.ipv4.ip_forward=1'                     >> /etc/sysctl.d/60-oracle.conf"
-sudo sh -c "echo ''                                          >> /etc/sysctl.d/60-oracle.conf"
-sudo sh -c "echo '# Oracle Settings'                         >> /etc/sysctl.d/60-oracle.conf"
-sudo sh -c "echo ''                                          >> /etc/sysctl.d/60-oracle.conf"
-sudo sh -c "echo 'kernel.shmall = $shmall'                   >> /etc/sysctl.d/60-oracle.conf"
-sudo sh -c "echo 'kernel.shmmax = $shmmax'                   >> /etc/sysctl.d/60-oracle.conf"
-sudo sh -c "echo 'kernel.shmmni = 4096'                      >> /etc/sysctl.d/60-oracle.conf"
-sudo sh -c "echo 'kernel.sem = 250 32000 100 128'            >> /etc/sysctl.d/60-oracle.conf"
-sudo sh -c "echo 'fs.file-max = 6815744'                     >> /etc/sysctl.d/60-oracle.conf"
-sudo sh -c "echo 'fs.aio-max-nr = 1048576'                   >> /etc/sysctl.d/60-oracle.conf"
-sudo sh -c "echo 'net.ipv4.ip_local_port_range = 9000 65500' >> /etc/sysctl.d/60-oracle.conf"
-sudo sh -c "echo 'net.core.rmem_default = 262144'            >> /etc/sysctl.d/60-oracle.conf"
-sudo sh -c "echo 'net.core.rmem_max = 4194304'               >> /etc/sysctl.d/60-oracle.conf"
-sudo sh -c "echo 'net.core.wmem_default = 262144'            >> /etc/sysctl.d/60-oracle.conf"
-sudo sh -c "echo 'net.core.wmem_max = 1048576'               >> /etc/sysctl.d/60-oracle.conf"
-sudo sh -c "echo 'kernel.panic_on_oops = 1'                  >> /etc/sysctl.d/60-oracle.conf"
+sudo sh -c "echo '# New Stack Settings'                       > /etc/sysctl.d/60-olxc.conf"
+sudo sh -c "echo ''                                          >> /etc/sysctl.d/60-olxc.conf"
+sudo sh -c "echo 'net.ipv4.conf.default.rp_filter=0'         >> /etc/sysctl.d/60-olxc.conf"
+sudo sh -c "echo 'net.ipv4.conf.all.rp_filter=0'             >> /etc/sysctl.d/60-olxc.conf"
+sudo sh -c "echo 'net.ipv4.ip_forward=1'                     >> /etc/sysctl.d/60-olxc.conf"
+sudo sh -c "echo ''                                          >> /etc/sysctl.d/60-olxc.conf"
+sudo sh -c "echo '# Oracle Settings'                         >> /etc/sysctl.d/60-olxc.conf"
+sudo sh -c "echo ''                                          >> /etc/sysctl.d/60-olxc.conf"
+sudo sh -c "echo 'kernel.shmall = $shmall'                   >> /etc/sysctl.d/60-olxc.conf"
+sudo sh -c "echo 'kernel.shmmax = $shmmax'                   >> /etc/sysctl.d/60-olxc.conf"
+sudo sh -c "echo 'kernel.shmmni = 4096'                      >> /etc/sysctl.d/60-olxc.conf"
+sudo sh -c "echo 'kernel.sem = 250 32000 100 128'            >> /etc/sysctl.d/60-olxc.conf"
+sudo sh -c "echo 'fs.file-max = 6815744'                     >> /etc/sysctl.d/60-olxc.conf"
+sudo sh -c "echo 'fs.aio-max-nr = 1048576'                   >> /etc/sysctl.d/60-olxc.conf"
+sudo sh -c "echo 'net.ipv4.ip_local_port_range = 9000 65500' >> /etc/sysctl.d/60-olxc.conf"
+sudo sh -c "echo 'net.core.rmem_default = 262144'            >> /etc/sysctl.d/60-olxc.conf"
+sudo sh -c "echo 'net.core.rmem_max = 4194304'               >> /etc/sysctl.d/60-olxc.conf"
+sudo sh -c "echo 'net.core.wmem_default = 262144'            >> /etc/sysctl.d/60-olxc.conf"
+sudo sh -c "echo 'net.core.wmem_max = 1048576'               >> /etc/sysctl.d/60-olxc.conf"
+sudo sh -c "echo 'kernel.panic_on_oops = 1'                  >> /etc/sysctl.d/60-olxc.conf"
 
-# echo ''
-# echo "=============================================="
-# echo "Created /etc/sysctl.d/60-oracle.conf file ... "
-# echo "=============================================="
+echo ''
+echo "=============================================="
+echo "Created /etc/sysctl.d/60-olxc.conf file ... "
+echo "=============================================="
 
-# sleep 5
+sleep 5
 
-# clear
+clear
 
-# echo ''
-# echo "=============================================="
-# echo "Display /etc/sysctl.d/60-oracle.conf          "
-# echo "=============================================="
-# echo ''
+echo ''
+echo "=============================================="
+echo "Display /etc/sysctl.d/60-olxc.conf          "
+echo "=============================================="
+echo ''
 
-sudo sysctl -p /etc/sysctl.d/60-oracle.conf > /dev/null 2>&1
+sudo sysctl -p /etc/sysctl.d/60-olxc.conf > /dev/null 2>&1
 
-# echo ''
-# echo "=============================================="
-# echo "Displayed /etc/sysctl.d/60-oracle.conf file.  "
-# echo "=============================================="
+echo ''
+echo "=============================================="
+echo "Displayed /etc/sysctl.d/60-olxc.conf file.  "
+echo "=============================================="
 
-# sleep 5
+sleep 5
 
-# clear
+clear
 
-# echo ''
-# echo "=============================================="
-# echo "Create 60-oracle.service in systemd...        "
-# echo "=============================================="
-# echo ''
+echo ''
+echo "=============================================="
+echo "Create 60-olxc.service in systemd...        "
+echo "=============================================="
+echo ''
 
-if [ ! -f /etc/systemd/system/60-oracle.service ]
+if [ ! -f /etc/systemd/system/60-olxc.service ]
 then
-	sudo sh -c "echo '[Unit]'                                    			 > /etc/systemd/system/60-oracle.service"
-	sudo sh -c "echo 'Description=60-oracle Service'            			>> /etc/systemd/system/60-oracle.service"
-	sudo sh -c "echo 'After=network.target'                     			>> /etc/systemd/system/60-oracle.service"
-	sudo sh -c "echo ''                                         			>> /etc/systemd/system/60-oracle.service"
-	sudo sh -c "echo '[Service]'                                			>> /etc/systemd/system/60-oracle.service"
-	sudo sh -c "echo 'Type=oneshot'                             			>> /etc/systemd/system/60-oracle.service"
-	sudo sh -c "echo 'User=root'                                			>> /etc/systemd/system/60-oracle.service"
-	sudo sh -c "echo 'RemainAfterExit=yes'                      			>> /etc/systemd/system/60-oracle.service"
-	sudo sh -c "echo 'ExecStart=/usr/sbin/sysctl -p /etc/sysctl.d/60-oracle.conf'	>> /etc/systemd/system/60-oracle.service"
-	sudo sh -c "echo ''                                         			>> /etc/systemd/system/60-oracle.service"
-	sudo sh -c "echo '[Install]'                                			>> /etc/systemd/system/60-oracle.service"
-	sudo sh -c "echo 'WantedBy=multi-user.target'               			>> /etc/systemd/system/60-oracle.service"
-	sudo chmod 644 /etc/systemd/system/60-oracle.service
-	sudo systemctl enable 60-oracle
+	sudo sh -c "echo '[Unit]'                                    			 > /etc/systemd/system/60-olxc.service"
+	sudo sh -c "echo 'Description=60-olxc Service'            			>> /etc/systemd/system/60-olxc.service"
+	sudo sh -c "echo 'After=network.target'                     			>> /etc/systemd/system/60-olxc.service"
+	sudo sh -c "echo ''                                         			>> /etc/systemd/system/60-olxc.service"
+	sudo sh -c "echo '[Service]'                                			>> /etc/systemd/system/60-olxc.service"
+	sudo sh -c "echo 'Type=oneshot'                             			>> /etc/systemd/system/60-olxc.service"
+	sudo sh -c "echo 'User=root'                                			>> /etc/systemd/system/60-olxc.service"
+	sudo sh -c "echo 'RemainAfterExit=yes'                      			>> /etc/systemd/system/60-olxc.service"
+	sudo sh -c "echo 'ExecStart=/usr/sbin/sysctl -p /etc/sysctl.d/60-olxc.conf'	>> /etc/systemd/system/60-olxc.service"
+	sudo sh -c "echo ''                                         			>> /etc/systemd/system/60-olxc.service"
+	sudo sh -c "echo '[Install]'                                			>> /etc/systemd/system/60-olxc.service"
+	sudo sh -c "echo 'WantedBy=multi-user.target'               			>> /etc/systemd/system/60-olxc.service"
+	sudo chmod 644 /etc/systemd/system/60-olxc.service
+	sudo systemctl enable 60-olxc
 fi
 
-# sudo cat /etc/systemd/system/60-oracle.service
+sudo cat /etc/systemd/system/60-olxc.service
 
-# echo ''
-# echo "=============================================="
-# echo "Created 60-oracle.service in systemd.         "
-# echo "=============================================="
+echo ''
+echo "=============================================="
+echo "Created 60-olxc.service in systemd.         "
+echo "=============================================="
 
-# sleep 5
+sleep 5
 
-# clear
+clear
 
 # echo ''
 # echo "=============================================="
@@ -3348,7 +3348,7 @@ then
         sudo sh -c "echo ' ln -sf /var/lib/lxc/$NameServer/rootfs/var/lib/bind/rev.consultingcommandos.us .' >> /etc/orabuntu-lxc-scripts/crt_links.sh"
 fi
 
-sudo sh -c "echo ' ln -sf /etc/sysctl.d/60-oracle.conf .' 			         		   >> /etc/orabuntu-lxc-scripts/crt_links.sh"
+sudo sh -c "echo ' ln -sf /etc/sysctl.d/60-olxc.conf .' 			         		   >> /etc/orabuntu-lxc-scripts/crt_links.sh"
 sudo sh -c "echo ' ln -sf /etc/security/limits.d/70-oracle.conf .' 					   >> /etc/orabuntu-lxc-scripts/crt_links.sh"
 sudo sh -c "echo ' ln -sf /etc/network/interfaces .' 							   >> /etc/orabuntu-lxc-scripts/crt_links.sh"
 sudo sh -c "echo ' ln -sf /etc/NetworkManager/dnsmasq.d/local .' 					   >> /etc/orabuntu-lxc-scripts/crt_links.sh"
