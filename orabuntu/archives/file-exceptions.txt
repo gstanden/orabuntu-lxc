@@ -16,7 +16,7 @@ rootfs/COPYING
 /home/OWNER/Downloads/orabuntu-lxc-master/anylinux/anylinux-services-1.sh
 /home/OWNER/Downloads/orabuntu-lxc-master/anylinux/dnf2yum
 /home/OWNER/Downloads/orabuntu-lxc-master/orabuntu/archives/nameserver_copy.sh
-/home/OWNER/Downloads/orabuntu-lxc-master/orabuntu/archives/docker_install_uekulele.sh
+/home/OWNER/Downloads/orabuntu-lxc-master/orabuntu/archives/docker_install_orabuntu.sh
 /home/OWNER/Downloads/orabuntu-lxc-master/orabuntu/orabuntu-services-0.sh
 /home/OWNER/Downloads/orabuntu-lxc-master/orabuntu/orabuntu-services-1.sh
 /home/OWNER/Downloads/orabuntu-lxc-master/orabuntu/orabuntu-services-2.sh
@@ -24,4 +24,15 @@ rootfs/COPYING
 /home/OWNER/Downloads/orabuntu-lxc-master/orabuntu/orabuntu-services-4.sh
 /home/OWNER/Downloads/orabuntu-lxc-master/orabuntu/orabuntu-services-5.sh
 /home/OWNER/Downloads/orabuntu-lxc-master/products/oracle-db
-/home/OWNER/Downloads/orabuntu-lxc-master/orabuntu/archives/scst-files/99-StorageOwner.rules.template
+/home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/scst-files/create-scst-dkms.sh
+/home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/scst-files/create-scst-install.sh
+/home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/scst-files/create-scst-uninstall-dkms.sh
+/home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/scst-files/create-scst-uninstall.sh
+/home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/scst-files/README
+/home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/scst-files/vercomp
+/home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/scst-files/create-scst-target.sh
+/home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/scst-files/create-scst-multipath.sh
+/home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/scst-files/create-scst.sh
+/home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/scst-files/99-StorageOwner.rules.template
+/home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/scst-files/GNU3
+/home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/scst-files/COPYING

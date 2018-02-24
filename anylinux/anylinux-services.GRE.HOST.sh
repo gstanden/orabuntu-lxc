@@ -84,7 +84,7 @@ fi
 if [ -z $2 ]
 then
 	SPOKEIP='lan.ip.this.host'
- 	SPOKEIP=192.168.7.81
+ 	SPOKEIP=192.168.7.82
 else
 	SPOKEIP=$2
 fi
@@ -92,7 +92,7 @@ fi
 if [ -z $3 ]
 then
 	HUBIP='lan.ip.hub.host'
- 	HUBIP=192.168.7.80
+ 	HUBIP=192.168.7.81
 else
 	HUBIP=$3
 fi
@@ -100,7 +100,7 @@ fi
 if [ -z $4 ]
 then
 	HubUserAct=username
- 	HubUserAct=amide
+ 	HubUserAct=lxc4oracle
 else
 	HubUserAct=$4
 fi
@@ -108,7 +108,7 @@ fi
 if [ -z $5 ]
 then
 	HubSudoPwd=password
- 	HubSudoPwd=amide
+ 	HubSudoPwd=lxc4oracle
 else
 	HubSudoPwd=$5
 fi
@@ -116,8 +116,8 @@ fi
 if [ -z $6 ]
 then
 	Product=product
- 	Product=oracle-db
 #	Product=workspaces
+ 	Product=oracle-db
 else
 	Product=$6
 fi
