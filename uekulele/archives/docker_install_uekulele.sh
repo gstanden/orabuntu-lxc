@@ -29,6 +29,7 @@
 #    There are two domains and two networks because the "seed" LXC containers are on a separate network from the production LXC containers.
 #    If the domain is an actual domain, you will need to change the subnet using the subnets feature of Orabuntu-LXC
 #
+#!/bin/bash
 
 GetLinuxFlavors(){
 if   [[ -e /etc/oracle-release ]]

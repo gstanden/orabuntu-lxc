@@ -1780,7 +1780,7 @@ echo "=============================================="
 echo ''
 echo "=============================================="
 echo "These values are set automatically based on   "
-echo "Oracle best practice guidelines.              "
+echo "best practice guidelines.                     "
 echo "You can adjust them after installation.       "
 echo "=============================================="
 echo ''
@@ -1858,7 +1858,7 @@ echo "Display /etc/sysctl.d/60-olxc.conf          "
 echo "=============================================="
 echo ''
 
-sudo sysctl -p /etc/sysctl.d/60-olxc.conf > /dev/null 2>&1
+sudo sysctl -p /etc/sysctl.d/60-olxc.conf
 
 echo ''
 echo "=============================================="
@@ -2663,7 +2663,7 @@ then
         	sudo mv /opt/olxc/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/archives/tgt-files  /opt/olxc/home/"$Owner"/Downloads/orabuntu-lxc-master/uekulele/archives/.
         fi
 	sudo chown -R $Owner:$Group		/opt/olxc/home/"$Owner"/Downloads/orabuntu-lxc-master/uekulele/archives/.
-        sudo sed -i "s/SWITCH_IP/$Sw1Index/g"	/opt/olxc/home/"$Owner"/Downloads/orabuntu-lxc-master/uekulele/archives/scst-files/create-scst-oracle.sh
+        sudo sed -i "s/SWITCH_IP/$Sw1Index/g"	/opt/olxc/home/"$Owner"/Downloads/orabuntu-lxc-master/uekulele/archives/scst-files/create-scst-target.sh
 
 	echo ''
 	echo "=============================================="
@@ -2755,7 +2755,7 @@ then
         	sudo mv /opt/olxc/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/archives/tgt-files  /opt/olxc/home/"$Owner"/Downloads/orabuntu-lxc-master/uekulele/archives/.
         fi
 	sudo chown -R $Owner:$Group		/opt/olxc/home/"$Owner"/Downloads/orabuntu-lxc-master/uekulele/archives/.
-        sudo sed -i "s/SWITCH_IP/$Sw1Index/g"	/opt/olxc/home/"$Owner"/Downloads/orabuntu-lxc-master/uekulele/archives/scst-files/create-scst-oracle.sh
+        sudo sed -i "s/SWITCH_IP/$Sw1Index/g"	/opt/olxc/home/"$Owner"/Downloads/orabuntu-lxc-master/uekulele/archives/scst-files/create-scst-target.sh
 		
 	echo ''
 	echo "=============================================="

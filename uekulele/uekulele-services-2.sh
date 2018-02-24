@@ -247,10 +247,14 @@ fi
 
 echo ''
 echo "=============================================="
-echo "Create the LXC oracle container...            "
-echo "(takes a few seconds to queue up ... patience)"
+echo "   Create the LXC Oracle Linux container      "
+echo "                                              "
+echo "    Note: Depends on download speed...        "
+echo "    Patience at downloading packages !        "
 echo "=============================================="
 echo ''
+
+sleep 5
 
 sudo lxc-create -n oel$OracleRelease$SeedPostfix -t oracle -- --release=$OracleVersion
 

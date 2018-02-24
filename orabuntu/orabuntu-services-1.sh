@@ -1015,7 +1015,7 @@ echo "=============================================="
 echo ''
 echo "=============================================="
 echo "These values are set automatically based on   "
-echo "Oracle best practice guidelines.              "
+echo "best practice guidelines.                     "
 echo "You can adjust them after installation.       "
 echo "=============================================="
 echo ''
@@ -1089,7 +1089,7 @@ echo "Display /etc/sysctl.d/60-olxc.conf            "
 echo "=============================================="
 echo ''
 
-sudo sysctl -p /etc/sysctl.d/60-olxc.conf > /dev/null 2>&1
+sudo sysctl -p /etc/sysctl.d/60-olxc.conf 
 
 echo ''
 echo "=============================================="
@@ -1121,7 +1121,7 @@ then
 	sudo sh -c "echo '[Install]'                                			>> /etc/systemd/system/60-olxc.service"
 	sudo sh -c "echo 'WantedBy=multi-user.target'               			>> /etc/systemd/system/60-olxc.service"
 	sudo chmod 644 /etc/systemd/system/60-olxc.service
-	sudo systemctl enable 60-olxc > /dev/null 2>&1
+	sudo systemctl enable 60-olxc
 fi
 
 sudo cat /etc/systemd/system/60-olxc.service
@@ -1356,7 +1356,7 @@ then
 		sudo sed -i '$!N; /^\(.*\)\n\1$/!P; D'	/etc/resolv.conf
 	fi
 
-	sudo service systemd-resolved-helper restart
+	sudo service systemd-resolved restart
 	sudo cat /etc/resolv.conf
 
 	sleep 5
@@ -2079,7 +2079,7 @@ then
 		sudo mv /opt/olxc/home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/tgt-files  /opt/olxc/home/"$Owner"/Downloads/orabuntu-lxc-master/orabuntu/archives/.
 	fi
         sudo chown -R $Owner:$Group		/opt/olxc/home/"$Owner"/Downloads/orabuntu-lxc-master/orabuntu/archives/.
-        sudo sed -i "s/SWITCH_IP/$Sw1Index/g"	/opt/olxc/home/"$Owner"/Downloads/orabuntu-lxc-master/orabuntu/archives/scst-files/create-scst-oracle.sh
+        sudo sed -i "s/SWITCH_IP/$Sw1Index/g"	/opt/olxc/home/"$Owner"/Downloads/orabuntu-lxc-master/orabuntu/archives/scst-files/create-scst-target.sh
 		
 	echo ''
 	echo "=============================================="
@@ -2170,7 +2170,7 @@ then
 		sudo mv /opt/olxc/home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/tgt-files  /opt/olxc/home/"$Owner"/Downloads/orabuntu-lxc-master/orabuntu/archives/.
 	fi
         sudo chown -R $Owner:$Group		/opt/olxc/home/"$Owner"/Downloads/orabuntu-lxc-master/orabuntu/archives/.
-        sudo sed -i "s/SWITCH_IP/$Sw1Index/g"	/opt/olxc/home/"$Owner"/Downloads/orabuntu-lxc-master/orabuntu/archives/scst-files/create-scst-oracle.sh
+        sudo sed -i "s/SWITCH_IP/$Sw1Index/g"	/opt/olxc/home/"$Owner"/Downloads/orabuntu-lxc-master/orabuntu/archives/scst-files/create-scst-target.sh
 		
 	echo ''
 	echo "=============================================="

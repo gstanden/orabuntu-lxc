@@ -84,7 +84,7 @@ fi
 if [ -z $2 ]
 then
 	SPOKEIP='lan.ip.this.host'
- 	SPOKEIP=192.168.7.82
+ 	SPOKEIP=192.168.7.84
 else
 	SPOKEIP=$2
 fi
@@ -116,8 +116,8 @@ fi
 if [ -z $6 ]
 then
 	Product=product
-#	Product=workspaces
  	Product=oracle-db
+#	Product=workspaces
 else
 	Product=$6
 fi
