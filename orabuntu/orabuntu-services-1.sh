@@ -172,6 +172,11 @@ echo $MultiHost | cut -f1 -d':'
 }
 Operation=$(GetOperation)
 
+function CheckAptProcessRunning {
+	ps -ef | grep -v '_apt' | grep apt | grep -v grep | wc -l
+}
+AptProcessRunning=$(CheckAptProcessRunning)
+
 sleep 5
 
 clear
@@ -397,6 +402,20 @@ then
 	echo "=============================================="
 	echo ''
 
+	function CheckAptProcessRunning {
+		ps -ef | grep -v '_apt' | grep apt | grep -v grep | wc -l
+	}
+	AptProcessRunning=$(CheckAptProcessRunning)
+
+	while [ $AptProcessRunning -gt 0 ]
+	do
+		echo 'Waiting for running apt update process(es) to finish...sleeping for 10 seconds'
+		echo ''
+		ps -ef | grep -v '_apt' | grep apt | grep -v grep
+		sleep 10
+		AptProcessRunning=$(CheckAptProcessRunning)
+	done
+
 	sudo apt-get -y install lxc facter iptables
 
 	echo ''
@@ -475,6 +494,20 @@ then
 	echo "=============================================="
 	echo ''
 
+	function CheckAptProcessRunning {
+		ps -ef | grep -v '_apt' | grep apt | grep -v grep | wc -l
+	}
+	AptProcessRunning=$(CheckAptProcessRunning)
+
+	while [ $AptProcessRunning -gt 0 ]
+	do
+		echo 'Waiting for running apt update process(es) to finish...sleeping for 10 seconds'
+		echo ''
+		ps -ef | grep -v '_apt' | grep apt | grep -v grep
+		sleep 10
+		AptProcessRunning=$(CheckAptProcessRunning)
+	done
+
 	sudo apt-get -y install lxc facter iptables
 
 	echo ''
@@ -545,16 +578,19 @@ fi
 # GLS 20170919 Ubuntu Specific Code Block 2 END
 # GLS 20170919 LXC at version 2.0.8
 
-function CheckAptGetRunning {
-	ps -ef | grep apt-get | sed 's/  */ /g' | wc -l
+function CheckAptProcessRunning {
+	ps -ef | grep -v '_apt' | grep apt | grep -v grep | wc -l
 }
-AptGetRunning=$(CheckAptGetRunning)
+AptProcessRunning=$(CheckAptProcessRunning)
 
-if [ $AptGetRunning -gt 1 ]
-then
-	echo "Another apt-get process is already running...please kill it and rerun anylinux-services.sh"
-	exit
-fi
+while [ $AptProcessRunning -gt 0 ]
+do
+	echo 'Waiting for running apt update process(es) to finish...sleeping for 10 seconds'
+	echo ''
+	ps -ef | grep -v '_apt' | grep apt | grep -v grep
+	sleep 10
+	AptProcessRunning=$(CheckAptProcessRunning)
+done
 
 echo ''
 echo "=============================================="
@@ -686,6 +722,20 @@ then
 	echo "=============================================="
 	echo ''
 	
+	function CheckAptProcessRunning {
+		ps -ef | grep -v '_apt' | grep apt | grep -v grep | wc -l
+	}
+	AptProcessRunning=$(CheckAptProcessRunning)
+
+	while [ $AptProcessRunning -gt 0 ]
+	do
+		echo 'Waiting for running apt update process(es) to finish...sleeping for 10 seconds'
+		echo ''
+		ps -ef | grep -v '_apt' | grep apt | grep -v grep
+		sleep 10
+		AptProcessRunning=$(CheckAptProcessRunning)
+	done
+
 	sudo apt-get install -y lxc facter iptables
 
 	echo ''
@@ -1051,11 +1101,11 @@ echo 'Page Size (in bytes) .................. '$PageSize
 
 ((shmall = MemOracleBytes / 4096))
 echo 'shmall (in 4Kb pages) ................. '$shmall
-sudo sysctl -w kernel.shmall=$shmall > /dev/null 2>&1
+sudo sysctl -w kernel.shmall=$shmall 
 
 ((shmmax = MemOracleBytes / 2))
 echo 'shmmax (in bytes) ..................... '$shmmax
-sudo sysctl -w kernel.shmmax=$shmmax > /dev/null 2>&1
+sudo sysctl -w kernel.shmmax=$shmmax
 
 sudo sh -c "echo '# New Stack Settings'                       > /etc/sysctl.d/60-olxc.conf"
 sudo sh -c "echo ''                                          >> /etc/sysctl.d/60-olxc.conf"

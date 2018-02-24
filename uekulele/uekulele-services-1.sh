@@ -1816,11 +1816,11 @@ echo 'Page Size (in bytes) .................. '$PageSize
 
 ((shmall = MemOracleBytes / 4096))
 echo 'shmall (in 4Kb pages) ................. '$shmall
-sudo sysctl -w kernel.shmall=$shmall > /dev/null 2>&1
+sudo sysctl -w kernel.shmall=$shmall
 
 ((shmmax = MemOracleBytes / 2))
 echo 'shmmax (in bytes) ..................... '$shmmax
-sudo sysctl -w kernel.shmmax=$shmmax > /dev/null 2>&1
+sudo sysctl -w kernel.shmmax=$shmmax
 
 sudo sh -c "echo '# New Stack Settings'                       > /etc/sysctl.d/60-olxc.conf"
 sudo sh -c "echo ''                                          >> /etc/sysctl.d/60-olxc.conf"

@@ -322,6 +322,7 @@ then
 	do
 		echo 'Waiting for running apt update process(es) to finish...sleeping for 10 seconds'
                 echo ''
+		ps -ef | grep apt | grep -v '_apt' | grep -v grep
 		sleep 10
 		AptProcessRunning=$(CheckAptProcessRunning)
 	done
