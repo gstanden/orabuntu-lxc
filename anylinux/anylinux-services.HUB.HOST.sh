@@ -40,7 +40,9 @@
 trap "exit" INT TERM; trap "kill 0" EXIT; sudo -v || exit $?; sleep 1; while true; do sleep 60; sudo -nv; done 2>/dev/null &
 
 GRE=N 
-	
+
+LOGEXT=`date +"%Y-%m-%d.%R:%S"`
+
 clear
 
 if [ -z $1 ]
@@ -87,7 +89,27 @@ DistDir=$(GetDistDir)
 
 MultiHost="$Operation:N:1:X:X:X:1500:X:X:$GRE:$Product"
 
-sudo mkdir -p "$DistDir"/installs/logs
-./anylinux-services.sh $MultiHost | tee "$DistDir/installs/logs/orabuntu-lxc.install.$(date +%F_%R).log"
+if [ ! -d "$DistDir"/installs/logs ]
+then
+	sudo mkdir -p "$DistDir"/installs/logs
+fi
+
+sudo rm -f /etc/sudoers.d/orabuntu-lxc
+sudo mv "$DistDir"/installs/logs/$USER.log "$DistDir"/installs/logs/$USER.log.$LOGEXT
+
+if [ ! -d /varlog/sudo-io ]
+then
+	sudo mkdir -m 750 /var/log/sudo-io
+fi
+
+if [ ! -f /etc/sudoers.d/orabuntu-lxc ]
+then
+	sudo sh -c "echo 'Defaults      logfile=\"/home/amide/Downloads/orabuntu-lxc-master/installs/logs/$USER.log\"'	>> /etc/sudoers.d/orabuntu-lxc"
+	sudo sh -c "echo 'Defaults      log_input,log_output'								>> /etc/sudoers.d/orabuntu-lxc"
+	sudo sh -c "echo 'Defaults      iolog_dir=/var/log/sudo-io/%{user}'						>> /etc/sudoers.d/orabuntu-lxc"
+	sudo chmod 0440 /etc/sudoers.d/orabuntu-lxc
+fi
+
+./anylinux-services.sh $MultiHost 
 
 exit

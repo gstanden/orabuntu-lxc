@@ -84,7 +84,7 @@ then
 
 	sudo service systemd-resolved-helper restart
 	sleep 5
-	sudo service systemd-resolved status
+	sudo service systemd-resolved status | tail -100
 	sleep 5
 	sudo service systemd-resolved-helper status
 	
