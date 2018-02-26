@@ -1195,4 +1195,7 @@ fi
 
 cd "$DistDir"/uekulele/archives
 rm -f uekulele-services.lst uekulele-files.lst product.lst uekulele-services.tar uekulele-files.tar product.tar
-cd $DistDir/anylinux 
+cd "$DistDir"/installs/logs
+LOGEXT=`date +"%Y-%m-%d.%R:%S"`
+sudo cp -p $USER.log $USER.orabuntu-lxc.install.$LOGEXT
+cd $DistDir/anylinux

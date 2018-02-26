@@ -84,7 +84,7 @@ fi
 if [ -z $2 ]
 then
 	SPOKEIP='lan.ip.this.host'
- 	SPOKEIP=192.168.7.84
+ 	SPOKEIP=192.168.7.85
 else
 	SPOKEIP=$2
 fi
@@ -92,7 +92,7 @@ fi
 if [ -z $3 ]
 then
 	HUBIP='lan.ip.hub.host'
- 	HUBIP=192.168.7.81
+ 	HUBIP=192.168.7.80
 else
 	HUBIP=$3
 fi
@@ -100,7 +100,7 @@ fi
 if [ -z $4 ]
 then
 	HubUserAct=username
- 	HubUserAct=lxc4oracle
+ 	HubUserAct=ubuntu
 else
 	HubUserAct=$4
 fi
@@ -108,7 +108,7 @@ fi
 if [ -z $5 ]
 then
 	HubSudoPwd=password
- 	HubSudoPwd=lxc4oracle
+ 	HubSudoPwd=ubuntu
 else
 	HubSudoPwd=$5
 fi
@@ -117,7 +117,7 @@ if [ -z $6 ]
 then
 	Product=product
  	Product=oracle-db
-#	Product=workspaces
+ 	Product=workspaces
 else
 	Product=$6
 fi
@@ -368,12 +368,39 @@ then
 	echo "Done: Test sshpass to HUB Host $HUBIP         "
 	echo "=============================================="
 	echo ''
+
 	sleep 5
+
 	echo ''
+
 	cd "$DistDir"/anylinux
+
         MultiHost="$Operation:Y:X:X:$HUBIP:$SPOKEIP:1420:$HubUserAct:$HubSudoPwd:$GRE:$Product"
-	sudo mkdir -p "$DistDir"/installs/logs
-	./anylinux-services.sh $MultiHost | tee "$DistDir/installs/logs/orabuntu-lxc.install.$(date +%F_%R).log"
+
+	if [ ! -d "$DistDir"/installs/logs ]
+	then
+		sudo mkdir -p "$DistDir"/installs/logs
+	fi
+
+	if [ -f "$DistDir"/installs/logs/$USER.log ]
+	then
+		sudo mv "$DistDir"/installs/logs/$USER.log "$DistDir"/installs/logs/$USER.log.$LOGEXT
+	fi
+
+	if [ ! -d /var/log/sudo-io ]
+	then
+		sudo mkdir -m 750 /var/log/sudo-io
+	fi
+
+	if [ ! -f /etc/sudoers.d/orabuntu-lxc ]
+	then
+		sudo sh -c "echo 'Defaults      logfile=\"/home/$USER/Downloads/orabuntu-lxc-master/installs/logs/$USER.log\"'	>> /etc/sudoers.d/orabuntu-lxc"
+		sudo sh -c "echo 'Defaults      log_input,log_output'								>> /etc/sudoers.d/orabuntu-lxc"
+		sudo sh -c "echo 'Defaults      iolog_dir=/var/log/sudo-io/%{user}'						>> /etc/sudoers.d/orabuntu-lxc"
+		sudo chmod 0440 /etc/sudoers.d/orabuntu-lxc
+	fi
+
+	./anylinux-services.sh $MultiHost
 else
         echo "The sshpass to the Orabuntu-LXC HUB host at $HUBIP failed. Recheck settings in this file and re-run."
 	echo ''
