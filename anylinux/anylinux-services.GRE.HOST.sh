@@ -46,6 +46,31 @@ echo "=============================================="
 echo "Script: anylinux-services.GRE.HOST.sh         "
 echo "=============================================="
 
+LOGEXT=`date +"%Y-%m-%d.%R:%S"`
+
+if [ ! -d "$DistDir"/installs/logs ]
+then
+	sudo mkdir -p "$DistDir"/installs/logs
+fi
+
+if [ -f "$DistDir"/installs/logs/$USER.log ]
+then
+	sudo mv "$DistDir"/installs/logs/$USER.log "$DistDir"/installs/logs/$USER.log.$LOGEXT
+fi
+
+if [ ! -d /var/log/sudo-io ]
+then
+	sudo mkdir -m 750 /var/log/sudo-io
+fi
+
+if [ ! -f /etc/sudoers.d/orabuntu-lxc ]
+then
+	sudo sh -c "echo 'Defaults      logfile=\"/home/$USER/Downloads/orabuntu-lxc-master/installs/logs/$USER.log\"'	>> /etc/sudoers.d/orabuntu-lxc"
+	sudo sh -c "echo 'Defaults      log_input,log_output'								>> /etc/sudoers.d/orabuntu-lxc"
+	sudo sh -c "echo 'Defaults      iolog_dir=/var/log/sudo-io/%{user}'						>> /etc/sudoers.d/orabuntu-lxc"
+	sudo chmod 0440 /etc/sudoers.d/orabuntu-lxc
+fi
+
 sleep 5
 
 clear
@@ -84,7 +109,7 @@ fi
 if [ -z $2 ]
 then
 	SPOKEIP='lan.ip.this.host'
- 	SPOKEIP=192.168.7.85
+ 	SPOKEIP=192.168.7.86
 else
 	SPOKEIP=$2
 fi
@@ -376,29 +401,6 @@ then
 	cd "$DistDir"/anylinux
 
         MultiHost="$Operation:Y:X:X:$HUBIP:$SPOKEIP:1420:$HubUserAct:$HubSudoPwd:$GRE:$Product"
-
-	if [ ! -d "$DistDir"/installs/logs ]
-	then
-		sudo mkdir -p "$DistDir"/installs/logs
-	fi
-
-	if [ -f "$DistDir"/installs/logs/$USER.log ]
-	then
-		sudo mv "$DistDir"/installs/logs/$USER.log "$DistDir"/installs/logs/$USER.log.$LOGEXT
-	fi
-
-	if [ ! -d /var/log/sudo-io ]
-	then
-		sudo mkdir -m 750 /var/log/sudo-io
-	fi
-
-	if [ ! -f /etc/sudoers.d/orabuntu-lxc ]
-	then
-		sudo sh -c "echo 'Defaults      logfile=\"/home/$USER/Downloads/orabuntu-lxc-master/installs/logs/$USER.log\"'	>> /etc/sudoers.d/orabuntu-lxc"
-		sudo sh -c "echo 'Defaults      log_input,log_output'								>> /etc/sudoers.d/orabuntu-lxc"
-		sudo sh -c "echo 'Defaults      iolog_dir=/var/log/sudo-io/%{user}'						>> /etc/sudoers.d/orabuntu-lxc"
-		sudo chmod 0440 /etc/sudoers.d/orabuntu-lxc
-	fi
 
 	./anylinux-services.sh $MultiHost
 else

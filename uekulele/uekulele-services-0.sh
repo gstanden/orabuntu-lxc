@@ -31,8 +31,17 @@
 #
 #    You can change the name of the username in this script from 'ubuntu' to whatever username is preferred.
 
-USERNAME=ubuntu
-PASSWORD=ubuntu
+genpasswd() {
+        local l=$1
+        [ "$l" == "" ] && l=8
+        tr -dc A-Za-z0-9_ < /dev/urandom | head -c ${l} | xargs
+}
+password=$(genpasswd)
+echo $password > amide-password.txt
+
+USERNAME=amide
+PASSWORD=$password
+
 sudo useradd -m -p $(openssl passwd -1 ${PASSWORD}) -s /bin/bash -G wheel ${USERNAME}
 sudo mkdir -p  /home/${USERNAME}/Downloads /home/${USERNAME}/Manage-Orabuntu
 sudo chown ${USERNAME}:${USERNAME} /home/${USERNAME}/Downloads /home/${USERNAME}/Manage-Orabuntu

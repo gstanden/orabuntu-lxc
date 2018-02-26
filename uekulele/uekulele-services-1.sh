@@ -2701,6 +2701,29 @@ then
 	echo "=============================================="
 	echo ''
 
+        genpasswd() { 
+                local l=$1 
+                [ "$l" == "" ] && l=8
+                tr -dc A-Za-z0-9_ < /dev/urandom | head -c ${l} | xargs 
+        }
+        password=$(genpasswd)
+        echo $password > "$DistDir"/installs/logs/amide-password.txt
+
+        USERNAME=amide
+        PASSWORD=$password
+
+        sudo sed -i "s/Owner=ubuntu/Owner=amide/"       /var/lib/lxc/nsa/rootfs/root/ns_backup_update.sh
+        sudo sed -i "s/Pass=ubuntu/Pass=$password/"     /var/lib/lxc/nsa/rootfs/root/ns_backup_update.sh
+
+#	sudo useradd -m -p $(openssl passwd -1 ${PASSWORD}) -s /bin/bash -G wheel ${USERNAME}
+	sudo useradd -m -p $(openssl passwd -1 ${PASSWORD}) -s /bin/bash 
+	sudo mkdir -p  /home/${USERNAME}/Downloads /home/${USERNAME}/Manage-Orabuntu
+	sudo chown ${USERNAME}:${USERNAME} /home/${USERNAME}/Downloads /home/${USERNAME}/Manage-Orabuntu
+
+        sudo sh -c "echo 'amide ALL=(ALL) /usr/bin/mkdir'      >  /etc/sudoers.d/amide"
+        sudo sh -c "echo 'amide ALL=(ALL) /usr/bin/cp'         >> /etc/sudoers.d/amide"
+	sudo chmod 0440 /etc/sudoers.d/amide
+
 	sudo lxc-attach -n $NameServer -- crontab /root/crontab.txt
 	sudo lxc-attach -n $NameServer -- crontab -l
 	sudo lxc-attach -n $NameServer -- mkdir -p /root/backup-lxc-container/$NameServer/updates

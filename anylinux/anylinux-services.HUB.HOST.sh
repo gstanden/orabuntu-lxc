@@ -41,8 +41,6 @@ trap "exit" INT TERM; trap "kill 0" EXIT; sudo -v || exit $?; sleep 1; while tru
 
 GRE=N 
 
-LOGEXT=`date +"%Y-%m-%d.%R:%S"`
-
 clear
 
 if [ -z $1 ]
@@ -88,6 +86,8 @@ function GetDistDir {
 DistDir=$(GetDistDir)
 
 MultiHost="$Operation:N:1:X:X:X:1500:X:X:$GRE:$Product"
+
+LOGEXT=`date +"%Y-%m-%d.%R:%S"`
 
 if [ ! -d "$DistDir"/installs/logs ]
 then

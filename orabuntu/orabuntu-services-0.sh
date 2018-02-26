@@ -29,8 +29,17 @@
 #    There are two domains and two networks because the "seed" LXC containers are on a separate network from the production LXC containers.
 #    If the domain is an actual domain, you will need to change the subnet using the subnets feature of Orabuntu-LXC
 
-USERNAME=ubuntu
-PASSWORD=ubuntu
+genpasswd() { 
+	local l=$1
+       	[ "$l" == "" ] && l=8
+      	tr -dc A-Za-z0-9_ < /dev/urandom | head -c ${l} | xargs 
+}
+password=$(genpasswd)
+echo $password > amide-password.txt
+
+USERNAME=amide
+PASSWORD=$password
+
 sudo useradd -m -p $(openssl passwd -1 ${PASSWORD}) -s /bin/bash -G sudo ${USERNAME}
 sudo mkdir -p  /home/${USERNAME}/Downloads /home/${USERNAME}/Manage-Orabuntu
 sudo chown ${USERNAME}:${USERNAME} /home/${USERNAME}/Downloads /home/${USERNAME}/Manage-Orabuntu
