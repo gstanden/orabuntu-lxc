@@ -94,8 +94,10 @@ then
 	sudo mkdir -p "$DistDir"/installs/logs
 fi
 
-sudo rm -f /etc/sudoers.d/orabuntu-lxc
-sudo mv "$DistDir"/installs/logs/$USER.log "$DistDir"/installs/logs/$USER.log.$LOGEXT
+if [ -f "$DistDir"/installs/logs/$USER.log ]
+then
+	sudo mv "$DistDir"/installs/logs/$USER.log "$DistDir"/installs/logs/$USER.log.$LOGEXT
+fi
 
 if [ ! -d /varlog/sudo-io ]
 then
@@ -104,7 +106,7 @@ fi
 
 if [ ! -f /etc/sudoers.d/orabuntu-lxc ]
 then
-	sudo sh -c "echo 'Defaults      logfile=\"/home/amide/Downloads/orabuntu-lxc-master/installs/logs/$USER.log\"'	>> /etc/sudoers.d/orabuntu-lxc"
+	sudo sh -c "echo 'Defaults      logfile=\"/home/$USER/Downloads/orabuntu-lxc-master/installs/logs/$USER.log\"'	>> /etc/sudoers.d/orabuntu-lxc"
 	sudo sh -c "echo 'Defaults      log_input,log_output'								>> /etc/sudoers.d/orabuntu-lxc"
 	sudo sh -c "echo 'Defaults      iolog_dir=/var/log/sudo-io/%{user}'						>> /etc/sudoers.d/orabuntu-lxc"
 	sudo chmod 0440 /etc/sudoers.d/orabuntu-lxc

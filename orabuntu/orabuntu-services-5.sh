@@ -904,7 +904,7 @@ fi
 
 cd "$DistDir"/orabuntu/archives
 rm -f orabuntu-services.lst orabuntu-files.lst product.lst orabuntu-services.tar orabuntu-files.tar product.tar
-cd "$DistDir"/installs/log
+cd "$DistDir"/installs/logs
 LOGEXT=`date +"%Y-%m-%d.%R:%S"`
 sudo cp -p $USER.log $USER.orabuntu-lxc.install.$LOGEXT
 cd $DistDir/anylinux
