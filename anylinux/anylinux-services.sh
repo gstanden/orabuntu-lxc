@@ -1259,14 +1259,12 @@ do
 			fi
 			if [ $LinuxFlavor = 'Fedora' ] && [ $RedHatVersion -ge 22 ] && [ $i = "$SubDirName-services.tar" ]
 			then
-				sudo sed -i "s/yum -y install/dnf -y install/g" 			$filename
+				sudo sed -i '/lxc-attach/!s/yum -y install/dnf -y install/g'		$filename
 				sudo sed -i "s/yum -y erase/dnf -y erase/g" 				$filename
 				sudo sed -i "s/yum -y localinstall/dnf -y localinstall/g" 		$filename
 				sudo sed -i "s/yum clean all/dnf clean all/g" 				$filename
 				sudo sed -i "s/yum provides/dnf provides/g" 				$filename
 				sudo sed -i "s/yum-utils/dnf-utils/g" 					$filename
-				sudo sed -i "s/yum -y install/dnf -y install/g"				$filename
-				sudo sed -i "s/yum-utils/dnf-utils/g"					$filename
 				sudo sed -i "s/yum-complete-transaction//g"				$filename
 			fi
 		fi

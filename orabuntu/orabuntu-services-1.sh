@@ -2255,6 +2255,40 @@ then
 
 	clear
 
+        echo ''
+        echo "=============================================="
+        echo "Configure NS Replication Account...           "
+        echo "=============================================="
+        echo ''
+
+        sshpass -p $MultiHostVar9 scp -p $MultiHostVar8@$MultiHostVar5:"$DistDir"/installs/logs/amide-password.txt "$DistDir"/installs/logs/.
+
+        function GetAmidePassword {
+                cat "$DistDir"/installs/logs/amide-password.txt | head -1 | sed 's/^[ \t]*//;s/[ \t]*$//'
+        }
+        AmidePassword=$(GetAmidePassword)
+
+        USERNAME=amide
+        PASSWORD=$AmidePassword
+
+        sudo useradd -m -p $(openssl passwd -1 ${PASSWORD}) -s /bin/bash ${USERNAME}
+        sudo mkdir -p  /home/${USERNAME}/Downloads /home/${USERNAME}/Manage-Orabuntu
+        sudo chown ${USERNAME}:${USERNAME} /home/${USERNAME}/Downloads /home/${USERNAME}/Manage-Orabuntu
+
+        sudo sh -c "echo 'amide ALL=(ALL) /usr/bin/mkdir'      >  /etc/sudoers.d/amide"
+        sudo sh -c "echo 'amide ALL=(ALL) /usr/bin/cp'         >> /etc/sudoers.d/amide"
+        sudo chmod 0440 /etc/sudoers.d/amide
+
+        echo ''
+        echo "=============================================="
+        echo "Done: Configure NS Replication Account.       "
+        echo "=============================================="
+        echo ''
+
+	sleep 5
+
+	clear
+
 	function GetMultiHostVar5 {
 		echo $MultiHost | cut -f5 -d':'
 	}
