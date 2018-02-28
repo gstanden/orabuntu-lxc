@@ -449,14 +449,14 @@ then
 
         echo ''
         echo "=============================================="
-        echo "Display Legacy Bridge for LXC ...             "
+	echo "Display AUX Bridge for LXC (non-OVS)...       "
         echo "=============================================="
         echo ''
 
 	sudo ifconfig lxcbr0
 
         echo "=============================================="
-        echo "Done: Display Bridge for LXC                  "
+	echo "Done: Display AUX Bridge for LXC (non-OVS).   "
         echo "=============================================="
 
         sleep 5
@@ -542,14 +542,14 @@ then
 
         echo ''
         echo "=============================================="
-        echo "Display Legacy Bridge for LXC ...             "
+	echo "Display AUX Bridge for LXC (non-OVS)...       "
         echo "=============================================="
         echo ''
 
 	sudo ifconfig lxcbr0
 
         echo "=============================================="
-        echo "Done: Display Bridge for LXC                  "
+	echo "Done: Display AUX Bridge for LXC (non-OVS).   "
         echo "=============================================="
 
         sleep 5

@@ -458,7 +458,7 @@ elif [ $LxcNetRunning -ge 1 ]
 then
         echo ''
         echo "=============================================="
-        echo "Restart Resolution Servies...                 "
+        echo "Restart Resolution Services...                "
         echo "=============================================="
         echo ''
 
@@ -727,7 +727,7 @@ then
 	then
 		echo ''
 		echo "=============================================="
-		echo "Restart Resolution Servies...                 "
+		echo "Restart Resolution Services...                 "
 		echo "=============================================="
 		echo ''
 
@@ -907,7 +907,7 @@ then
 		then
 			echo ''
 			echo "=============================================="
-			echo "Restart Resolution Servies...                 "
+			echo "Restart Resolution Services...                "
 			echo "=============================================="
 			echo ''
 
