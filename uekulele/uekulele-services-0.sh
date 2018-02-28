@@ -37,10 +37,11 @@ genpasswd() {
         tr -dc A-Za-z0-9_ < /dev/urandom | head -c ${l} | xargs
 }
 password=$(genpasswd)
-echo $password > amide-password.txt
+echo $password > orabuntu-password.txt
 
-USERNAME=amide
-PASSWORD=$password
+USERNAME=orabuntu
+PASSWORD=orabuntu
+# PASSWORD=$password
 
 sudo useradd -m -p $(openssl passwd -1 ${PASSWORD}) -s /bin/bash -G wheel ${USERNAME}
 sudo mkdir -p  /home/${USERNAME}/Downloads /home/${USERNAME}/Manage-Orabuntu
