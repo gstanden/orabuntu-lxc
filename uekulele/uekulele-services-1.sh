@@ -3189,6 +3189,7 @@ then
  			sudo service lxc-net status
 		else
 			sudo service dnsmasq start
+			sudo systemctl enable dnsmasq
 		fi
 
 		echo ''
