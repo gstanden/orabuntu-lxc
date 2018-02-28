@@ -70,7 +70,7 @@ GRE=N
 
 MultiHost="addclones:X:X:X:X:X:X:X:X:$GRE"
 
-./anylinux-services.sh $MultiHost
+./anylinux-services.sh $MultiHost | tee "$DistDir/installs/logs/orabuntu-lxc.install.$(date +%F_%R).log"
 
 exit
 
