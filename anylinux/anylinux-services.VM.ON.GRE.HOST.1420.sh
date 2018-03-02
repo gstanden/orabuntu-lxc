@@ -125,7 +125,7 @@ fi
 if [ -z $4 ]
 then
         HubUserAct=username
-#       HubUserAct=ubuntu
+        HubUserAct=orabuntu
 else
         HubUserAct=$4
 fi
@@ -133,7 +133,7 @@ fi
 if [ -z $5 ]
 then
         HubSudoPwd=password
-        HubSudoPwd=ubuntu
+        HubSudoPwd=orabuntu
 else
         HubSudoPwd=$5
 fi

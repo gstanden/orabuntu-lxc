@@ -2614,16 +2614,18 @@ then
 
         if [ $(SoftwareVersion $LXCVersion) -ge $(SoftwareVersion 2.1.0) ] && [ $NameServerConfigFormat -eq 0 ]
         then
-                sudo lxc-update-config -c /var/lib/lxc/$NameServer/config
-                sudo lxc-update-config -c /var/lib/lxc/"$NameServer"-base/config
+                sudo lxc-update-config -c /var/lib/lxc/"$NameServer"/config
+                sudo lxc-update-config -c /var/lib/lxc/"$NameServerBase"/config
         fi
 
         if [ $(SoftwareVersion $LXCVersion) -ge $(SoftwareVersion 2.1.0) ] && [ $NameServerBaseConfigFormat -eq 0 ]
         then
-                sudo lxc-update-config -c /var/lib/lxc/$NameServer/config
-                sudo lxc-update-config -c /var/lib/lxc/"$NameServer"-base/config
+                sudo lxc-update-config -c /var/lib/lxc/"$NameServer"/config
+                sudo lxc-update-config -c /var/lib/lxc/"$NameServerBase"/config
         fi
 
+	sudo lxc-update-config -c /var/lib/lxc/"$NameServer"/config
+	sudo lxc-update-config -c /var/lib/lxc/"$NameServerBase"/config
         sudo lxc-ls -f
 fi
 
