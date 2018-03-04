@@ -12,7 +12,7 @@ That's all.  This one command will build Oracle Linux LXC containers, build the 
 
 Note that although the software is unpacked at /home/username/Downloads, nothing is actually installed there.  The installation actuall takes place at /opt/olxc/home/username/Downloads which is where the installer puts all installation files.  Your distribution at /home/username/Downloads remains static during the install.
 
-You can configure the install in the anylinux-services.sh file.  Search for {pgroup1, pgroup2, pgroup3} to see the configurable settings.
+You can configure the install in the "anylinux-services.sh" file.  Search for {pgroup1, pgroup2, pgroup3} to see the configurable settings.  When first trying out Orabuntu-LXC, the simplest approach is probably to just build a VM of one of a supported vanilla Linux distro (Oracle Linux, Ubuntu, CentOS, Fedora, or RedHat) and then just download and run as described above "./anylinux-services.HUB.HOST.sh new" and then after install study the setup to see how the configurations in "anylinux-services.sh" affect the deployment.
 
 When you want to add additional physical hosts you use the "./anylinux-services.GRE.HOST.sh new" script command.  This script requires configuring SPOKEIP, HUBIP, HubUserAct, HubSudoPwd, and Product variables.  Note that once you have chosen subnet ranges in anylinux-services.HUB.HOST.sh you need to leave those unchanged when running anylinux-services.GRE.HOST.sh so that the multi-host networking works correctly.
 
