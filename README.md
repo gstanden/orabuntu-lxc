@@ -1,6 +1,6 @@
 Installing Orabuntu-LXC
 
-You need an administrative user account such as the install account (i.e. the install user need to have "sudo ALL" privilege).  On Ubuntu Linux this would be membership in the "sudo" group, and on Oracle Linux this would be membership in the "wheel" group.
+You need an administrative user account such as the install account (i.e. the install user need to have "sudo ALL" privilege).  On Ubuntu Linux this would be membership in the "sudo" group, and on Oracle Linux this would be membership in the "wheel" group, for example.
 
 Download Orabuntu-LXC to /home/username/Downloads and unzip the distribution.  We strongly recommend staging the software in the /home/username/Downloads directory.  You can use the script "uekulele-services-0.sh" or "orabuntu-services-0.sh" to create the required user and directories for Orabuntu-LXC install.
 
