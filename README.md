@@ -6,7 +6,7 @@ Download Orabuntu-LXC to /home/username/Downloads and unzip the distribution.  W
 
 Change directory to /home/username/Downloads/orabuntu-lxc-master/anylinux.
 
-Run ./anylinux-services.HUB.HOST.sh new
+Run  "./anylinux-services.HUB.HOST.sh new" command.
 
 That's all.  This one command will build Oracle Linux LXC containers, build the OpenvSwitch networks (with VLANs) on whatever IP subnets and domains you specify, put the LXC containers on the OvS networks, build a DNS/DHCP LXC container, and configure the containers according to your specifications (configured in the "products" subdirectory).  Each product in the "products" directory gets 3 files.  Examples are included for Oracle DB, and for Workspaces.  
 
