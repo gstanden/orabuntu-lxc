@@ -50,7 +50,7 @@ This functionality can be used with any HA monitoring solution such as HP Servic
 
 # OpenvSwitch
 
-Orabuntu-LXC uses OpenvSwitch as it's core switch technology.  This means that all of the power of OpenvSwitch production-grade Software Defined Networking (SDN) is available in an Orabuntu-LXC deployment.  This includes high performance features such as OVS-DPDK https://software.intel.com/en-us/articles/open-vswitch-with-dpdk-overview.
+Orabuntu-LXC uses OpenvSwitch as it's core switch technology.  This means that all of the power of OpenvSwitch production-grade Software Defined Networking (SDN) is available in an Orabuntu-LXC deployment.  This includes a rich production-ready switch feature set http://www.openvswitch.org/ and other high performance features that can be added-on, such as OVS-DPDK https://software.intel.com/en-us/articles/open-vswitch-with-dpdk-overview.
 
 
 Gilbert Standen
