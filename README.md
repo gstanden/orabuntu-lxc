@@ -43,7 +43,15 @@ cd /home/username/Downloads/orabuntu-lxc-master/anylinux
 ./anylinux-services.HUB.HOST.sh new
 ```
 
-That's all.  This one command will build Oracle Linux LXC containers, build the OpenvSwitch networks (with VLANs) on whatever IP subnets and domains you specify, put the LXC containers on the OvS networks, build a DNS/DHCP LXC container, and configure the containers according to your specifications (configured in the "products" subdirectory).  Each product in the "products" directory gets 3 files.  Examples are included for Oracle DB, and for Workspaces.  
+That's all.  This one command will do the following:
+
+* Build Oracle Linux LXC containers
+* Build the OpenvSwitch networks (with VLANs)
+* Configure the IP subnets and domains specified in the anylinux-services.sh file
+* Put the LXC containers on the OvS networks
+* Build a DNS/DHCP LXC container
+* Configure the containers according to specifications in the "product" subdirectory.
+* Clone the number of containers specified in the anylinux-services.sh file
 
 Note that although the software is unpacked at /home/username/Downloads, nothing is actually installed there.  The installation actuall takes place at /opt/olxc/home/username/Downloads which is where the installer puts all installation files.  Your distribution at /home/username/Downloads remains static during the install.
 
