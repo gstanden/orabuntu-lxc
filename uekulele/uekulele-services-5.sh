@@ -1199,3 +1199,11 @@ cd "$DistDir"/installs/logs
 LOGEXT=`date +"%Y-%m-%d.%R:%S"`
 sudo cp -p $USER.log $USER.orabuntu-lxc.install.$LOGEXT
 cd $DistDir/anylinux
+
+# Band-aid for openvswitch update which breaks openvswitch.
+# This will need a fix so that openvswitch updates are applied during dnf-updates.
+
+if [ $LinuxFlavor = 'Fedora' ]
+then
+	sudo sh -c "echo 'exclude=openvswitch*' >> /etc/dnf/dnf.conf"
+fi

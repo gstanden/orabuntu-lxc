@@ -1,151 +1,28 @@
 # Installing Orabuntu-LXC v6.0-beta AMIDE Edition
 
-An administrative non-root user account is required (such as the install account). The user needs to have "sudo ALL" privilege.  
+You need an administrative user account such as the install account (i.e. the install user need to have "sudo ALL" privilege).  On Ubuntu Linux this would be membership in the "sudo" group, and on Oracle Linux this would be membership in the "wheel" group, for example.
 
-On a Debian-family Linux, such as Ubuntu, this would be membership in the "sudo" group,  e.g.
+Download Orabuntu-LXC to /home/username/Downloads and unzip the distribution.  We strongly recommend staging the software in the /home/username/Downloads directory.  You can use the script "uekulele-services-0.sh" or "orabuntu-services-0.sh" to create the required user and directories for Orabuntu-LXC install.
 
-```
-orabuntu@UL-1710-S:~$ id orabuntu
-uid=1001(orabuntu) gid=1001(orabuntu) groups=1001(orabuntu),27(sudo)
-orabuntu@UL-1710-S:~$ cat /etc/lsb-release 
-DISTRIB_ID=Ubuntu
-DISTRIB_RELEASE=17.10
-DISTRIB_CODENAME=artful
-DISTRIB_DESCRIPTION="Ubuntu 17.10"
-orabuntu@UL-1710-S:~$ 
-```
+Change directory to /home/username/Downloads/orabuntu-lxc-master/anylinux.
 
-On a RedHat-family Linux, such as Fedora, this would be membership in the "wheel" group, e.g.
-```
-[orabuntu@fedora27 archives]$ id orabuntu
-uid=1000(orabuntu) gid=1000(orabuntu) groups=1000(orabuntu),10(wheel)
-[orabuntu@fedora27 archives]$ cat /etc/fedora-release 
-Fedora release 27 (Twenty Seven)
-[orabuntu@fedora27 archives]$
-```
+Run  "./anylinux-services.HUB.HOST.sh new" command.
 
-For Debian-family Linuxes the following script can be used to create the required administrative install user.
+That's all.  This one command will build Oracle Linux LXC containers, build the OpenvSwitch networks (with VLANs) on whatever IP subnets and domains you specify, put the LXC containers on the OvS networks, build a DNS/DHCP LXC container, and configure the containers according to your specifications (configured in the "products" subdirectory).  Each product in the "products" directory gets 3 files.  Examples are included for Oracle DB, and for Workspaces.  
 
-```
-orabuntu-services-0.sh
-```
+Note that although the software is unpacked at /home/username/Downloads, nothing is actually installed there.  The installation actuall takes place at /opt/olxc/home/username/Downloads which is where the installer puts all installation files.  Your distribution at /home/username/Downloads remains static during the install.
 
-For RedHat-family Linuxes the follwoing script can be used to create the required administative isntall user.
+You can configure the install in the "anylinux-services.sh" file.  Search for {pgroup1, pgroup2, pgroup3} to see the configurable settings.  When first trying out Orabuntu-LXC, the simplest approach is probably to just build a VM of one of a supported vanilla Linux distro (Oracle Linux, Ubuntu, CentOS, Fedora, or Red Hat) and then just download and run as described above "./anylinux-services.HUB.HOST.sh new" and then after install study the setup to see how the configurations in "anylinux-services.sh" affect the deployment.
 
-```
-uekulele-services-0.sh
-```
+When you want to add additional physical hosts you use the "./anylinux-services.GRE.HOST.sh new" script command.  This script requires configuring SPOKEIP, HUBIP, HubUserAct, HubSudoPwd, and Product variables.  Note that once you have chosen subnet ranges in anylinux-services.HUB.HOST.sh you need to leave those unchanged when running anylinux-services.GRE.HOST.sh so that the multi-host networking works correctly.
 
-The first Orabuntu-LXC install is always the "HUB" host install. Install the Orabuntu-LXC HUB host as shown below.
+If you want to put VM's on either a HUB physical host or a GRE phyical host, and you want those VM's to be on the Orabuntu-LXC OpenvSwitch networks (and get DHCP IP addresses from the same DNS/DHCP container as the LXC containers) then you use "anylinux-services.VM.ON.HUB.HOST.1500.sh" or "anylinux-services.VM.ON.GRE.HOST.1420.sh" depending on whether your VM's will run on the HUB Orabuntu-LXC host or on a GRE-tunnel-connected Orabuntu-LXC physical host, respectively.  In this case again it is necessary to configure SPOKEIP, HUBIP, HubUserAct, HubSudoPwd, and Product variables.
 
-```
-cd /home/username/Downloads/orabuntu-lxc-master/anylinux
-./anylinux-services.HUB.HOST.sh new
-```
+If you want to add additional Oracle Linux container versions (e.g. 7.3, 6.9 etc.) you use either "anylinux-services.ADD.RELEASE.ON.HUB.HOST.1500.sh" or "anylinux-services.ADD.RELEASE.ON.GRE.HOST.1420.sh" depending again on whether you are adding container versions on an Orabuntu-LXC HUB host or a GRE-tunnel-connected Orabuntu-LXC host, respectively.
 
-That's all.  This one command will do the following:
+If you want to add more clones of an already existing version, e.g. you have 3 Oracle Linux 7.3 LXC containers and you want to add 2 more Oracle Linux 7.3. LXC containers, then you use "anylinux-services.ADD.CLONES.sh" script.
 
-* Build Oracle Linux LXC containers
-* Build the OpenvSwitch networks (with VLANs)
-* Configure the IP subnets and domains specified in the anylinux-services.sh file
-* Put the LXC containers on the OvS networks
-* Build a DNS/DHCP LXC container
-* Configure the containers according to specifications in the "product" subdirectory.
-* Clone the number of containers specified in the anylinux-services.sh file
-
-Note that although the software is unpacked at /home/username/Downloads, nothing is actually installed there.  The installation actuall takes place at /opt/olxc/home/username/Downloads which is where the installer puts all installation files.  The distribution at /home/username/Downloads remains static during the install.
-
-The install is customized and configured in the "anylinux-services.sh" file.  Search for {pgroup1, pgroup2, pgroup3} to see the configurable settings.  
-
-When first trying out Orabuntu-LXC, the simplest approach is probably to just build a VM of a supported distro
-
-* Oracle Linux
-* Ubuntu
-* CentOS
-* Fedora
-* Red Hat
-
-and then just download and run as described above 
-
-```
-./anylinux-services.HUB.HOST.sh new
-```
-and then after install study the setup to see how the configurations in "anylinux-services.sh" affect the deployment.
-
-To add additional physical hosts use
-
-```
-./anylinux-services.GRE.HOST.sh new
-```
-This script requires configuring the parameters
-
-* SPOKEIP
-* HUBIP
-* HubUserAct
-* HubSudoPwd
-* Product 
-
-Note that the subnet ranges chosen in the anylinux-services.HUB.HOST.sh install must be used unchanged when running anylinux-services.GRE.HOST.sh so that the multi-host networking works correctly.
-
-To put VM's on the Orabuntu-LXC OpenvSwitch network, on either a HUB physical host or a GRE phyical host, use the following scripts, respectively.
-
-```
-anylinux-services.VM.ON.HUB.HOST.1500.sh new
-```
-or
-```
-anylinux-services.VM.ON.GRE.HOST.1420.sh new
-```
-
-In this case again it is necessary to configure the variables:
-
-* SPOKEIP
-* HUBIP 
-* HubUserAct
-* HubSudoPwd
-* Product
-
-To add Oracle Linux container versions (e.g. add some Oracle Linux 7.3 LXC containers to a deployment of Oracle Linux 6.9 LXC containers) use either 
-
-```
-anylinux-services.ADD.RELEASE.ON.HUB.HOST.1500.sh
-```
-or
-```
-anylinux-services.ADD.RELEASE.ON.GRE.HOST.1420.sh
-```
-depending again on whether container versions are being add on an Orabuntu-LXC HUB host, or a GRE-tunnel-connected Orabuntu-LXC host, respectively.
-
-To add more clones of an already existing version, e.g. add more Oracle Linux 7.3 LXC containers to a set of existing Oracle Linux 7.3 LXC containers, use 
-
-```
-anylinux-services.ADD.CLONES.sh
-```
-
-Note that Orabuntu-LXC also includes the default LXC Linux Bridge for that distro, e.g. for CentOS and Fedora
-
-```
-[orabuntu@fedora27 logs]$ ifconfig virbr0
-virbr0: flags=4099<UP,BROADCAST,MULTICAST>  mtu 1500
-        inet 192.168.122.1  netmask 255.255.255.0  broadcast 192.168.122.255
-        ether 52:54:00:8b:e7:18  txqueuelen 1000  (Ethernet)
-        RX packets 3189  bytes 187049 (182.6 KiB)
-        RX errors 0  dropped 0  overruns 0  frame 0
-        TX packets 4739  bytes 28087232 (26.7 MiB)
-        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
-
-[orabuntu@fedora27 logs]$ cat /etc/fedora-release 
-Fedora release 27 (Twenty Seven)
-[orabuntu@fedora27 logs]$ 
-```
-
-and for Oracle Linux, Ubuntu and Red Hat Linux:
-
-```
-lxcbr0
-```
-
-so to include containers other than Oracle Linux in your deployment, use the default LXC linux bridge to add non-Orabuntu-LXC LXC containers, and those containers will be able to talk to the containers on the OvS network right out of the box.  In this way Ubuntu Linux LXC containers, Alpine Linux LXC containers, etc. can be added to the mix using the standard Linux Bridge (non-OVS).
+Note that Orabuntu-LXC also includes the default LXC Linux Bridge for that distro (e.g. virbr0 for CentOS and Fedora, and lxcbr0 for Oracle Linux, Ubuntu and Red Hat Linux) so if you want to include containers other than Oracle Linux in your deployment, you can use the default LXC linux bridge to add non-Orabuntu-LXC LXC containers to your deployments, and those containers will be able to talk to the containers on the OvS network right out of the box.  In this way you can add Ubuntu Linux LXC containers, Alpine Linux LXC containers, etc. to the mix using the standard Linux Bridge (non-OVS).
 
 # Why Oracle Linux
 
