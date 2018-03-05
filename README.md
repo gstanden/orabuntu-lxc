@@ -57,7 +57,21 @@ Note that although the software is unpacked at /home/username/Downloads, nothing
 
 You can configure the install in the "anylinux-services.sh" file.  Search for {pgroup1, pgroup2, pgroup3} to see the configurable settings.  When first trying out Orabuntu-LXC, the simplest approach is probably to just build a VM of one of a supported vanilla Linux distro (Oracle Linux, Ubuntu, CentOS, Fedora, or Red Hat) and then just download and run as described above "./anylinux-services.HUB.HOST.sh new" and then after install study the setup to see how the configurations in "anylinux-services.sh" affect the deployment.
 
-When you want to add additional physical hosts you use the "./anylinux-services.GRE.HOST.sh new" script command.  This script requires configuring SPOKEIP, HUBIP, HubUserAct, HubSudoPwd, and Product variables.  Note that once you have chosen subnet ranges in anylinux-services.HUB.HOST.sh you need to leave those unchanged when running anylinux-services.GRE.HOST.sh so that the multi-host networking works correctly.
+To add additional physical hosts you use
+
+```
+./anylinux-services.GRE.HOST.sh new
+
+```
+This script requires configuring the parameters
+
+* SPOKEIP
+* HUBIP
+* HubUserAct
+* HubSudoPwd
+* Product 
+
+Note that the subnet ranges chosen in the anylinux-services.HUB.HOST.sh install must be used unchanged when running anylinux-services.GRE.HOST.sh so that the multi-host networking works correctly.
 
 If you want to put VM's on either a HUB physical host or a GRE phyical host, and you want those VM's to be on the Orabuntu-LXC OpenvSwitch networks (and get DHCP IP addresses from the same DNS/DHCP container as the LXC containers) then you use "anylinux-services.VM.ON.HUB.HOST.1500.sh" or "anylinux-services.VM.ON.GRE.HOST.1420.sh" depending on whether your VM's will run on the HUB Orabuntu-LXC host or on a GRE-tunnel-connected Orabuntu-LXC physical host, respectively.  In this case again it is necessary to configure SPOKEIP, HUBIP, HubUserAct, HubSudoPwd, and Product variables.
 
