@@ -46,6 +46,7 @@ That's all. This one command will do the following:
     * Build a DNS/DHCP LXC container
     * Configure the containers according to specifications in the "product" subdirectory.
     * Clone the number of containers specified in the anylinux-services.sh file
+    * Install Docker and a sample network-tools Docker container
 
 Note that although the software is unpacked at /home/username/Downloads, nothing is actually installed there. The installation actuall takes place at /opt/olxc/home/username/Downloads which is where the installer puts all installation files. The distribution at /home/username/Downloads remains static during the install.
 
