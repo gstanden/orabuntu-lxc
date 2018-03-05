@@ -63,13 +63,13 @@ This script requires configuring the parameters
 Note that the subnet ranges chosen in the anylinux-services.HUB.HOST.sh install must be used unchanged when running anylinux-services.GRE.HOST.sh so that the multi-host networking works correctly.
 
 To put VM's on the Orabuntu-LXC OpenvSwitch network, on either a HUB physical host or a GRE phyical host, use the following scripts, respectively.
-
+```
 anylinux-services.VM.ON.HUB.HOST.1500.sh new
-
+```
 or
-
+```
 anylinux-services.VM.ON.GRE.HOST.1420.sh new
-
+```
 In this case again it is necessary to configure the variables:
 
     * SPOKEIP
