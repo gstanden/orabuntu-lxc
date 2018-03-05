@@ -177,7 +177,7 @@ Orabuntu-LXC uses OpenvSwitch as it's core switch technology.  This means that a
 
 # SCST Linux SAN
 
-The included Orabuntu-LXC SCST Linux SAN deployer (scst-files.tar) clears away the fog that has for too long surrounded SCST deployments on Ubuntu Linux.  The Orabuntu-LXC SCST Linux SAN deployer installs SCST on Ubuntu Linux using DKMS-enabled DEB packages, for worry-free hands-off SCST performance across host kernel updates.  SCST module updates after host kernel updates are handled transparently by DKMS technology allowing users and administrators to focus on the rich production-ready feature set of SCST used by many of the largest techologly, services, and hardware companies.  http://scst.sourceforge.net/users.html
+The included Orabuntu-LXC SCST Linux SAN deployer (scst-files.tar) clears away the fog that has for too long surrounded SCST deployments on Ubuntu Linux.  The Orabuntu-LXC SCST Linux SAN deployer installs SCST on Ubuntu Linux using DKMS-enabled DEB packages, for worry-free hands-off SCST performance across host kernel updates.  Support for RPM based distros, as well as DEB based distros, is FULLY AUTOMATED from start to finish.  Kick off the Orabuntu-LXC SCST installer and go get a cup of coffee or jog around the block.  When you come back multipath, production-ready LUNs are waiting for your project, and the /etc/multipath.conf file has been built for you and installed automatically. SCST module updates after host kernel updates are handled transparently by DKMS technology allowing users and administrators to focus on the rich production-ready feature set of SCST used by many of the largest techologly, services, and hardware companies.  http://scst.sourceforge.net/users.html
 
 
 Gilbert Standen
