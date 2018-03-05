@@ -10,6 +10,7 @@ Orabuntu-LXC v6.0-beta AMIDE Edition stands for "Amazon Mult-I-host Docker Enter
 * Builds LXC from source as RPM or DEB packages
 * Creates an LXC-containerized DNS/DHCP container for the systems running bind9 and isc-dhcp-server
 * Replicates the LXC-containerized DNS/DHCP container to all Orabuntu-LXC physical GRE-connected hosts
+* Automatically detects filesystem types which support lxc-snapshot overlayfs for LXC-containerized DNS/DHCP
 * Updates the LXC-containerized DNS/DHCP container replicas with the latest zone and lease updates every x minutes.
 * Builds the LXC containers
 * Configures gold copy LXC containers (on a separate network) according to your specifications
