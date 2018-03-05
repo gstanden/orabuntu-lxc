@@ -24,7 +24,24 @@ Fedora release 27 (Twenty Seven)
 [orabuntu@fedora27 archives]$
 ```
 
-Download Orabuntu-LXC to /home/username/Downloads and unzip the distribution.  We strongly recommend staging the software in the /home/username/Downloads directory.  You can use the script "uekulele-services-0.sh" or "orabuntu-services-0.sh" to create the required user and directories for Orabuntu-LXC install.
+For Debian-family Linuxes the script
+
+```
+uekulele-services-0.sh
+```
+
+can be used to create the required administrative install user.
+
+For RedHat-family Linuxes the script
+
+```
+orabuntu-services-0.sh
+```
+
+can be used to create the required administative isntall user.
+
+```
+The first Orabuntu-LXC install is always the "HUB" host install. Install the Orabuntu-LXC HUB host as shown below.
 
 ```
 cd /home/username/Downloads/orabuntu-lxc-master/anylinux
