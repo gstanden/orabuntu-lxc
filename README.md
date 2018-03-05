@@ -55,9 +55,24 @@ That's all.  This one command will do the following:
 
 Note that although the software is unpacked at /home/username/Downloads, nothing is actually installed there.  The installation actuall takes place at /opt/olxc/home/username/Downloads which is where the installer puts all installation files.  The distribution at /home/username/Downloads remains static during the install.
 
-The install is customized and configured in the "anylinux-services.sh" file.  Search for {pgroup1, pgroup2, pgroup3} to see the configurable settings.  When first trying out Orabuntu-LXC, the simplest approach is probably to just build a VM of one of a supported vanilla Linux distro (Oracle Linux, Ubuntu, CentOS, Fedora, or Red Hat) and then just download and run as described above "./anylinux-services.HUB.HOST.sh new" and then after install study the setup to see how the configurations in "anylinux-services.sh" affect the deployment.
+The install is customized and configured in the "anylinux-services.sh" file.  Search for {pgroup1, pgroup2, pgroup3} to see the configurable settings.  
 
-To add additional physical hosts you use
+When first trying out Orabuntu-LXC, the simplest approach is probably to just build a VM of a supported distro
+
+* Oracle Linux
+* Ubuntu
+* CentOS
+* Fedora
+* Red Hat
+
+and then just download and run as described above 
+
+```
+./anylinux-services.HUB.HOST.sh new
+```
+and then after install study the setup to see how the configurations in "anylinux-services.sh" affect the deployment.
+
+To add additional physical hosts use
 
 ```
 ./anylinux-services.GRE.HOST.sh new
