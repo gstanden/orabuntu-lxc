@@ -36,6 +36,8 @@ cd /home/username/Downloads/orabuntu-lxc-master/anylinux
 ```
 That's all. This one command will do the following:
 
+    * Install or build LXC from source 
+    * Install or build OpenvSwitch from source
     * Build Oracle Linux LXC containers
     * Build the OpenvSwitch networks (with VLANs)
     * Configure the IP subnets and domains specified in the anylinux-services.sh file
