@@ -107,7 +107,30 @@ To add more clones of an already existing version, e.g. add more Oracle Linux 7.
 anylinux-services.ADD.CLONES.sh
 ```
 
-Note that Orabuntu-LXC also includes the default LXC Linux Bridge for that distro (e.g. virbr0 for CentOS and Fedora, and lxcbr0 for Oracle Linux, Ubuntu and Red Hat Linux) so if you want to include containers other than Oracle Linux in your deployment, you can use the default LXC linux bridge to add non-Orabuntu-LXC LXC containers to your deployments, and those containers will be able to talk to the containers on the OvS network right out of the box.  In this way you can add Ubuntu Linux LXC containers, Alpine Linux LXC containers, etc. to the mix using the standard Linux Bridge (non-OVS).
+Note that Orabuntu-LXC also includes the default LXC Linux Bridge for that distro, e.g. for CentOS and Fedora
+
+```
+[orabuntu@fedora27 logs]$ ifconfig virbr0
+virbr0: flags=4099<UP,BROADCAST,MULTICAST>  mtu 1500
+        inet 192.168.122.1  netmask 255.255.255.0  broadcast 192.168.122.255
+        ether 52:54:00:8b:e7:18  txqueuelen 1000  (Ethernet)
+        RX packets 3189  bytes 187049 (182.6 KiB)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 4739  bytes 28087232 (26.7 MiB)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+[orabuntu@fedora27 logs]$ cat /etc/fedora-release 
+Fedora release 27 (Twenty Seven)
+[orabuntu@fedora27 logs]$ 
+```
+
+and for Oracle Linux, Ubuntu and Red Hat Linux:
+
+```
+lxcbr0
+```
+
+so to include containers other than Oracle Linux in your deployment, use the default LXC linux bridge to add non-Orabuntu-LXC LXC containers, and those containers will be able to talk to the containers on the OvS network right out of the box.  In this way Ubuntu Linux LXC containers, Alpine Linux LXC containers, etc. can be added to the mix using the standard Linux Bridge (non-OVS).
 
 # Why Oracle Linux
 
