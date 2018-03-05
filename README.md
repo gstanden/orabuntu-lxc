@@ -20,7 +20,9 @@ Orabuntu-LXC v6.0-beta AMIDE Edition stands for "Amazon Mult-I-host Docker Enter
 * Presents LUNs in 3 locations, including a container-friendly non-symlink location under /dev/containername
 * Preseent LUNs to containers directly, only the LUNs for that container, at full bare-metal storage performance.
 
-Orabuntu-LXC does all of this and much more by setting just 5 required parameters and kicking off the anylinux-services.HUB.HOST.sh script.  The Orabuntu-LXC installer can simply be downloaded and started easy button, while on the other hand, for expert customized usage, Orabuntu-LXC is highly-flexible and configurable using the parameters in the anylinux-services.sh file, including support for any two separate user-selectable IP subnet ranges, and 2 domain names, and much much more.  One network, for example the "seed" network can also be used as an out-of-band maintenance network.
+Orabuntu-LXC does all of this and much more by setting just 5 required parameters and kicking off the anylinux-services.HUB.HOST.sh script.  The Orabuntu-LXC installer can simply be downloaded and started easy button for an instant next-generation container infrastructure deployment.
+
+On the other hand, for expert customized usage, Orabuntu-LXC is highly-flexible and configurable using the parameters in the anylinux-services.sh file, including support for any two separate user-selectable IP subnet ranges, and 2 domain names, and much much more.  One network, for example the "seed" network can also be used as an out-of-band maintenance network.
 
 With the replicated and constantly updated LXC containerized DNS/DHCP solution, GRE-connected hosts (such as developer laptops) can be disconnected from the network and still have full DNS/DHCP lookup services for any containers stored locally on the developer laptop.  Plus, containers that are added by the developer after detachment from the Orabuntu-LXC netowrk will be added to the local copy of the LXC containerized DNS/DHCP.
 
