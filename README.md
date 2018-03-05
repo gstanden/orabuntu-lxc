@@ -1,3 +1,24 @@
+# What is Orabuntu-LXC v6.0-beta AMIDE Edition ?
+
+Orabuntu-LXC v6.0-beta AMIDE Edition stands for "Amazon Mult-I-host Docker Enterprise" Edition.  Orabuntu-LXC is turnkey software for building an entire next-generation enterprise infrastructure, including LXC Linux Containers, Docker containers, VM's, and physical hosts, all running on OpenvSwitch Software Defined Networks (SDNs), all networked to each other, and with container friendly block devices storage (SCST Linux SAN) direct-attached to the LXC Linux containers with everything running at bare-metal performance of network, CPU, and storage.  Orabuntu-LXC BUILDS EVERYTHING itself.  
+
+* Automatically detects your OS and branches to the appropriate build pathway
+* Builds OpenvSwitch from source as RPM or DEB packages
+* Builds the OpenvSwitch Network
+* Configures VLANs on the OpenvSwitch Network
+* Connects the OpenvSwitch network physical host interfaces using iptables rules
+* Builds LXC from source as RPM or DEB packages
+* Builds the LXC containers
+* Configures gold copy LXC containers (on a separate network) according to your specifications
+* Creates clones of the gold copy LXC containers
+* Builds SCST Linux SAN from source code as RPM or DKMS-enabled DEB packages
+* Creates the target, group, and LUNs according to your specifications
+* Creates the multipath.conf file and configures multipath
+* Presents LUNs in 3 locations, including a container-friendly non-symlink location under /dev/containername
+* Preseent LUNs to containers directly, only the LUNs for that container, at full bare-metal storage performance.
+
+Orabuntu-LXC does all of this and much more by setting just 5 required parameters and kicking off the anylinux-services.HUB.HOST.sh script.
+
 # Installing Orabuntu-LXC v6.0-beta AMIDE Edition
 
 An administrative non-root user account is required (such as the install account). The user needs to have "sudo ALL" privilege.
