@@ -90,9 +90,22 @@ In this case again it is necessary to configure the variables:
 * HubSudoPwd
 * Product
 
-If you want to add additional Oracle Linux container versions (e.g. 7.3, 6.9 etc.) you use either "anylinux-services.ADD.RELEASE.ON.HUB.HOST.1500.sh" or "anylinux-services.ADD.RELEASE.ON.GRE.HOST.1420.sh" depending again on whether you are adding container versions on an Orabuntu-LXC HUB host or a GRE-tunnel-connected Orabuntu-LXC host, respectively.
+To add Oracle Linux container versions (e.g. add some Oracle Linux 7.3 LXC containers to a deployment of Oracle Linux 6.9 LXC containers) use either 
 
-If you want to add more clones of an already existing version, e.g. you have 3 Oracle Linux 7.3 LXC containers and you want to add 2 more Oracle Linux 7.3. LXC containers, then you use "anylinux-services.ADD.CLONES.sh" script.
+```
+anylinux-services.ADD.RELEASE.ON.HUB.HOST.1500.sh
+```
+or
+```
+anylinux-services.ADD.RELEASE.ON.GRE.HOST.1420.sh
+```
+depending again on whether container versions are being add on an Orabuntu-LXC HUB host, or a GRE-tunnel-connected Orabuntu-LXC host, respectively.
+
+To add more clones of an already existing version, e.g. add more Oracle Linux 7.3 LXC containers to a set of existing Oracle Linux 7.3 LXC containers, use 
+
+```
+anylinux-services.ADD.CLONES.sh
+```
 
 Note that Orabuntu-LXC also includes the default LXC Linux Bridge for that distro (e.g. virbr0 for CentOS and Fedora, and lxcbr0 for Oracle Linux, Ubuntu and Red Hat Linux) so if you want to include containers other than Oracle Linux in your deployment, you can use the default LXC linux bridge to add non-Orabuntu-LXC LXC containers to your deployments, and those containers will be able to talk to the containers on the OvS network right out of the box.  In this way you can add Ubuntu Linux LXC containers, Alpine Linux LXC containers, etc. to the mix using the standard Linux Bridge (non-OVS).
 
