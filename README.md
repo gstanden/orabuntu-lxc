@@ -1,6 +1,10 @@
 # Installing Orabuntu-LXC v6.0-beta AMIDE Edition
 
-You need an administrative user account such as the install account (i.e. the install user need to have "sudo ALL" privilege).  On Ubuntu Linux this would be membership in the "sudo" group, and on Oracle Linux this would be membership in the "wheel" group, e.g. on Fedora:
+An administrative non-root user account is required (such as the install account). The user needs to have "sudo ALL" privilege.  
+
+On a Debian-family Linux, such as Ubuntu, this would be membership in the "sudo" group,  e.g.
+
+On a RedHat-family Linux, such as Fedora, this would be membership in the "wheel" group, e.g.
 ```
 [orabuntu@fedora27 archives]$ id orabuntu
 uid=1000(orabuntu) gid=1000(orabuntu) groups=1000(orabuntu),10(wheel)
