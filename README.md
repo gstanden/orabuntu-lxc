@@ -30,10 +30,10 @@ For RedHat-family Linuxes the follwoing script can be used to create the require
 uekulele-services-0.sh
 ```
 The first Orabuntu-LXC install is always the "HUB" host install. Install the Orabuntu-LXC HUB host as shown below.
-
+```
 cd /home/username/Downloads/orabuntu-lxc-master/anylinux
 ./anylinux-services.HUB.HOST.sh new
-
+```
 That's all. This one command will do the following:
 
     * Build Oracle Linux LXC containers
