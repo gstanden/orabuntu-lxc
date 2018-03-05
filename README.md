@@ -69,6 +69,7 @@ That's all. This one command will do the following:
     * Install or build LXC from source 
     * Install or build OpenvSwitch from source
     * Build the LXC containerized DNS/DHCP 
+    * Detect filesystem type and use overlayfs technology if supported for LXC containerized DNS/DHCP
     * Build Oracle Linux LXC containers
     * Build the OpenvSwitch networks (with VLANs)
     * Configure the IP subnets and domains specified in the anylinux-services.sh file
