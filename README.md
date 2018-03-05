@@ -24,23 +24,18 @@ Fedora release 27 (Twenty Seven)
 [orabuntu@fedora27 archives]$
 ```
 
-For Debian-family Linuxes the script
+For Debian-family Linuxes the following script can be used to create the required administrative install user.
 
 ```
 uekulele-services-0.sh
 ```
 
-can be used to create the required administrative install user.
-
-For RedHat-family Linuxes the script
+For RedHat-family Linuxes the follwoing script can be used to create the required administative isntall user.
 
 ```
 orabuntu-services-0.sh
 ```
 
-can be used to create the required administative isntall user.
-
-```
 The first Orabuntu-LXC install is always the "HUB" host install. Install the Orabuntu-LXC HUB host as shown below.
 
 ```
