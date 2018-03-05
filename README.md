@@ -4,6 +4,17 @@ An administrative non-root user account is required (such as the install account
 
 On a Debian-family Linux, such as Ubuntu, this would be membership in the "sudo" group,  e.g.
 
+```
+orabuntu@UL-1710-S:~$ id orabuntu
+uid=1001(orabuntu) gid=1001(orabuntu) groups=1001(orabuntu),27(sudo)
+orabuntu@UL-1710-S:~$ cat /etc/lsb-release 
+DISTRIB_ID=Ubuntu
+DISTRIB_RELEASE=17.10
+DISTRIB_CODENAME=artful
+DISTRIB_DESCRIPTION="Ubuntu 17.10"
+orabuntu@UL-1710-S:~$ 
+```
+
 On a RedHat-family Linux, such as Fedora, this would be membership in the "wheel" group, e.g.
 ```
 [orabuntu@fedora27 archives]$ id orabuntu
