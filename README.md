@@ -48,6 +48,11 @@ If at any time DNS/DHCP services are needed, such as if the HUB DNS/DHCP goes do
 
 This functionality can be used with any HA monitoring solution such as HP Service Guard to monitor that at all times at least 1 DNS/DHCP LXC container on the network is up and running.
 
+# OpenvSwitch
+
+Orabuntu-LXC uses OpenvSwitch as it's core switch technology.  This means that all of the power of OpenvSwitch production-grade Software Defined Networking (SDN) is available in an Orabuntu-LXC deployment.  This includes high performance features such as OVS-DPDK https://software.intel.com/en-us/articles/open-vswitch-with-dpdk-overview.
+
+
 Gilbert Standen
 St. Louis, MO
 March 4, 2018
