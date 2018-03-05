@@ -1,6 +1,13 @@
 # Installing Orabuntu-LXC v6.0-beta AMIDE Edition
 
-You need an administrative user account such as the install account (i.e. the install user need to have "sudo ALL" privilege).  On Ubuntu Linux this would be membership in the "sudo" group, and on Oracle Linux this would be membership in the "wheel" group, for example.
+You need an administrative user account such as the install account (i.e. the install user need to have "sudo ALL" privilege).  On Ubuntu Linux this would be membership in the "sudo" group, and on Oracle Linux this would be membership in the "wheel" group, e.g. on Fedora:
+```
+[orabuntu@fedora27 archives]$ id orabuntu
+uid=1000(orabuntu) gid=1000(orabuntu) groups=1000(orabuntu),10(wheel)
+[orabuntu@fedora27 archives]$ cat /etc/fedora-release 
+Fedora release 27 (Twenty Seven)
+[orabuntu@fedora27 archives]$
+```
 
 Download Orabuntu-LXC to /home/username/Downloads and unzip the distribution.  We strongly recommend staging the software in the /home/username/Downloads directory.  You can use the script "uekulele-services-0.sh" or "orabuntu-services-0.sh" to create the required user and directories for Orabuntu-LXC install.
 
