@@ -175,6 +175,10 @@ This functionality can be used with any HA monitoring solution such as HP Servic
 
 Orabuntu-LXC uses OpenvSwitch as it's core switch technology.  This means that all of the power of OpenvSwitch production-grade Software Defined Networking (SDN) is available in an Orabuntu-LXC deployment.  This includes a rich production-ready switch feature set http://www.openvswitch.org/ and other high performance features that can be added-on, such as OVS-DPDK https://software.intel.com/en-us/articles/open-vswitch-with-dpdk-overview.
 
+# SCST Linux SAN
+
+The included Orabuntu-LXC SCST Linux SAN deployer (scst-files.tar) clears away the fog that has for too long surrounded SCST deployments on Ubuntu Linux.  The Orabuntu-LXC SCST Linux SAN deployer installs SCST on Ubuntu Linux using DKMS-enabled DEB packages, for worry-free hands-off SCST performance across host kernel updates.  SCST module updates after host kernel updates are handled transparently by DKMS technology allowing users and administrators to focus on the rich production-ready feature set of SCST used by many of the largest techologly, services, and hardware companies.  http://scst.sourceforge.net/users.html
+
 
 Gilbert Standen
 St. Louis, MO
