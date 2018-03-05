@@ -72,7 +72,23 @@ This script requires configuring the parameters
 
 Note that the subnet ranges chosen in the anylinux-services.HUB.HOST.sh install must be used unchanged when running anylinux-services.GRE.HOST.sh so that the multi-host networking works correctly.
 
-If you want to put VM's on either a HUB physical host or a GRE phyical host, and you want those VM's to be on the Orabuntu-LXC OpenvSwitch networks (and get DHCP IP addresses from the same DNS/DHCP container as the LXC containers) then you use "anylinux-services.VM.ON.HUB.HOST.1500.sh" or "anylinux-services.VM.ON.GRE.HOST.1420.sh" depending on whether your VM's will run on the HUB Orabuntu-LXC host or on a GRE-tunnel-connected Orabuntu-LXC physical host, respectively.  In this case again it is necessary to configure SPOKEIP, HUBIP, HubUserAct, HubSudoPwd, and Product variables.
+To put VM's on the Orabuntu-LXC OpenvSwitch network, on either a HUB physical host or a GRE phyical host, use the following scripts, respectively.
+
+```
+anylinux-services.VM.ON.HUB.HOST.1500.sh new
+```
+or
+```
+anylinux-services.VM.ON.GRE.HOST.1420.sh new
+```
+
+In this case again it is necessary to configure the variables:
+
+* SPOKEIP
+* HUBIP 
+* HubUserAct
+* HubSudoPwd
+* Product
 
 If you want to add additional Oracle Linux container versions (e.g. 7.3, 6.9 etc.) you use either "anylinux-services.ADD.RELEASE.ON.HUB.HOST.1500.sh" or "anylinux-services.ADD.RELEASE.ON.GRE.HOST.1420.sh" depending again on whether you are adding container versions on an Orabuntu-LXC HUB host or a GRE-tunnel-connected Orabuntu-LXC host, respectively.
 
