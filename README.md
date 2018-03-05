@@ -192,6 +192,10 @@ Orabuntu-LXC multi-host configuration does NOT require key-exchange technology a
 
 The root account is NOT used for Orabuntu-LXC installation.  All that is required currently is an adminstrative user with "SUDO ALL" privilege, and work is underway on the roadmap to get the minimal set of SUDO privileges defined so that not even SUDO ALL privilege will be needed.  Interestingly, once Orabuntu-LXC is installed, the administrative SUDO ALL user used to install Orabuntu-LXC can actually be DELETED using userdel for example because after installation that user is no longer needed.  All the GRE-tunnels and other functionality of Orabuntu-LXC continue to operate normally under root authority even though the install user no longer exists.  For GRE-connected Orabuntu-LXC hosts, there is a user called "amide" which has two sudo privileges, "mkdir" and "cp" which is used to handle updating the LXC containerized DNS/DHCP replicas across all the Orabuntu-LXC physical hosts, but even this user can be replaced with the Orabuntu-LXC built-in AmazonS3 LXC containerized DNS/DHCP replication option for secured operations.
 
+# Installer Logging
+
+The Orabuntu-LXC installer uses the highly-sophisticated sudoreplay logging facility, which not only logs every single sudo command, but also allows actualy PLAYBACK of the installer step - not just a static log - but an actual VIDEO of that install step.  And sudoreplay allows speedup or slowdown of the install step video, so it is possible to review a lengthy install step (such as building OpenvSwitch from source code) speeded-up.  And playback includes every input and output that the actual session encountered, so the entire session is captured in all respects.  And this functionality does not require any direct edit to the sudoers file, rather it uses /etc/sudoers.d and sets removable parameters that can be turned after the install.
+
 Gilbert Standen
 St. Louis, MO
 March 4, 2018
