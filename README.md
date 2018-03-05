@@ -185,6 +185,10 @@ The included Orabuntu-LXC SCST Linux SAN deployer (scst-files.tar) clears away t
 # WeaveWorks
 
 Although Orabuntu-LXC provides it's own multi-host solution, it can also be used with WeaveWorks technologies, and can be managed from Google Cloud Platform (GCP) using WeaveWorks technology for web-based access and management from anywhere.
+
+# Security Considerations
+
+Orabuntu-LXC does NOT require key-exchange technology aka automated key logins.  Therefore, Orabuntu-LXC can be used in PCI-DSS environments where key-exchange is not permitted and can be used in any situation where no data at all can be written during login. Orabuntu-LXC is also excellent for certain types of LDAP authentication mechanisms where public-key technology cannot be used.  Orabuntu-LXC is potentially also useful for implementation on routers where public-key technology again may not be an option.
 Gilbert Standen
 St. Louis, MO
 March 4, 2018
