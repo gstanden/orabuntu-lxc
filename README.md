@@ -61,7 +61,6 @@ To add additional physical hosts you use
 
 ```
 ./anylinux-services.GRE.HOST.sh new
-
 ```
 This script requires configuring the parameters
 
