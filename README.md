@@ -15,11 +15,11 @@ Orabuntu-LXC BUILDS EVERYTHING itself for the currently supported distros
 Orabuntu-LXC installer does all of the following automatically:
 
 * Automatically detects your OS and branches to the appropriate build pathway
-* Builds OpenvSwitch from source as RPM or DEB packages
+* Deploys/Builds OpenvSwitch from source as RPM or DEB packages
 * Builds the OpenvSwitch Network
 * Configures VLANs on the OpenvSwitch Network
 * Connects the OpenvSwitch network physical host interfaces using iptables rules
-* Builds LXC from source as RPM or DEB packages
+* Deploys/Builds LXC from source as RPM or DEB packages
 * Creates an LXC-containerized DNS/DHCP container for the systems running bind9 and isc-dhcp-server
 * Replicates the LXC-containerized DNS/DHCP container to all Orabuntu-LXC physical GRE-connected hosts
 * Optionally storage LXC-containerized DNS/DHCP updates at Amazon S3 for replication
