@@ -22,7 +22,7 @@ Orabuntu-LXC installer does all of the following automatically:
 * Deploys/Builds LXC from source as RPM or DEB packages
 * Creates an LXC-containerized DNS/DHCP container for the systems running bind9 and isc-dhcp-server
 * Replicates the LXC-containerized DNS/DHCP container to all Orabuntu-LXC physical GRE-connected hosts
-* Optionally storage LXC-containerized DNS/DHCP updates at Amazon S3 for replication
+* Optionally stores LXC-containerized DNS/DHCP updates at Amazon S3 for replication
 * Automatically detects filesystem types which support lxc-snapshot overlayfs for LXC-containerized DNS/DHCP
 * Updates the LXC-containerized DNS/DHCP container replicas with the latest zone and lease updates every x minutes.
 * Builds the LXC containers
@@ -31,8 +31,8 @@ Orabuntu-LXC installer does all of the following automatically:
 * Builds SCST Linux SAN from source code as RPM or DKMS-enabled DEB packages
 * Creates the target, group, and LUNs according to your specifications
 * Creates the multipath.conf file and configures multipath
-* Presents LUNs in 3 locations, including a container-friendly non-symlink location under /dev/containername
-* Preseent LUNs to containers directly, only the LUNs for that container, at full bare-metal storage performance.
+* Present LUNs in 3 locations, including a container-friendly non-symlink location under /dev/containername
+* Present LUNs to containers directly, only the LUNs for that container, at full bare-metal storage performance.
 
 Orabuntu-LXC does all of this and much more by setting just 5 required parameters and kicking off the anylinux-services.HUB.HOST.sh script.  The Orabuntu-LXC installer can simply be downloaded and started easy button for an instant next-generation container infrastructure deployment.
 
