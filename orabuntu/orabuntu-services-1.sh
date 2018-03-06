@@ -2179,8 +2179,8 @@ then
 	USERNAME=amide
 	PASSWORD=$password
 
-	sudo sed -i "s/Owner=ubuntu/Owner=amide/"	/var/lib/lxc/nsa/rootfs/root/ns_backup_update.sh
-	sudo sed -i "s/Pass=ubuntu/Pass=$password/"	/var/lib/lxc/nsa/rootfs/root/ns_backup_update.sh
+	sudo sed -i "s/Owner=ubuntu/Owner=amide/"	/var/lib/lxc/$NameServer/rootfs/root/ns_backup_update.sh
+	sudo sed -i "s/Pass=ubuntu/Pass=$password/"	/var/lib/lxc/$NameServer/rootfs/root/ns_backup_update.sh
 
 #	sudo useradd -m -p $(openssl passwd -1 ${PASSWORD}) -s /bin/bash -G sudo ${USERNAME}
  	sudo useradd -m -p $(openssl passwd -1 ${PASSWORD}) -s /bin/bash
