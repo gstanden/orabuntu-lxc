@@ -2277,8 +2277,7 @@ then
         sudo mkdir -p  /home/${USERNAME}/Downloads /home/${USERNAME}/Manage-Orabuntu
         sudo chown ${USERNAME}:${USERNAME} /home/${USERNAME}/Downloads /home/${USERNAME}/Manage-Orabuntu
 
-        sudo sh -c "echo 'amide ALL=(ALL) /usr/bin/mkdir'      >  /etc/sudoers.d/amide"
-        sudo sh -c "echo 'amide ALL=(ALL) /usr/bin/cp'         >> /etc/sudoers.d/amide"
+	sudo sh -c "echo 'amide ALL=/bin/mkdir, /bin/cp' > /etc/sudoers.d/amide"
         sudo chmod 0440 /etc/sudoers.d/amide
 
         echo ''
