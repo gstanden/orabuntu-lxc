@@ -50,6 +50,8 @@ With the replicated and constantly updated LXC containerized DNS/DHCP solution, 
 
 An administrative non-root user account is required (such as the install account). The user needs to have "sudo ALL" privilege.
 
+Be sure you are installing on an internet-connected LAN-connected host that can download source software from repositories which include yum.oracle.com, archive.ubuntu.com, SourceForge, etc.
+
 On a Debian-family Linux, such as Ubuntu, this would be membership in the "sudo" group, e.g.
 ```
 orabuntu@UL-1710-S:~$ id orabuntu
