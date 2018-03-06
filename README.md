@@ -170,8 +170,18 @@ Fedora release 27 (Twenty Seven)
 ```
 and for Oracle Linux, Ubuntu and Red Hat Linux:
 ```
-lxcbr0
+orabuntu@UL-1710-S:~$ ifconfig lxcbr0
+lxcbr0: flags=4099<UP,BROADCAST,MULTICAST>  mtu 1500
+        inet 10.0.3.1  netmask 255.255.255.0  broadcast 0.0.0.0
+        ether 00:16:3e:00:00:00  txqueuelen 1000  (Ethernet)
+        RX packets 0  bytes 0 (0.0 B)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 0  bytes 0 (0.0 B)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+orabuntu@UL-1710-S:~$ 
 ```
+
 so to include containers other than Oracle Linux in your deployment, use the default LXC linux bridge to add non-Orabuntu-LXC LXC containers, and those containers will be able to talk to the containers on the OvS network right out of the box. In this way Ubuntu Linux LXC containers, Alpine Linux LXC containers, etc. can be added to the mix using the standard Linux Bridge (non-OVS).
 
 # Why Oracle Linux
