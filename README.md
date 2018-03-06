@@ -206,7 +206,7 @@ Every Orabuntu-LXC physical host when deployed automatically gets a replica of t
 
 If at any time DNS/DHCP services are needed, such as if the HUB DNS/DHCP goes down, or if a GRE-connected host needs to be detached from the network, the replica DNS/DHCP LXC container can be started on that local host, and will immediately apply all of the latest updates from the master DNS/DHCP LXC container on HUB host (using the "dns-sync" service), and will be able to resolve DNS and provide DHCP for all GRE-connected hosts and HUB host on the network. (Be sure that only one DNS/DHCP LXC replica is up at any given time).  A replica can be converted to master status simply by copying the list of customer GRE-connected physical hosts to the DNS/DHCP replica, since all replicas have all scripting on board to function as primary DNS/DHCP.  This can also be useful if a developer laptop is a GRE-replicated host which will provide the developer with full DNS/DHCP while disconnected from the network for all LXC containers installed locally on the developer laptop.
 
-This functionality can be used with any HA monitoring solution such as HP Service Guard to monitor that at all times at least 1 DNS/DHCP LXC container on the network is up and running.
+This functionality can be used with any HA monitoring solution such as HP Service Guard to monitor that at all times at least one DNS/DHCP LXC container on the network is up and running.
 
 # OpenvSwitch
 
