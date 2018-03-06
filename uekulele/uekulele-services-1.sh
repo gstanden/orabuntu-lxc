@@ -2626,6 +2626,7 @@ then
 
 	sudo lxc-update-config -c /var/lib/lxc/"$NameServer"/config
 	sudo lxc-update-config -c /var/lib/lxc/"$NameServerBase"/config
+	sudo lxc-update-config -c /var/lib/lxc/"$NameServer"-base/config
         sudo lxc-ls -f
 fi
 
