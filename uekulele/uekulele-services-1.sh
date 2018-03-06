@@ -14,7 +14,7 @@
 #    GNU General Public License for more details.
 
 #    You should have received a copy of the GNU General Public License
-#    along with Orabuntu-LXC.  If not, see <http://www.gnu.org/licenses/>.
+#    along with Orabuntu-LXC. If not, see <http://www.gnu.org/licenses/>.
 
 #    v2.4 		GLS 20151224
 #    v2.8 		GLS 20151231
