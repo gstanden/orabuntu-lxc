@@ -145,7 +145,7 @@ fi
 GetLinuxFlavors
 
 function TrimLinuxFlavors {
-echo $LinuxFlavors | sed 's/^[ \t]//;s/[ \t]$//'
+echo $LinuxFlavors | sed 's/^[ \t]//;s/[ \t]$//' | sed 's/\!//'
 }
 LinuxFlavor=$(TrimLinuxFlavors)
 LF=$LinuxFlavor
@@ -2127,11 +2127,11 @@ then
 
 	if [ $Owner != 'ubuntu' ]
 	then
-		sudo mv /opt/olxc/home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/scst-files /opt/olxc/home/"$Owner"/Downloads/orabuntu-lxc-master/orabuntu/archives/.
-		sudo mv /opt/olxc/home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/tgt-files  /opt/olxc/home/"$Owner"/Downloads/orabuntu-lxc-master/orabuntu/archives/.
+		sudo mv /opt/olxc/$DistDir/orabuntu/archives/scst-files /opt/olxc/"$DistDir"/orabuntu/archives/.
+		sudo mv /opt/olxc/$DistDir/orabuntu/archives/tgt-files  /opt/olxc/"$DistDir"/orabuntu/archives/.
 	fi
-        sudo chown -R $Owner:$Group		/opt/olxc/home/"$Owner"/Downloads/orabuntu-lxc-master/orabuntu/archives/.
-        sudo sed -i "s/SWITCH_IP/$Sw1Index/g"	/opt/olxc/home/"$Owner"/Downloads/orabuntu-lxc-master/orabuntu/archives/scst-files/create-scst-target.sh
+        sudo chown -R $Owner:$Group		/opt/olxc/"$DistDir"/orabuntu/archives/.
+        sudo sed -i "s/SWITCH_IP/$Sw1Index/g"	/opt/olxc/"$DistDir"/orabuntu/archives/scst-files/create-scst-target.sh
 		
 	echo ''
 	echo "=============================================="
@@ -2241,11 +2241,11 @@ then
 	sleep 2
 	if [ $Owner != 'ubuntu' ]
 	then
-		sudo mv /opt/olxc/home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/scst-files /opt/olxc/home/"$Owner"/Downloads/orabuntu-lxc-master/orabuntu/archives/.
-		sudo mv /opt/olxc/home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/tgt-files  /opt/olxc/home/"$Owner"/Downloads/orabuntu-lxc-master/orabuntu/archives/.
+		sudo mv /opt/olxc/$DistDir/orabuntu/archives/scst-files /opt/olxc/"$DistDir"/orabuntu/archives/.
+		sudo mv /opt/olxc/$DistDir/orabuntu/archives/tgt-files  /opt/olxc/"$DistDir"/orabuntu/archives/.
 	fi
-        sudo chown -R $Owner:$Group		/opt/olxc/home/"$Owner"/Downloads/orabuntu-lxc-master/orabuntu/archives/.
-        sudo sed -i "s/SWITCH_IP/$Sw1Index/g"	/opt/olxc/home/"$Owner"/Downloads/orabuntu-lxc-master/orabuntu/archives/scst-files/create-scst-target.sh
+        sudo chown -R $Owner:$Group		/opt/olxc/"$DistDir"/orabuntu/archives/.
+        sudo sed -i "s/SWITCH_IP/$Sw1Index/g"	/opt/olxc/"$DistDir"/orabuntu/archives/scst-files/create-scst-target.sh
 		
 	echo ''
 	echo "=============================================="

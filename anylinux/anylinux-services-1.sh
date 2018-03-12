@@ -94,7 +94,7 @@ fi
 GetLinuxFlavors
 
 function TrimLinuxFlavors {
-echo $LinuxFlavors | sed 's/^[ \t]//;s/[ \t]$//'
+echo $LinuxFlavors | sed 's/^[ \t]//;s/[ \t]$//' | sed 's/\!//'
 }
 LinuxFlavor=$(TrimLinuxFlavors)
 
@@ -153,7 +153,7 @@ then
         LF=$LinuxFlavor
 	LFA=$LinuxFlavor
         RL=$Release
-elif [ $LinuxFlavor = 'Ubuntu' ]
+elif [ $LinuxFlavor = 'Ubuntu' ] || [ $LinuxFlavor = 'Pop_OS' ]
 then
         function GetUbuntuVersion {
                 cat /etc/lsb-release | grep DISTRIB_RELEASE | cut -f2 -d'='
@@ -695,7 +695,7 @@ then
 
 	fi # $LinuxFlavor = 'RedHat'
 
-	if [ $LinuxFlavor = 'Ubuntu' ] # $LinuxFlavor = 'Ubuntu'
+	if [ $LinuxFlavor = 'Ubuntu' ] || [ $LinuxFlavor = 'Pop_OS' ] # $LinuxFlavor = 'Ubuntu'
 	then
 		function GetUbuntuVersion {
 		cat /etc/lsb-release | grep DISTRIB_RELEASE | cut -f2 -d'='

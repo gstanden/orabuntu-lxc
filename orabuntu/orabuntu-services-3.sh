@@ -88,7 +88,7 @@ fi
 GetLinuxFlavors
 
 function TrimLinuxFlavors {
-echo $LinuxFlavors | sed 's/^[ \t]//;s/[ \t]$//'
+echo $LinuxFlavors | sed 's/^[ \t]//;s/[ \t]$//' | sed 's/\!//'
 }
 LinuxFlavor=$(TrimLinuxFlavors)
 

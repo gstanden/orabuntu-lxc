@@ -214,7 +214,7 @@ fi
 GetLinuxFlavors
 
 function TrimLinuxFlavors {
-echo $LinuxFlavors | sed 's/^[ \t]//;s/[ \t]$//'
+echo $LinuxFlavors | sed 's/^[ \t]//;s/[ \t]$//' | sed 's/\!//'
 }
 LinuxFlavor=$(TrimLinuxFlavors)
 
@@ -267,7 +267,7 @@ then
         LF=$LinuxFlavor
         RL=$Release
 	SubDirName=uekulele
-elif [ $LinuxFlavor = 'Ubuntu' ]
+elif [ $LinuxFlavor = 'Ubuntu' ] || [ $LinuxFlavor = 'Pop_OS' ]
 then
         function GetUbuntuVersion {
                 cat /etc/lsb-release | grep DISTRIB_RELEASE | cut -f2 -d'='
@@ -361,7 +361,7 @@ echo ''
 
 echo 'Linux Host Flavor         = '$LinuxFlavor    
 
-if [ $LinuxFlavor != 'Ubuntu' ]
+if [ $LinuxFlavor != 'Ubuntu' ] && [ $LinuxFlavor != 'Pop_OS' ]
 then
 	echo 'Linux Host Release        = '$RedHatVersion
 	echo 'Linux Host Base Release   = '$Release

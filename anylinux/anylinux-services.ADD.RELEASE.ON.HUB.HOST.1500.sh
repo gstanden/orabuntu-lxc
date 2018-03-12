@@ -60,7 +60,7 @@ fi
 
 if [ ! -f /etc/sudoers.d/orabuntu-lxc ]
 then
-        sudo sh -c "echo 'Defaults      logfile=\"/home/$USER/Downloads/orabuntu-lxc-master/installs/logs/$USER.log\"'  >> /etc/sudoers.d/orabuntu-lxc"
+        sudo sh -c "echo 'Defaults      logfile=\"$DistDir/installs/logs/$USER.log\"'  					>> /etc/sudoers.d/orabuntu-lxc"
         sudo sh -c "echo 'Defaults      log_input,log_output'                                                           >> /etc/sudoers.d/orabuntu-lxc"
         sudo sh -c "echo 'Defaults      iolog_dir=/var/log/sudo-io/%{user}'                                             >> /etc/sudoers.d/orabuntu-lxc"
         sudo chmod 0440 /etc/sudoers.d/orabuntu-lxc

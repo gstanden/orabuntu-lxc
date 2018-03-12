@@ -2664,11 +2664,11 @@ then
         sleep 5
 	if [ $Owner != 'ubuntu' ]
 	then
-        	sudo mv /opt/olxc/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/archives/scst-files /opt/olxc/home/"$Owner"/Downloads/orabuntu-lxc-master/uekulele/archives/.
-        	sudo mv /opt/olxc/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/archives/tgt-files  /opt/olxc/home/"$Owner"/Downloads/orabuntu-lxc-master/uekulele/archives/.
+        	sudo mv /opt/olxc/"$DistDir"/uekulele/archives/scst-files /opt/olxc/"$DistDir"/uekulele/archives/.
+        	sudo mv /opt/olxc/"$DistDir"/uekulele/archives/tgt-files  /opt/olxc/"$DistDir"/uekulele/archives/.
         fi
-	sudo chown -R $Owner:$Group		/opt/olxc/home/"$Owner"/Downloads/orabuntu-lxc-master/uekulele/archives/.
-        sudo sed -i "s/SWITCH_IP/$Sw1Index/g"	/opt/olxc/home/"$Owner"/Downloads/orabuntu-lxc-master/uekulele/archives/scst-files/create-scst-target.sh
+	sudo chown -R $Owner:$Group		/opt/olxc/"$DistDir"/uekulele/archives/.
+        sudo sed -i "s/SWITCH_IP/$Sw1Index/g"	/opt/olxc/"$DistDir"/uekulele/archives/scst-files/create-scst-target.sh
 
 	echo ''
 	echo "=============================================="
@@ -2779,11 +2779,11 @@ then
         sleep 5
 	if [ $Owner != 'ubuntu' ]
 	then
-        	sudo mv /opt/olxc/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/archives/scst-files /opt/olxc/home/"$Owner"/Downloads/orabuntu-lxc-master/uekulele/archives/.
-        	sudo mv /opt/olxc/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/archives/tgt-files  /opt/olxc/home/"$Owner"/Downloads/orabuntu-lxc-master/uekulele/archives/.
+        	sudo mv /opt/olxc/"$DistDir"/uekulele/archives/scst-files /opt/olxc/"$DistDir"/uekulele/archives/.
+        	sudo mv /opt/olxc/"$DistDir"/uekulele/archives/tgt-files  /opt/olxc/"$DistDir"/uekulele/archives/.
         fi
-	sudo chown -R $Owner:$Group		/opt/olxc/home/"$Owner"/Downloads/orabuntu-lxc-master/uekulele/archives/.
-        sudo sed -i "s/SWITCH_IP/$Sw1Index/g"	/opt/olxc/home/"$Owner"/Downloads/orabuntu-lxc-master/uekulele/archives/scst-files/create-scst-target.sh
+	sudo chown -R $Owner:$Group		/opt/olxc/"$DistDir"/uekulele/archives/.
+        sudo sed -i "s/SWITCH_IP/$Sw1Index/g"	/opt/olxc/"$DistDir"/uekulele/archives/scst-files/create-scst-target.sh
 		
 	echo ''
 	echo "=============================================="
