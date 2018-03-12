@@ -87,7 +87,7 @@ including support for any two separate user-selectable IP subnet ranges, and 2 d
 
 With the replicated and constantly updated LXC containerized DNS/DHCP solution, GRE-connected hosts (such as developer laptops) can be disconnected from the network and still have full DNS/DHCP lookup services for any containers stored locally on the developer laptop.  Plus, containers that are added by the developer after detachment from the Orabuntu-LXC network will be added to the local copy of the LXC containerized DNS/DHCP.
 
-# Installing Orabuntu-LXC v6.0-beta AMIDE Edition
+#  More Detailed Installing Orabuntu-LXC v6.0-beta AMIDE Edition
 
 An administrative non-root user account is required (such as the install account). The non-root user needs to have "sudo ALL" privilege.
 
