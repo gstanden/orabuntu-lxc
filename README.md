@@ -80,7 +80,15 @@ For RedHat-family Linuxes the following script can be used to create the require
 ```
 uekulele-services-0.sh
 ```
-The first Orabuntu-LXC install is always the "HUB" host install. Install the Orabuntu-LXC HUB host as shown below.
+The first Orabuntu-LXC install is always the "HUB" host install. 
+
+Install the Orabuntu-LXC HUB host as shown below (if installing an Orabuntu-LXC release).
+```
+cd /home/username/Downloads/orabuntu-lxc-6.02-beta/anylinux
+./anylinux-services.HUB.HOST.sh new
+```
+
+Install the Orabuntu-LXC HUB host as shown below (if installing from the development branch).
 ```
 cd /home/username/Downloads/orabuntu-lxc-master/anylinux
 ./anylinux-services.HUB.HOST.sh new
