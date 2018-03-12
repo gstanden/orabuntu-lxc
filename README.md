@@ -4,7 +4,7 @@ Orabuntu-LXC v6.0-beta AMIDE Edition stands for "Amazon Mult-I-host Docker Enter
 
 Orabuntu-LXC is turnkey software for building an entire next-generation container infrastructure spanning multiple hosts, including LXC Linux Containers, Docker containers, VM's, and physical hosts, all running on OpenvSwitch Software Defined Networks (SDNs), all networked to each other, and with container friendly block devices storage (SCST Linux SAN) available for direct-attachment (if needed) to the LXC Linux containers with everything running at bare-metal performance of network, CPU, and storage.  
 
-Orabuntu-LXC BUILDS EVERYTHING itself for the currently supported distros 
+Orabuntu-LXC BUILDS EVERYTHING itself for the currently supported distros: 
 
 * Oracle Linux 7.x
 * Ubuntu 16.04+
