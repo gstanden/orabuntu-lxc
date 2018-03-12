@@ -45,7 +45,7 @@ script.  The Orabuntu-LXC installer can simply be downloaded and started easy bu
 
 On the other hand, for expert customized usage, Orabuntu-LXC is highly-flexible and configurable using the parameters in the anylinux-services.sh file, including support for any two separate user-selectable IP subnet ranges, and 2 domain names, and much much more.  One network, for example the "seed" network can also be used as an out-of-band maintenance network.
 
-With the replicated and constantly updated LXC containerized DNS/DHCP solution, GRE-connected hosts (such as developer laptops) can be disconnected from the network and still have full DNS/DHCP lookup services for any containers stored locally on the developer laptop.  Plus, containers that are added by the developer after detachment from the Orabuntu-LXC netowrk will be added to the local copy of the LXC containerized DNS/DHCP.
+With the replicated and constantly updated LXC containerized DNS/DHCP solution, GRE-connected hosts (such as developer laptops) can be disconnected from the network and still have full DNS/DHCP lookup services for any containers stored locally on the developer laptop.  Plus, containers that are added by the developer after detachment from the Orabuntu-LXC network will be added to the local copy of the LXC containerized DNS/DHCP.
 
 # Installing Orabuntu-LXC v6.0-beta AMIDE Edition
 
@@ -76,7 +76,7 @@ For Debian-family Linuxes the following script can be used to create the require
 ```
 orabuntu-services-0.sh
 ```
-For RedHat-family Linuxes the follwoing script can be used to create the required administative isntall user.
+For RedHat-family Linuxes the following script can be used to create the required administrative install user.
 ```
 uekulele-services-0.sh
 ```
@@ -125,7 +125,7 @@ This script requires configuring the parameters
 
 Note that the subnet ranges chosen in the anylinux-services.HUB.HOST.sh install must be used unchanged when running anylinux-services.GRE.HOST.sh so that the multi-host networking works correctly.
 
-To put VM's on the Orabuntu-LXC OpenvSwitch network, on either a HUB physical host or a GRE phyical host, use the following scripts, respectively.
+To put VM's on the Orabuntu-LXC OpenvSwitch network, on either a HUB physical host or a GRE physical host, use the following scripts, respectively.
 ```
 anylinux-services.VM.ON.HUB.HOST.1500.sh new
 ```
@@ -217,7 +217,7 @@ Orabuntu-LXC uses OpenvSwitch as it's core switch technology.  This means that a
 
 # SCST Linux SAN
 
-The included Orabuntu-LXC SCST Linux SAN deployer (scst-files.tar) clears away the fog that has for too long surrounded SCST deployments on Ubuntu Linux.  The Orabuntu-LXC SCST Linux SAN deployer installs SCST on Ubuntu Linux using DKMS-enabled DEB packages, for worry-free hands-off SCST performance across host kernel updates.  Support for RPM based distros, as well as DEB based distros, is FULLY AUTOMATED from start to finish.  Kick off the Orabuntu-LXC SCST installer and go get a cup of coffee or jog around the block.  When you come back multipath, production-ready LUNs are waiting for your project, and the /etc/multipath.conf file has been built for you and installed automatically. SCST module updates after host kernel updates are handled transparently by DKMS technology allowing users and administrators to focus on the rich production-ready feature set of SCST used by many of the largest techologly, services, and hardware companies.  http://scst.sourceforge.net/users.html
+The included Orabuntu-LXC SCST Linux SAN deployer (scst-files.tar) clears away the fog that has for too long surrounded SCST deployments on Ubuntu Linux.  The Orabuntu-LXC SCST Linux SAN deployer installs SCST on Ubuntu Linux using DKMS-enabled DEB packages, for worry-free hands-off SCST performance across host kernel updates.  Support for RPM based distros, as well as DEB based distros, is FULLY AUTOMATED from start to finish.  Kick off the Orabuntu-LXC SCST installer and go get a cup of coffee or jog around the block.  When you come back multipath, production-ready LUNs are waiting for your project, and the /etc/multipath.conf file has been built for you and installed automatically. SCST module updates after host kernel updates are handled transparently by DKMS technology allowing users and administrators to focus on the rich production-ready feature set of SCST used by many of the largest technology, services, and hardware companies.  http://scst.sourceforge.net/users.html
 
 # WeaveWorks
 
