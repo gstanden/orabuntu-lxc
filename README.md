@@ -40,18 +40,34 @@ Orabuntu-LXC does all of this and much more with just these easy steps:
 
 Step 1
 
+Make sure your Linux distribution is updated.  
+
+On Debian-family Linuxes this is:
+
+```
+sudo apt-get -y update
+sudo apt-get -y upgrade
+```
+
+On Redhat-family Linuxes this is:
+
+```
+sudo yum -y update
+```
+
+Step 2
+
 Install manually the following packages (if on Debian-family Linux):
 
 ```
 sudo apt-get -y install unzip wget openssh-server net-tools bind9utils
 ```
 Install manually the following packages (if on RedHat-family Linux):
-
 ```
 sudo yum -y install unzip wget openssh-server net-tools bind-utils
 ```
 
-Step 2
+Step 3
 
 Download the latest Orabuntu-LXC v6.0x AMIDE release to /home/username/Downloads and unzip it, then navigate to the "anylinux" directory and run the following script:
 
