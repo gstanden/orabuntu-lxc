@@ -36,7 +36,7 @@ Orabuntu-LXC installer does all of the following automatically:
 * Present LUNs in 3 locations, including a container-friendly non-symlink location under /dev/containername
 * Present LUNs to containers directly, only the LUNs for that container, at full bare-metal storage performance.
 
-Orabuntu-LXC does all of this and much more by just running the following script: 
+Orabuntu-LXC does all of this and much more by just downloads the DEV branch or an Orabuntu-LXC release to /home/username/Downloads, unzipping it, then running the following script:
 
 ```
 ./anylinux-services.HUB.HOST.sh
@@ -44,13 +44,13 @@ Orabuntu-LXC does all of this and much more by just running the following script
 
 The Orabuntu-LXC installer can simply be downloaded and started easy button as shown above for an instant next-generation container infrastructure deployment.
 
-On the other hand, for expert customized usage, Orabuntu-LXC is highly-flexible and configurable using the parameters in the 
+On the other hand, for expert customized usage, Orabuntu-LXC is highly-flexible and configurable using the parameters in the file: 
 
 ```
 anylinux-services.sh
 ```
 
-file, including support for any two separate user-selectable IP subnet ranges, and 2 domain names, and much more. One network, for example the "seed" network can also be used as an out-of-band maintenance network, and the other network used for production containers.
+including support for any two separate user-selectable IP subnet ranges, and 2 domain names, and much more. One network, for example the "seed" network can also be used as an out-of-band maintenance network, and the other network used for production containers.
 
 With the replicated and constantly updated LXC containerized DNS/DHCP solution, GRE-connected hosts (such as developer laptops) can be disconnected from the network and still have full DNS/DHCP lookup services for any containers stored locally on the developer laptop.  Plus, containers that are added by the developer after detachment from the Orabuntu-LXC network will be added to the local copy of the LXC containerized DNS/DHCP.
 
@@ -118,25 +118,27 @@ That's all. This one command will do the following:
 
 Note that although the software is unpacked at /home/username/Downloads, nothing is actually installed there. The installation actuall takes place at /opt/olxc/home/username/Downloads which is where the installer puts all installation files. The distribution at /home/username/Downloads remains static during the install.
 
-The install is customized and configured in the 
+The install is customized and configured in the file:
 
 ```
 anylinux-services.sh
 ```
 
-file. Search for {pgroup1, pgroup2, pgroup3} to see the configurable settings. When first trying out Orabuntu-LXC, the simplest approach is probably to just build a VM of one of a supported vanilla Linux distro (Oracle Linux, Ubuntu, CentOS, Fedora, or Red Hat) and then just download and run as described above "./anylinux-services.HUB.HOST.sh new" and then after install study the setup to see how the configurations in "anylinux-services.sh" affect the deployment.
+Search for {pgroup1, pgroup2, pgroup3} to see the configurable settings. When first trying out Orabuntu-LXC, the simplest approach is probably to just build a VM of one of a supported vanilla Linux distro (Oracle Linux, Ubuntu, CentOS, Fedora, or Red Hat) and then just download and run as described above "./anylinux-services.HUB.HOST.sh new" and then after install study the setup to see how the configurations in "anylinux-services.sh" affect the deployment.
 
 To add additional physical hosts you use
 ```
 ./anylinux-services.GRE.HOST.sh new
 ```
-This script requires configuring these parameters in the "anylinux-services.GRE.HOST.sh" script:
+This script requires configuring these parameters in the "anylinux-services.GRE.HOST.sh" script.  
 
     * SPOKEIP
     * HUBIP
     * HubUserAct
     * HubSudoPwd
     * Product
+    
+If you used the scripts to create an "orabuntu" user then HubUserAct=orabuntu and HubSudoPwd=orabuntu (or optionally the generated password).  The products currently available in the "products" directory are "oracle-db" and "workspaces" but you can create your own product file sets and put them in the products directory.
 
 Note that the subnet ranges chosen in the "anylinux-services.HUB.HOST.sh" install must be used unchanged when running the script "anylinux-services.GRE.HOST.sh" so that the multi-host networking works correctly.
 
