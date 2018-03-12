@@ -36,7 +36,24 @@ Orabuntu-LXC installer does all of the following automatically:
 * Present LUNs in 3 locations, including a container-friendly non-symlink location under /dev/containername
 * Present LUNs to containers directly, only the LUNs for that container, at full bare-metal storage performance.
 
-Orabuntu-LXC does all of this and much more by just downloads the DEV branch or an Orabuntu-LXC release to /home/username/Downloads, unzipping it, then running the following script:
+Orabuntu-LXC does all of this and much more with just these easy steps:
+
+Step 1
+
+Install manually the following packages (if on Debian-family Linux):
+
+```
+sudo apt-get -y install unzip wget openssh-server net-tools bind9utils
+```
+Install manually the following packages (if on RedHat-family Linux):
+
+```
+sudo yum -y install unzip wget openssh-server net-tools bind-utils
+```
+
+Step 2
+
+Download the latest Orabuntu-LXC v6.0x AMIDE release to /home/username/Downloads and unzip it, then navigate to the "anylinux" directory and run the following script:
 
 ```
 ./anylinux-services.HUB.HOST.sh
