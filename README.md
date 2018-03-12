@@ -75,9 +75,9 @@ Download the latest Orabuntu-LXC v6.0x AMIDE release to /home/username/Downloads
 ./anylinux-services.HUB.HOST.sh
 ```
 
-The Orabuntu-LXC installer can simply be downloaded and started easy button as shown above for an instant next-generation container infrastructure deployment.
+That's it. It runs fully-automated and delivers a complete next-generation LXC and Docker container infrastructure.
 
-On the other hand, for expert customized usage, Orabuntu-LXC is highly-flexible and configurable using the parameters in the file: 
+If, on the other hand, it is desired to customize Orabuntu-LXC, it is highly-flexible and configurable using the parameters in the file: 
 
 ```
 anylinux-services.sh
