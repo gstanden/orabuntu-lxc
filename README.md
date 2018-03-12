@@ -11,6 +11,7 @@ Orabuntu-LXC BUILDS EVERYTHING itself for the currently supported distros:
 * CentOS 7.x
 * Fedora 22-27 (tested on 27)
 * RedHat 7.x
+* Pop_OS 17.10+ (System76)
 
 Orabuntu-LXC installer does all of the following automatically:
 
@@ -35,21 +36,27 @@ Orabuntu-LXC installer does all of the following automatically:
 * Present LUNs in 3 locations, including a container-friendly non-symlink location under /dev/containername
 * Present LUNs to containers directly, only the LUNs for that container, at full bare-metal storage performance.
 
-Orabuntu-LXC does all of this and much more by setting just 5 required parameters and kicking off the 
+Orabuntu-LXC does all of this and much more by just running the following script: 
 
 ```
-anylinux-services.HUB.HOST.sh
+./anylinux-services.HUB.HOST.sh
 ```
 
-script.  The Orabuntu-LXC installer can simply be downloaded and started easy button for an instant next-generation container infrastructure deployment.
+The Orabuntu-LXC installer can simply be downloaded and started easy button as shown above for an instant next-generation container infrastructure deployment.
 
-On the other hand, for expert customized usage, Orabuntu-LXC is highly-flexible and configurable using the parameters in the anylinux-services.sh file, including support for any two separate user-selectable IP subnet ranges, and 2 domain names, and much much more.  One network, for example the "seed" network can also be used as an out-of-band maintenance network.
+On the other hand, for expert customized usage, Orabuntu-LXC is highly-flexible and configurable using the parameters in the 
+
+```
+anylinux-services.sh
+```
+
+file, including support for any two separate user-selectable IP subnet ranges, and 2 domain names, and much more. One network, for example the "seed" network can also be used as an out-of-band maintenance network, and the other network used for production containers.
 
 With the replicated and constantly updated LXC containerized DNS/DHCP solution, GRE-connected hosts (such as developer laptops) can be disconnected from the network and still have full DNS/DHCP lookup services for any containers stored locally on the developer laptop.  Plus, containers that are added by the developer after detachment from the Orabuntu-LXC network will be added to the local copy of the LXC containerized DNS/DHCP.
 
 # Installing Orabuntu-LXC v6.0-beta AMIDE Edition
 
-An administrative non-root user account is required (such as the install account). The user needs to have "sudo ALL" privilege.
+An administrative non-root user account is required (such as the install account). The non-root user needs to have "sudo ALL" privilege.
 
 Be sure you are installing on an internet-connected LAN-connected host that can download source software from repositories which include yum.oracle.com, archive.ubuntu.com, SourceForge, etc.
 
@@ -74,21 +81,21 @@ Fedora release 27 (Twenty Seven)
 ```
 For Debian-family Linuxes the following script can be used to create the required administrative install user.
 ```
-orabuntu-services-0.sh
+./orabuntu-services-0.sh
 ```
 For RedHat-family Linuxes the following script can be used to create the required administrative install user.
 ```
-uekulele-services-0.sh
+./uekulele-services-0.sh
 ```
 The first Orabuntu-LXC install is always the "HUB" host install. 
 
 Install the Orabuntu-LXC HUB host as shown below (if installing an Orabuntu-LXC release).
 ```
-cd /home/username/Downloads/orabuntu-lxc-6.02-beta/anylinux
+cd /home/username/Downloads/orabuntu-lxc-6.03-beta/anylinux
 ./anylinux-services.HUB.HOST.sh new
 ```
 
-Install the Orabuntu-LXC HUB host as shown below (if installing from the development branch).
+Install the Orabuntu-LXC HUB host as shown below (if installing from the DEV branch).
 ```
 cd /home/username/Downloads/orabuntu-lxc-master/anylinux
 ./anylinux-services.HUB.HOST.sh new
@@ -123,7 +130,7 @@ To add additional physical hosts you use
 ```
 ./anylinux-services.GRE.HOST.sh new
 ```
-This script requires configuring the parameters
+This script requires configuring these parameters in the "anylinux-services.GRE.HOST.sh" script:
 
     * SPOKEIP
     * HUBIP
@@ -131,17 +138,21 @@ This script requires configuring the parameters
     * HubSudoPwd
     * Product
 
-Note that the subnet ranges chosen in the anylinux-services.HUB.HOST.sh install must be used unchanged when running anylinux-services.GRE.HOST.sh so that the multi-host networking works correctly.
+Note that the subnet ranges chosen in the "anylinux-services.HUB.HOST.sh" install must be used unchanged when running the script "anylinux-services.GRE.HOST.sh" so that the multi-host networking works correctly.
 
-To put VM's on the Orabuntu-LXC OpenvSwitch network, on either a HUB physical host or a GRE physical host, use the following scripts, respectively.
+To put VM's on the Orabuntu-LXC OpenvSwitch network, on either a HUB physical host, or, on a GRE physical host, see the guide in the Orabuntu-LXC wiki which gives an example (VirtualBox) of putting a VM on the LXC OpenvSwitch network.
+
+To install Orabuntu-LXC in a VM running on the LXC OpenvSwitch network on the HUB host use the following script.  In this case, Orabuntu-LXC is already installed on the phyiscal host, a VM has been put on the LXC OpenvSwitch networks, and now Orabuntu-LXC is installed in the VM.  This results in containers that are running in the VM on the LXC OpenvSwitch network, as well as the existing LXC containers which are running on the Orabuntu-LXC physical host.  All of these containers, VM's and physical hosts can talk to each other by default.
+
 ```
-anylinux-services.VM.ON.HUB.HOST.1500.sh new
+./anylinux-services.VM.ON.HUB.HOST.1500.sh new
 ```
-or
+
+To install Orabuntu-LXC in a VM running on the LXC OpenvSwitch network on a GRE-connected host use the following script:
 ```
-anylinux-services.VM.ON.GRE.HOST.1420.sh new
+./anylinux-services.VM.ON.GRE.HOST.1420.sh new
 ```
-In this case again it is necessary to configure the variables:
+In this case again it is necessary to configure parameters in the "anylinux-services.VM.ON.GRE.HOST.1420.sh" script:
 
     * SPOKEIP
     * HUBIP
