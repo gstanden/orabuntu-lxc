@@ -69,7 +69,7 @@ sudo yum -y install unzip wget openssh-server net-tools bind-utils
 
 Step 3
 
-Download the latest Orabuntu-LXC v6.0x AMIDE release to /home/username/Downloads and unzip it, then navigate to the "anylinux" directory and run the following script:
+Download the latest Orabuntu-LXC v6.0x AMIDE release to /home/username/Downloads and unzip it, then navigate to the "anylinux" directory and run it (as a NON-root "administrative" user with "SUDO ALL" privilege or "wheel" privilege) the following script:
 
 ```
 ./anylinux-services.HUB.HOST.sh
