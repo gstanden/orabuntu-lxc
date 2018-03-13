@@ -99,7 +99,7 @@ then
 	sudo mv "$DistDir"/installs/logs/$USER.log "$DistDir"/installs/logs/$USER.log.$LOGEXT
 fi
 
-if [ ! -d /varlog/sudo-io ]
+if [ ! -d /var/log/sudo-io ]
 then
 	sudo mkdir -m 750 /var/log/sudo-io
 fi
