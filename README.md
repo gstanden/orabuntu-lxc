@@ -75,7 +75,7 @@ Download the latest Orabuntu-LXC v6.0x AMIDE release to /home/username/Downloads
 ./anylinux-services.HUB.HOST.sh
 ```
 
-That's it. It runs fully-automated and delivers a complete next-generation LXC and Docker container infrastructure.
+That's it. It runs fully-automated and delivers a complete next-generation LXC and Docker SDN container infrastructure.
 
 If, on the other hand, it is desired to customize Orabuntu-LXC, it is highly-flexible and configurable using the parameters in the file: 
 
