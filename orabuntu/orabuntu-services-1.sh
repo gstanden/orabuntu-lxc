@@ -1126,7 +1126,6 @@ sudo sh -c "echo 'net.core.rmem_default = 262144'            >> /etc/sysctl.d/60
 sudo sh -c "echo 'net.core.rmem_max = 4194304'               >> /etc/sysctl.d/60-olxc.conf"
 sudo sh -c "echo 'net.core.wmem_default = 262144'            >> /etc/sysctl.d/60-olxc.conf"
 sudo sh -c "echo 'net.core.wmem_max = 1048576'               >> /etc/sysctl.d/60-olxc.conf"
-sudo sh -c "echo 'vm.nr_hugepages = 3500'                    >> /etc/sysctl.d/60-olxc.conf"
 sudo sh -c "echo 'kernel.panic_on_oops = 1'                  >> /etc/sysctl.d/60-olxc.conf"
 
 echo ''
