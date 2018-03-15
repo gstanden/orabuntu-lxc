@@ -1,5 +1,3 @@
-Update March 15:  !!! IMPORTANT:  Do NOT use AMIDE with Ubuntu 16.04 !!! - there is a problem with reboots after install.
-
 # What is Orabuntu-LXC v6.0-beta AMIDE Edition ?
 
 Orabuntu-LXC v6.0-beta AMIDE Edition stands for "Amazon Mult-I-host Docker Enterprise" Edition.  
