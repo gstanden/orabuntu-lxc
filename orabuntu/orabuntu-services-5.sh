@@ -42,6 +42,11 @@ NameServer=$5
 MultiHost=$6
 DistDir=$7
 
+function GetUbuntuVersion {
+	cat /etc/lsb-release | grep DISTRIB_RELEASE | cut -f2 -d'='
+}
+UbuntuVersion=$(GetUbuntuVersion)
+
 function CheckSearchDomain1 {
         grep -c $Domain1 /etc/resolv.conf
 }
@@ -426,7 +431,7 @@ then
 	echo ''
 	
 	sudo touch /etc/orabuntu-lxc-release
-	sudo sh -c "echo 'Orabuntu-LXC v6.07-beta AMIDE' > /etc/orabuntu-lxc-release"
+	sudo sh -c "echo 'Orabuntu-LXC v6.09-beta AMIDE' > /etc/orabuntu-lxc-release"
 	sudo ls -l /etc/orabuntu-lxc-release
 	echo ''
 	sudo cat /etc/orabuntu-lxc-release
