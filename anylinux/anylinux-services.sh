@@ -398,14 +398,14 @@ fi
 	Domain1=$4
 	if [ -z $4 ]
 	then
-		Domain1=urdomain1.com
+		Domain1=tutortronics.net
 	fi
 	echo 'Domain1                   = '$Domain1
 
 	Domain2=$5
 	if [ -z $5 ]
 	then
-		Domain2=urdomain2.com
+		Domain2=caltek.net
 	fi
 	echo 'Domain2                   = '$Domain2
 

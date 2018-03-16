@@ -194,7 +194,10 @@ sleep 5
 
 clear
 
-sudo sed -i 's/yum install/yum -y install/g' /var/lib/lxc/$SeedContainerName/rootfs/root/lxc-services.sh
+if [ -f /var/lib/lxc/$SeedContainerName/rootfs/root/lxc-services.sh ]
+then
+	sudo sed -i 's/yum install/yum -y install/g' /var/lib/lxc/$SeedContainerName/rootfs/root/lxc-services.sh
+fi
 
 let CloneIndex=10
 let CopyCompleted=0
