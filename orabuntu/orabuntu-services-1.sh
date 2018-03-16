@@ -42,6 +42,16 @@ OSMemRes=$6
 MultiHost=$7
 DistDir=$8
 
+function CheckFacterValue {
+	facter virtual
+}
+FacterValue=$(CheckFacterValue)
+
+function CheckAWS {
+	grep -c ec2 /etc/resolv.conf
+}
+AWS=$(CheckAWS)
+
 function GetNameServerBase {
 	echo $NameServer | cut -f1 -d'-'
 }
@@ -605,6 +615,11 @@ sudo apt-get install -y bind9utils dnsutils apparmor-utils openssh-server uuid r
 sudo apt-get install -y iotop sshpass facter iptables xfsprogs
 
 if [ $NetworkManagerInstalled -eq 1 ] && [ $SystemdResolvedInstalled -eq 0 ]
+then
+	sudo apt-get -y install dnsmasq
+fi
+
+if [ $UbuntuVersion = '16.04' ] && [ $FacterValue = 'xenu' ] && [ $AWS -eq 1 ]
 then
 	sudo apt-get -y install dnsmasq
 fi
@@ -1405,7 +1420,11 @@ then
 		sudo sed -i '$!N; /^\(.*\)\n\1$/!P; D'	/etc/resolv.conf
 	fi
 
-	sudo service systemd-resolved restart
+	if [ $UbuntuVersion != '16.04' ]
+	then
+		sudo service systemd-resolved restart
+	fi
+
 	sudo cat /etc/resolv.conf
 
 	sleep 5
@@ -1462,9 +1481,7 @@ then
 		echo "which is the setting required for NM dnsmasq. "
 		echo "=============================================="
  	fi
-
-	# sudo sh -c "echo 'search $Domain1 $Domain2 gns1.$Domain1' >> /etc/resolv.conf"
-
+	
 	echo "=============================================="
 	echo "NetworkManager dnsmasq activated.             "
 	echo "=============================================="
@@ -1502,19 +1519,23 @@ then
 	sudo apt-get -y install dnsmasq
 	sudo service dnsmasq stop
 	sleep 5
-	
-	sudo sed -i '0,/.*#listen-address.*/s/.*#listen-address.*/listen-address=127.0.0.1\n&/'							/etc/dnsmasq.conf
-	sudo sed -i '0,/.*#server=\/localnet.*/s/.*#server=\/localnet.*/server=\/$Domain1\/10.207.39.2\n&/'					/etc/dnsmasq.conf
-	sudo sed -i '0,/.*#server=\/localnet.*/s/.*#server=\/localnet.*/server=\/$Domain2\.com\/10.207.29.2\n&/'				/etc/dnsmasq.conf
-	sudo sed -i '0,/.*#server=\/localnet.*/s/.*#server=\/localnet.*/server=\/gns1\.$Domain1\/10.207.39.2\n&/'				/etc/dnsmasq.conf
-	sudo sed -i '0,/.*#server=\/3\.168\.192.*/s/.*#server=\/3\.168\.192.*/server=\/39\.207\.10\.in-addr\.arpa\/10\.207\.39\.2\n&/'          /etc/dnsmasq.conf
-	sudo sed -i '0,/.*#server=\/3\.168\.192.*/s/.*#server=\/3\.168\.192.*/server=\/29\.207\.10\.in-addr\.arpa\/10\.207\.29\.2\n&/'          /etc/dnsmasq.conf
 
+        sudo sh -c "echo 'server=/$Domain1/10.207.39.2'                 >> /etc/dnsmasq.conf"
+        sudo sh -c "echo 'server=/$Domain2/10.207.29.2'                 >> /etc/dnsmasq.conf"
+        sudo sh -c "echo 'server=/gns1.$Domain1/10.207.39.2'            >> /etc/dnsmasq.conf"
+        sudo sh -c "echo 'server=/39.207.10.in-addr.arpa/10.207.39.2'   >> /etc/dnsmasq.conf"
+        sudo sh -c "echo 'server=/29.207.10.in-addr.arpa/10.207.29.2'   >> /etc/dnsmasq.conf"
+	sudo sh -c "echo 'cache-size=0'					>> /etc/dnsmasq.conf"
+	
 	sudo systemctl enable dnsmasq
 
 	sudo service dnsmasq start
 
-	sudo sh -c "echo 'search $Domain1 $Domain2 gns1.$Domain1' >> /etc/resolv.conf"
+	if [ $AWS -eq 1 ] && [ $FacterValue = 'xenu' ]
+	then
+		sudo sed -i '/search/d'	/etc/resolv.conf
+		sudo sh -c "echo 'search ec2.internal $Domain1 $Domain2 gns1.$Domain1' >> /etc/resolv.conf"
+	fi
 
 	echo ''	
 	echo "=============================================="
@@ -1553,11 +1574,11 @@ then
 #       echo "=============================================="
 #       echo ''
 
-        sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service systemd-resolved restart > /dev/null 2>&1"
-        sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service lxc-net restart > /dev/null 2>&1"
+sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service systemd-resolved restart > /dev/null 2>&1"
+sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service lxc-net restart > /dev/null 2>&1"
         
 	Sx1Index=201
-        function CheckHighestSx1IndexHit {
+       function CheckHighestSx1IndexHit {
                 sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 nslookup -timeout=2 10.207.29.$Sx1Index | grep 'name =' | wc -l
         }
         HighestSx1IndexHit=$(CheckHighestSx1IndexHit)
@@ -1578,8 +1599,8 @@ then
 #       echo "=============================================="
 #       echo ''
 
-        sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service systemd-resolved restart > /dev/null 2>&1"
-        sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service lxc-net restart > /dev/null 2>&1"
+sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service systemd-resolved restart > /dev/null 2>&1"
+sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service lxc-net restart > /dev/null 2>&1"
         
         Sw1Index=201
         function CheckHighestSw1IndexHit {
@@ -1767,7 +1788,7 @@ sleep 5
 
 clear
 
-if   [ $SystemdResolvedInstalled -eq 1 ] && [ $NetworkManagerInstalled -eq 1 ]
+if   [ $SystemdResolvedInstalled -eq 1 ] && [ $NetworkManagerInstalled -eq 1 ] && [ $UbuntuVersion != '16.04' ]
 then
 	echo ''
 	echo "=============================================="
@@ -2511,7 +2532,7 @@ then
         fi
 fi
 
-if [ $SystemdResolvedInstalled -ge 1 ]
+if [ $SystemdResolvedInstalled -ge 1 ] && [ $UbuntuVersion != '16.04' ]
 then
         echo ''
         echo "=============================================="
@@ -2532,8 +2553,9 @@ then
         sleep 5
 
         clear
+fi
 
-elif [ $LxcNetRunning -ge 1 ]
+if [ $LxcNetRunning -ge 1 ] && [ $UbuntuVersion != '16.04' ]
 then
         echo ''
         echo "=============================================="
@@ -2638,63 +2660,63 @@ clear
 
 # clear
 
-echo ''
-echo "=============================================="
-echo "Create RSA key if it does not already exist   "
-echo "=============================================="
-echo ''
+# # echo ''
+# echo "=============================================="
+# echo "Create RSA key if it does not already exist   "
+# echo "=============================================="
+# echo ''
 
-if [ ! -e ~/.ssh/id_rsa.pub ]
-then
+# if [ ! -e ~/.ssh/id_rsa.pub ]
+# then
 # ssh-keygen -t rsa
-ssh-keygen -f ~/.ssh/id_rsa -t rsa -N ''
-fi
+# ssh-keygen -f ~/.ssh/id_rsa -t rsa -N ''
+# fi
 
-if [ -e ~/.ssh/authorized_keys ]
-then
-rm ~/.ssh/authorized_keys
-fi
+# if [ -e ~/.ssh/authorized_keys ]
+# then
+# rm ~/.ssh/authorized_keys
+# fi
 
-touch ~/.ssh/authorized_keys
+# touch ~/.ssh/authorized_keys
 
-if [ -e ~/.ssh/id_rsa.pub ]
-then
-function GetAuthorizedKey {
-cat ~/.ssh/id_rsa.pub
-}
-AuthorizedKey=$(GetAuthorizedKey)
+# if [ -e ~/.ssh/id_rsa.pub ]
+# then
+# function GetAuthorizedKey {
+# cat ~/.ssh/id_rsa.pub
+# }
+# AuthorizedKey=$(GetAuthorizedKey)
 
-echo 'Authorized Key:'
-echo ''
-echo $AuthorizedKey 
-echo ''
-fi
+# echo 'Authorized Key:'
+# echo ''
+# echo $AuthorizedKey 
+# echo ''
+# fi
 
-function CheckAuthorizedKeys {
-grep -c "$AuthorizedKey" ~/.ssh/authorized_keys
-}
-AuthorizedKeys=$(CheckAuthorizedKeys)
+# function CheckAuthorizedKeys {
+# grep -c "$AuthorizedKey" ~/.ssh/authorized_keys
+# }
+# AuthorizedKeys=$(CheckAuthorizedKeys)
 
-echo "Results of grep = $AuthorizedKeys"
+# echo "Results of grep = $AuthorizedKeys"
 
-if [ "$AuthorizedKeys" -eq 0 ]
-then
-cat  ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
-fi
+# if [ "$AuthorizedKeys" -eq 0 ]
+# then
+# cat  ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
+# fi
 
-echo ''
-echo 'cat of authorized_keys'
-echo ''
-cat ~/.ssh/authorized_keys
+# echo ''
+# echo 'cat of authorized_keys'
+# echo ''
+# cat ~/.ssh/authorized_keys
 
-echo ''
-echo "=============================================="
-echo "Create RSA key completed                      "
-echo "=============================================="
+# echo ''
+# echo "=============================================="
+# echo "Create RSA key completed                      "
+# echo "=============================================="
 
-sleep 5
+# sleep 5
 
-clear
+# clear
 
 echo ''
 echo "=============================================="

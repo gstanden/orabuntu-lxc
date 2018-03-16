@@ -74,7 +74,7 @@ function CheckSystemdResolvedInstalled {
 }
 SystemdResolvedInstalled=$(CheckSystemdResolvedInstalled)
 
-if [ $SystemdResolvedInstalled -gt 0 ]
+if [ $SystemdResolvedInstalled -gt 0 ] && [ $UbuntuVersion != '16.04' ]
 then
 	echo ''
 	echo "=============================================="
@@ -475,7 +475,7 @@ echo "Container oel$OracleRelease$SeedPostfix ping test..."
 echo "=============================================="
 echo ''
 
-if [ $SystemdResolvedInstalled -eq 1 ]
+if [ $SystemdResolvedInstalled -eq 1 ] && [ $UbuntuVersion != '16.04' ]
 then
 	        sudo service systemd-resolved restart
 fi
@@ -491,7 +491,7 @@ NetworkUp=$(CheckNetworkUp)
 n=$((n+1))
 done
 
-if [ $SystemdResolvedInstalled -eq 1 ]
+if [ $SystemdResolvedInstalled -eq 1 ] && [ $UbuntuVersion != '16.04' ]
 then
 	sudo service systemd-resolved restart > /dev/null 2>&1
 	sleep 2

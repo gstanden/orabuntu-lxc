@@ -1,4 +1,3 @@
-/home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/scst-files/create-scst.sh
 /home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/scst-files/create-scst-install.sh
 /home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/scst-files/create-scst-dkms.sh
 /home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/scst-files/create-scst-target.sh
@@ -8,5 +7,6 @@
 /home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/scst-files/create-scst-uninstall-dkms.sh
 /home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/scst-files/README
 /home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/scst-files/vercomp
-/home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/scst-files/GNU3
-/home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/scst-files/COPYING
+/home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/scst-files/create-scst.sh
+/home/ubuntu/Downloads/orabuntu-lxc-6.04-beta/orabuntu/archives/GNU3
+/home/ubuntu/Downloads/orabuntu-lxc-6.04-beta/orabuntu/archives/COPYING

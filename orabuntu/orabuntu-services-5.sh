@@ -262,7 +262,10 @@ ClonedContainersExist=$(CheckClonedContainersExist)
 # sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service systemd-resolved restart > /dev/null 2>&1"
 # sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service dnsmasq restart > /dev/null 2>&1"
 
-sudo service systemd-resolved restart > /dev/null 2>&1
+if [ $UbuntuVersion != '16.04' ]
+then
+	sudo service systemd-resolved restart > /dev/null 2>&1
+fi
 
 for j in $ClonedContainersExist
 do
@@ -304,7 +307,10 @@ do
 			echo ''
 			sudo /etc/network/openvswitch/veth_cleanups.sh $j
 			echo ''
-			sudo service systemd-resolved restart > /dev/null 2>&1
+			if [ $UbuntuVersion != '16.04' ]
+			then
+				sudo service systemd-resolved restart > /dev/null 2>&1
+			fi
 			sleep 2
 			sudo lxc-start -n $j
 			sleep 5
@@ -332,7 +338,7 @@ sleep 5
 
 clear
 
-if   [ $SystemdResolvedInstalled -ge 1 ]
+if   [ $SystemdResolvedInstalled -ge 1 ] && [ $UbuntuVersion != '16.04' ]
 then
 	echo ''
 	echo "=============================================="
@@ -353,8 +359,9 @@ then
 	sleep 5
 	
 	clear
+fi
 
-elif [ $LxcNetRunning -ge 1 ]
+if [ $LxcNetRunning -ge 1 ]
 then
 	echo ''
 	echo "=============================================="
@@ -584,7 +591,7 @@ then
 		clear
 	fi
 	
-	if [ $SystemdResolvedInstalled -ge 1 ]
+	if [ $SystemdResolvedInstalled -ge 1 ] && [ $UbuntuVersion != '16.04' ]
 	then
 		echo ''
 		echo "=============================================="
@@ -605,8 +612,9 @@ then
 		sleep 5
 	
 		clear
+	fi
 
-        elif [ $LxcNetRunning -ge 1 ]
+        if [ $LxcNetRunning -ge 1 ]
         then
                 echo ''
                 echo "=============================================="
@@ -748,7 +756,7 @@ then
 
                 sleep 5
         
-                if   [ $SystemdResolvedInstalled -ge 1 ] 
+                if   [ $SystemdResolvedInstalled -ge 1 ] && [ $UbuntuVersion != '16.04' ]
                 then
                         echo ''
                         echo "=============================================="
@@ -767,8 +775,9 @@ then
                         echo '' 
         
                         sleep 5 
-        
-                elif [ $LxcNetRunning -ge 1 ] 
+       		fi
+ 
+                if [ $LxcNetRunning -ge 1 ] 
                 then    
                         echo '' 
                         echo "=============================================="
