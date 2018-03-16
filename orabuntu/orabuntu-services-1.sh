@@ -42,6 +42,8 @@ OSMemRes=$6
 MultiHost=$7
 DistDir=$8
 
+RSA=N
+
 function CheckFacterValue {
 	facter virtual
 }
@@ -2673,7 +2675,7 @@ clear
 
 # clear
 
-if [ $AWS -eq 0 ]
+if [ $AWS -eq 0 ] && [ $RSA = 'Y' ]
 then
 	echo ''
 	echo "=============================================="
