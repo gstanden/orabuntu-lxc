@@ -469,6 +469,17 @@ sleep 10
 
 clear
 
+function CheckSearchDomain1 {
+        grep -c $Domain1 /etc/resolv.conf
+}
+SearchDomain1=$(CheckSearchDomain1)
+
+if [ $SearchDomain1 -eq 0 ] && [ $AWS -eq 0 ]
+then
+        sudo sed -i '/search/d' /etc/resolv.conf
+        sudo sh -c "echo 'search $Domain1 $Domain2 gns1.$Domain1' >> /etc/resolv.conf"
+fi
+
 echo ''
 echo "=============================================="
 echo "Container oel$OracleRelease$SeedPostfix ping test..."

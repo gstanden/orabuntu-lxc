@@ -1537,6 +1537,17 @@ then
 		sudo sh -c "echo 'search ec2.internal $Domain1 $Domain2 gns1.$Domain1' >> /etc/resolv.conf"
 	fi
 
+	function CheckSearchDomain1 {
+		grep -c $Domain1 /etc/resolv.conf
+	}
+	SearchDomain1=$(CheckSearchDomain1)
+
+	if [ $SearchDomain1 -eq 0 ] && [ $AWS -eq 0 ]
+	then
+		sudo sed -i '/search/d' /etc/resolv.conf
+		sudo sh -c "echo 'search $Domain1 $Domain2 gns1.$Domain1' >> /etc/resolv.conf"
+	fi
+
 	sudo sed -i "/supersede domain-name/c\append domain-name \" $Domain1 $Domain2 gns1.$Domain1\"" /etc/dhcp/dhclient.conf
 
 	echo ''	
@@ -2662,59 +2673,62 @@ clear
 
 # clear
 
-# # echo ''
-# echo "=============================================="
-# echo "Create RSA key if it does not already exist   "
-# echo "=============================================="
-# echo ''
+if [ $AWS -eq 0 ]
+then
+	echo ''
+	echo "=============================================="
+	echo "Create RSA key if it does not already exist   "
+	echo "=============================================="
+	echo ''
 
-# if [ ! -e ~/.ssh/id_rsa.pub ]
-# then
-# ssh-keygen -t rsa
-# ssh-keygen -f ~/.ssh/id_rsa -t rsa -N ''
-# fi
+	if [ ! -e ~/.ssh/id_rsa.pub ]
+	then
+		ssh-keygen -t rsa
+		ssh-keygen -f ~/.ssh/id_rsa -t rsa -N ''
+	fi
 
-# if [ -e ~/.ssh/authorized_keys ]
-# then
-# rm ~/.ssh/authorized_keys
-# fi
+	# if [ -e ~/.ssh/authorized_keys ]
+	# then
+	# 	rm ~/.ssh/authorized_keys
+	# fi
 
-# touch ~/.ssh/authorized_keys
+	touch ~/.ssh/authorized_keys
 
-# if [ -e ~/.ssh/id_rsa.pub ]
-# then
-# function GetAuthorizedKey {
-# cat ~/.ssh/id_rsa.pub
-# }
-# AuthorizedKey=$(GetAuthorizedKey)
+	if [ -e ~/.ssh/id_rsa.pub ]
+	then
+		function GetAuthorizedKey {
+			cat ~/.ssh/id_rsa.pub
+		}
+		AuthorizedKey=$(GetAuthorizedKey)
 
-# echo 'Authorized Key:'
-# echo ''
-# echo $AuthorizedKey 
-# echo ''
-# fi
+		echo 'Authorized Key:'
+		echo ''
+		echo $AuthorizedKey 
+		echo ''
+	fi
 
-# function CheckAuthorizedKeys {
-# grep -c "$AuthorizedKey" ~/.ssh/authorized_keys
-# }
-# AuthorizedKeys=$(CheckAuthorizedKeys)
+	function CheckAuthorizedKeys {
+		grep -c "$AuthorizedKey" ~/.ssh/authorized_keys
+	}
+	AuthorizedKeys=$(CheckAuthorizedKeys)
 
-# echo "Results of grep = $AuthorizedKeys"
+	echo "Results of grep = $AuthorizedKeys"
 
-# if [ "$AuthorizedKeys" -eq 0 ]
-# then
-# cat  ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
-# fi
+	if [ "$AuthorizedKeys" -eq 0 ]
+	then
+		cat  ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
+	fi
 
-# echo ''
-# echo 'cat of authorized_keys'
-# echo ''
-# cat ~/.ssh/authorized_keys
+	echo ''
+	echo 'cat of authorized_keys'
+	echo ''
+	cat ~/.ssh/authorized_keys
 
-# echo ''
-# echo "=============================================="
-# echo "Create RSA key completed                      "
-# echo "=============================================="
+	echo ''
+	echo "=============================================="
+	echo "Create RSA key completed                      "
+	echo "=============================================="
+fi
 
 # sleep 5
 

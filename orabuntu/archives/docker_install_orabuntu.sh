@@ -60,18 +60,24 @@ echo "Done: Install docker-ce.                      "
 echo "=============================================="
 echo ''
 echo "=============================================="
-echo "Install docker raesene/alping-nettools...     "
+echo "Install User-Settable Docker Containers...    "
 echo "=============================================="
 echo ''
 
-sudo docker run -d -p 2200:22 raesene/alpine-nettools
+# Install alpine-nettools
+# sudo docker run -d -p 2200:22 raesene/alpine-nettools
+
+# Install odoo ERP
+# sudo docker run -d -e POSTGRES_USER=odoo -e POSTGRES_PASSWORD=odoo --name db postgres:9.4
+# sudo docker run -d -p 8069:8069 --name odoo --link db:db -t odoo
+
 # sudo docker exec -ti <container_name> /bin/sh
 sleep 2
 sudo docker ps -a
 
 echo ''
 echo "=============================================="
-echo "Done: Install docker raesene/alping-nettools. "
+echo "Done: Install User-Settable Docker Containers."
 echo "=============================================="
 echo ''
 echo "=============================================="

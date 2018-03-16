@@ -377,14 +377,14 @@ fi
 	MajorRelease=$8
 	if [ -z $8 ]
 	then
-		MajorRelease=6
+		MajorRelease=7
 	fi
 	# echo 'Oracle Container Release  = '$MajorRelease
 
 	PointRelease=$2
 	if [ -z $2 ]
 	then
-		PointRelease=6
+		PointRelease=3
 	fi
 	echo 'Oracle Container Version  = '$MajorRelease.$PointRelease
 
@@ -398,21 +398,21 @@ fi
 	Domain1=$4
 	if [ -z $4 ]
 	then
-		Domain1=urdomain1.com
+		Domain1=tutortronics.net
 	fi
 	echo 'Domain1                   = '$Domain1
 
 	Domain2=$5
 	if [ -z $5 ]
 	then
-		Domain2=urdomain2.com
+		Domain2=caltek.net
 	fi
 	echo 'Domain2                   = '$Domain2
 
 	NameServer=$6
 	if [ -z $6 ]
 	then
-		NameServer=afns1
+		NameServer=scale16
 	fi
 	echo 'NameServer                = '$NameServer
 

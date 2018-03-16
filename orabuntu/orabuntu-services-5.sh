@@ -42,6 +42,17 @@ NameServer=$5
 MultiHost=$6
 DistDir=$7
 
+function CheckSearchDomain1 {
+        grep -c $Domain1 /etc/resolv.conf
+}
+SearchDomain1=$(CheckSearchDomain1)
+
+if [ $SearchDomain1 -eq 0 ] && [ $AWS -eq 0 ]
+then
+        sudo sed -i '/search/d' /etc/resolv.conf
+        sudo sh -c "echo 'search $Domain1 $Domain2 gns1.$Domain1' >> /etc/resolv.conf"
+fi
+
 OR=$OracleRelease
 Config=/var/lib/lxc/$SeedContainerName/config
 
@@ -415,7 +426,7 @@ then
 	echo ''
 	
 	sudo touch /etc/orabuntu-lxc-release
-	sudo sh -c "echo 'Orabuntu-LXC v6.0-beta AMIDE' > /etc/orabuntu-lxc-release"
+	sudo sh -c "echo 'Orabuntu-LXC v6.07-beta AMIDE' > /etc/orabuntu-lxc-release"
 	sudo ls -l /etc/orabuntu-lxc-release
 	echo ''
 	sudo cat /etc/orabuntu-lxc-release

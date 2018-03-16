@@ -36,10 +36,12 @@ clear
 MajorRelease=$1
 OracleRelease=$1$2
 OracleVersion=$1.$2
-Domain2=$3
-MultiHost=$4
-DistDir=$5
-Product=$6
+Domain1=$3
+Domain2=$4
+MultiHost=$5
+DistDir=$6
+Product=$7
+Domain1=$8
 
 echo ''
 echo "=============================================="
@@ -227,6 +229,17 @@ fi
 sleep 5
 
 clear
+
+function CheckSearchDomain2 {
+        grep -c $Domain2 /etc/resolv.conf
+}
+SearchDomain2=$(CheckSearchDomain2)
+
+if [ $SearchDomain2 -eq 0 ] && [ $AWS -eq 0 ]
+then
+        sudo sed -i '/search/d' /etc/resolv.conf
+        sudo sh -c "echo 'search $Domain1 $Domain2 gns1.$Domain1' >> /etc/resolv.conf"
+fi
 
 echo ''
 echo "=============================================="
