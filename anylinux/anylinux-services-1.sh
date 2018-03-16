@@ -29,7 +29,16 @@
 #    There are two domains and two networks because the "seed" LXC containers are on a separate network from the production LXC containers.
 #    If the domain is an actual domain, you will need to change the subnet though (a feature this software does not yet support - it's on the roadmap) to match your subnet manually.
 
-# trap "exit" INT TERM; trap "kill 0" EXIT; sudo -v || exit $?; sleep 1; while true; do sleep 60; sudo -nv; done 2>/dev/null &
+
+function CheckAWS {
+        grep -c ec2 /etc/resolv.conf
+}
+AWS=$(CheckAWS)
+ 
+if [ $AWS -eq 0 ]
+then
+	trap "exit" INT TERM; trap "kill 0" EXIT; sudo -v || exit $?; sleep 1; while true; do sleep 60; sudo -nv; done 2>/dev/null &
+fi
 
 MajorRelease=$1
 PointRelease=$2

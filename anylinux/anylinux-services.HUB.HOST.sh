@@ -37,7 +37,15 @@
 #    Passing parameters in from the command line is possible but is not described herein. The supported usage is to configure this file as described below.
 #    Capital 'X' means 'not used' do not replace leave as is.
 
-# trap "exit" INT TERM; trap "kill 0" EXIT; sudo -v || exit $?; sleep 1; while true; do sleep 60; sudo -nv; done 2>/dev/null &
+function CheckAWS {
+        grep -c ec2 /etc/resolv.conf
+}
+AWS=$(CheckAWS)
+
+if [ $AWS -eq 0 ]
+then
+        trap "exit" INT TERM; trap "kill 0" EXIT; sudo -v || exit $?; sleep 1; while true; do sleep 60; sudo -nv; done 2>/dev/null &
+fi
 
 GRE=N 
 
