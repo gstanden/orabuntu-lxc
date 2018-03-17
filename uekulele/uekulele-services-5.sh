@@ -1207,3 +1207,4 @@ if [ $LinuxFlavor = 'Fedora' ]
 then
 	sudo sh -c "echo 'exclude=openvswitch*' >> /etc/dnf/dnf.conf"
 fi
+sudo rm -f /etc/sudoers.d/orabuntu-lxc

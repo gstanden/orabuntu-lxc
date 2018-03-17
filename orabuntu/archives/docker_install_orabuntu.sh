@@ -65,11 +65,11 @@ echo "=============================================="
 echo ''
 
 # Install alpine-nettools
-# sudo docker run -d -p 2200:22 raesene/alpine-nettools
+sudo docker run -d -p 2200:22 raesene/alpine-nettools
 
-# Install odoo ERP
-sudo docker run -d -e POSTGRES_USER=odoo -e POSTGRES_PASSWORD=odoo --name db postgres:9.4
-sudo docker run -d -p 8069:8069 --name odoo --link db:db -t odoo
+# Install ODOO ERP
+# sudo docker run -d -e POSTGRES_USER=odoo -e POSTGRES_PASSWORD=odoo --name db postgres:9.4
+# sudo docker run -d -p 8069:8069 --name odoo --link db:db -t odoo
 
 # sudo docker exec -ti <container_name> /bin/sh
 sleep 2

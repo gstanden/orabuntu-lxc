@@ -412,7 +412,7 @@ fi
 	NameServer=$6
 	if [ -z $6 ]
 	then
-		NameServer=scale16
+		NameServer=ns1
 	fi
 	echo 'NameServer                = '$NameServer
 
