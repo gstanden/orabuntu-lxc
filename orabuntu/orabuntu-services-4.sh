@@ -73,7 +73,7 @@ echo "This script clones additional containers.     "
 echo "=============================================="
 echo ''
 echo "=============================================="
-echo "NumCon is the number of RAC nodes             "
+echo "NumCon is the number of containers            "
 echo "NumCon (small integer)                        "
 echo "NumCon defaults to value '2'                  "
 echo "=============================================="
@@ -99,14 +99,13 @@ echo "Number of LXC Container RAC Nodes = $NumCon   "
 echo "=============================================="
 echo ''
 echo "=============================================="
-echo "If wrong number of desired RAC nodes, then    "
+echo "If wrong number of desired containers, then   "
 echo "<ctrl>+c and restart script to set            "
 echo "Sleeping 15 seconds...                        "
 echo "=============================================="
 echo ''
 echo "=============================================="
-echo "This script creates oracle-ready lxc clones   "
-echo "for oracle-ready RAC container nodes          "
+echo "This script creates container clones          "
 echo "=============================================="
 
 sleep 10

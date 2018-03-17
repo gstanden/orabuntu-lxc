@@ -45,10 +45,10 @@ Domain1=$8
 
 echo ''
 echo "=============================================="
-echo "Script:  orabuntu-services-3.sh                 "
+echo "Script:  orabuntu-services-3.sh               "
 echo "                                              "
-echo "This script installs packages into the Oracle "
-echo "Linux container required for running Oracle.  "
+echo "This script installs required packages into   "
+echo "the Oracle Linux container.                   "
 echo "=============================================="
 echo ''
 echo "=============================================="
