@@ -1619,7 +1619,7 @@ sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no 
         
 	Sx1Index=201
        function CheckHighestSx1IndexHit {
-                sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" nslookup -timeout=2 10.207.29.$Sx1Index | grep 'name =' | wc -l" | cut -f5 -d' '
+                sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" nslookup -timeout=1 $Sx1Net.$Sx1Index" | grep -c 'name ='
         }
         HighestSx1IndexHit=$(CheckHighestSx1IndexHit)
 
@@ -1644,7 +1644,7 @@ sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no 
         
         Sw1Index=201
         function CheckHighestSw1IndexHit {
-                sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" nslookup -timeout=2 10.207.39.$Sw1Index | grep 'name =' | wc -l" | cut -f5 -d' '
+                sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" nslookup -timeout=1 $Sw1Net.$Sw1Index" | grep -c 'name ='
         }
         HighestSw1IndexHit=$(CheckHighestSw1IndexHit)
 
