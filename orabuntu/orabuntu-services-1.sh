@@ -41,6 +41,8 @@ NameServer=$5
 OSMemRes=$6
 MultiHost=$7
 DistDir=$8
+Sx1Net=$9
+Sw1Net=${10}
 
 RSA=N
 
@@ -1556,12 +1558,13 @@ then
                 	ExistingSearchDomains=$(GetExistingSearchDomains)
 		fi
 
-		sudo sed -i '/#/d'		/etc/resolv.conf
-                sudo sed -i '/search/d' 	/etc/resolv.conf
+		sudo sed -i '/#/d'			/etc/resolv.conf
+                sudo sed -i '/search/d' 		/etc/resolv.conf
 		sudo sh  -c "echo 'nameserver 127.0.0.1' >> /etc/resolv.conf"
                 sudo sh  -c "echo 'search $ExistingSearchDomains $Domain1 $Domain2 gns1.$Domain1' >> /etc/resolv.conf"
 		sudo sed -i "/supersede domain-name/c\append domain-name \" $Domain1 $Domain2 gns1.$Domain1\"" /etc/dhcp/dhclient.conf
-		sudo sed -i '/8.8.8.8/d' 	/etc/resolv.conf
+		sudo sed -i '/8.8.8.8/d' 		/etc/resolv.conf
+		sudo sed -i '$!N; /^\(.*\)\n\1$/!P; D'  /etc/resolv.conf
         fi
 
         function CheckSearchDomain1 {
@@ -1574,6 +1577,7 @@ then
                 sudo sed -i '/search/d' /etc/resolv.conf
                 sudo sh -c "echo 'search $Domain1 $Domain2 gns1.$Domain1' >> /etc/resolv.conf"
 		sudo sed -i "/supersede domain-name/c\append domain-name \" $Domain1 $Domain2 gns1.$Domain1\"" /etc/dhcp/dhclient.conf
+		sudo sed -i '$!N; /^\(.*\)\n\1$/!P; D'  /etc/resolv.conf
         fi
 
 
@@ -1608,17 +1612,17 @@ sudo chmod 755 /etc/network/openvswitch/*.sh
 
 if   [ $MultiHostVar3 = 'X' ]
 then
-#       echo ''
-#       echo "=============================================="
-#       echo "Get sx1 IP address...                         "
-#       echo "=============================================="
-#       echo ''
+        echo ''
+        echo "=============================================="
+        echo "Get sx1 IP address...                         "
+        echo "=============================================="
+        echo ''
 
-sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service systemd-resolved restart > /dev/null 2>&1"
-sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service lxc-net restart > /dev/null 2>&1"
+	sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service systemd-resolved restart > /dev/null 2>&1"
+	sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service lxc-net restart > /dev/null 2>&1"
         
 	Sx1Index=201
-       function CheckHighestSx1IndexHit {
+        function CheckHighestSx1IndexHit {
                 sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" nslookup -timeout=1 $Sx1Net.$Sx1Index" | grep -c 'name ='
         }
         HighestSx1IndexHit=$(CheckHighestSx1IndexHit)
@@ -1631,16 +1635,16 @@ sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no 
 
         sleep 5
 
-#       clear
+        clear
 
-#       echo ''
-#       echo "=============================================="
-#       echo "Get sw1 IP address.                           "
-#       echo "=============================================="
-#       echo ''
+        echo ''
+        echo "=============================================="
+        echo "Get sw1 IP address.                           "
+        echo "=============================================="
+        echo ''
 
-sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service systemd-resolved restart > /dev/null 2>&1"
-sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service lxc-net restart > /dev/null 2>&1"
+	sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service systemd-resolved restart > /dev/null 2>&1"
+	sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service lxc-net restart > /dev/null 2>&1"
         
         Sw1Index=201
         function CheckHighestSw1IndexHit {
@@ -1654,9 +1658,6 @@ sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no 
                 HighestSw1IndexHit=$(CheckHighestSw1IndexHit)
         done
 
-#       sleep 5
-
-#       clear
 elif [ $MultiHostVar3 = 'X' ] && [ $MultiHostVar2 = 'Y' ] && [ $GRE = 'N' ]
 then
         function GetSx1Index {

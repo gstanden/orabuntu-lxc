@@ -115,6 +115,8 @@
 # Set these before running anylinux-services.sh
 # Leave GRE set to N for first Orabuntu-LXC host install
 
+sudo sed -i '$!N; /^\(.*\)\n\1$/!P; D'  /etc/resolv.conf
+
 function GetDistDir {
 	pwd | rev | cut -f2-20 -d'/' | rev
 }
@@ -1361,6 +1363,6 @@ sleep 5
 
 clear
 
-/opt/olxc/"$DistDir"/anylinux/anylinux-services-1.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $OSMemRes $NumCon $MultiHost $LxcOvsVersion $DistDir $Product $SubDirName
+/opt/olxc/"$DistDir"/anylinux/anylinux-services-1.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $OSMemRes $NumCon $MultiHost $LxcOvsVersion $DistDir $Product $SubDirName $Sx1Net $Sw1Net
 	
 exit
