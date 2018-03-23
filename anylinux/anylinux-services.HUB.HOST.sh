@@ -38,14 +38,19 @@
 #    Capital 'X' means 'not used' do not replace leave as is.
 
 function CheckAWS {
-        grep -c ec2 /etc/resolv.conf
+        cat /sys/hypervisor/uuid | cut -c1-3 | grep -c ec2
 }
 AWS=$(CheckAWS)
 
-if [ $AWS -eq 0 ]
+if [ $AWS -eq 1 ]
 then
-        trap "exit" INT TERM; trap "kill 0" EXIT; sudo -v || exit $?; sleep 1; while true; do sleep 60; sudo -nv; done 2>/dev/null &
+	function GetAwsMtu {
+		sudo ip link | grep eth0 | cut -f5 -d' '
+	}
+	AwsMtu=$(GetAwsMtu)
 fi
+
+trap "exit" INT TERM; trap "kill 0" EXIT; sudo -v || exit $?; sleep 1; while true; do sleep 60; sudo -nv; done 2>/dev/null &
 
 GRE=N 
 
@@ -81,9 +86,9 @@ fi
 
 if [ -z $2 ]
 then
-        Product=workspaces
 	Product=oracle-db
 	Product=no-product
+        Product=workspaces
 else
         Product=$2
 fi
@@ -93,7 +98,18 @@ function GetDistDir {
 }
 DistDir=$(GetDistDir)
 
-MultiHost="$Operation:N:1:X:X:X:1500:X:X:$GRE:$Product"
+if [ $AWS -eq 1 ]
+then
+	if [ $AwsMtu -ge 9000 ]
+	then
+		# Until support for MTU 9000 is ready, set MTU to 1500.
+		sudo ifconfig eth0 mtu 1500
+		AwsMtu=1500
+	fi
+	MultiHost="$Operation:N:1:X:X:X:$AwsMtu:X:X:$GRE:$Product"
+else
+	MultiHost="$Operation:N:1:X:X:X:1500:X:X:$GRE:$Product"
+fi
 
 LOGEXT=`date +"%Y-%m-%d.%R:%S"`
 

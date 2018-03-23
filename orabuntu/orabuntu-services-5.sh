@@ -42,6 +42,11 @@ NameServer=$5
 MultiHost=$6
 DistDir=$7
 
+function CheckAWS {
+        cat /sys/hypervisor/uuid | cut -c1-3 | grep -c ec2
+}
+AWS=$(CheckAWS)
+
 function GetUbuntuVersion {
 	cat /etc/lsb-release | grep DISTRIB_RELEASE | cut -f2 -d'='
 }
@@ -431,7 +436,7 @@ then
 	echo ''
 	
 	sudo touch /etc/orabuntu-lxc-release
-	sudo sh -c "echo 'Orabuntu-LXC v6.09-beta AMIDE' > /etc/orabuntu-lxc-release"
+	sudo sh -c "echo 'Orabuntu-LXC v6.10-beta AMIDE' > /etc/orabuntu-lxc-release"
 	sudo ls -l /etc/orabuntu-lxc-release
 	echo ''
 	sudo cat /etc/orabuntu-lxc-release
@@ -446,12 +451,12 @@ then
 	clear
 	
 	function CheckMtuSetLocalSw1 {
-	 	ifconfig sw1 | grep mtu | grep $MultiHostVar7 | wc -l
+	 	sudo ifconfig sw1 | grep mtu | grep $MultiHostVar7 | wc -l
 	}
 	MtuSetLocalSw1=$(CheckMtuSetLocalSw1)
 	
 	function CheckMtuSetLocalSx1 {
-	 	ifconfig sx1 | grep mtu | grep $MultiHostVar7 | wc -l
+	 	sudo ifconfig sx1 | grep mtu | grep $MultiHostVar7 | wc -l
 	}
 	MtuSetLocalSx1=$(CheckMtuSetLocalSx1)
 	
@@ -466,8 +471,8 @@ then
 		if [ "$MtuSetLocalSw1" -eq 0 ] && [ "$MtuSetLocalSx1" -eq 0 ]
 		then
 			sudo sh -c "sed -i '/1500/s/1500/$MultiHostVar7/' /var/lib/lxc/*/config"
-			/etc/orabuntu-lxc-scripts/stop_containers.sh
-			/etc/orabuntu-lxc-scripts/start_containers.sh
+			/etc/orabuntu-lxc-scripts/stop_ora_containers.sh
+			/etc/orabuntu-lxc-scripts/start_ora_containers.sh
 		fi
 
 		sleep 5
@@ -503,7 +508,7 @@ then
 		clear
 	
 		function GetMtuLocal {
-			ifconfig | grep mtu | grep $MultiHostVar7 | cut -f1,5 -d' ' | sed 's/  *//g' | sed 's/$/ /' | tr -d '\n'
+			sudo ifconfig | grep mtu | grep $MultiHostVar7 | cut -f1,5 -d' ' | sed 's/  *//g' | sed 's/$/ /' | tr -d '\n'
 		}
 		MtuLocal=$(GetMtuLocal)
 	
@@ -555,7 +560,7 @@ then
 	}
 	ShortHost=$(GetShortHost)
 	
-	nslookup -timeout=1 $HOSTNAME.$Domain1 > /dev/null 2>&1
+	sudo nslookup -timeout=1 $HOSTNAME.$Domain1 > /dev/null 2>&1
 	if [ $? -eq 1 ]
 	then
 	      	echo ''
@@ -581,7 +586,7 @@ then
 		clear
 	fi
 	
-	nslookup -timeout=1 $HOSTNAME.$Domain2 > /dev/null 2>&1
+	sudo nslookup -timeout=1 $HOSTNAME.$Domain2 > /dev/null 2>&1
 	if [ $? -eq 1 ]
 	then
 	      	echo ''
@@ -659,7 +664,7 @@ then
 	echo "=============================================="
 	echo ''
 	
-	nslookup $ShortHost.$Domain1
+	sudo nslookup $ShortHost.$Domain1
 	
 	echo "=============================================="
 	echo "Done: nslookup $ShortHost.$Domain1            "
@@ -675,7 +680,7 @@ then
 	echo "=============================================="
 	echo ''
 	
-	nslookup $ShortHost.$Domain2
+	sudo nslookup $ShortHost.$Domain2
 	
 	echo "=============================================="
 	echo "Done: nslookup $ShortHost.$Domain2            "

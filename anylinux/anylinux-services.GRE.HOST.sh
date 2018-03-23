@@ -37,22 +37,25 @@
 #    Passing parameters in from the command line is possible but is not described herein. The supported usage is to configure this file as described below.
 #    Capital 'X' means 'not used' do not replace leave as is.
 
-function CheckAWS {
-        grep -c ec2 /etc/resolv.conf
-}
-AWS=$(CheckAWS)
-
-if [ $AWS -eq 0 ]
-then
-        trap "exit" INT TERM; trap "kill 0" EXIT; sudo -v || exit $?; sleep 1; while true; do sleep 60; sudo -nv; done 2>/dev/null &
-fi
-
 clear
 
 echo ''
 echo "=============================================="
 echo "Script: anylinux-services.GRE.HOST.sh         "
 echo "=============================================="
+
+function CheckAWS {
+        cat /sys/hypervisor/uuid | cut -c1-3 | grep -c ec2
+}
+AWS=$(CheckAWS)
+
+if [ $AWS -eq 1 ]
+then
+        function GetAwsMtu {
+                sudo ip link | grep eth0 | cut -f5 -d' '
+        }
+        AwsMtu=$(GetAwsMtu)
+fi
 
 LOGEXT=`date +"%Y-%m-%d.%R:%S"`
 
@@ -117,7 +120,7 @@ fi
 if [ -z $2 ]
 then
 	SPOKEIP='lan.ip.this.host'
- 	SPOKEIP=192.168.7.87
+ 	SPOKEIP=10.0.140.183
 else
 	SPOKEIP=$2
 fi
@@ -125,7 +128,7 @@ fi
 if [ -z $3 ]
 then
 	HUBIP='lan.ip.hub.host'
- 	HUBIP=192.168.7.95
+ 	HUBIP=10.0.140.59
 else
 	HUBIP=$3
 fi
@@ -148,9 +151,9 @@ fi
 
 if [ -z $6 ]
 then
- 	Product=workspaces
  	Product=oracle-db
         Product=no-product
+ 	Product=workspaces
 else
 	Product=$6
 fi
@@ -408,7 +411,22 @@ then
 
 	cd "$DistDir"/anylinux
 
-        MultiHost="$Operation:Y:X:X:$HUBIP:$SPOKEIP:1420:$HubUserAct:$HubSudoPwd:$GRE:$Product"
+	if [ $AWS -eq 1 ] && [ $AwsMtu -eq 9001 ]
+	then
+		# Until support for MTU 9000 is completed, set MTU to 1500.
+		sudo ifconfig eth0 mtu 1500
+        	MultiHost="$Operation:Y:X:X:$HUBIP:$SPOKEIP:1420:$HubUserAct:$HubSudoPwd:$GRE:$Product"
+	fi
+
+	if [ $AWS -eq 1 ] && [ $AwsMtu -eq 1500 ]
+	then
+        	MultiHost="$Operation:Y:X:X:$HUBIP:$SPOKEIP:1420:$HubUserAct:$HubSudoPwd:$GRE:$Product"
+	fi
+
+	if [ $AWS -eq 0 ]
+	then
+        	MultiHost="$Operation:Y:X:X:$HUBIP:$SPOKEIP:1420:$HubUserAct:$HubSudoPwd:$GRE:$Product"
+	fi
 
 	./anylinux-services.sh $MultiHost
 else

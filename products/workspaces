@@ -234,7 +234,7 @@ SeedPostfix=$(GetSeedPostfix)
 
 echo ''
 echo "=============================================="
-echo "Script: Blackberry Workspaces Setup...        "
+echo "Script: Workspaces Setup...        "
 echo "=============================================="
 echo ''
 
@@ -288,7 +288,7 @@ echo ''
 
 sudo sh -c "echo '# tmpfs                              /dev/shm                        tmpfs   rw,exec,size=3500m      0 0'	>  /var/lib/lxc/$SeedContainerName/rootfs/etc/fstab"
 sudo sh -c "echo ''														>> /var/lib/lxc/$SeedContainerName/rootfs/etc/fstab"
-sudo sh -c "echo '# Mount points for BlackBerry Workspaces Filesystems' 						   	>> /var/lib/lxc/$SeedContainerName/rootfs/etc/fstab"
+sudo sh -c "echo '# Mount points for Workspaces Filesystems' 						   			>> /var/lib/lxc/$SeedContainerName/rootfs/etc/fstab"
 sudo sh -c "echo ''														>> /var/lib/lxc/$SeedContainerName/rootfs/etc/fstab"
 sudo sh -c "echo '# /dev/salt-master/wdx_data1_00      /mnt/database                   xfs     defaults                0 0'	>> /var/lib/lxc/$SeedContainerName/rootfs/etc/fstab"
 sudo sh -c "echo '# /dev/salt-master/wdx_fspa1_00      /opt/watchdox/storage/filespace xfs     defaults                0 0'	>> /var/lib/lxc/$SeedContainerName/rootfs/etc/fstab"

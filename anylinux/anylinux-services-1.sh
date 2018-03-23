@@ -29,17 +29,6 @@
 #    There are two domains and two networks because the "seed" LXC containers are on a separate network from the production LXC containers.
 #    If the domain is an actual domain, you will need to change the subnet though (a feature this software does not yet support - it's on the roadmap) to match your subnet manually.
 
-
-function CheckAWS {
-        grep -c ec2 /etc/resolv.conf
-}
-AWS=$(CheckAWS)
- 
-if [ $AWS -eq 0 ]
-then
-	trap "exit" INT TERM; trap "kill 0" EXIT; sudo -v || exit $?; sleep 1; while true; do sleep 60; sudo -nv; done 2>/dev/null &
-fi
-
 MajorRelease=$1
 PointRelease=$2
 OracleRelease=$1$2
@@ -56,6 +45,18 @@ Product=${11}
 SubDirName=${12}
 
 NameServerBase="$NameServer"-base
+
+function CheckAWS {
+        cat /sys/hypervisor/uuid | cut -c1-3 | grep -c ec2
+}
+AWS=$(CheckAWS)
+
+if [ $AWS -eq 1 ]
+then
+	PFM=EC2
+fi
+
+trap "exit" INT TERM; trap "kill 0" EXIT; sudo -v || exit $?; sleep 1; while true; do sleep 60; sudo -nv; done 2>/dev/null &
 
 function GetLxcVersion {
 echo $LxcOvsVersion | cut -f1 -d':'
@@ -499,19 +500,19 @@ then
 			if [ $Facter != 'physical' ] # 6
 			then
 				function GetVirtualInterfaces {
-					ifconfig | grep enp | cut -f1 -d':' | cut -f1 -d' ' | sed 's/$/ /' | tr -d '\n' | sed 's/^[ \t]*//;s/[ \t]*$//'
+					sudo ifconfig | grep enp | cut -f1 -d':' | cut -f1 -d' ' | sed 's/$/ /' | tr -d '\n' | sed 's/^[ \t]*//;s/[ \t]*$//'
 				}
 				VirtualInterfaces=$(GetVirtualInterfaces)
 
 				for i in $VirtualInterfaces
 				do
 					function CheckIpOnVirtualInterface1 {
-						ifconfig $i | grep 10.207.39 | wc -l
+						sudo ifconfig $i | grep 10.207.39 | wc -l
 					}
 					IpOnVirtualInterface1=$(CheckIpOnVirtualInterface1)
 
 					function CheckIpOnVirtualInterface2 {
-						ifconfig $i | grep 10.207.29 | wc -l
+						sudo ifconfig $i | grep 10.207.29 | wc -l
 					}
 					IpOnVirtualInterface2=$(CheckIpOnVirtualInterface2)
 
@@ -520,7 +521,7 @@ then
 					if [ $IpOnVirtualInterface1 -eq 1 ] || [ -f /etc/network/openvswitch/sw1.info ]
 					then
 						function GetIpVirtualInterface1 {
-							ifconfig $i | grep inet | grep 10.207.39 | sed 's/^[ \t]*//;s/[ \t]*$//' | cut -f2 -d' '
+							sudo ifconfig $i | grep inet | grep 10.207.39 | sed 's/^[ \t]*//;s/[ \t]*$//' | cut -f2 -d' '
 						}
 						IpVirtualInterface1=$(GetIpVirtualInterface1)
 						
@@ -533,7 +534,7 @@ then
 					if [ $IpOnVirtualInterface2 -eq 1 ] || [ -f /etc/network/openvswitch/sx1.info ]
 					then
 						function GetIpVirtualInterface2 {
-							ifconfig $i | grep inet | grep 10.207.29 | sed 's/^[ \t]*//;s/[ \t]*$//' | cut -f2 -d' '
+							sudo ifconfig $i | grep inet | grep 10.207.29 | sed 's/^[ \t]*//;s/[ \t]*$//' | cut -f2 -d' '
 						}
 						IpVirtualInterface2=$(GetIpVirtualInterface2)
 						
@@ -546,7 +547,7 @@ then
 
  				echo ''
 				echo "=============================================="
-				echo "Orabuntu-LXC $LFA Linux $RHV on $Facter.      "
+				echo "Orabuntu-LXC $LFA Linux $RHV on $Facter $PFM. "
 				echo "=============================================="
 				echo ''
 
@@ -623,7 +624,7 @@ then
 
 				echo ''
 				echo "=============================================="
-				echo "Orabuntu-LXC $LFA Linux $RHV on $Facter.      " 
+				echo "Orabuntu-LXC $LFA Linux $RHV on $Facter $PFM. " 
 				echo "=============================================="
 				echo ''
 
@@ -870,19 +871,19 @@ then
 			if [ $Facter != 'physical' ] # 6
 			then
 				function GetVirtualInterfaces {
-					ifconfig | grep enp | cut -f1 -d':' | cut -f1 -d' ' | sed 's/$/ /' | tr -d '\n' | sed 's/^[ \t]*//;s/[ \t]*$//'
+					sudo ifconfig | grep enp | cut -f1 -d':' | cut -f1 -d' ' | sed 's/$/ /' | tr -d '\n' | sed 's/^[ \t]*//;s/[ \t]*$//'
 				}
 				VirtualInterfaces=$(GetVirtualInterfaces)
 
 				for i in $VirtualInterfaces
 				do
 					function CheckIpOnVirtualInterface1 {
-						ifconfig $i | grep 10.207.39 | wc -l
+						sudo ifconfig $i | grep 10.207.39 | wc -l
 					}
 					IpOnVirtualInterface1=$(CheckIpOnVirtualInterface1)
 
 					function CheckIpOnVirtualInterface2 {
-						ifconfig $i | grep 10.207.29 | wc -l
+						sudo ifconfig $i | grep 10.207.29 | wc -l
 					}
 					IpOnVirtualInterface2=$(CheckIpOnVirtualInterface2)
 
@@ -891,7 +892,7 @@ then
 					if [ $IpOnVirtualInterface1 -eq 1 ] || [ -f /etc/network/openvswitch/sw1.info ]
 					then
 						function GetIpVirtualInterface1 {
-							ifconfig $i | grep inet | grep 10.207.39 | sed 's/^[ \t]*//;s/[ \t]*$//' | cut -f2 -d' '
+							sudo ifconfig $i | grep inet | grep 10.207.39 | sed 's/^[ \t]*//;s/[ \t]*$//' | cut -f2 -d' '
 						}
 						IpVirtualInterface1=$(GetIpVirtualInterface1)
 						
@@ -904,7 +905,7 @@ then
 					if [ $IpOnVirtualInterface2 -eq 1 ] || [ -f /etc/network/openvswitch/sx1.info ]
 					then
 						function GetIpVirtualInterface2 {
-							ifconfig $i | grep inet | grep 10.207.29 | sed 's/^[ \t]*//;s/[ \t]*$//' | cut -f2 -d' '
+							sudo ifconfig $i | grep inet | grep 10.207.29 | sed 's/^[ \t]*//;s/[ \t]*$//' | cut -f2 -d' '
 						}
 						IpVirtualInterface2=$(GetIpVirtualInterface2)
 						
@@ -917,7 +918,7 @@ then
 
  				echo ''
 				echo "=============================================="
-				echo "Orabuntu-LXC $LFA Linux $RL on $Facter.       "
+				echo "Orabuntu-LXC $LFA Linux $RL on $Facter $PFM.  "
 				echo "=============================================="
 				echo ''
 
@@ -999,7 +1000,7 @@ then
 
 				echo ''
 				echo "=============================================="
-				echo "Orabuntu-LXC $LFA Linux $RL on $Facter.       "
+				echo "Orabuntu-LXC $LFA Linux $RL on $Facter $PFM.  "
 				echo "=============================================="
 				echo ''
 

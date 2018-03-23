@@ -377,14 +377,14 @@ fi
 	MajorRelease=$8
 	if [ -z $8 ]
 	then
-		MajorRelease=7
+		MajorRelease=6
 	fi
 	# echo 'Oracle Container Release  = '$MajorRelease
 
 	PointRelease=$2
 	if [ -z $2 ]
 	then
-		PointRelease=3
+		PointRelease=6
 	fi
 	echo 'Oracle Container Version  = '$MajorRelease.$PointRelease
 
@@ -659,7 +659,7 @@ then
         
 	Sx1Index=201
         function CheckHighestSx1IndexHit {
-                sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 nslookup -timeout=1 $Sx1Net.$Sx1Index | grep 'name =' | wc -l
+                sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" nslookup -timeout=1 $Sx1Net.$Sx1Index | grep 'name =' | wc -l" | cut -f5 -d' '
         }
         HighestSx1IndexHit=$(CheckHighestSx1IndexHit)
 
@@ -671,7 +671,7 @@ then
 
         Sw1Index=201
         function CheckHighestSw1IndexHit {
-                sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 nslookup -timeout=1 $Sw1Net.$Sw1Index | grep 'name =' | wc -l
+                sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" nslookup -timeout=1 $Sw1Net.$Sw1Index | grep 'name =' | wc -l" | cut -f5 -d' '
         }
         HighestSw1IndexHit=$(CheckHighestSw1IndexHit)
 
@@ -743,7 +743,7 @@ then
 	echo ''
 
 	function GetVirtualInterfaces {
-		ifconfig | grep enp | cut -f1 -d':' | cut -f1 -d' ' | sed 's/$/ /' | tr -d '\n' | sed 's/^[ \t]*//;s/[ \t]*$//'
+		sudo ifconfig | grep enp | cut -f1 -d':' | cut -f1 -d' ' | sed 's/$/ /' | tr -d '\n' | sed 's/^[ \t]*//;s/[ \t]*$//'
 	}
 	VirtualInterfaces=$(GetVirtualInterfaces)
 
@@ -764,7 +764,7 @@ then
 		for i in $VirtualInterfaces
        		do
        	        	function CheckVirtualInterfaceMtu {
-       	                	ifconfig $i | grep -B1 "$j" | grep mtu | cut -f5 -d' '
+       	                	sudo ifconfig $i | grep -B1 "$j" | grep mtu | cut -f5 -d' '
        	        	}
        	        	VirtualInterfaceMtu=$(CheckVirtualInterfaceMtu)
        	        	function GetCharCount {
@@ -782,7 +782,7 @@ then
 					echo ''
 	
        	                        	sudo ifconfig $i mtu $MultiHostVar7
-					ifconfig $i
+					sudo ifconfig $i
 
 					echo "=============================================="
 					echo "Done: Set NIC $i to MTU $MultiHostVar7.       "

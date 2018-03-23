@@ -17,5 +17,7 @@
 /etc/orabuntu-lxc-scripts/stop_containers.sh
 /etc/orabuntu-lxc-scripts/ubuntu-host-backup.sh
 /etc/systemd/resolved.conf
+/etc/orabuntu-lxc-scripts/stop_ora_containers.sh
+/etc/orabuntu-lxc-scripts/start_ora_containers.sh
 /etc/GNU3
 /etc/COPYING

@@ -57,7 +57,17 @@ MultiHost=$5
 NameServer=$6
 DistDir=$7
 
+function CheckAWS {
+        cat /sys/hypervisor/uuid | cut -c1-3 | grep -c ec2
+}
+AWS=$(CheckAWS)
+
 function SoftwareVersion { echo "$@" | awk -F. '{ printf("%d%03d%03d%03d\n", $1,$2,$3,$4); }'; }
+
+function GetUbuntuVersion {
+	cat /etc/lsb-release | grep DISTRIB_RELEASE | cut -f2 -d'='
+}
+UbuntuVersion=$(GetUbuntuVersion)
 
 function GetLXCVersion {
         lxc-create --version
@@ -102,7 +112,7 @@ SeedIndex=10
 SeedPostfix=c$SeedIndex
 
 function CheckHighestSeedIndexHit {
-        nslookup -timeout=1 oel$OracleRelease$SeedPostfix | grep -v '#' | grep Address | grep '10\.207\.29' | wc -l
+        sudo nslookup -timeout=1 oel$OracleRelease$SeedPostfix | grep -v '#' | grep Address | grep '10\.207\.29' | wc -l
 }
 HighestSeedIndexHit=$(CheckHighestSeedIndexHit)
 
@@ -413,10 +423,7 @@ then
 	do
         	# GLS 20160707 updated to use lxc-copy instead of lxc-clone for Ubuntu 16.04
         	# GLS 20160707 continues to use lxc-clone for Ubuntu 15.04 and 15.10
-		function GetUbuntuVersion {
-			cat /etc/lsb-release | grep DISTRIB_RELEASE | cut -f2 -d'='
-		}
-		UbuntuVersion=$(GetUbuntuVersion)
+
 		if [ $UbuntuVersion = '16.04' ] || [ $UbuntuVersion = '16.10' ] || [ $UbuntuVersion = '17.04' ] || [ $UbuntuVersion = '17.10' ]
         	then
         		function CheckPublicIPIterative {

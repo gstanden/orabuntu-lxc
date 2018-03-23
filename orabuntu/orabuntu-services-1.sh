@@ -50,7 +50,7 @@ function CheckFacterValue {
 FacterValue=$(CheckFacterValue)
 
 function CheckAWS {
-	grep -c ec2 /etc/resolv.conf
+        cat /sys/hypervisor/uuid | cut -c1-3 | grep -c ec2
 }
 AWS=$(CheckAWS)
 
@@ -1332,18 +1332,18 @@ then
 			# GLS 20151223 Settable Nameserver feature added
 			# GLS 20161022 Settable Nameserver feature moved into DNS DHCP LXC container.
 			# GLS 20162011 Settable Nameserver feature expanded to include nameserver and both domains.
-			sudo sed -i "/nsa/s/nsa/$NameServerBase/g" /var/lib/lxc/nsa/rootfs/var/lib/bind/fwd.orabuntu-lxc.com
-			sudo sed -i "/nsa/s/nsa/$NameServerBase/g" /var/lib/lxc/nsa/rootfs/var/lib/bind/rev.orabuntu-lxc.com
-			sudo sed -i "/nsa/s/nsa/$NameServerBase/g" /var/lib/lxc/nsa/rootfs/var/lib/bind/fwd.consultingcommandos.us
-			sudo sed -i "/nsa/s/nsa/$NameServerBase/g" /var/lib/lxc/nsa/rootfs/var/lib/bind/rev.consultingcommandos.us
-			sudo sed -i "/nsa/s/nsa/$NameServer/g" /var/lib/lxc/nsa/config
-			sudo sed -i "/nsa/s/nsa/$NameServer/g" /var/lib/lxc/nsa/rootfs/etc/hostname
-			sudo sed -i "/nsa/s/nsa/$NameServer/g" /var/lib/lxc/nsa/rootfs/etc/hosts
-			sudo sed -i "/nsa/s/nsa/$NameServer/g" /var/lib/lxc/nsa/rootfs/root/crontab.txt
-			sudo sed -i "/nsa/s/nsa/$NameServer/g" /var/lib/lxc/nsa/rootfs/root/ns_backup_update.lst
-			sudo sed -i "/nsa/s/nsa/$NameServer/g" /var/lib/lxc/nsa/rootfs/root/ns_backup_update.sh
-			sudo sed -i "/nsa/s/nsa/$NameServer/g" /var/lib/lxc/nsa/rootfs/root/ns_backup.start.sh
-			sudo sed -i "/nsa/s/nsa/$NameServer/g" /var/lib/lxc/nsa/rootfs/root/dns-sync.sh
+			sudo sed -i "/nsa/s/nsa/$NameServerBase/g" 	/var/lib/lxc/nsa/rootfs/var/lib/bind/fwd.orabuntu-lxc.com
+			sudo sed -i "/nsa/s/nsa/$NameServerBase/g" 	/var/lib/lxc/nsa/rootfs/var/lib/bind/rev.orabuntu-lxc.com
+			sudo sed -i "/nsa/s/nsa/$NameServerBase/g" 	/var/lib/lxc/nsa/rootfs/var/lib/bind/fwd.consultingcommandos.us
+			sudo sed -i "/nsa/s/nsa/$NameServerBase/g" 	/var/lib/lxc/nsa/rootfs/var/lib/bind/rev.consultingcommandos.us
+			sudo sed -i "/nsa/s/nsa/$NameServer/g" 		/var/lib/lxc/nsa/config
+			sudo sed -i "/nsa/s/nsa/$NameServer/g" 		/var/lib/lxc/nsa/rootfs/etc/hostname
+			sudo sed -i "/nsa/s/nsa/$NameServer/g" 		/var/lib/lxc/nsa/rootfs/etc/hosts
+			sudo sed -i "/nsa/s/nsa/$NameServer/g" 		/var/lib/lxc/nsa/rootfs/root/crontab.txt
+			sudo sed -i "/nsa/s/nsa/$NameServer/g" 		/var/lib/lxc/nsa/rootfs/root/ns_backup_update.lst
+			sudo sed -i "/nsa/s/nsa/$NameServer/g" 		/var/lib/lxc/nsa/rootfs/root/ns_backup_update.sh
+			sudo sed -i "/nsa/s/nsa/$NameServer/g" 		/var/lib/lxc/nsa/rootfs/root/ns_backup.start.sh
+			sudo sed -i "/nsa/s/nsa/$NameServer/g" 		/var/lib/lxc/nsa/rootfs/root/dns-sync.sh
 
 			sudo sed -i "/nsa/s/nsa/$NameServer/g" /etc/network/openvswitch/strt_nsa.sh
 			sudo mv /var/lib/lxc/nsa /var/lib/lxc/$NameServer
@@ -1380,7 +1380,10 @@ then
 				sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /etc/NetworkManager/dnsmasq.d/local
 			fi
 			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /etc/network/openvswitch/crt_ovs_sw1.sh
-			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /etc/systemd/resolved.conf > /dev/null 2>&1
+			if [ $SystemdResolvedInstalled -gt 0 ]
+			then
+				sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /etc/systemd/resolved.conf > /dev/null 2>&1
+			fi
 #			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /run/systemd/resolve/stub-resolv.conf
 			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/etc/bind/named.conf.local
 			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/etc/dhcp/dhcpd.conf
@@ -1401,7 +1404,10 @@ then
 				sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /etc/NetworkManager/dnsmasq.d/local
 			fi
 			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /etc/network/openvswitch/crt_ovs_sw1.sh
-			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /etc/systemd/resolved.conf > /dev/null 2>&1
+			if [ $SystemdResolvedInstalled -gt 0 ]
+			then
+				sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /etc/systemd/resolved.conf > /dev/null 2>&1
+			fi
 #			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /run/systemd/resolve/stub-resolv.conf
 			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /var/lib/lxc/$NameServer/rootfs/etc/bind/named.conf.local
 			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /var/lib/lxc/$NameServer/rootfs/etc/dhcp/dhcpd.conf
@@ -1410,7 +1416,7 @@ then
 			sudo mv /var/lib/lxc/$NameServer/rootfs/var/lib/bind/fwd.consultingcommandos.us /var/lib/lxc/$NameServer/rootfs/var/lib/bind/fwd.$Domain2
 			sudo mv /var/lib/lxc/$NameServer/rootfs/var/lib/bind/rev.consultingcommandos.us /var/lib/lxc/$NameServer/rootfs/var/lib/bind/rev.$Domain2
 		fi
-	elif [ $MultiHostVar2 = 'Y' ]
+	elif [ $MultiHostVar2 = 'Y' ] && [ $SystemdResolvedInstalled -gt 0 ]
 	then
 			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /etc/systemd/resolved.conf
 			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /etc/systemd/resolved.conf
@@ -1493,7 +1499,9 @@ sleep 5
 
 clear
 
-if [ $UbuntuVersion = '16.04' ] && [ $SystemdResolvedInstalled -eq 0 ] && [ $MultiHostVar1 = 'new' ] && [ $MultiHostVar2 = 'N' ]
+# if [ $UbuntuVersion = '16.04' ] && [ $SystemdResolvedInstalled -eq 0 ] && [ $MultiHostVar1 = 'new' ] && [ $MultiHostVar2 = 'N' ]
+
+if [ $UbuntuVersion = '16.04' ] && [ $SystemdResolvedInstalled -eq 0 ]
 then
 	echo ''
 	echo "=============================================="
@@ -1534,23 +1542,40 @@ then
 	sudo service dnsmasq start
 
 	if [ $AWS -eq 1 ] && [ $FacterValue = 'xenu' ]
-	then
-		sudo sed -i '/search/d'	/etc/resolv.conf
-		sudo sh -c "echo 'search ec2.internal $Domain1 $Domain2 gns1.$Domain1' >> /etc/resolv.conf"
-	fi
+        then
+		if [ -f /etc/resolv.conf.orabuntu-lxc.original.* ]
+		then	
+                	function GetExistingSearchDomains {
+                        	cat /etc/resolv.conf.orabuntu-lxc.original.* | grep search | cut -f2-10 -d' '
+                	}
+                	ExistingSearchDomains=$(GetExistingSearchDomains)
+		else
+                	function GetExistingSearchDomains {
+                        	cat /etc/resolv.conf | grep search | sed 's/  */ /g' | grep -v "$Domain1" | cut -f2-100 -d' '
+                	}
+                	ExistingSearchDomains=$(GetExistingSearchDomains)
+		fi
 
-	function CheckSearchDomain1 {
-		grep -c $Domain1 /etc/resolv.conf
-	}
-	SearchDomain1=$(CheckSearchDomain1)
+		sudo sed -i '/#/d'		/etc/resolv.conf
+                sudo sed -i '/search/d' 	/etc/resolv.conf
+		sudo sh  -c "echo 'nameserver 127.0.0.1' >> /etc/resolv.conf"
+                sudo sh  -c "echo 'search $ExistingSearchDomains $Domain1 $Domain2 gns1.$Domain1' >> /etc/resolv.conf"
+		sudo sed -i "/supersede domain-name/c\append domain-name \" $Domain1 $Domain2 gns1.$Domain1\"" /etc/dhcp/dhclient.conf
+		sudo sed -i '/8.8.8.8/d' 	/etc/resolv.conf
+        fi
 
-	if [ $SearchDomain1 -eq 0 ] && [ $AWS -eq 0 ]
-	then
-		sudo sed -i '/search/d' /etc/resolv.conf
-		sudo sh -c "echo 'search $Domain1 $Domain2 gns1.$Domain1' >> /etc/resolv.conf"
-	fi
+        function CheckSearchDomain1 {
+                grep -c $Domain1 /etc/resolv.conf
+        }
+        SearchDomain1=$(CheckSearchDomain1)
 
-	sudo sed -i "/supersede domain-name/c\append domain-name \" $Domain1 $Domain2 gns1.$Domain1\"" /etc/dhcp/dhclient.conf
+        if [ $SearchDomain1 -eq 0 ] && [ $AWS -eq 0 ]
+        then
+                sudo sed -i '/search/d' /etc/resolv.conf
+                sudo sh -c "echo 'search $Domain1 $Domain2 gns1.$Domain1' >> /etc/resolv.conf"
+		sudo sed -i "/supersede domain-name/c\append domain-name \" $Domain1 $Domain2 gns1.$Domain1\"" /etc/dhcp/dhclient.conf
+        fi
+
 
 	echo ''	
 	echo "=============================================="
@@ -1594,7 +1619,7 @@ sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no 
         
 	Sx1Index=201
        function CheckHighestSx1IndexHit {
-                sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 nslookup -timeout=2 10.207.29.$Sx1Index | grep 'name =' | wc -l
+                sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" nslookup -timeout=2 10.207.29.$Sx1Index | grep 'name =' | wc -l" | cut -f5 -d' '
         }
         HighestSx1IndexHit=$(CheckHighestSx1IndexHit)
 
@@ -1619,7 +1644,7 @@ sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no 
         
         Sw1Index=201
         function CheckHighestSw1IndexHit {
-                sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 nslookup -timeout=2 10.207.39.$Sw1Index | grep 'name =' | wc -l
+                sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" nslookup -timeout=2 10.207.39.$Sw1Index | grep 'name =' | wc -l" | cut -f5 -d' '
         }
         HighestSw1IndexHit=$(CheckHighestSw1IndexHit)
 
@@ -1658,6 +1683,9 @@ sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw6.sh
 sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw7.sh
 sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw8.sh
 sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw9.sh
+
+sudo sed -i "s/MULTIHOSTVAR7/$MultiHostVar7/g"	/etc/network/openvswitch/crt_ovs_sw1.sh
+sudo sed -i "s/MULTIHOSTVAR7/$MultiHostVar7/g"	/etc/network/openvswitch/crt_ovs_sx1.sh
 
 if   [ $UbuntuMajorVersion -ge 16 ]
 then
@@ -1890,7 +1918,7 @@ sleep 2
 sudo service sw1 start
 sleep 2
 echo ''
-ifconfig sw1
+sudo ifconfig sw1
 echo ''
 sudo service sw1 status
 
@@ -1915,7 +1943,7 @@ sleep 2
 sudo service sx1 start
 sleep 2
 echo ''
-ifconfig sx1
+sudo ifconfig sx1
 echo ''
 sudo service sx1 status
 
@@ -1977,6 +2005,8 @@ then
         then
                 sudo service sw1 restart
                 sudo service sx1 restart
+		sudo sed -i "/1500/s/1500/$MultiHostVar7/g"	/var/lib/lxc/$NameServer/config 	> /dev/null 2>&1
+		sudo sed -i "/1500/s/1500/$MultiHostVar7/g"	/var/lib/lxc/$NameServerBase/config 	> /dev/null 2>&1
 
                 function CheckFileSystemTypeXfs {
                         stat --file-system --format=%T /var/lib/lxc | grep -c xfs
@@ -2096,7 +2126,7 @@ then
         NameServerConfigFormat=$(CheckNameServerConfigFormat)
 
         function CheckNameServerBaseConfigFormat {
-                sudo grep -c lxc.net.0 /var/lib/lxc/"$NameServer-base"/config
+                sudo grep -c lxc.net.0 /var/lib/lxc/"$NameServerBase"/config
         }
         NameServerBaseConfigFormat=$(CheckNameServerBaseConfigFormat)
 
@@ -2125,8 +2155,8 @@ then
                 sudo lxc-update-config -c /var/lib/lxc/"$NameServerBase"/config
         fi
 
-	sudo lxc-update-config -c /var/lib/lxc/"$NameServer"/config
-	sudo lxc-update-config -c /var/lib/lxc/"$NameServerBase"/config
+#	sudo lxc-update-config -c /var/lib/lxc/"$NameServer"/config
+#	sudo lxc-update-config -c /var/lib/lxc/"$NameServerBase"/config
         sudo lxc-ls -f
 fi
 
@@ -2430,7 +2460,7 @@ then
 		sudo ifconfig sw1 mtu $MultiHostVar7
 		sudo ifconfig sx1 mtu $MultiHostVar7
 
-                nslookup -timeout=5 $HOSTNAME.$Domain1 > /dev/null 2>&1
+                sudo nslookup -timeout=5 $HOSTNAME.$Domain1 > /dev/null 2>&1
                 if [ $? -eq 1 ]
                 then
                         echo ''
@@ -2488,7 +2518,7 @@ then
 
                 fi
 
-                nslookup -timeout=5 $HOSTNAME.$Domain2 > /dev/null 2>&1
+                sudo nslookup -timeout=5 $HOSTNAME.$Domain2 > /dev/null 2>&1
                 if [ $? -eq 1 ]
                 then
                         echo ''

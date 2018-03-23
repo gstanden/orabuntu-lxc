@@ -216,7 +216,7 @@ do
 	SystemdResolvedInstalled=$(CheckSystemdResolvedInstalled)
 
         function CheckDNSLookup {
-                nslookup -timeout=1 $ContainerPrefix$CloneIndex | grep -v '#' | grep Address | grep '10\.207\.39' | wc -l
+                sudo nslookup -timeout=1 $ContainerPrefix$CloneIndex | grep -v '#' | grep Address | grep '10\.207\.39' | wc -l
         }
         DNSLookup=$(CheckDNSLookup)
 
