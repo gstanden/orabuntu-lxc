@@ -51,10 +51,15 @@ function CheckFacterValue {
 }
 FacterValue=$(CheckFacterValue)
 
-function CheckAWS {
-        cat /sys/hypervisor/uuid | cut -c1-3 | grep -c ec2
-}
-AWS=$(CheckAWS)
+if [ -e /sys/hypervisor/uuid ]
+then
+        function CheckAWS {
+                cat /sys/hypervisor/uuid | cut -c1-3 | grep -c ec2
+        }
+        AWS=$(CheckAWS)
+else
+        AWS=0
+fi
 
 function GetNameServerBase {
 	echo $NameServer | cut -f1 -d'-'
@@ -1532,52 +1537,80 @@ then
 	sudo service dnsmasq stop
 	sleep 5
 
-        sudo sh -c "echo 'server=/$Domain1/10.207.39.2'                 >> /etc/dnsmasq.conf"
-        sudo sh -c "echo 'server=/$Domain2/10.207.29.2'                 >> /etc/dnsmasq.conf"
-        sudo sh -c "echo 'server=/gns1.$Domain1/10.207.39.2'            >> /etc/dnsmasq.conf"
-        sudo sh -c "echo 'server=/39.207.10.in-addr.arpa/10.207.39.2'   >> /etc/dnsmasq.conf"
-        sudo sh -c "echo 'server=/29.207.10.in-addr.arpa/10.207.29.2'   >> /etc/dnsmasq.conf"
-	sudo sh -c "echo 'cache-size=0'					>> /etc/dnsmasq.conf"
-	
-	sudo systemctl enable dnsmasq
-
-	sudo service dnsmasq start
-
-	if [ $AWS -eq 1 ] && [ $FacterValue = 'xenu' ]
-        then
-		if [ -f /etc/resolv.conf.orabuntu-lxc.original.* ]
-		then	
-                	function GetExistingSearchDomains {
-                        	cat /etc/resolv.conf.orabuntu-lxc.original.* | grep search | cut -f2-10 -d' '
-                	}
-                	ExistingSearchDomains=$(GetExistingSearchDomains)
-		else
-                	function GetExistingSearchDomains {
-                        	cat /etc/resolv.conf | grep search | sed 's/  */ /g' | grep -v "$Domain1" | cut -f2-100 -d' '
-                	}
-                	ExistingSearchDomains=$(GetExistingSearchDomains)
-		fi
-
-		sudo sed -i '/#/d'			/etc/resolv.conf
-                sudo sed -i '/search/d' 		/etc/resolv.conf
-		sudo sh  -c "echo 'nameserver 127.0.0.1' >> /etc/resolv.conf"
-                sudo sh  -c "echo 'search $ExistingSearchDomains $Domain1 $Domain2 gns1.$Domain1' >> /etc/resolv.conf"
-		sudo sed -i "/supersede domain-name/c\append domain-name \" $Domain1 $Domain2 gns1.$Domain1\"" /etc/dhcp/dhclient.conf
-		sudo sed -i '/8.8.8.8/d' 		/etc/resolv.conf
-		sudo sed -i '$!N; /^\(.*\)\n\1$/!P; D'  /etc/resolv.conf
-        fi
-
         function CheckSearchDomain1 {
                 grep -c $Domain1 /etc/resolv.conf
         }
         SearchDomain1=$(CheckSearchDomain1)
 
-        if [ $SearchDomain1 -eq 0 ] && [ $AWS -eq 0 ]
+        function CheckServerDomain1 {
+                grep -c $Domain1 /etc/dnsmasq.conf
+        }
+        ServerDomain1=$(CheckServerDomain1)
+
+        function CheckServerDomain2 {
+                grep -c $Domain2 /etc/dnsmasq.conf
+        }
+        ServerDomain2=$(CheckServerDomain2)
+
+        function CheckCacheSizeDnsmasq {
+                grep -c cache-size=0 /etc/dnsmasq.conf
+        }
+        CacheSizeDnsmasq=$(CheckCacheSizeDnsmasq)
+
+	if [ $ServerDomain1 -eq 0 ]
+	then
+        	sudo sh -c "echo 'server=/$Domain1/10.207.39.2'                 >> /etc/dnsmasq.conf"
+        	sudo sh -c "echo 'server=/39.207.10.in-addr.arpa/10.207.39.2'   >> /etc/dnsmasq.conf"
+		sudo sh -c "echo 'server=/gns1.$Domain1/10.207.39.2'            >> /etc/dnsmasq.conf"
+	fi
+
+	if [ $ServerDomain2 -eq 0 ]
+	then
+        	sudo sh -c "echo 'server=/$Domain2/10.207.29.2'                 >> /etc/dnsmasq.conf"
+        	sudo sh -c "echo 'server=/29.207.10.in-addr.arpa/10.207.29.2'   >> /etc/dnsmasq.conf"
+        fi
+
+	if [ $CacheSizeDnsmasq -eq 0 ]
+	then
+		sudo sh -c "echo 'cache-size=0'					>> /etc/dnsmasq.conf"
+	fi
+	
+	sudo systemctl enable dnsmasq
+
+	sudo service dnsmasq start
+
+	if [ -f /etc/resolv.conf.orabuntu-lxc.original.* ]
+	then	
+               	function GetExistingSearchDomains {
+                       	cat /etc/resolv.conf.orabuntu-lxc.original.* | grep search | cut -f2-10 -d' '
+               	}
+               	ExistingSearchDomains=$(GetExistingSearchDomains)
+	else
+               	function GetExistingSearchDomains {
+                       	cat /etc/resolv.conf | grep search | sed 's/  */ /g' | grep -v "$Domain1" | cut -f2-100 -d' '
+               	}
+               	ExistingSearchDomains=$(GetExistingSearchDomains)
+	fi
+
+	if [ $AWS -eq 1 ] && [ $FacterValue = 'xenu' ]
         then
-                sudo sed -i '/search/d' /etc/resolv.conf
+		sudo sed -i '/#/d'					/etc/resolv.conf
+                sudo sed -i '/search/d' 				/etc/resolv.conf
+		sudo sed -i '/127.0.0.1/!s/nameserver/# nameserver/g'   /etc/resolv.conf
+		sudo sh  -c "echo 'nameserver 127.0.0.1' >> /etc/resolv.conf"
+                sudo sh  -c "echo 'search $ExistingSearchDomains $Domain1 $Domain2 gns1.$Domain1' >> /etc/resolv.conf"
+		sudo sed -i "/supersede domain-name/c\append domain-name \" $Domain1 $Domain2 gns1.$Domain1\"" /etc/dhcp/dhclient.conf
+		sudo sed -i '/8.8.8.8/d' 				/etc/resolv.conf
+		sudo sed -i '$!N; /^\(.*\)\n\1$/!P; D'  		/etc/resolv.conf
+        fi
+
+        if [ $AWS -eq 0 ] && [ $SearchDomain1 -eq 0 ]
+        then
+                sudo sed -i '/search/d' 				/etc/resolv.conf
+		sudo sed -i '/127.0.0.1/!s/nameserver/# nameserver/g'   /etc/resolv.conf
                 sudo sh -c "echo 'search $Domain1 $Domain2 gns1.$Domain1' >> /etc/resolv.conf"
 		sudo sed -i "/supersede domain-name/c\append domain-name \" $Domain1 $Domain2 gns1.$Domain1\"" /etc/dhcp/dhclient.conf
-		sudo sed -i '$!N; /^\(.*\)\n\1$/!P; D'  /etc/resolv.conf
+		sudo sed -i '$!N; /^\(.*\)\n\1$/!P; D'  		/etc/resolv.conf
         fi
 
 
