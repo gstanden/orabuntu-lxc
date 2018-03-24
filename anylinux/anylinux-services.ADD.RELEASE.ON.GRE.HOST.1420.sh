@@ -37,17 +37,39 @@
 #    Passing parameters in from the command line is possible but is not described herein. The supported usage is to configure this file as described below.
 #    Capital 'X' means 'not used' do not replace leave as is.
 
-function CheckAWS {
-        grep -c ec2 /etc/resolv.conf
-}
-AWS=$(CheckAWS)
+clear
 
-if [ $AWS -eq 0 ]
+echo ''
+echo "=============================================="
+echo "Script: ADD.RELEASE.ON.GRE.HOST.1420.sh       "
+echo "=============================================="
+echo ''
+
+if [ -e /sys/hypervisor/uuid ]
 then
-        trap "exit" INT TERM; trap "kill 0" EXIT; sudo -v || exit $?; sleep 1; while true; do sleep 60; sudo -nv; done 2>/dev/null &
+        function CheckAWS {
+                cat /sys/hypervisor/uuid | cut -c1-3 | grep -c ec2
+        }
+        AWS=$(CheckAWS)
+else
+        AWS=0
 fi
 
+if [ $AWS -eq 1 ]
+then
+	function GetAwsMtu {
+		sudo ip link | grep eth0 | cut -f5 -d' '
+	}
+	AwsMtu=$(GetAwsMtu)
+fi
+
+trap "exit" INT TERM; trap "kill 0" EXIT; sudo -v || exit $?; sleep 1; while true; do sleep 60; sudo -nv; done 2>/dev/null &
+
+GRE=N
+MTU=1420
 LOGEXT=`date +"%Y-%m-%d.%R:%S"`
+
+Operation=addrelease
 
 if [ ! -d "$DistDir"/installs/logs ]
 then
@@ -72,11 +94,23 @@ then
         sudo chmod 0440 /etc/sudoers.d/orabuntu-lxc
 fi
 
-GRE=N
+if [ $AWS -eq 1 ]
+then
+	if   [ $AwsMtu -ge 9000 ]
+	then
+		# Until support for jumbo frames ready set 1500.
+		sudo ifconfig eth0 mtu 1500
+		AwsMtu=1500
+#		MultiHost="$Operation:Y:X:X:X:X:8920:X:X:$GRE"
+		MultiHost="$Operation:Y:X:X:X:X:1420:X:X:$GRE"
 
-Operation=addrelease
-
-MultiHost="$Operation:Y:X:X:X:X:1420:X:X:$GRE"
+	elif [ $AwsMtu -eq 1500 ]
+	then
+		MultiHost="$Operation:Y:X:X:X:X:1420:X:X:$GRE"
+	fi
+else
+	MultiHost="$Operation:Y:X:X:X:X:$MTU:X:X:$GRE"
+fi
 
 ./anylinux-services.sh $MultiHost
 

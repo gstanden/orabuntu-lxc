@@ -1633,10 +1633,6 @@ then
                 HighestSx1IndexHit=$(CheckHighestSx1IndexHit)
         done
 
-        sleep 5
-
-        clear
-
         echo ''
         echo "=============================================="
         echo "Get sw1 IP address.                           "

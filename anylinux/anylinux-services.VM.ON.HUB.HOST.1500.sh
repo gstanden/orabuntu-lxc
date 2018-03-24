@@ -37,29 +37,36 @@
 #    Passing parameters in from the command line is possible but is not described herein. The supported usage is to configure this file as described below.
 #    Capital 'X' means 'not used' do not replace leave as is.
 
-function CheckAWS {
-        grep -c ec2 /etc/resolv.conf
-}
-AWS=$(CheckAWS)
-
-if [ $AWS -eq 0 ]
-then
-	trap "exit" INT TERM; trap "kill 0" EXIT; sudo -v || exit $?; sleep 1; while true; do sleep 60; sudo -nv; done 2>/dev/null &
-fi
-
 clear
 
 echo ''
 echo "=============================================="
-echo "anylinux-services.VM.ON.GRE.HOST.1500.sh      "
+echo "anylinux-services.VM.ON.HUB.HOST.1500.sh      "
 echo "=============================================="
+echo ''
 
-sleep 5
+if [ -e /sys/hypervisor/uuid ]
+then
+        function CheckAWS {
+                cat /sys/hypervisor/uuid | cut -c1-3 | grep -c ec2
+        }
+        AWS=$(CheckAWS)
+else
+        AWS=0
+fi
 
-clear
+if [ $AWS -eq 1 ]
+then
+	function GetAwsMtu {
+		sudo ip link | grep eth0 | cut -f5 -d' '
+	}
+	AwsMtu=$(GetAwsMtu)
+fi
+
+trap "exit" INT TERM; trap "kill 0" EXIT; sudo -v || exit $?; sleep 1; while true; do sleep 60; sudo -nv; done 2>/dev/null &
 
 GRE=N
-
+MTU=1500
 LOGEXT=`date +"%Y-%m-%d.%R:%S"`
 
 if [ ! -d "$DistDir"/installs/logs ]
@@ -403,7 +410,23 @@ then
 	echo ''
 	sleep 5
 	echo ''
-        MultiHost="$Operation:Y:X:X:$HUBIP:X:1500:$HubUserAct:$HubSudoPwd:$GRE:$Product"
+
+if [ $AWS -eq 1 ]
+then
+	if   [ $AwsMtu -ge 9000 ]
+	then
+		# Until support for jumbo frames is ready set 1500.
+		sudo ifconfig eth0 mtu 1500
+		AwsMtu=1500
+        	MultiHost="$Operation:Y:X:X:$HUBIP:X:$AwsMtu:$HubUserAct:$HubSudoPwd:$GRE:$Product"
+
+	elif [ $AwsMtu -eq 1500 ]
+	then
+        	MultiHost="$Operation:Y:X:X:$HUBIP:X:$AwsMtu:$HubUserAct:$HubSudoPwd:$GRE:$Product"
+	fi
+else
+        MultiHost="$Operation:Y:X:X:$HUBIP:X:$MTU:$HubUserAct:$HubSudoPwd:$GRE:$Product"
+fi
 	cd "$DistDir"/anylinux
 	./anylinux-services.sh $MultiHost
 else

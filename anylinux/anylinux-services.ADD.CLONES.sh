@@ -37,17 +37,33 @@
 #    Passing parameters in from the command line is possible but is not described herein. The supported usage is to configure this file as described below.
 #    Capital 'X' means 'not used' do not replace leave as is.
 
-function CheckAWS {
-        grep -c ec2 /etc/resolv.conf
-}
-AWS=$(CheckAWS)
+clear
 
-if [ $AWS -eq 0 ]
+echo ''
+echo "=============================================="
+echo "Script: anylinux-services.ADD.CLONES.sh       "
+echo "=============================================="
+echo ''
+
+if [ -e /sys/hypervisor/uuid ]
 then
-        trap "exit" INT TERM; trap "kill 0" EXIT; sudo -v || exit $?; sleep 1; while true; do sleep 60; sudo -nv; done 2>/dev/null &
+        function CheckAWS {
+                cat /sys/hypervisor/uuid | cut -c1-3 | grep -c ec2
+        }
+        AWS=$(CheckAWS)
+else
+        AWS=0
 fi
 
-clear
+if [ $AWS -eq 1 ]
+then
+	function GetAwsMtu {
+		sudo ip link | grep eth0 | cut -f5 -d' '
+	}
+	AwsMtu=$(GetAwsMtu)
+fi
+
+trap "exit" INT TERM; trap "kill 0" EXIT; sudo -v || exit $?; sleep 1; while true; do sleep 60; sudo -nv; done 2>/dev/null &
 
 LOGEXT=`date +"%Y-%m-%d.%R:%S"`
 

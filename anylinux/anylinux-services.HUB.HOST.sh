@@ -37,10 +37,23 @@
 #    Passing parameters in from the command line is possible but is not described herein. The supported usage is to configure this file as described below.
 #    Capital 'X' means 'not used' do not replace leave as is.
 
-function CheckAWS {
-        cat /sys/hypervisor/uuid | cut -c1-3 | grep -c ec2
-}
-AWS=$(CheckAWS)
+clear
+
+echo ''
+echo "=============================================="
+echo "Script: anylinux-services.HUB.HOST.sh         "
+echo "=============================================="
+echo ''
+
+if [ -e /sys/hypervisor/uuid ]
+then
+        function CheckAWS {
+                cat /sys/hypervisor/uuid | cut -c1-3 | grep -c ec2
+        }
+        AWS=$(CheckAWS)
+else
+        AWS=0
+fi
 
 if [ $AWS -eq 1 ]
 then
@@ -53,8 +66,8 @@ fi
 trap "exit" INT TERM; trap "kill 0" EXIT; sudo -v || exit $?; sleep 1; while true; do sleep 60; sudo -nv; done 2>/dev/null &
 
 GRE=N 
-
-clear
+MTU=1500
+LOGEXT=`date +"%Y-%m-%d.%R:%S"`
 
 if [ -z $1 ]
 then	
@@ -98,21 +111,6 @@ function GetDistDir {
 }
 DistDir=$(GetDistDir)
 
-if [ $AWS -eq 1 ]
-then
-	if [ $AwsMtu -ge 9000 ]
-	then
-		# Until support for MTU 9000 is ready, set MTU to 1500.
-		sudo ifconfig eth0 mtu 1500
-		AwsMtu=1500
-	fi
-	MultiHost="$Operation:N:1:X:X:X:$AwsMtu:X:X:$GRE:$Product"
-else
-	MultiHost="$Operation:N:1:X:X:X:1500:X:X:$GRE:$Product"
-fi
-
-LOGEXT=`date +"%Y-%m-%d.%R:%S"`
-
 if [ ! -d "$DistDir"/installs/logs ]
 then
 	sudo mkdir -p "$DistDir"/installs/logs
@@ -134,6 +132,23 @@ then
 	sudo sh -c "echo 'Defaults      log_input,log_output'								>> /etc/sudoers.d/orabuntu-lxc"
 	sudo sh -c "echo 'Defaults      iolog_dir=/var/log/sudo-io/%{user}'						>> /etc/sudoers.d/orabuntu-lxc"
 	sudo chmod 0440 /etc/sudoers.d/orabuntu-lxc
+fi
+
+if [ $AWS -eq 1 ]
+then
+	if   [ $AwsMtu -ge 9000 ]
+	then
+		# Until support for MTU 9000 is ready, set MTU to 1500.
+		sudo ifconfig eth0 mtu 1500
+		AwsMtu=1500
+		MultiHost="$Operation:N:1:X:X:X:$AwsMtu:X:X:$GRE:$Product"
+
+	elif [ $AwsMtu -eq 1500 ]
+	then
+		MultiHost="$Operation:N:1:X:X:X:$AwsMtu:X:X:$GRE:$Product"
+	fi
+else
+	MultiHost="$Operation:N:1:X:X:X:$MTU:X:X:$GRE:$Product"
 fi
 
 ./anylinux-services.sh $MultiHost 

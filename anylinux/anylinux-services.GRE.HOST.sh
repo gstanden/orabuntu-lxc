@@ -43,11 +43,17 @@ echo ''
 echo "=============================================="
 echo "Script: anylinux-services.GRE.HOST.sh         "
 echo "=============================================="
+echo ''
 
-function CheckAWS {
-        cat /sys/hypervisor/uuid | cut -c1-3 | grep -c ec2
-}
-AWS=$(CheckAWS)
+if [ -e /sys/hypervisor/uuid ]
+then
+        function CheckAWS {
+                cat /sys/hypervisor/uuid | cut -c1-3 | grep -c ec2
+        }
+        AWS=$(CheckAWS)
+else
+        AWS=0
+fi
 
 if [ $AWS -eq 1 ]
 then
@@ -57,6 +63,10 @@ then
         AwsMtu=$(GetAwsMtu)
 fi
 
+trap "exit" INT TERM; trap "kill 0" EXIT; sudo -v || exit $?; sleep 1; while true; do sleep 60; sudo -nv; done 2>/dev/null &
+
+GRE=Y 
+MTU=1420
 LOGEXT=`date +"%Y-%m-%d.%R:%S"`
 
 if [ ! -d "$DistDir"/installs/logs ]
@@ -81,12 +91,6 @@ then
 	sudo sh -c "echo 'Defaults      iolog_dir=/var/log/sudo-io/%{user}'						>> /etc/sudoers.d/orabuntu-lxc"
 	sudo chmod 0440 /etc/sudoers.d/orabuntu-lxc
 fi
-
-sleep 5
-
-clear
-
-GRE=Y 
 
 if [ -z $1 ]
 then	
@@ -411,22 +415,23 @@ then
 
 	cd "$DistDir"/anylinux
 
-	if [ $AWS -eq 1 ] && [ $AwsMtu -eq 9001 ]
-	then
-		# Until support for MTU 9000 is completed, set MTU to 1500.
-		sudo ifconfig eth0 mtu 1500
-        	MultiHost="$Operation:Y:X:X:$HUBIP:$SPOKEIP:1420:$HubUserAct:$HubSudoPwd:$GRE:$Product"
-	fi
+        if [ $AWS -eq 1 ]
+        then
+                if   [ $AwsMtu -ge 9000 ]
+                then
+                        # Until support for MTU 9000 is ready, set MTU to 1500.
+                        sudo ifconfig eth0 mtu 1500
+                        AwsMtu=1500
+#			MultiHost="$Operation:Y:X:X:$HUBIP:$SPOKEIP:8920:$HubUserAct:$HubSudoPwd:$GRE:$Product"
+                	MultiHost="$Operation:Y:X:X:$HUBIP:$SPOKEIP:1420:$HubUserAct:$HubSudoPwd:$GRE:$Product"
 
-	if [ $AWS -eq 1 ] && [ $AwsMtu -eq 1500 ]
-	then
-        	MultiHost="$Operation:Y:X:X:$HUBIP:$SPOKEIP:1420:$HubUserAct:$HubSudoPwd:$GRE:$Product"
-	fi
-
-	if [ $AWS -eq 0 ]
-	then
-        	MultiHost="$Operation:Y:X:X:$HUBIP:$SPOKEIP:1420:$HubUserAct:$HubSudoPwd:$GRE:$Product"
-	fi
+		elif [ $AwsMtu -eq 1500 ]
+		then
+                	MultiHost="$Operation:Y:X:X:$HUBIP:$SPOKEIP:1420:$HubUserAct:$HubSudoPwd:$GRE:$Product"
+                fi
+        else
+                MultiHost="$Operation:Y:X:X:$HUBIP:$SPOKEIP:$MTU:$HubUserAct:$HubSudoPwd:$GRE:$Product"
+        fi
 
 	./anylinux-services.sh $MultiHost
 else
