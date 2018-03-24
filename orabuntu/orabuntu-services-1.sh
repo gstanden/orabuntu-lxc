@@ -1522,6 +1522,16 @@ then
 
 	sudo cat /etc/resolv.conf
 
+	function GetOriginalNameServers {
+		cat /etc/resolv.conf  | grep nameserver | tr -d '\n' | sed 's/nameserver//g' | sed 's/^[ \t]*//;s/[ \t]*$//' | sed 's/  */ /g'
+	}
+	OriginalNameServers=$(GetOriginalNameServers)
+
+	function GetOriginalSearchDomains {
+		cat /etc/resolv.conf  | grep search | sed 's/  */ /g' | sed 's/search //g'
+	}
+	OriginalSearchDomains=$(GetOriginalSearchDomains)
+
 	echo ''
 	echo "=============================================="
 	echo "Done: Display original /etc/resolv.conf.      "
@@ -1556,6 +1566,22 @@ then
                 grep -c cache-size=0 /etc/dnsmasq.conf
         }
         CacheSizeDnsmasq=$(CheckCacheSizeDnsmasq)
+
+	for j in $OriginalNameServers
+	do
+		for i in $OriginalSearchDomains
+		do
+			function CountOriginalSearchDomainsDnsmasq {
+				grep -c $i /etc/dnsmasq.conf
+			}
+			OriginalSearchDomainsDnsmasq=$(CountOriginalSearchDomainsDnsmasq)
+		
+			if [ $OriginalSearchDomainsDnsmasq -eq 0 ]
+			then	
+				sudo sh -c "echo 'server=/$i/$j' >> /etc/dnsmasq.conf"
+			fi
+		done
+	done
 
 	if [ $ServerDomain1 -eq 0 ]
 	then
