@@ -1572,7 +1572,7 @@ then
 		for i in $OriginalSearchDomains
 		do
 			function CountOriginalSearchDomainsDnsmasq {
-				grep -c $i /etc/dnsmasq.conf
+				grep -c $j /etc/dnsmasq.conf
 			}
 			OriginalSearchDomainsDnsmasq=$(CountOriginalSearchDomainsDnsmasq)
 		
