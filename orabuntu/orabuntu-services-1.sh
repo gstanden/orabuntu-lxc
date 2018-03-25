@@ -2356,9 +2356,9 @@ then
  	sudo useradd -m -p $(openssl passwd -1 ${PASSWORD}) -s /bin/bash ${USERNAME}
 	sudo mkdir -p  /home/${USERNAME}/Downloads /home/${USERNAME}/Manage-Orabuntu
 	sudo chown ${USERNAME}:${USERNAME} /home/${USERNAME}/Downloads /home/${USERNAME}/Manage-Orabuntu
+	sudo runuser -l amide -c "ssh-keygen -f /home/amide/.ssh/id_rsa -t rsa -N ''"
 
-	sudo sh -c "echo 'amide ALL=(ALL) /bin/mkdir'	>  /etc/sudoers.d/amide"
-	sudo sh -c "echo 'amide ALL=(ALL) /bin/cp' 	>> /etc/sudoers.d/amide"
+	sudo sh -c "echo 'amide ALL=/bin/mkdir, /bin/cp' > /etc/sudoers.d/amide"
 	sudo chmod 0440 /etc/sudoers.d/amide
 
 	sudo lxc-attach -n $NameServer -- crontab /root/crontab.txt
@@ -2376,7 +2376,9 @@ then
         sudo lxc-attach -n $NameServer -- chown bind:bind /var/lib/bind/rev.$Domain2
         sudo lxc-attach -n $NameServer -- chown root:bind /var/lib/bind
         sudo lxc-attach -n $NameServer -- chmod 775 /var/lib/bind
-	sudo lxc-attach -n $NameServer -- /root/ns_create_rsa_key.sh
+	sudo lxc-attach -n $NameServer -- ssh-keygen -f /root/.ssh/id_rsa -t rsa -N ''
+
+	sudo sh -c "cat '/var/lib/lxc/$NameServer/delta0/root/.ssh/id_rsa.pub' >> /home/amide/.ssh/authorized_keys"
 
 	echo ''
 	echo "=============================================="
@@ -2445,13 +2447,13 @@ then
         sudo useradd -m -p $(openssl passwd -1 ${PASSWORD}) -s /bin/bash ${USERNAME}
         sudo mkdir -p  /home/${USERNAME}/Downloads /home/${USERNAME}/Manage-Orabuntu
         sudo chown ${USERNAME}:${USERNAME} /home/${USERNAME}/Downloads /home/${USERNAME}/Manage-Orabuntu
-
-	sudo sh -c "cat '/var/lib/lxc/$NameServer-base/rootfs/root/.ssh/authorized_keys' >> /home/amide/.ssh/authorized_keys"
+	sudo runuser -l amide -c "ssh-keygen -f /home/amide/.ssh/id_rsa -t rsa -N ''"
+	sudo sh -c "cat '/var/lib/lxc/$NameServer/delta0/root/.ssh/id_rsa.pub' >> /home/amide/.ssh/authorized_keys"
 
 	sudo sh -c "echo 'amide ALL=/bin/mkdir, /bin/cp' > /etc/sudoers.d/amide"
         sudo chmod 0440 /etc/sudoers.d/amide
 
-        echo ''
+	echo ''
         echo "=============================================="
         echo "Done: Configure NS Replication Account.       "
         echo "=============================================="
