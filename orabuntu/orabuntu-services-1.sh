@@ -2437,7 +2437,7 @@ then
         echo ''
 
         function GetAmidePassword {
-		sudo sh -c "cat /var/lib/lxc/"$NameServer"-base/rootfs/root/ns_backup_update.sh" | grep 'Pass=' | cut -f2 -d'='
+		sudo sh -c "cat /var/lib/lxc/$NameServer/rootfs/root/ns_backup_update.sh" | grep 'Pass=' | cut -f2 -d'='
         }
         AmidePassword=$(GetAmidePassword)
 
