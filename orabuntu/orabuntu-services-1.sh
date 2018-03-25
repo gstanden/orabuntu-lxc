@@ -443,6 +443,7 @@ then
 		done
 
 		sudo apt-get -y purge lxc lxc-common lxc-templates lxc1 lxcfs python3-lxc liblxc1 dnsmasq
+		sudo mv /etc/resolv.conf.orabuntu-lxc.original.* /etc/resolv.conf
 	
 		echo ''
 		echo "=============================================="
