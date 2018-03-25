@@ -747,8 +747,8 @@ then
                         sudo mkdir -p ~/Manage-Orabuntu
                 fi
 
-                echo "/var/lib/lxc/$NameServer" 	>> /opt/olxc/"$DistDir"/orabuntu/archives/nameserver.lst
-                echo "/var/lib/lxc/$NameServer-base" 	>> /opt/olxc/"$DistDir"/orabuntu/archives/nameserver.lst
+                echo "/var/lib/lxc/$NameServer/." 	>> /opt/olxc/"$DistDir"/orabuntu/archives/nameserver.lst
+                echo "/var/lib/lxc/$NameServer-base/." 	>> /opt/olxc/"$DistDir"/orabuntu/archives/nameserver.lst
                 sudo tar -P -czf ~/Manage-Orabuntu/$NameServer.tar.gz -T /opt/olxc/"$DistDir"/orabuntu/archives/nameserver.lst --checkpoint=10000 --totals
                 sudo lxc-start -n $NameServer > /dev/null 2>&1
 
