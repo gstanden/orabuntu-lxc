@@ -226,6 +226,57 @@ sleep 5
 
 clear
 
+if [ $RSA = 'Y' ]
+then
+	echo "=============================================="
+	echo "Create RSA key if it does not already exist   "
+	echo "=============================================="
+	echo ''
+
+	if [ ! -e ~/.ssh/id_rsa.pub ]
+	then
+		ssh-keygen -f ~/.ssh/id_rsa -t rsa -N ''
+	fi
+
+	if [ -e ~/.ssh/authorized_keys ]
+	then
+		cp -p ~/.ssh/authorized_keys ~/.ssh/authorized_keys.pre.olxc
+	fi
+
+	touch ~/.ssh/authorized_keys
+
+	if [ -e ~/.ssh/id_rsa.pub ]
+	then
+		function GetAuthorizedKey {
+			cat ~/.ssh/id_rsa.pub
+		}
+		AuthorizedKey=$(GetAuthorizedKey)
+	fi
+
+	function CheckAuthorizedKeys {
+		grep -c "$AuthorizedKey" ~/.ssh/authorized_keys
+	}
+	AuthorizedKeys=$(CheckAuthorizedKeys)
+
+	echo ''
+	echo "Results of grep = $AuthorizedKeys"
+	echo ''
+	
+	if [ "$AuthorizedKeys" -eq 0 ]
+	then
+		cat  ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
+	fi
+
+	echo ''
+	echo "=============================================="
+	echo "Create RSA key completed                      "
+	echo "=============================================="
+
+	sleep 5
+
+	clear
+fi
+
 echo ''
 echo "=============================================="
 echo "Performance settings for sshd_config.         "
@@ -2295,7 +2346,6 @@ then
       		tr -dc A-Za-z0-9_ < /dev/urandom | head -c ${l} | xargs 
 	}
 	password=$(genpasswd)
-	echo $password > "$DistDir"/installs/logs/amide-password.txt
 
 	USERNAME=amide
 	PASSWORD=$password
@@ -2303,7 +2353,6 @@ then
 	sudo sed -i "s/Owner=ubuntu/Owner=amide/"	/var/lib/lxc/"$NameServer"-base/rootfs/root/ns_backup_update.sh
 	sudo sed -i "s/Pass=ubuntu/Pass=$password/"	/var/lib/lxc/"$NameServer"-base/rootfs/root/ns_backup_update.sh
 
-#	sudo useradd -m -p $(openssl passwd -1 ${PASSWORD}) -s /bin/bash -G sudo ${USERNAME}
  	sudo useradd -m -p $(openssl passwd -1 ${PASSWORD}) -s /bin/bash ${USERNAME}
 	sudo mkdir -p  /home/${USERNAME}/Downloads /home/${USERNAME}/Manage-Orabuntu
 	sudo chown ${USERNAME}:${USERNAME} /home/${USERNAME}/Downloads /home/${USERNAME}/Manage-Orabuntu
@@ -2327,6 +2376,7 @@ then
         sudo lxc-attach -n $NameServer -- chown bind:bind /var/lib/bind/rev.$Domain2
         sudo lxc-attach -n $NameServer -- chown root:bind /var/lib/bind
         sudo lxc-attach -n $NameServer -- chmod 775 /var/lib/bind
+	sudo lxc-attach -n $NameServer -- /root/ns_create_rsa_key.sh
 
 	echo ''
 	echo "=============================================="
@@ -2384,10 +2434,8 @@ then
         echo "=============================================="
         echo ''
 
-        sshpass -p $MultiHostVar9 scp -p $MultiHostVar8@$MultiHostVar5:"$DistDir"/installs/logs/amide-password.txt "$DistDir"/installs/logs/.
-
         function GetAmidePassword {
-                cat "$DistDir"/installs/logs/amide-password.txt | head -1 | sed 's/^[ \t]*//;s/[ \t]*$//'
+		sudo sh -c "cat /var/lib/lxc/"$NameServer"-base/rootfs/root/ns_backup_update.sh" | grep 'Pass=' | cut -f2 -d'='
         }
         AmidePassword=$(GetAmidePassword)
 
@@ -2397,6 +2445,8 @@ then
         sudo useradd -m -p $(openssl passwd -1 ${PASSWORD}) -s /bin/bash ${USERNAME}
         sudo mkdir -p  /home/${USERNAME}/Downloads /home/${USERNAME}/Manage-Orabuntu
         sudo chown ${USERNAME}:${USERNAME} /home/${USERNAME}/Downloads /home/${USERNAME}/Manage-Orabuntu
+
+	sudo sh -c "cat '/var/lib/lxc/$NameServer-base/rootfs/root/.ssh/authorized_keys' >> /home/amide/.ssh/authorized_keys"
 
 	sudo sh -c "echo 'amide ALL=/bin/mkdir, /bin/cp' > /etc/sudoers.d/amide"
         sudo chmod 0440 /etc/sudoers.d/amide
@@ -2737,91 +2787,6 @@ echo ''
 sleep 5
 
 clear
-
-# echo ''
-# echo "=============================================="
-# echo "Verify existence of Oracle and Grid users...  "
-# echo "=============================================="
-# echo ''
-
-# sudo useradd -u 1098 grid 		>/dev/null 2>&1
-# sudo useradd -u 500 oracle 		>/dev/null 2>&1
-# sudo groupadd -g 1100 asmadmin	>/dev/null 2>&1
-# sudo usermod -a -G asmadmin grid	>/dev/null 2>&1
-
-# id grid
-# id oracle
-
-# echo ''
-# echo "=============================================="
-# echo "Existence of Oracle and Grid users verified.  "
-# echo "=============================================="
-
-# sleep 5
-
-# clear
-
-if [ $RSA = 'Y' ]
-then
-	echo ''
-	echo "=============================================="
-	echo "Create RSA key if it does not already exist   "
-	echo "=============================================="
-	echo ''
-
-	if [ ! -e ~/.ssh/id_rsa.pub ]
-	then
-		ssh-keygen -t rsa
-		ssh-keygen -f ~/.ssh/id_rsa -t rsa -N ''
-	fi
-
-	# if [ -e ~/.ssh/authorized_keys ]
-	# then
-	# 	rm ~/.ssh/authorized_keys
-	# fi
-
-	touch ~/.ssh/authorized_keys
-
-	if [ -e ~/.ssh/id_rsa.pub ]
-	then
-		function GetAuthorizedKey {
-			cat ~/.ssh/id_rsa.pub
-		}
-		AuthorizedKey=$(GetAuthorizedKey)
-
-		echo 'Authorized Key:'
-		echo ''
-		echo $AuthorizedKey 
-		echo ''
-	fi
-
-	function CheckAuthorizedKeys {
-		grep -c "$AuthorizedKey" ~/.ssh/authorized_keys
-	}
-	AuthorizedKeys=$(CheckAuthorizedKeys)
-
-	echo "Results of grep = $AuthorizedKeys"
-
-	if [ "$AuthorizedKeys" -eq 0 ]
-	then
-		cat  ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
-	fi
-
-	echo ''
-	echo 'cat of authorized_keys'
-	echo ''
-	cat ~/.ssh/authorized_keys
-
-	echo ''
-	echo "=============================================="
-	echo "Create RSA key completed                      "
-	echo "=============================================="
-
-	sleep 5
-
-
-	clear
-fi
 
 echo ''
 echo "=============================================="
