@@ -44,7 +44,7 @@ DistDir=$8
 Sx1Net=$9
 Sw1Net=${10}
 
-RSA=N
+RSA=Y
 
 function CheckFacterValue {
 	facter virtual
@@ -2761,7 +2761,7 @@ clear
 
 # clear
 
-if [ $AWS -eq 0 ] && [ $RSA = 'Y' ]
+if [ $RSA = 'Y' ]
 then
 	echo ''
 	echo "=============================================="
@@ -2816,11 +2816,12 @@ then
 	echo "=============================================="
 	echo "Create RSA key completed                      "
 	echo "=============================================="
+
+	sleep 5
+
+
+	clear
 fi
-
-# sleep 5
-
-# clear
 
 echo ''
 echo "=============================================="
