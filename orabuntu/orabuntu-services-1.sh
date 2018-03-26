@@ -228,6 +228,7 @@ clear
 
 if [ $RSA = 'Y' ]
 then
+	echo ''
 	echo "=============================================="
 	echo "Create RSA key if it does not already exist   "
 	echo "=============================================="
@@ -258,18 +259,18 @@ then
 	}
 	AuthorizedKeys=$(CheckAuthorizedKeys)
 
-	echo ''
-	echo "Results of grep = $AuthorizedKeys"
-	echo ''
-	
 	if [ "$AuthorizedKeys" -eq 0 ]
 	then
 		cat  ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
 	fi
 
+	sleep 5
+
+	clear
+
 	echo ''
 	echo "=============================================="
-	echo "Create RSA key completed                      "
+	echo "Done: Create RSA key completed                "
 	echo "=============================================="
 
 	sleep 5
@@ -455,7 +456,7 @@ then
 		echo "=============================================="
 		echo '' 
 		echo "=============================================="
-		echo "Re-run anylinux-services.sh after reboot...   "
+		echo "Re-run same script in anylinux after reboot   "
 		echo "=============================================="
 
 		sleep 5
@@ -1071,7 +1072,7 @@ then
 	clear
 fi
 
-# Unpack customized OS host files for Oracle on LXC host server
+# Unpack customized OS host files for Oracle Linux LXC containers on LXC host server
 
 function CheckNsaExists {
 	sudo lxc-ls -f | grep -c nsa
@@ -1164,10 +1165,10 @@ MemTotal=$(GetMemTotal)
 echo 'Memory (in Kb) ........................ '$MemTotal
 
 ((MemOracleKb = MemTotal - OSMemRes))
-echo 'Memory for Oracle (in Kb) ............. '$MemOracleKb
+echo 'Memory for (in Kb) .................... '$MemOracleKb
 
 ((MemOracleBytes = MemOracleKb * 1024))
-echo 'Memory for Oracle (in bytes) .......... '$MemOracleBytes
+echo 'Memory for (in bytes) ................. '$MemOracleBytes
 
 function GetPageSize {
 	sudo getconf PAGE_SIZE
@@ -2300,8 +2301,12 @@ then
 
 	if [ $Owner != 'ubuntu' ]
 	then
-		sudo mv /opt/olxc/home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/scst-files /opt/olxc/"$DistDir"/orabuntu/archives/.
-		sudo mv /opt/olxc/home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/tgt-files  /opt/olxc/"$DistDir"/orabuntu/archives/.
+		sudo mkdir -p /opt/olxc/"$DistDir"/orabuntu/archives/scst-files
+		sudo mkdir -p /opt/olxc/"$DistDir"/orabuntu/archives/tgt-files
+		sudo chown $Owner:$Group /opt/olxc/"$DistDir"/orabuntu/archives/scst-files
+		sudo chown $Owner:$Group /opt/olxc/"$DistDir"/orabuntu/archives/tgt-files
+		sudo cp /opt/olxc/home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/scst-files/* /opt/olxc/"$DistDir"/orabuntu/archives/scst-files/.
+		sudo cp /opt/olxc/home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/tgt-files/*  /opt/olxc/"$DistDir"/orabuntu/archives/tgt-files/.
 	fi
         sudo chown -R $Owner:$Group		/opt/olxc/"$DistDir"/orabuntu/archives/.
         sudo sed -i "s/SWITCH_IP/$Sw1Index/g"	/opt/olxc/"$DistDir"/orabuntu/archives/scst-files/create-scst-target.sh
@@ -2379,7 +2384,7 @@ then
         sudo lxc-attach -n $NameServer -- chmod 775 /var/lib/bind
 	sudo lxc-attach -n $NameServer -- ssh-keygen -f /root/.ssh/id_rsa -t rsa -N ''
 
-	sudo sh -c "cat '/var/lib/lxc/$NameServer/delta0/root/.ssh/id_rsa.pub' >> /home/amide/.ssh/authorized_keys"
+	sudo sh -c "cat '/var/lib/lxc/$NameServerBase/delta0/root/.ssh/id_rsa.pub' >> /home/amide/.ssh/authorized_keys"
 
 	echo ''
 	echo "=============================================="
@@ -2415,8 +2420,12 @@ then
 	sleep 2
 	if [ $Owner != 'ubuntu' ]
 	then
-		sudo mv /opt/olxc/home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/scst-files /opt/olxc/"$DistDir"/orabuntu/archives/.
-		sudo mv /opt/olxc/home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/tgt-files  /opt/olxc/"$DistDir"/orabuntu/archives/.
+		sudo mkdir -p /opt/olxc/"$DistDir"/orabuntu/archives/scst-files
+		sudo mkdir -p /opt/olxc/"$DistDir"/orabuntu/archives/tgt-files
+		sudo chown $Owner:$Group /opt/olxc/"$DistDir"/orabuntu/archives/scst-files
+		sudo chown $Owner:$Group /opt/olxc/"$DistDir"/orabuntu/archives/tgt-files
+		sudo cp /opt/olxc/home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/scst-files/* /opt/olxc/"$DistDir"/orabuntu/archives/scst-files/.
+		sudo cp /opt/olxc/home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/tgt-files/*  /opt/olxc/"$DistDir"/orabuntu/archives/tgt-files/.
 	fi
         sudo chown -R $Owner:$Group		/opt/olxc/"$DistDir"/orabuntu/archives/.
         sudo sed -i "s/SWITCH_IP/$Sw1Index/g"	/opt/olxc/"$DistDir"/orabuntu/archives/scst-files/create-scst-target.sh
@@ -2449,7 +2458,7 @@ then
         sudo mkdir -p  /home/${USERNAME}/Downloads /home/${USERNAME}/Manage-Orabuntu
         sudo chown ${USERNAME}:${USERNAME} /home/${USERNAME}/Downloads /home/${USERNAME}/Manage-Orabuntu
 	sudo runuser -l amide -c "ssh-keygen -f /home/amide/.ssh/id_rsa -t rsa -N ''"
-	sudo sh -c "cat '/var/lib/lxc/$NameServer/delta0/root/.ssh/id_rsa.pub' >> /home/amide/.ssh/authorized_keys"
+	sudo sh -c "cat '/var/lib/lxc/$NameServerBase/delta0/root/.ssh/id_rsa.pub' >> /home/amide/.ssh/authorized_keys"
 
 	sudo sh -c "echo 'amide ALL=/bin/mkdir, /bin/cp' > /etc/sudoers.d/amide"
         sudo chmod 0440 /etc/sudoers.d/amide

@@ -46,15 +46,21 @@ sudo cp -p COPYING /etc/.
 sudo cp -p GNU3    /var/.
 sudo cp -p COPYING /var/.
 
-sudo mkdir -p      "$DistDir"/"$SubDirName"/archives/rootfs/.
+sudo mkdir -p      "$DistDir"/"$SubDirName"/archives/rootfs
 sudo cp -p GNU3    "$DistDir"/"$SubDirName"/archives/rootfs/.
 sudo cp -p COPYING "$DistDir"/"$SubDirName"/archives/rootfs/.
 
+sudo mkdir -p	   "$DistDir"/"$SubDirName"/archives/scst-files
+sudo mkdir -p	   "$DistDir"/"$SubDirName"/archives/tgt-files
 sudo cp -p COPYING "$DistDir"/"$SubDirName"/.
 sudo cp -p COPYING "$DistDir"/"$SubDirName"/archives/.
+sudo cp -p COPYING "$DistDir"/"$SubDirName"/archives/scst-files/.
+sudo cp -p COPYING "$DistDir"/"$SubDirName"/archives/tgt-files/.
 
 sudo cp -p GNU3    "$DistDir"/"$SubDirName"/.
 sudo cp -p GNU3    "$DistDir"/"$SubDirName"/archives/.
+sudo cp -p GNU3    "$DistDir"/"$SubDirName"/archives/scst-files/.
+sudo cp -p GNU3    "$DistDir"/"$SubDirName"/archives/tgt-files/.
 
 cd "$DistDir"/"$SubDirName"/archives
 
@@ -90,10 +96,18 @@ do
 		sudo chown root:root /etc/COPYING > /dev/null 2>&1
 		tar -vP --append --file=$i /etc/GNU3
 		tar -vP --append --file=$i /etc/COPYING
-	elif [ $i = 'scst-files.tar' ] || [ $i = 'tgt-files.tar' ]
+	elif [ $i = 'scst-files.tar' ]
 	then
-		tar -vP --append --file=$i "$DistDir"/"$SubDirName"/archives/GNU3 	--numeric-owner
-		tar -vP --append --file=$i "$DistDir"/"$SubDirName"/archives/COPYING 	--numeric-owner
+		sudo chown 1000:1000 "$DistDir"/"$SubDirName"/archives/scst-files/GNU3
+		sudo chown 1000:1000 "$DistDir"/"$SubDirName"/archives/scst-files/COPYING
+		tar -vP --append --file=$i "$DistDir"/"$SubDirName"/archives/scst-files/GNU3 	--numeric-owner
+		tar -vP --append --file=$i "$DistDir"/"$SubDirName"/archives/scst-files/COPYING --numeric-owner
+	elif [ $i = 'tgt-files.tar' ]
+	then
+		sudo chown 1000:1000 "$DistDir"/"$SubDirName"/archives/tgt-files/GNU3
+		sudo chown 1000:1000 "$DistDir"/"$SubDirName"/archives/tgt-files/COPYING
+		tar -vP --append --file=$i "$DistDir"/"$SubDirName"/archives/tgt-files/GNU3 	--numeric-owner
+		tar -vP --append --file=$i "$DistDir"/"$SubDirName"/archives/tgt-files/COPYING	--numeric-owner
 	elif [ $i = 'dns-dhcp-cont.tar' ]
 	then
 		sudo chown root:root /var/GNU3 > /dev/null 2>&1

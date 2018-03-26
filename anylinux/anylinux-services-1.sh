@@ -58,7 +58,7 @@ then
 	PFM=EC2
 fi
 
-trap "exit" INT TERM; trap "kill 0" EXIT; sudo -v || exit $?; sleep 1; while true; do sleep 60; sudo -nv; done 2>/dev/null &
+# trap "exit" INT TERM; trap "kill 0" EXIT; sudo -v || exit $?; sleep 1; while true; do sleep 60; sudo -nv; done 2>/dev/null &
 
 function GetLxcVersion {
 echo $LxcOvsVersion | cut -f1 -d':'
@@ -188,7 +188,7 @@ echo ''
 echo 'Author:  Gilbert Standen                      '
 echo 'Email :  gilbert@orabuntu-lxc.com             '
 echo ''
-echo 'Motto :  Any Oracle on Any Linux (sm)         '
+echo 'Motto :  Anything on Any Linux (sm)           '
 echo ''
 echo "=============================================="
 echo "Oracle container automation.                  "
