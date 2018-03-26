@@ -7,7 +7,8 @@ Orabuntu-LXC is turnkey software for building an entire next-generation containe
 Orabuntu-LXC BUILDS EVERYTHING itself for the currently supported distros: 
 
 * Oracle Linux 7.x
-* Ubuntu 16.04+
+* Ubuntu 16.x (and now with AWS EC2 VPC support as well)
+* Ubuntu 17.x 
 * CentOS 7.x
 * Fedora 22-27 (tested on 27)
 * RedHat 7.x
