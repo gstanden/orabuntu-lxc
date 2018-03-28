@@ -125,7 +125,7 @@ The first Orabuntu-LXC install is always the "HUB" host install.
 
 Install the Orabuntu-LXC HUB host as shown below (if installing an Orabuntu-LXC release).
 ```
-cd /home/username/Downloads/orabuntu-lxc-6.03-beta/anylinux
+cd /home/username/Downloads/orabuntu-lxc-6.10.6-beta/anylinux
 ./anylinux-services.HUB.HOST.sh new
 ```
 
