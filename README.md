@@ -7,8 +7,7 @@ Orabuntu-LXC is turnkey software for building an entire next-generation containe
 Orabuntu-LXC BUILDS EVERYTHING itself for the currently supported distros: 
 
 * Oracle Linux 7.x
-* Ubuntu 16.x (and now with AWS EC2 VPC support as well)
-* Ubuntu 17.x 
+* Ubuntu 16.04+
 * CentOS 7.x
 * Fedora 22-27 (tested on 27)
 * RedHat 7.x
@@ -125,7 +124,7 @@ The first Orabuntu-LXC install is always the "HUB" host install.
 
 Install the Orabuntu-LXC HUB host as shown below (if installing an Orabuntu-LXC release).
 ```
-cd /home/username/Downloads/orabuntu-lxc-6.10.6-beta/anylinux
+cd /home/username/Downloads/orabuntu-lxc-6.03-beta/anylinux
 ./anylinux-services.HUB.HOST.sh new
 ```
 

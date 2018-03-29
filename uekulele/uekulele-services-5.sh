@@ -327,10 +327,11 @@ fi
 
 sudo systemctl daemon-reload
 
-if [ $LinuxFlavor != 'Fedora' ] && [ $LinuxFlavor != 'CentOS' ]
+if [ $LinuxFlavor != 'Fedora' ] && [ $LinuxFlavor != 'CentOS' ] && [ $LinuxFlavor != 'Red' ]
 then
 	sudo service lxc-net restart > /dev/null 2>&1
 else
+	sudo sed -i '/cache-size=150/s/cache-size=150/cache-size=0/g' /etc/dnsmasq.conf
 	sudo service dnsmasq restart > /dev/null 2>&1
 fi
 
@@ -398,10 +399,11 @@ do
 			echo ''
 			sudo systemctl daemon-reload
 
-			if [ $LinuxFlavor != 'Fedora' ] && [ $LinuxFlavor != 'CentOS' ]
+			if [ $LinuxFlavor != 'Fedora' ] && [ $LinuxFlavor != 'CentOS' ] && [ $LinuxFlavor != 'Red' ]
 			then
 				sudo service lxc-net restart > /dev/null 2>&1
 			else
+				sudo sed -i '/cache-size=150/s/cache-size=150/cache-size=0/g' /etc/dnsmasq.conf
 				sudo service dnsmasq restart > /dev/null 2>&1
 			fi
 
@@ -462,7 +464,7 @@ then
         echo "=============================================="
         echo ''
 
-	if [ $LinuxFlavor != 'Fedora' ] && [ $LinuxFlavor != 'CentOS' ]
+	if [ $LinuxFlavor != 'Fedora' ] && [ $LinuxFlavor != 'CentOS' ] && [ $LinuxFlavor != 'Red' ]
 	then
 		function GetDhcpRange {
        	 		cat /etc/sysconfig/lxc-net | grep LXC_DHCP_RANGE | cut -f2 -d'=' | sed 's/"//g' 
@@ -731,7 +733,7 @@ then
 		echo "=============================================="
 		echo ''
 
-		if [ $LinuxFlavor != 'Fedora' ] && [ $LinuxFlavor != 'CentOS' ]
+		if [ $LinuxFlavor != 'Fedora' ] && [ $LinuxFlavor != 'CentOS' ] && [ $LinuxFlavor != 'Red' ]
 		then
 			function GetDhcpRange {
 				cat /etc/sysconfig/lxc-net | grep LXC_DHCP_RANGE | cut -f2 -d'=' | sed 's/"//g' 
@@ -911,7 +913,7 @@ then
 			echo "=============================================="
 			echo ''
 
-			if [ $LinuxFlavor != 'Fedora' ] && [ $LinuxFlavor != 'CentOS' ]
+			if [ $LinuxFlavor != 'Fedora' ] && [ $LinuxFlavor != 'CentOS' ] && [ $LinuxFlavor != 'Red' ]
 			then
 				function GetDhcpRange {
 					cat /etc/sysconfig/lxc-net | grep LXC_DHCP_RANGE | cut -f2 -d'=' | sed 's/"//g' 

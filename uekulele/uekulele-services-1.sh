@@ -45,6 +45,21 @@ DistDir=$9
 Sx1Net=${10}
 Sw1Net=${11}
 
+function CheckFacterValue {
+        facter virtual
+}
+FacterValue=$(CheckFacterValue)
+
+if [ -e /sys/hypervisor/uuid ]
+then
+        function CheckAWS {
+                cat /sys/hypervisor/uuid | cut -c1-3 | grep -c ec2
+        }
+        AWS=$(CheckAWS)
+else
+        AWS=0
+fi
+
 function GetNameServerBase {
         echo $NameServer | cut -f1 -d'-'
 }
@@ -553,7 +568,7 @@ then
 	then
 		sudo dnf -y install lxc lxc-templates debootstrap qemu-kvm libvirt virt-install bridge-utils perl gpg
 
-	elif [ $LinuxFlavor = 'CentOS' ]
+	elif [ $LinuxFlavor = 'CentOS' ] || [ $LinuxFlavor = 'Red' ]
 	then
 		sudo yum -y install qemu-kvm libvirt virt-install bridge-utils
 	fi
@@ -581,11 +596,17 @@ then
 		sudo systemctl status lxc.service
 		echo ''
 		
-		if [ $LinuxFlavor = 'Fedora' ] || [ $LinuxFlavor = 'CentOS' ]
+		if [ $LinuxFlavor = 'Fedora' ] || [ $LinuxFlavor = 'CentOS' ] || [ $LinuxFlavor = 'Red' ]
 		then
 			sudo setenforce permissive
-			sudo systemctl start libvirtd 
+			sudo systemctl start libvirtd
+			sleep 2
+			sudo systemctl stop libvirtd
+			sleep 2
+			sudo systemctl start libvirtd
 			sudo systemctl status libvirtd
+			sleep 2
+			sudo cp -p /etc/lxc/default.conf /etc/lxc/default.conf.bak
 		fi
 	fi
 
@@ -738,15 +759,25 @@ then
 		sudo systemctl start lxc.service
 		sudo systemctl status lxc.service
 		echo ''
-		sudo systemctl start libvirtd 
-		sudo systemctl status libvirtd
+		
+		if [ $LinuxFlavor = 'Fedora' ] || [ $LinuxFlavor = 'CentOS' ] || [ $LinuxFlavor = 'Red' ]
+		then
+			sudo setenforce permissive
+			sudo systemctl start libvirtd
+			sleep 2
+			sudo systemctl stop libvirtd
+			sleep 2
+			sudo systemctl start libvirtd
+			sudo systemctl status libvirtd
+			sleep 2
+			sudo cp -p /etc/lxc/default.conf /etc/lxc/default.conf.bak
+		fi
 	fi
 
 	echo ''
 	echo "=============================================="
 	echo "LXC and related services started.             "
 	echo "=============================================="
-	echo ''
 
 	sleep 5
 
@@ -871,7 +902,10 @@ then
 			cp -p lxc-"$LxcVersion".tar.gz /opt/olxc/"$DistDir"/uekulele/lxc/rpmbuild/SOURCES/.
 			tar -zxvf lxc-"$LxcVersion".tar.gz
 			cp -p lxc-"$LxcVersion"/lxc.spec /opt/olxc/"$DistDir"/uekulele/lxc/.
-			sudo sed -i '/bash_completion/d' /opt/olxc/"$DistDir"/uekulele/lxc/lxc.spec
+			sed -i '/find %{buildroot} -type f -name/a install -m 755 -d $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig'		/opt/olxc/"$DistDir"/uekulele/lxc/lxc.spec
+			sed -i '/find %{buildroot} -type f -name/a install -m 755 -d $RPM_BUILD_ROOT%{_sysconfdir}/bash_completion.d'	/opt/olxc/"$DistDir"/uekulele/lxc/lxc.spec
+			sudo sed -i '/sysconfig/s/\*//'											/opt/olxc/"$DistDir"/uekulele/lxc/lxc.spec
+			
 			cd /opt/olxc/"$DistDir"/uekulele/lxc
 
 			function CheckMacrosFile {
@@ -901,7 +935,7 @@ then
 			echo ''
 
 			cd /opt/olxc/"$DistDir"/uekulele/lxc/rpmbuild/RPMS/x86_64
-			if [ $LinuxFlavor = 'CentOS' ]
+			if [ $LinuxFlavor = 'CentOS' ] || [ $LinuxFlavor = 'Red' ]
 			then
 				sudo yum -y erase lxc-libs
 			fi
@@ -939,7 +973,10 @@ then
 			cp -p lxc-"$LxcVersion".tar.gz /opt/olxc/"$DistDir"/uekulele/lxc/rpmbuild/SOURCES/.
 			tar -zxvf lxc-"$LxcVersion".tar.gz
 			cp -p lxc-"$LxcVersion"/lxc.spec /opt/olxc/"$DistDir"/uekulele/lxc/.
-			sudo sed -i '/bash_completion/d' /opt/olxc/"$DistDir"/uekulele/lxc/lxc.spec
+			sudo sed -i '/sysconfig/s/noreplace/missingok, noreplace/' 	/opt/olxc/"$DistDir"/uekulele/lxc/lxc.spec
+			sudo sed -i '/bash_completion.d/s/^/%config(missingok) /'  	/opt/olxc/"$DistDir"/uekulele/lxc/lxc.spec
+#			sudo sed -i '/bash_completion/d'				/opt/olxc/"$DistDir"/uekulele/lxc/lxc.spec
+#			sudo sed -i '/sysconfig/d'					/opt/olxc/"$DistDir"/uekulele/lxc/lxc.spec
 			cd /opt/olxc/"$DistDir"/uekulele/lxc
 
 			function CheckMacrosFile {
@@ -1007,7 +1044,7 @@ then
 
 #	sleep 5
 
-	if [ $LinuxFlavor != 'CentOS' ] && [ $LinuxFlavor != 'Fedora' ]
+	if [ $LinuxFlavor != 'CentOS' ] && [ $LinuxFlavor != 'Fedora' ] && [ $LinuxFlavor != 'Red' ]
 	then
 		sudo ifconfig lxcbr0 > /dev/null 2>&1
 	else
@@ -1064,12 +1101,12 @@ echo ''
 
 sleep 5
 
-if [ $LinuxFlavor != 'CentOS' ] && [ $LinuxFlavor != 'Fedora' ]
+if [ $LinuxFlavor != 'CentOS' ] && [ $LinuxFlavor != 'Fedora' ] && [ $LinuxFlavor != 'Red' ]
 then
 	sudo ifconfig lxcbr0
 fi
 
-if [ $LinuxFlavor = 'CentOS' ] || [ $LinuxFlavor = 'Fedora' ]
+if [ $LinuxFlavor = 'CentOS' ] || [ $LinuxFlavor = 'Fedora' ] || [ $LinuxFlavor = 'Red' ]
 then
 	sudo ifconfig virbr0
 	if [ $? -eq 0 ]
@@ -1109,7 +1146,7 @@ sudo yum -y install openssh-server uuid sshpass
 sudo yum -y install rpm ntp iotop
 sudo yum -y install iptables gawk yum-utils
 
-if [ $LinuxFlavor = 'CentOS' ] || [ $LinuxFlavor = 'Fedora' ]
+if [ $LinuxFlavor = 'CentOS' ] || [ $LinuxFlavor = 'Fedora' ] || [ $LinuxFlavor = 'Red' ]
 then
 	sudo yum -y install lsb
 fi
@@ -1532,6 +1569,16 @@ function CheckNameServerExists {
 	sudo lxc-ls -f | grep -c "$NameServer"
 }
 NameServerExists=$(CheckNameServerExists)
+
+function CheckLxcDefaultEmpty {
+	cat /etc/lxc/default.conf | grep -c empty
+}
+LxcDefaultEmpty=$(CheckLxcDefaultEmpty)
+
+if [ $LxcDefaultEmpty -gt 0 ]
+then
+	sudo cp -p /etc/lxc/default.conf.bak /etc/lxc/default.conf
+fi
 
 if   [ $NameServerExists -eq 0 ] && [ $MultiHostVar2 = 'N' ]
 then
@@ -2715,13 +2762,12 @@ then
         sudo sed -i "s/Owner=ubuntu/Owner=amide/"       /var/lib/lxc/"$NameServer"-base/rootfs/root/ns_backup_update.sh
         sudo sed -i "s/Pass=ubuntu/Pass=$password/"     /var/lib/lxc/"$NameServer"-base/rootfs/root/ns_backup_update.sh
 
-#	sudo useradd -m -p $(openssl passwd -1 ${PASSWORD}) -s /bin/bash -G wheel ${USERNAME}
 	sudo useradd -m -p $(openssl passwd -1 ${PASSWORD}) -s /bin/bash ${USERNAME}
 	sudo mkdir -p  /home/${USERNAME}/Downloads /home/${USERNAME}/Manage-Orabuntu
 	sudo chown ${USERNAME}:${USERNAME} /home/${USERNAME}/Downloads /home/${USERNAME}/Manage-Orabuntu
+	sudo runuser -l amide -c "ssh-keygen -f /home/amide/.ssh/id_rsa -t rsa -N ''"
 
-        sudo sh -c "echo 'amide ALL=(ALL) /usr/bin/mkdir'      >  /etc/sudoers.d/amide"
-        sudo sh -c "echo 'amide ALL=(ALL) /usr/bin/cp'         >> /etc/sudoers.d/amide"
+	sudo sh -c "echo 'amide ALL=/bin/mkdir, /bin/cp' > /etc/sudoers.d/amide"
 	sudo chmod 0440 /etc/sudoers.d/amide
 
 	sudo lxc-attach -n $NameServer -- crontab /root/crontab.txt
@@ -2739,6 +2785,9 @@ then
 	sudo lxc-attach -n $NameServer -- chown bind:bind /var/lib/bind/rev.$Domain2
 	sudo lxc-attach -n $NameServer -- chown root:bind /var/lib/bind
 	sudo lxc-attach -n $NameServer -- chmod 775 /var/lib/bind
+	sudo lxc-attach -n $NameServer -- ssh-keygen -f /root/.ssh/id_rsa -t rsa -N ''
+
+	sudo sh -c "cat '/var/lib/lxc/$NameServerBase/delta0/root/.ssh/id_rsa.pub' >> /home/amide/.ssh/authorized_keys"
                
 	echo ''
 	echo "=============================================="
@@ -2796,12 +2845,10 @@ then
 	echo "=============================================="
 	echo ''
 
-	sshpass -p $MultiHostVar9 scp -p $MultiHostVar8@$MultiHostVar5:"$DistDir"/installs/logs/amide-password.txt "$DistDir"/installs/logs/.
-
-	function GetAmidePassword {
-		cat "$DistDir"/installs/logs/amide-password.txt | head -1 | sed 's/^[ \t]*//;s/[ \t]*$//'
-	}
-	AmidePassword=$(GetAmidePassword)
+        function GetAmidePassword {
+                sudo sh -c "cat /var/lib/lxc/$NameServer/rootfs/root/ns_backup_update.sh" | grep 'Pass=' | cut -f2 -d'='
+        }
+        AmidePassword=$(GetAmidePassword)
 
 	USERNAME=amide
 	PASSWORD=$AmidePassword
@@ -2809,9 +2856,10 @@ then
 	sudo useradd -m -p $(openssl passwd -1 ${PASSWORD}) -s /bin/bash ${USERNAME}
 	sudo mkdir -p  /home/${USERNAME}/Downloads /home/${USERNAME}/Manage-Orabuntu
 	sudo chown ${USERNAME}:${USERNAME} /home/${USERNAME}/Downloads /home/${USERNAME}/Manage-Orabuntu
+	sudo runuser -l amide -c "ssh-keygen -f /home/amide/.ssh/id_rsa -t rsa -N ''"
+	sudo sh -c "cat '/var/lib/lxc/$NameServerBase/delta0/root/.ssh/id_rsa.pub' >> /home/amide/.ssh/authorized_keys"
 
-        sudo sh -c "echo 'amide ALL=(ALL) /usr/bin/mkdir'      >  /etc/sudoers.d/amide"
-        sudo sh -c "echo 'amide ALL=(ALL) /usr/bin/cp'         >> /etc/sudoers.d/amide"
+	sudo sh -c "echo 'amide ALL=/bin/mkdir, /bin/cp' > /etc/sudoers.d/amide"
 	sudo chmod 0440 /etc/sudoers.d/amide
 
 	echo ''
@@ -3132,7 +3180,7 @@ then
 		echo "=============================================="
 		echo ''
 
-		if [ $LinuxFlavor != 'Fedora' ] && [ $LinuxFlavor != 'CentOS' ]
+		if [ $LinuxFlavor != 'Fedora' ] && [ $LinuxFlavor != 'CentOS' ] && [ $LinuxFlavor != 'Red' ]
 		then
 			function GetDhcpRange {
 				cat /etc/sysconfig/lxc-net | grep LXC_DHCP_RANGE | cut -f2 -d'=' | sed 's/"//g' 
@@ -3163,7 +3211,7 @@ then
 		sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /etc/dnsmasq.conf
 		sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /etc/dnsmasq.conf
 
-		if [ $LinuxFlavor != 'Fedora' ] && [ $LinuxFlavor != 'CentOS' ]
+		if [ $LinuxFlavor != 'Fedora' ] && [ $LinuxFlavor != 'CentOS' ] && [ $LinuxFlavor != 'Red' ]
 		then
 			sudo sed -i '/LXC_DHCP_CONFILE/s/#//' /etc/sysconfig/lxc-net
 			sudo sed -i 's/^[ \t]*//' /etc/dnsmasq.conf
@@ -3177,17 +3225,46 @@ then
 		sudo service NetworkManager restart
 		sleep 5
 		sudo systemctl daemon-reload
+			
+		function GetOriginalNameServers {
+		        cat /etc/resolv.conf  | grep nameserver | tr -d '\n' | sed 's/nameserver//g' | sed 's/^[ \t]*//;s/[ \t]*$//' | sed 's/  */ /g'
+		}
+		OriginalNameServers=$(GetOriginalNameServers)
+
+		function GetOriginalSearchDomains {
+		        cat /etc/resolv.conf  | grep search | sed 's/  */ /g' | sed 's/search //g'
+		}
+		OriginalSearchDomains=$(GetOriginalSearchDomains)
+
 		sudo rm -f /etc/resolv.conf
 
 		sudo sh -c "echo 'nameserver 127.0.0.1' 			>  /etc/resolv.conf"
-		sudo sh -c "echo 'search $Domain1 $Domain2 gns1.$Domain1' 	>> /etc/resolv.conf"
+#		sudo sh -c "echo 'search $Domain1 $Domain2 gns1.$Domain1' 	>> /etc/resolv.conf"
 
-		if [ $LinuxFlavor != 'Fedora' ] && [ $LinuxFlavor != 'CentOS' ]
+		if [ $LinuxFlavor != 'Fedora' ] && [ $LinuxFlavor != 'CentOS' ] && [ $LinuxFlavor != 'Red' ]
 		then
 			sudo sed -i "s/DHCP-RANGE-OLXC/dhcp-range=$DHR/" /etc/dnsmasq.conf
 			sudo service lxc-net restart> /dev/null 2>&1
  			sudo service lxc-net status
 		else
+			sudo sed -i '/cache-size=150/s/cache-size=150/cache-size=0/g' /etc/dnsmasq.conf
+			sudo sh -c "echo 'search $Domain1 $Domain2 gns1.$Domain1 $OriginalSearchDomains' 	>> /etc/resolv.conf"
+
+			for j in $OriginalNameServers
+			do
+			        for i in $OriginalSearchDomains
+			        do
+			                function CountOriginalSearchDomainsDnsmasq {
+			                        grep -c $j /etc/dnsmasq.conf
+			                }
+			                OriginalSearchDomainsDnsmasq=$(CountOriginalSearchDomainsDnsmasq)
+
+			                if [ $OriginalSearchDomainsDnsmasq -eq 0 ]
+			                then   
+			                        sudo sh -c "echo 'server=/$i/$j' >> /etc/dnsmasq.conf"
+			                fi
+			        done
+			done
 			sudo service dnsmasq start
 			sudo systemctl enable dnsmasq
 		fi
