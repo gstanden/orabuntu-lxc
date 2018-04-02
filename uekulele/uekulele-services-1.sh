@@ -1016,6 +1016,7 @@ then
 				echo ''
 
 				sudo modprobe overlay
+				sudo cat /proc/filesystems | grep overlay
 
 				echo ''
 				echo "=============================================="
@@ -3899,6 +3900,7 @@ then
 		sudo rm -f /etc/resolv.conf
 		sudo sh -c "echo 'nameserver 127.0.0.1'	> 						/etc/resolv.conf"
 		sudo sh -c "echo 'search $Domain1 $Domain2 gns1.$Domain1 $OriginalSearchDomains' >> 	/etc/resolv.conf"
+		sudo cp -p /etc/resolv.conf /etc/resolv.conf.olxc
 
 		for j in $OriginalNameServers
 		do

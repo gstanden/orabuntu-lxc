@@ -497,6 +497,11 @@ do
         echo "SSH to local container $j...                  "
         echo "=============================================="
         echo ''
+
+	if [ $LinuxFlavor = 'CentOS' ] && [ $Release -eq 6 ]
+	then
+		sudo cp -p /etc/resolv.conf.olxc /etc/resolv.conf
+	fi
 	
 	ssh-keygen -R $j
        	sshpass -p root ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no root@$j "uname -a; cat /etc/oracle-release"
@@ -521,7 +526,7 @@ then
 	echo ''
 
         sudo touch /etc/orabuntu-lxc-release
-        sudo sh -c "echo 'Orabuntu-LXC v6.10.7-beta AMIDE' > /etc/orabuntu-lxc-release"
+        sudo sh -c "echo 'Orabuntu-LXC v6.11.0-beta AMIDE' > /etc/orabuntu-lxc-release"
 	sudo ls -l /etc/orabuntu-lxc-release
 	echo ''
 	sudo cat /etc/orabuntu-lxc-release
@@ -825,6 +830,7 @@ then
 					echo "=============================================="
 					echo "LXC snapshot not supported on this fs/kernel. "
 					echo "=============================================="
+					echo ''
                                 fi
 			fi
                         
@@ -845,6 +851,7 @@ then
 					echo "=============================================="
 					echo "LXC snapshot not supported on this fs/kernel. "
 					echo "=============================================="
+					echo ''
                                 fi
 			fi
                 fi
@@ -868,6 +875,7 @@ then
 					echo "=============================================="
 					echo "LXC snapshot not supported on this fs/kernel. "
 					echo "=============================================="
+					echo ''
 				fi
 			fi
 			
@@ -888,6 +896,7 @@ then
 					echo "=============================================="
 					echo "LXC snapshot not supported on this fs/kernel. "
 					echo "=============================================="
+					echo ''
 				fi
 			fi
                 fi

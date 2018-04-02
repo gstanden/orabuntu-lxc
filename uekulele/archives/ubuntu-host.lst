@@ -19,5 +19,6 @@
 /etc/systemd/resolved.conf
 /etc/resolv.dnsmasq
 /etc/dnsmasq.conf
+/etc/dhcp/dhclient.conf
 /etc/GNU3
 /etc/COPYING
