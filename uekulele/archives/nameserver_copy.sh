@@ -38,16 +38,20 @@ MultiHostVar6=$2
 MultiHostVar8=$3
 MultiHostVar9=$4
 NameServer=$5
+Release=$6
 
 function CheckSystemdResolvedInstalled {
 	sudo netstat -ulnp | grep 53 | sed 's/  */ /g' | rev | cut -f1 -d'/' | rev | sort -u | grep systemd- | wc -l
 }
 SystemdResolvedInstalled=$(CheckSystemdResolvedInstalled)
 
-function CheckLxcNetInstalled {
-	systemctl | grep -c lxc-net
-}
-LxcNetInstalled=$(CheckLxcNetInstalled)
+if [ $Release -ge 7 ]
+then
+	function CheckLxcNetInstalled {
+		systemctl | grep -c lxc-net
+	}
+	LxcNetInstalled=$(CheckLxcNetInstalled)
+fi
 
 echo ''
 echo "=============================================="
@@ -55,21 +59,59 @@ echo "Copy nameserver $NameServer...                "
 echo "=============================================="
 echo ''
 
-rsync -hP --rsh="sshpass -p $MultiHostVar9 ssh -l $MultiHostVar8" $MultiHostVar5:~/Manage-Orabuntu/$NameServer.tar.gz ~/Manage-Orabuntu/.
+echo ''
+echo "=============================================="
+echo "Install rsync ...                             "
+echo "=============================================="
+echo ''
+
+sudo yum -y install rsync
+
+echo ''
+echo "=============================================="
+echo "Done: Install rsync.                          "
+echo "=============================================="
+echo ''
+
+sleep 5
+
+clear
+
+echo ''
+echo "=============================================="
+echo "Nameserver rsync...                           "
+echo "=============================================="
+echo ''
+
+rsync -XhP --rsh="sshpass -p $MultiHostVar9 ssh -l $MultiHostVar8" $MultiHostVar5:~/Manage-Orabuntu/$NameServer.tar.gz ~/Manage-Orabuntu/.
+
+echo ''
+echo "=============================================="
+echo "Done: Nameserver rsync...                     "
+echo "=============================================="
+echo ''
+
+sleep 5
+
+clear
 
 echo ''
 echo "=============================================="
 echo "Destroy nameserver $NameServer...             "
 echo "=============================================="
 echo ''
+
 sudo lxc-stop    -n $NameServer
 sudo lxc-destroy -n $NameServer
+
 echo ''
 echo "=============================================="
 echo "Unpack tar file...                            "
 echo "=============================================="
 echo ''
+
 sudo tar -P -xzf ~/Manage-Orabuntu/$NameServer.tar.gz --checkpoint=10000 --totals
+
 echo ''
 echo "=============================================="
 echo "Done: Copy nameserver container $NameServer.  "

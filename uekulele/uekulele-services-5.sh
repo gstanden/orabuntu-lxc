@@ -114,11 +114,6 @@ function CheckSystemdResolvedInstalled {
 }
 SystemdResolvedInstalled=$(CheckSystemdResolvedInstalled)
 
-function CheckLxcNetRunning {
-	sudo systemctl | grep lxc-net | grep 'loaded active exited' | wc -l
-}
-LxcNetRunning=$(CheckLxcNetRunning)
-
 function CheckNameServerExists {
         sudo lxc-info -n $NameServer 2>&1 | grep -i name | wc -l
 }
@@ -211,6 +206,16 @@ then
         UbuntuMajorVersion=$(GetUbuntuMajorVersion)
 fi
 
+if [ $Release -ge 7 ]
+then
+	function CheckLxcNetRunning {
+		sudo systemctl | grep lxc-net | grep 'loaded active exited' | wc -l
+	}
+	LxcNetRunning=$(CheckLxcNetRunning)
+else
+	LxcNetRunning=0
+fi
+
 echo ''
 echo "=============================================="
 echo "Script: uekulele-services-5.sh                "
@@ -243,6 +248,11 @@ then
 	then
 		sudo chmod 775 /opt/olxc/"$DistDir"/uekulele/archives/docker_install_uekulele.sh
 		/opt/olxc/"$DistDir"/uekulele/archives/docker_install_uekulele.sh
+
+	if [ $Release -eq 6 ] && [ $LinuxFlavor = 'Oracle' ]
+	then
+		sudo chmod 775 /opt/olxc/"$DistDir"/uekulele/archives/docker_install_uekulele.sh
+		/opt/olxc/"$DistDir"/uekulele/archives/docker_install_uekulele.sh
 	fi
 	
 	echo ''
@@ -270,48 +280,88 @@ then
 	SwitchList='sw2 sw3 sw4 sw5 sw6 sw7 sw8 sw9'
 	for k in $SwitchList
 	do
-		echo ''
-		echo "=============================================="
-		echo "Create systemd OpenvSwitch $k service...      "
-		echo "=============================================="
+		if [ $Release -ge 7 ]
+		then
+			echo ''
+			echo "=============================================="
+			echo "Create systemd OpenvSwitch $k service...      "
+			echo "=============================================="
 
-         	if [ ! -f /etc/systemd/system/$k.service ]
-         	then
-               		sudo sh -c "echo '[Unit]'						 > /etc/systemd/system/$k.service"
-                	sudo sh -c "echo 'Description=$k Service'				>> /etc/systemd/system/$k.service"
-                	sudo sh -c "echo 'After=network-online.target'				>> /etc/systemd/system/$k.service"
-                	sudo sh -c "echo ''							>> /etc/systemd/system/$k.service"
-                	sudo sh -c "echo '[Service]'						>> /etc/systemd/system/$k.service"
-                	sudo sh -c "echo 'Type=oneshot'						>> /etc/systemd/system/$k.service"
-                	sudo sh -c "echo 'User=root'						>> /etc/systemd/system/$k.service"
-                	sudo sh -c "echo 'RemainAfterExit=yes'					>> /etc/systemd/system/$k.service"
-                	sudo sh -c "echo 'ExecStart=/etc/network/openvswitch/crt_ovs_$k.sh' 	>> /etc/systemd/system/$k.service"
-                	sudo sh -c "echo ''							>> /etc/systemd/system/$k.service"
-                	sudo sh -c "echo '[Install]'						>> /etc/systemd/system/$k.service"
-                	sudo sh -c "echo 'WantedBy=multi-user.target'				>> /etc/systemd/system/$k.service"
- 		fi
+			if [ ! -f /etc/systemd/system/$k.service ]
+			then
+				sudo sh -c "echo '[Unit]'						 > /etc/systemd/system/$k.service"
+			      	sudo sh -c "echo 'Description=$k Service'				>> /etc/systemd/system/$k.service"
+			      	sudo sh -c "echo 'After=network-online.target'				>> /etc/systemd/system/$k.service"
+			      	sudo sh -c "echo ''							>> /etc/systemd/system/$k.service"
+			      	sudo sh -c "echo '[Service]'						>> /etc/systemd/system/$k.service"
+			      	sudo sh -c "echo 'Type=oneshot'						>> /etc/systemd/system/$k.service"
+			      	sudo sh -c "echo 'User=root'						>> /etc/systemd/system/$k.service"
+			      	sudo sh -c "echo 'RemainAfterExit=yes'					>> /etc/systemd/system/$k.service"
+			      	sudo sh -c "echo 'ExecStart=/etc/network/openvswitch/crt_ovs_$k.sh' 	>> /etc/systemd/system/$k.service"
+			      	sudo sh -c "echo ''							>> /etc/systemd/system/$k.service"
+			      	sudo sh -c "echo '[Install]'						>> /etc/systemd/system/$k.service"
+			      	sudo sh -c "echo 'WantedBy=multi-user.target'				>> /etc/systemd/system/$k.service"
+ 			fi
 	
-		echo ''
-		echo "=============================================="
-		echo "Start OpenvSwitch $k ...                      "
-		echo "=============================================="
-		echo ''
+			echo ''
+			echo "=============================================="
+			echo "Start OpenvSwitch $k ...                      "
+			echo "=============================================="
+			echo ''
 
-		sudo chmod 644 /etc/systemd/system/$k.service
-		sudo systemctl enable $k.service
-		sudo service $k stop
-		sudo service $k start
-		sudo service $k status
+			sudo chmod 644 /etc/systemd/system/$k.service
+			sudo systemctl enable $k.service
+			sudo service $k stop
+			sudo service $k start
+			sudo service $k status
 
-		echo ''
-		echo "=============================================="
-		echo "OpenvSwitch $k is up.                         "
-		echo "=============================================="
-	
-		sleep 3
+			echo ''
+			echo "=============================================="
+			echo "OpenvSwitch $k is up.                         "
+			echo "=============================================="
+		
+			sleep 3
 
-		clear
+			clear
 
+		elif [ $Release -eq 6 ]
+		then
+			echo ''
+			echo "=============================================="
+			echo "Create OpenvSwitch $k service...              "
+			echo "=============================================="
+			echo ''
+
+			if [ ! -f /etc/init.d/ovs_$k ]
+			then
+				sudo cp -p /etc/network/openvswitch/switch-service-linux6.sh /etc/init.d/ovs_$k
+				sudo sed -i "s/SWK/$k/g" /etc/init.d/ovs_$k
+				sudo chmod 755 /etc/init.d/ovs_$k
+				sudo chown $Owner:$Group /etc/init.d/ovs_$k
+				sudo chkconfig --add ovs_$k
+				sudo chkconfig ovs_$k on --level 345
+				sudo chkconfig --list ovs_$k
+			fi
+
+		        echo ''
+			echo "=============================================="
+			echo "Start OpenvSwitch $k ...                      "
+			echo "=============================================="
+			echo ''
+
+			sudo chmod 755 /etc/network/openvswitch/crt_ovs_$k.sh
+			sudo /etc/network/openvswitch/crt_ovs_$k.sh >/dev/null 2>&1
+			sudo ifconfig $k | tail -50
+
+			echo "=============================================="
+			echo "OpenvSwitch $k is up.                         "
+			echo "=============================================="
+			echo ''
+
+			sleep 3
+
+			clear
+		fi
 	done
 
 	echo ''
@@ -324,8 +374,10 @@ then
 
 	clear
 fi
-
-sudo systemctl daemon-reload
+if [ $Release -ge 7 ]
+then
+	sudo systemctl daemon-reload
+fi
 
 if [ $LinuxFlavor != 'Fedora' ] && [ $LinuxFlavor != 'CentOS' ] && [ $LinuxFlavor != 'Red' ]
 then
@@ -472,12 +524,18 @@ then
 		DhcpRange=$(GetDhcpRange)
 		DHR="$DhcpRange"
 		sudo sed -i "s/DHCP-RANGE-OLXC/dhcp-range=$DHR/" /etc/dnsmasq.conf
-		sudo systemctl daemon-reload
+		if [ $Release -ge 7 ]
+		then
+			sudo systemctl daemon-reload
+		fi
         	sudo service lxc-net restart > /dev/null 2>&1
 		sleep 2
         	sudo service lxc-net status
 	else
-		sudo systemctl daemon-reload
+		if [ $Release -ge 7 ]
+		then
+			sudo systemctl daemon-reload
+		fi
 		sudo service dnsmasq restart > /dev/null 2>&1
 		sleep 2
 		sudo service dnsmasq status
@@ -527,7 +585,7 @@ then
 	echo ''
 
         sudo touch /etc/orabuntu-lxc-release
-        sudo sh -c "echo 'Orabuntu-LXC v6.10-beta AMIDE' > /etc/orabuntu-lxc-release"
+        sudo sh -c "echo 'Orabuntu-LXC v6.10.7-beta AMIDE' > /etc/orabuntu-lxc-release"
 	sudo ls -l /etc/orabuntu-lxc-release
 	echo ''
 	sudo cat /etc/orabuntu-lxc-release
@@ -741,12 +799,18 @@ then
 			DhcpRange=$(GetDhcpRange)
 			DHR="$DhcpRange"
 			sudo sed -i "s/DHCP-RANGE-OLXC/dhcp-range=$DHR/" /etc/dnsmasq.conf
-			sudo systemctl daemon-reload
+			if [ $Release -ge 7 ]
+			then
+				sudo systemctl daemon-reload
+			fi
 			sudo service lxc-net restart > /dev/null 2>&1
 			sleep 2
 			sudo service lxc-net status
 		else
-			sudo systemctl daemon-reload
+			if [ $Release -ge 7 ]
+			then
+				sudo systemctl daemon-reload
+			fi
 			sudo service dnsmasq restart > /dev/null 2>&1
 			sleep 2
 			sudo service dnsmasq status
@@ -830,22 +894,28 @@ then
                         if   [ $Ftype -eq 1 ]
                         then
                                 sudo lxc-stop -n $NameServer
-                                echo 'hub nameserver post-install snapshot' > snap-comment
-                                sudo lxc-snapshot -n $NameServer -c snap-comment
-                                sudo rm -f snap-comment
-                                sudo lxc-snapshot -n $NameServer -L -C
-                                sleep 5
+				if [ $Release -ge 7 ]
+				then
+                                	echo 'hub nameserver post-install snapshot' > snap-comment
+                                	sudo lxc-snapshot -n $NameServer -c snap-comment
+                                	sudo rm -f snap-comment
+                                	sudo lxc-snapshot -n $NameServer -L -C
+                                	sleep 5
+				fi
                         fi
                 fi
 
-                if [ $FileSystemTypeExt -eq 1 ]
+                if [ $FileSystemTypeExt -eq 1 ] && [ $Release -ge 7 ]
                 then
                         sudo lxc-stop -n $NameServer
-                        echo 'hub nameserver post-install snapshot' > snap-comment
-                        sudo lxc-snapshot -n $NameServer -c snap-comment
-                        sudo rm -f snap-comment
-                        sudo lxc-snapshot -n $NameServer -L -C
-                        sleep 5
+			if [ $Release -ge 7 ]
+			then
+                        	echo 'hub nameserver post-install snapshot' > snap-comment
+                        	sudo lxc-snapshot -n $NameServer -c snap-comment
+                        	sudo rm -f snap-comment
+                        	sudo lxc-snapshot -n $NameServer -L -C
+                        	sleep 5
+			fi
                 fi
 
                 if [ ! -e ~/Manage-Orabuntu ]
@@ -921,12 +991,18 @@ then
 				DhcpRange=$(GetDhcpRange)
 				DHR="$DhcpRange"
 				sudo sed -i "s/DHCP-RANGE-OLXC/dhcp-range=$DHR/" /etc/dnsmasq.conf
-				sudo systemctl daemon-reload
+				if [ $Release -ge 7 ]
+				then
+					sudo systemctl daemon-reload
+				fi
 				sudo service lxc-net restart > /dev/null 2>&1
 				sleep 2
 				sudo service lxc-net status
 			else
-				sudo systemctl daemon-reload
+				if [ $Release -ge 7 ]
+				then
+					sudo systemctl daemon-reload
+				fi
 				sudo service dnsmasq restart > /dev/null 2>&1
 				sleep 2
 				sudo service dnsmasq status

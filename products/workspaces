@@ -120,11 +120,6 @@ function CheckSystemdResolvedInstalled {
 }
 SystemdResolvedInstalled=$(CheckSystemdResolvedInstalled)
 
-function CheckLxcNetRunning {
-	sudo systemctl | grep lxc-net | grep 'loaded active exited' | wc -l
-}
-LxcNetRunning=$(CheckLxcNetRunning)
-
 function CheckNetworkManagerRunning {
 	ps -ef | grep NetworkManager | grep -v grep | wc -l
 }
@@ -337,8 +332,6 @@ echo "=============================================="
 echo ''
 
 sudo tar -xvf /opt/olxc/"$DistDir"/"$SubDirName"/archives/product.tar -C /var/lib/lxc/oel$OracleRelease$SeedPostfix --touch
-
-sudo lxc-attach -n $SeedContainerName -- ls -l /root
 
 echo ''
 echo "=============================================="

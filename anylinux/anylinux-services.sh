@@ -242,7 +242,7 @@ then
                 CutIndex=7
         elif [ $LinuxFlavor = 'CentOS' ]
         then
-                CutIndex=4
+                CutIndex=3
         fi
         function GetRedHatVersion {
                 sudo cat /etc/redhat-release | cut -f"$CutIndex" -d' ' | cut -f1 -d'.'
@@ -355,6 +355,29 @@ then
 	clear
 fi
 
+sleep 5
+
+clear
+
+echo ''
+echo "==============================================" 
+echo "Install libvirt ...                           "
+echo "=============================================="
+echo ''
+
+sleep 5
+
+sudo yum -y install libvirt
+
+echo ''
+echo "==============================================" 
+echo "Done: Install libvirt ...                     "
+echo "=============================================="
+
+sleep 5
+
+clear
+
 echo ''
 echo "=============================================="
 echo "Display Installation Parameters ...           "
@@ -414,7 +437,7 @@ fi
 	NameServer=$6
 	if [ -z $6 ]
 	then
-		NameServer=ns1
+		NameServer=afns1
 	fi
 	echo 'NameServer                = '$NameServer
 
@@ -481,7 +504,7 @@ echo 'MultiHost                 = '$MultiHost
 	LxcOvsVersion=$9
 	if [ -z $9 ] && [ $LinuxFlavor != 'Fedora' ]
 	then
-                	LxcOvsVersion="2.1.1:2.5.4"
+                	LxcOvsVersion="2.0.8:2.5.4"
 	fi
 
 	# Fedora MUST leave Lxc version at 2.0.9 but can change Ovs version.
@@ -711,6 +734,7 @@ fi
 	echo 'DistDir                   = '$DistDir
 	echo 'SubDirName                = '$SubDirName
 	echo 'Product                   = '$Product
+	echo 'RPM libvirt installed     = '`rpm -qa | grep libvirt | grep -v client`
 
 echo ''
 echo "=============================================="

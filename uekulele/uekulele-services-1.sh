@@ -136,11 +136,6 @@ function CheckSystemdResolvedInstalled {
 }
 SystemdResolvedInstalled=$(CheckSystemdResolvedInstalled)
 
-function CheckLxcNetRunning {
-	sudo systemctl | grep lxc-net | grep 'loaded active exited' | wc -l
-}
-LxcNetRunning=$(CheckLxcNetRunning)
-
 function CheckNetworkManagerRunning {
 	ps -ef | grep NetworkManager | grep -v grep | wc -l
 }
@@ -192,7 +187,7 @@ then
                 CutIndex=7
         elif [ $LinuxFlavor = 'CentOS' ]
         then
-                CutIndex=4
+                CutIndex=3
         fi
         function GetRedHatVersion {
                 sudo cat /etc/redhat-release | cut -f"$CutIndex" -d' ' | cut -f1 -d'.'
@@ -238,6 +233,21 @@ echo $MultiHost | cut -f1 -d':'
 }
 Operation=$(GetOperation)
 
+if   [ $Release -ge 7 ]
+then
+	function CheckLxcNetRunning {
+		sudo systemctl | grep lxc-net | grep 'loaded active exited' | wc -l
+	}
+	LxcNetRunning=$(CheckLxcNetRunning)
+
+elif [ $Release -eq 6 ]
+then
+	function CheckLxcNetRunning {
+		sudo chkconfig | grep lxc-net | grep -c on
+	}
+	LxcNetRunning=$(CheckLxcNetRunning)
+fi
+
 echo ''
 echo "=============================================="
 echo "Script: uekulele-services-1.sh                "
@@ -264,59 +274,63 @@ sleep 5
 
 clear
 
-echo ''
-echo "=============================================="
-echo "Performance settings for sshd_config.         "
-echo "=============================================="
-echo ''
-echo "=============================================="
-echo "These make the install of Orabuntu-LXC faster."
-echo "You can change these back after install or    "
-echo "leave them at the new settings shown below.   "
-echo "=============================================="
-echo ''
-echo "=============================================="
-echo "Orabuntu-LXC has made a backup of sshd_config "
-echo "located in the /etc/ssh directory if you want "
-echo "to revert sshd_config to original settings    "
-echo "after Orabuntu-LXC install is completed.      "
-echo "=============================================="
-echo ''
+if [ $Release -ge 7 ]
+then
+	echo ''
+	echo "=============================================="
+	echo "Performance settings for sshd_config.         "
+	echo "=============================================="
+	echo ''
+	echo "=============================================="
+	echo "These make the install of Orabuntu-LXC faster."
+	echo "You can change these back after install or    "
+	echo "leave them at the new settings shown below.   "
+	echo "=============================================="
+	echo ''
+	echo "=============================================="
+	echo "Orabuntu-LXC has made a backup of sshd_config "
+	echo "located in the /etc/ssh directory if you want "
+	echo "to revert sshd_config to original settings    "
+	echo "after Orabuntu-LXC install is completed.      "
+	echo "=============================================="
+	echo ''
 
-sleep 5
+	sleep 5
 
-sudo sed -i '/GSSAPIAuthentication/s/yes/no/'                                /etc/ssh/sshd_config
-sudo sed -i '/UseDNS/s/yes/no/'                                              /etc/ssh/sshd_config
-sudo sed -i '/GSSAPIAuthentication/s/#//'                                    /etc/ssh/sshd_config
-sudo sed -i '/UseDNS/s/#//'                                                  /etc/ssh/sshd_config
-sudo egrep 'GSSAPIAuthentication|UseDNS'         	                     /etc/ssh/sshd_config
+	sudo cp -p /etc/ssh/sshd_config /etc/ssh/sshd_config.olxc
+	sudo sed -i '/GSSAPIAuthentication/s/yes/no/'	/etc/ssh/sshd_config
+	sudo sed -i '/UseDNS/s/yes/no/'			/etc/ssh/sshd_config
+	sudo sed -i '/GSSAPIAuthentication/s/#//'	/etc/ssh/sshd_config
+	sudo sed -i '/UseDNS/s/#//'			/etc/ssh/sshd_config
+	sudo egrep 'GSSAPIAuthentication|UseDNS'	/etc/ssh/sshd_config | sort -u
 
-echo ''
-echo "=============================================="
-echo "Done: edit sshd_config.                       "
-echo "=============================================="
-echo ''
+	echo ''
+	echo "=============================================="
+	echo "Done: edit sshd_config.                       "
+	echo "=============================================="
+	echo ''
 
-sleep 5
+	sleep 5
 
-clear
+	clear
 
-echo ''
-echo "=============================================="
-echo "Restart sshd...                               "
-echo "=============================================="
-echo ''
+	echo ''
+	echo "=============================================="
+	echo "Restart sshd...                               "
+	echo "=============================================="
+	echo ''
 
-sudo service sshd restart
+	sudo service sshd restart
 
-echo ''
-echo "=============================================="
-echo "Done: Restart sshd.                           "
-echo "=============================================="
+	echo ''
+	echo "=============================================="
+	echo "Done: Restart sshd.                           "
+	echo "=============================================="
 
-sleep 5
+	sleep 5
 
-clear
+	clear
+fi
 
 if [ -f /etc/orabuntu-lxc-release ] 
 then
@@ -506,7 +520,142 @@ then
 	fi
 	sudo yum clean all
 
-	sudo yum -y install wget tar gzip libtool
+	sudo yum -y install wget tar gzip libtool libvit
+	
+	if [ $Release -eq 6 ]
+	then
+		if [ $LinuxFlavor = 'Oracle' ]
+		then
+                        sudo yum -y install lxc libcgroup libcap-devel
+	
+			echo ''
+			echo "=============================================="
+			echo "Done: Install LXC and prerequisite packages.  "
+			echo "=============================================="
+
+			sleep 5
+
+			clear
+
+			echo ''
+			echo "=============================================="
+			echo "Verify cgconfig service running...            "
+			echo "=============================================="
+			echo ''
+
+			function CheckCgconfigRunning {
+				sudo service cgconfig status
+			}
+			CgconfigRunning=$(CheckCgconfigRunning)
+
+			if [ $CgconfigRunning != 'Running' ]
+			then
+				sudo service cgconfig start
+			else
+				echo Service cgconfig status:  $CgconfigRunning
+			fi
+
+                        sudo chkconfig cgconfig on
+
+			echo ''
+			echo "=============================================="
+			echo "Done: Verify cgconfig service running.        "
+			echo "=============================================="
+
+			sleep 5
+
+			clear
+
+			echo ''
+			echo "=============================================="
+			echo "Configure memory.use.hierarchy...             "
+			echo "=============================================="
+			echo ''
+
+			# GLS 20180403 Credit: Dwight Engen (dwengen) https://github.com/lxc/lxc/issues/345
+
+                        function CheckMemoryUseHierarchy {
+                                grep -c memory.use_hierarchy /etc/cgconfig.conf
+                        }
+                        MemoryUseHierarchy=$(CheckMemoryUseHierarchy)
+
+                        if [ $MemoryUseHierarchy -eq 0 ]
+                        then
+                                sudo sh -c "echo 'group . {'                    >> /etc/cgconfig.conf"
+                                sudo sh -c "echo 'memory {'                     >> /etc/cgconfig.conf"
+                                sudo sh -c "echo 'memory.use_hierarchy = "1";'  >> /etc/cgconfig.conf"
+                                sudo sh -c "echo '}'                            >> /etc/cgconfig.conf"
+                                sudo sh -c "echo '}'                            >> /etc/cgconfig.conf"
+                        fi
+
+			cat /etc/cgconfig.conf
+
+			echo ''
+			echo "=============================================="
+			echo "Done: Configure memory.use.hierarchy.         "
+			echo "=============================================="
+
+			sleep 5
+
+			clear
+
+			echo ''
+			echo "=============================================="
+			echo "Build cgroupfs service...                     "
+			echo "=============================================="
+			echo ''
+
+			# GLS 20180403 Credit: Tianon Gravi (tianon) https://github.com/tianon/cgroupfs-mount
+			# GLS 20180403 Credit: Gilbert Standen (gstanden) forked and added support for Oracle Linux 6 and similar.
+
+                        if [ ! -d /opt/olxc/"$DistDir"/uekulele/cgroupfs-linux6 ]
+                        then
+                                sudo mkdir -p /opt/olxc/"$DistDir"/uekulele/cgroupfs-linux6
+                                sudo chown -R $Owner:$Group /opt/olxc/"$DistDir"/uekulele/cgroupfs-linux6
+                                cd /opt/olxc/"$DistDir"/uekulele/cgroupfs-linux6
+                                wget https://github.com/gstanden/cgroupfs-mount/archive/master.zip
+                                unzip master.zip
+                        fi
+			
+			echo ''
+			echo "=============================================="
+			echo "Done: Build  cgroupfs service.                "
+			echo "=============================================="
+
+			sleep 5
+
+			clear
+
+			echo ''
+			echo "=============================================="
+			echo "Verify cgroupfs service running...            "
+			echo "=============================================="
+			echo ''
+
+                        function CheckCgroupfsInstalled {
+                                sudo chkconfig --list | grep -c cgroupfs
+                        }
+                        CgroupfsInstalled=$(CheckCgroupfsInstalled)
+
+                        if [ $CgroupfsInstalled -eq 0 ]
+                        then
+                                cd /opt/olxc/"$DistDir"/uekulele/cgroupfs-linux6/cgroupfs-mount-master
+                                chmod 755 install-linux-6.sh
+                                ./install-linux-6.sh
+                                sudo service cgroupfs start
+                                sudo service cgroupfs status
+                        fi
+			
+			echo ''
+			echo "=============================================="
+			echo "Done: Verify cgroupfs service running.        "
+			echo "=============================================="
+
+			sleep 5
+
+			clear
+		fi
+	fi
 
 	if [ $LinuxFlavor != 'Fedora' ]
 	then
@@ -515,6 +664,12 @@ then
 
 		while [ $DocBook2XInstalled -eq 0 ] && [ $m -le 5 ]
 		do
+			echo ''
+			echo "=============================================="
+			echo 'Install epel repo...                          '
+			echo "=============================================="
+			echo ''
+
                         sudo yum -y install wget
                         sudo mkdir -p /opt/olxc/"$DistDir"/uekulele/epel
                         sudo chown -R $Owner:$Group /opt/olxc
@@ -543,7 +698,7 @@ then
 			then
 				echo ''
 				echo "=============================================="
-				echo 'epel configuration and installs successful.   '
+				echo "Done: Install epel repo.                      "
 				echo "=============================================="
 				echo ''
 
@@ -551,7 +706,7 @@ then
 				then
 				echo ''
 				echo "=============================================="
-				echo 'epel failure ... retrying epel configuration. '
+				echo "epel failure ... retrying epel install...     "
 				echo "=============================================="
 				echo ''
 			fi
@@ -561,8 +716,15 @@ then
 
 	cd /opt/olxc/"$DistDir"
 
-	sudo yum -y install debootstrap perl bash-completion bash-completion-extras dnsmasq
+	sudo yum -y install debootstrap perl bash-completion bash-completion-extras
 	sudo yum -y install lxc libcap-devel libcgroup wget bridge-utils lsb
+
+	echo '############### Installing libvirt ! #############################'
+	sleep 5
+	echo ''
+	sudo yum -y install libvirt
+	echo ''
+	echo '############### Installing libvirt ! #############################'
 
 	if [ $LinuxFlavor = 'Fedora' ]
 	then
@@ -585,34 +747,40 @@ then
 
 	echo ''
 	echo "=============================================="
-	echo "Start LXC and related services...             "
+	echo "Start LXC and libvirt...                      "
 	echo "=============================================="
 	echo ''
 
-	if [ $Release -eq 7 ] 
+	if [ $Release -ge 7 ] 
 	then
 		sudo systemctl daemon-reload
 		sudo systemctl start lxc.service
 		sudo systemctl status lxc.service
 		echo ''
-		
-		if [ $LinuxFlavor = 'Fedora' ] || [ $LinuxFlavor = 'CentOS' ] || [ $LinuxFlavor = 'Red' ]
-		then
-			sudo setenforce permissive
-			sudo systemctl start libvirtd
-			sleep 2
-			sudo systemctl stop libvirtd
-			sleep 2
-			sudo systemctl start libvirtd
-			sudo systemctl status libvirtd
-			sleep 2
-			sudo cp -p /etc/lxc/default.conf /etc/lxc/default.conf.bak
-		fi
+		sudo setenforce permissive
+		sudo systemctl start libvirtd
+		sleep 2
+		sudo systemctl stop libvirtd
+		sleep 2
+		sudo systemctl start libvirtd
+		sudo systemctl status libvirtd
+		sleep 2
+		sudo cp -p /etc/lxc/default.conf /etc/lxc/default.conf.bak
+	elif [ $Release -eq 6 ]
+	then
+#		sudo service lxc start
+		echo ''
+		sudo chkconfig --list | grep lxc
+		echo ''
+		sudo setenforce permissive
+		sudo service libvirtd start
+		echo ''
+		sudo service libvirtd status
 	fi
 
 	echo ''
 	echo "=============================================="
-	echo "LXC and related services started.             "
+	echo "Done: Start LXC and libvirt.                  "
 	echo "=============================================="
 	echo ''
 
@@ -675,6 +843,139 @@ then
 		sudo mv /etc/dnsmasq.conf /etc/dnsmasq.olxc.1
 	fi
 	sudo yum -y install wget tar gzip libtool
+	
+	if [ $Release -eq 6 ]
+	then
+		if [ $LinuxFlavor = 'Oracle' ]
+		then
+                        sudo yum -y install lxc libcgroup libcap-devel
+	
+			echo ''
+			echo "=============================================="
+			echo "Done: Install LXC and prerequisite packages.  "
+			echo "=============================================="
+
+			sleep 5
+
+			clear
+
+			echo ''
+			echo "=============================================="
+			echo "Verify cgconfig service running...            "
+			echo "=============================================="
+			echo ''
+
+			function CheckCgconfigRunning {
+				sudo service cgconfig status
+			}
+			CgconfigRunning=$(CheckCgconfigRunning)
+
+			if [ $CgconfigRunning != 'Running' ]
+			then
+				sudo service cgconfig start
+			else
+				echo Service cgconfig status:  $CgconfigRunning
+			fi
+
+			echo ''
+			echo "=============================================="
+			echo "Done: Verify cgconfig service running.        "
+			echo "=============================================="
+
+			sleep 5
+
+			clear
+
+			echo ''
+			echo "=============================================="
+			echo "Configure memory.use.hierarchy...             "
+			echo "=============================================="
+			echo ''
+
+			# GLS 20180403 Credit: Dwight Engen (dwengen) https://github.com/lxc/lxc/issues/345
+
+                        function CheckMemoryUseHierarchy {
+                                grep -c memory.use_hierarchy /etc/cgconfig.conf
+                        }
+                        MemoryUseHierarchy=$(CheckMemoryUseHierarchy)
+
+                        if [ $MemoryUseHierarchy -eq 0 ]
+                        then
+                                sudo sh -c "echo 'group . {'                    >> /etc/cgconfig.conf"
+                                sudo sh -c "echo 'memory {'                     >> /etc/cgconfig.conf"
+                                sudo sh -c "echo 'memory.use_hierarchy = "1";'  >> /etc/cgconfig.conf"
+                                sudo sh -c "echo '}'                            >> /etc/cgconfig.conf"
+                                sudo sh -c "echo '}'                            >> /etc/cgconfig.conf"
+                        fi
+
+			cat /etc/cgconfig.conf
+
+			echo ''
+			echo "=============================================="
+			echo "Done: Configure memory.use.hierarchy.         "
+			echo "=============================================="
+
+			sleep 5
+
+			clear
+
+			echo ''
+			echo "=============================================="
+			echo "Build cgroupfs service...                     "
+			echo "=============================================="
+			echo ''
+
+			# GLS 20180403 Credit: Gilbert Standen (gstanden) forked and added support for Oracle Linux 6 and similar.
+			# GLS 20180403 Forked and added support for Oracle Linux 6 and similar.
+
+                        if [ ! -d /opt/olxc/"$DistDir"/uekulele/cgroupfs-linux6 ]
+                        then
+                                sudo mkdir -p /opt/olxc/"$DistDir"/uekulele/cgroupfs-linux6
+                                sudo chown -R $Owner:$Group /opt/olxc/"$DistDir"/uekulele/cgroupfs-linux6
+                                cd /opt/olxc/"$DistDir"/uekulele/cgroupfs-linux6
+                                wget https://github.com/gstanden/cgroupfs-mount/archive/master.zip
+                                unzip master.zip
+                        fi
+			
+			echo ''
+			echo "=============================================="
+			echo "Done: Build  cgroupfs service.                "
+			echo "=============================================="
+
+			sleep 5
+
+			clear
+
+			echo ''
+			echo "=============================================="
+			echo "Verify cgroupfs service running...            "
+			echo "=============================================="
+			echo ''
+
+                        function CheckCgroupfsInstalled {
+                                sudo chkconfig --list | grep -c cgroupfs
+                        }
+                        CgroupfsInstalled=$(CheckCgroupfsInstalled)
+
+                        if [ $CgroupfsInstalled -eq 0 ]
+                        then
+                                cd /opt/olxc/"$DistDir"/uekulele/cgroupfs-linux6/cgroupfs-mount-master
+                                chmod 755 install-linux-6.sh
+                                ./install-linux-6.sh
+                                sudo service cgroupfs start
+                                sudo service cgroupfs status
+                        fi
+			
+			echo ''
+			echo "=============================================="
+			echo "Done: Verify cgroupfs service running.        "
+			echo "=============================================="
+
+			sleep 5
+
+			clear
+		fi
+	fi
 
 	if [ $LinuxFlavor != 'Fedora' ]
 	then
@@ -683,6 +984,12 @@ then
 
 		while [ $DocBook2XInstalled -eq 0 ] && [ $m -le 5 ]
 		do
+			echo ''
+			echo "=============================================="
+			echo 'Install epel repo...                          '
+			echo "=============================================="
+			echo ''
+
                         sudo yum -y install wget
                         sudo mkdir -p /opt/olxc/"$DistDir"/uekulele/epel
                         sudo chown -R $Owner:$Group /opt/olxc
@@ -711,7 +1018,7 @@ then
 			then
 				echo ''
 				echo "=============================================="
-				echo 'epel configuration and installs successful.   '
+				echo "Done: Install epel repo.                      "
 				echo "=============================================="
 				echo ''
 
@@ -719,7 +1026,7 @@ then
 				then
 				echo ''
 				echo "=============================================="
-				echo 'epel failure ... retrying epel configuration. '
+				echo "epel failure ... retrying epel install...     "
 				echo "=============================================="
 				echo ''
 			fi
@@ -729,7 +1036,7 @@ then
 
 	cd /opt/olxc/"$DistDir"
 
-	sudo yum -y install debootstrap perl bash-completion bash-completion-extras dnsmasq libvirt
+	sudo yum -y install debootstrap perl bash-completion bash-completion-extras 
 	sudo yum -y install lxc libcap-devel libcgroup wget bridge-utils lsb
 
 	if [ $LinuxFlavor = 'Fedora' ]
@@ -753,25 +1060,32 @@ then
 	echo "=============================================="
 	echo ''
 
-	if [ $Release -eq 7 ] 
+	if   [ $Release -eq 7 ] 
 	then
 		sudo systemctl daemon-reload
 		sudo systemctl start lxc.service
 		sudo systemctl status lxc.service
 		echo ''
-		
-		if [ $LinuxFlavor = 'Fedora' ] || [ $LinuxFlavor = 'CentOS' ] || [ $LinuxFlavor = 'Red' ]
-		then
-			sudo setenforce permissive
-			sudo systemctl start libvirtd
-			sleep 2
-			sudo systemctl stop libvirtd
-			sleep 2
-			sudo systemctl start libvirtd
-			sudo systemctl status libvirtd
-			sleep 2
-			sudo cp -p /etc/lxc/default.conf /etc/lxc/default.conf.bak
-		fi
+		sudo setenforce permissive
+		sudo systemctl start libvirtd
+		sleep 2
+		sudo systemctl stop libvirtd
+		sleep 2
+		sudo systemctl start libvirtd
+		sudo systemctl status libvirtd
+		sleep 2
+		sudo cp -p /etc/lxc/default.conf /etc/lxc/default.conf.bak
+
+	elif [ $Release -eq 6 ]
+	then
+#		sudo service lxc start
+		echo ''
+		sudo chkconfig --list | grep lxc
+		echo ''
+		sudo setenforce permissive
+		sudo service libvirtd start
+		echo ''
+		sudo service libvirtd status
 	fi
 
 	echo ''
@@ -956,27 +1270,66 @@ then
 		then
 			echo ''
 			echo "=============================================="
-			echo "Untar source code and build LXC RPM...        "
+			echo "Build LXC for Linux Release $Release...       "
 			echo "=============================================="
 			echo ''
+			
+			sudo mkdir /opt/olxc/"$DistDir"/uekulele/lxc
+			sudo chown -R $Owner:$Group /opt/olxc/"$DistDir"/uekulele/lxc
+			cd /opt/olxc/"$DistDir"/uekulele/lxc
+	
+#  			if [ ! -f glibc-2.17-55.el6.x86_64.rpm ]
+#  			then
+#				sudo yum -y install kernel-uek-headers
+#  				wget http://copr-be.cloud.fedoraproject.org/results/mosquito/myrepo-el6/epel-6-x86_64/glibc-2.17-55.fc20/glibc-2.17-55.el6.x86_64.rpm
+#  				wget http://copr-be.cloud.fedoraproject.org/results/mosquito/myrepo-el6/epel-6-x86_64/glibc-2.17-55.fc20/glibc-common-2.17-55.el6.x86_64.rpm
+#  				wget http://copr-be.cloud.fedoraproject.org/results/mosquito/myrepo-el6/epel-6-x86_64/glibc-2.17-55.fc20/glibc-devel-2.17-55.el6.x86_64.rpm
+#  				wget http://copr-be.cloud.fedoraproject.org/results/mosquito/myrepo-el6/epel-6-x86_64/glibc-2.17-55.fc20/glibc-headers-2.17-55.el6.x86_64.rpm
+#  				sudo rpm -Uvh glibc-2.17-55.el6.x86_64.rpm \
+#  				glibc-common-2.17-55.el6.x86_64.rpm \
+#  				glibc-devel-2.17-55.el6.x86_64.rpm \
+#  				glibc-headers-2.17-55.el6.x86_64.rpm
+#  			fi
+
+#			echo ''
+#			echo "=============================================="
+#			echo "Build /opt/glibc-2.17 for LXC build...        "
+#			echo "=============================================="
+#			echo ''
+
+#			mkdir glibc
+#			cd glibc
+#			wget https://ftp.gnu.org/gnu/glibc/glibc-2.17.tar.gz
+#			tar -xzvf glibc-2.17.tar.gz 
+#			mkdir build
+#			cd build
+#			../glibc-2.17/configure --prefix=/opt/glibc-2.17
+#			make -j4
+#			sudo make install
+#			export LD_LIBRARY_PATH=/opt/glibc-2.17/lib
+#			cd /opt/olxc/"$DistDir"/uekulele/lxc
+
+#			echo ''
+#			echo "=============================================="
+#			echo "Done: Build /opt/glibc-2.17 for LXC build.    "
+#			echo "=============================================="
 
 			sleep 5
 
 			sudo touch /etc/rpm/macros
-			sudo yum -y install rpm-build wget openssl-devel gcc make docbook2X xmlto automake graphviz
+			sudo yum -y install rpm-build wget openssl-devel gcc make docbook2X xmlto automake graphviz libtool
 			sudo mkdir -p /opt/olxc/"$DistDir"/uekulele/lxc
 			sudo chown -R $Owner:$Group /opt/olxc
-			cd /opt/olxc/"$DistDir"/uekulele/lxc
 			wget --timeout=5 --tries=10 https://linuxcontainers.org/downloads/lxc/lxc-"$LxcVersion".tar.gz
 			sudo mkdir -p /opt/olxc/"$DistDir"/uekulele/lxc/rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
 			sudo chown -R $Owner:$Group /opt/olxc
 			cp -p lxc-"$LxcVersion".tar.gz /opt/olxc/"$DistDir"/uekulele/lxc/rpmbuild/SOURCES/.
 			tar -zxvf lxc-"$LxcVersion".tar.gz
 			cp -p lxc-"$LxcVersion"/lxc.spec /opt/olxc/"$DistDir"/uekulele/lxc/.
-			sudo sed -i '/sysconfig/s/noreplace/missingok, noreplace/' 	/opt/olxc/"$DistDir"/uekulele/lxc/lxc.spec
-			sudo sed -i '/bash_completion.d/s/^/%config(missingok) /'  	/opt/olxc/"$DistDir"/uekulele/lxc/lxc.spec
-#			sudo sed -i '/bash_completion/d'				/opt/olxc/"$DistDir"/uekulele/lxc/lxc.spec
-#			sudo sed -i '/sysconfig/d'					/opt/olxc/"$DistDir"/uekulele/lxc/lxc.spec
+			sed -i '/find %{buildroot} -type f -name/a install -m 755 -d $RPM_BUILD_ROOT%{_libexecdir}/%{name}/lxc-apparmor-load'   /opt/olxc/"$DistDir"/uekulele/lxc/lxc.spec
+			sed -i "/%build/a CFLAGS='-include /usr/include/linux/types.h'"                                                         /opt/olxc/"$DistDir"/uekulele/lxc/lxc.spec
+			sed -i '/sysconfig/s/noreplace/missingok, noreplace/'	/opt/olxc/"$DistDir"/uekulele/lxc/lxc.spec
+			sed -i '/bash_completion.d/s/^/%config(missingok) /'	/opt/olxc/"$DistDir"/uekulele/lxc/lxc.spec
 			cd /opt/olxc/"$DistDir"/uekulele/lxc
 
 			function CheckMacrosFile {
@@ -988,9 +1341,15 @@ then
 			then
 				sudo sh -c "echo '%_unpackaged_files_terminate_build 0' >> /etc/rpm/macros"
 			fi
+
+			DESTDIR="/opt/olxc/$DistDir/uekulele/lxc/rpmbuild"
+			sudo perl -p -i -e 's#^(\s*libfile=")(\$libdir/)#$1\$DESTDIR$2#' /usr/bin/libtool
+			sudo perl -p -i -e 's#^(\s*if test "X\$destdir" = "X)(\$libdir")#$1\$DESTDIR$2#' /usr/bin/libtool
+
 			rpmbuild --define "_topdir /opt/olxc/"$DistDir"/uekulele/lxc/rpmbuild" -ba lxc.spec
 			cd /opt/olxc/"$DistDir"/uekulele/lxc/rpmbuild/RPMS/x86_64
-			sudo yum -y localinstall lxc* > /dev/null 2>&1
+			sudo yum -y localinstall lxc*
+			export LD_LIBRARY_PATH=''
 			cd /opt/olxc/"$DistDir"/uekulele/lxc
 		fi
 		
@@ -1036,32 +1395,27 @@ then
 
 	clear
 
-#	echo ''
-#	echo "=============================================="
-#	echo "Display Legacy Bridge for LXC ...             "
-#	echo "=============================================="
-#	echo ''
+ 	echo ''
+ 	echo "=============================================="
+	echo "Display AUX Bridge for LXC (non-OvS)...     "
+ 	echo "=============================================="
+ 	echo ''
 
-#	sleep 5
+ 	sleep 5
 
-	if [ $LinuxFlavor != 'CentOS' ] && [ $LinuxFlavor != 'Fedora' ] && [ $LinuxFlavor != 'Red' ]
+	sudo ifconfig virbr0 > /dev/null 2>&1
+	if [ $? -eq 0 ]
 	then
-		sudo ifconfig lxcbr0 > /dev/null 2>&1
-	else
-		sudo ifconfig virbr0 > /dev/null 2>&1
-		if [ $? -eq 0 ]
-		then
-			sudo sed -i "s/lxcbr0/virbr0/g" /etc/lxc/default.conf
-		fi
+		sudo sed -i "s/lxcbr0/virbr0/g" /etc/lxc/default.conf
 	fi
 
-#	echo "=============================================="
-#	echo "Done: Display Bridge for LXC                  "
-#	echo "=============================================="
+ 	echo "=============================================="
+	echo "Done: Display AUX Bridge for LXC (non-OvS).   "
+ 	echo "=============================================="
 
-#	sleep 5
+ 	sleep 5
 
-#	clear
+ 	clear
 
 	echo ''
 	echo "=============================================="
@@ -1099,20 +1453,13 @@ echo "Display AUX Bridge for LXC (non-OvS)...     "
 echo "=============================================="
 echo ''
 
+sudo service libvirtd start > /dev/null 2>&1
+echo ''
 sleep 5
-
-if [ $LinuxFlavor != 'CentOS' ] && [ $LinuxFlavor != 'Fedora' ] && [ $LinuxFlavor != 'Red' ]
+sudo ifconfig virbr0
+if [ $? -eq 0 ]
 then
-	sudo ifconfig lxcbr0
-fi
-
-if [ $LinuxFlavor = 'CentOS' ] || [ $LinuxFlavor = 'Fedora' ] || [ $LinuxFlavor = 'Red' ]
-then
-	sudo ifconfig virbr0
-	if [ $? -eq 0 ]
-	then
-		sudo sed -i "s/lxcbr0/virbr0/g" /etc/lxc/default.conf
-	fi
+	sudo sed -i "s/lxcbr0/virbr0/g" /etc/lxc/default.conf
 fi
 
 echo "=============================================="
@@ -1146,7 +1493,7 @@ sudo yum -y install openssh-server uuid sshpass
 sudo yum -y install rpm ntp iotop
 sudo yum -y install iptables gawk yum-utils
 
-if [ $LinuxFlavor = 'CentOS' ] || [ $LinuxFlavor = 'Fedora' ] || [ $LinuxFlavor = 'Red' ]
+if [ $LinuxFlavor = 'Fedora' ] || [ $LinuxFlavor = 'Red' ] || [ $LinuxFlavor = 'Oracle' ]
 then
 	sudo yum -y install lsb
 fi
@@ -1297,20 +1644,67 @@ then
 		
 		if    [ $Release -eq 6 ]
 		then
+#			sudo yum -y install logrotate python-six openssl-devel checkpolicy selinux-policy-devel autoconf automake libtool python-sphinx
+#			sudo yum -y install @'Development Tools' rpm-build yum-utils
 			sudo yum -y install autoconf automake gcc libtool rpm-build
-			sudo yum -y install openssl-devel python-devel kernel-uek-debug-devel kernel-devel 
-			sudo yum -y install kernel-uek-devel-`uname -r` redhat-rpm-config kabi-whitelists
-			sudo rm /lib/modules/`uname -r`/build
-			sudo ln -s /usr/src/kernels/`uname -r` /lib/modules/`uname -r`/build
-			sudo sed -i -e '/\[public_ol6_software_collections\]/,/^\[/s/enabled=0/enabled=1/' /etc/yum.repos.d/public-yum-ol6.repo
-			sudo yum -y install python27
-			source /opt/rh/python27/enable
-			python -V
-			sudo sed -i -e '/\[public_ol6_software_collections\]/,/^\[/s/enabled=1/enabled=0/' /etc/yum.repos.d/public-yum-ol6.repo
+			sudo yum -y install openssl-devel python-devel kernel-devel kernel-devel-`uname -r`
+			sudo yum -y install redhat-rpm-config kabi-whitelists
+
+			if [ $LinuxFlavor = 'Oracle' ]
+			then
+				sudo yum -y install kernel-uek-debug-devel kernel-uek-devel-`uname -r`
+			fi
+
+			mkdir -p /opt/olxc/"$DistDir"/uekulele/openvswitch
+			cd /opt/olxc/"$DistDir"/uekulele/openvswitch
+			
+			echo ''
+			echo "=============================================="
+			echo "Install Python27 SCL...                       "
+			echo "=============================================="
+			echo ''
+
+			if   [ $LinuxFlavor = 'CentOS' ]
+			then
+				sudo yum -y install centos-release-scl
+
+			elif [ $LinuxFlavor = 'Oracle' ]
+			then
+				sudo yum -y install yum-utils
+				sudo yum -y install scl-utils
+				sudo yum-config-manager --enable public_ol6_software_collections
+				sudo yum -y install python27
+				source /opt/rh/python27/enable
+			fi
+
+			
+			echo ''
+			echo "=============================================="
+			echo "Done: Install Python27 SCL.                   "
+			echo "=============================================="
+			echo ''
+
 			sleep 5
+
+			clear
+
+			echo ''
+			echo "=============================================="
+			echo "Prepare OpenvSwitch Source...                "
+			echo "=============================================="
+			echo ''
+
+			cd /opt/olxc/"$DistDir"/uekulele/openvswitch
 			wget --timeout=5 --tries=10 http://openvswitch.org/releases/openvswitch-"$OvsVersion".tar.gz
 			mkdir -p /opt/olxc/"$DistDir"/uekulele/openvswitch/rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
 			cp -p openvswitch-"$OvsVersion".tar.gz /opt/olxc/"$DistDir"/uekulele/openvswitch/rpmbuild/SOURCES/.
+ 			tar -xzvf openvswitch-"$OvsVersion".tar.gz
+
+			echo ''
+			echo "=============================================="
+			echo "Done: Prepare OpenvSwitch Source.             "
+			echo "=============================================="
+			echo ''
 
 		elif [ $Release -eq 7 ]
 		then
@@ -1343,12 +1737,11 @@ then
 		then
 			cd /opt/olxc/"$DistDir"/uekulele/openvswitch/rpmbuild/SOURCES
 			tar -xzvf openvswitch-"$OvsVersion".tar.gz
-			cd openvswitch-"$OvsVersion"
-			sudo sed -i '/python >= 2\.7/s/python >= 2\.7/python27/g' /opt/olxc/"$DistDir"/uekulele/openvswitch/rpmbuild/SOURCES/openvswitch-"$OvsVersion"/rhel/openvswitch.spec
-			sleep 5
-			sudo sed -i '/python >= 2\.7/s/python >= 2\.7/python27/' openvswitch.spec
-			rpmbuild --define "_topdir /opt/olxc/"$DistDir"/uekulele/openvswitch/rpmbuild" -bb rhel/openvswitch.spec
-			cd /opt/olxc/"$DistDir"/uekulele/openvswitch/rpmbuild/RPMS/x86_64
+			cd /opt/olxc/"$DistDir"/uekulele/openvswitch/openvswitch-"$OvsVersion"
+#			sed -e 's/@VERSION@/0.0.1/' rhel/openvswitch.spec.in > /tmp/ovs.spec
+#			sudo yum-builddep /tmp/ovs.spec
+			sed -i 's/python >= 2.7/python27/g' rhel/openvswitch.spec
+			rpmbuild --define "_topdir /opt/olxc/"$DistDir"/uekulele/openvswitch/rpmbuild" --without check -bb rhel/openvswitch.spec
 		
 			sleep 5
 
@@ -1371,18 +1764,65 @@ then
 
 			clear
 
-			sudo yum -y localinstall openvswitch* > /dev/null 2>&1
+			echo ''
+			echo "=============================================="
+			echo "Install OpenvSwitch RPMs...                   "
+			echo "=============================================="
+			echo ''
+
+			cd /opt/olxc/"$DistDir"/uekulele/openvswitch/rpmbuild/RPMS/x86_64
+			sudo yum -y localinstall openvswitch* 
 			OVSPackageCount=$(GetOVSPackageCount)
 			cd /opt/olxc/"$DistDir"/uekulele/openvswitch
+			
+			echo ''
+			echo "=============================================="
+			echo "Done: Install OpenvSwitch RPMs.               "
+			echo "=============================================="
+
+			sleep 5
+
+			clear
+
+			echo ''
+			echo "=============================================="
+			echo "Enable Python27 SCL Onboot...                 "
+			echo "=============================================="
+			echo ''
+
+			sudo sh -c "echo '/bin/bash' > /etc/profile.d/enablepython27.sh"
+			sudo sed -i 's/^/\#\!/g' /etc/profile.d/enablepython27.sh
+			sudo sh -c "echo 'source scl_source enable python27' >> /etc/profile.d/enablepython27.sh"
+			cat /etc/profile.d/enablepython27.sh 
+			
+			echo ''
+			echo "=============================================="
+			echo "Done: Enable Python27 SCL Onboot.             "
+			echo "=============================================="
+			echo ''
+
+			sleep 5
+
+			clear
 
 		elif [ $Release -eq 7 ]
 		then
+			echo ''
+			echo "=============================================="
+			echo "Build OpenvSwitch RPMs...                     "
+			echo "=============================================="
+			echo ''
+
 			cd /opt/olxc/"$DistDir"/uekulele/openvswitch/rpmbuild/SOURCES
 			tar -zxvf openvswitch-"$OvsVersion".tar.gz
 			cp -p openvswitch-"$OvsVersion"/rhel/*.spec /opt/olxc/"$DistDir"/uekulele/openvswitch/.
 			cd /opt/olxc/"$DistDir"/uekulele/openvswitch
 			rpmbuild --define "_topdir /opt/olxc/"$DistDir"/uekulele/openvswitch/rpmbuild" -ba openvswitch.spec
-			cd /opt/olxc/"$DistDir"/uekulele/openvswitch/rpmbuild/RPMS/x86_64
+
+			echo ''
+			echo "=============================================="
+			echo "Done: Build OpenvSwitch RPMs                  "
+			echo "=============================================="
 
 			sleep 5
 
@@ -1405,9 +1845,27 @@ then
 
 			clear
 
-			sudo yum -y localinstall openvswitch* > /dev/null 2>&1
+			echo ''
+			echo "=============================================="
+			echo "Install OpenvSwitch RPMs...                   "
+			echo "=============================================="
+			echo ''
+
+			cd /opt/olxc/"$DistDir"/uekulele/openvswitch/rpmbuild/RPMS/x86_64
+#			sudo yum -y localinstall openvswitch* 
+			sudo rpm -ivh openvswitch-*
 			OVSPackageCount=$(GetOVSPackageCount)
 			cd /opt/olxc/"$DistDir"/uekulele/openvswitch
+			
+			echo ''
+			echo "=============================================="
+			echo "Done: Install OpenvSwitch RPMs.               "
+			echo "=============================================="
+			echo ''
+
+			sleep 5
+
+			clear
 		fi
 	done
 
@@ -1459,9 +1917,10 @@ then
 	elif [ $Release -eq 6 ]
 	then
 		sudo service openvswitch start
+		sudo chkconfig openvswitch on
 	fi
 
-	sudo ls -l /usr/local/etc/openvswitch/conf.db
+#	sudo ls -l /usr/local/etc/openvswitch/conf.db
 
 	echo ''
 	echo "=============================================="
@@ -1559,11 +2018,11 @@ sleep 5
 
 clear
 
-sudo lxc-info -n nsa > /dev/null 2>&1
-if [ $? -ne 0 ] && [ $Release -eq 6 ]
-then
-	sudo reboot
-fi
+# sudo lxc-info -n nsa > /dev/null 2>&1
+# if [ $? -ne 0 ] && [ $Release -eq 6 ]
+# then
+# 	sudo reboot
+# fi
 
 function CheckNameServerExists {
 	sudo lxc-ls -f | grep -c "$NameServer"
@@ -1588,18 +2047,18 @@ then
 	echo "=============================================="
 	echo ''
 	echo "=============================================="
-	echo "Trying Method 1...                            "
-        echo "                                              "
-        echo "Patience...download of rootfs takes time...   "
-        echo "=============================================="
+	echo "Trying primary method...                      "
+       	echo "                                              "
+       	echo "Patience...download of rootfs takes time...   "
+       	echo "=============================================="
 	echo ''
 
  	sudo lxc-create -t download -n nsa -- --dist ubuntu --release xenial --arch amd64
 
-        if [ $(SoftwareVersion $LXCVersion) -ge $(SoftwareVersion "2.1.0") ]
-        then
-                sudo lxc-update-config -c /var/lib/lxc/nsa/config
-        fi
+	if [ $(SoftwareVersion $LXCVersion) -ge $(SoftwareVersion "2.1.0") ]
+       	then
+               	sudo lxc-update-config -c /var/lib/lxc/nsa/config
+       	fi
 
 	echo ''
 	echo "=============================================="
@@ -1619,7 +2078,7 @@ then
 	echo "=============================================="
 	echo ''
 	echo "=============================================="
-	echo "Trying Method 2...                            "
+	echo "Trying alternate method...                    "
 	echo "=============================================="
 	echo ''
 
@@ -1918,14 +2377,14 @@ sleep 5
 
 clear
 
-echo ''
-echo "=============================================="
-echo "Create 60-olxc.service in systemd...        "
-echo "=============================================="
-echo ''
-
-if [ ! -f /etc/systemd/system/60-olxc.service ]
+if [ ! -f /etc/systemd/system/60-olxc.service ] && [ $Release -ge 7 ]
 then
+	echo ''
+	echo "=============================================="
+	echo "Create 60-olxc.service in systemd...        "
+	echo "=============================================="
+	echo ''
+
 	sudo sh -c "echo '[Unit]'                                    			 > /etc/systemd/system/60-olxc.service"
 	sudo sh -c "echo 'Description=60-olxc Service'            			>> /etc/systemd/system/60-olxc.service"
 	sudo sh -c "echo 'After=network.target'                     			>> /etc/systemd/system/60-olxc.service"
@@ -1939,19 +2398,20 @@ then
 	sudo sh -c "echo '[Install]'                                			>> /etc/systemd/system/60-olxc.service"
 	sudo sh -c "echo 'WantedBy=multi-user.target'               			>> /etc/systemd/system/60-olxc.service"
 	sudo chmod 644 /etc/systemd/system/60-olxc.service
+
 	sudo systemctl enable 60-olxc
+
+	sudo cat /etc/systemd/system/60-olxc.service
+
+	echo ''
+	echo "=============================================="
+	echo "Created 60-olxc.service in systemd.         "
+	echo "=============================================="
+
+	sleep 5
+
+	clear
 fi
-
-sudo cat /etc/systemd/system/60-olxc.service
-
-echo ''
-echo "=============================================="
-echo "Created 60-olxc.service in systemd.         "
-echo "=============================================="
-
-sleep 5
-
-clear
 
 # echo ''
 # echo "=============================================="
@@ -2241,14 +2701,18 @@ sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw7.sh
 sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw8.sh
 sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw9.sh
 
-if   [ $Release -eq 7 ]
-then
-	SwitchList='sw1 sx1'
-	for k in $SwitchList
-	do
+sleep 5
+
+clear
+
+SwitchList='sw1 sx1'
+for k in $SwitchList
+do
+	if   [ $Release -eq 7 ]
+	then
 		echo ''
 		echo "=============================================="
-		echo "Installing OpenvSwitch $k...                  "
+		echo "Create OpenvSwitch systemd $k service...      "
 		echo "=============================================="
 		echo ''
 
@@ -2257,18 +2721,19 @@ then
        	        	sudo sh -c "echo '[Unit]'						 > /etc/systemd/system/$k.service"
        	         	sudo sh -c "echo 'Description=$k Service'				>> /etc/systemd/system/$k.service"
 		
-		if [ $k = 'sw1' ]
-		then
-                	sudo sh -c "echo 'Wants=network-online.target'				>> /etc/systemd/system/$k.service"
-                	sudo sh -c "echo 'After=network-online.target'				>> /etc/systemd/system/$k.service"
-		fi
-		if [ $k = 'sx1' ]
-		then
-                	sudo sh -c "echo 'Wants=network-online.target'				>> /etc/systemd/system/$k.service"
-                	sudo sh -c "echo 'After=network-online.target sw1.service'		>> /etc/systemd/system/$k.service"
-		fi
-                	sudo sh -c "echo ''							>> /etc/systemd/system/$k.service"
-                	sudo sh -c "echo '[Service]'						>> /etc/systemd/system/$k.service"
+			if [ $k = 'sw1' ]
+			then
+                		sudo sh -c "echo 'Wants=network-online.target'			>> /etc/systemd/system/$k.service"
+                		sudo sh -c "echo 'After=network-online.target'			>> /etc/systemd/system/$k.service"
+			fi
+			if [ $k = 'sx1' ]
+			then
+                		sudo sh -c "echo 'Wants=network-online.target'			>> /etc/systemd/system/$k.service"
+                		sudo sh -c "echo 'After=network-online.target sw1.service'	>> /etc/systemd/system/$k.service"
+			fi
+
+               	 	sudo sh -c "echo ''							>> /etc/systemd/system/$k.service"
+               	 	sudo sh -c "echo '[Service]'						>> /etc/systemd/system/$k.service"
                 	sudo sh -c "echo 'Type=oneshot'						>> /etc/systemd/system/$k.service"
                 	sudo sh -c "echo 'User=root'						>> /etc/systemd/system/$k.service"
                 	sudo sh -c "echo 'RemainAfterExit=yes'					>> /etc/systemd/system/$k.service"
@@ -2277,30 +2742,32 @@ then
                 	sudo sh -c "echo ''							>> /etc/systemd/system/$k.service"
                 	sudo sh -c "echo '[Install]'						>> /etc/systemd/system/$k.service"
                 	sudo sh -c "echo 'WantedBy=multi-user.target'				>> /etc/systemd/system/$k.service"
-
+		
 			echo ''
 			echo "=============================================="
-			echo "Starting OpenvSwitch $k ...                   "
+			echo "Done: Create OpenvSwitch systemd $k service.  "
 			echo "=============================================="
 			echo ''
-	
+			echo "=============================================="
+			echo "Start OpenvSwitch $k ...                      "
+			echo "=============================================="
+			echo ''
+		
        			sudo chmod 644 /etc/systemd/system/$k.service
 			sudo systemctl daemon-reload
        			sudo systemctl enable $k.service
 			sudo service $k start
 			sudo service $k status
-
+	
 			echo ''
 			echo "=============================================="
-			echo "Started OpenvSwitch $k.                       "
+			echo "Done: Start OpenvSwitch $k.                   "
 			echo "=============================================="
 
 			sleep 5
 
 			clear
 		else
-			clear
-
 			echo ''
 			echo "=============================================="
 			echo "OpenvSwitch $k previously installed.          "
@@ -2320,68 +2787,82 @@ then
 		sleep 5
 
 		clear
-	done
-elif [ $Release -eq 6 ]
-then
-	echo ''
-	echo "=============================================="
-	echo "Starting OpenvSwitch sw1 ...                  "
-	echo "=============================================="
 
-	sudo chmod 755 /etc/network/openvswitch/crt_ovs_sw1.sh
-	sudo /etc/network/openvswitch/crt_ovs_sw1.sh >/dev/null 2>&1
-	echo ''
-	sleep 3
-	sudo ifconfig sw1
-	sudo sed -i '/sw1/s/^# //g' /etc/network/if-up.d/orabuntu-lxc-net
+	elif [ $Release -eq 6 ]
+	then
+		echo ''
+		echo "=============================================="
+		echo "Create OpenvSwitch init.d $k service...       "
+		echo "=============================================="
+		echo ''
 
-	echo "=============================================="
-	echo "OpenvSwitch sw1 started.                      "
-	echo "=============================================="
-	echo ''
+                if [ ! -f /etc/init.d/ovs_$k ]
+       		then
+			sudo cp -p /etc/network/openvswitch/switch-service-linux6.sh /etc/init.d/ovs_$k
+			sudo sed -i "s/SWK/$k/g" /etc/init.d/ovs_$k
+			sudo chmod 755 /etc/init.d/ovs_$k
+			sudo chown $Owner:$Group /etc/init.d/ovs_$k
+			sudo chkconfig --add ovs_$k
+			sudo chkconfig ovs_$k on --level 345
+			sudo chkconfig --list ovs_$k
+		
+			echo ''
+			echo "=============================================="
+			echo "Done: Create OpenvSwitch systemd $k service.  "
+			echo "=============================================="
+			echo ''
+			echo "=============================================="
+			echo "Start OpenvSwitch $k ...                      "
+			echo "=============================================="
+			echo ''
+		
+			sudo /etc/network/openvswitch/crt_ovs_$k.sh >/dev/null 2>&1
+			sleep 2
+			sudo ifconfig $k
 
-	sleep 5
+                        echo "=============================================="
+                        echo "Done: Start OpenvSwitch $k                    "
+                        echo "=============================================="
+                        echo ''
 
-	clear
+			sleep 5
 
-	echo ''
-	echo "=============================================="
-	echo "Starting OpenvSwitch sx1 ...                  "
-	echo "=============================================="
+			clear
+		else
+			echo ''
+			echo "=============================================="
+			echo "OpenvSwitch $k previously installed.          "
+			echo "=============================================="
+			echo ''
+		
+			sleep 5
 
-	sudo chmod 755 /etc/network/openvswitch/crt_ovs_sx1.sh
-	sudo /etc/network/openvswitch/crt_ovs_sx1.sh >/dev/null 2>&1
-	echo ''
-	sleep 3
-	sudo ifconfig sx1
-	sudo sed -i '/sx1/s/^# //g' /etc/network/if-up.d/orabuntu-lxc-net
-
-	echo "=============================================="
-	echo "OpenvSwitch sx1 started.                      "
-	echo "=============================================="
-
-	sleep 5
-
-	clear
-
-	echo ''
-	echo "=============================================="
-	echo "Ensure Networks up...                         "
-	echo "=============================================="
-	echo ''
-
-	sudo ifconfig sw1
-	sudo ifconfig sx1
-
-	echo "=============================================="
-	echo "Networks are up.                              "
-	echo "=============================================="
-	echo ''
+			clear
+		fi
+	fi
 
 	sleep 5
 
 	clear
-fi
+done
+
+echo ''
+echo "=============================================="
+echo "Ensure Networks up...                         "
+echo "=============================================="
+echo ''
+
+sudo ifconfig sw1
+sudo ifconfig sx1
+
+echo "=============================================="
+echo "Networks are up.                              "
+echo "=============================================="
+echo ''
+
+sleep 5
+
+clear
 
 if [ $MultiHostVar2 = 'N' ]
 then
@@ -2418,55 +2899,58 @@ sleep 5
 
 clear
 
-echo ''
-echo "=============================================="
-echo "Checking OpenvSwitch sw1...                   "
-echo "=============================================="
-echo ''
+if [ $Release -ge 7 ]
+then
+	echo ''
+	echo "=============================================="
+	echo "Checking OpenvSwitch sw1 service...           "
+	echo "=============================================="
+	echo ''
 
-sudo service sw1 stop
-sleep 2
-sudo systemctl start sw1
-sleep 2
-echo ''
-ifconfig sw1
-echo ''
-sudo service sw1 status
+	sudo service sw1 stop
+	sleep 2
+	sudo systemctl start sw1
+	sleep 2
+	echo ''
+	sudo ifconfig sw1
+	echo ''
+	sudo service sw1 status
 
-echo ''
-echo "=============================================="
-echo "OpenvSwitch sw1 is up.                        "
-echo "=============================================="
-echo ''
+	echo ''
+	echo "=============================================="
+	echo "OpenvSwitch sw1 service is up.                "
+	echo "=============================================="
+	echo ''
 
-sleep 5
+	sleep 5
 
-clear
+	clear
 
-echo ''
-echo "=============================================="
-echo "Checking OpenvSwitch sx1...                   "
-echo "=============================================="
-echo ''
+	echo ''
+	echo "=============================================="
+	echo "Checking OpenvSwitch service sx1...           "
+	echo "=============================================="
+	echo ''
 
-sudo service sx1 stop
-sleep 2
-sudo systemctl start sx1
-sleep 2
-echo ''
-ifconfig sx1
-echo ''
-sudo service sx1 status
+	sudo service sx1 stop
+	sleep 2
+	sudo systemctl start sx1
+	sleep 2
+	echo ''
+	sudo ifconfig sx1
+	echo ''
+	sudo service sx1 status
 
-echo ''
-echo "=============================================="
-echo "OpenvSwitch sx1 is up.                        "
-echo "=============================================="
-echo ''
+	echo ''
+	echo "=============================================="
+	echo "OpenvSwitch service sx1 is up.                "
+	echo "=============================================="
+	echo ''
 
-sleep 5
+	sleep 5
 
-clear
+	clear
+fi
 
 echo ''
 echo "=============================================="
@@ -2514,8 +2998,11 @@ then
 
 	if [ -n $NameServer ]
 	then
- 		sudo service sw1 restart
- 		sudo service sx1 restart
+		if [ $Release -ge 7 ]
+		then
+ 			sudo service sw1 restart
+ 			sudo service sx1 restart
+		fi
 
 	        function CheckFileSystemTypeXfs {
 			stat --file-system --format=%T /var/lib/lxc | grep -c xfs
@@ -2559,42 +3046,71 @@ then
 		fi
 	fi
 
-
-	if [ ! -f /etc/systemd/system/$NameServer.service ]
+	if [ $Release -ge 7 ]
 	then
-		echo ''
-		echo "=============================================="
-		echo "Create $NameServer Onboot Service...          "
-		echo "=============================================="
-		echo ''
+		if [ ! -f /etc/systemd/system/$NameServer.service ]
+		then
+			echo ''
+			echo "=============================================="
+			echo "Create $NameServer Onboot Service...          "
+			echo "=============================================="
+			echo ''
 
-		sudo sh -c "echo '[Unit]'             	         				 > /etc/systemd/system/$NameServer.service"
-		sudo sh -c "echo 'Description=$NameServer Service'  				>> /etc/systemd/system/$NameServer.service"
-		sudo sh -c "echo 'Wants=network-online.target sw1.service sx1.service'		>> /etc/systemd/system/$NameServer.service"
-		sudo sh -c "echo 'After=network-online.target sw1.service sx1.service'		>> /etc/systemd/system/$NameServer.service"
-		sudo sh -c "echo ''                                 				>> /etc/systemd/system/$NameServer.service"
-		sudo sh -c "echo '[Service]'                        				>> /etc/systemd/system/$NameServer.service"
-		sudo sh -c "echo 'Type=oneshot'                     				>> /etc/systemd/system/$NameServer.service"
-		sudo sh -c "echo 'User=root'                        				>> /etc/systemd/system/$NameServer.service"
-		sudo sh -c "echo 'RemainAfterExit=yes'              				>> /etc/systemd/system/$NameServer.service"
-		sudo sh -c "echo 'ExecStart=/etc/network/openvswitch/strt_$NameServer.sh start'	>> /etc/systemd/system/$NameServer.service"
-		sudo sh -c "echo 'ExecStop=/etc/network/openvswitch/strt_$NameServer.sh stop'	>> /etc/systemd/system/$NameServer.service"
-		sudo sh -c "echo ''                                 				>> /etc/systemd/system/$NameServer.service"
-		sudo sh -c "echo '[Install]'                        				>> /etc/systemd/system/$NameServer.service"
-		sudo sh -c "echo 'WantedBy=multi-user.target'       				>> /etc/systemd/system/$NameServer.service"
-		sudo chmod 644 /etc/systemd/system/$NameServer.service
+			sudo sh -c "echo '[Unit]'             	         				 > /etc/systemd/system/$NameServer.service"
+			sudo sh -c "echo 'Description=$NameServer Service'  				>> /etc/systemd/system/$NameServer.service"
+			sudo sh -c "echo 'Wants=network-online.target sw1.service sx1.service'		>> /etc/systemd/system/$NameServer.service"
+			sudo sh -c "echo 'After=network-online.target sw1.service sx1.service'		>> /etc/systemd/system/$NameServer.service"
+			sudo sh -c "echo ''                                 				>> /etc/systemd/system/$NameServer.service"
+			sudo sh -c "echo '[Service]'                        				>> /etc/systemd/system/$NameServer.service"
+			sudo sh -c "echo 'Type=oneshot'                     				>> /etc/systemd/system/$NameServer.service"
+			sudo sh -c "echo 'User=root'                        				>> /etc/systemd/system/$NameServer.service"
+			sudo sh -c "echo 'RemainAfterExit=yes'              				>> /etc/systemd/system/$NameServer.service"
+			sudo sh -c "echo 'ExecStart=/etc/network/openvswitch/strt_$NameServer.sh start'	>> /etc/systemd/system/$NameServer.service"
+			sudo sh -c "echo 'ExecStop=/etc/network/openvswitch/strt_$NameServer.sh stop'	>> /etc/systemd/system/$NameServer.service"
+			sudo sh -c "echo ''                                 				>> /etc/systemd/system/$NameServer.service"
+			sudo sh -c "echo '[Install]'                        				>> /etc/systemd/system/$NameServer.service"
+			sudo sh -c "echo 'WantedBy=multi-user.target'       				>> /etc/systemd/system/$NameServer.service"
+			sudo chmod 644 /etc/systemd/system/$NameServer.service
 
-                echo "/etc/systemd/system/$NameServer.service" >> /opt/olxc/"$DistDir"/uekulele/archives/nameserver.lst
-                sudo cp -p /opt/olxc/"$DistDir"/uekulele/archives/nameserver.lst ~/nameserver.lst
-                sudo sed -i "s/-base//g" /etc/network/openvswitch/strt_$NameServer.sh
+			echo "/etc/systemd/system/$NameServer.service" >> /opt/olxc/"$DistDir"/uekulele/archives/nameserver.lst
+			sudo cp -p /opt/olxc/"$DistDir"/uekulele/archives/nameserver.lst ~/nameserver.lst
+			sudo sed -i "s/-base//g" /etc/network/openvswitch/strt_$NameServer.sh
 
-                sudo systemctl enable $NameServer
+			sudo systemctl enable $NameServer
 
-		echo ''
-		echo "=============================================="
-		echo "Created $NameServer Onboot Service.           "
-		echo "=============================================="
+			echo ''
+			echo "=============================================="
+			echo "Created $NameServer Onboot Service.           "
+			echo "=============================================="
+		fi
+	elif [ $Release -eq 6 ]
+	then
+		if [ ! -f /etc/init.d/lxc_$NameServer ]
+		then
+			echo ''
+			echo "=============================================="
+			echo "Create $NameServer Onboot Service...          "
+			echo "=============================================="
+			echo ''
+
+			sudo cp -p /etc/network/openvswitch/container-service-linux6.sh /etc/init.d/lxc_$NameServer
+			sudo sed -i "s/LXCON/$NameServer/g" /etc/init.d/lxc_$NameServer
+			sudo chmod 755 /etc/init.d/lxc_$NameServer
+			sudo chown $Owner:$Group /etc/init.d/lxc_$NameServer
+			sudo chkconfig --add lxc_$NameServer
+			sudo chkconfig lxc_$NameServer on --level 345
+			sudo chkconfig --list lxc_$NameServer
+
+			echo ''
+			echo "=============================================="
+			echo "Done: Create $NameServer Onboot Service.      "
+			echo "=============================================="
+		fi
 	fi
+	
+	sleep 5
+
+	clear
 
 	echo ''
 	echo "=============================================="
@@ -2621,7 +3137,7 @@ then
 	sudo mkdir -p /home/$Owner/Manage-Orabuntu
         sudo chown $Owner:$Group /home/$Owner/Manage-Orabuntu
         sudo chmod 775 /opt/olxc/"$DistDir"/uekulele/archives/nameserver_copy.sh
-        /opt/olxc/"$DistDir"/uekulele/archives/nameserver_copy.sh $MultiHostVar5 $MultiHostVar6 $MultiHostVar8 $MultiHostVar9 $NameServerBase
+        /opt/olxc/"$DistDir"/uekulele/archives/nameserver_copy.sh $MultiHostVar5 $MultiHostVar6 $MultiHostVar8 $MultiHostVar9 $NameServerBase $Release
 
         echo ''
         echo "=============================================="
@@ -2701,20 +3217,32 @@ then
 	echo "=============================================="
 	echo ''
 
-        sudo tar -xvf /opt/olxc/"$DistDir"/uekulele/archives/scst-files.tar -C /opt/olxc --touch
-        sudo tar -xf  /opt/olxc/"$DistDir"/uekulele/archives/tgt-files.tar  -C /opt/olxc --touch
-        sleep 5
-	if [ $Owner != 'ubuntu' ]
-	then
-        	sudo mv /opt/olxc/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/archives/scst-files /opt/olxc/"$DistDir"/uekulele/archives/.
-        	sudo mv /opt/olxc/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/archives/tgt-files  /opt/olxc/"$DistDir"/uekulele/archives/.
-        fi
-	sudo chown -R $Owner:$Group		/opt/olxc/"$DistDir"/uekulele/archives/.
-        sudo sed -i "s/SWITCH_IP/$Sw1Index/g"	/opt/olxc/"$DistDir"/uekulele/archives/scst-files/create-scst-target.sh
+        sudo tar -xvf /opt/olxc/"$DistDir"/uekulele/archives/scst-files.tar -C / --touch
+
+	sudo chown -R $Owner:$Group		/opt/olxc/home/scst-files/.
+        sudo sed -i "s/SWITCH_IP/$Sw1Index/g"	/opt/olxc/home/scst-files/create-scst-target.sh
 
 	echo ''
 	echo "=============================================="
 	echo "Done: Unpack SCST Linux SAN Files.            "
+	echo "=============================================="
+	echo ''
+
+	sleep 5
+
+	clear
+
+	echo ''
+	echo "=============================================="
+	echo "Unpack TGT Linux SAN Files...                "
+	echo "=============================================="
+	echo ''
+
+        sudo tar -xvf /opt/olxc/"$DistDir"/uekulele/archives/tgt-files.tar  -C / --touch
+	
+	echo ''
+	echo "=============================================="
+	echo "Done: Unpack TGT Linux SAN Files.            "
 	echo "=============================================="
 	echo ''
 
@@ -2765,15 +3293,55 @@ then
 	sudo useradd -m -p $(openssl passwd -1 ${PASSWORD}) -s /bin/bash ${USERNAME}
 	sudo mkdir -p  /home/${USERNAME}/Downloads /home/${USERNAME}/Manage-Orabuntu
 	sudo chown ${USERNAME}:${USERNAME} /home/${USERNAME}/Downloads /home/${USERNAME}/Manage-Orabuntu
+	
+	echo ''
+	echo "=============================================="
+        echo "Create amide user RSA key...                  "
+	echo "=============================================="
+	echo ''
+
 	sudo runuser -l amide -c "ssh-keygen -f /home/amide/.ssh/id_rsa -t rsa -N ''"
+
+	echo ''
+	echo "=============================================="
+        echo "Done: Create amide user RSA key.              "
+	echo "=============================================="
+
+	sleep 5
+
+	clear
 
 	sudo sh -c "echo 'amide ALL=/bin/mkdir, /bin/cp' > /etc/sudoers.d/amide"
 	sudo chmod 0440 /etc/sudoers.d/amide
 
 	sudo lxc-attach -n $NameServer -- crontab /root/crontab.txt
-	sudo lxc-attach -n $NameServer -- crontab -l
+	
+	echo ''
+	echo "=============================================="
+        echo "Display $NameServer replica cronjob...        "
+	echo "=============================================="
+	echo ''
+
+	sudo lxc-attach -n $NameServer -- crontab -l | tail -23
+	
+	echo ''
+	echo "=============================================="
+        echo "Done: Display $NameServer replica cronjob.    "
+	echo "=============================================="
+	echo ''
+
+	sleep 5
+
+	clear
+
 	sudo lxc-attach -n $NameServer -- mkdir -p /root/backup-lxc-container/$NameServer/updates
 	sudo lxc-attach -n $NameServer -- tar -cvzPf /root/backup-lxc-container/$NameServer/updates/backup_"$NameServer"_ns_update.tar.gz /root/ns_backup_update.lst
+
+	echo ''
+	echo "=============================================="
+        echo "Extract DNS sync service files ...            "
+	echo "=============================================="
+	echo ''
 
  	sudo tar -v --extract --file=/opt/olxc/"$DistDir"/uekulele/archives/dns-dhcp-cont.tar -C / var/lib/lxc/nsa/rootfs/etc/systemd/system/dns-sync.service
  	sudo mv /var/lib/lxc/nsa/rootfs/etc/systemd/system/dns-sync.service /var/lib/lxc/$NameServer/rootfs/etc/systemd/system/dns-sync.service > /dev/null 2>&1
@@ -2785,7 +3353,33 @@ then
 	sudo lxc-attach -n $NameServer -- chown bind:bind /var/lib/bind/rev.$Domain2
 	sudo lxc-attach -n $NameServer -- chown root:bind /var/lib/bind
 	sudo lxc-attach -n $NameServer -- chmod 775 /var/lib/bind
+	
+	echo ''
+	echo "=============================================="
+        echo "Done: Extract DNS sync service files.         "
+	echo "=============================================="
+
+	sleep 5
+
+	clear
+
+	echo ''
+	echo "=============================================="
+        echo "Create $NameServer RSA key...                 "
+	echo "=============================================="
+	echo ''
+
 	sudo lxc-attach -n $NameServer -- ssh-keygen -f /root/.ssh/id_rsa -t rsa -N ''
+	
+	echo ''
+	echo "=============================================="
+        echo "Done: Create $NameServer RSA key.             "
+	echo "=============================================="
+	echo ''
+	
+	sleep 5
+
+	clear
 
 	sudo sh -c "cat '/var/lib/lxc/$NameServerBase/delta0/root/.ssh/id_rsa.pub' >> /home/amide/.ssh/authorized_keys"
                
@@ -2818,16 +3412,11 @@ then
 	echo "=============================================="
 	echo ''
 
-        sudo tar -xvf /opt/olxc/"$DistDir"/uekulele/archives/scst-files.tar -C /opt/olxc --touch
-        sudo tar -xf  /opt/olxc/"$DistDir"/uekulele/archives/tgt-files.tar  -C /opt/olxc --touch
-        sleep 5
-	if [ $Owner != 'ubuntu' ]
-	then
-        	sudo mv /opt/olxc/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/archives/scst-files /opt/olxc/"$DistDir"/uekulele/archives/.
-        	sudo mv /opt/olxc/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/archives/tgt-files  /opt/olxc/"$DistDir"/uekulele/archives/.
-        fi
-	sudo chown -R $Owner:$Group		/opt/olxc/"$DistDir"/uekulele/archives/.
-        sudo sed -i "s/SWITCH_IP/$Sw1Index/g"	/opt/olxc/"$DistDir"/uekulele/archives/scst-files/create-scst-target.sh
+        sudo tar -xvf /opt/olxc/"$DistDir"/uekulele/archives/scst-files.tar -C / --touch
+        sudo tar -xvf /opt/olxc/"$DistDir"/uekulele/archives/tgt-files.tar  -C / --touch
+
+	sudo chown -R $Owner:$Group		/opt/olxc/home/scst-files/.
+        sudo sed -i "s/SWITCH_IP/$Sw1Index/g"	/opt/olxc/home/scst-files/create-scst-target.sh
 		
 	echo ''
 	echo "=============================================="
@@ -3110,35 +3699,6 @@ then
         sleep 5
 
         clear
-
-elif [ $LxcNetRunning -ge 1 ] 
-then
-        echo ''
-        echo "=============================================="
-        echo "Restart service lxc-net...                    "
-        echo "=============================================="
-        echo ''
-
-	function GetDhcpRange {
-        	cat /etc/sysconfig/lxc-net | grep LXC_DHCP_RANGE | cut -f2 -d'=' | sed 's/"//g' 
-	}       
-	DhcpRange=$(GetDhcpRange)
-	DHR="$DhcpRange"
-	sudo sed -i "s/DHCP-RANGE-OLXC/dhcp-range=$DHR/" /etc/dnsmasq.conf
-	sudo systemctl daemon-reload
-        sudo service lxc-net restart > /dev/null 2>&1
-        sleep 2
-        sudo service lxc-net status
-
-        echo ''
-        echo "=============================================="
-        echo "Done: Restart service lxc-net.                "
-        echo "=============================================="
-        echo ''
-
-        sleep 5
-
-        clear
 fi
 
 # GLS 20161118 This section for any tweaks to the unpacked files from archives.
@@ -3170,61 +3730,40 @@ NetworkManagerRunning=$(CheckNetworkManagerRunning)
 
 # sleep 10
 
-if [ $SystemdResolvedInstalled -eq 0 ] && [ $NetworkManagerRunning -ge 1 ]
+if [ $SystemdResolvedInstalled -eq 0 ]
 then
 	if [ $GRE = 'Y' ] || [ $MultiHostVar2 = 'N' ]
 	then
 		echo ''
 		echo "=============================================="
-		echo "Configure NetworkManager with dnsmasq...      "
+		echo "Configure dnsmasq...                          "
 		echo "=============================================="
 		echo ''
 
-		if [ $LinuxFlavor != 'Fedora' ] && [ $LinuxFlavor != 'CentOS' ] && [ $LinuxFlavor != 'Red' ]
+		if [ $NetworkManagerRunning -ge 1 ]
 		then
-			function GetDhcpRange {
-				cat /etc/sysconfig/lxc-net | grep LXC_DHCP_RANGE | cut -f2 -d'=' | sed 's/"//g' 
-			}
-			DhcpRange=$(GetDhcpRange)
-
-			function GetListenAddress {
-				cat /etc/sysconfig/lxc-net | grep LXC_ADDR | cut -f2 -d'=' | sed 's/"//g'
-			}
-			ListenAddress=$(GetListenAddress)
+			sudo sed -i '/plugins=ifcfg-rh/a dns=none' /etc/NetworkManager/NetworkManager.conf
+			sudo sed -i '$!N; /^\(.*\)\n\1$/!P; D' /etc/NetworkManager/NetworkManager.conf
 		fi
 
-#		function GetDnsmasqPid {
-#			ps -eo pid,comm | grep dnsmasq | sed 's/^[ \t]*//;s/[ \t]*$//' | cut -f1 -d' '
-#		}
-#		DnsmasqPid=$(GetDnsmasqPid)
-#		sudo kill -9 $DnsmasqPid > /dev/null 2>&1
-
-		DHR="$DhcpRange"
-		LFL="/var/lib/misc/dnsmasq.lxcbr0.leases"
-		ADR="$ListenAddress"
-		PFL="/var/run/lxc/dnsmasq.pid"
-		CFL="/etc/dnsmasq.conf"
-
-		sudo sed -i '/plugins=ifcfg-rh/a dns=none' /etc/NetworkManager/NetworkManager.conf
-		sudo sed -i '$!N; /^\(.*\)\n\1$/!P; D' /etc/NetworkManager/NetworkManager.conf
 		sudo yum -y install dnsmasq
-		sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /etc/dnsmasq.conf
-		sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /etc/dnsmasq.conf
 
-		if [ $LinuxFlavor != 'Fedora' ] && [ $LinuxFlavor != 'CentOS' ] && [ $LinuxFlavor != 'Red' ]
-		then
-			sudo sed -i '/LXC_DHCP_CONFILE/s/#//' /etc/sysconfig/lxc-net
-			sudo sed -i 's/^[ \t]*//' /etc/dnsmasq.conf
-			sudo sed -i "/LXC_DHCP_CONFILE/s/LXC_DHCP_CONFILE=\/etc\/lxc\/dnsmasq.conf/LXC_DHCP_CONFILE=\/etc\/dnsmasq.conf/" /etc/sysconfig/lxc-net
-			sudo sed -i "s/DHCP-RANGE-OLXC/dhcp-range=$DHR/" /etc/dnsmasq.conf
-		else
-			sudo sed -i '/lxcbr0/d'			/etc/dnsmasq.conf
-			sudo sed -i '/DHCP-RANGE-OLXC/d'	/etc/dnsmasq.conf
-		fi
+		sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" 		/etc/dnsmasq.conf
+		sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" 	/etc/dnsmasq.conf
+		sudo sed -i '/lxcbr0/d'								/etc/dnsmasq.conf
+		sudo sed -i '/DHCP-RANGE-OLXC/d'						/etc/dnsmasq.conf
+		sudo sed -i '/cache-size=150/s/cache-size=150/cache-size=0/g' 			/etc/dnsmasq.conf
 			
-		sudo service NetworkManager restart
-		sleep 5
-		sudo systemctl daemon-reload
+		if [ $NetworkManagerRunning -ge 1 ]
+		then
+			sudo service NetworkManager restart
+			sleep 5
+		fi
+
+		if [ $Release -ge 7 ]
+		then
+			sudo systemctl daemon-reload
+		fi
 			
 		function GetOriginalNameServers {
 		        cat /etc/resolv.conf  | grep nameserver | tr -d '\n' | sed 's/nameserver//g' | sed 's/^[ \t]*//;s/[ \t]*$//' | sed 's/  */ /g'
@@ -3237,36 +3776,34 @@ then
 		OriginalSearchDomains=$(GetOriginalSearchDomains)
 
 		sudo rm -f /etc/resolv.conf
+		sudo sh -c "echo 'nameserver 127.0.0.1'	> 						/etc/resolv.conf"
+		sudo sh -c "echo 'search $Domain1 $Domain2 gns1.$Domain1 $OriginalSearchDomains' >> 	/etc/resolv.conf"
 
-		sudo sh -c "echo 'nameserver 127.0.0.1' 			>  /etc/resolv.conf"
-#		sudo sh -c "echo 'search $Domain1 $Domain2 gns1.$Domain1' 	>> /etc/resolv.conf"
+		for j in $OriginalNameServers
+		do
+		        for i in $OriginalSearchDomains
+		        do
+		                function CountOriginalSearchDomainsDnsmasq {
+		                        grep -c $j /etc/dnsmasq.conf
+		                }
+		                OriginalSearchDomainsDnsmasq=$(CountOriginalSearchDomainsDnsmasq)
 
-		if [ $LinuxFlavor != 'Fedora' ] && [ $LinuxFlavor != 'CentOS' ] && [ $LinuxFlavor != 'Red' ]
+		                if [ $OriginalSearchDomainsDnsmasq -eq 0 ]
+		                then   
+		                        sudo sh -c "echo 'server=/$i/$j' >> /etc/dnsmasq.conf"
+		                fi
+		        done
+		done
+
+		sudo service dnsmasq start
+
+		if   [ $Release -ge 7 ]
 		then
-			sudo sed -i "s/DHCP-RANGE-OLXC/dhcp-range=$DHR/" /etc/dnsmasq.conf
-			sudo service lxc-net restart> /dev/null 2>&1
- 			sudo service lxc-net status
-		else
-			sudo sed -i '/cache-size=150/s/cache-size=150/cache-size=0/g' /etc/dnsmasq.conf
-			sudo sh -c "echo 'search $Domain1 $Domain2 gns1.$Domain1 $OriginalSearchDomains' 	>> /etc/resolv.conf"
-
-			for j in $OriginalNameServers
-			do
-			        for i in $OriginalSearchDomains
-			        do
-			                function CountOriginalSearchDomainsDnsmasq {
-			                        grep -c $j /etc/dnsmasq.conf
-			                }
-			                OriginalSearchDomainsDnsmasq=$(CountOriginalSearchDomainsDnsmasq)
-
-			                if [ $OriginalSearchDomainsDnsmasq -eq 0 ]
-			                then   
-			                        sudo sh -c "echo 'server=/$i/$j' >> /etc/dnsmasq.conf"
-			                fi
-			        done
-			done
-			sudo service dnsmasq start
 			sudo systemctl enable dnsmasq
+
+		elif [ $Release -eq 6 ]
+		then
+			sudo chkconfig dnsmasq on
 		fi
 
 		echo ''

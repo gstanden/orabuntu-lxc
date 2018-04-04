@@ -373,7 +373,12 @@ function GetDhcpRange {
 DhcpRange=$(GetDhcpRange)
 DHR="$DhcpRange"
 sudo sed -i "s/DHCP-RANGE-OLXC/dhcp-range=$DHR/" /etc/dnsmasq.conf
-sudo systemctl daemon-reload
+
+if [ $Release -ge 7 ]
+then
+	sudo systemctl daemon-reload
+fi
+
 sudo service lxc-net restart > /dev/null 2>&1
 
 ping -c 3 $SeedContainerName

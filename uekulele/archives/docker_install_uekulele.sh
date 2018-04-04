@@ -123,10 +123,20 @@ echo ''
 
 if [ $LinuxFlavor = 'Oracle' ]
 then
-	sudo yum-config-manager --enable ol7_addons
-	sudo yum -y install docker-engine
-	sudo systemctl start docker
-	sudo systemctl enable docker
+	if   [ $Release -ge 7 ]
+	then
+		sudo yum-config-manager --enable ol7_addons
+		sudo yum -y install docker-engine
+		sudo systemctl start docker
+		sudo systemctl enable docker
+
+	elif [ $Release -eq 6 ]
+	then
+		sudo yum-config-manager --enable public_ol6_addons
+		sudo yum -y install docker-engine
+		sudo service docker start
+		sudo chkconfig docker on
+	fi
 elif [ $LinuxFlavor = 'CentOS' ]
 then
 	sudo yum install -y yum-utils device-mapper-persistent-data lvm2

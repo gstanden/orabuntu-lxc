@@ -1,8 +1,8 @@
-/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/archives/tgt-files/create-tgt-1.sh
-/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/archives/tgt-files/create-tgt-2.sh
-/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/archives/tgt-files/create-tgt-3.sh
-/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/archives/tgt-files/create-tgt-4.sh
-/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/archives/tgt-files/multipath.conf
-/home/ubuntu/Downloads/orabuntu-lxc-master/uekulele/archives/tgt-files/remove-tgt-1.sh
-/home/orabuntu/Downloads/orabuntu-lxc-6.10.6-beta/uekulele/archives/tgt-files/GNU3
-/home/orabuntu/Downloads/orabuntu-lxc-6.10.6-beta/uekulele/archives/tgt-files/COPYING
+/opt/olxc/home/tgt-files/create-tgt-1.sh
+/opt/olxc/home/tgt-files/create-tgt-2.sh
+/opt/olxc/home/tgt-files/create-tgt-3.sh
+/opt/olxc/home/tgt-files/create-tgt-4.sh
+/opt/olxc/home/tgt-files/multipath.conf
+/opt/olxc/home/tgt-files/remove-tgt-1.sh
+/opt/olxc/home/tgt-files/GNU3
+/opt/olxc/home/tgt-files/COPYING

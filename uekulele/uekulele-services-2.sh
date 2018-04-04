@@ -467,7 +467,7 @@ fi
 
 echo ''
 echo "=============================================="
-echo "Initialize LXC Seed Container on OpenvSwitch.."
+echo "Initialize Oracle Linux seed container...     "
 echo "=============================================="
 
 cd /etc/network/if-up.d/openvswitch
@@ -497,7 +497,7 @@ sudo chmod 755 /etc/network/openvswitch/veth_cleanups.sh
 
 echo ''
 echo "=============================================="
-echo "Starting LXC Seed Container for Oracle        "
+echo "Start Oracle Linux seed LXC container...      "
 echo "=============================================="
 echo ''
 
@@ -552,7 +552,7 @@ then
 	done
 	
 	echo "=============================================="
-	echo "LXC Seed Container for Oracle started.        "
+	echo "Done: Start Oracle Linux seed LXC container..."
 	echo "=============================================="
 	echo ''
 	echo "=============================================="
@@ -611,7 +611,10 @@ then
 	DHR="$DhcpRange"
 	sudo sed -i "s/DHCP-RANGE-OLXC/dhcp-range=$DHR/" /etc/dnsmasq.conf
 
-	sudo systemctl daemon-reload
+	if [ $Release -ge 7 ]
+	then
+		sudo systemctl daemon-reload
+	fi
 	sudo service lxc-net restart > /dev/null 2>&1
 else
 	sudo sed -i '/cache-size=150/s/cache-size=150/cache-size=0/g' /etc/dnsmasq.conf

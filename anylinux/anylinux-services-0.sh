@@ -50,17 +50,20 @@ sudo mkdir -p      "$DistDir"/"$SubDirName"/archives/rootfs
 sudo cp -p GNU3    "$DistDir"/"$SubDirName"/archives/rootfs/.
 sudo cp -p COPYING "$DistDir"/"$SubDirName"/archives/rootfs/.
 
-sudo mkdir -p	   "$DistDir"/"$SubDirName"/archives/scst-files
-sudo mkdir -p	   "$DistDir"/"$SubDirName"/archives/tgt-files
 sudo cp -p COPYING "$DistDir"/"$SubDirName"/.
 sudo cp -p COPYING "$DistDir"/"$SubDirName"/archives/.
-sudo cp -p COPYING "$DistDir"/"$SubDirName"/archives/scst-files/.
-sudo cp -p COPYING "$DistDir"/"$SubDirName"/archives/tgt-files/.
 
 sudo cp -p GNU3    "$DistDir"/"$SubDirName"/.
 sudo cp -p GNU3    "$DistDir"/"$SubDirName"/archives/.
-sudo cp -p GNU3    "$DistDir"/"$SubDirName"/archives/scst-files/.
-sudo cp -p GNU3    "$DistDir"/"$SubDirName"/archives/tgt-files/.
+
+sudo mkdir -p      /opt/olxc/home/scst-files
+sudo mkdir -p      /opt/olxc/home/tgt-files
+sudo cp -p COPYING /opt/olxc/home/scst-files/.
+sudo cp -p COPYING /opt/olxc/home/tgt-files/.
+sudo cp -p COPYING /opt/olxc/.
+sudo cp -p GNU3    /opt/olxc/home/scst-files/.
+sudo cp -p GNU3    /opt/olxc/home/tgt-files/.
+sudo cp -p GNU3    /opt/olxc/.
 
 cd "$DistDir"/"$SubDirName"/archives
 
@@ -98,16 +101,12 @@ do
 		tar -vP --append --file=$i /etc/COPYING
 	elif [ $i = 'scst-files.tar' ]
 	then
-		sudo chown 1000:1000 "$DistDir"/"$SubDirName"/archives/scst-files/GNU3
-		sudo chown 1000:1000 "$DistDir"/"$SubDirName"/archives/scst-files/COPYING
-		tar -vP --append --file=$i "$DistDir"/"$SubDirName"/archives/scst-files/GNU3 	--numeric-owner
-		tar -vP --append --file=$i "$DistDir"/"$SubDirName"/archives/scst-files/COPYING --numeric-owner
+		tar -vP --append --file=$i /opt/olxc/home/scst-files/GNU3    --numeric-owner
+		tar -vP --append --file=$i /opt/olxc/home/scst-files/COPYING --numeric-owner
 	elif [ $i = 'tgt-files.tar' ]
 	then
-		sudo chown 1000:1000 "$DistDir"/"$SubDirName"/archives/tgt-files/GNU3
-		sudo chown 1000:1000 "$DistDir"/"$SubDirName"/archives/tgt-files/COPYING
-		tar -vP --append --file=$i "$DistDir"/"$SubDirName"/archives/tgt-files/GNU3 	--numeric-owner
-		tar -vP --append --file=$i "$DistDir"/"$SubDirName"/archives/tgt-files/COPYING	--numeric-owner
+		tar -vP --append --file=$i /opt/olxc/home/tgt-files/GNU3    --numeric-owner
+		tar -vP --append --file=$i /opt/olxc/home/tgt-files/COPYING --numeric-owner
 	elif [ $i = 'dns-dhcp-cont.tar' ]
 	then
 		sudo chown root:root /var/GNU3 > /dev/null 2>&1

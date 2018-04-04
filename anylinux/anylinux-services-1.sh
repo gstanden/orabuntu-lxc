@@ -48,10 +48,15 @@ Sw1Net=${14}
 
 NameServerBase="$NameServer"-base
 
-function CheckAWS {
-        cat /sys/hypervisor/uuid | cut -c1-3 | grep -c ec2
-}
-AWS=$(CheckAWS)
+if [ -e /sys/hypervisor/uuid ]
+then
+        function CheckAWS {
+                cat /sys/hypervisor/uuid | cut -c1-3 | grep -c ec2
+        }
+        AWS=$(CheckAWS)
+else
+        AWS=0
+fi
 
 if [ $AWS -eq 1 ]
 then
@@ -136,7 +141,7 @@ then
 		LFA=$LinuxFlavor
         elif [ $LinuxFlavor = 'CentOS' ]
         then
-                CutIndex=4
+                CutIndex=3
 		LF=$LinuxFlavor
 		LFA=$LinuxFlavor
         fi
