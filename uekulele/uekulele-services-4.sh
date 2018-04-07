@@ -558,10 +558,6 @@ ClonedContainers=$(GetClonedContainers)
 
 for j in $ClonedContainers
 do
-	if [ -e /var/lib/lxc/$j/rootfs/var/run/dhclient.pid ]
-	then
-		sudo rm -f /var/lib/lxc/$j/rootfs/var/run/dhclient.pid
-	fi
 	sudo lxc-start -n $j
 	sleep 10
 	sudo lxc-ls -f
