@@ -63,8 +63,25 @@ then
 	if   [ $Release -eq 6 ]
 	then
 		sudo yum -y install docker-io
+		sleep 2
 		sudo service docker start
 		sudo chkconfig docker on
+
+		function CheckDockerRunning {
+			ps -ef | grep -c 'docker \-d'
+		}
+		DockerRunning=$(CheckDockerRunning)
+
+		d=1
+		while [ $DockerRunning -eq 0 ] && [ $d -le 5 ]
+		do
+			sleep 5
+			sudo service docker start
+			echo ''
+			DockerRunning=$(CheckDockerRunning)
+			ps -ef | grep docker
+			d=$((d+1))
+		done
 
  	elif [ $Release -eq 7 ]
  	then
