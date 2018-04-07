@@ -101,7 +101,13 @@ echo "Destroy nameserver $NameServer...             "
 echo "=============================================="
 echo ''
 
-sudo lxc-stop    -n $NameServer
+if [ $LinuxFlavor = 'CentOS' ] && [ $Release -eq 6 ]
+then
+        sudo lxc-stop -n $NameServer -k > /dev/null 2>&1
+else
+        sudo lxc-stop -n $NameServer    > /dev/null 2>&1
+fi
+
 sudo lxc-destroy -n $NameServer
 
 echo ''

@@ -135,21 +135,23 @@ elif [ $LinuxFlavor = 'Red' ] || [ $LinuxFlavor = 'CentOS' ]
 then
         if   [ $LinuxFlavor = 'Red' ]
         then
-                CutIndex=7
+                function GetRedHatVersion {
+                        sudo cat /etc/redhat-release | cut -f7 -d' ' | cut -f1 -d'.'
+                }
+                RedHatVersion=$(GetRedHatVersion)
 		LF=$LinuxFlavor'Hat'
 		LinuxFlavor=$LF
 		LFA=$LinuxFlavor
         elif [ $LinuxFlavor = 'CentOS' ]
         then
-                CutIndex=3
+                function GetRedHatVersion {
+                        cat /etc/redhat-release | sed 's/ Linux//' | cut -f1 -d'.' | rev | cut -f1 -d' '
+                }
+                RedHatVersion=$(GetRedHatVersion)
 		LF=$LinuxFlavor
 		LFA=$LinuxFlavor
         fi
-        function GetRedHatVersion {
-                sudo cat /etc/redhat-release | cut -f"$CutIndex" -d' ' | cut -f1 -d'.'
-        }
-        RedHatVersion=$(GetRedHatVersion)
-	RHV=$RedHatVersion
+        RHV=$RedHatVersion
         Release=$RedHatVersion
         RL=$Release
 elif [ $LinuxFlavor = 'Fedora' ]
@@ -371,8 +373,10 @@ then
 			echo ''
 			echo "=============================================="
 			echo "DISTRO REL   KERN TYPE       EDITION          "
+			echo "CentOS Linux 6.x   ELREPO-4  V,P ALL          "
 			echo "CentOS Linux 7.x   ALL       V,P ALL          "
 			echo "Fedora Linux 27    ALL       V,P ALL          "
+			echo "Oracle Linux 6.x   UEK4      V,P ALL          "
 			echo "Oracle Linux 7.x   RHEL,UEK4 V,P ALL          "
 			echo "RedHat Linux 7.x   ALL       V,P ALL          "
 			echo "Ubuntu Linux 16.x  ALL       V,P S,D,AWS      "
@@ -764,8 +768,10 @@ then
 			echo ''
 			echo "=============================================="
 			echo "DISTRO REL   KERN TYPE       EDITION          "
+			echo "CentOS Linux 6.x   ELREPO-4  V,P ALL          "
 			echo "CentOS Linux 7.x   ALL       V,P ALL          "
 			echo "Fedora Linux 27    ALL       V,P ALL          "
+			echo "Oracle Linux 6.x   UEK4      V,P ALL          "
 			echo "Oracle Linux 7.x   RHEL,UEK4 V,P ALL          "
 			echo "RedHat Linux 7.x   ALL       V,P ALL          "
 			echo "Ubuntu Linux 16.x  ALL       V,P S,D,AWS      "

@@ -145,15 +145,18 @@ elif [ $LinuxFlavor = 'Red' ] || [ $LinuxFlavor = 'CentOS' ]
 then
         if   [ $LinuxFlavor = 'Red' ]
         then
-                CutIndex=7
+                function GetRedHatVersion {
+                        sudo cat /etc/redhat-release | cut -f7 -d' ' | cut -f1 -d'.'
+                }
+                RedHatVersion=$(GetRedHatVersion)
         elif [ $LinuxFlavor = 'CentOS' ]
         then
-                CutIndex=4
+                function GetRedHatVersion {
+                        cat /etc/redhat-release | sed 's/ Linux//' | cut -f1 -d'.' | rev | cut -f1 -d' '
+                }
+                RedHatVersion=$(GetRedHatVersion)
         fi
-        function GetRedHatVersion {
-                sudo cat /etc/redhat-release | cut -f"$CutIndex" -d' ' | cut -f1 -d'.'
-        }
-        RedHatVersion=$(GetRedHatVersion)
+	RHV=$RedHatVersion
         Release=$RedHatVersion
         LF=$LinuxFlavor
         RL=$Release
@@ -244,6 +247,24 @@ then
 
 	clear
 fi
+
+echo ''
+echo "=============================================="
+echo "Install lsb on CentOS 6 ...                   "
+echo "=============================================="
+echo ''
+
+sudo yum -y install lsb
+
+
+echo ''
+echo "=============================================="
+echo "Done: Install lsb on CentOS 6.                "
+echo "=============================================="
+
+sleep 5
+
+clear
 
 echo ''
 echo "=============================================="
@@ -541,10 +562,15 @@ then
 			PublicIPIterative=$(CheckPublicIPIterative)
 			if [ $i -eq 5 ]
 			then
-			sudo lxc-stop -n $j > /dev/null 2>&1
-			sudo /etc/network/openvswitch/veth_cleanups.sh oel$OracleRelease$SeedPostfix
-			echo ''
-			sudo lxc-start -n $j > /dev/null 2>&1
+				if [ $LinuxFlavor = 'CentOS' ] && [ $Release -eq 6 ]
+				then
+					sudo lxc-stop -n $j -k > /dev/null 2>&1
+				else
+					sudo lxc-stop -n $j    > /dev/null 2>&1
+				fi
+				sudo /etc/network/openvswitch/veth_cleanups.sh oel$OracleRelease$SeedPostfix
+				echo ''
+				sudo lxc-start -n $j > /dev/null 2>&1
 			fi
 		sleep 1
 		i=$((i+1))
@@ -601,25 +627,6 @@ echo "=============================================="
 echo "Container oel$OracleRelease$SeedPostfix ping test..."
 echo "=============================================="
 echo ''
-
-if [ $LinuxFlavor != 'Fedora' ] && [ $LinuxFlavor != 'CentOS' ] && [ $LinuxFlavor != 'Red' ]
-then
-	function GetDhcpRange {
-	        cat /etc/sysconfig/lxc-net | grep LXC_DHCP_RANGE | cut -f2 -d'=' | sed 's/"//g' 
-	}       
-	DhcpRange=$(GetDhcpRange)
-	DHR="$DhcpRange"
-	sudo sed -i "s/DHCP-RANGE-OLXC/dhcp-range=$DHR/" /etc/dnsmasq.conf
-
-	if [ $Release -ge 7 ]
-	then
-		sudo systemctl daemon-reload
-	fi
-	sudo service lxc-net restart > /dev/null 2>&1
-else
-	sudo sed -i '/cache-size=150/s/cache-size=150/cache-size=0/g' /etc/dnsmasq.conf
-	sudo service dnsmasq restart
-fi
 
 function CheckNetworkUp {
 ping -c 3 oel$OracleRelease$SeedPostfix | grep packet | cut -f3 -d',' | sed 's/ //g'

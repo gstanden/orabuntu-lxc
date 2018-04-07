@@ -40,30 +40,45 @@ function GetDistDir {
 }
 DistDir=$(GetDistDir)
 
-sudo cp -p GNU3    /etc/.
-sudo cp -p COPYING /etc/.
+function GetGroup {
+        id | cut -f2 -d' ' | cut -f2 -d'(' | cut -f1 -d')'
+}
+Group=$(GetGroup)
 
-sudo cp -p GNU3    /var/.
-sudo cp -p COPYING /var/.
+function GetOwner {
+        id | cut -f1 -d' ' | cut -f2 -d'(' | cut -f1 -d')'
+}
+Owner=$(GetOwner)
 
-sudo mkdir -p      "$DistDir"/"$SubDirName"/archives/rootfs
-sudo cp -p GNU3    "$DistDir"/"$SubDirName"/archives/rootfs/.
-sudo cp -p COPYING "$DistDir"/"$SubDirName"/archives/rootfs/.
+sudo cp -p GNU3    		/etc/.
+sudo cp -p COPYING 		/etc/.
 
-sudo cp -p COPYING "$DistDir"/"$SubDirName"/.
-sudo cp -p COPYING "$DistDir"/"$SubDirName"/archives/.
+sudo cp -p GNU3    		/var/.
+sudo cp -p COPYING 		/var/.
 
-sudo cp -p GNU3    "$DistDir"/"$SubDirName"/.
-sudo cp -p GNU3    "$DistDir"/"$SubDirName"/archives/.
+sudo mkdir -p      		"$DistDir"/"$SubDirName"/archives/rootfs
+sudo cp -p GNU3    		"$DistDir"/"$SubDirName"/archives/rootfs/.
+sudo cp -p COPYING 		"$DistDir"/"$SubDirName"/archives/rootfs/.
 
-sudo mkdir -p      /opt/olxc/home/scst-files
-sudo mkdir -p      /opt/olxc/home/tgt-files
-sudo cp -p COPYING /opt/olxc/home/scst-files/.
-sudo cp -p COPYING /opt/olxc/home/tgt-files/.
-sudo cp -p COPYING /opt/olxc/.
-sudo cp -p GNU3    /opt/olxc/home/scst-files/.
-sudo cp -p GNU3    /opt/olxc/home/tgt-files/.
-sudo cp -p GNU3    /opt/olxc/.
+sudo cp -p COPYING 		"$DistDir"/"$SubDirName"/.
+sudo cp -p COPYING 		"$DistDir"/"$SubDirName"/archives/.
+
+sudo cp -p GNU3    		"$DistDir"/"$SubDirName"/.
+sudo cp -p GNU3    		"$DistDir"/"$SubDirName"/archives/.
+
+sudo mkdir -p			/opt/olxc/home/scst-files
+sudo mkdir -p			/opt/olxc/home/tgt-files
+sudo chown -R $Owner:$Group 	/opt/olxc/home/scst-files
+sudo chown -R $Owner:$Group	/opt/olxc/home/tgt-files
+sudo chown -R $Owner:$Group	/opt/olxc/
+sudo cp -p COPYING		/opt/olxc/.
+sudo cp -p COPYING		/opt/olxc/home/.
+sudo cp -p COPYING		/opt/olxc/home/tgt-files/.
+sudo cp -p COPYING		/opt/olxc/home/scst-files/.
+sudo cp -p GNU3			/opt/olxc/.
+sudo cp -p GNU3			/opt/olxc/home/.
+sudo cp -p GNU3			/opt/olxc/home/tgt-files/.
+sudo cp -p GNU3			/opt/olxc/home/scst-files/.
 
 cd "$DistDir"/"$SubDirName"/archives
 

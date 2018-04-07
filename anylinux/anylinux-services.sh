@@ -239,15 +239,18 @@ elif [ $LinuxFlavor = 'Red' ] || [ $LinuxFlavor = 'CentOS' ]
 then
         if   [ $LinuxFlavor = 'Red' ]
         then
-                CutIndex=7
+                function GetRedHatVersion {
+                        sudo cat /etc/redhat-release | cut -f7 -d' ' | cut -f1 -d'.'
+                }
+                RedHatVersion=$(GetRedHatVersion)
         elif [ $LinuxFlavor = 'CentOS' ]
         then
-                CutIndex=3
+                function GetRedHatVersion {
+                        cat /etc/redhat-release | sed 's/ Linux//' | cut -f1 -d'.' | rev | cut -f1 -d' '
+                }
+                RedHatVersion=$(GetRedHatVersion)
         fi
-        function GetRedHatVersion {
-                sudo cat /etc/redhat-release | cut -f"$CutIndex" -d' ' | cut -f1 -d'.'
-        }
-        RedHatVersion=$(GetRedHatVersion)
+        RHV=$RedHatVersion
         Release=$RedHatVersion
         LF=$LinuxFlavor
         RL=$Release
@@ -358,6 +361,118 @@ fi
 sleep 5
 
 clear
+
+if [ $LinuxFlavor = 'CentOS' ] && [ $Release -eq 6 ]
+then
+	function GetKernelVersion {
+		uname -r | cut -f1 -d'.'
+	}
+	KernelVersion=$(GetKernelVersion)
+
+	if [ $KernelVersion -eq 2 ]
+	then
+		echo ''
+	     	echo "=============================================="
+		echo "                                              "
+		echo "CentOS stock 2.x kernels do not adequately    "
+		echo "support cgroupfs for Orabuntu-LXC install.    "
+		echo "                                              "
+		echo "To install Orabuntu-LXC it is necessary to    "
+		echo "upgrade to the "elrepo" kernel.               "
+		echo "                                              "
+		echo "          !!!!!  WARNING !!!!!                "
+		echo "                                              "
+		echo "Kernel upgrades can have unexpected effects   "
+		echo "on applications with kernel dependencies.     "
+		echo "                                              "
+		echo "Do NOT upgrade your kernel if this is a PROD  "
+		echo "(production) host or if this host is in any   "
+		echo "way directly-related to production operations."
+		echo "                                              "
+		echo "Instead, first, run the Orabuntu-LXC installer"
+		echo "and upgrade the kernel on an exact development"
+		echo "copy of production and do a full system and   "
+		echo "user acceptance test (UAT) of all the apps    "
+		echo "running on this upgraded elrepo kernel.  If   "
+		echo "those tests are successful, then Orabuntu-LXC "
+		echo "and the elrepo kernel can be installed on the "
+		echo "CentOS 6 production server.                   "
+		echo "                                              "
+		echo "Reminder that this is GNU3 software and that  "
+		echo "this software is provided under the terms of  "
+		echo "that license.  Please read and familiarize    "
+		echo "with the GNU3 license before installing       "
+		echo "Orabuntu-LXC on a production CentOS 6 server  "
+        	echo "                                              "
+        	echo "=============================================="
+        	echo "                                              "
+		read -e -p   "Upgrade to elrepo kernel ? [Y/N]              " -i "N" install_elrepo_kernel
+        	echo "                                              "
+        	echo "=============================================="
+
+        	sleep 5
+
+        	clear
+
+		if [ $install_elrepo_kernel = 'Y' ] || [ $install_elrepo_kernel = 'y' ]
+		then
+			echo ''
+			echo "==============================================" 
+			echo "Install ELREPO 4.x kernel for CentOS 6 ...    "
+			echo "=============================================="
+			echo ''
+
+			#GLS 20180405 Credit: Gerald Clark https://www.centos.org/forums/viewtopic.php?t=3155
+			sudo sed -i 's/DEFAULTKERNEL=kernel/DEFAULTKERNEL=kernel-ml/g' /etc/sysconfig/kernel
+			
+			#GLS 20180405 Credit: https://portal.cloudunboxed.net/knowledgebase/17/Installing-the-latest-mainline-kernel-on-CentOS-6-and-7.html
+			sudo rpm --import https://www.elrepo.org/RPM-GPG-KEY-elrepo.org
+			sudo rpm -Uvh http://www.elrepo.org/elrepo-release-6-8.el6.elrepo.noarch.rpm
+			sudo yum --enablerepo=elrepo-kernel install kernel-ml
+
+			echo ''
+			echo "==============================================" 
+			echo "Done: Install ELREPO 4.x kernel for CentOS 6. "
+			echo "=============================================="
+			echo ''
+
+			sleep 5
+
+			clear
+
+			echo ''
+			echo "==============================================" 
+			echo "Host Reboot in 5 seconds...                   "
+			echo "=============================================="
+			echo ''
+			echo "==============================================" 
+			echo "After reboot re-run Orabuntu-LXC installer.   "
+			echo "=============================================="
+			echo ''
+			
+			sleep 5
+
+			sudo reboot
+
+			sleep 5
+		else
+			echo ''
+			echo "==============================================" 
+			echo "                                              "
+			echo "   CentOS kernel version fails requirements.  "
+			echo "       Orabuntu-LXC cannot be installed.      "
+			echo "                  Exiting.                    "
+			echo "                                              "
+			echo "=============================================="
+			exit
+		fi
+	else
+		echo ''
+		echo "==============================================" 
+		echo "CentOS kernel version meets requirements.     "
+		echo "=============================================="
+	fi
+fi
 
 echo ''
 echo "==============================================" 
@@ -896,9 +1011,10 @@ then
 			echo "=============================================="
 			echo ''
 
-	sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" lxc-stop -n $NameServer;echo '(Do NOT enter passwords...Wait...)'"
-	sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" lxc-copy -n $NameServer -N $NameServer-$HOSTNAME" >/dev/null 2>&1
-	sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" lxc-start -n $NameServer; echo ''; sudo -S <<< "$MultiHostVar9" lxc-ls -f"
+			sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" lxc-stop -n $NameServer -k;echo '(Do NOT enter passwords...Wait...)'"
+			sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" lxc-copy -n $NameServer -N $NameServer-$HOSTNAME" >/dev/null 2>&1
+			sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" lxc-start -n $NameServer; echo ''; sudo -S <<< "$MultiHostVar9" lxc-ls -f"
+			sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" lxc-attach -n $NameServer -- dhclient; echo ''; sudo -S <<< "$MultiHostVar9" lxc-ls -f"
  			
 			echo ''
  			echo "$NameServer-$HOSTNAME has been created on the Orabuntu-LXC HUB host at $MultiHostVar5"
@@ -921,7 +1037,7 @@ then
 			echo "=============================================="
 			echo ''
 
-			sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" lxc-stop -n $NameServer;echo '(Do NOT enter a password.  Wait...)'; echo '$HOSTNAME pre-install nameserver snapshot' > snap_comment; echo ''; sudo -S <<< "$MultiHostVar9" lxc-snapshot -n $NameServer -c snap_comment; sudo -S <<< "$MultiHostVar9" lxc-start -n $NameServer; echo ''; sleep 5; sudo -S <<< "$MultiHostVar9" lxc-snapshot -n $NameServer -L -C"
+			sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" lxc-stop -n $NameServer -k;echo '(Do NOT enter a password.  Wait...)'; echo '$HOSTNAME pre-install nameserver snapshot' > snap_comment; echo ''; sudo -S <<< "$MultiHostVar9" lxc-snapshot -n $NameServer -c snap_comment; sudo -S <<< "$MultiHostVar9" lxc-start -n $NameServer; sudo -S <<< "$MultiHostVar9" lxc-attach -n $NameServer -- dhclient; echo ''; sleep 5; sudo -S <<< "$MultiHostVar9" lxc-snapshot -n $NameServer -L -C"
 			echo ''
 			echo "Snapshot of $NameServer created on the Orabuntu-LXC HUB host at $MultiHostVar5."
 			echo "Snapshot of $NameServer can be restored to $NameServer if necessary using 'lxc-snapshot -r SnapX -N $NameServer' command."
@@ -947,7 +1063,7 @@ then
 		echo "=============================================="
 		echo ''
 
-		sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" lxc-stop -n $NameServer;echo '(Do NOT enter a password.  Wait...)'; echo '$HOSTNAME pre-install nameserver snapshot' > snap_comment; echo ''; sudo -S <<< "$MultiHostVar9" lxc-snapshot -n $NameServer -c snap_comment; sudo -S <<< "$MultiHostVar9" lxc-start -n $NameServer; echo ''; sleep 5; sudo -S <<< "$MultiHostVar9" lxc-snapshot -n $NameServer -L -C"
+		sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" lxc-stop -n $NameServer -k;echo '(Do NOT enter a password.  Wait...)'; echo '$HOSTNAME pre-install nameserver snapshot' > snap_comment; echo ''; sudo -S <<< "$MultiHostVar9" lxc-snapshot -n $NameServer -c snap_comment; sudo -S <<< "$MultiHostVar9" lxc-start -n $NameServer; sudo -S <<< "$MultiHostVar9" lxc-attach -n $NameServer -- dhclient; echo ''; sleep 5; sudo -S <<< "$MultiHostVar9" lxc-snapshot -n $NameServer -L -C"
 		echo ''
 		echo "Snapshot of $NameServer created on the Orabuntu-LXC HUB host at $MultiHostVar5."
 		echo "Snapshot of $NameServer can be restored to $NameServer if necessary using 'lxc-snapshot -r SnapX -N $NameServer' command."

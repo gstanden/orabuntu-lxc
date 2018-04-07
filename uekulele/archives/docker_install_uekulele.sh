@@ -31,89 +31,8 @@
 #
 #!/bin/bash
 
-GetLinuxFlavors(){
-if   [[ -e /etc/oracle-release ]]
-then
-        LinuxFlavors=$(cat /etc/oracle-release | cut -f1 -d' ')
-elif [[ -e /etc/redhat-release ]]
-then
-        LinuxFlavors=$(cat /etc/redhat-release | cut -f1 -d' ')
-elif [[ -e /usr/bin/lsb_release ]]
-then
-        LinuxFlavors=$(lsb_release -d | awk -F ':' '{print $2}' | cut -f1 -d' ')
-elif [[ -e /etc/issue ]]
-then
-        LinuxFlavors=$(cat /etc/issue | cut -f1 -d' ')
-else
-        LinuxFlavors=$(cat /proc/version | cut -f1 -d' ')
-fi
-}
-GetLinuxFlavors
-
-function TrimLinuxFlavors {
-echo $LinuxFlavors | sed 's/^[ \t]//;s/[ \t]$//'
-}
-LinuxFlavor=$(TrimLinuxFlavors)
-
-if   [ $LinuxFlavor = 'Oracle' ]
-then
-        CutIndex=7
-        function GetRedHatVersion {
-                sudo cat /etc/redhat-release | cut -f"$CutIndex" -d' ' | cut -f1 -d'.'
-        }
-        RedHatVersion=$(GetRedHatVersion)
-        function GetOracleDistroRelease {
-                sudo cat /etc/oracle-release | cut -f5 -d' ' | cut -f1 -d'.'
-        }
-        OracleDistroRelease=$(GetOracleDistroRelease)
-        Release=$OracleDistroRelease
-        LF=$LinuxFlavor
-        RL=$Release
-elif [ $LinuxFlavor = 'Red' ] || [ $LinuxFlavor = 'CentOS' ]
-then
-        if   [ $LinuxFlavor = 'Red' ]
-        then
-                CutIndex=7
-        elif [ $LinuxFlavor = 'CentOS' ]
-        then
-                CutIndex=4
-        fi
-        function GetRedHatVersion {
-                sudo cat /etc/redhat-release | cut -f"$CutIndex" -d' ' | cut -f1 -d'.'
-        }
-        RedHatVersion=$(GetRedHatVersion)
-        Release=$RedHatVersion
-        LF=$LinuxFlavor
-        RL=$Release
-elif [ $LinuxFlavor = 'Fedora' ]
-then
-        CutIndex=3
-        function GetRedHatVersion {
-                sudo cat /etc/redhat-release | cut -f"$CutIndex" -d' ' | cut -f1 -d'.'
-        }
-        RedHatVersion=$(GetRedHatVersion)
-        if [ $RedHatVersion -ge 19 ]
-        then
-                Release=7
-        elif [ $RedHatVersion -ge 12 ] && [ $RedHatVersion -le 18 ]
-        then
-                Release=6
-        fi
-        LF=$LinuxFlavor
-        RL=$Release
-elif [ $LinuxFlavor = 'Ubuntu' ]
-then
-        function GetUbuntuVersion {
-                cat /etc/lsb-release | grep DISTRIB_RELEASE | cut -f2 -d'='
-        }
-        UbuntuVersion=$(GetUbuntuVersion)
-        LF=$LinuxFlavor
-        RL=$UbuntuVersion
-        function GetUbuntuMajorVersion {
-                cat /etc/lsb-release | grep DISTRIB_RELEASE | cut -f2 -d'=' | cut -f1 -d'.'
-        }
-        UbuntuMajorVersion=$(GetUbuntuMajorVersion)
-fi
+LinuxFlavor=$1
+    Release=$2
 
 echo ''
 echo "=============================================="
@@ -137,16 +56,29 @@ then
 		sudo service docker start
 		sudo chkconfig docker on
 	fi
-elif [ $LinuxFlavor = 'CentOS' ]
+fi
+
+if [ $LinuxFlavor = 'CentOS' ]
 then
-	sudo yum install -y yum-utils device-mapper-persistent-data lvm2
-	sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
-# 	sudo yum-config-manager --enable docker-ce-edge
-# 	sudo yum-config-manager --enable docker-ce-test
-	sudo yum -y install docker-ce
-	sudo systemctl start docker
-	sudo systemctl enable docker
-elif [ $LinuxFlavor = 'Fedora' ]
+	if   [ $Release -eq 6 ]
+	then
+		sudo yum -y install docker-io
+		sudo service docker start
+		sudo chkconfig docker on
+
+ 	elif [ $Release -eq 7 ]
+ 	then
+ 		sudo yum install -y yum-utils device-mapper-persistent-data lvm2
+ 		sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+ 		sudo yum-config-manager --enable docker-ce-edge
+ 		sudo yum-config-manager --enable docker-ce-test
+ 		sudo yum -y install docker-ce
+ 		sudo systemctl start docker
+ 		sudo systemctl enable docker
+ 	fi
+fi
+
+if [ $LinuxFlavor = 'Fedora' ]
 then
 	sudo dnf -y install dnf-plugins-core
 	sudo dnf -y config-manager --add-repo https://download.docker.com/linux/fedora/docker-ce.repo
