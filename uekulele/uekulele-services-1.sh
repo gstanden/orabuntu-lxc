@@ -1800,7 +1800,7 @@ then
 #			sed -e 's/@VERSION@/0.0.1/' rhel/openvswitch.spec.in > /tmp/ovs.spec
 #			sudo yum-builddep /tmp/ovs.spec
 			sed -i 's/python >= 2.7/python27/g' rhel/openvswitch.spec
-			rpmbuild --define "_topdir /opt/olxc/"$DistDir"/uekulele/openvswitch/rpmbuild" --without check -bb rhel/openvswitch.spec
+			rpmbuild --define "_topdir /opt/olxc/"$DistDir"/uekulele/openvswitch/rpmbuild" -bb rhel/openvswitch.spec
 		
 			sleep 5
 
