@@ -827,11 +827,51 @@ then
 					echo "=============================================="
                                 fi
 			fi
+                        
+			if [ $LinuxFlavor = 'Oracle' ]
+                        then
+                                if   [ $Release -ge 7 ]
+                                then
+					sudo lxc-stop -n $NameServer
+                        		echo 'HUB nameserver post-install snapshot' > snap-comment
+                        		sudo lxc-snapshot -n $NameServer -c snap-comment
+                        		sudo rm -f snap-comment
+                        		sudo lxc-snapshot -n $NameServer -L -C
+					sudo lxc-start -n $NameServer
+
+                                elif [ $Release -eq 6 ]
+				then
+					echo ''
+					echo "=============================================="
+					echo "LXC snapshot not supported on this fs/kernel. "
+					echo "=============================================="
+                                fi
+			fi
                 fi
 
                 if [ $FileSystemTypeBtrfs -eq 1 ]
                 then
 			if [ $LinuxFlavor = 'CentOS' ]
+			then
+				if [ $Release -eq 7 ]
+				then
+					sudo lxc-stop -n $NameServer
+                       			echo 'HUB nameserver post-install snapshot' > snap-comment
+                       			sudo lxc-snapshot -n $NameServer -c snap-comment
+                       			sudo rm -f snap-comment
+                       			sudo lxc-snapshot -n $NameServer -L -C
+					sudo lxc-start -n $NameServer
+
+				elif [ $Release -eq 6 ]
+				then
+					echo ''
+					echo "=============================================="
+					echo "LXC snapshot not supported on this fs/kernel. "
+					echo "=============================================="
+				fi
+			fi
+			
+			if [ $LinuxFlavor = 'Oracle' ]
 			then
 				if [ $Release -eq 7 ]
 				then
