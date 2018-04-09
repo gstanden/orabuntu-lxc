@@ -57,10 +57,13 @@ MultiHost=$5
 NameServer=$6
 DistDir=$7
 
-function CheckAWS {
-        cat /sys/hypervisor/uuid | cut -c1-3 | grep -c ec2
-}
-AWS=$(CheckAWS)
+if [ -e /sys/hypervisor/uuid ]
+then
+	function CheckAWS {
+        	cat /sys/hypervisor/uuid | cut -c1-3 | grep -c ec2
+	}
+	AWS=$(CheckAWS)
+fi
 
 function SoftwareVersion { echo "$@" | awk -F. '{ printf("%d%03d%03d%03d\n", $1,$2,$3,$4); }'; }
 

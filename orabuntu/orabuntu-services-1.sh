@@ -1671,26 +1671,26 @@ then
                	ExistingSearchDomains=$(GetExistingSearchDomains)
 	fi
 
-	if [ $AWS -eq 1 ] && [ $FacterValue = 'xenu' ]
+	if [ $AWS -eq 1 ]
         then
-		sudo sed -i '/#/d'					/etc/resolv.conf
-                sudo sed -i '/search/d' 				/etc/resolv.conf
-		sudo sed -i '/127.0.0.1/!s/nameserver/# nameserver/g'   /etc/resolv.conf
-		sudo sh  -c "echo 'nameserver 127.0.0.1' >> /etc/resolv.conf"
-                sudo sh  -c "echo 'search $ExistingSearchDomains $Domain1 $Domain2 gns1.$Domain1' >> /etc/resolv.conf"
+		sudo sed -i '/#/d'										/etc/resolv.conf
+                sudo sed -i '/search/d' 									/etc/resolv.conf
+		sudo sed -i '/127.0.0.1/!s/nameserver/# nameserver/g'   					/etc/resolv.conf
+		sudo sh  -c "echo 'nameserver 127.0.0.1' 							>> /etc/resolv.conf"
+                sudo sh  -c "echo 'search $ExistingSearchDomains $Domain1 $Domain2 gns1.$Domain1' 		>> /etc/resolv.conf"
 		sudo sed -i "/supersede domain-name/c\append domain-name \" $Domain1 $Domain2 gns1.$Domain1\"" /etc/dhcp/dhclient.conf
-		sudo sed -i '/8.8.8.8/d' 				/etc/resolv.conf
-		sudo sed -i '$!N; /^\(.*\)\n\1$/!P; D'  		/etc/resolv.conf
+		sudo sed -i '/8.8.8.8/d' 									/etc/resolv.conf
+		sudo sed -i '$!N; /^\(.*\)\n\1$/!P; D'  							/etc/resolv.conf
         fi
 
         if [ $AWS -eq 0 ] && [ $SearchDomain1 -eq 0 ]
         then
-                sudo sed -i '/search/d' 					/etc/resolv.conf
-		sudo sed -i '/127.0.0.1/!s/nameserver/# nameserver/g'   	/etc/resolv.conf
-                sudo sh -c "echo 'search $Domain1 $Domain2 gns1.$Domain1' >> 	/etc/resolv.conf"
+                sudo sed -i '/search/d' 									/etc/resolv.conf
+		sudo sed -i '/127.0.0.1/!s/nameserver/# nameserver/g'   					/etc/resolv.conf
+                sudo sh -c "echo 'search $Domain1 $Domain2 gns1.$Domain1' >> 					/etc/resolv.conf"
 		sudo sed -i "/supersede domain-name/c\append domain-name \" $Domain1 $Domain2 gns1.$Domain1\"" 	/etc/dhcp/dhclient.conf
                 sudo sed -i "/prepend domain-name-servers/s/#//"  						/etc/dhcp/dhclient.conf
-		sudo sed -i '$!N; /^\(.*\)\n\1$/!P; D'  			/etc/resolv.conf
+		sudo sed -i '$!N; /^\(.*\)\n\1$/!P; D'  							/etc/resolv.conf
         fi
 
 
@@ -2291,36 +2291,44 @@ then
 	sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw8.sh
 	sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw9.sh
 
-	echo ''
-	echo "=============================================="
-	echo "Unpack SCST Linux SAN Files...                "
-	echo "=============================================="
-	echo ''
+        echo ''
+        echo "=============================================="
+        echo "Unpack SCST Linux SAN Files...                "
+        echo "=============================================="
+        echo ''
 
-	sudo tar -xvf /opt/olxc/"$DistDir"/orabuntu/archives/scst-files.tar -C /opt/olxc --touch
-	sudo tar -xf  /opt/olxc/"$DistDir"/orabuntu/archives/tgt-files.tar  -C /opt/olxc --touch
+        sudo tar -xvf /opt/olxc/"$DistDir"/orabuntu/archives/scst-files.tar -C / --touch
 
-	if [ $Owner != 'ubuntu' ]
-	then
-		sudo mkdir -p /opt/olxc/"$DistDir"/orabuntu/archives/scst-files
-		sudo mkdir -p /opt/olxc/"$DistDir"/orabuntu/archives/tgt-files
-		sudo chown $Owner:$Group /opt/olxc/"$DistDir"/orabuntu/archives/scst-files
-		sudo chown $Owner:$Group /opt/olxc/"$DistDir"/orabuntu/archives/tgt-files
-		sudo cp /opt/olxc/home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/scst-files/* /opt/olxc/"$DistDir"/orabuntu/archives/scst-files/.
-		sudo cp /opt/olxc/home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/tgt-files/*  /opt/olxc/"$DistDir"/orabuntu/archives/tgt-files/.
-	fi
-        sudo chown -R $Owner:$Group		/opt/olxc/"$DistDir"/orabuntu/archives/.
-        sudo sed -i "s/SWITCH_IP/$Sw1Index/g"	/opt/olxc/"$DistDir"/orabuntu/archives/scst-files/create-scst-target.sh
-		
-	echo ''
-	echo "=============================================="
-	echo "Done: Unpack SCST Linux SAN Files.            "
-	echo "=============================================="
-	echo ''
+        sudo chown -R $Owner:$Group             /opt/olxc/home/scst-files/.
+        sudo sed -i "s/SWITCH_IP/$Sw1Index/g"   /opt/olxc/home/scst-files/create-scst-target.sh
 
-	sleep 5
+        echo ''
+        echo "=============================================="
+        echo "Done: Unpack SCST Linux SAN Files.            "
+        echo "=============================================="
+        echo ''
 
-	clear
+        sleep 5
+
+        clear
+
+        echo ''
+        echo "=============================================="
+        echo "Unpack TGT Linux SAN Files...                "
+        echo "=============================================="
+        echo ''
+
+        sudo tar -xvf /opt/olxc/"$DistDir"/orabuntu/archives/tgt-files.tar  -C / --touch
+
+        echo ''
+        echo "=============================================="
+        echo "Done: Unpack TGT Linux SAN Files.            "
+        echo "=============================================="
+        echo ''
+
+        sleep 5
+
+        clear
 
 	echo ''
 	echo "=============================================="

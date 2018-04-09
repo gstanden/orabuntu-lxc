@@ -55,10 +55,13 @@ echo "=============================================="
 echo "This script is re-runnable                    "
 echo "=============================================="
 
-function CheckAWS {
-        cat /sys/hypervisor/uuid | cut -c1-3 | grep -c ec2
-}
-AWS=$(CheckAWS)
+if [ -e /sys/hypervisor/uuid ]
+then
+	function CheckAWS {
+        	cat /sys/hypervisor/uuid | cut -c1-3 | grep -c ec2
+	}
+	AWS=$(CheckAWS)
+fi
 
 function GetMultiHostVar2 {
         echo $MultiHost | cut -f2 -d':'

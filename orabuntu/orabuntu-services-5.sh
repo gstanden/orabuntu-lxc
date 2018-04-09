@@ -42,11 +42,13 @@ NameServer=$5
 MultiHost=$6
 DistDir=$7
 
-function CheckAWS {
-        cat /sys/hypervisor/uuid | cut -c1-3 | grep -c ec2
-}
-AWS=$(CheckAWS)
-
+if [ -e /sys/hypervisor/uuid ]
+then
+	function CheckAWS {
+        	cat /sys/hypervisor/uuid | cut -c1-3 | grep -c ec2
+	}
+	AWS=$(CheckAWS)
+fi
 function GetUbuntuVersion {
 	cat /etc/lsb-release | grep DISTRIB_RELEASE | cut -f2 -d'='
 }
@@ -724,7 +726,8 @@ then
                         if   [ $Ftype -eq 1 ]
                         then
                                 sudo lxc-stop -n $NameServer > /dev/null 2>&1
-                                echo 'hub nameserver post-install snapshot' > snap-comment
+                                sudo echo 'hub nameserver post-install snapshot' > snap-comment
+				sudo chown -R $Owner:$Group snap-comment
                                 sudo lxc-snapshot -n $NameServer -c snap-comment
                                 sudo rm -f snap-comment
                                 sudo lxc-snapshot -n $NameServer -L -C
@@ -735,7 +738,8 @@ then
                 if [ $FileSystemTypeExt -eq 1 ]
                 then
                         sudo lxc-stop -n $NameServer > /dev/null 2>&1
-                        echo 'hub nameserver post-install snapshot' > snap-comment
+                        sudo echo 'hub nameserver post-install snapshot' > snap-comment
+			sudo chown -R $Owner:$Group snap-comment
                         sudo lxc-snapshot -n $NameServer -c snap-comment
                         sudo rm -f snap-comment
                         sudo lxc-snapshot -n $NameServer -L -C
