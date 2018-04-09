@@ -226,6 +226,32 @@ sleep 5
 
 clear
 
+if [ $MultiHostVar1 = 'new' ]
+then
+	echo ''
+	echo "=============================================="
+  	echo "Install Docker...                             "
+  	echo "=============================================="
+  	echo ''
+
+  	sleep 5
+	
+  	if [ $Release -ge 6 ]
+  	then
+  		sudo chmod 775 /opt/olxc/"$DistDir"/uekulele/archives/docker_install_uekulele.sh
+  		/opt/olxc/"$DistDir"/uekulele/archives/docker_install_uekulele.sh $LinuxFlavor $Release
+  	fi
+	
+  	echo ''
+  	echo "=============================================="
+  	echo "Done: Install Docker.                         "
+  	echo "=============================================="
+
+ 	sleep 5
+	
+ 	clear
+fi
+
 if [ $MultiHostVar1 = 'new' ] || [ $MultiHostVar1 = 'reinstall' ]
 then
 	echo ''
@@ -1095,6 +1121,42 @@ then
 		clear
 	fi
 
+        echo ''
+        echo "=============================================="
+        echo "List Containers...                            "
+        echo "=============================================="
+        echo ''
+        echo "=============================================="
+        echo "LXC  Containers...                            "
+        echo "=============================================="
+        echo ''
+
+        sudo lxc-ls -f
+
+        echo ''
+        echo "=============================================="
+        echo "Docker Containers...                          "
+        echo "=============================================="
+        echo ''
+
+        sudo docker ps -a
+
+	echo ''
+        echo "=============================================="
+        echo "To ssh to Docker raesene/alpine-nettools:     "
+        echo "                                              "
+        echo "     ssh username@localhost -p 2200           "
+        echo "                                              "
+        echo "=============================================="
+        echo ''
+        echo "=============================================="
+        echo "Done: List Containers.                        "
+        echo "=============================================="
+
+	sleep 5
+
+	clear
+
 	echo ''
 	echo "=============================================="
 	echo "Management links directory creation...        "
@@ -1131,8 +1193,8 @@ then
 	echo "Build SCST Linux SAN (optional e.g. for a DB) "
 	echo "                                              "
 	echo "Instructions:                                 "
-	echo "     connect as root user                     "
-	echo "     cd /opt/olxc/home/scst-files             "
+	echo "                                              "
+	echo "     cd ../uekulele/archives/scst-files       "
 	echo "     cat README                               "
 	echo "     ./create-scst.sh                         "
 	echo "=============================================="
@@ -1140,68 +1202,6 @@ then
 	
 	sleep 5
 fi
-
-if [ $MultiHostVar1 = 'new' ]
-then
-	echo ''
-	echo "=============================================="
-  	echo "Install Docker...                             "
-  	echo "=============================================="
-  	echo ''
-
-  	sleep 5
-	
-  	if [ $Release -ge 6 ]
-  	then
-  		sudo chmod 775 /opt/olxc/"$DistDir"/uekulele/archives/docker_install_uekulele.sh
-  		/opt/olxc/"$DistDir"/uekulele/archives/docker_install_uekulele.sh $LinuxFlavor $Release
-  	fi
-	
-  	echo ''
-  	echo "=============================================="
-  	echo "Done: Install Docker.                         "
-  	echo "=============================================="
-
- 	sleep 5
-	
- 	clear
-fi
-
-echo ''
-echo "=============================================="
-echo "List Containers...                            "
-echo "=============================================="
-echo ''
-echo "=============================================="
-echo "LXC  Containers...                            "
-echo "=============================================="
-echo ''
-
-sudo lxc-ls -f
-
-echo ''
-echo "=============================================="
-echo "Docker Containers...                          "
-echo "=============================================="
-echo ''
-
-sudo docker ps -a
-
-echo ''
-echo "=============================================="
-echo "To ssh to Docker raesene/alpine-nettools:     "
-echo "                                              "
-echo "     ssh username@localhost -p 2200           "
-echo "                                              "
-echo "=============================================="
-echo ''
-echo "=============================================="
-echo "Done: List Containers.                        "
-echo "=============================================="
-
-sleep 5
-
-clear
 
 # Set permissions on scst-files and cleanup staging area
 
