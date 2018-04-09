@@ -1,0 +1,5 @@
+rootfs/root/packages.sh
+rootfs/root/lxc-services.sh
+rootfs/etc/fstab
+rootfs/COPYING
+rootfs/GNU3
