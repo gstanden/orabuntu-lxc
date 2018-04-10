@@ -2418,36 +2418,44 @@ then
 	sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw8.sh
 	sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw9.sh
 	
-	echo ''
-	echo "=============================================="
-	echo "Unpack SCST Linux SAN Files...                "
-	echo "=============================================="
-	echo ''
+        echo ''
+        echo "=============================================="
+        echo "Unpack SCST Linux SAN Files...                "
+        echo "=============================================="
+        echo ''
 
-	sudo tar -xvf /opt/olxc/"$DistDir"/orabuntu/archives/scst-files.tar -C /opt/olxc --touch
-	sudo tar -xf  /opt/olxc/"$DistDir"/orabuntu/archives/tgt-files.tar  -C /opt/olxc --touch
-	sleep 2
-	if [ $Owner != 'ubuntu' ]
-	then
-		sudo mkdir -p /opt/olxc/"$DistDir"/orabuntu/archives/scst-files
-		sudo mkdir -p /opt/olxc/"$DistDir"/orabuntu/archives/tgt-files
-		sudo chown $Owner:$Group /opt/olxc/"$DistDir"/orabuntu/archives/scst-files
-		sudo chown $Owner:$Group /opt/olxc/"$DistDir"/orabuntu/archives/tgt-files
-		sudo cp /opt/olxc/home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/scst-files/* /opt/olxc/"$DistDir"/orabuntu/archives/scst-files/.
-		sudo cp /opt/olxc/home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/tgt-files/*  /opt/olxc/"$DistDir"/orabuntu/archives/tgt-files/.
-	fi
-        sudo chown -R $Owner:$Group		/opt/olxc/"$DistDir"/orabuntu/archives/.
-        sudo sed -i "s/SWITCH_IP/$Sw1Index/g"	/opt/olxc/"$DistDir"/orabuntu/archives/scst-files/create-scst-target.sh
-		
-	echo ''
-	echo "=============================================="
-	echo "Done: Unpack SCST Linux SAN Files.            "
-	echo "=============================================="
-	echo ''
+        sudo tar -xvf /opt/olxc/"$DistDir"/orabuntu/archives/scst-files.tar -C / --touch
 
-	sleep 5
+        sudo chown -R $Owner:$Group             /opt/olxc/home/scst-files/.
+        sudo sed -i "s/SWITCH_IP/$Sw1Index/g"   /opt/olxc/home/scst-files/create-scst-target.sh
 
-	clear
+        echo ''
+        echo "=============================================="
+        echo "Done: Unpack SCST Linux SAN Files.            "
+        echo "=============================================="
+        echo ''
+
+        sleep 5
+
+        clear
+
+        echo ''
+        echo "=============================================="
+        echo "Unpack TGT Linux SAN Files...                "
+        echo "=============================================="
+        echo ''
+
+        sudo tar -xvf /opt/olxc/"$DistDir"/orabuntu/archives/tgt-files.tar  -C / --touch
+
+        echo ''
+        echo "=============================================="
+        echo "Done: Unpack TGT Linux SAN Files.            "
+        echo "=============================================="
+        echo ''
+
+        sleep 5
+
+        clear
 
         echo ''
         echo "=============================================="

@@ -154,7 +154,10 @@ echo "    Patience at downloading packages !        "
 echo "=============================================="
 echo ''
 
-sleep 5
+sudo lxc-stop -n $NameServer
+sleep 2
+sudo lxc-start -n $NameServer
+sleep 3
 
 sudo lxc-create -n oel$OracleRelease$SeedPostfix -t oracle -- --release=$OracleVersion
 

@@ -726,10 +726,10 @@ then
                         if   [ $Ftype -eq 1 ]
                         then
                                 sudo lxc-stop -n $NameServer > /dev/null 2>&1
-                                sudo echo 'hub nameserver post-install snapshot' > snap-comment
-				sudo chown -R $Owner:$Group snap-comment
-                                sudo lxc-snapshot -n $NameServer -c snap-comment
-                                sudo rm -f snap-comment
+                                sudo echo 'hub nameserver post-install snapshot' > /home/$Owner/snap-comment
+				sudo chown -R $Owner:$Group /home/$Owner/snap-comment
+                                sudo lxc-snapshot -n $NameServer -c /home/$Owner/snap-comment
+                                sudo rm -f /home/$Owner/snap-comment
                                 sudo lxc-snapshot -n $NameServer -L -C
                                 sleep 5
                         fi
@@ -738,10 +738,10 @@ then
                 if [ $FileSystemTypeExt -eq 1 ]
                 then
                         sudo lxc-stop -n $NameServer > /dev/null 2>&1
-                        sudo echo 'hub nameserver post-install snapshot' > snap-comment
-			sudo chown -R $Owner:$Group snap-comment
-                        sudo lxc-snapshot -n $NameServer -c snap-comment
-                        sudo rm -f snap-comment
+                        sudo echo 'hub nameserver post-install snapshot' > /home/$Owner/snap-comment
+			sudo chown -R $Owner:$Group /home/$Owner/snap-comment
+                        sudo lxc-snapshot -n $NameServer -c /home/$Owner/snap-comment
+                        sudo rm -f /home/$Owner/snap-comment
                         sudo lxc-snapshot -n $NameServer -L -C
                         sleep 5
                 fi
