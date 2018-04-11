@@ -77,10 +77,56 @@ function GetLXCVersion {
 }
 LXCVersion=$(GetLXCVersion)
 
+function GetMultiHostVar1 {
+echo $MultiHost | cut -f1 -d':'
+}
+MultiHostVar1=$(GetMultiHostVar1)
+
+function GetMultiHostVar2 {
+echo $MultiHost | cut -f2 -d':'
+}
+MultiHostVar2=$(GetMultiHostVar2)
+
+function GetMultiHostVar3 {
+echo $MultiHost | cut -f3 -d':'
+}
+MultiHostVar3=$(GetMultiHostVar3)
+
+function GetMultiHostVar4 {
+echo $MultiHost | cut -f4 -d':'
+}
+MultiHostVar4=$(GetMultiHostVar4)
+
+function GetMultiHostVar5 {
+echo $MultiHost | cut -f5 -d':'
+}
+MultiHostVar5=$(GetMultiHostVar5)
+
+function GetMultiHostVar6 {
+echo $MultiHost | cut -f6 -d':'
+}
+MultiHostVar6=$(GetMultiHostVar6)
+
 function GetMultiHostVar7 {
-	echo $MultiHost | cut -f7 -d':'
+        echo $MultiHost | cut -f7 -d':'
 }
 MultiHostVar7=$(GetMultiHostVar7)
+
+function GetMultiHostVar8 {
+        echo $MultiHost | cut -f8 -d':'
+}
+MultiHostVar8=$(GetMultiHostVar8)
+
+function GetMultiHostVar9 {
+        echo $MultiHost | cut -f9 -d':'
+}
+MultiHostVar9=$(GetMultiHostVar9)
+
+function GetMultiHostVar10 {
+        echo $MultiHost | cut -f10 -d':'
+}
+MultiHostVar10=$(GetMultiHostVar10)
+GRE=$MultiHostVar10
 
 function CheckSystemdResolvedInstalled {
 	sudo netstat -ulnp | grep 53 | sed 's/  */ /g' | rev | cut -f1 -d'/' | rev | sort -u | grep systemd- | wc -l
@@ -154,10 +200,12 @@ echo "    Patience at downloading packages !        "
 echo "=============================================="
 echo ''
 
-sudo lxc-stop -n $NameServer
-sleep 2
-sudo lxc-start -n $NameServer
-sleep 3
+# GLS 20180410 
+# Band-aid needs better solution/root cause analysis.  HUB host DNS/DHCP LXC container picks up a "ghost" DHCP IP that has to be cleared by a stop/start before Oracle container comes up on GRE host.
+
+sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" lxc-stop -n $NameServer -k; sudo -S <<< "$MultiHostVar9" lxc-start -n $NameServer"
+
+sleep 5
 
 sudo lxc-create -n oel$OracleRelease$SeedPostfix -t oracle -- --release=$OracleVersion
 
@@ -410,6 +458,10 @@ echo "=============================================="
 echo "Starting LXC Seed Container for Oracle        "
 echo "=============================================="
 echo ''
+
+sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" lxc-stop -n $NameServer -k; sudo -S <<< "$MultiHostVar9" lxc-start -n $NameServer"
+
+sleep 5
 
 sudo sed -i 's/sw1/sx1/' /etc/network/if-up.d/openvswitch/oel$OracleRelease$SeedPostfix*
 sudo sed -i 's/sw1/sx1/' /etc/network/if-down.d/openvswitch/oel$OracleRelease$SeedPostfix*
