@@ -124,7 +124,7 @@ fi
 if [ -z $2 ]
 then
 	SPOKEIP='lan.ip.this.host'
- 	SPOKEIP=10.0.131.169
+ 	SPOKEIP=10.0.137.100
 else
 	SPOKEIP=$2
 fi
@@ -132,7 +132,7 @@ fi
 if [ -z $3 ]
 then
 	HUBIP='lan.ip.hub.host'
- 	HUBIP=10.0.141.117
+ 	HUBIP=10.0.135.113
 else
 	HUBIP=$3
 fi
