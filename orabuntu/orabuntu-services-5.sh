@@ -49,6 +49,17 @@ then
 	}
 	AWS=$(CheckAWS)
 fi
+
+function GetGroup {
+        id | cut -f2 -d' ' | cut -f2 -d'(' | cut -f1 -d')'
+}
+Group=$(GetGroup)
+
+function GetOwner {
+        id | cut -f1 -d' ' | cut -f2 -d'(' | cut -f1 -d')'
+}
+Owner=$(GetOwner)
+
 function GetUbuntuVersion {
 	cat /etc/lsb-release | grep DISTRIB_RELEASE | cut -f2 -d'='
 }
