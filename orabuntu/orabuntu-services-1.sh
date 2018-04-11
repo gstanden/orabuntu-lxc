@@ -2382,9 +2382,12 @@ then
 	sudo lxc-attach -n $NameServer -- tar -cvzPf /root/backup-lxc-container/$NameServer/updates/backup_"$NameServer"_ns_update.tar.gz /root/ns_backup_update.lst
  
         sudo tar -v --extract --file=/opt/olxc/"$DistDir"/orabuntu/archives/dns-dhcp-cont.tar -C / var/lib/lxc/nsa/rootfs/etc/systemd/system/dns-sync.service
+        sudo tar -v --extract --file=/opt/olxc/"$DistDir"/orabuntu/archives/dns-dhcp-cont.tar -C / var/lib/lxc/nsa/rootfs/etc/systemd/system/dns-thaw.service
         sudo mv /var/lib/lxc/nsa/rootfs/etc/systemd/system/dns-sync.service /var/lib/lxc/"$NameServer"-base/rootfs/etc/systemd/system/dns-sync.service
+        sudo mv /var/lib/lxc/nsa/rootfs/etc/systemd/system/dns-thaw.service /var/lib/lxc/"$NameServer"-base/rootfs/etc/systemd/system/dns-thaw.service
 
 	sudo lxc-attach -n $NameServer -- systemctl enable dns-sync
+	sudo lxc-attach -n $NameServer -- systemctl enable dns-thaw
         sudo lxc-attach -n $NameServer -- chown bind:bind /var/lib/bind/fwd.$Domain1
         sudo lxc-attach -n $NameServer -- chown bind:bind /var/lib/bind/rev.$Domain1
         sudo lxc-attach -n $NameServer -- chown bind:bind /var/lib/bind/fwd.$Domain2
