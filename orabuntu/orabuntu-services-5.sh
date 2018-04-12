@@ -234,7 +234,14 @@ then
                 	sudo sh -c "echo 'After=network-online.target'				>> /etc/systemd/system/$k.service"
                 	sudo sh -c "echo ''							>> /etc/systemd/system/$k.service"
                 	sudo sh -c "echo '[Service]'						>> /etc/systemd/system/$k.service"
-                	sudo sh -c "echo 'Type=oneshot'						>> /etc/systemd/system/$k.service"
+			
+			if [ $AWS -eq 1 ]
+			then
+                		sudo sh -c "echo 'Type=idle'					>> /etc/systemd/system/$k.service"
+			else
+                		sudo sh -c "echo 'Type=oneshot'					>> /etc/systemd/system/$k.service"
+			fi
+
                 	sudo sh -c "echo 'User=root'						>> /etc/systemd/system/$k.service"
                 	sudo sh -c "echo 'RemainAfterExit=yes'					>> /etc/systemd/system/$k.service"
                 	sudo sh -c "echo 'ExecStart=/etc/network/openvswitch/crt_ovs_$k.sh' 	>> /etc/systemd/system/$k.service"
