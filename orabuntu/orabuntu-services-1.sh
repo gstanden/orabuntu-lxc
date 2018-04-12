@@ -2191,7 +2191,14 @@ then
 		sudo sh -c "echo 'After=network-online.target sw1.service sx1.service'		>> /etc/systemd/system/$NameServer.service"
 		sudo sh -c "echo ''                                 				>> /etc/systemd/system/$NameServer.service"
 		sudo sh -c "echo '[Service]'                        				>> /etc/systemd/system/$NameServer.service"
-		sudo sh -c "echo 'Type=oneshot'                     				>> /etc/systemd/system/$NameServer.service"
+	
+		if [ $AWS -eq 1 ]
+		then
+			sudo sh -c "echo 'Type=idle'                   				>> /etc/systemd/system/$NameServer.service"
+		else
+			sudo sh -c "echo 'Type=oneshot'                   			>> /etc/systemd/system/$NameServer.service"
+		fi
+
 		sudo sh -c "echo 'User=root'                        				>> /etc/systemd/system/$NameServer.service"
 		sudo sh -c "echo 'RemainAfterExit=yes'              				>> /etc/systemd/system/$NameServer.service"
 		sudo sh -c "echo 'ExecStart=/etc/network/openvswitch/strt_$NameServer.sh start'	>> /etc/systemd/system/$NameServer.service"
