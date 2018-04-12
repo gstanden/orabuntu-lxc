@@ -202,8 +202,9 @@ echo ''
 
 # GLS 20180410 
 # Band-aid needs better solution/root cause analysis.  HUB host DNS/DHCP LXC container picks up a "ghost" DHCP IP that has to be cleared by a stop/start before Oracle container comes up on GRE host.
-
-sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" lxc-stop -n $NameServer -k; sudo -S <<< "$MultiHostVar9" lxc-start -n $NameServer"
+# GLS 20180412 
+# This is no longer needed.  Problem was the the lxc.net.ipv4 was commented out in the config for the nameserver which was causing DHCP addresses to be issued instead of static.
+# sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" lxc-stop -n $NameServer -k; sudo -S <<< "$MultiHostVar9" lxc-start -n $NameServer"
 
 sleep 5
 
@@ -459,7 +460,11 @@ echo "Starting LXC Seed Container for Oracle        "
 echo "=============================================="
 echo ''
 
-sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" lxc-stop -n $NameServer -k; sudo -S <<< "$MultiHostVar9" lxc-start -n $NameServer"
+# GLS 20180410 
+# Band-aid needs better solution/root cause analysis.  HUB host DNS/DHCP LXC container picks up a "ghost" DHCP IP that has to be cleared by a stop/start before Oracle container comes up on GRE host.
+# GLS 20180412 
+# This is no longer needed.  Problem was the the lxc.net.ipv4 was commented out in the config for the nameserver which was causing DHCP addresses to be issued instead of static.
+# sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" lxc-stop -n $NameServer -k; sudo -S <<< "$MultiHostVar9" lxc-start -n $NameServer"
 
 sleep 5
 

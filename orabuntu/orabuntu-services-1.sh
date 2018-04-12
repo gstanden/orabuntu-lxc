@@ -1397,7 +1397,6 @@ then
 			sudo sed -i "/nsa/s/nsa/$NameServerBase/g" 	/var/lib/lxc/nsa/rootfs/var/lib/bind/fwd.consultingcommandos.us
 			sudo sed -i "/nsa/s/nsa/$NameServerBase/g" 	/var/lib/lxc/nsa/rootfs/var/lib/bind/rev.consultingcommandos.us
 			sudo sed -i "/nsa/s/nsa/$NameServer/g" 		/var/lib/lxc/nsa/config
-			sudo sed -i "/ipv4/s/# //g"			/var/lib/lxc/nsa/config
 			sudo sed -i "/nsa/s/nsa/$NameServer/g" 		/var/lib/lxc/nsa/rootfs/etc/hostname
 			sudo sed -i "/nsa/s/nsa/$NameServer/g" 		/var/lib/lxc/nsa/rootfs/etc/hosts
 			sudo sed -i "/nsa/s/nsa/$NameServer/g" 		/var/lib/lxc/nsa/rootfs/root/crontab.txt
@@ -2237,6 +2236,11 @@ then
         sudo mkdir -p /home/$Owner/Manage-Orabuntu
         sudo chown $Owner:$Group /home/$Owner/Manage-Orabuntu
         sudo chmod 775 /opt/olxc/"$DistDir"/orabuntu/archives/nameserver_copy.sh
+
+	# GLS 20180411 Create the tar.gz of the source nameserver dynamically so that GRE hosts pick up all post-install nameserver configuration changes.
+
+	sshpass -p $MultiHostVar9 ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" echo '(Do NOT enter passwords...Wait...)'; echo ''; sudo -S <<< "$MultiHostVar9" lxc-stop -n $NameServerBase -k; sudo -S <<< "$MultiHostVar9" tar -P -czf ~/Manage-Orabuntu/"$NameServerBase".export."$HOSTNAME".tar.gz -T ~/Manage-Orabuntu/nameserver.lst --checkpoint=10000 --totals; sleep 2; sudo -S <<< "$MultiHostVar9" lxc-start -n $NameServerBase"
+
         /opt/olxc/"$DistDir"/orabuntu/archives/nameserver_copy.sh $MultiHostVar5 $MultiHostVar6 $MultiHostVar8 $MultiHostVar9 $NameServerBase
 
         echo ''
@@ -2589,12 +2593,12 @@ then
                 sshpass -p $MultiHostVar9 ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 date
                 if [ $? -eq 0 ]
                 then
-                  sshpass -p $MultiHostVar9 scp -p /etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh $MultiHostVar8@$MultiHostVar5:~/.
+                	sshpass -p $MultiHostVar9 scp -p /etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh $MultiHostVar8@$MultiHostVar5:~/.
                 fi
                 sshpass -p $MultiHostVar9 ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" ls -l ~/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh"
                 if [ $? -eq 0 ]
                 then
-                  sshpass -p $MultiHostVar9 ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" ~/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh"
+                	sshpass -p $MultiHostVar9 ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" ~/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh"
                 fi
 
                 echo ''

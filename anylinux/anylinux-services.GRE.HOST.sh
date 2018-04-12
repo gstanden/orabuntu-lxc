@@ -69,29 +69,6 @@ GRE=Y
 MTU=1420
 LOGEXT=`date +"%Y-%m-%d.%R:%S"`
 
-if [ ! -d "$DistDir"/installs/logs ]
-then
-	sudo mkdir -p "$DistDir"/installs/logs
-fi
-
-if [ -f "$DistDir"/installs/logs/$USER.log ]
-then
-	sudo mv "$DistDir"/installs/logs/$USER.log "$DistDir"/installs/logs/$USER.log.$LOGEXT
-fi
-
-if [ ! -d /var/log/sudo-io ]
-then
-	sudo mkdir -m 750 /var/log/sudo-io
-fi
-
-if [ ! -f /etc/sudoers.d/orabuntu-lxc ]
-then
-	sudo sh -c "echo 'Defaults      logfile=\"$DistDir/installs/logs/$USER.log\"'					>> /etc/sudoers.d/orabuntu-lxc"
-	sudo sh -c "echo 'Defaults      log_input,log_output'								>> /etc/sudoers.d/orabuntu-lxc"
-	sudo sh -c "echo 'Defaults      iolog_dir=/var/log/sudo-io/%{user}'						>> /etc/sudoers.d/orabuntu-lxc"
-	sudo chmod 0440 /etc/sudoers.d/orabuntu-lxc
-fi
-
 if [ -z $1 ]
 then	
 	echo ''
@@ -124,7 +101,7 @@ fi
 if [ -z $2 ]
 then
 	SPOKEIP='lan.ip.this.host'
- 	SPOKEIP=10.0.137.100
+ 	SPOKEIP=10.0.128.237
 else
 	SPOKEIP=$2
 fi
@@ -132,7 +109,7 @@ fi
 if [ -z $3 ]
 then
 	HUBIP='lan.ip.hub.host'
- 	HUBIP=10.0.135.113
+ 	HUBIP=10.0.137.100
 else
 	HUBIP=$3
 fi
@@ -184,6 +161,29 @@ function GetOwner {
         id | cut -f1 -d' ' | cut -f2 -d'(' | cut -f1 -d')'
 }
 Owner=$(GetOwner)
+
+if [ ! -d "$DistDir"/installs/logs ]
+then
+        sudo mkdir -p "$DistDir"/installs/logs
+fi
+
+if [ -f "$DistDir"/installs/logs/$USER.log ]
+then
+        sudo mv "$DistDir"/installs/logs/$USER.log "$DistDir"/installs/logs/$USER.log.$LOGEXT
+fi
+
+if [ ! -d /var/log/sudo-io ]
+then
+        sudo mkdir -m 750 /var/log/sudo-io
+fi
+
+if [ ! -f /etc/sudoers.d/orabuntu-lxc ]
+then
+        sudo sh -c "echo 'Defaults      logfile=\"$DistDir/installs/logs/$USER.log\"'   >> /etc/sudoers.d/orabuntu-lxc"
+        sudo sh -c "echo 'Defaults      log_input,log_output'                                                           >> /etc/sudoers.d/orabuntu-lxc"
+        sudo sh -c "echo 'Defaults      iolog_dir=/var/log/sudo-io/%{user}'                                             >> /etc/sudoers.d/orabuntu-lxc"
+        sudo chmod 0440 /etc/sudoers.d/orabuntu-lxc
+fi
 
 GetLinuxFlavors(){
 if   [[ -e /etc/oracle-release ]]
@@ -403,7 +403,8 @@ echo "=============================================="
 echo ''
 
 ssh-keygen -R $HUBIP
-sshpass -p $HubSudoPwd ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $HubUserAct@$HUBIP "sudo -S <<< "$HubSudoPwd" uname -a;echo '';sudo -S <<< "$HubSudoPwd" lxc-ls -f"
+echo ''
+sshpass -p $HubSudoPwd ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $HubUserAct@$HUBIP "sudo -S <<< "$HubSudoPwd" echo '(Do NOT enter password...Wait...)'; echo ''; uname -a; echo '';sudo -S <<< "$HubSudoPwd" lxc-ls -f"
 if [ $? -eq 0 ]
 then
 	echo ''
@@ -435,6 +436,8 @@ then
         else
                 MultiHost="$Operation:Y:X:X:$HUBIP:$SPOKEIP:$MTU:$HubUserAct:$HubSudoPwd:$GRE:$Product"
         fi
+
+	sleep 5
 
 	./anylinux-services.sh $MultiHost
 else
