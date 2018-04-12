@@ -304,9 +304,9 @@ do
 	
 	if [ $AWS -eq 1 ]
 	then
-		sudo sh -c "echo 'Type=oneshot'									>> /etc/systemd/system/$ContainerPrefix$CloneIndex.service"
-	else
 		sudo sh -c "echo 'Type=idle'									>> /etc/systemd/system/$ContainerPrefix$CloneIndex.service"
+	else
+		sudo sh -c "echo 'Type=oneshot'									>> /etc/systemd/system/$ContainerPrefix$CloneIndex.service"
 	fi
 
 	sudo sh -c "echo 'User=root'                                                    			>> /etc/systemd/system/$ContainerPrefix$CloneIndex.service"
