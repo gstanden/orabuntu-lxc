@@ -1397,6 +1397,7 @@ then
 			sudo sed -i "/nsa/s/nsa/$NameServerBase/g" 	/var/lib/lxc/nsa/rootfs/var/lib/bind/fwd.consultingcommandos.us
 			sudo sed -i "/nsa/s/nsa/$NameServerBase/g" 	/var/lib/lxc/nsa/rootfs/var/lib/bind/rev.consultingcommandos.us
 			sudo sed -i "/nsa/s/nsa/$NameServer/g" 		/var/lib/lxc/nsa/config
+			sudo sed -i "/ipv4/s/# //g"			/var/lib/lxc/nsa/config
 			sudo sed -i "/nsa/s/nsa/$NameServer/g" 		/var/lib/lxc/nsa/rootfs/etc/hostname
 			sudo sed -i "/nsa/s/nsa/$NameServer/g" 		/var/lib/lxc/nsa/rootfs/etc/hosts
 			sudo sed -i "/nsa/s/nsa/$NameServer/g" 		/var/lib/lxc/nsa/rootfs/root/crontab.txt
