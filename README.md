@@ -1,3 +1,11 @@
+## Update April 2018
+
+Please visit the wiki here:
+
+https://github.com/gstanden/orabuntu-lxc/wiki/Amazon-(AWS)-HUB-EC2-Host
+
+to learn about AWS EC2 MultiHost Edition for LXC and Docker on OpenvSwitch networks new in v6.11.1-beta AMIDE release.
+
 # What is Orabuntu-LXC v6.0-beta AMIDE Edition ?
 
 Orabuntu-LXC v6.0-beta AMIDE Edition stands for "Amazon Mult-I-host Docker Enterprise" Edition.  
