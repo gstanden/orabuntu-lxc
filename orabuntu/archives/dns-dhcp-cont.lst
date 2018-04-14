@@ -6,7 +6,6 @@
 /var/lib/lxc/nsa/rootfs/etc/default/isc-dhcp-server
 /var/lib/lxc/nsa/rootfs/etc/dhcp/dhcpd.conf
 /var/lib/lxc/nsa/rootfs/etc/network/interfaces
-/var/lib/lxc/nsa/rootfs/etc/rc.local
 /var/lib/lxc/nsa/rootfs/etc/systemd/system/dns-sync.service
 /var/lib/lxc/nsa/rootfs/etc/systemd/system/dns-thaw.service
 /var/lib/lxc/nsa/rootfs/root/crontab.txt
