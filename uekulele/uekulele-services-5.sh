@@ -119,6 +119,11 @@ function CheckNameServerExists {
 }
 NameServerExists=$(CheckNameServerExists)
 
+function GetShortHost {
+        uname -n | cut -f1 -d'.'
+}
+ShortHost=$(GetShortHost)
+	
 GetLinuxFlavors(){
 if   [[ -e /etc/oracle-release ]]
 then
@@ -526,7 +531,7 @@ then
 	echo ''
 
         sudo touch /etc/orabuntu-lxc-release
-        sudo sh -c "echo 'Orabuntu-LXC v6.11.0-beta AMIDE' > /etc/orabuntu-lxc-release"
+        sudo sh -c "echo 'Orabuntu-LXC v6.11.2-beta AMIDE' > /etc/orabuntu-lxc-release"
 	sudo ls -l /etc/orabuntu-lxc-release
 	echo ''
 	sudo cat /etc/orabuntu-lxc-release
@@ -598,7 +603,7 @@ then
 	        clear
 	
 	        function GetMtuLocal {
-	                ifconfig | grep mtu | grep $MultiHostVar7 | cut -f1,5 -d' ' | sed 's/  *//g' | sed 's/$/ /' | tr -d '\n'
+	                sudo ifconfig | grep mtu | grep $MultiHostVar7 | cut -f1,5 -d' ' | sed 's/  *//g' | sed 's/$/ /' | tr -d '\n'
 	        }
 	        MtuLocal=$(GetMtuLocal)
 	
@@ -643,63 +648,58 @@ then
 	        sleep 5
 	
 	        clear
-	fi
 	
-	function GetShortHost {
-	        uname -n | cut -f1 -d'.'
-	}
-	ShortHost=$(GetShortHost)
+		nslookup -timeout=1 $HOSTNAME.$Domain1 > /dev/null 2>&1
+		if [ $? -eq 1 ]
+		then
+		        echo ''
+		        echo "=============================================="
+		        echo "Create ADD DNS $ShortHost.$Domain1            "
+		        echo "=============================================="
+		        echo ''
 	
-	nslookup -timeout=1 $HOSTNAME.$Domain1 > /dev/null 2>&1
-	if [ $? -eq 1 ]
-	then
-	        echo ''
-	        echo "=============================================="
-	        echo "Create ADD DNS $ShortHost.$Domain1            "
-	        echo "=============================================="
-	        echo ''
+		        ssh-keygen -R 10.207.39.2
+		        sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.39.2 "sudo -S <<< "ubuntu" mkdir -p ~/Downloads"
+		        sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.39.2 "sudo -S <<< "ubuntu" chown ubuntu:ubuntu Downloads"
+		        sshpass -p ubuntu scp    -o CheckHostIP=no -o StrictHostKeyChecking=no -p /etc/network/openvswitch/nsupdate_domain1_add_$ShortHost.sh ubuntu@10.207.39.2:~/Downloads/.
+		        sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.39.2 "sudo -S <<< "ubuntu" ~/Downloads/nsupdate_domain1_add_$ShortHost.sh"
 	
-	        ssh-keygen -R 10.207.39.2
-	        sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.39.2 "sudo -S <<< "ubuntu" mkdir -p ~/Downloads"
-	        sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.39.2 "sudo -S <<< "ubuntu" chown ubuntu:ubuntu Downloads"
-	        sshpass -p ubuntu scp    -o CheckHostIP=no -o StrictHostKeyChecking=no -p /etc/network/openvswitch/nsupdate_domain1_add_$ShortHost.sh ubuntu@10.207.39.2:~/Downloads/.
-	        sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.39.2 "sudo -S <<< "ubuntu" ~/Downloads/nsupdate_domain1_add_$ShortHost.sh"
+		        echo ''
+		        echo "=============================================="
+		        echo "Done: Create ADD DNS $ShortHost.$Domain1      "
+		        echo "=============================================="
+		        echo ''
+		
+		        sleep 5
+		
+		        clear
+		fi
 	
-	        echo ''
-	        echo "=============================================="
-	        echo "Done: Create ADD DNS $ShortHost.$Domain1      "
-	        echo "=============================================="
-	        echo ''
+		nslookup -timeout=1 $HOSTNAME.$Domain2 > /dev/null 2>&1
+		if [ $? -eq 1 ]
+		then
+		        echo ''
+		        echo "=============================================="
+		        echo "Create ADD DNS $ShortHost.$Domain2            "
+		        echo "=============================================="
+		        echo ''
 	
-	        sleep 5
+		        ssh-keygen -R 10.207.29.2
+		        sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.29.2 "sudo -S <<< "ubuntu" mkdir -p ~/Downloads"
+		        sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.29.2 "sudo -S <<< "ubuntu" chown ubuntu:ubuntu Downloads"
+		        sshpass -p ubuntu scp    -o CheckHostIP=no -o StrictHostKeyChecking=no -p /etc/network/openvswitch/nsupdate_domain2_add_$ShortHost.sh ubuntu@10.207.29.2:~/Downloads/.
+		        sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.29.2 "sudo -S <<< "ubuntu" ~/Downloads/nsupdate_domain2_add_$ShortHost.sh"
+		
+		        echo ''
+		        echo "=============================================="
+		        echo "Done: Create ADD DNS $ShortHost.$Domain2      "
+		        echo "=============================================="
+		        echo ''
 	
-	        clear
-	fi
+		        sleep 5
 	
-	nslookup -timeout=1 $HOSTNAME.$Domain2 > /dev/null 2>&1
-	if [ $? -eq 1 ]
-	then
-	        echo ''
-	        echo "=============================================="
-	        echo "Create ADD DNS $ShortHost.$Domain2            "
-	        echo "=============================================="
-	        echo ''
-	
-	        ssh-keygen -R 10.207.29.2
-	        sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.29.2 "sudo -S <<< "ubuntu" mkdir -p ~/Downloads"
-	        sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.29.2 "sudo -S <<< "ubuntu" chown ubuntu:ubuntu Downloads"
-	        sshpass -p ubuntu scp    -o CheckHostIP=no -o StrictHostKeyChecking=no -p /etc/network/openvswitch/nsupdate_domain2_add_$ShortHost.sh ubuntu@10.207.29.2:~/Downloads/.
-	        sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.29.2 "sudo -S <<< "ubuntu" ~/Downloads/nsupdate_domain2_add_$ShortHost.sh"
-	
-	        echo ''
-	        echo "=============================================="
-	        echo "Done: Create ADD DNS $ShortHost.$Domain2      "
-	        echo "=============================================="
-	        echo ''
-	
-	        sleep 5
-	
-	        clear
+		        clear
+		fi
 	fi
 	
 	if   [ $SystemdResolvedInstalled -ge 1 ]
@@ -800,9 +800,9 @@ then
 
 				if [ $Release -ge 7 ]
 				then
-                                	echo 'hub nameserver post-install snapshot' > snap-comment
-                                	sudo lxc-snapshot -n $NameServer -c snap-comment
-                                	sudo rm -f snap-comment
+                                	echo 'hub nameserver post-install snapshot' > /home/$Owner/snap-comment
+                                	sudo lxc-snapshot -n $NameServer -c /home/$Owner/snap-comment
+                                	sudo rm -f /home/$Owner/snap-comment
                                 	sudo lxc-snapshot -n $NameServer -L -C
                                 	sleep 5
 				fi
@@ -813,14 +813,14 @@ then
                 then
                 	sudo lxc-stop -n $NameServer    > /dev/null 2>&1
 
-                        if [ $LinuxFlavor = 'CentOS' ]
+                        if [ $LinuxFlavor = 'CentOS' ] || [ $LinuxFlavor = 'Red' ]
                         then
                                 if   [ $Release -ge 7 ]
                                 then
 					sudo lxc-stop -n $NameServer
-                        		echo 'HUB nameserver post-install snapshot' > snap-comment
-                        		sudo lxc-snapshot -n $NameServer -c snap-comment
-                        		sudo rm -f snap-comment
+                        		echo 'HUB nameserver post-install snapshot' > /home/$Owner/snap-comment
+                        		sudo lxc-snapshot -n $NameServer -c /home/$Owner/snap-comment
+                        		sudo rm -f /home/$Owner/snap-comment
                         		sudo lxc-snapshot -n $NameServer -L -C
 					sudo lxc-start -n $NameServer
 
@@ -839,9 +839,9 @@ then
                                 if   [ $Release -ge 7 ]
                                 then
 					sudo lxc-stop -n $NameServer
-                        		echo 'HUB nameserver post-install snapshot' > snap-comment
-                        		sudo lxc-snapshot -n $NameServer -c snap-comment
-                        		sudo rm -f snap-comment
+                        		echo 'HUB nameserver post-install snapshot' > /home/$Owner/snap-comment
+                        		sudo lxc-snapshot -n $NameServer -c /home/$Owner/snap-comment
+                        		sudo rm -f /home/$Owner/snap-comment
                         		sudo lxc-snapshot -n $NameServer -L -C
 					sudo lxc-start -n $NameServer
 
@@ -858,14 +858,14 @@ then
 
                 if [ $FileSystemTypeBtrfs -eq 1 ]
                 then
-			if [ $LinuxFlavor = 'CentOS' ]
+			if [ $LinuxFlavor = 'CentOS' ] || [ $LinuxFlavor = 'Red' ]
 			then
 				if [ $Release -eq 7 ]
 				then
 					sudo lxc-stop -n $NameServer
-                       			echo 'HUB nameserver post-install snapshot' > snap-comment
-                       			sudo lxc-snapshot -n $NameServer -c snap-comment
-                       			sudo rm -f snap-comment
+                       			echo 'HUB nameserver post-install snapshot' > /home/$Owner/snap-comment
+                       			sudo lxc-snapshot -n $NameServer -c /home/$Owner/snap-comment
+                       			sudo rm -f /home/$Owner/snap-comment
                        			sudo lxc-snapshot -n $NameServer -L -C
 					sudo lxc-start -n $NameServer
 
@@ -884,9 +884,9 @@ then
 				if [ $Release -eq 7 ]
 				then
 					sudo lxc-stop -n $NameServer
-                       			echo 'HUB nameserver post-install snapshot' > snap-comment
-                       			sudo lxc-snapshot -n $NameServer -c snap-comment
-                       			sudo rm -f snap-comment
+                       			echo 'HUB nameserver post-install snapshot' > /home/$Owner/snap-comment
+                       			sudo lxc-snapshot -n $NameServer -c /home/$Owner/snap-comment
+                       			sudo rm -f /home/$Owner/snap-comment
                        			sudo lxc-snapshot -n $NameServer -L -C
 					sudo lxc-start -n $NameServer
 

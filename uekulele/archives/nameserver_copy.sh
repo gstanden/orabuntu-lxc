@@ -83,7 +83,7 @@ echo "Nameserver rsync...                           "
 echo "=============================================="
 echo ''
 
-rsync -XhP --rsh="sshpass -p $MultiHostVar9 ssh -l $MultiHostVar8" $MultiHostVar5:~/Manage-Orabuntu/$NameServer.tar.gz ~/Manage-Orabuntu/.
+rsync -XhP --rsh="sshpass -p $MultiHostVar9 ssh -l $MultiHostVar8" $MultiHostVar5:~/Manage-Orabuntu/"$NameServer".export."$HOSTNAME".tar.gz ~/Manage-Orabuntu/.
 
 echo ''
 echo "=============================================="

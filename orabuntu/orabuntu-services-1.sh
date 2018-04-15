@@ -144,6 +144,11 @@ function CheckSystemdResolvedInstalled {
 }
 SystemdResolvedInstalled=$(CheckSystemdResolvedInstalled)
 
+function CheckNetworkManagerRunning {
+        ps -ef | grep NetworkManager | grep -v grep | wc -l
+}
+NetworkManagerRunning=$(CheckNetworkManagerRunning)
+
 GetLinuxFlavors(){
 if   [[ -e /etc/oracle-release ]]
 then
@@ -444,7 +449,7 @@ then
 		done
 
 		sudo apt-get -y purge lxc lxc-common lxc-templates lxc1 lxcfs python3-lxc liblxc1 dnsmasq
-		sudo mv /etc/resolv.conf.orabuntu-lxc.original.* /etc/resolv.conf
+		sudo mv /etc/resolv.conf.orabuntu-lxc.original /etc/resolv.conf
 	
 		echo ''
 		echo "=============================================="
@@ -1435,15 +1440,19 @@ then
 			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/var/lib/bind/fwd.orabuntu-lxc.com
 			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/var/lib/bind/rev.orabuntu-lxc.com
 			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/etc/resolv.conf
+			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /etc/resolv.conf
+			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /etc/network/openvswitch/crt_ovs_sw1.sh
+
 			if [ $NetworkManagerInstalled -eq 1 ]
 			then
 				sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /etc/NetworkManager/dnsmasq.d/local
 			fi
-			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /etc/network/openvswitch/crt_ovs_sw1.sh
+
 			if [ $SystemdResolvedInstalled -gt 0 ]
 			then
 				sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /etc/systemd/resolved.conf > /dev/null 2>&1
 			fi
+
 #			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /run/systemd/resolve/stub-resolv.conf
 			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/etc/bind/named.conf.local
 			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/etc/dhcp/dhcpd.conf
@@ -1460,15 +1469,20 @@ then
 			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /var/lib/lxc/$NameServer/rootfs/var/lib/bind/fwd.consultingcommandos.us
 			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /var/lib/lxc/$NameServer/rootfs/var/lib/bind/rev.consultingcommandos.us
 			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /var/lib/lxc/$NameServer/rootfs/etc/resolv.conf
+			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /etc/resolv.conf
+			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /etc/network/openvswitch/crt_ovs_sw1.sh
+
+
 			if [ $NetworkManagerInstalled -eq 1 ]
 			then
 				sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /etc/NetworkManager/dnsmasq.d/local
 			fi
-			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /etc/network/openvswitch/crt_ovs_sw1.sh
+
 			if [ $SystemdResolvedInstalled -gt 0 ]
 			then
 				sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /etc/systemd/resolved.conf > /dev/null 2>&1
 			fi
+
 #			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /run/systemd/resolve/stub-resolv.conf
 			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /var/lib/lxc/$NameServer/rootfs/etc/bind/named.conf.local
 			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /var/lib/lxc/$NameServer/rootfs/etc/dhcp/dhcpd.conf
@@ -1483,6 +1497,15 @@ then
 			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /etc/systemd/resolved.conf
 			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /etc/systemd/resolved.conf
 	fi
+
+	# Cleanup duplicate search lines in /etc/resolv.conf if Orabuntu-LXC has been re-run
+	if [ $NetworkManagerInstalled -eq 1 ]
+	then
+		sudo sed -i '$!N; /^\(.*\)\n\1$/!P; D'	/etc/resolv.conf
+	fi
+
+	if [ $UbuntuVersion != '16.04' ]
+	then
 
 	# Cleanup duplicate search lines in /etc/resolv.conf if Orabuntu-LXC has been re-run
 	if [ $NetworkManagerInstalled -eq 1 ]
@@ -1561,166 +1584,171 @@ sleep 5
 
 clear
 
-# if [ $UbuntuVersion = '16.04' ] && [ $SystemdResolvedInstalled -eq 0 ] && [ $MultiHostVar1 = 'new' ] && [ $MultiHostVar2 = 'N' ]
-
-if [ $UbuntuVersion = '16.04' ] && [ $SystemdResolvedInstalled -eq 0 ]
+if [ $SystemdResolvedInstalled -eq 0 ]
 then
-	echo ''
-	echo "=============================================="
-	echo "Configure DNS (dnsmasq)                       "
-	echo "=============================================="
-	echo ''
-	echo "=============================================="
-	echo "Display original /etc/resolv.conf...          "
-	echo "=============================================="
-	echo ''
-
-	sudo cat /etc/resolv.conf
-
-	function GetOriginalNameServers {
-		cat /etc/resolv.conf  | grep nameserver | tr -d '\n' | sed 's/nameserver//g' | sed 's/^[ \t]*//;s/[ \t]*$//' | sed 's/  */ /g'
-	}
-	OriginalNameServers=$(GetOriginalNameServers)
-
-	function GetOriginalSearchDomains {
-		cat /etc/resolv.conf  | grep search | sed 's/  */ /g' | sed 's/search //g'
-	}
-	OriginalSearchDomains=$(GetOriginalSearchDomains)
-
-	echo ''
-	echo "=============================================="
-	echo "Done: Display original /etc/resolv.conf.      "
-	echo "=============================================="
-	echo ''
-	echo "=============================================="
-	echo "Install and Configure dnsmasq...              "
-	echo "=============================================="
-	echo ''
-
-	sudo dpkg --configure -a
-	sudo apt-get -y install dnsmasq
-	sudo service dnsmasq stop
-	sleep 5
-
-        function CheckSearchDomain1 {
-                grep -c $Domain1 /etc/resolv.conf
-        }
-        SearchDomain1=$(CheckSearchDomain1)
-
-        function CheckServerDomain1 {
-                grep -c $Domain1 /etc/dnsmasq.conf
-        }
-        ServerDomain1=$(CheckServerDomain1)
-
-        function CheckServerDomain2 {
-                grep -c $Domain2 /etc/dnsmasq.conf
-        }
-        ServerDomain2=$(CheckServerDomain2)
-
-        function CheckCacheSizeDnsmasq {
-                grep -c cache-size=0 /etc/dnsmasq.conf
-        }
-        CacheSizeDnsmasq=$(CheckCacheSizeDnsmasq)
-
-	for j in $OriginalNameServers
-	do
-		for i in $OriginalSearchDomains
-		do
-			function CountOriginalSearchDomainsDnsmasq {
-				grep -c $j /etc/dnsmasq.conf
-			}
-			OriginalSearchDomainsDnsmasq=$(CountOriginalSearchDomainsDnsmasq)
-		
-			if [ $OriginalSearchDomainsDnsmasq -eq 0 ]
-			then	
-				sudo sh -c "echo 'server=/$i/$j' >> /etc/dnsmasq.conf"
-			fi
-		done
-	done
-
-	if [ $ServerDomain1 -eq 0 ]
+	if [ $GRE = 'Y' ] || [ $MultiHostVar2 = 'N' ]
 	then
-        	sudo sh -c "echo 'server=/$Domain1/10.207.39.2'                 >> /etc/dnsmasq.conf"
-        	sudo sh -c "echo 'server=/39.207.10.in-addr.arpa/10.207.39.2'   >> /etc/dnsmasq.conf"
-		sudo sh -c "echo 'server=/gns1.$Domain1/10.207.39.2'            >> /etc/dnsmasq.conf"
-	fi
+		echo ''
+		echo "=============================================="
+		echo "Configure DNS (dnsmasq)                       "
+		echo "=============================================="
+		echo ''
+		echo "=============================================="
+		echo "Display original /etc/resolv.conf...          "
+		echo "=============================================="
+		echo ''
 
-	if [ $ServerDomain2 -eq 0 ]
-	then
-        	sudo sh -c "echo 'server=/$Domain2/10.207.29.2'                 >> /etc/dnsmasq.conf"
-        	sudo sh -c "echo 'server=/29.207.10.in-addr.arpa/10.207.29.2'   >> /etc/dnsmasq.conf"
-        fi
+		sudo cat /etc/resolv.conf
 
-	if [ $CacheSizeDnsmasq -eq 0 ]
-	then
-		sudo sh -c "echo 'cache-size=0'					>> /etc/dnsmasq.conf"
-	fi
+                if [ ! -f /etc/resolv.conf.orabuntu-lxc.original ]
+                then
+                        function GetOriginalNameServers {
+                                cat /etc/resolv.conf  | grep nameserver | tr -d '\n' | sed 's/nameserver//g' | sed 's/^[ \t]*//;s/[ \t]*$//' | sed 's/  */ /g'
+                        }
+                        OriginalNameServers=$(GetOriginalNameServers)
+
+                        function GetOriginalSearchDomains {
+                                cat /etc/resolv.conf  | grep search | sed 's/  */ /g' | sed 's/search //g'
+                        }
+                        OriginalSearchDomains=$(GetOriginalSearchDomains)
+                else
+                        function GetOriginalNameServers {
+                                cat /etc/resolv.conf.orabuntu-lxc.original  | grep nameserver | tr -d '\n' | sed 's/nameserver//g' | sed 's/^[ \t]*//;s/[ \t]*$//' | sed 's/  */ /g'
+                        }
+                        OriginalNameServers=$(GetOriginalNameServers)
+
+                        function GetOriginalSearchDomains {
+                                cat /etc/resolv.conf.orabuntu-lxc.original  | grep search | sed 's/  */ /g' | sed 's/search //g'
+                        }
+                        OriginalSearchDomains=$(GetOriginalSearchDomains)
+                fi
+
+		echo ''
+		echo "=============================================="
+		echo "Done: Display original /etc/resolv.conf.      "
+		echo "=============================================="
+		echo ''
+		echo "=============================================="
+		echo "Install and Configure dnsmasq...              "
+		echo "=============================================="
+		echo ''
+
+                if [ $NetworkManagerRunning -ge 1 ]
+                then
+		function CheckSearchDomain1 {
+		        grep -c $Domain1 /etc/resolv.conf
+		}
+		SearchDomain1=$(CheckSearchDomain1)
+
+		function CheckServerDomain1 {
+		        grep -c $Domain1 /etc/dnsmasq.conf
+		}
+		ServerDomain1=$(CheckServerDomain1)
+
+		function CheckServerDomain2 {
+		        grep -c $Domain2 /etc/dnsmasq.conf
+		}
+		ServerDomain2=$(CheckServerDomain2)
+
+		function CheckCacheSizeDnsmasq {
+		        grep -c cache-size /etc/dnsmasq.conf
+		}
+		CacheSizeDnsmasq=$(CheckCacheSizeDnsmasq)
+
+                sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g"                 /etc/dnsmasq.conf
+                sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g"     /etc/dnsmasq.conf
+
+                if [ $CacheSizeDnsmasq -gt 0 ]
+                then
+                        sudo sed -i 's,^\(cache-size[ ]*=\).*,\1'0',g'                          /etc/dnsmasq.conf
+                else
+                        sudo sh -c "echo 'cache-size=0'                                      >> /etc/dnsmasq.conf"
+                fi
+
+                if [ $NetworkManagerRunning -ge 1 ]
+                then
+                        sudo service NetworkManager restart
+                        sleep 5
+                fi
+
+		if [ $UbuntuMajorVersion -ge 16 ]
+		then
+			sudo systemctl daemon-reload
+		fi
+
+                sudo rm -f /etc/resolv.conf
+                sudo sh -c "echo 'nameserver 127.0.0.1' >                                               /etc/resolv.conf"
+                sudo sh -c "echo 'search $Domain1 $Domain2 gns1.$Domain1 $OriginalSearchDomains' >>     /etc/resolv.conf"
+		sudo cp -p /etc/resolv.conf /etc/resolv.conf.olxc
+
+                for j in $OriginalNameServers
+                do
+                        for i in $OriginalSearchDomains
+                        do
+                                function CountOriginalSearchDomainsDnsmasq {
+                                        grep -c $j /etc/dnsmasq.conf
+                                }
+                                OriginalSearchDomainsDnsmasq=$(CountOriginalSearchDomainsDnsmasq)
+
+                                if [ $OriginalSearchDomainsDnsmasq -eq 0 ]
+                                then  
+                                        sudo sh -c "echo 'server=/$i/$j' >> /etc/dnsmasq.conf"
+                                fi
+                        done
+                done
+
+		if [ $ServerDomain1 -eq 0 ]
+		then
+       		 	sudo sh -c "echo 'server=/$Domain1/10.207.39.2'                 >> /etc/dnsmasq.conf"
+       		 	sudo sh -c "echo 'server=/39.207.10.in-addr.arpa/10.207.39.2'   >> /etc/dnsmasq.conf"
+			sudo sh -c "echo 'server=/gns1.$Domain1/10.207.39.2'            >> /etc/dnsmasq.conf"
+		fi
+
+		if [ $ServerDomain2 -eq 0 ]
+		then
+       		 	sudo sh -c "echo 'server=/$Domain2/10.207.29.2'                 >> /etc/dnsmasq.conf"
+       		 	sudo sh -c "echo 'server=/29.207.10.in-addr.arpa/10.207.29.2'   >> /etc/dnsmasq.conf"
+		fi
+
+		if [ $CacheSizeDnsmasq -eq 0 ]
+		then
+			sudo sh -c "echo 'cache-size=0'					>> /etc/dnsmasq.conf"
+		fi
 	
-	sudo systemctl enable dnsmasq
+		sudo service dnsmasq start
 
-	sudo service dnsmasq start
+                if   [ $UbuntuMajorVersion -ge 16 ]
+                then
+                        sudo systemctl enable dnsmasq
+                else
+                        sudo chkconfig dnsmasq on
+                fi
 
-	if [ -f /etc/resolv.conf.orabuntu-lxc.original.* ]
-	then	
-               	function GetExistingSearchDomains {
-                       	cat /etc/resolv.conf.orabuntu-lxc.original.* | grep search | cut -f2-10 -d' '
-               	}
-               	ExistingSearchDomains=$(GetExistingSearchDomains)
-	else
-               	function GetExistingSearchDomains {
-                       	cat /etc/resolv.conf | grep search | sed 's/  */ /g' | grep -v "$Domain1" | cut -f2-100 -d' '
-               	}
-               	ExistingSearchDomains=$(GetExistingSearchDomains)
-	fi
-
-	if [ $AWS -eq 1 ]
-        then
 		sudo sed -i '/#/d'										/etc/resolv.conf
-                sudo sed -i '/search/d' 									/etc/resolv.conf
+		sudo sed -i '/search/d' 									/etc/resolv.conf
 		sudo sed -i '/127.0.0.1/!s/nameserver/# nameserver/g'   					/etc/resolv.conf
 		sudo sh  -c "echo 'nameserver 127.0.0.1' 							>> /etc/resolv.conf"
-                sudo sh  -c "echo 'search $ExistingSearchDomains $Domain1 $Domain2 gns1.$Domain1' 		>> /etc/resolv.conf"
-		sudo sed -i "/supersede domain-name/c\append domain-name \" $Domain1 $Domain2 gns1.$Domain1\"" /etc/dhcp/dhclient.conf
+		sudo sh  -c "echo 'search $ExistingSearchDomains $Domain1 $Domain2 gns1.$Domain1' 		>> /etc/resolv.conf"
+		sudo sed -i "/supersede domain-name/c\append domain-name \" $Domain1 $Domain2 gns1.$Domain1\""  /etc/dhcp/dhclient.conf
+		sudo sed -i "/prepend domain-name-servers/s/#//"  						/etc/dhcp/dhclient.conf
 		sudo sed -i '/8.8.8.8/d' 									/etc/resolv.conf
 		sudo sed -i '$!N; /^\(.*\)\n\1$/!P; D'  							/etc/resolv.conf
-        fi
 
-        if [ $AWS -eq 0 ] && [ $SearchDomain1 -eq 0 ]
-        then
-                sudo sed -i '/search/d' 									/etc/resolv.conf
-		sudo sed -i '/127.0.0.1/!s/nameserver/# nameserver/g'   					/etc/resolv.conf
-                sudo sh -c "echo 'search $Domain1 $Domain2 gns1.$Domain1' >> 					/etc/resolv.conf"
-		sudo sed -i "/supersede domain-name/c\append domain-name \" $Domain1 $Domain2 gns1.$Domain1\"" 	/etc/dhcp/dhclient.conf
-                sudo sed -i "/prepend domain-name-servers/s/#//"  						/etc/dhcp/dhclient.conf
-		sudo sed -i '$!N; /^\(.*\)\n\1$/!P; D'  							/etc/resolv.conf
-        fi
+                echo ''
+                sleep 2
+                nslookup $NameServer
+                ping -c 3 $NameServer
 
+                echo ''
+                echo "=============================================="
+                echo "Done: Configure NetworkManager with dnsmasq.  "
+                echo "=============================================="
+                echo ''
 
-	echo ''	
-	echo "=============================================="
-	echo "Done: Install and Configure dnsmasq           "
-	echo "=============================================="
-	echo ''
-	echo "=============================================="
-	echo "Display dnsmasq /etc/resolv.conf...           "
-	echo "=============================================="
-	echo ''
+		sleep 5
 
-	sudo cat /etc/resolv.conf
-	sleep 5
-
-	echo ''
-	echo "=============================================="
-	echo "Done: Display dnsmasq /etc/resolv.conf        "
-	echo "=============================================="
-	echo ''
-	echo "=============================================="
-	echo "Done: Configure /etc/dhcp/dhclient.conf       "
-	echo "=============================================="
-
-	sleep 5
-
-	clear
+		clear
+	fi
 fi
 
 sudo chmod 755 /etc/network/openvswitch/*.sh
@@ -1749,6 +1777,8 @@ then
         done
 
         echo ''
+        echo "=============================================="
+        echo "Get sw1 IP address.                           "
         echo "=============================================="
         echo "Get sw1 IP address.                           "
         echo "=============================================="
@@ -2237,7 +2267,8 @@ then
         sudo chown $Owner:$Group /home/$Owner/Manage-Orabuntu
         sudo chmod 775 /opt/olxc/"$DistDir"/orabuntu/archives/nameserver_copy.sh
 
-	# GLS 20180411 Create the tar.gz of the source nameserver dynamically so that GRE hosts pick up all post-install nameserver configuration changes.
+        # GLS 20180411 Create the tar.gz of the source nameserver dynamically so that GRE hosts pick up all post-install nameserver configuration changes including gre_hosts.txt and new_gre_host.txt file.
+        # GLS 20180414 The gre_hosts.txt and new_gre_host.txt files have also been added to the nameserver.lst file so that they are shipped with NS updates so that replicas NS can become master NS.
 
 	sshpass -p $MultiHostVar9 ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" echo '(Do NOT enter passwords...Wait...)'; echo ''; sudo -S <<< "$MultiHostVar9" lxc-stop -n $NameServerBase -k; sudo -S <<< "$MultiHostVar9" tar -P -czf ~/Manage-Orabuntu/"$NameServerBase".export."$HOSTNAME".tar.gz -T ~/Manage-Orabuntu/nameserver.lst --checkpoint=10000 --totals; sleep 2; sudo -S <<< "$MultiHostVar9" lxc-start -n $NameServerBase"
 
@@ -2389,9 +2420,25 @@ then
 	sudo sed -i "s/Owner=ubuntu/Owner=amide/"	/var/lib/lxc/"$NameServer"-base/rootfs/root/ns_backup_update.sh
 	sudo sed -i "s/Pass=ubuntu/Pass=$password/"	/var/lib/lxc/"$NameServer"-base/rootfs/root/ns_backup_update.sh
 
+        echo ''
+        echo "=============================================="
+        echo "Create amide user ...                         "
+        echo "=============================================="
+        echo ''
+
  	sudo useradd -m -p $(openssl passwd -1 ${PASSWORD}) -s /bin/bash ${USERNAME}
 	sudo mkdir -p  /home/${USERNAME}/Downloads /home/${USERNAME}/Manage-Orabuntu
 	sudo chown ${USERNAME}:${USERNAME} /home/${USERNAME}/Downloads /home/${USERNAME}/Manage-Orabuntu
+
+        echo ''
+        echo "=============================================="
+        echo "Done: Create amide user.                      "
+        echo "=============================================="
+        echo ''
+
+        sleep 5
+
+        clear
 
         echo ''
         echo "=============================================="
@@ -2399,7 +2446,16 @@ then
         echo "=============================================="
         echo ''
 
-	sudo runuser -l amide -c "ssh-keygen -f /home/amide/.ssh/id_rsa -t rsa -N ''"
+        if   [ $Operation = 'reinstall' ]
+        then
+                echo "n
+                quit
+                " | sudo runuser -l amide -c "ssh-keygen -f /home/amide/.ssh/id_rsa -t rsa -N ''"
+        
+	elif [ $Operation = 'new' ]
+        then
+                sudo runuser -l amide -c "ssh-keygen -f /home/amide/.ssh/id_rsa -t rsa -N ''"
+        fi
 
         echo ''
         echo "=============================================="
@@ -2472,18 +2528,52 @@ then
 
         echo ''
         echo "=============================================="
-        echo "Create $NameServer RSA key...                 "
+        echo "Done: Extract DNS sync service files.         "
+        echo "=============================================="
+
+        sleep 5
+
+        clear
+
+        echo ''
+        echo "=============================================="
+        echo "Initialize GRE hosts files...                 "
+        echo "=============================================="
+        echo ''
+
+        sudo lxc-attach -n $NameServer -- touch /root/gre_hosts.txt
+        sudo lxc-attach -n $NameServer -- touch /home/ubuntu/new_gre_host.txt
+        sudo lxc-attach -n $NameServer -- ls -l /root/gre_hosts.txt /home/ubuntu/new_gre_host.txt
+
+        echo ''
+        echo "=============================================="
+        echo "Done: Initialize GRE hosts files.             "
+        echo "=============================================="
+        echo ''
+
+        sleep 5
+
+        clear
+
+        echo ''
+        echo "=============================================="
+        echo "Configure NameServer RSA PKI...               "
         echo "=============================================="
         echo ''
 
 	sudo lxc-attach -n $NameServer -- ssh-keygen -f /root/.ssh/id_rsa -t rsa -N ''
+	sleep 5
+	sudo sh -c "cat '/var/lib/lxc/$NameServerBase/delta0/root/.ssh/id_rsa.pub' >> /home/amide/.ssh/authorized_keys"
+
 
         echo ''
         echo "=============================================="
-        echo "Done: Create $NameServer RSA key.             "
+        echo "Done: Configure NameServer RSA PKI.           "
         echo "=============================================="
 
-	sudo sh -c "cat '/var/lib/lxc/$NameServerBase/delta0/root/.ssh/id_rsa.pub' >> /home/amide/.ssh/authorized_keys"
+	sleep 5
+
+	clear
 
 	echo ''
 	echo "=============================================="
@@ -2997,8 +3087,6 @@ sudo sh -c "echo ' ln -sf /etc/network/openvswitch/crt_ovs_sw7.sh .' 					   >> 
 sudo sh -c "echo ' ln -sf /etc/network/openvswitch/crt_ovs_sw8.sh .' 					   >> /etc/orabuntu-lxc-scripts/crt_links.sh"
 sudo sh -c "echo ' ln -sf /etc/network/openvswitch/crt_ovs_sw9.sh .' 					   >> /etc/orabuntu-lxc-scripts/crt_links.sh"
 sudo sh -c "echo ' ln -sf /etc/network/openvswitch/crt_ovs_sx1.sh .' 					   >> /etc/orabuntu-lxc-scripts/crt_links.sh"
-sudo sh -c "echo ' ln -sf /etc/network/openvswitch/del-bridges.sh .' 					   >> /etc/orabuntu-lxc-scripts/crt_links.sh"
-sudo sh -c "echo ' ln -sf /etc/network/openvswitch/veth_cleanups.sh .' 					   >> /etc/orabuntu-lxc-scripts/crt_links.sh"
 sudo sh -c "echo ' ln -sf /etc/network/openvswitch/create-ovs-sw-files-v2.sh .' 			   >> /etc/orabuntu-lxc-scripts/crt_links.sh"
 sudo sh -c "echo ' ln -sf /etc/init/openvswitch-switch.conf .' 						   >> /etc/orabuntu-lxc-scripts/crt_links.sh"
 sudo sh -c "echo ' ln -sf /etc/default/openvswitch-switch .' 						   >> /etc/orabuntu-lxc-scripts/crt_links.sh"

@@ -40,6 +40,18 @@ echo "Install docker-ce...                          "
 echo "=============================================="
 echo ''
 
+if [ $LinuxFlavor = 'Red' ]
+then
+	if [ $Release -ge 7 ]
+	then
+		sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+		sudo yum install -y http://mirror.centos.org/centos/7/extras/x86_64/Packages/container-selinux-2.21-1.el7.noarch.rpm
+		sudo yum install -y docker-ce
+		sudo systemctl start docker
+		sudo systemctl enable docker
+	fi
+fi
+
 if [ $LinuxFlavor = 'Oracle' ]
 then
 	if   [ $Release -ge 7 ]

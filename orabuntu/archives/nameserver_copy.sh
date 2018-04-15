@@ -24,7 +24,34 @@ echo "Copy nameserver $NameServer...                "
 echo "=============================================="
 echo ''
 
-# rsync -hP --rsh="sshpass -p $MultiHostVar9 ssh -l $MultiHostVar8" $MultiHostVar5:~/Manage-Orabuntu/$NameServer.tar.gz ~/Manage-Orabuntu/.
+sleep 5
+
+clear
+
+echo ''
+echo "=============================================="
+echo "Install rsync ...                             "
+echo "=============================================="
+echo ''
+
+sudo apt-get -y install rsync
+
+echo ''
+echo "=============================================="
+echo "Done: Install rsync.                          "
+echo "=============================================="
+echo ''
+
+sleep 5
+
+clear
+
+echo ''
+echo "=============================================="
+echo "Nameserver rsync...                           "
+echo "=============================================="
+echo ''
+
 rsync -hP --rsh="sshpass -p $MultiHostVar9 ssh -l $MultiHostVar8" $MultiHostVar5:~/Manage-Orabuntu/"$NameServer".export."$HOSTNAME".tar.gz ~/Manage-Orabuntu/.
 
 echo ''
