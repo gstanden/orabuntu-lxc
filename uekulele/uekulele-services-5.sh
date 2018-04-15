@@ -901,13 +901,19 @@ then
 			fi
                 fi
                 
-		if [ ! -e ~/Manage-Orabuntu ]
+		if [ ! -d ~/Manage-Orabuntu ]
                 then
                         sudo mkdir -p ~/Manage-Orabuntu
                 fi
 
                 echo "/var/lib/lxc/$NameServer"         >> /opt/olxc/"$DistDir"/uekulele/archives/nameserver.lst
                 echo "/var/lib/lxc/$NameServer-base"    >> /opt/olxc/"$DistDir"/uekulele/archives/nameserver.lst
+
+		# GLS 20180411 create a copy of nameserver.lst in ~/Manage-Orabuntu so that nameserver replication job can create nameserver copy dynamically to capture any post-install changes on HUB host.
+
+		sudo cp -p /opt/olxc/"$DistDir"/uekulele/archives/nameserver.lst ~/Manage-Orabuntu/.
+		sudo chown $Owner:$Group ~/Manage-Orabuntu/nameserver.lst
+
 		sudo tar -P -czf $HOME/Manage-Orabuntu/$NameServer.tar.gz -T /opt/olxc/"$DistDir"/uekulele/archives/nameserver.lst --checkpoint=10000 --totals
 		sudo lxc-start -n $NameServer > /dev/null 2>&1
 
