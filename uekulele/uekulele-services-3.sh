@@ -374,12 +374,12 @@ echo "Container $SeedContainerName ping test...     "
 echo "=============================================="
 echo ''
 
-# function GetDhcpRange {
-# 	cat /etc/sysconfig/lxc-net | grep LXC_DHCP_RANGE | cut -f2 -d'=' | sed 's/"//g' 
-# }
-# DhcpRange=$(GetDhcpRange)
-# DHR="$DhcpRange"
-# sudo sed -i "s/DHCP-RANGE-OLXC/dhcp-range=$DHR/" /etc/dnsmasq.conf
+function GetDhcpRange {
+	cat /etc/sysconfig/lxc-net | grep LXC_DHCP_RANGE | cut -f2 -d'=' | sed 's/"//g' 
+}
+DhcpRange=$(GetDhcpRange)
+DHR="$DhcpRange"
+sudo sed -i "s/DHCP-RANGE-OLXC/dhcp-range=$DHR/" /etc/dnsmasq.conf
 
 if [ $Release -ge 7 ]
 then

@@ -58,7 +58,7 @@ fi
 if [ $AWS -eq 1 ]
 then
         function GetAwsMtu {
-                sudo ip link | grep eth0 | cut -f5 -d' '
+                sudo ip link | grep -v veth0 | grep eth0 | cut -f5 -d' '
         }
         AwsMtu=$(GetAwsMtu)
 fi

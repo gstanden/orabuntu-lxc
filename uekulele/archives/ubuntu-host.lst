@@ -15,10 +15,10 @@
 /etc/network/if-up.d/openvswitch/lxcora00-pub-ifup-sw1
 /etc/orabuntu-lxc-scripts/start_containers.sh
 /etc/orabuntu-lxc-scripts/stop_containers.sh
+/etc/orabuntu-lxc-scripts/ubuntu-host-backup.sh
 /etc/systemd/resolved.conf
 /etc/resolv.dnsmasq
 /etc/dnsmasq.conf
 /etc/dhcp/dhclient.conf
-/etc/orabuntu-lxc-scripts/ubuntu-host-backup.sh
 /etc/GNU3
 /etc/COPYING

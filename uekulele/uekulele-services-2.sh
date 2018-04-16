@@ -248,25 +248,23 @@ then
 	clear
 fi
 
-if [ $Release -eq 6 ] && [ $LinuxFlavor = 'CentOS' ]
-then
-	echo ''
-	echo "=============================================="
-	echo "Install lsb on CentOS 6 ...                   "
-	echo "=============================================="
-	echo ''
+echo ''
+echo "=============================================="
+echo "Install lsb on CentOS 6 ...                   "
+echo "=============================================="
+echo ''
 
-	sudo yum -y install lsb
-		
-	echo ''
-	echo "=============================================="
-	echo "Done: Install lsb on CentOS 6.                "
-	echo "=============================================="
+sudo yum -y install lsb
 
-	sleep 5
 
-	clear
-fi
+echo ''
+echo "=============================================="
+echo "Done: Install lsb on CentOS 6.                "
+echo "=============================================="
+
+sleep 5
+
+clear
 
 echo ''
 echo "=============================================="

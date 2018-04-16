@@ -231,7 +231,7 @@ then
 fi
 
 function GetOperation {
-	echo $MultiHost | cut -f1 -d':'
+echo $MultiHost | cut -f1 -d':'
 }
 Operation=$(GetOperation)
 
@@ -271,28 +271,6 @@ echo ''
 echo "=============================================="
 echo "Privileges established.                       "
 echo "=============================================="
-
-sleep 5
-
-clear
-
-echo ''
-echo "=============================================="
-echo "Pre-install backup of key files...            "
-echo "==============================================" 
-echo ''
-echo "=============================================="
-echo "Extracting backup scripts...                  "
-echo "==============================================" 
-echo ''
-
-sudo tar -v --extract --file=/opt/olxc/"$DistDir"/uekulele/archives/ubuntu-host.tar -C / etc/orabuntu-lxc-scripts/ubuntu-host-backup.sh --touch
-sudo /etc/orabuntu-lxc-scripts/ubuntu-host-backup.sh
-
-echo ''
-echo "=============================================="
-echo "Key files backups check complete.             "
-echo "==============================================" 
 
 sleep 5
 
@@ -367,7 +345,7 @@ then
 		echo "=============================================="
 		echo '' 
 		echo "=============================================="
-		echo "Re-run anylinux-services file after reboot... "
+		echo "Re-run anylinux-services.sh after reboot...   "
 		echo "=============================================="
 		echo ''
 
@@ -387,11 +365,6 @@ then
 
 			if [ $DestroyAllContainers = 'Y' ] || [ $DestroyContainers = 'y' ]
 			then
-				echo "=============================================="
-				echo "Stopping LXC containers ...                   "
-				echo "=============================================="
-				echo ''
-
 				DestroyContainers=$(CheckContainersExist)
 				for j in $DestroyContainers
 				do
@@ -399,7 +372,7 @@ then
 					then
 						sudo lxc-stop -n $j -k
 					else
-						sudo lxc-stop -n $j -k
+						sudo lxc-stop -n $j
 					fi
 					sleep 2
 					sudo lxc-destroy -n $j -f -s
@@ -521,12 +494,6 @@ then
 		sudo yum -y erase lxc lxc-libs dnsmasq
 		sudo rm -f /etc/sysconfig/lxc-net	> /dev/null 2>&1
 		sudo rm -f /etc/dnsmasq.conf		> /dev/null 2>&1
-#		sudo mv /etc/resolv.conf.orabuntu-lxc.original /etc/resolv.conf
-
-		if [ -f /etc/dhcp/dhclient.conf ]
-		then
-			sudo rm -f /etc/dhcp/dhclient.conf
-		fi
 
 		echo ''
 		echo "=============================================="
@@ -539,7 +506,7 @@ then
 		echo "=============================================="
 		echo '' 
 		echo "=============================================="
-		echo "Re-run anylinux-services after reboot...      "
+		echo "Re-run anylinux-services.sh after reboot...   "
 		echo "=============================================="
 
 		sleep 5
@@ -2089,6 +2056,28 @@ sleep 5
 
 clear
 
+echo ''
+echo "=============================================="
+echo "Pre-install backup of key files...            "
+echo "==============================================" 
+echo ''
+echo "=============================================="
+echo "Extracting backup scripts...                  "
+echo "==============================================" 
+echo ''
+
+sudo tar -v --extract --file=/opt/olxc/"$DistDir"/uekulele/archives/ubuntu-host.tar -C / etc/orabuntu-lxc-scripts/ubuntu-host-backup.sh --touch
+sudo /etc/orabuntu-lxc-scripts/ubuntu-host-backup.sh
+
+echo ''
+echo "=============================================="
+echo "Key files backups check complete.             "
+echo "==============================================" 
+
+sleep 5
+
+clear
+
 # sudo lxc-info -n nsa > /dev/null 2>&1
 # if [ $? -ne 0 ] && [ $Release -eq 6 ]
 # then
@@ -2660,17 +2649,18 @@ then
 			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/var/lib/bind/fwd.orabuntu-lxc.com
 			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/var/lib/bind/rev.orabuntu-lxc.com
 			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/etc/resolv.conf
-			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /etc/resolv.conf
 			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /etc/NetworkManager/dnsmasq.d/local
 			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /etc/network/openvswitch/crt_ovs_sw1.sh
 			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/etc/bind/named.conf.local
 			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/etc/dhcp/dhcpd.conf
 			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/etc/network/interfaces
 			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/root/ns_backup_update.lst
-			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/root/dns-thaw.sh
 			sudo mv /var/lib/lxc/$NameServer/rootfs/var/lib/bind/fwd.orabuntu-lxc.com /var/lib/lxc/$NameServer/rootfs/var/lib/bind/fwd.$Domain1
 			sudo mv /var/lib/lxc/$NameServer/rootfs/var/lib/bind/rev.orabuntu-lxc.com /var/lib/lxc/$NameServer/rootfs/var/lib/bind/rev.$Domain1
-			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /etc/dhcp/dhclient.conf
+			if [ $Release -eq 6 ]
+			then
+				sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /etc/dhcp/dhclient.conf
+			fi
 		fi
 
 		if [ -n $Domain2 ]
@@ -2679,17 +2669,18 @@ then
 			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /var/lib/lxc/$NameServer/rootfs/var/lib/bind/fwd.consultingcommandos.us
 			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /var/lib/lxc/$NameServer/rootfs/var/lib/bind/rev.consultingcommandos.us
 			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /var/lib/lxc/$NameServer/rootfs/etc/resolv.conf
-			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /etc/resolv.conf
 			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /etc/NetworkManager/dnsmasq.d/local
 			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /etc/network/openvswitch/crt_ovs_sw1.sh
 			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /var/lib/lxc/$NameServer/rootfs/etc/bind/named.conf.local
 			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /var/lib/lxc/$NameServer/rootfs/etc/dhcp/dhcpd.conf
 			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /var/lib/lxc/$NameServer/rootfs/etc/network/interfaces
 			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /var/lib/lxc/$NameServer/rootfs/root/ns_backup_update.lst
-			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /var/lib/lxc/$NameServer/rootfs/root/dns-thaw.sh
 			sudo mv /var/lib/lxc/$NameServer/rootfs/var/lib/bind/fwd.consultingcommandos.us /var/lib/lxc/$NameServer/rootfs/var/lib/bind/fwd.$Domain2
 			sudo mv /var/lib/lxc/$NameServer/rootfs/var/lib/bind/rev.consultingcommandos.us /var/lib/lxc/$NameServer/rootfs/var/lib/bind/rev.$Domain2
-			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /etc/dhcp/dhclient.conf
+			if [ $Release -eq 6 ]
+			then
+				sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /etc/dhcp/dhclient.conf
+			fi
 		fi
 	fi
 
@@ -2819,14 +2810,7 @@ do
 
                	 	sudo sh -c "echo ''							>> /etc/systemd/system/$k.service"
                	 	sudo sh -c "echo '[Service]'						>> /etc/systemd/system/$k.service"
-
-			if [ $AWS -eq 1 ]
-			then
-				sudo sh -c "echo 'Type=idle'					>> /etc/systemd/system/$k.service"
-			else
-				sudo sh -c "echo 'Type=oneshot'					>> /etc/systemd/system/$k.service"
-			fi
-
+                	sudo sh -c "echo 'Type=oneshot'						>> /etc/systemd/system/$k.service"
                 	sudo sh -c "echo 'User=root'						>> /etc/systemd/system/$k.service"
                 	sudo sh -c "echo 'RemainAfterExit=yes'					>> /etc/systemd/system/$k.service"
                 	sudo sh -c "echo 'ExecStart=/etc/network/openvswitch/crt_ovs_$k.sh' 	>> /etc/systemd/system/$k.service"
@@ -3096,7 +3080,7 @@ then
  			sudo service sx1 restart
 		fi
 
-		sudo yum -y -q install xfsprogs xfsdump xfsprogs-devel xfsprogs-qa-devel > /dev/null 2>&1
+		sudo yum -y install xfsprogs xfsdump xfsprogs-devel xfsprogs-qa-devel
 
 	        function CheckFileSystemTypeXfs {
 			stat --file-system --format=%T /var/lib/lxc | grep -c xfs
@@ -3199,14 +3183,7 @@ then
 			sudo sh -c "echo 'After=network-online.target sw1.service sx1.service'		>> /etc/systemd/system/$NameServer.service"
 			sudo sh -c "echo ''                                 				>> /etc/systemd/system/$NameServer.service"
 			sudo sh -c "echo '[Service]'                        				>> /etc/systemd/system/$NameServer.service"
-
-			if [ $AWS -eq 1 ]
-			then
-				sudo sh -c "echo 'Type=idle'                                            >> /etc/systemd/system/$NameServer.service"
-			else
-				sudo sh -c "echo 'Type=oneshot'                                         >> /etc/systemd/system/$NameServer.service"
-			fi
-
+			sudo sh -c "echo 'Type=oneshot'                     				>> /etc/systemd/system/$NameServer.service"
 			sudo sh -c "echo 'User=root'                        				>> /etc/systemd/system/$NameServer.service"
 			sudo sh -c "echo 'RemainAfterExit=yes'              				>> /etc/systemd/system/$NameServer.service"
 			sudo sh -c "echo 'ExecStart=/etc/network/openvswitch/strt_$NameServer.sh start'	>> /etc/systemd/system/$NameServer.service"
@@ -3282,12 +3259,6 @@ then
 	sudo mkdir -p /home/$Owner/Manage-Orabuntu
         sudo chown $Owner:$Group /home/$Owner/Manage-Orabuntu
         sudo chmod 775 /opt/olxc/"$DistDir"/uekulele/archives/nameserver_copy.sh
-
-        # GLS 20180411 Create the tar.gz of the source nameserver dynamically so that GRE hosts pick up all post-install nameserver configuration changes including gre_hosts.txt and new_gre_host.txt file.
-	# GLS 20180414 The gre_hosts.txt and new_gre_host.txt files have also been added to the nameserver.lst file so that they are shipped with NS updates so that replicas NS can become master NS.
-
-        sshpass -p $MultiHostVar9 ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" echo '(Do NOT enter passwords...Wait...)'; echo ''; sudo -S <<< "$MultiHostVar9" lxc-stop -n $NameServerBase -k; sudo -S <<< "$MultiHostVar9" tar -P -czf ~/Manage-Orabuntu/"$NameServerBase".export."$HOSTNAME".tar.gz -T ~/Manage-Orabuntu/nameserver.lst --checkpoint=10000 --totals; sleep 2; sudo -S <<< "$MultiHostVar9" lxc-start -n $NameServerBase"
-
         /opt/olxc/"$DistDir"/uekulele/archives/nameserver_copy.sh $MultiHostVar5 $MultiHostVar6 $MultiHostVar8 $MultiHostVar9 $NameServerBase $Release
 
         echo ''
@@ -3433,6 +3404,7 @@ then
                 tr -dc A-Za-z0-9_ < /dev/urandom | head -c ${l} | xargs 
         }
         password=$(genpasswd)
+        echo $password > "$DistDir"/installs/logs/amide-password.txt
 
         USERNAME=amide
         PASSWORD=$password
@@ -3440,43 +3412,17 @@ then
         sudo sed -i "s/Owner=ubuntu/Owner=amide/"       /var/lib/lxc/"$NameServer"-base/rootfs/root/ns_backup_update.sh
         sudo sed -i "s/Pass=ubuntu/Pass=$password/"     /var/lib/lxc/"$NameServer"-base/rootfs/root/ns_backup_update.sh
 
-	echo ''
-	echo "=============================================="
-        echo "Create amide user ...                         "
-	echo "=============================================="
-	echo ''
-
 	sudo useradd -m -p $(openssl passwd -1 ${PASSWORD}) -s /bin/bash ${USERNAME}
 	sudo mkdir -p  /home/${USERNAME}/Downloads /home/${USERNAME}/Manage-Orabuntu
 	sudo chown ${USERNAME}:${USERNAME} /home/${USERNAME}/Downloads /home/${USERNAME}/Manage-Orabuntu
 	
 	echo ''
 	echo "=============================================="
-        echo "Done: Create amide user.                      "
-	echo "=============================================="
-	echo ''
-
-	sleep 5
-
-	clear
-
-	echo ''
-	echo "=============================================="
         echo "Create amide user RSA key...                  "
 	echo "=============================================="
 	echo ''
 
-	if   [ $Operation = 'reinstall' ]
-	then
-		echo "n
-		quit
-		" | sudo runuser -l amide -c "ssh-keygen -f /home/amide/.ssh/id_rsa -t rsa -N ''"
-		echo ''
-	
-	elif [ $Operation = 'new' ]
-	then
-		sudo runuser -l amide -c "ssh-keygen -f /home/amide/.ssh/id_rsa -t rsa -N ''"
-	fi
+	sudo runuser -l amide -c "ssh-keygen -f /home/amide/.ssh/id_rsa -t rsa -N ''"
 
 	echo ''
 	echo "=============================================="
@@ -3487,32 +3433,17 @@ then
 
 	clear
 
-        echo ''
-        echo "=============================================="
-        echo "Create amide sudoers.d file...                "
-        echo "=============================================="
-        echo ''
-
 	sudo sh -c "echo 'amide ALL=/bin/mkdir, /bin/cp' > /etc/sudoers.d/amide"
 	sudo chmod 0440 /etc/sudoers.d/amide
-	sudo cat /etc/sudoers.d/amide
 
-        echo ''
-        echo "=============================================="
-        echo "Done: Create amide sudoers.d file.            "
-        echo "=============================================="
-
-        sleep 5
-
-        clear
-
+	sudo lxc-attach -n $NameServer -- crontab /root/crontab.txt
+	
 	echo ''
 	echo "=============================================="
         echo "Display $NameServer replica cronjob...        "
 	echo "=============================================="
 	echo ''
 
-	sudo lxc-attach -n $NameServer -- crontab /root/crontab.txt
 	sudo lxc-attach -n $NameServer -- crontab -l | tail -23
 	
 	echo ''
@@ -3525,24 +3456,8 @@ then
 
 	clear
 
-	echo ''
-	echo "=============================================="
-        echo "Create NS updates archive...                  "
-	echo "=============================================="
-	echo ''
-
 	sudo lxc-attach -n $NameServer -- mkdir -p /root/backup-lxc-container/$NameServer/updates
-	sudo lxc-attach -n $NameServer -- tar -cvzPf /root/backup-lxc-container/$NameServer/updates/backup_"$NameServer"_ns_update.tar.gz /root/ns_backup_update.lst
-
-	echo ''
-	echo "=============================================="
-        echo "Done: Create NS updates archive.              "
-	echo "=============================================="
-	echo ''
-
-	sleep 5
-
-	clear
+	sudo lxc-attach -n $NameServer -- tar -czPf /root/backup-lxc-container/$NameServer/updates/backup_"$NameServer"_ns_update.tar.gz /root/ns_backup_update.lst
 
 	echo ''
 	echo "=============================================="
@@ -3551,18 +3466,15 @@ then
 	echo ''
 
  	sudo tar -v --extract --file=/opt/olxc/"$DistDir"/uekulele/archives/dns-dhcp-cont.tar -C / var/lib/lxc/nsa/rootfs/etc/systemd/system/dns-sync.service
-	sudo tar -v --extract --file=/opt/olxc/"$DistDir"/uekulele/archives/dns-dhcp-cont.tar -C / var/lib/lxc/nsa/rootfs/etc/systemd/system/dns-thaw.service
- 	sudo mv /var/lib/lxc/nsa/rootfs/etc/systemd/system/dns-sync.service /var/lib/lxc/"$NameServer"-base/rootfs/etc/systemd/system/dns-sync.service
-	sudo mv /var/lib/lxc/nsa/rootfs/etc/systemd/system/dns-thaw.service /var/lib/lxc/"$NameServer"-base/rootfs/etc/systemd/system/dns-thaw.service
+ 	sudo mv /var/lib/lxc/nsa/rootfs/etc/systemd/system/dns-sync.service /var/lib/lxc/$NameServer/rootfs/etc/systemd/system/dns-sync.service > /dev/null 2>&1
 
-        sudo lxc-attach -n $NameServer -- systemctl enable dns-sync
-        sudo lxc-attach -n $NameServer -- systemctl enable dns-thaw
-        sudo lxc-attach -n $NameServer -- chown bind:bind /var/lib/bind/fwd.$Domain1
-        sudo lxc-attach -n $NameServer -- chown bind:bind /var/lib/bind/rev.$Domain1
-        sudo lxc-attach -n $NameServer -- chown bind:bind /var/lib/bind/fwd.$Domain2
-        sudo lxc-attach -n $NameServer -- chown bind:bind /var/lib/bind/rev.$Domain2
-        sudo lxc-attach -n $NameServer -- chown root:bind /var/lib/bind
-        sudo lxc-attach -n $NameServer -- chmod 775 /var/lib/bind
+	sudo lxc-attach -n $NameServer -- systemctl enable dns-sync
+	sudo lxc-attach -n $NameServer -- chown bind:bind /var/lib/bind/fwd.$Domain1
+	sudo lxc-attach -n $NameServer -- chown bind:bind /var/lib/bind/rev.$Domain1
+	sudo lxc-attach -n $NameServer -- chown bind:bind /var/lib/bind/fwd.$Domain2
+	sudo lxc-attach -n $NameServer -- chown bind:bind /var/lib/bind/rev.$Domain2
+	sudo lxc-attach -n $NameServer -- chown root:bind /var/lib/bind
+	sudo lxc-attach -n $NameServer -- chmod 775 /var/lib/bind
 	
 	echo ''
 	echo "=============================================="
@@ -3575,42 +3487,23 @@ then
 
 	echo ''
 	echo "=============================================="
-        echo "Initialize GRE hosts files...                 "
-	echo "=============================================="
-	echo ''
-
-	sudo lxc-attach -n $NameServer -- touch /root/gre_hosts.txt
-	sudo lxc-attach -n $NameServer -- touch /home/ubuntu/new_gre_host.txt
-	sudo lxc-attach -n $NameServer -- ls -l /root/gre_hosts.txt /home/ubuntu/new_gre_host.txt
-
-	echo ''
-	echo "=============================================="
-        echo "Done: Initialize GRE hosts files.             "
-	echo "=============================================="
-	echo ''
-
-	sleep 5
-
-	clear
-
-	echo ''
-	echo "=============================================="
-        echo "Configure $NameServer RSA PKI...              "
+        echo "Create $NameServer RSA key...                 "
 	echo "=============================================="
 	echo ''
 
 	sudo lxc-attach -n $NameServer -- ssh-keygen -f /root/.ssh/id_rsa -t rsa -N ''
-	sleep 5
-	sudo sh -c "cat '/var/lib/lxc/$NameServerBase/delta0/root/.ssh/id_rsa.pub' >> /home/amide/.ssh/authorized_keys"
 	
 	echo ''
 	echo "=============================================="
-        echo "Done: Configure $NameServer RSA PKI.          "
+        echo "Done: Create $NameServer RSA key.             "
 	echo "=============================================="
-
+	echo ''
+	
 	sleep 5
 
-	clear	
+	clear
+
+	sudo sh -c "cat '/var/lib/lxc/$NameServerBase/delta0/root/.ssh/id_rsa.pub' >> /home/amide/.ssh/authorized_keys"
                
 	echo ''
 	echo "=============================================="
@@ -3965,96 +3858,23 @@ then
 	then
 		echo ''
 		echo "=============================================="
-		echo "Configure DNS (dnsmasq)...                    "
+		echo "Configure dnsmasq...                          "
 		echo "=============================================="
 		echo ''
-                echo "=============================================="
-                echo "Display original /etc/resolv.conf...          "
-                echo "=============================================="
-                echo ''
-
-                sudo cat /etc/resolv.conf
-
-		if [ ! -f /etc/resolv.conf.orabuntu-lxc.original ] && [ ! -f /etc/resolv.conf.orabuntu-lxc.original.* ]
-		then
-			function GetOriginalNameServers {
-			        cat /etc/resolv.conf  | grep nameserver | tr -d '\n' | sed 's/nameserver//g' | sed 's/^[ \t]*//;s/[ \t]*$//' | sed 's/  */ /g'
-			}
-			OriginalNameServers=$(GetOriginalNameServers)
-
-			function GetOriginalSearchDomains {
-			        cat /etc/resolv.conf  | grep search | sed 's/  */ /g' | sed 's/search //g'
-			}
-			OriginalSearchDomains=$(GetOriginalSearchDomains)
-		else
-			function GetOriginalNameServers {
-		        	cat /etc/resolv.conf.orabuntu-lxc.original  | grep nameserver | tr -d '\n' | sed 's/nameserver//g' | sed 's/^[ \t]*//;s/[ \t]*$//' | sed 's/  */ /g'
-			}
-			OriginalNameServers=$(GetOriginalNameServers)
-
-			function GetOriginalSearchDomains {
-			        cat /etc/resolv.conf.orabuntu-lxc.original  | grep search | sed 's/  */ /g' | sed 's/search //g'
-			}
-			OriginalSearchDomains=$(GetOriginalSearchDomains)
-		fi
-
-                echo ''
-                echo "=============================================="
-                echo "Done: Display original /etc/resolv.conf.      "
-                echo "=============================================="
-                echo ''
-                echo "=============================================="
-                echo "Install and Configure dnsmasq...              "
-                echo "=============================================="
-                echo ''
 
 		if [ $NetworkManagerRunning -ge 1 ]
 		then
-			sudo sed -i '/plugins=ifcfg-rh/a dns=none'	/etc/NetworkManager/NetworkManager.conf
-			sudo sed -i '$!N; /^\(.*\)\n\1$/!P; D'		/etc/NetworkManager/NetworkManager.conf
+			sudo sed -i '/plugins=ifcfg-rh/a dns=none' /etc/NetworkManager/NetworkManager.conf
+			sudo sed -i '$!N; /^\(.*\)\n\1$/!P; D' /etc/NetworkManager/NetworkManager.conf
 		fi
 
-		sudo yum clean all
 		sudo yum -y install dnsmasq
-		sudo service dnsmasq stop
-		sleep 5
-
-                function CheckSearchDomain1 {
-                        grep -c $Domain1 /etc/resolv.conf
-                }
-                SearchDomain1=$(CheckSearchDomain1)
-
-                function CheckSearchDomain2 {
-                        grep -c $Domain2 /etc/resolv.conf
-                }
-                SearchDomain2=$(CheckSearchDomain2)
-
-                function CheckServerDomain1 {
-                        grep -c $Domain1 /etc/dnsmasq.conf
-                }
-                ServerDomain1=$(CheckServerDomain1)
-
-                function CheckServerDomain2 {
-                        grep -c $Domain2 /etc/dnsmasq.conf
-                }
-                ServerDomain2=$(CheckServerDomain2)
-
-                function CheckCacheSizeDnsmasq {
-                        grep -c cache-size /etc/dnsmasq.conf
-                }
-                CacheSizeDnsmasq=$(CheckCacheSizeDnsmasq)
 
 		sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" 		/etc/dnsmasq.conf
 		sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" 	/etc/dnsmasq.conf
 		sudo sed -i '/lxcbr0/d'								/etc/dnsmasq.conf
 		sudo sed -i '/DHCP-RANGE-OLXC/d'						/etc/dnsmasq.conf
-
-		if [ $CacheSizeDnsmasq -gt 0 ]
-		then
-			sudo sed -i 's,^\(cache-size[ ]*=\).*,\1'0',g'				/etc/dnsmasq.conf
-		else
-			sudo sh -c "echo 'cache-size=0' 				     >> /etc/dnsmasq.conf"
-		fi
+		sudo sed -i '/cache-size=150/s/cache-size=150/cache-size=0/g' 			/etc/dnsmasq.conf
 			
 		if [ $NetworkManagerRunning -ge 1 ]
 		then
@@ -4067,9 +3887,19 @@ then
 			sudo systemctl daemon-reload
 		fi
 			
+		function GetOriginalNameServers {
+		        cat /etc/resolv.conf  | grep nameserver | tr -d '\n' | sed 's/nameserver//g' | sed 's/^[ \t]*//;s/[ \t]*$//' | sed 's/  */ /g'
+		}
+		OriginalNameServers=$(GetOriginalNameServers)
+
+		function GetOriginalSearchDomains {
+		        cat /etc/resolv.conf  | grep search | sed 's/  */ /g' | sed 's/search //g'
+		}
+		OriginalSearchDomains=$(GetOriginalSearchDomains)
+
 		sudo rm -f /etc/resolv.conf
-		sudo sh -c "echo 'nameserver 127.0.0.1'							>  /etc/resolv.conf"
-		sudo sh -c "echo 'search $Domain1 $Domain2 gns1.$Domain1 $OriginalSearchDomains' 	>> /etc/resolv.conf"
+		sudo sh -c "echo 'nameserver 127.0.0.1'	> 						/etc/resolv.conf"
+		sudo sh -c "echo 'search $Domain1 $Domain2 gns1.$Domain1 $OriginalSearchDomains' >> 	/etc/resolv.conf"
 		sudo cp -p /etc/resolv.conf /etc/resolv.conf.olxc
 
 		for j in $OriginalNameServers
@@ -4088,37 +3918,16 @@ then
 		        done
 		done
 
-                if [ $ServerDomain1 -eq 0 ]
-                then
-                        sudo sh -c "echo 'server=/$Domain1/10.207.39.2'                 >> /etc/dnsmasq.conf"
-                        sudo sh -c "echo 'server=/39.207.10.in-addr.arpa/10.207.39.2'   >> /etc/dnsmasq.conf"
-                        sudo sh -c "echo 'server=/gns1.$Domain1/10.207.39.2'            >> /etc/dnsmasq.conf"
-                fi
-
-                if [ $ServerDomain2 -eq 0 ]
-                then
-                        sudo sh -c "echo 'server=/$Domain2/10.207.29.2'                 >> /etc/dnsmasq.conf"
-                        sudo sh -c "echo 'server=/29.207.10.in-addr.arpa/10.207.29.2'   >> /etc/dnsmasq.conf"
-                fi
-
 		sudo service dnsmasq start
 
 		if   [ $Release -ge 7 ]
 		then
 			sudo systemctl enable dnsmasq
-		else
+
+		elif [ $Release -eq 6 ]
+		then
 			sudo chkconfig dnsmasq on
 		fi
-
-                sudo sed -i '/#/d'                                                                              /etc/resolv.conf
-                sudo sed -i '/search/d'                                                                         /etc/resolv.conf
-                sudo sed -i '/127.0.0.1/!s/nameserver/# nameserver/g'                                           /etc/resolv.conf
-                sudo sh  -c "echo 'nameserver 127.0.0.1'                                                        >> /etc/resolv.conf"
-                sudo sh  -c "echo 'search $OriginalSearchDomains $Domain1 $Domain2 gns1.$Domain1'               >> /etc/resolv.conf"
-                sudo sed -i "/supersede domain-name/c\append domain-name \" $Domain1 $Domain2 gns1.$Domain1\""  /etc/dhcp/dhclient.conf
-                sudo sed -i "/prepend domain-name-servers/s/#//"                                                /etc/dhcp/dhclient.conf
-                sudo sed -i '/8.8.8.8/d'                                                                        /etc/resolv.conf
-                sudo sed -i '$!N; /^\(.*\)\n\1$/!P; D'                                                          /etc/resolv.conf
 
 		echo ''
 		sleep 2
@@ -4130,10 +3939,6 @@ then
 		echo "Done: Configure NetworkManager with dnsmasq.  "
 		echo "=============================================="
 		echo ''
-
-		sleep 5
-
-		clear
 	fi
 fi
 

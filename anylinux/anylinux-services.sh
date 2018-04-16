@@ -534,7 +534,7 @@ fi
 	NumCon=$3
 	if [ -z $3 ]
 	then
-		NumCon=3
+		NumCon=1
 	fi
 	echo 'Oracle Container Count    = '$NumCon
 
@@ -855,7 +855,7 @@ fi
 
 if [ $LinuxFlavor != 'Ubuntu' ] && [ $LinuxFlavor != 'Pop_OS' ]
 then
-	echo 'RPM libvirt installed     = '`rpm -qa | grep libvirt-[123] | grep -v client`
+	echo 'RPM libvirt installed     = '`rpm -qa | grep libvirt | grep -v client`
 fi
 
 echo ''

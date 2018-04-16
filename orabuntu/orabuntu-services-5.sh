@@ -456,7 +456,7 @@ then
 	echo ''
 	
 	sudo touch /etc/orabuntu-lxc-release
-	sudo sh -c "echo 'Orabuntu-LXC v6.11.2-beta AMIDE' > /etc/orabuntu-lxc-release"
+	sudo sh -c "echo 'Orabuntu-LXC v6.11.0-beta AMIDE' > /etc/orabuntu-lxc-release"
 	sudo ls -l /etc/orabuntu-lxc-release
 	echo ''
 	sudo cat /etc/orabuntu-lxc-release
@@ -785,7 +785,20 @@ then
                 sudo tar -P -czf ~/Manage-Orabuntu/$NameServer.tar.gz -T /opt/olxc/"$DistDir"/orabuntu/archives/nameserver.lst --checkpoint=10000 --totals
                 sudo lxc-start -n $NameServer > /dev/null 2>&1
 
+                echo "=============================================="
+                echo "Configure replica nameserver $NameServer...   "
+                echo "=============================================="
                 echo ''
+
+                ssh-keygen -R 10.207.39.2
+                ssh-keygen -R $NameServer
+		sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ubuntu@10.207.39.2 "sudo -S <<< "ubuntu" echo $HOSTNAME > ~/new_gre_host.txt"
+                
+                echo ''
+                echo "=============================================="
+                echo "Done: Configure replica nameserver $NameServer"
+                echo "=============================================="
+		echo ''
                 echo "=============================================="
                 echo "Done: Replicate nameserver $NameServer.       "
                 echo "=============================================="
