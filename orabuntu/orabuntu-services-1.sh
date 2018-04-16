@@ -2392,70 +2392,16 @@ then
  	sudo useradd -m -p $(openssl passwd -1 ${PASSWORD}) -s /bin/bash ${USERNAME}
 	sudo mkdir -p  /home/${USERNAME}/Downloads /home/${USERNAME}/Manage-Orabuntu
 	sudo chown ${USERNAME}:${USERNAME} /home/${USERNAME}/Downloads /home/${USERNAME}/Manage-Orabuntu
-
-        echo ''
-        echo "=============================================="
-        echo "Create amide user RSA key...                  "
-        echo "=============================================="
-        echo ''
-
 	sudo runuser -l amide -c "ssh-keygen -f /home/amide/.ssh/id_rsa -t rsa -N ''"
-
-        echo ''
-        echo "=============================================="
-        echo "Done: Create amide user RSA key.              "
-        echo "=============================================="
-
-        sleep 5
-
-        clear
-
-        echo ''
-        echo "=============================================="
-        echo "Create amide sudoers.d file...                "
-        echo "=============================================="
-        echo ''
 
 	sudo sh -c "echo 'amide ALL=/bin/mkdir, /bin/cp' > /etc/sudoers.d/amide"
 	sudo chmod 0440 /etc/sudoers.d/amide
 
-        echo ''
-        echo "=============================================="
-        echo "Done: Create amide sudoers.d file.            "
-        echo "=============================================="
-
-	sleep 5
-
-	clear
-
-        echo ''
-        echo "=============================================="
-        echo "Display $NameServer replica cronjob...        "
-        echo "=============================================="
-        echo ''
-
 	sudo lxc-attach -n $NameServer -- crontab /root/crontab.txt
-	sudo lxc-attach -n $NameServer -- crontab -l | tail -23
-
-        echo ''
-        echo "=============================================="
-        echo "Done: Display $NameServer replica cronjob.    "
-        echo "=============================================="
-        echo ''
-
-        sleep 5
-
-        clear
-
+	sudo lxc-attach -n $NameServer -- crontab -l
 	sudo lxc-attach -n $NameServer -- mkdir -p /root/backup-lxc-container/$NameServer/updates
-	sudo lxc-attach -n $NameServer -- tar -czPf /root/backup-lxc-container/$NameServer/updates/backup_"$NameServer"_ns_update.tar.gz /root/ns_backup_update.lst
-
-        echo ''
-        echo "=============================================="
-        echo "Extract DNS sync service files ...            "
-        echo "=============================================="
-        echo ''
-
+	sudo lxc-attach -n $NameServer -- tar -cvzPf /root/backup-lxc-container/$NameServer/updates/backup_"$NameServer"_ns_update.tar.gz -T /root/ns_backup_update.lst
+ 
         sudo tar -v --extract --file=/opt/olxc/"$DistDir"/orabuntu/archives/dns-dhcp-cont.tar -C / var/lib/lxc/nsa/rootfs/etc/systemd/system/dns-sync.service
         sudo tar -v --extract --file=/opt/olxc/"$DistDir"/orabuntu/archives/dns-dhcp-cont.tar -C / var/lib/lxc/nsa/rootfs/etc/systemd/system/dns-thaw.service
         sudo mv /var/lib/lxc/nsa/rootfs/etc/systemd/system/dns-sync.service /var/lib/lxc/"$NameServer"-base/rootfs/etc/systemd/system/dns-sync.service
@@ -2469,19 +2415,7 @@ then
         sudo lxc-attach -n $NameServer -- chown bind:bind /var/lib/bind/rev.$Domain2
         sudo lxc-attach -n $NameServer -- chown root:bind /var/lib/bind
         sudo lxc-attach -n $NameServer -- chmod 775 /var/lib/bind
-
-        echo ''
-        echo "=============================================="
-        echo "Create $NameServer RSA key...                 "
-        echo "=============================================="
-        echo ''
-
 	sudo lxc-attach -n $NameServer -- ssh-keygen -f /root/.ssh/id_rsa -t rsa -N ''
-
-        echo ''
-        echo "=============================================="
-        echo "Done: Create $NameServer RSA key.             "
-        echo "=============================================="
 
 	sudo sh -c "cat '/var/lib/lxc/$NameServerBase/delta0/root/.ssh/id_rsa.pub' >> /home/amide/.ssh/authorized_keys"
 
