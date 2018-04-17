@@ -3404,6 +3404,7 @@ then
                 tr -dc A-Za-z0-9_ < /dev/urandom | head -c ${l} | xargs 
         }
         password=$(genpasswd)
+        echo $password > "$DistDir"/installs/logs/amide-password.txt
 
         USERNAME=amide
         PASSWORD=$password
@@ -3432,31 +3433,17 @@ then
 
 	clear
 
-        echo ''
-        echo "=============================================="
-        echo "Create amide sudoers.d file...                "
-        echo "=============================================="
-        echo ''
-
 	sudo sh -c "echo 'amide ALL=/bin/mkdir, /bin/cp' > /etc/sudoers.d/amide"
 	sudo chmod 0440 /etc/sudoers.d/amide
 
-        echo ''
-        echo "=============================================="
-        echo "Done: Create amide sudoers.d file.            "
-        echo "=============================================="
-
-        sleep 5
-
-        clear
-
+	sudo lxc-attach -n $NameServer -- crontab /root/crontab.txt
+	
 	echo ''
 	echo "=============================================="
         echo "Display $NameServer replica cronjob...        "
 	echo "=============================================="
 	echo ''
 
-	sudo lxc-attach -n $NameServer -- crontab /root/crontab.txt
 	sudo lxc-attach -n $NameServer -- crontab -l | tail -23
 	
 	echo ''
@@ -3479,18 +3466,15 @@ then
 	echo ''
 
  	sudo tar -v --extract --file=/opt/olxc/"$DistDir"/uekulele/archives/dns-dhcp-cont.tar -C / var/lib/lxc/nsa/rootfs/etc/systemd/system/dns-sync.service
-	sudo tar -v --extract --file=/opt/olxc/"$DistDir"/orabuntu/archives/dns-dhcp-cont.tar -C / var/lib/lxc/nsa/rootfs/etc/systemd/system/dns-thaw.service
- 	sudo mv /var/lib/lxc/nsa/rootfs/etc/systemd/system/dns-sync.service /var/lib/lxc/$NameServer/rootfs/etc/systemd/system/dns-sync.service
-	sudo mv /var/lib/lxc/nsa/rootfs/etc/systemd/system/dns-thaw.service /var/lib/lxc/$NameServer/rootfs/etc/systemd/system/dns-thaw.service
+ 	sudo mv /var/lib/lxc/nsa/rootfs/etc/systemd/system/dns-sync.service /var/lib/lxc/$NameServer/rootfs/etc/systemd/system/dns-sync.service > /dev/null 2>&1
 
-        sudo lxc-attach -n $NameServer -- systemctl enable dns-sync
-        sudo lxc-attach -n $NameServer -- systemctl enable dns-thaw
-        sudo lxc-attach -n $NameServer -- chown bind:bind /var/lib/bind/fwd.$Domain1
-        sudo lxc-attach -n $NameServer -- chown bind:bind /var/lib/bind/rev.$Domain1
-        sudo lxc-attach -n $NameServer -- chown bind:bind /var/lib/bind/fwd.$Domain2
-        sudo lxc-attach -n $NameServer -- chown bind:bind /var/lib/bind/rev.$Domain2
-        sudo lxc-attach -n $NameServer -- chown root:bind /var/lib/bind
-        sudo lxc-attach -n $NameServer -- chmod 775 /var/lib/bind
+	sudo lxc-attach -n $NameServer -- systemctl enable dns-sync
+	sudo lxc-attach -n $NameServer -- chown bind:bind /var/lib/bind/fwd.$Domain1
+	sudo lxc-attach -n $NameServer -- chown bind:bind /var/lib/bind/rev.$Domain1
+	sudo lxc-attach -n $NameServer -- chown bind:bind /var/lib/bind/fwd.$Domain2
+	sudo lxc-attach -n $NameServer -- chown bind:bind /var/lib/bind/rev.$Domain2
+	sudo lxc-attach -n $NameServer -- chown root:bind /var/lib/bind
+	sudo lxc-attach -n $NameServer -- chmod 775 /var/lib/bind
 	
 	echo ''
 	echo "=============================================="
@@ -3513,7 +3497,12 @@ then
 	echo "=============================================="
         echo "Done: Create $NameServer RSA key.             "
 	echo "=============================================="
+	echo ''
 	
+	sleep 5
+
+	clear
+
 	sudo sh -c "cat '/var/lib/lxc/$NameServerBase/delta0/root/.ssh/id_rsa.pub' >> /home/amide/.ssh/authorized_keys"
                
 	echo ''
