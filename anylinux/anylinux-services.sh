@@ -534,7 +534,7 @@ fi
 	NumCon=$3
 	if [ -z $3 ]
 	then
-		NumCon=1
+		NumCon=2
 	fi
 	echo 'Oracle Container Count    = '$NumCon
 
