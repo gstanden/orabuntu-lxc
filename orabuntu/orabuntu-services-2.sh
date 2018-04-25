@@ -133,6 +133,23 @@ function CheckSystemdResolvedInstalled {
 }
 SystemdResolvedInstalled=$(CheckSystemdResolvedInstalled)
 
+if [ -f /etc/lsb-release ]
+then
+        function GetUbuntuVersion {
+                cat /etc/lsb-release | grep DISTRIB_RELEASE | cut -f2 -d'='
+        }
+        UbuntuVersion=$(GetUbuntuVersion)
+fi
+RL=$UbuntuVersion
+
+if [ -f /etc/lsb-release ]
+then
+        function GetUbuntuMajorVersion {
+                cat /etc/lsb-release | grep DISTRIB_RELEASE | cut -f2 -d'=' | cut -f1 -d'.'
+        }
+        UbuntuMajorVersion=$(GetUbuntuMajorVersion)
+fi
+
 if [ $SystemdResolvedInstalled -gt 0 ] && [ $UbuntuVersion != '16.04' ]
 then
 	echo ''
@@ -487,7 +504,7 @@ then
         	# GLS 20160707 updated to use lxc-copy instead of lxc-clone for Ubuntu 16.04
         	# GLS 20160707 continues to use lxc-clone for Ubuntu 15.04 and 15.10
 
-		if [ $UbuntuVersion = '16.04' ] || [ $UbuntuVersion = '16.10' ] || [ $UbuntuVersion = '17.04' ] || [ $UbuntuVersion = '17.10' ]
+		if [ $UbuntuMajorVersion -ge 16 ]
         	then
         		function CheckPublicIPIterative {
 				sudo lxc-info -n oel$OracleRelease$SeedPostfix -iH | cut -f1-3 -d'.' | sed 's/\.//g'	

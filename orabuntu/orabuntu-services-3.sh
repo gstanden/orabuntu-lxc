@@ -41,7 +41,6 @@ Domain2=$4
 MultiHost=$5
 DistDir=$6
 Product=$7
-Domain1=$8
 
 echo ''
 echo "=============================================="
@@ -156,6 +155,23 @@ then
         UbuntuVersion=$(GetUbuntuVersion)
         LF=$LinuxFlavor
         RL=$UbuntuVersion
+        function GetUbuntuMajorVersion {
+                cat /etc/lsb-release | grep DISTRIB_RELEASE | cut -f2 -d'=' | cut -f1 -d'.'
+        }
+        UbuntuMajorVersion=$(GetUbuntuMajorVersion)
+fi
+
+if [ -f /etc/lsb-release ]
+then
+        function GetUbuntuVersion {
+                cat /etc/lsb-release | grep DISTRIB_RELEASE | cut -f2 -d'='
+        }
+        UbuntuVersion=$(GetUbuntuVersion)
+fi
+RL=$UbuntuVersion
+
+if [ -f /etc/lsb-release ]
+then
         function GetUbuntuMajorVersion {
                 cat /etc/lsb-release | grep DISTRIB_RELEASE | cut -f2 -d'=' | cut -f1 -d'.'
         }
@@ -319,7 +335,7 @@ then
 
 		UbuntuVersion=$(GetUbuntuVersion)
 
-                if [ $UbuntuVersion = '16.04' ] || [ $UbuntuVersion = '16.10' ] || [ $UbuntuVersion = '17.04' ] || [ $UbuntuVersion = '17.10' ]
+                if [ $UbuntuMajorVersion -ge 16 ]
                 then
                         function CheckPublicIPIterative {
                                 sudo lxc-info -n oel$OracleRelease$SeedPostfix -iH | cut -f1-3 -d'.' | sed 's/\.//g'
@@ -391,10 +407,10 @@ then
 	sudo service systemd-resolved restart
 fi
 
-ping -c 3 $SeedContainerName.$Domain2
+ping -c 3 $SeedContainerName
 
 function CheckNetworkUp {
-ping -c 3 $SeedContainerName.$Domain2 | grep packet | cut -f3 -d',' | sed 's/ //g'
+ping -c 3 $SeedContainerName | grep packet | cut -f3 -d',' | sed 's/ //g'
 }
 NetworkUp=$(CheckNetworkUp)
 n=1

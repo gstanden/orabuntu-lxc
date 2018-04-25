@@ -63,6 +63,23 @@ function GetMultiHostVar7 {
 }
 MultiHostVar7=$(GetMultiHostVar7)
 
+if [ -f /etc/lsb-release ]
+then
+        function GetUbuntuVersion {
+                cat /etc/lsb-release | grep DISTRIB_RELEASE | cut -f2 -d'='
+        }
+        UbuntuVersion=$(GetUbuntuVersion)
+fi
+RL=$UbuntuVersion
+
+if [ -f /etc/lsb-release ]
+then
+        function GetUbuntuMajorVersion {
+                cat /etc/lsb-release | grep DISTRIB_RELEASE | cut -f2 -d'=' | cut -f1 -d'.'
+        }
+        UbuntuMajorVersion=$(GetUbuntuMajorVersion)
+fi
+
 echo ''
 echo "=============================================="
 echo "Next script to run: orabuntu-services-4.sh    "
@@ -215,10 +232,6 @@ while [ $CopyCompleted -lt $NumCon ]
 do
 	# GLS 20160707 updated to use lxc-copy instead of lxc-clone for Ubuntu 16.04
 	# GLS 20160707 continues to use lxc-clone for Ubuntu 15.04 and 15.10
-	function GetUbuntuVersion {
-		cat /etc/lsb-release | grep DISTRIB_RELEASE | cut -f2 -d'='
-	}
-	UbuntuVersion=$(GetUbuntuVersion)
 
 	function CheckSystemdResolvedInstalled {
 		sudo netstat -ulnp | grep 53 | sed 's/  */ /g' | rev | cut -f1 -d'/' | rev | sort -u | grep systemd- | wc -l
@@ -230,7 +243,7 @@ do
         }
         DNSLookup=$(CheckDNSLookup)
 
-	if [ $UbuntuVersion = '16.04' ] || [ $UbuntuVersion = '16.10' ] || [ $UbuntuVersion = '17.04' ] || [ $UbuntuVersion = '17.10' ]
+	if [ $UbuntuMajorVersion -ge 16 ]
 	then
 		while [ $DNSLookup -eq 1 ]
 		do
@@ -306,7 +319,7 @@ do
 	then
 		sudo sh -c "echo 'Type=idle'									>> /etc/systemd/system/$ContainerPrefix$CloneIndex.service"
 	else
-		sudo sh -c "echo 'Type=oneshot'									>> /etc/systemd/system/$ContainerPrefix$CloneIndex.service"
+		sudo sh -c "echo 'Type=idle'									>> /etc/systemd/system/$ContainerPrefix$CloneIndex.service"
 	fi
 
 	sudo sh -c "echo 'User=root'                                                    			>> /etc/systemd/system/$ContainerPrefix$CloneIndex.service"

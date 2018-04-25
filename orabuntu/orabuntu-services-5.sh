@@ -48,6 +48,8 @@ then
         	cat /sys/hypervisor/uuid | cut -c1-3 | grep -c ec2
 	}
 	AWS=$(CheckAWS)
+else
+	AWS=0
 fi
 
 function GetGroup {
@@ -456,7 +458,7 @@ then
 	echo ''
 	
 	sudo touch /etc/orabuntu-lxc-release
-	sudo sh -c "echo 'Orabuntu-LXC v6.11.0-beta AMIDE' > /etc/orabuntu-lxc-release"
+	sudo sh -c "echo 'Orabuntu-LXC v6.11.3-beta AMIDE' > /etc/orabuntu-lxc-release"
 	sudo ls -l /etc/orabuntu-lxc-release
 	echo ''
 	sudo cat /etc/orabuntu-lxc-release
@@ -785,6 +787,7 @@ then
                 sudo tar -P -czf ~/Manage-Orabuntu/$NameServer.tar.gz -T /opt/olxc/"$DistDir"/orabuntu/archives/nameserver.lst --checkpoint=10000 --totals
                 sudo lxc-start -n $NameServer > /dev/null 2>&1
 
+		echo ''
                 echo "=============================================="
                 echo "Configure replica nameserver $NameServer...   "
                 echo "=============================================="
@@ -973,7 +976,7 @@ function GetOwner {
 Owner=$(GetOwner)
 
 sudo rm -f /opt/olxc/*.lst /opt/olxc/*.tar
-if [ $Owner != 'ubuntu' ]
+if [ $Owner != 'ubuntu' ] && [ -d /opt/olxc/home/ubuntu ]
 then
 	sudo rm -r /opt/olxc/home/ubuntu
 fi
