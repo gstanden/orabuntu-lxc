@@ -855,7 +855,7 @@ fi
 
 if [ $LinuxFlavor != 'Ubuntu' ] && [ $LinuxFlavor != 'Pop_OS' ]
 then
-	echo 'RPM libvirt installed     = '`rpm -qa | grep libvirt | grep -v client`
+	echo 'RPM libvirt installed     = '`rpm -qa | grep libvirt-[123] | grep -v client`
 fi
 
 echo ''

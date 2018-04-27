@@ -800,9 +800,9 @@ then
 
 				if [ $Release -ge 7 ]
 				then
-                                	echo 'hub nameserver post-install snapshot' > snap-comment
-                                	sudo lxc-snapshot -n $NameServer -c snap-comment
-                                	sudo rm -f snap-comment
+                                	echo 'hub nameserver post-install snapshot' > /home/$Owner/snap-comment
+                                	sudo lxc-snapshot -n $NameServer -c /home/$Owner/snap-comment
+                                	sudo rm -f /home/$Owner/snap-comment
                                 	sudo lxc-snapshot -n $NameServer -L -C
                                 	sleep 5
 				fi
@@ -818,9 +818,9 @@ then
                                 if   [ $Release -ge 7 ]
                                 then
 					sudo lxc-stop -n $NameServer
-                        		echo 'HUB nameserver post-install snapshot' > snap-comment
-                        		sudo lxc-snapshot -n $NameServer -c snap-comment
-                        		sudo rm -f snap-comment
+                        		echo 'HUB nameserver post-install snapshot' > /home/$Owner/snap-comment
+                        		sudo lxc-snapshot -n $NameServer -c /home/$Owner/snap-comment
+                        		sudo rm -f /home/$Owner/snap-comment
                         		sudo lxc-snapshot -n $NameServer -L -C
 					sudo lxc-start -n $NameServer
 
@@ -839,9 +839,9 @@ then
                                 if   [ $Release -ge 7 ]
                                 then
 					sudo lxc-stop -n $NameServer
-                        		echo 'HUB nameserver post-install snapshot' > snap-comment
-                        		sudo lxc-snapshot -n $NameServer -c snap-comment
-                        		sudo rm -f snap-comment
+                        		echo 'HUB nameserver post-install snapshot' > /home/$Owner/snap-comment
+                        		sudo lxc-snapshot -n $NameServer -c /home/$Owner/snap-comment
+                        		sudo rm -f /home/$Owner/snap-comment
                         		sudo lxc-snapshot -n $NameServer -L -C
 					sudo lxc-start -n $NameServer
 
@@ -863,9 +863,9 @@ then
 				if [ $Release -eq 7 ]
 				then
 					sudo lxc-stop -n $NameServer
-                       			echo 'HUB nameserver post-install snapshot' > snap-comment
-                       			sudo lxc-snapshot -n $NameServer -c snap-comment
-                       			sudo rm -f snap-comment
+                       			echo 'HUB nameserver post-install snapshot' > /home/$Owner/snap-comment
+                       			sudo lxc-snapshot -n $NameServer -c /home/$Owner/snap-comment
+                       			sudo rm -f /home/$Owner/snap-comment
                        			sudo lxc-snapshot -n $NameServer -L -C
 					sudo lxc-start -n $NameServer
 
@@ -884,9 +884,9 @@ then
 				if [ $Release -eq 7 ]
 				then
 					sudo lxc-stop -n $NameServer
-                       			echo 'HUB nameserver post-install snapshot' > snap-comment
-                       			sudo lxc-snapshot -n $NameServer -c snap-comment
-                       			sudo rm -f snap-comment
+                       			echo 'HUB nameserver post-install snapshot' > /home/$Owner/snap-comment
+                       			sudo lxc-snapshot -n $NameServer -c /home/$Owner/snap-comment
+                       			sudo rm -f /home/$Owner/snap-comment
                        			sudo lxc-snapshot -n $NameServer -L -C
 					sudo lxc-start -n $NameServer
 
@@ -911,6 +911,20 @@ then
 		sudo tar -P -czf $HOME/Manage-Orabuntu/$NameServer.tar.gz -T /opt/olxc/"$DistDir"/uekulele/archives/nameserver.lst --checkpoint=10000 --totals
 		sudo lxc-start -n $NameServer > /dev/null 2>&1
 
+                echo ''
+                echo "=============================================="
+                echo "Configure replica nameserver $NameServer...   "
+                echo "=============================================="
+                echo ''
+
+                ssh-keygen -R 10.207.39.2
+                ssh-keygen -R $NameServer
+                sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ubuntu@10.207.39.2 "sudo -S <<< "ubuntu" echo $HOSTNAME > ~/new_gre_host.txt"
+
+                echo ''
+                echo "=============================================="
+                echo "Done: Configure replica nameserver $NameServer"
+                echo "=============================================="
 		echo ''
 		echo "=============================================="
 		echo "Done: Replicate nameserver $NameServer.       "

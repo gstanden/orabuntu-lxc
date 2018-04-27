@@ -2605,44 +2605,11 @@ then
 
 	clear
 
-	function GetMultiHostVar5 {
-		echo $MultiHost | cut -f5 -d':'
-	}
-	MultiHostVar5=$(GetMultiHostVar5)
-
-	function GetMultiHostVar6 {
-		echo $MultiHost | cut -f6 -d':'
-	}
-	MultiHostVar6=$(GetMultiHostVar6)
-
 	if [ $GRE = 'Y' ]
 	then
                 sudo sed -i "/route add -net/s/#/ /"                            /etc/network/openvswitch/crt_ovs_sw1.sh
                 sudo sed -i "/REMOTE_GRE_ENDPOINT/s/#/ /"                       /etc/network/openvswitch/crt_ovs_sw1.sh
                 sudo sed -i "s/REMOTE_GRE_ENDPOINT/$MultiHostVar5/g"            /etc/network/openvswitch/crt_ovs_sw1.sh
-
-#                function GetGrePortName {
-#                        sudo ovs-vsctl show | grep -B3 "$MultiHostVar5" | grep Port | sed 's/  *//g' | cut -f2 -d'"'
-#                }
-#                GrePortName=$(GetGrePortName)
-
-#                function GetGrePortNameStringLen {
-#                        echo $GrePortName | wc -c
-#                }
-#                GrePortNameStringLen=$(GetGrePortNameStringLen)
-
-#                if [ $GrePortNameStringLen -gt 1 ]
-#                then
-#                        function CheckGreExists {
-#                                sudo ovs-vsctl show | grep $GrePortName | wc -l
-#                        }
-#                        GreExists=$(CheckGreExists)
-
-#                       if [ $GreExists -gt 0 ]
-#                       then
-#                               sudo ovs-vsctl del-port $GrePortName
-#                       fi
-#                fi
 
                 sudo ovs-vsctl add-port sw1 gre$Sw1Index -- set interface gre$Sw1Index type=gre options:remote_ip=$MultiHostVar5
 
@@ -2676,9 +2643,6 @@ then
                 echo "Setup GRE & Routes on $MultiHostVar5...       "
                 echo "=============================================="
                 echo ''
-
-#               sudo service sw1 restart
-#               sudo service sx1 restart
 
                 ssh-keygen -R $MultiHostVar5
                 sshpass -p $MultiHostVar9 ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 date

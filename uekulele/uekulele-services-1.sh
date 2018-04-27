@@ -2655,6 +2655,7 @@ then
 			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/etc/dhcp/dhcpd.conf
 			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/etc/network/interfaces
 			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/root/ns_backup_update.lst
+			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/root/dns-thaw.sh
 			sudo mv /var/lib/lxc/$NameServer/rootfs/var/lib/bind/fwd.orabuntu-lxc.com /var/lib/lxc/$NameServer/rootfs/var/lib/bind/fwd.$Domain1
 			sudo mv /var/lib/lxc/$NameServer/rootfs/var/lib/bind/rev.orabuntu-lxc.com /var/lib/lxc/$NameServer/rootfs/var/lib/bind/rev.$Domain1
 			if [ $Release -eq 6 ]
@@ -2675,6 +2676,7 @@ then
 			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /var/lib/lxc/$NameServer/rootfs/etc/dhcp/dhcpd.conf
 			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /var/lib/lxc/$NameServer/rootfs/etc/network/interfaces
 			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /var/lib/lxc/$NameServer/rootfs/root/ns_backup_update.lst
+			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /var/lib/lxc/$NameServer/rootfs/root/dns-thaw.sh
 			sudo mv /var/lib/lxc/$NameServer/rootfs/var/lib/bind/fwd.consultingcommandos.us /var/lib/lxc/$NameServer/rootfs/var/lib/bind/fwd.$Domain2
 			sudo mv /var/lib/lxc/$NameServer/rootfs/var/lib/bind/rev.consultingcommandos.us /var/lib/lxc/$NameServer/rootfs/var/lib/bind/rev.$Domain2
 			if [ $Release -eq 6 ]
@@ -3380,7 +3382,6 @@ then
 
 	sudo lxc-attach -n $NameServer -- usermod --password `perl -e "print crypt('ubuntu','ubuntu');"` ubuntu
 	ssh-keygen -q -R 10.207.39.2
-#	sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ubuntu@10.207.39.2 "ssh-keygen -f ~/.ssh/id_rsa -t rsa -N ''"
 	sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ubuntu@10.207.39.2 "date; uname -a"
 	
 	echo ''
@@ -3404,7 +3405,6 @@ then
                 tr -dc A-Za-z0-9_ < /dev/urandom | head -c ${l} | xargs 
         }
         password=$(genpasswd)
-        echo $password > "$DistDir"/installs/logs/amide-password.txt
 
         USERNAME=amide
         PASSWORD=$password
@@ -3465,16 +3465,23 @@ then
 	echo "=============================================="
 	echo ''
 
- 	sudo tar -v --extract --file=/opt/olxc/"$DistDir"/uekulele/archives/dns-dhcp-cont.tar -C / var/lib/lxc/nsa/rootfs/etc/systemd/system/dns-sync.service
- 	sudo mv /var/lib/lxc/nsa/rootfs/etc/systemd/system/dns-sync.service /var/lib/lxc/$NameServer/rootfs/etc/systemd/system/dns-sync.service > /dev/null 2>&1
+        sudo lxc-attach -n $NameServer -- mkdir -p /root/backup-lxc-container/$NameServer/updates
+        sudo lxc-attach -n $NameServer -- touch /root/gre_hosts.txt
+        sudo lxc-attach -n $NameServer -- touch /home/ubuntu/gre_hosts.txt
+        sudo lxc-attach -n $NameServer -- tar -cvzPf /root/backup-lxc-container/$NameServer/updates/backup_"$NameServer"_ns_update.tar.gz -T /root/ns_backup_update.lst --numeric-owner
+        sudo tar -v --extract --file=/opt/olxc/"$DistDir"/uekulele/archives/dns-dhcp-cont.tar -C / var/lib/lxc/nsa/rootfs/etc/systemd/system/dns-sync.service
+        sudo tar -v --extract --file=/opt/olxc/"$DistDir"/uekulele/archives/dns-dhcp-cont.tar -C / var/lib/lxc/nsa/rootfs/etc/systemd/system/dns-thaw.service
+        sudo mv /var/lib/lxc/nsa/rootfs/etc/systemd/system/dns-sync.service /var/lib/lxc/"$NameServer"-base/rootfs/etc/systemd/system/dns-sync.service
+        sudo mv /var/lib/lxc/nsa/rootfs/etc/systemd/system/dns-thaw.service /var/lib/lxc/"$NameServer"-base/rootfs/etc/systemd/system/dns-thaw.service
 
-	sudo lxc-attach -n $NameServer -- systemctl enable dns-sync
-	sudo lxc-attach -n $NameServer -- chown bind:bind /var/lib/bind/fwd.$Domain1
-	sudo lxc-attach -n $NameServer -- chown bind:bind /var/lib/bind/rev.$Domain1
-	sudo lxc-attach -n $NameServer -- chown bind:bind /var/lib/bind/fwd.$Domain2
-	sudo lxc-attach -n $NameServer -- chown bind:bind /var/lib/bind/rev.$Domain2
-	sudo lxc-attach -n $NameServer -- chown root:bind /var/lib/bind
-	sudo lxc-attach -n $NameServer -- chmod 775 /var/lib/bind
+        sudo lxc-attach -n $NameServer -- systemctl enable dns-sync
+        sudo lxc-attach -n $NameServer -- systemctl enable dns-thaw
+        sudo lxc-attach -n $NameServer -- chown bind:bind /var/lib/bind/fwd.$Domain1
+        sudo lxc-attach -n $NameServer -- chown bind:bind /var/lib/bind/rev.$Domain1
+        sudo lxc-attach -n $NameServer -- chown bind:bind /var/lib/bind/fwd.$Domain2
+        sudo lxc-attach -n $NameServer -- chown bind:bind /var/lib/bind/rev.$Domain2
+        sudo lxc-attach -n $NameServer -- chown root:bind /var/lib/bind
+        sudo lxc-attach -n $NameServer -- chmod 775 /var/lib/bind
 	
 	echo ''
 	echo "=============================================="
@@ -3583,37 +3590,11 @@ then
 
 	clear
 
-#       sudo service sw1 restart
-#       sudo service sx1 restart
-
 	if [ $GRE = 'Y' ]
 	then
 		sudo sed -i "/route add -net/s/#/ /"				/etc/network/openvswitch/crt_ovs_sw1.sh	
 		sudo sed -i "/REMOTE_GRE_ENDPOINT/s/#/ /"			/etc/network/openvswitch/crt_ovs_sw1.sh	
 		sudo sed -i "s/REMOTE_GRE_ENDPOINT/$MultiHostVar5/g"		/etc/network/openvswitch/crt_ovs_sw1.sh
-
-#		function GetGrePortName {
-#			sudo ovs-vsctl show | grep -B3 "$MultiHostVar5" | grep Port | sed 's/  *//g' | cut -f2 -d'"'
-#		}
-#		GrePortName=$(GetGrePortName)
-
-#		function GetGrePortNameStringLen {
-#			echo $GrePortName | wc -c
-#		}
-#		GrePortNameStringLen=$(GetGrePortNameStringLen)
-
-#		if [ $GrePortNameStringLen -gt 1 ]
-#		then
-#			function CheckGreExists {
-#				sudo ovs-vsctl show | grep $GrePortName | wc -l
-#			}
-#			GreExists=$(CheckGreExists)
-#
-#			if [ $GreExists -gt 0 ]
-#			then
-#				sudo ovs-vsctl del-port $GrePortName
-#			fi
-#		fi
 
 		sudo ovs-vsctl add-port sw1 gre$Sw1Index -- set interface gre$Sw1Index type=gre options:remote_ip=$MultiHostVar5
 
@@ -3648,9 +3629,6 @@ then
                 echo "=============================================="
                 echo ''
 	
-#		sudo service sw1 restart
-#		sudo service sx1 restart
-
 		ssh-keygen -R $MultiHostVar5
 		sshpass -p $MultiHostVar9 ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 date
 		if [ $? -eq 0 ]
