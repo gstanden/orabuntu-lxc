@@ -312,6 +312,8 @@ sudo lxc-attach -n $SeedContainerName -- yum -y install createrepo sudo which ma
 sudo lxc-attach -n $SeedContainerName -- yum -y install sysstat unixODBC unixODBC-devel xdpyinfo xorg-x11-apps pdksh libicu ntp sg3-utils xauth xorg-x11-fonts* unzip nfs-utils
 sudo lxc-attach -n $SeedContainerName -- yum -y install binutils compat-libcap1 compat-libstdc++-33 perl bash bind-utils net-tools wget
 sudo lxc-attach -n $SeedContainerName -- usermod --password `perl -e "print crypt('root','root');"` root
+sudo sh -c "echo 'SEARCH=\"workspaces.$Domain1 $Domain1\"' >> /var/lib/lxc/$SeedContainerName/rootfs/etc/sysconfig/network-scripts/ifcfg-eth0"
+sudo sh -c "echo 'DNS1=10.209.53.11'                       >> /var/lib/lxc/$SeedContainerName/rootfs/etc/sysconfig/network-scripts/ifcfg-eth0"
 
 echo ''
 echo "=============================================="
