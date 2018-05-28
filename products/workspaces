@@ -285,9 +285,9 @@ sudo sh -c "echo '# tmpfs                              /dev/shm                 
 sudo sh -c "echo ''														>> /var/lib/lxc/$SeedContainerName/rootfs/etc/fstab"
 sudo sh -c "echo '# Mount points for Workspaces Filesystems' 						   			>> /var/lib/lxc/$SeedContainerName/rootfs/etc/fstab"
 sudo sh -c "echo ''														>> /var/lib/lxc/$SeedContainerName/rootfs/etc/fstab"
-sudo sh -c "echo '# /dev/salt-master/wdx_data1_00      /mnt/database                   xfs     defaults                0 0'	>> /var/lib/lxc/$SeedContainerName/rootfs/etc/fstab"
-sudo sh -c "echo '# /dev/salt-master/wdx_fspa1_00      /opt/watchdox/storage/filespace xfs     defaults                0 0'	>> /var/lib/lxc/$SeedContainerName/rootfs/etc/fstab"
-sudo sh -c "echo '# /dev/salt-master/wdx_fcac1_00      /opt/watchdox/storage/fs_cache  xfs     defaults                0 0'	>> /var/lib/lxc/$SeedContainerName/rootfs/etc/fstab"
+sudo sh -c "echo '# /dev/ora66c11/wdx_data_1_00      /mnt/database                   xfs     defaults                0 0'	>> /var/lib/lxc/$SeedContainerName/rootfs/etc/fstab"
+sudo sh -c "echo '# /dev/ora66c11/wdx_fspa_1_00      /opt/watchdox/storage/filespace xfs     defaults                0 0'	>> /var/lib/lxc/$SeedContainerName/rootfs/etc/fstab"
+sudo sh -c "echo '# /dev/ora66c11/wdx_fcac_1_00      /opt/watchdox/storage/fs_cache  xfs     defaults                0 0'	>> /var/lib/lxc/$SeedContainerName/rootfs/etc/fstab"
 
 sudo lxc-attach -n $SeedContainerName -- cat /etc/fstab
 
@@ -310,9 +310,7 @@ sleep 5
 
 sudo lxc-attach -n $SeedContainerName -- yum -y install createrepo sudo which man tar gcc gcc-c++ glibc glibc-devel ksh libgcc libstdc++ libstdc++-devel libaio libaio-devel libXext libXtst libX11 libXau libxcb libXi make
 sudo lxc-attach -n $SeedContainerName -- yum -y install sysstat unixODBC unixODBC-devel xdpyinfo xorg-x11-apps pdksh libicu ntp sg3-utils xauth xorg-x11-fonts* unzip nfs-utils
-sudo lxc-attach -n $SeedContainerName -- yum -y install binutils compat-libcap1 compat-libstdc++-33 perl bash bind-utils net-tools
-sudo lxc-attach -n $SeedContainerName -- yum -y remove  compat-libstdc++-33.i686 glibc.i686 glibc-devel.i686 libgcc.i686 libstdc++.i686 libstdc++-devel.i686 
-# sudo lxc-attach -n $SeedContainerName -- yum -y remove  libaio.i686 libaio-devel.i686 libXext.i686 libXtst.i686 libX11.i686 libXau.i686 libxcb.i686 elfutils-libelf-devel.i386
+sudo lxc-attach -n $SeedContainerName -- yum -y install binutils compat-libcap1 compat-libstdc++-33 perl bash bind-utils net-tools wget
 sudo lxc-attach -n $SeedContainerName -- usermod --password `perl -e "print crypt('root','root');"` root
 
 echo ''
