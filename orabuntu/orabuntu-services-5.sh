@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#    Copyright 2015-2018 Gilbert Standen
+#    Copyright 2015-2019 Gilbert Standen
 #    This file is part of Orabuntu-LXC.
 
 #    Orabuntu-LXC is free software: you can redistribute it and/or modify
@@ -209,77 +209,77 @@ then
 	clear
 fi
 
-if [ $MultiHostVar1 = 'new' ] || [ $MultiHostVar1 = 'reinstall' ]
-then
-	echo ''
-	echo "=============================================="
-	echo "Create additional OpenvSwitch networks...     "
-	echo "=============================================="
-	echo ''
+# if [ $MultiHostVar1 = 'new' ] || [ $MultiHostVar1 = 'reinstall' ]
+# then
+# 	echo ''
+# 	echo "=============================================="
+# 	echo "Create additional OpenvSwitch networks...     "
+# 	echo "=============================================="
+# 	echo ''
 
-	sleep 5
+# 	sleep 5
 
-	clear
+# 	clear
 
-	SwitchList='sw2 sw3 sw4 sw5 sw6 sw7 sw8 sw9'
-	for k in $SwitchList
-	do
-		echo ''
-		echo "=============================================="
-		echo "Create systemd OpenvSwitch $k service...      "
-		echo "=============================================="
-
-       		if [ ! -f /etc/systemd/system/$k.service ]
-       		then
-                	sudo sh -c "echo '[Unit]'						 > /etc/systemd/system/$k.service"
-                	sudo sh -c "echo 'Description=$k Service'				>> /etc/systemd/system/$k.service"
-                	sudo sh -c "echo 'After=network-online.target'				>> /etc/systemd/system/$k.service"
-                	sudo sh -c "echo ''							>> /etc/systemd/system/$k.service"
-                	sudo sh -c "echo '[Service]'						>> /etc/systemd/system/$k.service"
-			
-			if [ $AWS -eq 1 ]
-			then
-                		sudo sh -c "echo 'Type=idle'					>> /etc/systemd/system/$k.service"
-			else
-                		sudo sh -c "echo 'Type=oneshot'					>> /etc/systemd/system/$k.service"
-			fi
-
-                	sudo sh -c "echo 'User=root'						>> /etc/systemd/system/$k.service"
-                	sudo sh -c "echo 'RemainAfterExit=yes'					>> /etc/systemd/system/$k.service"
-                	sudo sh -c "echo 'ExecStart=/etc/network/openvswitch/crt_ovs_$k.sh' 	>> /etc/systemd/system/$k.service"
-                	sudo sh -c "echo ''							>> /etc/systemd/system/$k.service"
-                	sudo sh -c "echo '[Install]'						>> /etc/systemd/system/$k.service"
-                	sudo sh -c "echo 'WantedBy=multi-user.target'				>> /etc/systemd/system/$k.service"
-		fi
-	
-		echo ''
-		echo "=============================================="
-		echo "Start OpenvSwitch $k ...                      "
-		echo "=============================================="
-		echo ''
-
-       		sudo chmod 644 /etc/systemd/system/$k.service
-       		sudo systemctl enable $k.service
-		sudo service $k stop
-		sudo service $k start
-		sudo service $k status
-
-		echo ''
-		echo "=============================================="
-		echo "OpenvSwitch $k is up.                         "
-		echo "=============================================="
-	
-		sleep 3
-
-		clear
-	done
-
-	echo ''
-	echo "=============================================="
-	echo "Openvswitch networks installed & configured.  "
-	echo "=============================================="
-	echo ''
-fi
+# 	SwitchList='sw2 sw3 sw4 sw5 sw6 sw7 sw8 sw9'
+# 	for k in $SwitchList
+# 	do
+# 		echo ''
+# 		echo "=============================================="
+# 		echo "Create systemd OpenvSwitch $k service...      "
+# 		echo "=============================================="
+#
+#		if [ ! -f /etc/systemd/system/$k.service ]
+#		then
+#			sudo sh -c "echo '[Unit]'						 > /etc/systemd/system/$k.service"
+#			sudo sh -c "echo 'Description=$k Service'				>> /etc/systemd/system/$k.service"
+#			sudo sh -c "echo 'After=network-online.target'				>> /etc/systemd/system/$k.service"
+#			sudo sh -c "echo ''							>> /etc/systemd/system/$k.service"
+#			sudo sh -c "echo '[Service]'						>> /etc/systemd/system/$k.service"
+#
+#			if [ $AWS -eq 1 ]
+#			then
+#				sudo sh -c "echo 'Type=idle'					>> /etc/systemd/system/$k.service"
+#			else
+#				sudo sh -c "echo 'Type=oneshot'					>> /etc/systemd/system/$k.service"
+#			fi
+#
+#			sudo sh -c "echo 'User=root'						>> /etc/systemd/system/$k.service"
+#			sudo sh -c "echo 'RemainAfterExit=yes'					>> /etc/systemd/system/$k.service"
+#			sudo sh -c "echo 'ExecStart=/etc/network/openvswitch/crt_ovs_$k.sh' 	>> /etc/systemd/system/$k.service"
+#			sudo sh -c "echo ''							>> /etc/systemd/system/$k.service"
+#			sudo sh -c "echo '[Install]'						>> /etc/systemd/system/$k.service"
+#			sudo sh -c "echo 'WantedBy=multi-user.target'				>> /etc/systemd/system/$k.service"
+#		fi
+#	
+#		echo ''
+#		echo "=============================================="
+#		echo "Start OpenvSwitch $k ...                      "
+#		echo "=============================================="
+#		echo ''
+#
+#		sudo chmod 644 /etc/systemd/system/$k.service
+#		sudo systemctl enable $k.service
+#		sudo service $k stop
+#		sudo service $k start
+#		sudo service $k status
+#
+#		echo ''
+#		echo "=============================================="
+#		echo "OpenvSwitch $k is up.                         "
+#		echo "=============================================="
+#	
+#		sleep 3
+#
+#		clear
+#	done
+#
+#	echo ''
+#	echo "=============================================="
+#	echo "Openvswitch networks installed & configured.  "
+#	echo "=============================================="
+#	echo ''
+#fi
 
 sleep 5
 
@@ -322,7 +322,7 @@ do
 	if [ $UbuntuMajorVersion -ge 16 ]
 	then
 		function CheckPublicIPIterative {
-			sudo lxc-info -n $j -iH | cut -f1-3 -d'.' | sed 's/\.//g'
+			sudo lxc-info -n $j -iH | cut -f1-3 -d'.' | sed 's/\.//g' | head -1
 		}
 	fi
 	PublicIPIterative=$(CheckPublicIPIterative)
@@ -458,7 +458,7 @@ then
 	echo ''
 	
 	sudo touch /etc/orabuntu-lxc-release
-	sudo sh -c "echo 'Orabuntu-LXC v6.11.3-beta AMIDE' > /etc/orabuntu-lxc-release"
+	sudo sh -c "echo 'Orabuntu-LXC v6.11.5-beta AMIDE' > /etc/orabuntu-lxc-release"
 	sudo ls -l /etc/orabuntu-lxc-release
 	echo ''
 	sudo cat /etc/orabuntu-lxc-release
@@ -954,7 +954,7 @@ then
 	echo "                                              "
 	echo "Instructions:                                 "
 	echo "                                              "
-	echo "     cd ../orabuntu/archives/scst-files       "
+	echo "     cd /opt/olxc/home/scst-files             "
 	echo "     cat README                               "
 	echo "     ./create-scst.sh                         "
 	echo "=============================================="

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#    Copyright 2015-2018 Gilbert Standen
+#    Copyright 2015-2019 Gilbert Standen
 #    This file is part of Orabuntu-LXC.
 
 #    Orabuntu-LXC is free software: you can redistribute it and/or modify
@@ -338,7 +338,7 @@ then
                 if [ $UbuntuMajorVersion -ge 16 ]
                 then
                         function CheckPublicIPIterative {
-                                sudo lxc-info -n oel$OracleRelease$SeedPostfix -iH | cut -f1-3 -d'.' | sed 's/\.//g'
+                                sudo lxc-info -n oel$OracleRelease$SeedPostfix -iH | cut -f1-3 -d'.' | sed 's/\.//g' | head -1
                         }
                 fi
 		PublicIPIterative=$(CheckPublicIPIterative)
@@ -470,80 +470,6 @@ echo "=============================================="
 sleep 5
 
 clear
-
-# echo ''
-# echo "=============================================="
-# echo "Configuring $SeedContainerName for Oracle...  "
-# echo "=============================================="
-# echo ''
-
-# sudo lxc-attach -n $SeedContainerName -- /root/packages.sh
-# sudo lxc-attach -n $SeedContainerName -- /root/create_users.sh
-# sudo lxc-attach -n $SeedContainerName -- /root/lxc-services.sh
-# sudo lxc-attach -n $SeedContainerName -- usermod --password `perl -e "print crypt('grid','grid');"` grid
-# sudo lxc-attach -n $SeedContainerName -- usermod --password `perl -e "print crypt('oracle','oracle');"` oracle
-# sudo lxc-attach -n $SeedContainerName -- usermod -g oinstall oracle
-# sudo lxc-attach -n $SeedContainerName -- chown oracle:oinstall /home/oracle/.bash_profile
-# sudo lxc-attach -n $SeedContainerName -- chown oracle:oinstall /home/oracle/.bashrc
-# sudo lxc-attach -n $SeedContainerName -- chown oracle:oinstall /home/oracle/.kshrc
-# sudo lxc-attach -n $SeedContainerName -- chown oracle:oinstall /home/oracle/.bash_logout
-# sudo lxc-attach -n $SeedContainerName -- chown oracle:oinstall /home/oracle/.
-# sudo lxc-attach -n $SeedContainerName -- chown grid:oinstall /home/grid/.bash_profile
-# sudo lxc-attach -n $SeedContainerName -- chown grid:oinstall /home/grid/.bashrc
-# sudo lxc-attach -n $SeedContainerName -- chown grid:oinstall /home/grid/.kshrc
-# sudo lxc-attach -n $SeedContainerName -- chown grid:oinstall /home/grid/.bash_logout
-# sudo lxc-attach -n $SeedContainerName -- chown grid:oinstall /home/grid/.
-
-# echo ''  
-# echo "=============================================="
-# echo "$SeedContainerName configured for Oracle.     "
-# echo "=============================================="
-# echo ''
-
-# sleep 5
-
-# clear
-
-# if [ $MajorRelease -eq 7 ]
-# then
-# 	echo ''
-# 	echo "=============================================="
-# 	echo "Start NTP service...                          "
-# 	echo "=============================================="
-# 	echo ''
-
-#	sudo lxc-attach -n $SeedContainerName -- chmod +x /etc/systemd/system/ntp.service
-#	sudo lxc-attach -n $SeedContainerName -- systemctl enable ntp.service
-#	sudo lxc-attach -n $SeedContainerName -- service ntp start
-#	sudo lxc-attach -n $SeedContainerName -- service ntpd start
-#	sudo lxc-attach -n $SeedContainerName -- service ntp status
-#	echo ''
-#	sudo lxc-attach -n $SeedContainerName -- chkconfig ntp on
-#	sudo lxc-attach -n $SeedContainerName -- chkconfig ntpd on
-
-#	sudo lxc-attach -n $SeedContainerName -- ntpd -x
-
-#	sleep 5
-
-#	clear
-
-#	echo ''
-#	echo "=============================================="
-#	echo "Done: Start NTP service.                      "
-#	echo "=============================================="
-
-#	sleep 5
-
-#	clear
-#elif [ $MajorRelease -eq 6 ] || [ $MajorRelease -eq 5 ]
-#then
-#	sudo lxc-attach -n $SeedContainerName -- ntpd -x
-##	sudo lxc-attach -n $SeedContainerName -- dhcpcd -k
-#fi
-
-# sleep 5
-
-# clear
 
 echo ''
 echo "=============================================="

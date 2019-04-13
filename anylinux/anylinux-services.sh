@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#    Copyright 2015-2018 Gilbert Standen
+#    Copyright 2015-2019 Gilbert Standen
 #    This file is part of Orabuntu-LXC.
 
 #    Orabuntu-LXC is free software: you can redistribute it and/or modify
@@ -157,8 +157,8 @@ Owner=$(GetOwner)
 	StorNet1='StorNet1Fwd:10.210.107'	# UNCOMMENT LINE IF USING CUSTOM SUBNETS
 	StorNet2='StorNet2Fwd:10.211.107'	# UNCOMMENT LINE IF USING CUSTOM SUBNETS
 
-	ExtrNet1='172.26.11'			# UNCOMMENT LINE IF USING CUSTOM SUBNETS
-	ExtrNet2='172.27.11'			# UNCOMMENT LINE IF USING CUSTOM SUBNETS
+	ExtrNet1='172.200.11'			# UNCOMMENT LINE IF USING CUSTOM SUBNETS
+	ExtrNet2='172.201.11'			# UNCOMMENT LINE IF USING CUSTOM SUBNETS
 	ExtrNet3='192.168.19'			# UNCOMMENT LINE IF USING CUSTOM SUBNETS
 	ExtrNet4='192.168.20'			# UNCOMMENT LINE IF USING CUSTOM SUBNETS
 	ExtrNet5='192.168.21'			# UNCOMMENT LINE IF USING CUSTOM SUBNETS
@@ -341,9 +341,9 @@ then
 	echo ''
 	echo "Acknowledgements"
 	echo ''
-	echo "1.  Mary Standen		(mother) (1934-2016)"
-	echo "2.  Yelena Belyaeva-Standen 	(spouse)"
-	echo "3.  Allen the Cat 		(cat)"
+        echo "1.  Mary Standen			(mother)	(1934-2016)"
+        echo "2.  Yelena Belyaeva-Standen		(spouse)"
+        echo "3.  Allen the Cat			(cat)		(2001-2018)"
 	echo ''
 	echo "For their patience and support during the long hours worked in the past and the long hours to be worked in the future for Orabuntu-LXC."
 	echo "Mary Standen my mother always raised me to put mission first and work first."
@@ -520,7 +520,7 @@ fi
 	MajorRelease=$8
 	if [ -z $8 ]
 	then
-		MajorRelease=6
+		MajorRelease=7
 	fi
 	# echo 'Oracle Container Release  = '$MajorRelease
 
@@ -534,7 +534,7 @@ fi
 	NumCon=$3
 	if [ -z $3 ]
 	then
-		NumCon=2
+		NumCon=4
 	fi
 	echo 'Oracle Container Count    = '$NumCon
 
@@ -1277,7 +1277,7 @@ echo "$DistDir/$SubDirName/$SubDirName-services-4.sh"	 			>> "$DistDir"/"$SubDir
 echo "$DistDir/$SubDirName/$SubDirName-services-5.sh"	 			>> "$DistDir"/"$SubDirName"/archives/"$SubDirName"-services.lst
 echo "$DistDir/$SubDirName/GNU3"                                                >> "$DistDir"/"$SubDirName"/archives/"$SubDirName"-services.lst
 echo "$DistDir/$SubDirName/COPYING"                                             >> "$DistDir"/"$SubDirName"/archives/"$SubDirName"-services.lst
-echo "$DistDir/products/$Product"						>> "$DistDir"/"$SubDirName"/archives/"$SubDirName"-services.lst
+echo "$DistDir/products/$Product/$Product"					>> "$DistDir"/"$SubDirName"/archives/"$SubDirName"-services.lst
 
 cd "$DistDir"/"$SubDirName"/archives
 
@@ -1486,7 +1486,7 @@ sudo tar -xf /opt/olxc/"$DistDir"/"$SubDirName"/archives/"$SubDirName"-services.
 sudo chown -R $Group:$Owner home
 sudo chmod 775 /opt/olxc/"$DistDir"/"$SubDirName"/"$SubDirName"-services-*.sh
 sudo chmod 775 /opt/olxc/"$DistDir"/anylinux/*
-sudo chmod 775 /opt/olxc/"$DistDir"/products/$Product
+sudo chmod 775 /opt/olxc/"$DistDir"/products/$Product/$Product
 sleep 5
 
 echo ''

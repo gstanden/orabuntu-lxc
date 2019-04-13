@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#    Copyright 2015-2018 Gilbert Standen
+#    Copyright 2015-2019 Gilbert Standen
 #    This file is part of Orabuntu-LXC.
 
 #    Orabuntu-LXC is free software: you can redistribute it and/or modify
@@ -70,6 +70,48 @@ MTU=1500
 LOGEXT=`date +"%Y-%m-%d.%R:%S"`
 
 Operation=addrelease
+OpType=add
+
+if [ -z $1 ]
+then
+        echo ''
+        echo "=============================================="
+        echo "                                              "
+        echo "If you doing a fresh Orabuntu-LXC install     "
+        echo "on this host then take default 'new'          "
+        echo "                                              "
+        echo "If you are doing a complete Orabuntu-LXC      "
+        echo "reinstall then answer 'reinstall'             "
+        echo "                                              "
+        echo "=============================================="
+        echo "                                              "
+        read -e -p "Install Type [new/rei/add]:             " -i "new" OpType
+        echo "                                              "
+        echo "=============================================="
+else
+        OpType=$1
+fi
+
+if   [ $OpType = 'rei' ]
+then
+        Operation=reinstall
+elif [ $OpType = 'new' ]
+then
+        Operation=new
+elif [ $OpType = 'add' ]
+then
+	Operation=addrelease
+fi
+
+if [ -z $2 ]
+then
+        Product=no-product
+        Product=workspaces
+        Product=oracle-db
+	Product=oracle-gi-18c
+else
+        Product=$2
+fi
 
 if [ ! -d "$DistDir"/installs/logs ]
 then
@@ -101,14 +143,14 @@ then
                 # Until support for jumbo frames ready set 1500.
                 sudo ifconfig eth0 mtu 1500
                 AwsMtu=1500
-		MultiHost="$Operation:N:X:X:X:X:$AwsMtu:X:X:$GRE"
+		MultiHost="$Operation:N:X:X:X:X:$AwsMtu:X:X:$GRE:$Product"
 
         elif [ $AwsMtu -eq 1500 ]
         then
-		MultiHost="$Operation:N:X:X:X:X:$AwsMtu:X:X:$GRE"
+		MultiHost="$Operation:N:X:X:X:X:$AwsMtu:X:X:$GRE:$Product"
         fi
 else
-	MultiHost="$Operation:N:X:X:X:X:$MTU:X:X:$GRE"
+	MultiHost="$Operation:N:X:X:X:X:$MTU:X:X:$GRE:$Product"
 fi
 
 ./anylinux-services.sh $MultiHost 

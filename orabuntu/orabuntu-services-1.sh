@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#    Copyright 2015-2018 Gilbert Standen
+#    Copyright 2015-2019 Gilbert Standen
 #    This file is part of Orabuntu-LXC.
 
 #    Orabuntu-LXC is free software: you can redistribute it and/or modify
@@ -992,8 +992,8 @@ then
 	echo "=============================================="
 
 	echo ''
-	sudo touch /var/lib/lxc/nsa/rootfs/etc/resolv.conf
-	sudo sed -i '0,/.*nameserver.*/s/.*nameserver.*/nameserver 8.8.8.8\n&/' /var/lib/lxc/nsa/rootfs/etc/resolv.conf
+	sudo touch /var/lib/lxc/nsa/rootfs/etc/resolv.conf > /dev/null 2>&1
+	sudo sed -i '0,/.*nameserver.*/s/.*nameserver.*/nameserver 8.8.8.8\n&/' /var/lib/lxc/nsa/rootfs/etc/resolv.conf > /dev/null 2>&1
 	sudo lxc-start -n nsa
 	echo ''
 
@@ -1384,10 +1384,10 @@ then
 	then
 		# Remove the extra nameserver line used for DNS DHCP setup and add the required nameservers.
 
-		sudo sed -i '/8.8.8.8/d' /var/lib/lxc/nsa/rootfs/etc/resolv.conf
-		sudo sed -i '/nameserver/c\nameserver 10.207.39.2' /var/lib/lxc/nsa/rootfs/etc/resolv.conf
-		sudo sh -c "echo 'nameserver 10.207.29.2' >> /var/lib/lxc/nsa/rootfs/etc/resolv.conf"
-		sudo sh -c "echo 'search orabuntu-lxc.com consultingcommandos.us' >> /var/lib/lxc/nsa/rootfs/etc/resolv.conf"
+		sudo sed -i '/8.8.8.8/d' /var/lib/lxc/nsa/rootfs/etc/resolv.conf								> /dev/null 2>&1
+		sudo sed -i '/nameserver/c\nameserver 10.207.39.2' /var/lib/lxc/nsa/rootfs/etc/resolv.conf					> /dev/null 2>&1
+		sudo sh -c "echo 'nameserver 10.207.29.2' >> /var/lib/lxc/nsa/rootfs/etc/resolv.conf"						> /dev/null 2>&1
+		sudo sh -c "echo 'search orabuntu-lxc.com consultingcommandos.us' >> /var/lib/lxc/nsa/rootfs/etc/resolv.conf"			> /dev/null 2>&1
 
 		if [ ! -z $HostName ]
 		then
@@ -1454,7 +1454,7 @@ then
 			# GLS 20151221 Settable Domain feature added
 			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/var/lib/bind/fwd.orabuntu-lxc.com
 			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/var/lib/bind/rev.orabuntu-lxc.com
-			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/etc/resolv.conf
+			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/etc/resolv.conf			> /dev/null 2>&1
 			if [ $NetworkManagerInstalled -eq 1 ]
 			then
 				sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /etc/NetworkManager/dnsmasq.d/local
@@ -1479,7 +1479,7 @@ then
 			# GLS 20151221 Settable Domain feature added
 			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /var/lib/lxc/$NameServer/rootfs/var/lib/bind/fwd.consultingcommandos.us
 			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /var/lib/lxc/$NameServer/rootfs/var/lib/bind/rev.consultingcommandos.us
-			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /var/lib/lxc/$NameServer/rootfs/etc/resolv.conf
+			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /var/lib/lxc/$NameServer/rootfs/etc/resolv.conf	> /dev/null 2>&1
 			if [ $NetworkManagerInstalled -eq 1 ]
 			then
 				sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /etc/NetworkManager/dnsmasq.d/local
@@ -1507,7 +1507,7 @@ then
 	# Cleanup duplicate search lines in /etc/resolv.conf if Orabuntu-LXC has been re-run
 	if [ $NetworkManagerInstalled -eq 1 ]
 	then
-		sudo sed -i '$!N; /^\(.*\)\n\1$/!P; D'	/etc/resolv.conf
+		sudo sed -i '$!N; /^\(.*\)\n\1$/!P; D'	/etc/resolv.conf								> /dev/null 2>&1
 	fi
 
 	if [ $UbuntuVersion != '16.04' ]

@@ -20,5 +20,6 @@
 /etc/resolv.dnsmasq
 /etc/dnsmasq.conf
 /etc/dhcp/dhclient.conf
+/usr/share/lxc/config/common.conf.d/01-sys-time.conf
 /etc/GNU3
 /etc/COPYING

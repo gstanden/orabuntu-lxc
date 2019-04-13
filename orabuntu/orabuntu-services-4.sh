@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#    Copyright 2015-2018 Gilbert Standen
+#    Copyright 2015-2019 Gilbert Standen
 #    This file is part of Orabuntu-LXC.
 
 #    Orabuntu-LXC is free software: you can redistribute it and/or modify
@@ -40,6 +40,7 @@ NumCon=$3
 NameServer=$4
 MultiHost=$5
 DistDir=$6
+Product=$7
 
 function SoftwareVersion { echo "$@" | awk -F. '{ printf("%d%03d%03d%03d\n", $1,$2,$3,$4); }'; }
 
@@ -57,6 +58,11 @@ function GetLXCVersion {
         lxc-create --version
 }
 LXCVersion=$(GetLXCVersion)
+
+function GetMultiHostVar1 {
+        echo $MultiHost | cut -f1 -d':'
+}
+MultiHostVar1=$(GetMultiHostVar1)
 
 function GetMultiHostVar7 {
         echo $MultiHost | cut -f7 -d':'
@@ -274,6 +280,13 @@ do
 	fi
 
 	sudo sed -i "s/$SeedContainerName/$ContainerPrefix$CloneIndex/g" /var/lib/lxc/$ContainerPrefix$CloneIndex/config
+
+	if [ $Product = 'oracle-gi-18c' ]
+	then	
+		sudo sed -i "s/\#marker//g" /var/lib/lxc/$ContainerPrefix$CloneIndex/config
+		sudo sed -i "s/$ContainerPrefix$CloneIndex//g" /var/lib/lxc/$ContainerPrefix$CloneIndex/rootfs/etc/hosts
+	fi
+
 	sudo sed -i "s/\.10/\.$CloneIndex/g" /var/lib/lxc/$ContainerPrefix$CloneIndex/config
 	sudo sed -i 's/sx1/sw1/g' /var/lib/lxc/$ContainerPrefix$CloneIndex/config
 	sudo sed -i "s/mtu = 1500/mtu = $MultiHostVar7/g" /var/lib/lxc/$ContainerPrefix$CloneIndex/config
@@ -404,6 +417,85 @@ then
 	echo "Done: Update config for LXC 2.1.0+            "
 	echo "=============================================="
 	echo ''
+fi
+
+sleep 5
+
+clear
+
+if [ $Product = 'oracle-gi-18c' ]
+then
+	if [ $MultiHostVar1 = 'new' ] || [ $MultiHostVar1 = 'reinstall' ]
+	then
+		echo ''
+		echo "=============================================="
+		echo "Create additional OpenvSwitch networks...     "
+		echo "=============================================="
+		echo ''
+
+		sleep 5
+
+		clear
+
+		SwitchList='sw2 sw3 sw4 sw5 sw6 sw7 sw8 sw9'
+		for k in $SwitchList
+		do
+			echo ''
+			echo "=============================================="
+			echo "Create systemd OpenvSwitch $k service...      "
+			echo "=============================================="
+
+       			if [ ! -f /etc/systemd/system/$k.service ]
+       			then
+       	         		sudo sh -c "echo '[Unit]'						 > /etc/systemd/system/$k.service"
+       	         		sudo sh -c "echo 'Description=$k Service'				>> /etc/systemd/system/$k.service"
+       	         		sudo sh -c "echo 'After=network-online.target'				>> /etc/systemd/system/$k.service"
+                		sudo sh -c "echo ''							>> /etc/systemd/system/$k.service"
+                		sudo sh -c "echo '[Service]'						>> /etc/systemd/system/$k.service"
+			
+				if [ $AWS -eq 1 ]
+				then
+                			sudo sh -c "echo 'Type=idle'					>> /etc/systemd/system/$k.service"
+				else
+                			sudo sh -c "echo 'Type=oneshot'					>> /etc/systemd/system/$k.service"
+				fi
+
+                		sudo sh -c "echo 'User=root'						>> /etc/systemd/system/$k.service"
+                		sudo sh -c "echo 'RemainAfterExit=yes'					>> /etc/systemd/system/$k.service"
+                		sudo sh -c "echo 'ExecStart=/etc/network/openvswitch/crt_ovs_$k.sh' 	>> /etc/systemd/system/$k.service"
+                		sudo sh -c "echo ''							>> /etc/systemd/system/$k.service"
+                		sudo sh -c "echo '[Install]'						>> /etc/systemd/system/$k.service"
+                		sudo sh -c "echo 'WantedBy=multi-user.target'				>> /etc/systemd/system/$k.service"
+			fi
+	
+			echo ''
+			echo "=============================================="
+			echo "Start OpenvSwitch $k ...                      "
+			echo "=============================================="
+			echo ''
+
+       			sudo chmod 644 /etc/systemd/system/$k.service
+       			sudo systemctl enable $k.service
+			sudo service $k stop
+			sudo service $k start
+			sudo service $k status
+
+			echo ''
+			echo "=============================================="
+			echo "OpenvSwitch $k is up.                         "
+			echo "=============================================="
+	
+			sleep 3
+
+			clear
+		done
+
+		echo ''
+		echo "=============================================="
+		echo "Openvswitch networks installed & configured.  "
+		echo "=============================================="
+		echo ''
+	fi
 fi
 
 sleep 5

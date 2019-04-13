@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#    Copyright 2015-2018 Gilbert Standen
+#    Copyright 2015-2019 Gilbert Standen
 #    This file is part of Orabuntu-LXC.
 
 #    Orabuntu-LXC is free software: you can redistribute it and/or modify
@@ -364,8 +364,18 @@ do
 	fi
 
 	sudo sed -i "s/$SeedContainerName/$ContainerPrefix$CloneIndex/g" /var/lib/lxc/$ContainerPrefix$CloneIndex/config
+
+        if [ $Product = 'oracle-gi-18c' ]
+        then
+                sudo sed -i "s/\#marker//g" /var/lib/lxc/$ContainerPrefix$CloneIndex/config
+                sudo sed -i "s/$ContainerPrefix$CloneIndex//g" /var/lib/lxc/$ContainerPrefix$CloneIndex/rootfs/etc/hosts
+        fi
+
 	sudo sed -i "s/\.10/\.$CloneIndex/g" /var/lib/lxc/$ContainerPrefix$CloneIndex/config
 	sudo sed -i 's/sx1/sw1/g' /var/lib/lxc/$ContainerPrefix$CloneIndex/config
+	sudo sed -i "s/mtu = 1500/mtu = $MultiHostVar7/g" /var/lib/lxc/$ContainerPrefix$CloneIndex/config
+#       sudo sed -i "s/lxc\.mount\.entry = \/dev\/lxc_luns/#lxc\.mount\.entry = \/dev\/lxc_luns/g" /var/lib/lxc/$ContainerPrefix$CloneIndex/config
+#       sudo sed -i "/domain-name-servers/s/10.207.29.2/10.207.39.2/g" /var/lib/lxc/$ContainerPrefix$CloneIndex/rootfs/etc/dhcp/dhclient.conf
 
 	function GetHostName (){ echo $ContainerPrefix$CloneIndex\1; }
 	HostName=$(GetHostName)

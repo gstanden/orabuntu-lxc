@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#    Copyright 2015-2018 Gilbert Standen
+#    Copyright 2015-2019 Gilbert Standen
 #    This file is part of Orabuntu-LXC.
 
 #    Orabuntu-LXC is free software: you can redistribute it and/or modify
@@ -99,9 +99,10 @@ fi
 
 if [ -z $2 ]
 then
-	Product=oracle-db
 	Product=no-product
         Product=workspaces
+	Product=oracle-db
+	Product=oracle-gi-18c
 else
         Product=$2
 fi

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#    Copyright 2015-2018 Gilbert Standen
+#    Copyright 2015-2019 Gilbert Standen
 #    This file is part of Orabuntu-LXC.
 
 #    Orabuntu-LXC is free software: you can redistribute it and/or modify
@@ -123,32 +123,28 @@ fi
 
 if [ -z $2 ]
 then
-        SPOKEIP='lan.ip.this.host'
-#       SPOKEIP=192.168.7.27
+        SPOKEIP=10.209.53.137
 else
         SPOKEIP=$2
 fi
 
 if [ -z $3 ]
 then
-        HUBIP='lan.ip.hub.host'
-#       HUBIP=192.168.7.32
+        HUBIP=10.209.53.1
 else
         HUBIP=$3
 fi
 
 if [ -z $4 ]
 then
-        HubUserAct=username
-        HubUserAct=orabuntu
+        HubUserAct=ubuntu
 else
         HubUserAct=$4
 fi
 
 if [ -z $5 ]
 then
-        HubSudoPwd=password
-        HubSudoPwd=orabuntu
+        HubSudoPwd=ubuntu
 else
         HubSudoPwd=$5
 fi
@@ -156,8 +152,9 @@ fi
 if [ -z $6 ]
 then
         Product=workspaces
-        Product=oracle-db
         Product=no-product
+        Product=oracle-db
+        Product=oracle-gi-18c
 else
         Product=$6
 fi

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#    Copyright 2015-2018 Gilbert Standen
+#    Copyright 2015-2019 Gilbert Standen
 #    This file is part of Orabuntu-LXC.
 
 #    Orabuntu-LXC is free software: you can redistribute it and/or modify
@@ -82,8 +82,8 @@ sudo cp -p GNU3			/opt/olxc/home/scst-files/.
 
 cd "$DistDir"/"$SubDirName"/archives
 
-cp -p "$DistDir"/products/"$Product".tar "$DistDir"/"$SubDirName"/archives/product.tar
-cp -p "$DistDir"/products/"$Product".lst "$DistDir"/"$SubDirName"/archives/product.lst
+cp -p "$DistDir"/products/"$Product"/"$Product".tar "$DistDir"/"$SubDirName"/archives/product.tar
+cp -p "$DistDir"/products/"$Product"/"$Product".lst "$DistDir"/"$SubDirName"/archives/product.lst
 
 ArchiveList="dns-dhcp-cont.tar dns-dhcp-host.tar lxc-oracle-files.tar product.tar $SubDirName-files.tar scst-files.tar tgt-files.tar ubuntu-host.tar"
 
