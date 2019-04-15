@@ -1,0 +1,222 @@
+#!/bin/bash
+
+#    Copyright 2015-2019 Gilbert Standen
+#    This file is part of Orabuntu-LXC.
+
+#    Orabuntu-LXC is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+
+#    Orabuntu-LXC is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+
+#    You should have received a copy of the GNU General Public License
+#    along with Orabuntu-LXC.  If not, see <http://www.gnu.org/licenses/>.
+
+#    v2.4 		GLS 20151224
+#    v2.8 		GLS 20151231
+#    v3.0 		GLS 20160710 Updates for Ubuntu 16.04
+#    v4.0 		GLS 20161025 DNS DHCP services moved into an LXC container
+#    v5.0 		GLS 20170909 Orabuntu-LXC Multi-Host
+#    v6.0-AMIDE-beta	GLS 20180106 Orabuntu-LXC AmazonS3 Multi-Host Docker Enterprise Edition (AMIDE)
+
+#    Note that this software builds a containerized DNS DHCP solution (bind9 / isc-dhcp-server).
+#    The nameserver should NOT be the name of an EXISTING nameserver but an arbitrary name because this software is CREATING a new LXC-containerized nameserver.
+#    The domain names can be arbitrary fictional names or they can be a domain that you actually own and operate.
+#    There are two domains and two networks because the "seed" LXC containers are on a separate network from the production LXC containers.
+#    If the domain is an actual domain, you will need to change the subnet using the subnets feature of Orabuntu-LXC
+
+clear
+
+Product=$1
+MultiHostVar1=$2
+
+if [ -e /sys/hypervisor/uuid ]
+then
+        function CheckAWS {
+                cat /sys/hypervisor/uuid | cut -c1-3 | grep -c ec2
+        }
+        AWS=$(CheckAWS)
+else
+        AWS=0
+fi
+
+GetLinuxFlavors(){
+if   [[ -e /etc/oracle-release ]]
+then
+        LinuxFlavors=$(cat /etc/oracle-release | cut -f1 -d' ')
+elif [[ -e /etc/redhat-release ]]
+then
+        LinuxFlavors=$(cat /etc/redhat-release | cut -f1 -d' ')
+elif [[ -e /usr/bin/lsb_release ]]
+then
+        LinuxFlavors=$(lsb_release -d | awk -F ':' '{print $2}' | cut -f1 -d' ')
+elif [[ -e /etc/issue ]]
+then
+        LinuxFlavors=$(cat /etc/issue | cut -f1 -d' ')
+else
+        LinuxFlavors=$(cat /proc/version | cut -f1 -d' ')
+fi
+}
+GetLinuxFlavors
+
+function TrimLinuxFlavors {
+echo $LinuxFlavors | sed 's/^[ \t]//;s/[ \t]$//'
+}
+LinuxFlavor=$(TrimLinuxFlavors)
+
+if   [ $LinuxFlavor = 'Oracle' ]
+then
+        CutIndex=7
+        function GetRedHatVersion {
+                sudo cat /etc/redhat-release | cut -f"$CutIndex" -d' ' | cut -f1 -d'.'
+        }
+        RedHatVersion=$(GetRedHatVersion)
+	RHV=$RedHatVersion
+        function GetOracleDistroRelease {
+                sudo cat /etc/oracle-release | cut -f5 -d' ' | cut -f1 -d'.'
+        }
+        OracleDistroRelease=$(GetOracleDistroRelease)
+        Release=$OracleDistroRelease
+        LF=$LinuxFlavor
+        RL=$Release
+elif [ $LinuxFlavor = 'Red' ] || [ $LinuxFlavor = 'CentOS' ]
+then
+        if   [ $LinuxFlavor = 'Red' ]
+        then
+                CutIndex=7
+        elif [ $LinuxFlavor = 'CentOS' ]
+        then
+                CutIndex=4
+        fi
+        function GetRedHatVersion {
+                sudo cat /etc/redhat-release | cut -f"$CutIndex" -d' ' | cut -f1 -d'.'
+        }
+        RedHatVersion=$(GetRedHatVersion)
+	RHV=$RedHatVersion
+        Release=$RedHatVersion
+        LF=$LinuxFlavor
+        RL=$Release
+elif [ $LinuxFlavor = 'Fedora' ]
+then
+        CutIndex=3
+        function GetRedHatVersion {
+                sudo cat /etc/redhat-release | cut -f"$CutIndex" -d' ' | cut -f1 -d'.'
+        }
+        RedHatVersion=$(GetRedHatVersion)
+	RHV=$RedHatVersion
+        if [ $RedHatVersion -ge 19 ]
+        then
+                Release=7
+        elif [ $RedHatVersion -ge 12 ] && [ $RedHatVersion -le 18 ]
+        then
+                Release=6
+        fi
+        LF=$LinuxFlavor
+        RL=$Release
+elif [ $LinuxFlavor = 'Ubuntu' ]
+then
+        function GetUbuntuVersion {
+                cat /etc/lsb-release | grep DISTRIB_RELEASE | cut -f2 -d'='
+        }
+        UbuntuVersion=$(GetUbuntuVersion)
+        LF=$LinuxFlavor
+        RL=$UbuntuVersion
+        function GetUbuntuMajorVersion {
+                cat /etc/lsb-release | grep DISTRIB_RELEASE | cut -f2 -d'=' | cut -f1 -d'.'
+        }
+        UbuntuMajorVersion=$(GetUbuntuMajorVersion)
+fi
+
+echo ''
+echo "=============================================="
+echo "Script: Oracle 18c GI and DB Networking.      "
+echo "=============================================="
+echo ''
+
+sleep 5
+
+clear
+
+if [ $Product = 'oracle-gi-18c' ]
+then
+        if [ $MultiHostVar1 = 'new' ] || [ $MultiHostVar1 = 'reinstall' ]
+        then
+                echo ''
+                echo "=============================================="
+                echo "Create additional OpenvSwitch networks...     "
+                echo "=============================================="
+                echo ''
+
+                sleep 5
+
+                clear
+
+                SwitchList='sw2 sw3 sw4 sw5 sw6 sw7 sw8 sw9'
+                for k in $SwitchList
+                do
+                        echo ''
+                        echo "=============================================="
+                        echo "Create systemd OpenvSwitch $k service...      "
+                        echo "=============================================="
+
+                        if [ ! -f /etc/systemd/system/$k.service ]
+                        then
+                                sudo sh -c "echo '[Unit]'                                                > /etc/systemd/system/$k.service"
+                                sudo sh -c "echo 'Description=$k Service'                               >> /etc/systemd/system/$k.service"
+                                sudo sh -c "echo 'After=network-online.target'                          >> /etc/systemd/system/$k.service"
+                                sudo sh -c "echo ''                                                     >> /etc/systemd/system/$k.service"
+                                sudo sh -c "echo '[Service]'                                            >> /etc/systemd/system/$k.service"
+
+                                if [ $AWS -eq 1 ]
+                                then
+                                        sudo sh -c "echo 'Type=idle'                                    >> /etc/systemd/system/$k.service"
+                                else
+                                        sudo sh -c "echo 'Type=oneshot'                                 >> /etc/systemd/system/$k.service"
+                                fi
+
+                                sudo sh -c "echo 'User=root'                                            >> /etc/systemd/system/$k.service"
+                                sudo sh -c "echo 'RemainAfterExit=yes'                                  >> /etc/systemd/system/$k.service"
+                                sudo sh -c "echo 'ExecStart=/etc/network/openvswitch/crt_ovs_$k.sh'     >> /etc/systemd/system/$k.service"
+                                sudo sh -c "echo ''                                                     >> /etc/systemd/system/$k.service"
+                                sudo sh -c "echo '[Install]'                                            >> /etc/systemd/system/$k.service"
+                                sudo sh -c "echo 'WantedBy=multi-user.target'                           >> /etc/systemd/system/$k.service"
+                        fi
+
+                        echo ''
+                        echo "=============================================="
+                        echo "Start OpenvSwitch $k ...                      "
+                        echo "=============================================="
+                        echo ''
+
+                        sudo chmod 644 /etc/systemd/system/$k.service
+                        sudo systemctl enable $k.service
+                        sudo service $k stop
+                        sudo service $k start
+                        sudo service $k status
+
+                        echo ''
+                        echo "=============================================="
+                        echo "OpenvSwitch $k is up.                         "
+                        echo "=============================================="
+
+                        sleep 3
+
+                        clear
+                done
+
+                echo ''
+                echo "=============================================="
+                echo "Openvswitch networks installed & configured.  "
+                echo "=============================================="
+                echo ''
+        fi
+fi
+
+sleep 5
+
+clear
+

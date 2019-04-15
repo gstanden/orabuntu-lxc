@@ -39,6 +39,7 @@ MultiHostVar8=$3
 MultiHostVar9=$4
 NameServer=$5
 Release=$6
+LinuxFlavor=$7
 
 function CheckSystemdResolvedInstalled {
 	sudo netstat -ulnp | grep 53 | sed 's/  */ /g' | rev | cut -f1 -d'/' | rev | sort -u | grep systemd- | wc -l

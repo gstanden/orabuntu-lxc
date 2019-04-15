@@ -159,8 +159,10 @@ then
 	echo ''
 
 	sudo service systemd-resolved-helper restart
+	echo ''
 	sleep 5
 	sudo service systemd-resolved status | tail -100
+	echo ''
 	sleep 5
 	sudo service systemd-resolved-helper status
 	

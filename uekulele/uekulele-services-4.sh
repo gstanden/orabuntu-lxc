@@ -40,6 +40,7 @@ NumCon=$3
 NameServer=$4
 MultiHost=$5
 DistDir=$6
+Product=$7
 
 function SoftwareVersion { echo "$@" | awk -F. '{ printf("%d%03d%03d%03d\n", $1,$2,$3,$4); }'; }
 
@@ -48,15 +49,20 @@ function GetLXCVersion {
 }
 LXCVersion=$(GetLXCVersion)
 
-function GetMultiHostVar7 {
-        echo $MultiHost | cut -f7 -d':'
+function GetMultiHostVar1 {
+        echo $MultiHost | cut -f1 -d':'
 }
-MultiHostVar7=$(GetMultiHostVar7)
+MultiHostVar1=$(GetMultiHostVar1)
 
 function GetMultiHostVar2 {
         echo $MultiHost | cut -f2 -d':'
 }
 MultiHostVar2=$(GetMultiHostVar2)
+
+function GetMultiHostVar7 {
+        echo $MultiHost | cut -f7 -d':'
+}
+MultiHostVar7=$(GetMultiHostVar7)
 
 GetLinuxFlavors(){
 if   [[ -e /etc/oracle-release ]]
@@ -268,41 +274,6 @@ sleep 5
 
 clear
 
-# echo ''
-# echo "=============================================="
-# echo "Configure Extra Networks (optional e.g. RAC)  "
-# echo "=============================================="
-# echo ''
-
-# AddPrivateNetworks=Y
-# # read -e -p "Add Extra Private Networks (e.g for Oracle RAC ASM Flex Cluster) [Y/N]   " -i "Y" AddPrivateNetworks
-
-# if [ $AddPrivateNetworks = 'y' ] || [ $AddPrivateNetworks = 'Y' ]
-# then
-#         sudo bash -c "cat /var/lib/lxc/$SeedContainerName/config.oracle /var/lib/lxc/$SeedContainerName/config.asm.flex.cluster > /var/lib/lxc/$SeedContainerName/config"
-#         sudo sed -i "s/ContainerName/$SeedContainerName/g" /var/lib/lxc/$SeedContainerName/config
-#         OracleNonPublicNetworks='sw2 sw3 sw4 sw5 sw6 sw7 sw8 sw9'
-#         for j in $OracleNonPublicNetworks
-#         do
-#                 echo 'nothing' > /dev/null 2>&1
-#         done
-# fi
-
-# if [ $AddPrivateNetworks = 'n' ] || [ $AddPrivateNetworks = 'N' ]
-# then
-#         sudo cp -p /var/lib/lxc/$SeedContainerName/config.oracle /var/lib/lxc/$SeedContainerName/config
-#         sudo sed -i "s/ContainerName/$SeedContainerName/g" /var/lib/lxc/$SeedContainerName/config
-# fi
-
-# echo ''
-# echo "=============================================="
-# echo "Configure extra private networks completed.   "
-# echo "=============================================="
-
-# sleep 5
-
-# clear
-
 if [ $MultiHostVar2 = 'Y' ]
 then
 	sudo sed -i "s/MtuSetting/$MultiHostVar7/g" /var/lib/lxc/$SeedContainerName/config
@@ -310,13 +281,36 @@ fi
 
 echo ''
 echo "=============================================="
-echo "Clone $SeedContainerName to $NumCon containers"
+echo "OpenvSwitch Networking for $Product ...       "
+echo "=============================================="
+echo ''
+
+sudo /opt/olxc/"$DistDir"/products/$Product/$Product.net $Product $MultiHostVar1
+	
+echo ''
+echo "=============================================="
+echo "Done: OpenvSwitch Networking for $Product.    "
 echo "=============================================="
 echo ''
 
 sleep 5
 
 clear
+
+if [ -f /var/lib/lxc/$SeedContainerName/rootfs/root/lxc-services.sh ]
+then
+        sudo sed -i 's/yum install/yum -y install/g' /var/lib/lxc/$SeedContainerName/rootfs/root/lxc-services.sh
+fi
+
+sleep 5
+
+clear
+
+echo ''
+echo "=============================================="
+echo "Clone $SeedContainerName to $NumCon containers"
+echo "=============================================="
+echo ''
 
 let CloneIndex=10
 let CopyCompleted=0
@@ -364,18 +358,27 @@ do
 	fi
 
 	sudo sed -i "s/$SeedContainerName/$ContainerPrefix$CloneIndex/g" /var/lib/lxc/$ContainerPrefix$CloneIndex/config
-
-        if [ $Product = 'oracle-gi-18c' ]
-        then
-                sudo sed -i "s/\#marker//g" /var/lib/lxc/$ContainerPrefix$CloneIndex/config
-                sudo sed -i "s/$ContainerPrefix$CloneIndex//g" /var/lib/lxc/$ContainerPrefix$CloneIndex/rootfs/etc/hosts
-        fi
-
 	sudo sed -i "s/\.10/\.$CloneIndex/g" /var/lib/lxc/$ContainerPrefix$CloneIndex/config
 	sudo sed -i 's/sx1/sw1/g' /var/lib/lxc/$ContainerPrefix$CloneIndex/config
 	sudo sed -i "s/mtu = 1500/mtu = $MultiHostVar7/g" /var/lib/lxc/$ContainerPrefix$CloneIndex/config
 #       sudo sed -i "s/lxc\.mount\.entry = \/dev\/lxc_luns/#lxc\.mount\.entry = \/dev\/lxc_luns/g" /var/lib/lxc/$ContainerPrefix$CloneIndex/config
 #       sudo sed -i "/domain-name-servers/s/10.207.29.2/10.207.39.2/g" /var/lib/lxc/$ContainerPrefix$CloneIndex/rootfs/etc/dhcp/dhclient.conf
+
+	echo ''
+	echo "=============================================="
+	echo "OpenvSwitch Networking for $Product ...       "
+	echo "=============================================="
+	echo ''
+
+	sudo /opt/olxc"$DistDir"/products/$Product/$Product.cnf $ContainerPrefix $CloneIndex $Product $MultiHostVar1
+	
+	echo ''
+	echo "=============================================="
+	echo "Done: OpenvSwitch Networking for $Product.    "
+	echo "=============================================="
+	echo ''
+
+	sleep 5
 
 	function GetHostName (){ echo $ContainerPrefix$CloneIndex\1; }
 	HostName=$(GetHostName)

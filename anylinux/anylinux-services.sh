@@ -353,7 +353,7 @@ then
 	echo "=============================================="
 	echo ''
 
-	sleep 5
+	sleep 10
 
 	clear
 fi
@@ -855,7 +855,7 @@ fi
 
 if [ $LinuxFlavor != 'Ubuntu' ] && [ $LinuxFlavor != 'Pop_OS' ]
 then
-	echo 'RPM libvirt installed     = '`rpm -qa | grep libvirt-[123] | grep -v client`
+	echo 'RPM libvirt installed     = '`rpm -qa | grep libvirt-[1234] | grep -v client`
 fi
 
 echo ''
@@ -1278,6 +1278,8 @@ echo "$DistDir/$SubDirName/$SubDirName-services-5.sh"	 			>> "$DistDir"/"$SubDir
 echo "$DistDir/$SubDirName/GNU3"                                                >> "$DistDir"/"$SubDirName"/archives/"$SubDirName"-services.lst
 echo "$DistDir/$SubDirName/COPYING"                                             >> "$DistDir"/"$SubDirName"/archives/"$SubDirName"-services.lst
 echo "$DistDir/products/$Product/$Product"					>> "$DistDir"/"$SubDirName"/archives/"$SubDirName"-services.lst
+echo "$DistDir/products/$Product/$Product.net"					>> "$DistDir"/"$SubDirName"/archives/"$SubDirName"-services.lst
+echo "$DistDir/products/$Product/$Product.cnf"					>> "$DistDir"/"$SubDirName"/archives/"$SubDirName"-services.lst
 
 cd "$DistDir"/"$SubDirName"/archives
 

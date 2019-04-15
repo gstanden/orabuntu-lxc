@@ -252,117 +252,118 @@ then
  	clear
 fi
 
-if [ $MultiHostVar1 = 'new' ] || [ $MultiHostVar1 = 'reinstall' ]
-then
-	echo ''
-	echo "=============================================="
-	echo "Create additional OpenvSwitch networks...     "
-	echo "=============================================="
-	echo ''
+# if [ $MultiHostVar1 = 'new' ] || [ $MultiHostVar1 = 'reinstall' ]
+# then
+# 	echo ''
+# 	echo "=============================================="
+# 	echo "Create additional OpenvSwitch networks...     "
+# 	echo "=============================================="
+# 	echo ''
+# 
+# 	sleep 5
+# 
+# 	clear
+#
+# 	SwitchList='sw2 sw3 sw4 sw5 sw6 sw7 sw8 sw9'
+# 	for k in $SwitchList
+# 	do
+# 		if [ $Release -ge 7 ]
+# 		then
+# 			echo ''
+# 			echo "=============================================="
+# 			echo "Create systemd OpenvSwitch $k service...      "
+# 			echo "=============================================="
+# 
+# 			if [ ! -f /etc/systemd/system/$k.service ]
+# 			then
+# 				sudo sh -c "echo '[Unit]'						 > /etc/systemd/system/$k.service"
+# 			      	sudo sh -c "echo 'Description=$k Service'				>> /etc/systemd/system/$k.service"
+# 			      	sudo sh -c "echo 'After=network-online.target'				>> /etc/systemd/system/$k.service"
+# 			      	sudo sh -c "echo ''							>> /etc/systemd/system/$k.service"
+# 			      	sudo sh -c "echo '[Service]'						>> /etc/systemd/system/$k.service"
+# 			      	sudo sh -c "echo 'Type=oneshot'						>> /etc/systemd/system/$k.service"
+# 			      	sudo sh -c "echo 'User=root'						>> /etc/systemd/system/$k.service"
+# 			      	sudo sh -c "echo 'RemainAfterExit=yes'					>> /etc/systemd/system/$k.service"
+# 			      	sudo sh -c "echo 'ExecStart=/etc/network/openvswitch/crt_ovs_$k.sh' 	>> /etc/systemd/system/$k.service"
+# 			      	sudo sh -c "echo ''							>> /etc/systemd/system/$k.service"
+# 			      	sudo sh -c "echo '[Install]'						>> /etc/systemd/system/$k.service"
+# 			      	sudo sh -c "echo 'WantedBy=multi-user.target'				>> /etc/systemd/system/$k.service"
+# 			fi
+#	
+#			echo ''
+#			echo "=============================================="
+#			echo "Start OpenvSwitch $k ...                      "
+#			echo "=============================================="
+#			echo ''
+#
+#			sudo chmod 644 /etc/systemd/system/$k.service
+#			sudo systemctl enable $k.service
+#			sudo service $k stop
+#			sudo service $k start
+#			sudo service $k status
+#
+#			echo ''
+#			echo "=============================================="
+#			echo "OpenvSwitch $k is up.                         "
+#			echo "=============================================="
+#		
+#			sleep 3
+#
+#			clear
+#
+#		elif [ $Release -eq 6 ]
+#		then
+#			echo ''
+#			echo "=============================================="
+#			echo "Create OpenvSwitch $k service...              "
+#			echo "=============================================="
+#			echo ''
+#
+#			if [ ! -f /etc/init.d/ovs_$k ]
+#			then
+#				sudo cp -p /etc/network/openvswitch/switch-service-linux6.sh /etc/init.d/ovs_$k
+#				sudo sed -i "s/SWK/$k/g" /etc/init.d/ovs_$k
+#				sudo chmod 755 /etc/init.d/ovs_$k
+#				sudo chown $Owner:$Group /etc/init.d/ovs_$k
+#				sudo chkconfig --add ovs_$k
+#				sudo chkconfig ovs_$k on --level 345
+#				sudo chkconfig --list ovs_$k
+#			else
+#				sudo chkconfig --list ovs_$k
+#			fi
+#
+#		        echo ''
+#			echo "=============================================="
+#			echo "Start OpenvSwitch $k ...                      "
+#			echo "=============================================="
+#			echo ''
+#
+#			sudo chmod 755 /etc/network/openvswitch/crt_ovs_$k.sh
+#			sudo /etc/network/openvswitch/crt_ovs_$k.sh >/dev/null 2>&1
+#			sudo ifconfig $k | tail -50
+#
+#			echo "=============================================="
+#			echo "OpenvSwitch $k is up.                         "
+#			echo "=============================================="
+#			echo ''
+#
+#			sleep 3
+#
+#			clear
+#		fi
+#	done
+#
+#	echo ''
+#	echo "=============================================="
+#	echo "Openvswitch networks installed & configured.  "
+#	echo "=============================================="
+#	echo ''
+#
+#	sleep 5
+#
+#	clear
+#fi
 
-	sleep 5
-
-	clear
-
-	SwitchList='sw2 sw3 sw4 sw5 sw6 sw7 sw8 sw9'
-	for k in $SwitchList
-	do
-		if [ $Release -ge 7 ]
-		then
-			echo ''
-			echo "=============================================="
-			echo "Create systemd OpenvSwitch $k service...      "
-			echo "=============================================="
-
-			if [ ! -f /etc/systemd/system/$k.service ]
-			then
-				sudo sh -c "echo '[Unit]'						 > /etc/systemd/system/$k.service"
-			      	sudo sh -c "echo 'Description=$k Service'				>> /etc/systemd/system/$k.service"
-			      	sudo sh -c "echo 'After=network-online.target'				>> /etc/systemd/system/$k.service"
-			      	sudo sh -c "echo ''							>> /etc/systemd/system/$k.service"
-			      	sudo sh -c "echo '[Service]'						>> /etc/systemd/system/$k.service"
-			      	sudo sh -c "echo 'Type=oneshot'						>> /etc/systemd/system/$k.service"
-			      	sudo sh -c "echo 'User=root'						>> /etc/systemd/system/$k.service"
-			      	sudo sh -c "echo 'RemainAfterExit=yes'					>> /etc/systemd/system/$k.service"
-			      	sudo sh -c "echo 'ExecStart=/etc/network/openvswitch/crt_ovs_$k.sh' 	>> /etc/systemd/system/$k.service"
-			      	sudo sh -c "echo ''							>> /etc/systemd/system/$k.service"
-			      	sudo sh -c "echo '[Install]'						>> /etc/systemd/system/$k.service"
-			      	sudo sh -c "echo 'WantedBy=multi-user.target'				>> /etc/systemd/system/$k.service"
- 			fi
-	
-			echo ''
-			echo "=============================================="
-			echo "Start OpenvSwitch $k ...                      "
-			echo "=============================================="
-			echo ''
-
-			sudo chmod 644 /etc/systemd/system/$k.service
-			sudo systemctl enable $k.service
-			sudo service $k stop
-			sudo service $k start
-			sudo service $k status
-
-			echo ''
-			echo "=============================================="
-			echo "OpenvSwitch $k is up.                         "
-			echo "=============================================="
-		
-			sleep 3
-
-			clear
-
-		elif [ $Release -eq 6 ]
-		then
-			echo ''
-			echo "=============================================="
-			echo "Create OpenvSwitch $k service...              "
-			echo "=============================================="
-			echo ''
-
-			if [ ! -f /etc/init.d/ovs_$k ]
-			then
-				sudo cp -p /etc/network/openvswitch/switch-service-linux6.sh /etc/init.d/ovs_$k
-				sudo sed -i "s/SWK/$k/g" /etc/init.d/ovs_$k
-				sudo chmod 755 /etc/init.d/ovs_$k
-				sudo chown $Owner:$Group /etc/init.d/ovs_$k
-				sudo chkconfig --add ovs_$k
-				sudo chkconfig ovs_$k on --level 345
-				sudo chkconfig --list ovs_$k
-			else
-				sudo chkconfig --list ovs_$k
-			fi
-
-		        echo ''
-			echo "=============================================="
-			echo "Start OpenvSwitch $k ...                      "
-			echo "=============================================="
-			echo ''
-
-			sudo chmod 755 /etc/network/openvswitch/crt_ovs_$k.sh
-			sudo /etc/network/openvswitch/crt_ovs_$k.sh >/dev/null 2>&1
-			sudo ifconfig $k | tail -50
-
-			echo "=============================================="
-			echo "OpenvSwitch $k is up.                         "
-			echo "=============================================="
-			echo ''
-
-			sleep 3
-
-			clear
-		fi
-	done
-
-	echo ''
-	echo "=============================================="
-	echo "Openvswitch networks installed & configured.  "
-	echo "=============================================="
-	echo ''
-
-	sleep 5
-
-	clear
-fi
 if [ $Release -ge 7 ]
 then
 	sudo systemctl daemon-reload
@@ -401,7 +402,7 @@ do
 	if [ $Release -ge 6 ]
 	then
 		function CheckPublicIPIterative {
-			sudo lxc-info -n $j -iH | cut -f1-3 -d'.' | sed 's/\.//g'
+			sudo lxc-info -n $j -iH | cut -f1-3 -d'.' | sed 's/\.//g' | head -1
 		}
 	fi
 	PublicIPIterative=$(CheckPublicIPIterative)
@@ -1229,7 +1230,7 @@ cd "$DistDir"/uekulele/archives
 rm -f uekulele-services.lst uekulele-files.lst product.lst uekulele-services.tar uekulele-files.tar product.tar
 cd "$DistDir"/installs/logs
 LOGEXT=`date +"%Y-%m-%d.%R:%S"`
-sudo cp -p $USER.log $USER.orabuntu-lxc.install.$LOGEXT
+sudo cp -p /opt/olxc/installs/logs/$USER.log /opt/olxc/installs/logs/$USER.orabuntu-lxc.install.$LOGEXT
 cd $DistDir/anylinux
 
 # Band-aid for openvswitch update which breaks openvswitch.

@@ -554,26 +554,28 @@ sudo lxc-attach -n $SeedContainerName -- chown grid:oinstall /home/grid/.bash_lo
 sudo lxc-attach -n $SeedContainerName -- chown grid:oinstall /home/grid/.
 
 sudo cp -p /var/lib/lxc/$SeedContainerName/config 				/var/lib/lxc/$SeedContainerName/config.$BEXT
-sudo sh -c "echo 'lxc.apparmor.profile = unconfined'			     >>	/var/lib/lxc/$SeedContainerName/config"
 sudo cp -p /var/lib/lxc/$SeedContainerName/rootfs/config.asm.flex.cluster	/var/lib/lxc/$SeedContainerName/config.asm.flex.cluster
 sudo sed -i "s/MtuSetting/9000/g" 	  	  				/var/lib/lxc/$SeedContainerName/config.asm.flex.cluster
 sudo sed -i "s/ContainerName/$SeedContainerName/g" 				/var/lib/lxc/$SeedContainerName/config.asm.flex.cluster
 sudo bash -c "cat /var/lib/lxc/$SeedContainerName/config 			/var/lib/lxc/$SeedContainerName/config.asm.flex.cluster > /var/lib/lxc/$SeedContainerName/config.ora-gi-18c"
 sudo cp -p /var/lib/lxc/$SeedContainerName/config.ora-gi-18c			/var/lib/lxc/$SeedContainerName/config
-sudo sed -i "s/net\.0/network/g"						/var/lib/lxc/$SeedContainerName/config
-sudo lxc-update-config -c /var/lib/lxc/$SeedContainerName/config
 sudo sed -i '/supersede/{/oracle-gi-18c/!d;}'					/var/lib/lxc/$SeedContainerName/rootfs/etc/dhcp/dhclient.conf
 sudo sed -i 's/# oracle-gi-18c //g'						/var/lib/lxc/$SeedContainerName/rootfs/etc/dhcp/dhclient.conf
 
-# echo 'LxcVersion = '$LxcVersion
-# sleep 5
 
-# function SoftwareVersion { echo "$@" | awk -F. '{ printf("%d%03d%03d%03d\n", $1,$2,$3,$4); }'; }
+if [ $LinuxFlavor = 'Ubuntu' ]
+then
+	sudo sh -c "echo 'lxc.apparmor.profile = unconfined'		     >>	/var/lib/lxc/$SeedContainerName/config"
+fi
 
-# if [ $(SoftwareVersion $LxcVersion) -ge $(SoftwareVersion "2.1.0") ]
-# then
-# 	sudo lxc-update-config -c /var/lib/lxc/$SeedContainerName/config
-# fi
+# GLS 20170927 credit yairchu
+function SoftwareVersion { echo "$@" | awk -F. '{ printf("%d%03d%03d%03d\n", $1,$2,$3,$4); }'; }
+
+if [ $(SoftwareVersion $LxcVersion) -ge $(SoftwareVersion "2.1.0") ]
+then
+	sudo sed -i "s/net\.0/network/g"					/var/lib/lxc/$SeedContainerName/config
+	sudo lxc-update-config -c /var/lib/lxc/$SeedContainerName/config
+fi
 
 sleep 5
 
@@ -588,7 +590,14 @@ echo ''
 sudo touch 									   /usr/share/lxc/config/common.conf.d/01-oracle-gi-ntp.conf
 sudo sh -c "echo 'lxc.cap.drop ='						>> /usr/share/lxc/config/common.conf.d/01-oracle-gi-ntp.conf"
 sudo sh -c "echo 'lxc.cap.drop = mac_admin mac_override sys_module sys_rawio'	>> /usr/share/lxc/config/common.conf.d/01-oracle-gi-ntp.conf" 
-sudo aa-complain /usr/sbin/ntpd
+sudo cat /usr/share/lxc/config/common.conf.d/01-oracle-gi-ntp.conf
+echo ''
+
+if [ $LinuxFlavor = 'Ubuntu' ]
+then
+	sudo aa-complain /usr/sbin/ntpd
+	echo 'sudo aa-complain /usr/sbin/ntpd'
+fi
 
 echo ''
 echo "=============================================="

@@ -4,6 +4,7 @@ rootfs/GNU3
 /var/COPYING
 /etc/COPYING
 rootfs/COPYING
+rootfs/config.asm.flex.cluster
 /home/OWNER/Downloads/orabuntu-lxc-master/uekulele/archives/GNU3
 /home/OWNER/Downloads/orabuntu-lxc-master/uekulele/archives/COPYING
 /var/lib/lxc/nsa/rootfs/var/lib/bind/fwd.consultingcommandos.us

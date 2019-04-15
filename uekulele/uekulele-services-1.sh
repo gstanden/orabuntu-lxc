@@ -2619,6 +2619,15 @@ then
                         sudo sed -i "/nsa/s/nsa/$NameServer/g" /var/lib/lxc/nsa/rootfs/root/ns_backup.start.sh
                         sudo sed -i "/nsa/s/nsa/$NameServer/g" /var/lib/lxc/nsa/rootfs/root/dns-sync.sh
 
+                        function GetNameServerShortName {
+                                echo $NameServer | cut -f1 -d'-'
+                        }
+                        NameServerShortName=$(GetNameServerShortName)
+
+                        sudo sed -i "/nsa/s/nsa/$NameServerShortName/g" /var/lib/lxc/nsa/rootfs/root/ns_backup_update.sh
+                        sudo sed -i "/nsa/s/nsa/$NameServerShortName/g" /var/lib/lxc/nsa/rootfs/root/ns_backup.start.sh
+                        sudo sed -i "/nsa/s/nsa/$NameServerShortName/g" /var/lib/lxc/nsa/rootfs/root/dns-sync.sh
+
 			sudo sed -i "/nsa/s/nsa/$NameServer/g" /etc/network/openvswitch/strt_nsa.sh
 			sudo mv /var/lib/lxc/nsa /var/lib/lxc/$NameServer
 
@@ -3261,7 +3270,7 @@ then
 	sudo mkdir -p /home/$Owner/Manage-Orabuntu
         sudo chown $Owner:$Group /home/$Owner/Manage-Orabuntu
         sudo chmod 775 /opt/olxc/"$DistDir"/uekulele/archives/nameserver_copy.sh
-        /opt/olxc/"$DistDir"/uekulele/archives/nameserver_copy.sh $MultiHostVar5 $MultiHostVar6 $MultiHostVar8 $MultiHostVar9 $NameServerBase $Release
+        /opt/olxc/"$DistDir"/uekulele/archives/nameserver_copy.sh $MultiHostVar5 $MultiHostVar6 $MultiHostVar8 $MultiHostVar9 $NameServerBase $Release $LinuxFlavor
 
         echo ''
         echo "=============================================="
@@ -3298,17 +3307,16 @@ then
         then
                 sudo lxc-update-config -c /var/lib/lxc/"$NameServer"/config
                 sudo lxc-update-config -c /var/lib/lxc/"$NameServerBase"/config
+		sudo lxc-update-config -c /var/lib/lxc/"$NameServer"-base/config
         fi
 
         if [ $(SoftwareVersion $LXCVersion) -ge $(SoftwareVersion 2.1.0) ] && [ $NameServerBaseConfigFormat -eq 0 ]
         then
                 sudo lxc-update-config -c /var/lib/lxc/"$NameServer"/config
                 sudo lxc-update-config -c /var/lib/lxc/"$NameServerBase"/config
+		sudo lxc-update-config -c /var/lib/lxc/"$NameServer"-base/config
         fi
 
-	sudo lxc-update-config -c /var/lib/lxc/"$NameServer"/config
-	sudo lxc-update-config -c /var/lib/lxc/"$NameServerBase"/config
-	sudo lxc-update-config -c /var/lib/lxc/"$NameServer"-base/config
         sudo lxc-ls -f
 fi
 
@@ -3563,8 +3571,8 @@ then
 	echo "=============================================="
 	echo ''
 
-        function GetAmidePassword {
-                sudo sh -c "cat /var/lib/lxc/$NameServer/rootfs/root/ns_backup_update.sh" | grep 'Pass=' | cut -f2 -d'='
+	function GetAmidePassword {
+                sudo sh -c "cat /var/lib/lxc/$NameServerBase-base/rootfs/root/ns_backup_update.sh" | grep 'Pass=' | cut -f2 -d'='
         }
         AmidePassword=$(GetAmidePassword)
 

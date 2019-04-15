@@ -1,6 +1,5 @@
 rootfs/etc/NetworkManager/dnsmasq.d/local
 rootfs/etc/nsswitch.conf
-rootfs/etc/ntp.conf
 rootfs/etc/selinux/config
 rootfs/etc/ssh/sshd_config
 rootfs/etc/sysconfig/network
@@ -9,7 +8,8 @@ rootfs/etc/sysconfig/ntpd
 rootfs/config.oracle.bak.oel5
 rootfs/config.oracle.bak.oel6
 rootfs/config.oracle.bak.oel7
-rootfs/etc/dhcp/dhclient.conf
 rootfs/etc/rc.d/rc.local
+rootfs/etc/ntp.conf
+rootfs/etc/dhcp/dhclient.conf
 rootfs/GNU3
 rootfs/COPYING

@@ -69,14 +69,16 @@ GRE=N
 MTU=1500
 LOGEXT=`date +"%Y-%m-%d.%R:%S"`
 
-if [ ! -d "$DistDir"/installs/logs ]
+if [ ! -d /opt/olxc/installs/logs ]
 then
-        sudo mkdir -p "$DistDir"/installs/logs
+        sudo mkdir -p /opt/olxc/installs/logs
 fi
 
-if [ -f "$DistDir"/installs/logs/$USER.log ]
+if [ -f /opt/olxc/installs/logs/$USER.log ]
 then
-        sudo mv "$DistDir"/installs/logs/$USER.log "$DistDir"/installs/logs/$USER.log.$LOGEXT
+        sudo mv /opt/olxc/installs/logs/$USER.log /opt/olxc/installs/logs/$USER.log.$LOGEXT
+else
+	sudo touch /opt/olxc/installs/logs/$USER.log
 fi
 
 if [ ! -d /var/log/sudo-io ]
@@ -86,9 +88,9 @@ fi
 
 if [ ! -f /etc/sudoers.d/orabuntu-lxc ]
 then
-        sudo sh -c "echo 'Defaults      logfile=\"$DistDir/installs/logs/$USER.log\"'  					>> /etc/sudoers.d/orabuntu-lxc"
-        sudo sh -c "echo 'Defaults      log_input,log_output'                                                           >> /etc/sudoers.d/orabuntu-lxc"
-        sudo sh -c "echo 'Defaults      iolog_dir=/var/log/sudo-io/%{user}'                                             >> /etc/sudoers.d/orabuntu-lxc"
+	sudo sh -c "echo 'Defaults      logfile=\"/opt/olxc/installs/logs/$USER.log\"'	>> /etc/sudoers.d/orabuntu-lxc"
+        sudo sh -c "echo 'Defaults      log_input,log_output'                           >> /etc/sudoers.d/orabuntu-lxc"
+        sudo sh -c "echo 'Defaults      iolog_dir=/var/log/sudo-io/%{user}'             >> /etc/sudoers.d/orabuntu-lxc"
         sudo chmod 0440 /etc/sudoers.d/orabuntu-lxc
 fi
 
@@ -123,7 +125,7 @@ fi
 
 if [ -z $2 ]
 then
-        SPOKEIP=10.209.53.137
+        SPOKEIP=10.209.53.160
 else
         SPOKEIP=$2
 fi
@@ -400,7 +402,7 @@ echo "=============================================="
 echo ''
 
 ssh-keygen -R $HUBIP
-sshpass -p $HubSudoPwd ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $HubUserAct@$HUBIP "sudo -S <<< "$HubSudoPwd" uname -a;echo '';sudo -S <<< "$HubSudoPwd" lxc-ls -f"
+sshpass -p $HubSudoPwd ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $HubUserAct@$HUBIP "sudo -S <<< "$HubSudoPwd" uname -a;echo '';sudo -S <<< "$HubSudoPwd" lxc-ls -f | tail -10"
 if [ $? -eq 0 ]
 then
 	echo ''
