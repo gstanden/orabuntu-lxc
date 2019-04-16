@@ -192,7 +192,11 @@ echo "OpenvSwitch Networking for $Product ...       "
 echo "=============================================="
 echo ''
 
-sudo /opt/olxc"$DistDir"/products/$Product/$Product.net $Product $MultiHostVar1
+sleep 5
+
+clear
+
+sudo /opt/olxc"$DistDir"/products/$Product/$Product.net $MultiHostVar1
 
 echo ''
 echo "=============================================="

@@ -31,8 +31,11 @@
 
 clear
 
-Product=$1
-MultiHostVar1=$2
+MultiHostVar1=$1
+OnOff=On
+
+if [ $OnOff = 'On' ]
+then
 
 if [ -e /sys/hypervisor/uuid ]
 then
@@ -131,8 +134,6 @@ then
         UbuntuMajorVersion=$(GetUbuntuMajorVersion)
 fi
 
-if [ $Product = 'oracle-gi-18c' ]
-then
         if [ $MultiHostVar1 = 'new' ] || [ $MultiHostVar1 = 'reinstall' ]
         then
                 SwitchList='sw2 sw3 sw4 sw5 sw6 sw7 sw8 sw9'
@@ -189,4 +190,3 @@ then
                 done
         fi
 fi
-
