@@ -131,30 +131,10 @@ then
         UbuntuMajorVersion=$(GetUbuntuMajorVersion)
 fi
 
-echo ''
-echo "=============================================="
-echo "Script: Oracle 18c GI and DB Networking.      "
-echo "=============================================="
-echo ''
-
-sleep 5
-
-clear
-
 if [ $Product = 'oracle-gi-18c' ]
 then
         if [ $MultiHostVar1 = 'new' ] || [ $MultiHostVar1 = 'reinstall' ]
         then
-                echo ''
-                echo "=============================================="
-                echo "Create additional OpenvSwitch networks...     "
-                echo "=============================================="
-                echo ''
-
-                sleep 5
-
-                clear
-
                 SwitchList='sw2 sw3 sw4 sw5 sw6 sw7 sw8 sw9'
                 for k in $SwitchList
                 do
@@ -203,20 +183,10 @@ then
                         echo "OpenvSwitch $k is up.                         "
                         echo "=============================================="
 
-                        sleep 3
+                        sleep 5
 
                         clear
                 done
-
-                echo ''
-                echo "=============================================="
-                echo "Openvswitch networks installed & configured.  "
-                echo "=============================================="
-                echo ''
         fi
 fi
-
-sleep 5
-
-clear
 

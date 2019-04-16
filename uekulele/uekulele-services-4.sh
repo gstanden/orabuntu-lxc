@@ -281,15 +281,19 @@ fi
 
 echo ''
 echo "=============================================="
-echo "OpenvSwitch Networking for $Product ...       "
+echo "Networking add-ons for $Product...            "
 echo "=============================================="
 echo ''
+
+sleep 5
+
+clear
 
 sudo /opt/olxc/"$DistDir"/products/$Product/$Product.net $Product $MultiHostVar1
 	
 echo ''
 echo "=============================================="
-echo "Done: OpenvSwitch Networking for $Product.    "
+echo "Done: Networking add-ons for $Product.        "
 echo "=============================================="
 echo ''
 
