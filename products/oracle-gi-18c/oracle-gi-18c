@@ -544,6 +544,7 @@ sleep 5
 sudo lxc-attach -n $SeedContainerName -- /root/packages.sh
 sudo lxc-attach -n $SeedContainerName -- /root/create_users.sh
 sudo lxc-attach -n $SeedContainerName -- /root/lxc-services.sh
+sudo lxc-attach -n $SeedContainerName -- /root/create_directories.sh
 sudo lxc-attach -n $SeedContainerName -- usermod --password `perl -e "print crypt('grid','grid');"` grid
 sudo lxc-attach -n $SeedContainerName -- usermod --password `perl -e "print crypt('oracle','oracle');"` oracle
 sudo lxc-attach -n $SeedContainerName -- usermod --password `perl -e "print crypt('root','root');"` root 
@@ -615,6 +616,26 @@ fi
 echo ''
 echo "=============================================="
 echo "Done: Configure NTP to run in LXC containers. "
+echo "=============================================="
+echo ''
+
+sleep 5
+
+clear
+
+echo ''
+echo "=============================================="
+echo "Configure LXC LUNs Location for ASM...        "
+echo "=============================================="
+echo ''
+
+sudo mkdir -p /dev/lxc_luns
+sudo sed -i 's/\# lxc\.mount\.entry = \/dev\/lxc_luns/lxc\.mount\.entry = \/dev\/lxc_luns/' /var/lib/lxc/$SeedContainerName/config
+
+
+echo ''
+echo "=============================================="
+echo "Done: Configure LXC LUNs Location for ASM.    "
 echo "=============================================="
 echo ''
 
