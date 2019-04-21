@@ -701,7 +701,7 @@ then
 	sudo apt-get -y install db5.1 db5.1-util
 fi
 
-if [ $UbuntuVersion = '16.04' ] || [ $UbuntuVersion = '17.04' ] || [ $UbuntuVersion = '17.10' ]
+if [ $UbuntuVersion = '16.04' ] || [ $UbuntuVersion = '17.04' ] || [ $UbuntuVersion = '17.10' ] || [ $UbuntuVersion = '18.04' ] || [ $UbuntuVersion = '18.10' ] || [ $UbuntuVersion = '19.04' ]
 then
 	sudo apt-get -y install db5.3 db5.3-util
 	sudo ln -s /usr/bin/db5.3_dump /usr/bin/db5.1_dump
@@ -888,7 +888,7 @@ then
 	PackageInstalled=$(CheckPackageInstalled)
 fi
 
-if [ $UbuntuVersion = '16.04' ] || [ $UbuntuVersion = '17.04' ] || [ $UbuntuVersion = '17.10' ]
+if [ $UbuntuVersion = '16.04' ] || [ $UbuntuVersion = '17.04' ] || [ $UbuntuVersion = '17.10' ] || [ $UbuntuVersion = '18.04' ] || [ $UbuntuVersion = '18.10' ] || [ $UbuntuVersion = '19.04' ]
 then
 	function CheckPackageInstalled {
 		echo 'facter lxc uml-utilities openvswitch-switch openvswitch-common bind9utils dnsutils apparmor-utils openssh-server uuid rpm yum hugepages ntp iotop sshpass db5.3-util'

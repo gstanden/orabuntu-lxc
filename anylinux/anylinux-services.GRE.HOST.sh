@@ -403,8 +403,7 @@ echo "Test sshpass to HUB Host $HUBIP               "
 echo "=============================================="
 echo ''
 
-ssh-keygen -R $HUBIP
-echo ''
+ssh-keygen -R $HUBIP > /dev/null 2>&1
 sshpass -p $HubSudoPwd ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $HubUserAct@$HUBIP "sudo -S <<< "$HubSudoPwd" echo '(Do NOT enter password...Wait...)'; echo ''; uname -a; echo '';sudo -S <<< "$HubSudoPwd" lxc-ls -f"
 if [ $? -eq 0 ]
 then

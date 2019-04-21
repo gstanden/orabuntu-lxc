@@ -125,7 +125,7 @@ fi
 
 if [ -z $2 ]
 then
-        SPOKEIP=10.209.53.160
+        SPOKEIP=10.209.53.120
 else
         SPOKEIP=$2
 fi
@@ -401,7 +401,7 @@ echo "Test sshpass to HUB Host $HUBIP               "
 echo "=============================================="
 echo ''
 
-ssh-keygen -R $HUBIP
+ssh-keygen -R $HUBIP > /dev/null 2>&1
 sshpass -p $HubSudoPwd ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $HubUserAct@$HUBIP "sudo -S <<< "$HubSudoPwd" uname -a;echo '';sudo -S <<< "$HubSudoPwd" lxc-ls -f | tail -10"
 if [ $? -eq 0 ]
 then

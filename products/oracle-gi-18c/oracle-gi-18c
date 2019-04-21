@@ -340,37 +340,40 @@ sleep 5
 
 clear
 
-echo ''
-echo "=============================================="
-echo "Create 60-oracle.service in systemd...        "
-echo "=============================================="
-echo ''
-
-if [ ! -f /etc/systemd/system/60-oracle.service ]
+if [ $UbuntuMajorVersion -ge 15 ]
 then
-sudo sh -c "echo '[Unit]'                                    			 > /etc/systemd/system/60-oracle.service"
-sudo sh -c "echo 'Description=60-oracle Service'            			>> /etc/systemd/system/60-oracle.service"
-sudo sh -c "echo 'After=network.target'                     			>> /etc/systemd/system/60-oracle.service"
-sudo sh -c "echo ''                                         			>> /etc/systemd/system/60-oracle.service"
-sudo sh -c "echo '[Service]'                                			>> /etc/systemd/system/60-oracle.service"
-sudo sh -c "echo 'Type=oneshot'                             			>> /etc/systemd/system/60-oracle.service"
-sudo sh -c "echo 'User=root'                                			>> /etc/systemd/system/60-oracle.service"
-sudo sh -c "echo 'RemainAfterExit=yes'                      			>> /etc/systemd/system/60-oracle.service"
-sudo sh -c "echo 'ExecStart=/usr/sbin/sysctl -p /etc/sysctl.d/60-oracle.conf'	>> /etc/systemd/system/60-oracle.service"
-sudo sh -c "echo ''                                         			>> /etc/systemd/system/60-oracle.service"
-sudo sh -c "echo '[Install]'                                			>> /etc/systemd/system/60-oracle.service"
-sudo sh -c "echo 'WantedBy=multi-user.target'               			>> /etc/systemd/system/60-oracle.service"
+	echo ''
+	echo "=============================================="
+	echo "Create 60-oracle.service in systemd...        "
+	echo "=============================================="
+	echo ''
 
-sudo chmod 644 /etc/systemd/system/60-oracle.service
-sudo systemctl enable 60-oracle
+	if [ ! -f /etc/systemd/system/60-oracle.service ]
+	then
+		sudo sh -c "echo '[Unit]'                                    			 > /etc/systemd/system/60-oracle.service"
+		sudo sh -c "echo 'Description=60-oracle Service'            			>> /etc/systemd/system/60-oracle.service"
+		sudo sh -c "echo 'After=network.target'                     			>> /etc/systemd/system/60-oracle.service"
+		sudo sh -c "echo ''                                         			>> /etc/systemd/system/60-oracle.service"
+		sudo sh -c "echo '[Service]'                                			>> /etc/systemd/system/60-oracle.service"
+		sudo sh -c "echo 'Type=oneshot'                             			>> /etc/systemd/system/60-oracle.service"
+		sudo sh -c "echo 'User=root'                                			>> /etc/systemd/system/60-oracle.service"
+		sudo sh -c "echo 'RemainAfterExit=yes'                      			>> /etc/systemd/system/60-oracle.service"
+		sudo sh -c "echo 'ExecStart=/usr/sbin/sysctl -p /etc/sysctl.d/60-oracle.conf'	>> /etc/systemd/system/60-oracle.service"
+		sudo sh -c "echo ''                                         			>> /etc/systemd/system/60-oracle.service"
+		sudo sh -c "echo '[Install]'                                			>> /etc/systemd/system/60-oracle.service"
+		sudo sh -c "echo 'WantedBy=multi-user.target'               			>> /etc/systemd/system/60-oracle.service"
+
+		sudo chmod 644 /etc/systemd/system/60-oracle.service
+		sudo systemctl enable 60-oracle
+	fi
+
+	sudo cat /etc/systemd/system/60-oracle.service
+
+	echo ''
+	echo "=============================================="
+	echo "Created 60-oracle.service in systemd.         "
+	echo "=============================================="
 fi
-
-sudo cat /etc/systemd/system/60-oracle.service
-
-echo ''
-echo "=============================================="
-echo "Created 60-oracle.service in systemd.         "
-echo "=============================================="
 
 sleep 5
 
@@ -432,21 +435,24 @@ sleep 5
 
 clear
 
-echo ''
-echo "=============================================="
-echo "Configure NOFILES Hard Limit...               "
-echo "=============================================="
-echo ''
+if [ $UbuntuMajorVersion -ge 15 ] && [ -f /etc/systemd/system.conf ]
+then
+	echo ''
+	echo "=============================================="
+	echo "Configure NOFILES Hard Limit...               "
+	echo "=============================================="
+	echo ''
 
-sudo sed -i '/#DefaultLimitNOFILE=/s/#//'	/etc/systemd/system.conf
-sudo sed -i '/DefaultLimitNOFILE=/s/$/65536/'	/etc/systemd/system.conf
-sudo cat /etc/systemd/system.conf | grep DefaultLimitNOFILE
+	sudo sed -i '/#DefaultLimitNOFILE=/s/#DefaultLimitNOFILE=/DefaultLimitNOFILE=/g'	/etc/systemd/system.conf
+	sudo sed -i '/DefaultLimitNOFILE=/s/=.*/=4096:65536/g'					/etc/systemd/system.conf
+	sudo cat										/etc/systemd/system.conf | grep DefaultLimitNOFILE
 
-echo ''
-echo "=============================================="
-echo "Done: Configure NOFILES Hard Limit.           "
-echo "=============================================="
-echo ''
+	echo ''
+	echo "=============================================="
+	echo "Done: Configure NOFILES Hard Limit.           "
+	echo "=============================================="
+	echo ''
+fi
 
 sleep 5
 
@@ -573,8 +579,15 @@ function SoftwareVersion { echo "$@" | awk -F. '{ printf("%d%03d%03d%03d\n", $1,
 
 if [ $(SoftwareVersion $LxcVersion) -ge $(SoftwareVersion "2.1.0") ]
 then
-	sudo sed -i "s/net\.0/network/g"					/var/lib/lxc/$SeedContainerName/config
-	sudo lxc-update-config -c /var/lib/lxc/$SeedContainerName/config
+	sudo sed -i "s/net\.0/network/g"                                        /var/lib/lxc/$SeedContainerName/config
+	sudo sed -i "s/\#marker//g"                                             /var/lib/lxc/$SeedContainerName/config
+	sudo lxc-update-config -c                                               /var/lib/lxc/$SeedContainerName/config
+	sudo sed -i "s/lxc\.net\.1/#markerlxc\.net\.1/g"          		/var/lib/lxc/$SeedContainerName/config
+	sudo sed -i "s/lxc\.net\.2/#markerlxc\.net\.2/g"          		/var/lib/lxc/$SeedContainerName/config
+	sudo sed -i "s/lxc\.net\.3/#markerlxc\.net\.3/g"          		/var/lib/lxc/$SeedContainerName/config
+	sudo sed -i "s/lxc\.net\.4/#markerlxc\.net\.4/g"          		/var/lib/lxc/$SeedContainerName/config
+	sudo sed -i "s/lxc\.net\.5/#markerlxc\.net\.5/g"          		/var/lib/lxc/$SeedContainerName/config
+	sudo sed -i "s/lxc\.net\.6/#markerlxc\.net\.6/g"          		/var/lib/lxc/$SeedContainerName/config
 fi
 
 sleep 5

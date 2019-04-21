@@ -29,11 +29,19 @@ rsync -hP --rsh="sshpass -p $MultiHostVar9 ssh -l $MultiHostVar8" $MultiHostVar5
 
 echo ''
 echo "=============================================="
-echo "Destroy nameserver $NameServer...             "
+echo "Destroy nameserver $NameServer if it exists..."
 echo "=============================================="
 echo ''
-sudo lxc-stop    -n $NameServer
-sudo lxc-destroy -n $NameServer
+
+sudo lxc-info -n $NameServer > /dev/null 2>&1
+if [ $? -eq 1 ]
+then
+	sudo lxc-info -n $NameServer
+else
+	sudo lxc-stop    -n $NameServer > /dev/null 2>&1
+	sudo lxc-destroy -n $NameServer > /dev/null 2>&1
+fi
+
 echo ''
 echo "=============================================="
 echo "Unpack tar file...                            "

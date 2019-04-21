@@ -145,8 +145,16 @@ clear
 
 if [ $Product = 'oracle-gi-18c' ]
 then
-	sudo sed -i "s/\#marker//g" /var/lib/lxc/$ContainerPrefix$CloneIndex/config
-	sudo sed -i "s/$ContainerPrefix$CloneIndex//g" /var/lib/lxc/$ContainerPrefix$CloneIndex/rootfs/etc/hosts
+	sudo sed -i "s/lxc\.net\.0/lxc\.network/g"		/var/lib/lxc/$ContainerPrefix$CloneIndex/config
+	sudo sed -i "s/lxc\.net\.1/lxc\.network/g"		/var/lib/lxc/$ContainerPrefix$CloneIndex/config
+	sudo sed -i "s/lxc\.net\.2/lxc\.network/g"		/var/lib/lxc/$ContainerPrefix$CloneIndex/config
+	sudo sed -i "s/lxc\.net\.3/lxc\.network/g"		/var/lib/lxc/$ContainerPrefix$CloneIndex/config
+	sudo sed -i "s/lxc\.net\.4/lxc\.network/g"		/var/lib/lxc/$ContainerPrefix$CloneIndex/config
+	sudo sed -i "s/lxc\.net\.5/lxc\.network/g"		/var/lib/lxc/$ContainerPrefix$CloneIndex/config
+	sudo sed -i "s/lxc\.net\.6/lxc\.network/g"		/var/lib/lxc/$ContainerPrefix$CloneIndex/config
+	sudo sed -i "s/\#marker//g" 				/var/lib/lxc/$ContainerPrefix$CloneIndex/config
+	sudo lxc-update-config -c				/var/lib/lxc/$ContainerPrefix$CloneIndex/config
+	sudo sed -i "s/$ContainerPrefix$CloneIndex//g"		/var/lib/lxc/$ContainerPrefix$CloneIndex/rootfs/etc/hosts
 fi
 
 sleep 5
