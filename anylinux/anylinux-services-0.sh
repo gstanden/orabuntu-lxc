@@ -84,6 +84,10 @@ cd "$DistDir"/"$SubDirName"/archives
 
 cp -p "$DistDir"/products/"$Product"/"$Product".tar "$DistDir"/"$SubDirName"/archives/product.tar
 cp -p "$DistDir"/products/"$Product"/"$Product".lst "$DistDir"/"$SubDirName"/archives/product.lst
+cp -p "$DistDir"/linuxsan/scst/scst-files.tar       "$DistDir"/"$SubDirName"/archives/scst-files.tar
+cp -p "$DistDir"/linuxsan/scst/scst-files.lst       "$DistDir"/"$SubDirName"/archives/scst-files.lst
+cp -p "$DistDir"/linuxsan/tgt/tgt-files.tar         "$DistDir"/"$SubDirName"/archives/tgt-files.tar
+cp -p "$DistDir"/linuxsan/tgt/tgt-files.lst         "$DistDir"/"$SubDirName"/archives/tgt-files.lst
 
 ArchiveList="dns-dhcp-cont.tar dns-dhcp-host.tar lxc-oracle-files.tar product.tar $SubDirName-files.tar scst-files.tar tgt-files.tar ubuntu-host.tar"
 
