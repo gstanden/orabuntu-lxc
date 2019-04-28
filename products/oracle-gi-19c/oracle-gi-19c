@@ -236,7 +236,7 @@ SeedPostfix=$(GetSeedPostfix)
 
 echo ''
 echo "=============================================="
-echo "Script: Oracle 18c GI and DB Prerequisites.   "
+echo "Script: Oracle 19c GI and DB Prerequisites.   "
 echo "=============================================="
 echo ''
 
@@ -529,7 +529,7 @@ clear
 
 echo ''
 echo "=============================================="
-echo "$SeedContainerName Oracle GI 18c config       "
+echo "$SeedContainerName Oracle GI 19c config       "
 echo "=============================================="
 echo ''
 echo "=============================================="
@@ -564,8 +564,8 @@ sudo cp -p /var/lib/lxc/$SeedContainerName/config 				/var/lib/lxc/$SeedContaine
 sudo cp -p /var/lib/lxc/$SeedContainerName/rootfs/config.asm.flex.cluster	/var/lib/lxc/$SeedContainerName/config.asm.flex.cluster
 sudo sed -i "s/MtuSetting/9000/g" 	  	  				/var/lib/lxc/$SeedContainerName/config.asm.flex.cluster
 sudo sed -i "s/ContainerName/$SeedContainerName/g" 				/var/lib/lxc/$SeedContainerName/config.asm.flex.cluster
-sudo bash -c "cat /var/lib/lxc/$SeedContainerName/config 			/var/lib/lxc/$SeedContainerName/config.asm.flex.cluster > /var/lib/lxc/$SeedContainerName/config.ora-gi-18c"
-sudo cp -p /var/lib/lxc/$SeedContainerName/config.ora-gi-18c			/var/lib/lxc/$SeedContainerName/config
+sudo bash -c "cat /var/lib/lxc/$SeedContainerName/config 			/var/lib/lxc/$SeedContainerName/config.asm.flex.cluster > /var/lib/lxc/$SeedContainerName/config.ora-gi-19c"
+sudo cp -p /var/lib/lxc/$SeedContainerName/config.ora-gi-19c			/var/lib/lxc/$SeedContainerName/config
 sudo sed -i '/supersede/{/oracle-gi/!d;}'					/var/lib/lxc/$SeedContainerName/rootfs/etc/dhcp/dhclient.conf
 sudo sed -i 's/# oracle-gi //g'							/var/lib/lxc/$SeedContainerName/rootfs/etc/dhcp/dhclient.conf
 
@@ -646,7 +646,7 @@ clear
 
 echo ''
 echo "=============================================="
-echo "Done: $SeedContainerName Oracle GI 18c config "
+echo "Done: $SeedContainerName Oracle GI 19c config "
 echo "=============================================="
 echo ''
 
