@@ -527,7 +527,7 @@ then
 	echo ''
 
         sudo touch /etc/orabuntu-lxc-release
-        sudo sh -c "echo 'Orabuntu-LXC v6.12.4-beta AMIDE' > /etc/orabuntu-lxc-release"
+        sudo sh -c "echo 'Orabuntu-LXC v6.12.5-beta AMIDE' > /etc/orabuntu-lxc-release"
 	sudo ls -l /etc/orabuntu-lxc-release
 	echo ''
 	sudo cat /etc/orabuntu-lxc-release
