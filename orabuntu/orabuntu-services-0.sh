@@ -35,6 +35,7 @@ genpasswd() {
       	tr -dc A-Za-z0-9_ < /dev/urandom | head -c ${l} | xargs 
 }
 password=$(genpasswd)
+mkdir -p ../installs/logs
 echo $password > ../installs/logs/orabuntu-password.txt
 
 USERNAME=orabuntu
