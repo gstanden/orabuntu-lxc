@@ -527,7 +527,7 @@ fi
 	PointRelease=$2
 	if [ -z $2 ]
 	then
-		PointRelease=6
+		PointRelease=3
 	fi
 	echo 'Oracle Container Version  = '$MajorRelease.$PointRelease
 
