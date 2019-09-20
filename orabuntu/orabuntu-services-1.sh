@@ -3007,6 +3007,29 @@ clear
 
 echo ''
 echo "=============================================="
+echo "Allow NTP to run in LXC Containers...         "
+echo "=============================================="
+echo ''
+
+if [ ! -f /usr/share/lxc/config/common.conf.d/01-sys-time.conf ]
+then
+	sudo touch /usr/share/lxc/config/common.conf.d/01-sys-time.conf
+	sudo sh -c "echo 'lxc.cap.drop ='                                              > /usr/share/lxc/config/common.conf.d/01-sys-time.conf"
+	sudo sh -c "echo 'lxc.cap.drop = mac_admin mac_override sys_module sys_rawio' >> /usr/share/lxc/config/common.conf.d/01-sys-time.conf"
+fi
+
+echo ''
+echo "=============================================="
+echo "Done: Allow NTP to run in LXC Containers.     "
+echo "=============================================="
+echo ''
+
+sleep 5
+
+clear
+
+echo ''
+echo "=============================================="
 echo "Next script to run: orabuntu-services-2.sh    "
 echo "=============================================="
 
