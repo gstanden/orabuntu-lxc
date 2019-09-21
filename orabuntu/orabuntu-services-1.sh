@@ -3016,6 +3016,11 @@ then
 	sudo touch /usr/share/lxc/config/common.conf.d/01-sys-time.conf
 	sudo sh -c "echo 'lxc.cap.drop ='                                              > /usr/share/lxc/config/common.conf.d/01-sys-time.conf"
 	sudo sh -c "echo 'lxc.cap.drop = mac_admin mac_override sys_module sys_rawio' >> /usr/share/lxc/config/common.conf.d/01-sys-time.conf"
+	echo ''
+	sudo ls -l /usr/share/lxc/config/common.conf.d/01-sys-time.conf
+	echo ''
+	cat /usr/share/lxc/config/common.conf.d/01-sys-time.conf
+	echo ''
 fi
 
 echo ''
