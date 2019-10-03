@@ -222,15 +222,21 @@ LinuxFlavor=$(TrimLinuxFlavors)
 
 if   [ $LinuxFlavor = 'Oracle' ]
 then
-	CutIndex=7
-        function GetRedHatVersion {
-                sudo cat /etc/redhat-release | cut -f"$CutIndex" -d' ' | cut -f1 -d'.'
-        }
-        RedHatVersion=$(GetRedHatVersion)
         function GetOracleDistroRelease {
                 sudo cat /etc/oracle-release | cut -f5 -d' ' | cut -f1 -d'.'
         }
         OracleDistroRelease=$(GetOracleDistroRelease)
+	if   [ $OracleDistroRelease -eq 7 ]
+	then
+		CutIndex=7
+	elif [ $OracleDistroRelease -eq 8 ]
+	then
+		CutIndex=6
+	fi
+        function GetRedHatVersion {
+                sudo cat /etc/redhat-release | cut -f"$CutIndex" -d' ' | cut -f1 -d'.'
+        }
+        RedHatVersion=$(GetRedHatVersion)
         Release=$OracleDistroRelease
         LF=$LinuxFlavor
         RL=$Release
@@ -622,7 +628,7 @@ echo 'MultiHost                 = '$MultiHost
 	LxcOvsVersion=$9
 	if [ -z $9 ] && [ $LinuxFlavor != 'Fedora' ]
 	then
-                	LxcOvsVersion="2.0.8:2.5.4"
+                	LxcOvsVersion="2.0.8:2.11.1"
 	fi
 
 	# Fedora MUST leave Lxc version at 2.0.9 but can change Ovs version.

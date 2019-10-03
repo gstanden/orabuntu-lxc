@@ -145,7 +145,17 @@ LinuxFlavor=$(TrimLinuxFlavors)
 
 if   [ $LinuxFlavor = 'Oracle' ]
 then
-	CutIndex=7
+        function GetOracleDistroRelease {
+                sudo cat /etc/oracle-release | cut -f5 -d' ' | cut -f1 -d'.'
+        }
+        OracleDistroRelease=$(GetOracleDistroRelease)
+        if   [ $OracleDistroRelease -eq 7 ]
+        then
+                CutIndex=7
+        elif [ $OracleDistroRelease -eq 8 ]
+        then
+                CutIndex=6
+        fi
         function GetRedHatVersion {
                 sudo cat /etc/redhat-release | cut -f"$CutIndex" -d' ' | cut -f1 -d'.'
         }
@@ -527,7 +537,7 @@ then
 	echo ''
 
         sudo touch /etc/orabuntu-lxc-release
-        sudo sh -c "echo 'Orabuntu-LXC v6.12.12-beta AMIDE' > /etc/orabuntu-lxc-release"
+        sudo sh -c "echo 'Orabuntu-LXC v6.13.1-beta AMIDE' > /etc/orabuntu-lxc-release"
 	sudo ls -l /etc/orabuntu-lxc-release
 	echo ''
 	sudo cat /etc/orabuntu-lxc-release
@@ -882,7 +892,7 @@ then
 			
 			if [ $LinuxFlavor = 'Oracle' ]
 			then
-				if [ $Release -eq 7 ]
+				if [ $Release -ge 7 ]
 				then
 					sudo lxc-stop -n $NameServer
                        			echo 'HUB nameserver post-install snapshot' > /home/$Owner/snap-comment

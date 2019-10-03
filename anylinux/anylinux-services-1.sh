@@ -117,7 +117,17 @@ LinuxFlavor=$(TrimLinuxFlavors)
 
 if   [ $LinuxFlavor = 'Oracle' ]
 then
-	CutIndex=7
+        function GetOracleDistroRelease {
+                sudo cat /etc/oracle-release | cut -f5 -d' ' | cut -f1 -d'.'
+        }
+        OracleDistroRelease=$(GetOracleDistroRelease)
+	if   [ $OracleDistroRelease -eq 7 ]
+	then
+		CutIndex=7
+	elif [ $OracleDistroRelease -eq 8 ]
+	then
+		CutIndex=6
+	fi
 	LF=$LinuxFlavor
 	LFA=$LinuxFlavor
         function GetRedHatVersion {
@@ -125,10 +135,6 @@ then
         }
         RedHatVersion=$(GetRedHatVersion)
 	RHV=$RedHatVersion
-        function GetOracleDistroRelease {
-                sudo cat /etc/oracle-release | cut -f5 -d' ' | cut -f1 -d'.'
-        }
-        OracleDistroRelease=$(GetOracleDistroRelease)
         Release=$OracleDistroRelease
         RL=$Release
 elif [ $LinuxFlavor = 'Red' ] || [ $LinuxFlavor = 'CentOS' ]
@@ -484,9 +490,15 @@ then
 
 				sleep 5
 
-				mkdir -p /opt/olxc/"$DistDir"/uekulele/facter
-				cd /opt/olxc/"$DistDir"/uekulele/facter
-				curl -s http://downloads.puppetlabs.com/facter/facter-2.4.4.tar.gz | sudo tar xz; sudo ruby facter*/install.rb
+				if [ $RedHatVersion -eq 8 ]
+				then
+					sudo yum -y install rubygems
+					sudo gem install facter -v 2.5.1
+				else
+					mkdir -p /opt/olxc/"$DistDir"/uekulele/facter
+					cd /opt/olxc/"$DistDir"/uekulele/facter
+					curl -s http://downloads.puppetlabs.com/facter/facter-2.4.4.tar.gz | sudo tar xz; sudo ruby facter*/install.rb
+				fi
 
 				echo ''
        			 	echo "=============================================="

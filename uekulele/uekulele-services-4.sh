@@ -90,7 +90,17 @@ LinuxFlavor=$(TrimLinuxFlavors)
 
 if   [ $LinuxFlavor = 'Oracle' ]
 then
-	CutIndex=7
+        function GetOracleDistroRelease {
+                sudo cat /etc/oracle-release | cut -f5 -d' ' | cut -f1 -d'.'
+        }
+        OracleDistroRelease=$(GetOracleDistroRelease)
+        if   [ $OracleDistroRelease -eq 7 ]
+        then
+                CutIndex=7
+        elif [ $OracleDistroRelease -eq 8 ]
+        then
+                CutIndex=6
+        fi
         function GetRedHatVersion {
                 sudo cat /etc/redhat-release | cut -f"$CutIndex" -d' ' | cut -f1 -d'.'
         }
@@ -331,7 +341,7 @@ do
 	}
 	DNSLookup=$(CheckDNSLookup)
 
-	if [ $Release -eq 7 ] || [ $Release -eq 6 ]
+	if [ $Release -ge 7 ] || [ $Release -eq 6 ]
 	then
 		while [ $DNSLookup -eq 1 ]
 		do
@@ -350,7 +360,7 @@ do
 
       			sudo lxc-copy -n $SeedContainerName -N $ContainerPrefix$CloneIndex
 
-			if [ $MajorRelease -eq 7 ]
+			if [ $MajorRelease -ge 7 ]
 			then
                         	sudo sed -i "s/$SeedContainerName/$ContainerPrefix$CloneIndex/g"        /var/lib/lxc/$ContainerPrefix$CloneIndex/rootfs/etc/hostname
                         fi

@@ -128,7 +128,17 @@ LinuxFlavor=$(TrimLinuxFlavors)
 
 if   [ $LinuxFlavor = 'Oracle' ]
 then
-	CutIndex=7
+        function GetOracleDistroRelease {
+                sudo cat /etc/oracle-release | cut -f5 -d' ' | cut -f1 -d'.'
+        }
+        OracleDistroRelease=$(GetOracleDistroRelease)
+        if   [ $OracleDistroRelease -eq 7 ]
+        then
+                CutIndex=7
+        elif [ $OracleDistroRelease -eq 8 ]
+        then
+                CutIndex=6
+        fi
         function GetRedHatVersion {
                 sudo cat /etc/redhat-release | cut -f"$CutIndex" -d' ' | cut -f1 -d'.'
         }
@@ -430,7 +440,7 @@ sleep 5
 
 clear
 
-# if [ $MajorRelease -eq 7 ]
+# if [ $MajorRelease -ge 7 ]
 # then
 # 	echo ''
 # 	echo "=============================================="
@@ -543,7 +553,7 @@ then
 		
 		RedHatVersion=$(GetRedHatVersion)
 
-        	if [ $Release -eq 7 ] || [ $Release -eq 6 ]
+        	if [ $Release -ge 7 ] || [ $Release -eq 6 ]
         	then
         	function CheckPublicIPIterative {
 			sudo lxc-info -n oel$OracleRelease$SeedPostfix -iH | cut -f1-3 -d'.' | sed 's/\.//g'

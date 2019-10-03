@@ -167,7 +167,17 @@ LinuxFlavor=$(TrimLinuxFlavors)
 
 if   [ $LinuxFlavor = 'Oracle' ]
 then
-        CutIndex=7
+        function GetOracleDistroRelease {
+                sudo cat /etc/oracle-release | cut -f5 -d' ' | cut -f1 -d'.'
+        }
+        OracleDistroRelease=$(GetOracleDistroRelease)
+        if   [ $OracleDistroRelease -eq 7 ]
+        then
+                CutIndex=7
+        elif [ $OracleDistroRelease -eq 8 ]
+        then
+                CutIndex=6
+        fi
         function GetRedHatVersion {
                 sudo cat /etc/redhat-release | cut -f"$CutIndex" -d' ' | cut -f1 -d'.'
         }
@@ -685,7 +695,7 @@ then
 		fi
 	fi
 
-	if [ $LinuxFlavor != 'Fedora' ]
+	if [ $LinuxFlavor != 'Fedora' ] && [ $Release -le 7 ]
 	then
 		DocBook2XInstalled=0
 		m=1
@@ -730,6 +740,10 @@ then
 				echo "=============================================="
 				echo ''
 
+			elif [ $Release -eq 8 ]
+			then
+				DocBook2XInstalled=1
+
 			elif [ $DocBook2XInstalled -eq 0 ]
 				then
 				echo ''
@@ -740,12 +754,35 @@ then
 			fi
 			m=$((m+1))
 	        done
+#	else
+#			echo ''
+#			echo "=============================================="
+#			echo 'Install epel repo...                          '
+#			echo "=============================================="
+#			echo ''
+#
+#                       sudo yum -y install wget
+#                       sudo mkdir -p /opt/olxc/"$DistDir"/uekulele/epel
+#                       sudo chown -R $Owner:$Group /opt/olxc
+#                       cd /opt/olxc/"$DistDir"/uekulele/epel
+#
+#                       if   [ $Release -eq 8 ]
+#                       then
+#                               wget --timeout=5 --tries=10 https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
+#                               sudo rpm -ivh epel-release-latest-8.noarch.rpm
+#			fi
 	fi
+
 
 	cd /opt/olxc/"$DistDir"
 
-	sudo yum -y install debootstrap perl bash-completion bash-completion-extras
-	sudo yum -y install lxc libcap-devel libcgroup wget bridge-utils 
+	sudo yum -y install perl bash-completion
+
+	if [ $Release -le 7 ]
+	then
+		sudo yum -y install debootstrap bash-completion-extras bridge-utils docbook2X lxc
+		sudo yum -y install lxc libcap-devel libcgroup wget bridge-utils 
+	fi
 
 	if   [ $Release -eq 6 ]
 	then
@@ -753,7 +790,8 @@ then
 		then
 			sudo yum -y install lsb
 		fi
-	elif [ $Release -eq 7 ]
+
+	elif [ $Release -ge 7 ]
 	then
 		sudo yum -y install lsb
 	fi
@@ -786,8 +824,13 @@ then
 	if [ $Release -ge 7 ] 
 	then
 		sudo systemctl daemon-reload
-		sudo systemctl start lxc.service
-		sudo systemctl status lxc.service
+
+		if [ $Release -eq 7 ]
+		then
+			sudo systemctl start lxc.service
+			sudo systemctl status lxc.service
+		fi
+
 		echo ''
 		sudo setenforce permissive
 		sudo systemctl start libvirtd
@@ -798,6 +841,7 @@ then
 		sudo systemctl status libvirtd
 		sleep 2
 		sudo cp -p /etc/lxc/default.conf /etc/lxc/default.conf.bak
+
 	elif [ $Release -eq 6 ]
 	then
 #		sudo service lxc start
@@ -816,46 +860,48 @@ then
 	echo "=============================================="
 	echo ''
 
-	sleep 5
+	if [ $Release -le 7 ]
+	then
+		sleep 5
 
-	clear
+		clear
 
-	echo ''
-	echo "=============================================="
-	echo "Run LXC Checkconfig...                        "
-	echo "=============================================="
-	echo ''
+		echo ''
+		echo "=============================================="
+		echo "Run LXC Checkconfig...                        "
+		echo "=============================================="
+		echo ''
 
-	sleep 5
+		sleep 5
 
-	sudo lxc-checkconfig
+		sudo lxc-checkconfig
 
-	echo "=============================================="
-	echo "LXC Checkconfig completed.                    "
-	echo "=============================================="
-	echo ''
-		
-	sleep 5
+		echo "=============================================="
+		echo "LXC Checkconfig completed.                    "
+		echo "=============================================="
+		echo ''
+		sleep 5
 
-	clear
+		clear
 
-	echo ''
-	echo "=============================================="
-	echo "Display LXC Version...                        "
-	echo "=============================================="
-	echo ''
+		echo ''
+		echo "=============================================="
+		echo "Display LXC Version...                        "
+		echo "=============================================="
+		echo ''
 
-	sudo lxc-create --version
+		sudo lxc-create --version
 
-	echo ''
-	echo "=============================================="
-	echo "LXC version displayed.                        "
-	echo "=============================================="
-	echo ''
+		echo ''
+		echo "=============================================="
+		echo "LXC version displayed.                        "
+		echo "=============================================="
+		echo ''
 	
-	sleep 5
+		sleep 5
 
-	clear
+		clear
+	fi
 fi
 
 # GLS 20170919 Oracle Linux Specific Code Block 1 END
@@ -1027,7 +1073,7 @@ then
 		fi
 	fi
 
-	if [ $LinuxFlavor != 'Fedora' ]
+	if [ $LinuxFlavor != 'Fedora' ] && [ $Release -le 7 ]
 	then
 		DocBook2XInstalled=0
 		m=1
@@ -1082,12 +1128,34 @@ then
 			fi
 			m=$((m+1))
 	        done
+#	else
+#			echo ''
+#			echo "=============================================="
+#			echo 'Install epel repo...                          '
+#			echo "=============================================="
+#			echo ''
+#
+#                       sudo yum -y install wget
+#                       sudo mkdir -p /opt/olxc/"$DistDir"/uekulele/epel
+#                       sudo chown -R $Owner:$Group /opt/olxc
+#                       cd /opt/olxc/"$DistDir"/uekulele/epel
+#
+#                       if   [ $Release -eq 8 ]
+#                       then
+#                               wget --timeout=5 --tries=10 https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
+#                               sudo rpm -ivh epel-release-latest-8.noarch.rpm
+#		fi
 	fi
 
 	cd /opt/olxc/"$DistDir"
 
-	sudo yum -y install debootstrap perl bash-completion bash-completion-extras 
-	sudo yum -y install lxc libcap-devel libcgroup wget bridge-utils
+	sudo yum -y install perl bash-completion
+
+	if [ $Release -le 7 ]
+	then
+		sudo yum -y install debootstrap bash-completion-extras bridge-utils docbook2X lxc
+		sudo yum -y install lxc libcap-devel libcgroup wget bridge-utils 
+	fi
 
 	if [ $LinuxFlavor = 'Fedora' ]
 	then
@@ -1110,11 +1178,16 @@ then
 	echo "=============================================="
 	echo ''
 
-	if   [ $Release -eq 7 ] 
+	if [ $Release -ge 7 ] 
 	then
 		sudo systemctl daemon-reload
-		sudo systemctl start lxc.service
-		sudo systemctl status lxc.service
+
+		if [ $Release -eq 7 ]
+		then
+			sudo systemctl start lxc.service
+			sudo systemctl status lxc.service
+		fi
+		
 		echo ''
 		sudo setenforce permissive
 		sudo systemctl start libvirtd
@@ -1146,6 +1219,9 @@ then
 	sleep 5
 
 	clear
+
+	if [ $Release -le 7 ]
+	then
 
 	echo ''
 	echo "=============================================="
@@ -1180,6 +1256,8 @@ then
 	echo "LXC version displayed.                        "
 	echo "=============================================="
 	echo ''
+
+	fi
 fi
 	
 sleep 5
@@ -1189,9 +1267,15 @@ clear
 # GLS 20170927 credit yairchu 
 function SoftwareVersion { echo "$@" | awk -F. '{ printf("%d%03d%03d%03d\n", $1,$2,$3,$4); }'; }
 
-function GetLXCVersion {
-        lxc-create --version
-}
+if [ $Release -le 7 ]
+then
+	function GetLXCVersion {
+        	lxc-create --version
+	}
+else
+	LXCVersion=0.1.0
+fi
+
 LXCVersion=$(GetLXCVersion)
 
 if [ $(SoftwareVersion $LXCVersion) -lt $(SoftwareVersion $LxcVersion) ]
@@ -1225,7 +1309,7 @@ then
 
 	while [ $(SoftwareVersion $LXCVersion) -lt $(SoftwareVersion $LxcVersion) ]
 	do
-		if [ $Release -eq 7 ]
+		if [ $Release -ge 7 ]
 		then
 			echo ''
 			echo "=============================================="
@@ -1236,7 +1320,25 @@ then
 			sleep 5
 
 			sudo touch /etc/rpm/macros
+
+			if [ $Release -ge 8 ]
+			then
+				sudo yum-config-manager --enable ol8_codeready_builder
+				sudo yum-config-manager --enable ol8_appstream
+				sudo yum-config-manager --enable ol8_u0_baseos_base
+				sudo yum-config-manager --enable ol8_baseos_latest
+			#	sudo yum-config-manager --enable ol8_addons
+				wget http://mirror.centos.org/centos/7/os/x86_64/Packages/bridge-utils-1.5-9.el7.x86_64.rpm
+			fi
+
 			sudo yum -y install rpm-build wget openssl-devel gcc make docbook2X xmlto automake graphviz libtool
+
+			if [ $Release -ge 8 ]
+			then
+				sudo yum -y localinstall bridge-utils-1.5-9.el7.x86_64.rpm
+				sudo yum -y install libcap-devel
+			fi
+
 			sudo mkdir -p /opt/olxc/"$DistDir"/uekulele/lxc
 			sudo chown -R $Owner:$Group /opt/olxc
 			cd /opt/olxc/"$DistDir"/uekulele/lxc
@@ -1406,7 +1508,7 @@ then
 		LXCVersion=$(GetLXCVersion)	
 	done
 	
-	if [ $Release -eq 7 ]
+	if [ $Release -ge 7 ]
 	then
 		echo ''
 		echo "=============================================="
@@ -1548,7 +1650,7 @@ then
 	then
 		sudo yum -y install lsb
 	fi
-elif [ $Release -eq 7 ]
+elif [ $Release -ge 7 ]
 then
 	sudo yum -y install lsb
 fi
@@ -1766,8 +1868,9 @@ then
 			echo "=============================================="
 			echo ''
 
-		elif [ $Release -eq 7 ]
+		elif [ $Release -ge 7 ]
 		then
+
 			sudo yum -y install rpm-build wget openssl-devel gcc make
 			mkdir -p /opt/olxc/"$DistDir"/uekulele/openvswitch
 			cd /opt/olxc/"$DistDir"/uekulele/openvswitch
@@ -1800,7 +1903,6 @@ then
 			cd /opt/olxc/"$DistDir"/uekulele/openvswitch/openvswitch-"$OvsVersion"
 #			sed -e 's/@VERSION@/0.0.1/' rhel/openvswitch.spec.in > /tmp/ovs.spec
 #			sudo yum-builddep /tmp/ovs.spec
-			sed -i 's/python >= 2.7/python27/g' rhel/openvswitch.spec
 			rpmbuild --define "_topdir /opt/olxc/"$DistDir"/uekulele/openvswitch/rpmbuild" -bb rhel/openvswitch.spec
 		
 			sleep 5
@@ -1865,7 +1967,7 @@ then
 
 			clear
 
-		elif [ $Release -eq 7 ]
+		elif [ $Release -ge 7 ]
 		then
 			echo ''
 			echo "=============================================="
@@ -1877,6 +1979,29 @@ then
 			tar -zxvf openvswitch-"$OvsVersion".tar.gz
 			cp -p openvswitch-"$OvsVersion"/rhel/*.spec /opt/olxc/"$DistDir"/uekulele/openvswitch/.
 			cd /opt/olxc/"$DistDir"/uekulele/openvswitch
+
+ 			if [ $Release -eq 8 ]
+ 			then
+				wget https://rpmfind.net/linux/centos/7.7.1908/os/x86_64/Packages/python-six-1.9.0-2.el7.noarch.rpm
+				sudo yum -y localinstall python-six-1.9.0-2.el7.noarch.rpm
+				sudo yum -y module install python36
+				sudo yum -y module install python27
+				sudo yum -y install python3-sphinx
+				sudo yum -y install python3-six
+				sudo yum -y install selinux-policy-devel unbound-devel
+ 				sudo alternatives --set python /usr/bin/python3
+ 				python3 -m venv py36env
+ 				source py36env/bin/activate
+ 				python3 -m pip install --upgrade pip
+ 				python3 -m pip install six
+ 				python3 -m pip install sphinx
+				sed -i 's/BuildRequires: python-six/BuildRequires: python3-six/g'       openvswitch.spec
+				sed -i 's/BuildRequires: python-sphinx/BuildRequires: python3-sphinx/g' openvswitch.spec
+				sudo cat openvswitch.spec | grep python3
+				sleep 5
+			fi
+
+			sed -i 's/python >= 2.7/python27/g'	  openvswitch.spec
 			rpmbuild --define "_topdir /opt/olxc/"$DistDir"/uekulele/openvswitch/rpmbuild" -ba openvswitch.spec
 
 			echo ''
@@ -1971,7 +2096,7 @@ then
 	cd /usr/local/etc
 	sudo mkdir openvswitch
 	sudo ovsdb-tool create /usr/local/etc/openvswitch/conf.db
-	if   [ $Release -eq 7 ]
+	if   [ $Release -ge 7 ]
 	then
 		sudo systemctl start openvswitch.service
 	elif [ $Release -eq 6 ]
@@ -2025,7 +2150,7 @@ echo "Verify required packages status...            "
 echo "=============================================="
 echo ''
 
-if [ $Release -eq 7 ] || [ $Release -eq 6 ]
+if [ $Release -ge 7 ] || [ $Release -eq 6 ]
 then
 	if [ $LinuxFlavor != 'Fedora' ]
 	then
@@ -2795,7 +2920,7 @@ clear
 SwitchList='sw1 sx1'
 for k in $SwitchList
 do
-	if   [ $Release -eq 7 ]
+	if   [ $Release -ge 7 ]
 	then
 		echo ''
 		echo "=============================================="
