@@ -384,6 +384,7 @@ then
 			echo "Fedora Linux 27		ALL	  V,P 	ALL "
 			echo "Oracle Linux 6.x	UEK4      V,P 	ALL         "
 			echo "Oracle Linux 7.x	RHEL,UEK4 V,P 	ALL         "
+			echo "Oracle Linux 8.x	RHEL	  V,P 	ALL         "
 			echo "RedHat Linux 7.x	ALL       V,P 	ALL,AWS     "
 			echo "Ubuntu Linux 16.x	ALL       V,P 	S,D,AWS     "
 			echo "Ubuntu Linux 17.x	ALL       V,P 	S,D         "
@@ -470,7 +471,10 @@ then
 
 				if [ $LinuxFlavor != 'Fedora' ]
 				then
-					sudo yum-complete-transaction
+					if [ $Release -le 7 ]
+					then
+						sudo yum-complete-transaction
+					fi
 				fi
        	 	
 				echo ''
@@ -788,6 +792,7 @@ then
 			echo "Fedora Linux 27		ALL	  V,P 	ALL "
 			echo "Oracle Linux 6.x	UEK4      V,P 	ALL         "
 			echo "Oracle Linux 7.x	RHEL,UEK4 V,P 	ALL         "
+			echo "Oracle Linux 8.x	RHEL	  V,P 	ALL         "
 			echo "RedHat Linux 7.x	ALL       V,P 	ALL,AWS     "
 			echo "Ubuntu Linux 16.x	ALL       V,P 	S,D,AWS     "
 			echo "Ubuntu Linux 17.x	ALL       V,P 	S,D         "

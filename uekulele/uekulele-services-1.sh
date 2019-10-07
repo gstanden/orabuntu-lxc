@@ -754,23 +754,23 @@ then
 			fi
 			m=$((m+1))
 	        done
-#	else
-#			echo ''
-#			echo "=============================================="
-#			echo 'Install epel repo...                          '
-#			echo "=============================================="
-#			echo ''
-#
-#                       sudo yum -y install wget
-#                       sudo mkdir -p /opt/olxc/"$DistDir"/uekulele/epel
-#                       sudo chown -R $Owner:$Group /opt/olxc
-#                       cd /opt/olxc/"$DistDir"/uekulele/epel
-#
-#                       if   [ $Release -eq 8 ]
-#                       then
-#                               wget --timeout=5 --tries=10 https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
-#                               sudo rpm -ivh epel-release-latest-8.noarch.rpm
-#			fi
+ 	else
+ 			echo ''
+ 			echo "=============================================="
+ 			echo 'Install epel repo...                          '
+ 			echo "=============================================="
+ 			echo ''
+ 
+                        sudo yum -y install wget
+                        sudo mkdir -p /opt/olxc/"$DistDir"/uekulele/epel
+                        sudo chown -R $Owner:$Group /opt/olxc
+                        cd /opt/olxc/"$DistDir"/uekulele/epel
+ 
+                        if   [ $Release -eq 8 ]
+                        then
+                                wget --timeout=5 --tries=10 https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
+                                sudo rpm -ivh epel-release-latest-8.noarch.rpm
+ 			fi
 	fi
 
 
@@ -829,9 +829,9 @@ then
 		then
 			sudo systemctl start lxc.service
 			sudo systemctl status lxc.service
+			echo ''
 		fi
 
-		echo ''
 		sudo setenforce permissive
 		sudo systemctl start libvirtd
 		sleep 2
@@ -1128,23 +1128,23 @@ then
 			fi
 			m=$((m+1))
 	        done
-#	else
-#			echo ''
-#			echo "=============================================="
-#			echo 'Install epel repo...                          '
-#			echo "=============================================="
-#			echo ''
-#
-#                       sudo yum -y install wget
-#                       sudo mkdir -p /opt/olxc/"$DistDir"/uekulele/epel
-#                       sudo chown -R $Owner:$Group /opt/olxc
-#                       cd /opt/olxc/"$DistDir"/uekulele/epel
-#
-#                       if   [ $Release -eq 8 ]
-#                       then
-#                               wget --timeout=5 --tries=10 https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
-#                               sudo rpm -ivh epel-release-latest-8.noarch.rpm
-#		fi
+ 	else
+ 			echo ''
+ 			echo "=============================================="
+ 			echo 'Install epel repo...                          '
+ 			echo "=============================================="
+ 			echo ''
+ 
+                        sudo yum -y install wget
+                        sudo mkdir -p /opt/olxc/"$DistDir"/uekulele/epel
+                        sudo chown -R $Owner:$Group /opt/olxc
+                        cd /opt/olxc/"$DistDir"/uekulele/epel
+ 
+                        if   [ $Release -eq 8 ]
+                        then
+                                wget --timeout=5 --tries=10 https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
+                                sudo rpm -ivh epel-release-latest-8.noarch.rpm
+ 		fi
 	fi
 
 	cd /opt/olxc/"$DistDir"
@@ -1186,9 +1186,9 @@ then
 		then
 			sudo systemctl start lxc.service
 			sudo systemctl status lxc.service
+			echo ''
 		fi
 		
-		echo ''
 		sudo setenforce permissive
 		sudo systemctl start libvirtd
 		sleep 2
@@ -1272,11 +1272,11 @@ then
 	function GetLXCVersion {
         	lxc-create --version
 	}
+	LXCVersion=$(GetLXCVersion)
 else
 	LXCVersion=0.1.0
 fi
 
-LXCVersion=$(GetLXCVersion)
 
 if [ $(SoftwareVersion $LXCVersion) -lt $(SoftwareVersion $LxcVersion) ]
 then
@@ -1299,10 +1299,15 @@ then
 	
 	clear
 
-	function GetLXCVersion {
-        	lxc-create --version
-	}
-	LXCVersion=$(GetLXCVersion)
+	if [ $Release -le 7 ]
+	then
+		function GetLXCVersion {
+        		lxc-create --version
+		}
+		LXCVersion=$(GetLXCVersion)
+	else
+		LXCVersion=0.1.0
+	fi
 
 #	echo 'LXCVersion = '$LXCVersion #debug only
 #	echo 'LxcVersion = '$LxcVersion #debug only
@@ -1327,7 +1332,7 @@ then
 				sudo yum-config-manager --enable ol8_appstream
 				sudo yum-config-manager --enable ol8_u0_baseos_base
 				sudo yum-config-manager --enable ol8_baseos_latest
-			#	sudo yum-config-manager --enable ol8_addons
+			 	sudo yum-config-manager --enable ol8_addons
 				wget http://mirror.centos.org/centos/7/os/x86_64/Packages/bridge-utils-1.5-9.el7.x86_64.rpm
 			fi
 
@@ -1504,8 +1509,11 @@ then
 			export LD_LIBRARY_PATH=''
 			cd /opt/olxc/"$DistDir"/uekulele/lxc
 		fi
-		
-		LXCVersion=$(GetLXCVersion)	
+	
+		function GetLXCVersion {
+        		lxc-create --version
+		}
+		LXCVersion=$(GetLXCVersion)
 	done
 	
 	if [ $Release -ge 7 ]
@@ -1639,7 +1647,16 @@ sudo yum -y install graphviz
 sudo yum -y install rpm-build wget
 sudo yum -y install openssl-devel
 sudo yum -y install bind-utils 
-sudo yum -y install net-tools wireless-tools
+
+if [ $Release -eq 8 ]
+then
+	wget https://rpmfind.net/linux/epel/7/x86_64/Packages/w/wireless-tools-29-13.el7.x86_64.rpm
+	sudo yum -y localinstall wireless-tools-29-13.el7.x86_64.rpm 
+else
+	sudo yum -y install wireless-tools
+fi
+
+sudo yum -y install net-tools
 sudo yum -y install openssh-server uuid sshpass
 sudo yum -y install rpm ntp iotop
 sudo yum -y install iptables gawk yum-utils
@@ -1984,8 +2001,6 @@ then
  			then
 				wget https://rpmfind.net/linux/centos/7.7.1908/os/x86_64/Packages/python-six-1.9.0-2.el7.noarch.rpm
 				sudo yum -y localinstall python-six-1.9.0-2.el7.noarch.rpm
-				sudo yum -y module install python36
-				sudo yum -y module install python27
 				sudo yum -y install python3-sphinx
 				sudo yum -y install python3-six
 				sudo yum -y install selinux-policy-devel unbound-devel
@@ -1997,7 +2012,6 @@ then
  				python3 -m pip install sphinx
 				sed -i 's/BuildRequires: python-six/BuildRequires: python3-six/g'       openvswitch.spec
 				sed -i 's/BuildRequires: python-sphinx/BuildRequires: python3-sphinx/g' openvswitch.spec
-				sudo cat openvswitch.spec | grep python3
 				sleep 5
 			fi
 
@@ -2713,10 +2727,10 @@ then
 	then
 		# Remove the extra nameserver line used for DNS DHCP setup and add the required nameservers.
 	
-		sudo sed -i '/8.8.8.8/d' /var/lib/lxc/nsa/rootfs/etc/resolv.conf
-		sudo sed -i '/nameserver/c\nameserver 10.207.39.2' /var/lib/lxc/nsa/rootfs/etc/resolv.conf
-		sudo sh -c "echo 'nameserver 10.207.29.2' >> /var/lib/lxc/nsa/rootfs/etc/resolv.conf"
-		sudo sh -c "echo 'search orabuntu-lxc.com consultingcommandos.us' >> /var/lib/lxc/nsa/rootfs/etc/resolv.conf"
+		sudo sed -i '/8.8.8.8/d' /var/lib/lxc/nsa/rootfs/etc/resolv.conf > /dev/null 2>&1
+		sudo sed -i '/nameserver/c\nameserver 10.207.39.2' /var/lib/lxc/nsa/rootfs/etc/resolv.conf > /dev/null 2>&1
+		sudo sh -c "echo 'nameserver 10.207.29.2' >> /var/lib/lxc/nsa/rootfs/etc/resolv.conf" > /dev/null 2>&1
+		sudo sh -c "echo 'search orabuntu-lxc.com consultingcommandos.us' >> /var/lib/lxc/nsa/rootfs/etc/resolv.conf" > /dev/null 2>&1
 
 		if [ ! -z $HostName ]
 		then
@@ -2782,7 +2796,7 @@ then
 			# GLS 20151221 Settable Domain feature added
 			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/var/lib/bind/fwd.orabuntu-lxc.com
 			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/var/lib/bind/rev.orabuntu-lxc.com
-			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/etc/resolv.conf
+			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/etc/resolv.conf > /dev/null 2>&1
 			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /etc/NetworkManager/dnsmasq.d/local
 			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /etc/network/openvswitch/crt_ovs_sw1.sh
 			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/etc/bind/named.conf.local
@@ -2803,7 +2817,7 @@ then
 			# GLS 20151221 Settable Domain feature added
 			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /var/lib/lxc/$NameServer/rootfs/var/lib/bind/fwd.consultingcommandos.us
 			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /var/lib/lxc/$NameServer/rootfs/var/lib/bind/rev.consultingcommandos.us
-			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /var/lib/lxc/$NameServer/rootfs/etc/resolv.conf
+			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /var/lib/lxc/$NameServer/rootfs/etc/resolv.conf > /dev/null 2>&1
 			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /etc/NetworkManager/dnsmasq.d/local
 			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /etc/network/openvswitch/crt_ovs_sw1.sh
 			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /var/lib/lxc/$NameServer/rootfs/etc/bind/named.conf.local
@@ -4307,6 +4321,33 @@ clear
 
 echo ''
 echo "=============================================="
-echo "Next script to run: uekulele-services-2.sh    "
+echo "Allow NTP to run in LXC Containers...         "
 echo "=============================================="
+echo ''
 
+if [ ! -f /usr/share/lxc/config/common.conf.d/01-sys-time.conf ]
+then
+        sudo touch /usr/share/lxc/config/common.conf.d/01-sys-time.conf
+        sudo sh -c "echo 'lxc.cap.drop ='                                              > /usr/share/lxc/config/common.conf.d/01-sys-time.conf"
+        sudo sh -c "echo 'lxc.cap.drop = mac_admin mac_override sys_module sys_rawio' >> /usr/share/lxc/config/common.conf.d/01-sys-time.conf"
+        echo ''
+        sudo ls -l /usr/share/lxc/config/common.conf.d/01-sys-time.conf
+        echo ''
+        cat /usr/share/lxc/config/common.conf.d/01-sys-time.conf
+        echo ''
+fi
+
+echo ''
+echo "=============================================="
+echo "Done: Allow NTP to run in LXC Containers.     "
+echo "=============================================="
+echo ''
+
+sleep 5
+
+clear
+
+echo ''
+echo "=============================================="
+echo "Next script to run: orabuntu-services-2.sh    "
+echo "=============================================="

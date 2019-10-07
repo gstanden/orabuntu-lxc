@@ -246,7 +246,7 @@ then
 
   	sleep 5
 	
-  	if [ $Release -ge 6 ]
+  	if [ $Release -ge 6 ] && [ $Release -le 7 ]
   	then
   		sudo chmod 775 /opt/olxc/"$DistDir"/uekulele/archives/docker_install_uekulele.sh
   		/opt/olxc/"$DistDir"/uekulele/archives/docker_install_uekulele.sh $LinuxFlavor $Release
@@ -1158,21 +1158,28 @@ then
 
         sudo lxc-ls -f
 
-        echo ''
-        echo "=============================================="
-        echo "Docker Containers...                          "
-        echo "=============================================="
-        echo ''
+	if [ $Release -ge 6 ] && [ $Release -le 7 ]
+	then
+		if [ $Release -le 7 ]
+		then
+        		echo ''
+        		echo "=============================================="
+        		echo "Docker Containers...                          "
+        		echo "=============================================="
+        		echo ''
 
-        sudo docker ps -a
+        		sudo docker ps -a
 
-	echo ''
-        echo "=============================================="
-        echo "To ssh to Docker raesene/alpine-nettools:     "
-        echo "                                              "
-        echo "     ssh username@localhost -p 2200           "
-        echo "                                              "
-        echo "=============================================="
+			echo ''
+        		echo "=============================================="
+        		echo "To ssh to Docker raesene/alpine-nettools:     "
+        		echo "                                              "
+        		echo "     ssh username@localhost -p 2200           "
+        		echo "                                              "
+        		echo "=============================================="
+		fi
+	fi
+
         echo ''
         echo "=============================================="
         echo "Done: List Containers.                        "
