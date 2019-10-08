@@ -2240,53 +2240,68 @@ fi
 
 if   [ $NameServerExists -eq 0 ] && [ $MultiHostVar2 = 'N' ]
 then
-	echo ''
-	echo "=============================================="
-	echo "Create LXC DNS DHCP container...              "
-	echo "=============================================="
-	echo ''
-	echo "=============================================="
-	echo "Trying primary method...                      "
-       	echo "                                              "
-       	echo "Patience...download of rootfs takes time...   "
-       	echo "=============================================="
-	echo ''
+		echo ''
+		echo "=============================================="
+		echo "Create LXC DNS DHCP container...              "
+		echo "=============================================="
+		echo ''
+	
+		function CheckNSARunning {
+			sudo lxc-ls -f | grep nsa | grep -c RUNNING
+		}
+		NSARunning=$(CheckNSARunning)
 
- 	sudo lxc-create -t download -n nsa -- --dist ubuntu --release xenial --arch amd64
+		n=1
+		while [ $NSARunning -ne 1 ] && [ "$n" -le 3 ]
+		do
+			echo "=============================================="
+			echo "Try #$n of the primary method...              "
+       			echo "                                              "
+       			echo "Patience...download of rootfs takes time...   "
+       			echo "=============================================="
+			echo ''
 
-	if [ $(SoftwareVersion $LXCVersion) -ge $(SoftwareVersion "2.1.0") ]
-       	then
-               	sudo lxc-update-config -c /var/lib/lxc/nsa/config
-       	fi
+ 			sudo lxc-create -t download -n nsa -- --dist ubuntu --release xenial --arch amd64
 
-	echo ''
-	echo "=============================================="
-	echo "Method 1 complete.                            "
-	echo "=============================================="
-	echo ''
-	echo "=============================================="
-	echo "Establish sudo privileges...                  "
-	echo "=============================================="
-	echo ''
+			n=$((n+1))
+			NSARunning=$(CheckNSARunning)
 
-	echo $MultiHostVar4 | sudo -S date
+			clear
+		done
 
-	echo ''
-	echo "=============================================="
-	echo "Privileges established.                       "
-	echo "=============================================="
-	echo ''
-	echo "=============================================="
-	echo "Trying alternate method...                    "
-	echo "=============================================="
-	echo ''
+		if [ $(SoftwareVersion $LXCVersion) -ge $(SoftwareVersion "2.1.0") ]
+       		then
+       	        	sudo lxc-update-config -c /var/lib/lxc/nsa/config
+       		fi
+	
+		echo ''
+		echo "=============================================="
+		echo "Method 1 complete.                            "
+		echo "=============================================="
+		echo ''
+		echo "=============================================="
+		echo "Establish sudo privileges...                  "
+		echo "=============================================="
+		echo ''
 
- 	sudo lxc-create -n nsa -t ubuntu -- --release xenial --arch amd64
+		echo $MultiHostVar4 | sudo -S date
 
-        if [ $(SoftwareVersion $LXCVersion) -ge $(SoftwareVersion "2.1.0") ]
-        then
-                sudo lxc-update-config -c /var/lib/lxc/nsa/config
-        fi
+		echo ''
+		echo "=============================================="
+		echo "Privileges established.                       "
+		echo "=============================================="
+		echo ''
+		echo "=============================================="
+		echo "Trying alternate method...                    "
+		echo "=============================================="
+		echo ''
+
+ 		sudo lxc-create -n nsa -t ubuntu -- --release xenial --arch amd64
+
+		if [ $(SoftwareVersion $LXCVersion) -ge $(SoftwareVersion "2.1.0") ]
+		then
+			sudo lxc-update-config -c /var/lib/lxc/nsa/config
+		fi
 
 	echo ''
 	echo "=============================================="
