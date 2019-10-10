@@ -125,7 +125,7 @@ fi
 
 if [ -z $2 ]
 then
-        SPOKEIP=10.209.53.120
+        SPOKEIP=10.209.53.193
 else
         SPOKEIP=$2
 fi
@@ -155,8 +155,8 @@ if [ -z $6 ]
 then
         Product=workspaces
         Product=no-product
-        Product=oracle-db
         Product=oracle-gi-18c
+        Product=oracle-db
 else
         Product=$6
 fi
@@ -293,7 +293,23 @@ then
                 	sudo mkdir -p /opt/olxc/"$DistDir"/uekulele/epel
                 	sudo chown -R $Owner:$Group /opt/olxc
                 	cd /opt/olxc/"$DistDir"/uekulele/epel
-                	if   [ $Release -eq 7 ]
+
+                	if     [ $Release -eq 8 ]
+                	then
+                        	wget --timeout=5 --tries=10 https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
+                        	sudo rpm -ivh epel-release-latest-8.noarch.rpm
+
+				if [ $LinuxFlavor = 'Oracle' ]
+				then
+					sudo yum -y install yum-utils
+			        	sudo yum-config-manager --enable ol8_codeready_builder
+                                	sudo yum-config-manager --enable ol8_appstream
+                                	sudo yum-config-manager --enable ol8_u0_baseos_base
+                                	sudo yum-config-manager --enable ol8_baseos_latest
+                                	sudo yum-config-manager --enable ol8_addons
+				fi
+
+                	elif   [ $Release -eq 7 ]
                 	then
                         	wget --timeout=5 --tries=10 https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
                         	sudo rpm -ivh epel-release-latest-7.noarch.rpm
@@ -302,7 +318,8 @@ then
                         	wget --timeout=5 --tries=10 https://dl.fedoraproject.org/pub/epel/epel-release-latest-6.noarch.rpm
                         	sudo rpm -ivh epel-release-latest-6.noarch.rpm
                 	fi
-                	sudo yum provides lxc | sed '/^\s*$/d' | grep Repo | sort -u
+                	
+			sudo yum provides lxc | sed '/^\s*$/d' | grep Repo | sort -u
                 	sudo yum -y install docbook2X
         	fi
 

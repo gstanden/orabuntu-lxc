@@ -629,6 +629,11 @@ echo 'MultiHost                 = '$MultiHost
 	if [ -z $9 ] && [ $LinuxFlavor != 'Fedora' ]
 	then
                 	LxcOvsVersion="2.0.8:2.11.1"
+			
+			if [ $LinuxFlavor = 'Oracle' ] && [ $Release -eq 8 ]
+			then
+                		LxcOvsVersion="2.1.1:2.11.1"
+			fi
 	fi
 
 	# Fedora MUST leave Lxc version at 2.0.9 but can change Ovs version.

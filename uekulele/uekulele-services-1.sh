@@ -2016,7 +2016,7 @@ then
 			fi
 
 			sed -i 's/python >= 2.7/python27/g'	  openvswitch.spec
-			rpmbuild --define "_topdir /opt/olxc/"$DistDir"/uekulele/openvswitch/rpmbuild" -ba openvswitch.spec
+			rpmbuild --define "_topdir /opt/olxc/"$DistDir"/uekulele/openvswitch/rpmbuild" -ba --without check openvswitch.spec
 
 			echo ''
 			echo "=============================================="
