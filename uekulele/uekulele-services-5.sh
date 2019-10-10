@@ -537,7 +537,7 @@ then
 	echo ''
 
         sudo touch /etc/orabuntu-lxc-release
-        sudo sh -c "echo 'Orabuntu-LXC v6.13.1-beta AMIDE' > /etc/orabuntu-lxc-release"
+        sudo sh -c "echo 'Orabuntu-LXC v6.13.3-beta AMIDE' > /etc/orabuntu-lxc-release"
 	sudo ls -l /etc/orabuntu-lxc-release
 	echo ''
 	sudo cat /etc/orabuntu-lxc-release
@@ -1245,9 +1245,12 @@ sudo rm -f /opt/olxc/*.lst /opt/olxc/*.tar
 
 cd "$DistDir"/uekulele/archives
 rm -f uekulele-services.lst uekulele-files.lst product.lst uekulele-services.tar uekulele-files.tar product.tar
-cd "$DistDir"/installs/logs
-LOGEXT=`date +"%Y-%m-%d.%R:%S"`
-sudo cp -p /opt/olxc/installs/logs/$USER.log /opt/olxc/installs/logs/$USER.orabuntu-lxc.install.$LOGEXT
+if [ -d "$DistDir"/installs/logs ]
+then
+	cd "$DistDir"/installs/logs
+	LOGEXT=`date +"%Y-%m-%d.%R:%S"`
+	sudo cp -p /opt/olxc/installs/logs/$USER.log /opt/olxc/installs/logs/$USER.orabuntu-lxc.install.$LOGEXT
+fi
 cd $DistDir/anylinux
 
 # Band-aid for openvswitch update which breaks openvswitch.
