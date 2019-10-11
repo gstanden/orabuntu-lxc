@@ -226,7 +226,7 @@ then
                 sudo cat /etc/oracle-release | cut -f5 -d' ' | cut -f1 -d'.'
         }
         OracleDistroRelease=$(GetOracleDistroRelease)
-	if   [ $OracleDistroRelease -eq 7 ]
+	if   [ $OracleDistroRelease -eq 7 ] || [ $OracleDistroRelease -eq 6 ]
 	then
 		CutIndex=7
 	elif [ $OracleDistroRelease -eq 8 ]
@@ -628,18 +628,23 @@ echo 'MultiHost                 = '$MultiHost
 	LxcOvsVersion=$9
 	if [ -z $9 ] && [ $LinuxFlavor != 'Fedora' ]
 	then
-                	LxcOvsVersion="2.0.8:2.5.4"
+               	LxcOvsVersion="2.0.8:2.5.4"
 			
-			if [ $LinuxFlavor = 'Oracle' ] && [ $Release -eq 8 ]
-			then
-                		LxcOvsVersion="2.1.1:2.11.1"
-			fi
+		if [ $LinuxFlavor = 'Oracle' ] && [ $Release -eq 8 ]
+		then
+               		LxcOvsVersion="2.1.1:2.11.1"
+		fi
 			
-			if [ $LinuxFlavor = 'Oracle' ] && [ $Release -eq 7 ]
-			then
-                		LxcOvsVersion="2.1.1:2.11.1"
-        # optional		LxcOvsVersion="2.1.1:2.5.4"
-			fi
+		if [ $LinuxFlavor = 'Oracle' ] && [ $Release -eq 7 ]
+		then
+               		LxcOvsVersion="2.1.1:2.11.1"
+		# 	LxcOvsVersion="2.1.1:2.5.4"  #optional
+		fi
+			
+		if [ $LinuxFlavor = 'Oracle' ] && [ $Release -eq 6 ]
+		then
+               		LxcOvsVersion="2.0.8:2.5.4"
+		fi
 	fi
 
 	# Fedora MUST leave Lxc version at 2.0.9 but can change Ovs version.
@@ -872,7 +877,7 @@ fi
 
 if [ $LinuxFlavor != 'Ubuntu' ] && [ $LinuxFlavor != 'Pop_OS' ]
 then
-	echo 'RPM libvirt installed     = '`rpm -qa | grep libvirt-[1234] | grep -v client`
+	echo 'RPM libvirt installed     = '`rpm -qa | grep libvirt-[01234] | grep -v client`
 fi
 
 echo ''

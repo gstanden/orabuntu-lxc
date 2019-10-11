@@ -171,7 +171,7 @@ then
                 sudo cat /etc/oracle-release | cut -f5 -d' ' | cut -f1 -d'.'
         }
         OracleDistroRelease=$(GetOracleDistroRelease)
-        if   [ $OracleDistroRelease -eq 7 ]
+        if   [ $OracleDistroRelease -eq 7 ] || [ $OracleDistroRelease -eq 6 ]
         then
                 CutIndex=7
         elif [ $OracleDistroRelease -eq 8 ]
