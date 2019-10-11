@@ -1992,11 +1992,37 @@ then
 			echo "=============================================="
 			echo ''
 
-			cd /opt/olxc/"$DistDir"/uekulele/openvswitch/rpmbuild/SOURCES
-			tar -zxvf openvswitch-"$OvsVersion".tar.gz
-			cp -p openvswitch-"$OvsVersion"/rhel/*.spec /opt/olxc/"$DistDir"/uekulele/openvswitch/.
-			cd /opt/olxc/"$DistDir"/uekulele/openvswitch
+			if [ $Release -eq 7 ] && [ $(SoftwareVersion $OvsVersion) -eq $(SoftwareVersion "2.5.4") ]
+			then
+				cd /opt/olxc/"$DistDir"/uekulele/openvswitch/rpmbuild/SOURCES
+				tar -zxvf openvswitch-"$OvsVersion".tar.gz
+				cp -p openvswitch-"$OvsVersion"/rhel/*.spec /opt/olxc/"$DistDir"/uekulele/openvswitch/.
+				cd /opt/olxc/"$DistDir"/uekulele/openvswitch
+				sleep 5
+			fi
 
+			if [ $Release -eq 7 ] && [ $(SoftwareVersion $OvsVersion) -eq $(SoftwareVersion "2.11.1") ]
+			then
+				cd /opt/olxc/"$DistDir"/uekulele/openvswitch/rpmbuild/SOURCES
+				tar -zxvf openvswitch-"$OvsVersion".tar.gz
+				cp -p openvswitch-"$OvsVersion"/rhel/*.spec /opt/olxc/"$DistDir"/uekulele/openvswitch/.
+				cd /opt/olxc/"$DistDir"/uekulele/openvswitch
+				sudo yum-config-manager --enable ol7_latest
+				sudo yum-config-manager --enable ol7_optional_archive
+				sudo yum -y install python3
+				sudo yum -y install python3-sphinx
+				sudo yum -y install python-six
+				sudo yum -y install selinux-policy-devel unbound-devel
+ 				sudo alternatives --set python /usr/bin/python3
+ 				python3 -m venv py36env
+ 				source py36env/bin/activate
+ 				python3 -m pip install --upgrade pip
+ 				python3 -m pip install six
+ 				python3 -m pip install sphinx
+				sed -i 's/BuildRequires: python-sphinx/BuildRequires: python3-sphinx/g' openvswitch.spec
+				sleep 5
+			fi
+				
  			if [ $Release -eq 8 ]
  			then
 				wget https://rpmfind.net/linux/centos/7.7.1908/os/x86_64/Packages/python-six-1.9.0-2.el7.noarch.rpm
@@ -2012,10 +2038,10 @@ then
  				python3 -m pip install sphinx
 				sed -i 's/BuildRequires: python-six/BuildRequires: python3-six/g'       openvswitch.spec
 				sed -i 's/BuildRequires: python-sphinx/BuildRequires: python3-sphinx/g' openvswitch.spec
+				sed -i 's/python >= 2.7/python27/g'	  				openvswitch.spec
 				sleep 5
 			fi
 
-			sed -i 's/python >= 2.7/python27/g'	  openvswitch.spec
 			rpmbuild --define "_topdir /opt/olxc/"$DistDir"/uekulele/openvswitch/rpmbuild" -ba --without check openvswitch.spec
 
 			echo ''

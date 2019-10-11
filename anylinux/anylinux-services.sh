@@ -628,11 +628,17 @@ echo 'MultiHost                 = '$MultiHost
 	LxcOvsVersion=$9
 	if [ -z $9 ] && [ $LinuxFlavor != 'Fedora' ]
 	then
-                	LxcOvsVersion="2.0.8:2.11.1"
+                	LxcOvsVersion="2.0.8:2.5.4"
 			
 			if [ $LinuxFlavor = 'Oracle' ] && [ $Release -eq 8 ]
 			then
                 		LxcOvsVersion="2.1.1:2.11.1"
+			fi
+			
+			if [ $LinuxFlavor = 'Oracle' ] && [ $Release -eq 7 ]
+			then
+                		LxcOvsVersion="2.1.1:2.11.1"
+        # optional		LxcOvsVersion="2.1.1:2.5.4"
 			fi
 	fi
 
