@@ -2025,6 +2025,10 @@ then
 				
  			if [ $Release -eq 8 ]
  			then
+				cd /opt/olxc/"$DistDir"/uekulele/openvswitch/rpmbuild/SOURCES
+				tar -zxvf openvswitch-"$OvsVersion".tar.gz
+				cp -p openvswitch-"$OvsVersion"/rhel/*.spec /opt/olxc/"$DistDir"/uekulele/openvswitch/.
+				cd /opt/olxc/"$DistDir"/uekulele/openvswitch
 				wget https://rpmfind.net/linux/centos/7.7.1908/os/x86_64/Packages/python-six-1.9.0-2.el7.noarch.rpm
 				sudo yum -y localinstall python-six-1.9.0-2.el7.noarch.rpm
 				sudo yum -y install python3-sphinx
