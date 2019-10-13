@@ -36,7 +36,6 @@ OnOff=On
 
 if [ $OnOff = 'On' ]
 then
-
 	if [ -e /sys/hypervisor/uuid ]
 	then
         	function CheckAWS {
@@ -134,59 +133,118 @@ then
         	UbuntuMajorVersion=$(GetUbuntuMajorVersion)
 	fi
 
-        if [ $MultiHostVar1 = 'new' ] || [ $MultiHostVar1 = 'reinstall' ]
+        if [ $MultiHostVar1 = 'new' ] || [ $MultiHostVar1 = 'reinstall' ] 
         then
-                SwitchList='sw2 sw3 sw4 sw5 sw6 sw7 sw8 sw9'
-                for k in $SwitchList
-                do
+		if [ $Release -gt 6 ]
+		then
+                	SwitchList='sw2 sw3 sw4 sw5 sw6 sw7 sw8 sw9'
+                	for k in $SwitchList
+                	do
+                        	echo ''
+                        	echo "=============================================="
+                        	echo "Create systemd OpenvSwitch $k service...      "
+                        	echo "=============================================="
+
+                        	if [ ! -f /etc/systemd/system/$k.service ]
+                        	then
+                                	sudo sh -c "echo '[Unit]'                                                > /etc/systemd/system/$k.service"
+                                	sudo sh -c "echo 'Description=$k Service'                               >> /etc/systemd/system/$k.service"
+                                	sudo sh -c "echo 'After=network-online.target'                          >> /etc/systemd/system/$k.service"
+                                	sudo sh -c "echo ''                                                     >> /etc/systemd/system/$k.service"
+                                	sudo sh -c "echo '[Service]'                                            >> /etc/systemd/system/$k.service"
+
+                                	if [ $AWS -eq 1 ]
+                                	then
+                                        	sudo sh -c "echo 'Type=idle'                                    >> /etc/systemd/system/$k.service"
+                                	else
+                                        	sudo sh -c "echo 'Type=oneshot'                                 >> /etc/systemd/system/$k.service"
+                                	fi
+
+                                	sudo sh -c "echo 'User=root'                                            >> /etc/systemd/system/$k.service"
+                                	sudo sh -c "echo 'RemainAfterExit=yes'                                  >> /etc/systemd/system/$k.service"
+                                	sudo sh -c "echo 'ExecStart=/etc/network/openvswitch/crt_ovs_$k.sh'     >> /etc/systemd/system/$k.service"
+                                	sudo sh -c "echo ''                                                     >> /etc/systemd/system/$k.service"
+                                	sudo sh -c "echo '[Install]'                                            >> /etc/systemd/system/$k.service"
+                                	sudo sh -c "echo 'WantedBy=multi-user.target'                           >> /etc/systemd/system/$k.service"
+                        	fi
+
+                        	echo ''
+                        	echo "=============================================="
+                        	echo "Start OpenvSwitch $k ...                      "
+                        	echo "=============================================="
+                        	echo ''
+
+                        	sudo chmod 644 /etc/systemd/system/$k.service
+                        	sudo systemctl enable $k.service
+                        	sudo service $k stop
+                        	sudo service $k start
+                        	sudo service $k status
+
+                        	echo ''
+                        	echo "=============================================="
+                        	echo "OpenvSwitch $k is up.                         "
+                        	echo "=============================================="
+
+                        	sleep 5
+
+                        	clear
+                	done
+
+		elif [ $Release -eq 6 ]
+		then
+                	SwitchList='sw2 sw3 sw4 sw5 sw6 sw7 sw8 sw9'
+                	for k in $SwitchList
+                	do
+                		echo ''
+                		echo "=============================================="
+                		echo "Create OpenvSwitch init.d $k service...       "
+                		echo "=============================================="
+                		echo ''
+
+                		if [ ! -f /etc/init.d/ovs_$k ]
+                		then
+                        		sudo cp -p /etc/network/openvswitch/switch-service-linux6.sh /etc/init.d/ovs_$k
+                        		sudo sed -i "s/SWK/$k/g" /etc/init.d/ovs_$k
+                        		sudo chmod 755 /etc/init.d/ovs_$k
+                        		sudo chown $Owner:$Group /etc/init.d/ovs_$k
+                        		sudo chkconfig --add ovs_$k
+                        		sudo chkconfig ovs_$k on --level 345
+                        		sudo chkconfig --list ovs_$k
+
+                        		echo ''
+                        		echo "=============================================="
+                        		echo "Done: Create OpenvSwitch systemd $k service.  "
+                        		echo "=============================================="
+                        		echo ''
+                        		echo "=============================================="
+                        		echo "Start OpenvSwitch $k ...                      "
+                        		echo "=============================================="
+                        		echo ''
+
+                        		sudo /etc/network/openvswitch/crt_ovs_$k.sh >/dev/null 2>&1
+                        		sleep 2
+                        		sudo ifconfig $k
+
+                        		echo "=============================================="
+                        		echo "Done: Start OpenvSwitch $k                    "
+                        		echo "=============================================="
+                        		echo ''
+
+                        		sleep 5
+
+                        		clear
+				fi
+			done
+                else
                         echo ''
                         echo "=============================================="
-                        echo "Create systemd OpenvSwitch $k service...      "
-                        echo "=============================================="
-
-                        if [ ! -f /etc/systemd/system/$k.service ]
-                        then
-                                sudo sh -c "echo '[Unit]'                                                > /etc/systemd/system/$k.service"
-                                sudo sh -c "echo 'Description=$k Service'                               >> /etc/systemd/system/$k.service"
-                                sudo sh -c "echo 'After=network-online.target'                          >> /etc/systemd/system/$k.service"
-                                sudo sh -c "echo ''                                                     >> /etc/systemd/system/$k.service"
-                                sudo sh -c "echo '[Service]'                                            >> /etc/systemd/system/$k.service"
-
-                                if [ $AWS -eq 1 ]
-                                then
-                                        sudo sh -c "echo 'Type=idle'                                    >> /etc/systemd/system/$k.service"
-                                else
-                                        sudo sh -c "echo 'Type=oneshot'                                 >> /etc/systemd/system/$k.service"
-                                fi
-
-                                sudo sh -c "echo 'User=root'                                            >> /etc/systemd/system/$k.service"
-                                sudo sh -c "echo 'RemainAfterExit=yes'                                  >> /etc/systemd/system/$k.service"
-                                sudo sh -c "echo 'ExecStart=/etc/network/openvswitch/crt_ovs_$k.sh'     >> /etc/systemd/system/$k.service"
-                                sudo sh -c "echo ''                                                     >> /etc/systemd/system/$k.service"
-                                sudo sh -c "echo '[Install]'                                            >> /etc/systemd/system/$k.service"
-                                sudo sh -c "echo 'WantedBy=multi-user.target'                           >> /etc/systemd/system/$k.service"
-                        fi
-
-                        echo ''
-                        echo "=============================================="
-                        echo "Start OpenvSwitch $k ...                      "
+                        echo "OpenvSwitch $k previously installed.          "
                         echo "=============================================="
                         echo ''
-
-                        sudo chmod 644 /etc/systemd/system/$k.service
-                        sudo systemctl enable $k.service
-                        sudo service $k stop
-                        sudo service $k start
-                        sudo service $k status
-
-                        echo ''
-                        echo "=============================================="
-                        echo "OpenvSwitch $k is up.                         "
-                        echo "=============================================="
 
                         sleep 5
 
                         clear
-                done
+                fi
         fi
 fi
