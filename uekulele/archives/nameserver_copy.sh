@@ -52,6 +52,12 @@ then
 		systemctl | grep -c lxc-net
 	}
 	LxcNetInstalled=$(CheckLxcNetInstalled)
+elif [ $Release -eq 6 ]
+then
+	function CheckLxcNetInstalled {
+		chkconfig | grep -c lxc-net
+	}
+	LxcNetInstalled=$(CheckLxcNetInstalled)
 fi
 
 echo ''

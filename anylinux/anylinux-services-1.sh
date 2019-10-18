@@ -522,16 +522,26 @@ then
 				facter virtual
 			}
 			Facter=$(GetFacter)
-			
+		
 			sleep 5
 
 			clear
 
 			if [ $Facter != 'physical' ] # 6
 			then
-				function GetVirtualInterfaces {
-					sudo ifconfig | grep enp | cut -f1 -d':' | cut -f1 -d' ' | sed 's/$/ /' | tr -d '\n' | sed 's/^[ \t]*//;s/[ \t]*$//'
-				}
+				if   [ $Release -eq 7 ] || [ $Release -eq 8 ]
+				then
+					function GetVirtualInterfaces {
+						sudo ifconfig | grep enp | cut -f1 -d':' | cut -f1 -d' ' | sed 's/$/ /' | tr -d '\n' | sed 's/^[ \t]*//;s/[ \t]*$//'
+					}
+
+				elif [ $Release -eq 6 ]
+				then
+					function GetVirtualInterfaces {
+						sudo ifconfig | grep eth | cut -f1 -d':' | cut -f1 -d' ' | sed 's/$/ /' | tr -d '\n' | sed 's/^[ \t]*//;s/[ \t]*$//'
+					}
+				fi
+
 				VirtualInterfaces=$(GetVirtualInterfaces)
 
 				for i in $VirtualInterfaces
@@ -574,6 +584,7 @@ then
 						fi
 					fi
 				done
+				sleep 15
 
  				echo ''
 				echo "=============================================="

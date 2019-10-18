@@ -22,5 +22,6 @@
 /etc/network/openvswitch/crt_ovs_sw1.sh
 /etc/network/openvswitch/switch-service-linux6.sh
 /etc/network/openvswitch/container-service-linux6.sh
+/etc/network/openvswitch/olxc-scst-linux6.sh
 /etc/GNU3
 /etc/COPYING

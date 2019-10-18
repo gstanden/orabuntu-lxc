@@ -2948,14 +2948,32 @@ then
 
 elif [ $MultiHostVar3 = 'X' ]  && [ $GRE = 'N' ] && [ $MultiHostVar2 = 'Y' ]
 then
-	function GetSx1Index {
-		sudo cat /etc/network/openvswitch/sx1.info | cut -f2 -d':' | cut -f4 -d'.'
-	}
+	if   [ $Release -eq 7 ] || [ $Release -eq 8 ]
+	then
+		function GetSx1Index {
+			sudo cat /etc/network/openvswitch/sx1.info | cut -f2 -d':' | cut -f4 -d'.'
+		}
+
+	elif [ $Release -eq 6 ]
+	then
+		function GetSx1Index {
+			sudo cat /etc/network/openvswitch/sx1.info | cut -f3 -d':' | cut -f4 -d'.'
+		}
+	fi
 	Sx1Index=$(GetSx1Index)
 
-	function GetSw1Index {
-		sudo cat /etc/network/openvswitch/sw1.info | cut -f2 -d':' | cut -f4 -d'.'
-	}
+	if   [ $Release -eq 7 ] || [ $Release -eq 8 ]
+	then
+		function GetSw1Index {
+			sudo cat /etc/network/openvswitch/sw1.info | cut -f2 -d':' | cut -f4 -d'.'
+		}
+
+	elif [ $Release -eq 6 ]
+	then
+		function GetSw1Index {
+			sudo cat /etc/network/openvswitch/sw1.info | cut -f3 -d':' | cut -f4 -d'.'
+		}
+	fi
 	Sw1Index=$(GetSw1Index)
 else
 	Sw1Index=$MultiHostVar3
@@ -3536,8 +3554,8 @@ then
 
         sudo tar -xvf /opt/olxc/"$DistDir"/uekulele/archives/scst-files.tar -C / --touch
 
-	sudo chown -R $Owner:$Group		/opt/olxc/home/scst-files/.
-        sudo sed -i "s/SWITCH_IP/$Sw1Index/g"	/opt/olxc/home/scst-files/create-scst-target.sh
+	sudo chown -R $Owner:$Group		        /opt/olxc/home/scst-files/.
+        sudo sed -i "s/\"SWITCH_IP\"/$Sw1Index/g"	/opt/olxc/home/scst-files/create-scst-target.sh
 
 	echo ''
 	echo "=============================================="
@@ -3719,6 +3737,17 @@ if [ $MultiHostVar2 = 'Y' ]
 then
 #	GLS 20170904 Switches sx1 and sw1 are set earlier (around lines 1988,1989) so they are not set here.
 
+	# sudo cat /etc/network/openvswitch/sx1.info | cut -f2 -d':' | cut -f4 -d'.'
+	function GetSx1Index {
+		sudo sh -c "cat '/etc/network/openvswitch/sx1.info' | cut -f2 -d':' | cut -f4 -d'.'"
+	}
+	Sx1Index=$(GetSx1Index)
+
+	# sudo cat /etc/network/openvswitch/sw1.info | cut -f2 -d':' | cut -f4 -d'.'
+	function GetSw1Index {
+		sudo sh -c "cat '/etc/network/openvswitch/sw1.info' | cut -f2 -d':' | cut -f4 -d'.'"
+	}
+
 	sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw2.sh
 	sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw3.sh
 	sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw4.sh
@@ -3735,14 +3764,31 @@ then
 	echo ''
 
         sudo tar -xvf /opt/olxc/"$DistDir"/uekulele/archives/scst-files.tar -C / --touch
-        sudo tar -xvf /opt/olxc/"$DistDir"/uekulele/archives/tgt-files.tar  -C / --touch
 
-	sudo chown -R $Owner:$Group		/opt/olxc/home/scst-files/.
-        sudo sed -i "s/SWITCH_IP/$Sw1Index/g"	/opt/olxc/home/scst-files/create-scst-target.sh
-		
+	sudo chown -R $Owner:$Group		        /opt/olxc/home/scst-files/.
+        sudo sed -i "s/\"SWITCH_IP\"/$Sw1Index/g"	/opt/olxc/home/scst-files/create-scst-target.sh
+
 	echo ''
 	echo "=============================================="
 	echo "Done: Unpack SCST Linux SAN Files.            "
+	echo "=============================================="
+	echo ''
+
+	sleep 5
+
+	clear
+
+	echo ''
+	echo "=============================================="
+	echo "Unpack TGT Linux SAN Files...                "
+	echo "=============================================="
+	echo ''
+
+        sudo tar -xvf /opt/olxc/"$DistDir"/uekulele/archives/tgt-files.tar  -C / --touch
+	
+	echo ''
+	echo "=============================================="
+	echo "Done: Unpack TGT Linux SAN Files.            "
 	echo "=============================================="
 	echo ''
 

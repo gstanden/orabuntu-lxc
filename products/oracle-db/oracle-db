@@ -151,12 +151,22 @@ LinuxFlavor=$(TrimLinuxFlavors)
 
 if   [ $LinuxFlavor = 'Oracle' ]
 then
-        CutIndex=7
+        function GetOracleDistroRelease {
+                sudo cat /etc/oracle-release | cut -f5 -d' ' | cut -f1 -d'.'
+        }
+        OracleDistroRelease=$(GetOracleDistroRelease)
+        if   [ $OracleDistroRelease -eq 7 ] || [ $OracleDistroRelease -eq 6 ]
+        then
+                CutIndex=7
+        elif [ $OracleDistroRelease -eq 8 ]
+        then
+                CutIndex=6
+        fi
         function GetRedHatVersion {
                 sudo cat /etc/redhat-release | cut -f"$CutIndex" -d' ' | cut -f1 -d'.'
         }
         RedHatVersion=$(GetRedHatVersion)
-	RHV=$RedHatVersion
+        RHV=$RedHatVersion
         function GetOracleDistroRelease {
                 sudo cat /etc/oracle-release | cut -f5 -d' ' | cut -f1 -d'.'
         }
@@ -443,7 +453,15 @@ echo "=============================================="
 echo ''
 
 sudo useradd -u 1098 grid 		>/dev/null 2>&1
-sudo useradd -u 500 oracle 		>/dev/null 2>&1
+
+if   [ $Release -eq 7 ] || [ $Release -eq 8 ]
+then
+	sudo useradd -u 500 oracle 	>/dev/null 2>&1
+elif [ $Release -eq 6 ]
+then
+	sudo useradd oracle 		>/dev/null 2>&1
+fi
+
 sudo groupadd -g 1100 asmadmin		>/dev/null 2>&1
 sudo usermod -a -G asmadmin grid	>/dev/null 2>&1
 
