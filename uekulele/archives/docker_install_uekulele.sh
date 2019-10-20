@@ -42,10 +42,15 @@ echo ''
 
 if [ $LinuxFlavor = 'Oracle' ]
 then
-	if   [ $Release -ge 7 ]
+	if   [ $Release -eq 8 ]
+	then
+		sudo yum-config-manager --enable ol8_addons
+		sudo yum -y install podman skopeo buildah 
+
+	if   [ $Release -eq 7 ]
 	then
 		sudo yum-config-manager --enable ol7_addons
-		sudo yum -y install docker-engine
+		sudo yum -y install docker-engine podman
 		sudo systemctl start docker
 		sudo systemctl enable docker
 
@@ -119,7 +124,17 @@ echo "=============================================="
 echo ''
 
 # Install alpine-nettools
-sudo docker run -d -p 2200:22 raesene/alpine-nettools
+
+if   [ $Release -le 7 ]
+then
+	sudo docker run -d -p 2200:22 raesene/alpine-nettools
+	sudo docker ps -a
+
+elif [ $Release -eq 8 ]
+then
+	podman run -d raesene/alpine-nettools
+	podman ps -a
+fi
 
 # Install ODOO ERP
 # sudo docker run -d -e POSTGRES_USER=odoo -e POSTGRES_PASSWORD=odoo --name db postgres:9.4
@@ -127,7 +142,6 @@ sudo docker run -d -p 2200:22 raesene/alpine-nettools
 
 # sudo docker exec -ti <container_name> /bin/sh
 sleep 2
-sudo docker ps -a
 
 echo ''
 echo "=============================================="
