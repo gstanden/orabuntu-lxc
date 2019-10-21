@@ -34,21 +34,28 @@
 LinuxFlavor=$1
     Release=$2
 
-echo ''
-echo "=============================================="
-echo "Install docker-ce...                          "
-echo "=============================================="
-echo ''
-
 if [ $LinuxFlavor = 'Oracle' ]
 then
 	if   [ $Release -eq 8 ]
 	then
+		echo ''
+		echo "=============================================="
+		echo "Install OCI Tools (podman skopeo buildah) ... "
+		echo "=============================================="
+		echo ''
+
+		sudo yum -y install yum-utils
 		sudo yum-config-manager --enable ol8_addons
 		sudo yum -y install podman skopeo buildah 
 
-	if   [ $Release -eq 7 ]
+	elif [ $Release -eq 7 ]
 	then
+		echo ''
+		echo "=============================================="
+		echo "Install docker-ce...                          "
+		echo "=============================================="
+		echo ''
+
 		sudo yum-config-manager --enable ol7_addons
 		sudo yum -y install docker-engine podman
 		sudo systemctl start docker
@@ -56,6 +63,12 @@ then
 
 	elif [ $Release -eq 6 ]
 	then
+		echo ''
+		echo "=============================================="
+		echo "Install docker-ce...                          "
+		echo "=============================================="
+		echo ''
+
 		sudo yum-config-manager --enable public_ol6_addons
 		sudo yum -y install docker-engine
 		sudo service docker start
@@ -109,19 +122,19 @@ then
 	sudo systemctl enable docker
 fi
 
-echo ''
-echo "=============================================="
-echo "Done: Configure required repository.          "
-echo "=============================================="
-echo ''
-echo "=============================================="
-echo "Done: Install docker-ce.                      "
-echo "=============================================="
-echo ''
-echo "=============================================="
-echo "Install User-Settable Docker Containers...    "
-echo "=============================================="
-echo ''
+# echo ''
+# echo "=============================================="
+# echo "Done: Configure required repository.          "
+# echo "=============================================="
+# echo ''
+# echo "=============================================="
+# echo "Done: Install docker-ce.                      "
+# echo "=============================================="
+# echo ''
+# echo "=============================================="
+# echo "Install User-Settable Docker Containers...    "
+# echo "=============================================="
+# echo ''
 
 # Install alpine-nettools
 
@@ -130,25 +143,36 @@ then
 	sudo docker run -d -p 2200:22 raesene/alpine-nettools
 	sudo docker ps -a
 
+	sleep 2
+
+	echo ''
+	echo "=============================================="
+	echo "Done: Install User-Settable Docker Containers."
+	echo "=============================================="
+	echo ''
+	echo "=============================================="
+	echo "Done: Install Docker.                         "
+	echo "=============================================="
+
 elif [ $Release -eq 8 ]
 then
 	podman run -d raesene/alpine-nettools
 	podman ps -a
+
+	sleep 2
+
+	echo ''
+	echo "=============================================="
+	echo "Done: Install User-Settable Podman Containers."
+	echo "=============================================="
+	echo ''
+	echo "=============================================="
+	echo "Done: Install OCI Tools.                      "
+	echo "=============================================="
 fi
 
 # Install ODOO ERP
 # sudo docker run -d -e POSTGRES_USER=odoo -e POSTGRES_PASSWORD=odoo --name db postgres:9.4
 # sudo docker run -d -p 8069:8069 --name odoo --link db:db -t odoo
-
 # sudo docker exec -ti <container_name> /bin/sh
-sleep 2
-
-echo ''
-echo "=============================================="
-echo "Done: Install User-Settable Docker Containers."
-echo "=============================================="
-echo ''
-echo "=============================================="
-echo "Done: Install Docker.                         "
-echo "=============================================="
 

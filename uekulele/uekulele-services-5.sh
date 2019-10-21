@@ -246,7 +246,7 @@ then
 
   	sleep 5
 	
-  	if [ $Release -ge 6 ] && [ $Release -le 7 ]
+  	if [ $Release -ge 6 ] && [ $Release -le 8 ]
   	then
   		sudo chmod 775 /opt/olxc/"$DistDir"/uekulele/archives/docker_install_uekulele.sh
   		/opt/olxc/"$DistDir"/uekulele/archives/docker_install_uekulele.sh $LinuxFlavor $Release
