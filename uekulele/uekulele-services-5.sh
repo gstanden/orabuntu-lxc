@@ -537,7 +537,7 @@ then
 	echo ''
 
         sudo touch /etc/orabuntu-lxc-release
-        sudo sh -c "echo 'Orabuntu-LXC v6.13.8-beta AMIDE' > /etc/orabuntu-lxc-release"
+        sudo sh -c "echo 'Orabuntu-LXC v6.13.10-beta AMIDE' > /etc/orabuntu-lxc-release"
 	sudo ls -l /etc/orabuntu-lxc-release
 	echo ''
 	sudo cat /etc/orabuntu-lxc-release
@@ -1152,24 +1152,27 @@ then
         echo "=============================================="
         echo ''
         echo "=============================================="
-        echo "LXC  Containers...                            "
+        echo "List LXC Containers...                        "
         echo "=============================================="
         echo ''
 
         sudo lxc-ls -f
 
-	if [ $Release -ge 6 ] && [ $Release -le 7 ]
+	if [ $Release -ge 6 ] && [ $Release -le 8 ]
 	then
-		if [ $Release -le 7 ]
+		if   [ $Release -le 7 ]
 		then
         		echo ''
         		echo "=============================================="
-        		echo "Docker Containers...                          "
+			echo "List Application (docker) Containers...       "
         		echo "=============================================="
         		echo ''
 
         		sudo docker ps -a
 
+        		echo "=============================================="
+			echo "Done: List Application (docker) Containers.   "
+        		echo "=============================================="
 			echo ''
         		echo "=============================================="
         		echo "To ssh to Docker raesene/alpine-nettools:     "
@@ -1177,6 +1180,22 @@ then
         		echo "     ssh username@localhost -p 2200           "
         		echo "                                              "
         		echo "=============================================="
+
+		elif [ $Release -ge 8 ]
+		then
+        		echo ''
+        		echo "=============================================="
+			echo "List Application (podman) Containers...       "
+        		echo "=============================================="
+        		echo ''
+
+        		podman  ps -a
+
+        		echo ''
+        		echo "=============================================="
+			echo "Done: List Application (podman) Containers.   "
+        		echo "=============================================="
+        		echo ''
 		fi
 	fi
 

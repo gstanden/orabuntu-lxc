@@ -140,6 +140,7 @@ fi
 
 if   [ $Release -le 7 ]
 then
+	sudo docker run -d oraclelinux:7.3
 	sudo docker run -d -p 2200:22 raesene/alpine-nettools
 	sudo docker ps -a
 
@@ -156,6 +157,7 @@ then
 
 elif [ $Release -eq 8 ]
 then
+	podman run -d oraclelinux:7.3
 	podman run -d raesene/alpine-nettools
 	podman ps -a
 
