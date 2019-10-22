@@ -1357,6 +1357,41 @@ then
 
 			clear
 
+			if [ $(SoftwareVersion $LxcVersion) -ge $(SoftwareVersion "3.0.0") ] && [ $(SoftwareVersion $LxcVersion) -le $(SoftwareVersion "3.0.4") ]
+			then
+				echo ''
+				echo "=============================================="
+				echo "Build and Install lxc-templates RPM ...       "
+				echo "=============================================="
+				echo ''
+
+				sleep 5
+				
+				sudo yum -y install automake gcc make rpmdevtools git
+				sudo mkdir -p /opt/olxc/"$DistDir"/uekulele/lxc-templates
+				sudo chown -R $Owner:$Group /opt/olxc
+				cd /opt/olxc/"$DistDir"/uekulele/lxc-templates
+				wget --timeout=5 --tries=10 https://linuxcontainers.org/downloads/lxc/lxc-templates-"$LxcVersion".tar.gz
+				sudo mkdir -p /opt/olxc/"$DistDir"/uekulele/lxc-templates/rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
+				sudo chown -R $Owner:$Group /opt/olxc/"$DistDir"/uekulele/lxc-templates/rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
+				cp -p lxc-templates-"$LxcVersion".tar.gz /opt/olxc/"$DistDir"/uekulele/lxc-templates/rpmbuild/SOURCES/.
+				tar -zxvf lxc-templates-"$LxcVersion".tar.gz
+				cp -p "$DistDir"/uekulele/archives/lxc-templates.spec /opt/olxc/"$DistDir"/uekulele/lxc-templates/.
+				sudo sed -i "s/LxcVersion/$LxcVersion/" /opt/olxc/"$DistDir"/uekulele/lxc-templates/lxc-templates.spec
+				rpmbuild --define "_topdir /opt/olxc/"$DistDir"/uekulele/lxc-templates/rpmbuild" -ba lxc-templates.spec
+				sudo yum -y localinstall /opt/olxc/"$DistDir"/uekulele/lxc-templates/rpmbuild/RPMS/x86_64/lxc-templates-"$LxcVersion"-1.el8.x86_64.rpm
+				
+				echo ''
+				echo "=============================================="
+				echo "Done: Build and Install lxc-templates RPM.    "
+				echo "=============================================="
+				echo ''
+
+				sleep 5
+
+				clear
+			fi
+			
 			echo ''
 			echo "=============================================="
 			echo "Untar source code and build LXC RPM...        "
@@ -1373,10 +1408,7 @@ then
 			cp -p lxc-"$LxcVersion".tar.gz /opt/olxc/"$DistDir"/uekulele/lxc/rpmbuild/SOURCES/.
 			tar -zxvf lxc-"$LxcVersion".tar.gz
 			cp -p lxc-"$LxcVersion"/lxc.spec /opt/olxc/"$DistDir"/uekulele/lxc/.
-			sed -i '/find %{buildroot} -type f -name/a install -m 755 -d $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig'		/opt/olxc/"$DistDir"/uekulele/lxc/lxc.spec
-			sed -i '/find %{buildroot} -type f -name/a install -m 755 -d $RPM_BUILD_ROOT%{_sysconfdir}/bash_completion.d'	/opt/olxc/"$DistDir"/uekulele/lxc/lxc.spec
-			sudo sed -i '/sysconfig/s/\*//'											/opt/olxc/"$DistDir"/uekulele/lxc/lxc.spec
-			
+
 			cd /opt/olxc/"$DistDir"/uekulele/lxc
 
 			function CheckMacrosFile {
@@ -1388,8 +1420,22 @@ then
 			then
 				sudo sh -c "echo '%_unpackaged_files_terminate_build 0' >> /etc/rpm/macros"
 			fi
-			rpmbuild --define "_topdir /opt/olxc/"$DistDir"/uekulele/lxc/rpmbuild" -ba lxc.spec
+				
+			if [ $(SoftwareVersion $LxcVersion) -lt $(SoftwareVersion "3.0.0") ]
+			then
+				sed -i '/find %{buildroot} -type f -name/a install -m 755 -d $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig'		/opt/olxc/"$DistDir"/uekulele/lxc/lxc.spec
+				sed -i '/find %{buildroot} -type f -name/a install -m 755 -d $RPM_BUILD_ROOT%{_sysconfdir}/bash_completion.d'	/opt/olxc/"$DistDir"/uekulele/lxc/lxc.spec
+				sudo sed -i '/sysconfig/s/\*//'											/opt/olxc/"$DistDir"/uekulele/lxc/lxc.spec
+			fi
 			
+			if [ $(SoftwareVersion $LxcVersion) -ge $(SoftwareVersion "3.0.0") ] && [ $(SoftwareVersion $LxcVersion) -le $(SoftwareVersion "3.0.4") ]
+			then
+				sudo sed -i 's/_smp_mflags\}/_smp_mflags\} CFLAGS=\"-fPIC\"/' /opt/olxc/"$DistDir"/uekulele/lxc/lxc.spec
+				sudo sed -i '/^\%prep/i \%define debug_package \%\{nil\}'     /opt/olxc/"$DistDir"/uekulele/lxc/lxc.spec
+			fi
+
+			rpmbuild --define "_topdir /opt/olxc/"$DistDir"/uekulele/lxc/rpmbuild" -ba lxc.spec
+
 			echo ''
 			echo "=============================================="
 			echo "Done: Untar source code and build LXC RPM     "
