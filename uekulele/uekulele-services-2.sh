@@ -289,7 +289,14 @@ echo ''
 
 sleep 5
 
-sudo lxc-create -n oel$OracleRelease$SeedPostfix -t oracle -- --release=$OracleVersion
+if   [ $MajorRelease -le 7 ]
+then
+	sudo lxc-create -n oel$OracleRelease$SeedPostfix -t oracle -- --release=$OracleVersion
+elif [ $MajorRelease -eq 8 ]
+then
+	sudo lxc-create -t download -n oel$OracleRelease$SeedPostfix -- --dist oracle --release $MajorRelease --arch amd64
+fi
+
 
 if [ $(SoftwareVersion $LXCVersion) -ge $(SoftwareVersion "2.1.0") ]
 then
