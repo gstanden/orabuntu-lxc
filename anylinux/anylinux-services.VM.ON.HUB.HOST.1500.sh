@@ -26,7 +26,8 @@
 #    Note that this software builds a containerized DNS DHCP solution (bind9 / isc-dhcp-server).
 #    The nameserver should NOT be the name of an EXISTING nameserver but an arbitrary name because this software is CREATING a new LXC-containerized nameserver.
 #    The domain names can be arbitrary fictional names or they can be a domain that you actually own and operate.
-#    There are two domains and two networks because the "seed" LXC containers are on a separate network from the production LXC containers.  #    If the domain is an actual domain, you will need to change the subnet using the subnets feature of Orabuntu-LXC
+#    There are two domains and two networks because the "seed" LXC containers are on a separate network from the production LXC containers.
+#    If the domain is an actual domain, you will need to change the subnet using the subnets feature of Orabuntu-LXC
 #
 #    Controlling script for Orabuntu-LXC
 
@@ -37,14 +38,6 @@
 #    Capital 'X' means 'not used' do not replace leave as is.
 
 clear
-
-sudo mkdir -p /opt/olxc/installs/logs
-if [ ! -d /opt/olxc/installs/logs ]
-then
-        sudo mkdir -p /opt/olxc/installs/logs
-	sudo chown -R $Owner:$Group /opt/olxc
-	sudo touch /opt/olxc/installs/logs/$Owner.log
-fi
 
 echo ''
 echo "=============================================="
@@ -75,6 +68,11 @@ trap "exit" INT TERM; trap "kill 0" EXIT; sudo -v || exit $?; sleep 1; while tru
 GRE=N
 MTU=1500
 LOGEXT=`date +"%Y-%m-%d.%R:%S"`
+
+if [ ! -d /opt/olxc/installs/logs ]
+then
+        sudo mkdir -p /opt/olxc/installs/logs
+fi
 
 if [ -f /opt/olxc/installs/logs/$USER.log ]
 then
@@ -123,12 +121,6 @@ then
 elif [ $OpType = 'new' ]
 then
         Operation=new
-elif [ $OpType = 'ovs' ]
-then
-	Operation=ovs
-elif [ $OpType = 'add' ]
-then
-        Operation=addrelease
 fi
 
 if [ -z $2 ]
@@ -283,7 +275,7 @@ then
 	SubDirName=orabuntu
 fi
 
-if [ $LinuxFlavor != 'Ubuntu' ] && [ $LinuxFlavor != 'Fedora' ] 
+if [ $LinuxFlavor != 'Ubuntu' ] && [ $LinuxFlavor != 'Fedora' ]
 then
 	echo ''
 	echo "=============================================="
@@ -343,14 +335,7 @@ then
                 	echo "Done: Configure epel for $LinuxFlavor Linux.  "
                 	echo "=============================================="
                 	echo ''
-
-			if [ $Operation = 'ovs' ]
-			then
-				sleep 2
-			else
-				sleep 5
-			fi
-
+			sleep 5
 			clear
         	elif [ $DocBook2XInstalled -eq 0 ]
         	then
@@ -377,16 +362,8 @@ then
         echo "=============================================="
         echo 'Done: Install sshpass package.                '
         echo "=============================================="
-			
-	if [ $Operation = 'ovs' ]
-	then
-		sleep 2
-	else
-		sleep 5
-	fi
-	
+	sleep 5
 	clear
-
 elif [ $LinuxFlavor = 'Ubuntu' ]
 then
         echo ''
@@ -435,72 +412,51 @@ then
 	clear
 fi
 
-if [ $Operation != 'ovs' ]
+echo ''
+echo "=============================================="
+echo "Test sshpass to HUB Host $HUBIP               "
+echo "=============================================="
+echo ''
+
+ssh-keygen -R $HUBIP > /dev/null 2>&1
+sshpass -p $HubSudoPwd ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $HubUserAct@$HUBIP "sudo -S <<< "$HubSudoPwd" uname -a;echo '';sudo -S <<< "$HubSudoPwd" lxc-ls -f | tail -10"
+if [ $? -eq 0 ]
 then
 	echo ''
 	echo "=============================================="
-	echo "Test sshpass to HUB Host $HUBIP               "
+	echo "Done: Test sshpass to HUB Host $HUBIP         "
 	echo "=============================================="
 	echo ''
+	sleep 5
+	echo ''
 
-	ssh-keygen -R $HUBIP > /dev/null 2>&1
-	sshpass -p $HubSudoPwd ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $HubUserAct@$HUBIP "sudo -S <<< "$HubSudoPwd" uname -a;echo '';sudo -S <<< "$HubSudoPwd" lxc-ls -f | tail -10"
-	if   [ $? -eq 0 ]
+if [ $AWS -eq 1 ]
+then
+	if   [ $AwsMtu -ge 9000 ]
 	then
-		echo ''
-		echo "=============================================="
-		echo "Done: Test sshpass to HUB Host $HUBIP         "
-		echo "=============================================="
-		echo ''
-		sleep 5
-		echo ''
+		# Until support for jumbo frames is ready set 1500.
+		sudo ifconfig eth0 mtu 1500
+		AwsMtu=1500
+        	MultiHost="$Operation:Y:X:X:$HUBIP:X:$AwsMtu:$HubUserAct:$HubSudoPwd:$GRE:$Product"
 
-		if [ $AWS -eq 1 ]
-		then
-       		 	if   [ $AwsMtu -ge 9000 ]
-       		 	then
-       		         	# Until support for jumbo frames is ready set 1500.
-       		         	sudo ifconfig eth0 mtu 1500
-       		         	AwsMtu=1500
-       		         	MultiHost="$Operation:Y:X:X:$HUBIP:X:$AwsMtu:$HubUserAct:$HubSudoPwd:$GRE:$Product"
-
-       		 	elif [ $AwsMtu -eq 1500 ]
-       		 	then
-       		         	MultiHost="$Operation:Y:X:X:$HUBIP:X:$AwsMtu:$HubUserAct:$HubSudoPwd:$GRE:$Product"
-       		 	fi
-		else
-       		 	MultiHost="$Operation:Y:X:X:$HUBIP:X:$MTU:$HubUserAct:$HubSudoPwd:$GRE:$Product"
-		fi
-
-		cd "$DistDir"/anylinux
-
-		./anylinux-services.sh $MultiHost
-	else
-       		echo "The sshpass to the Orabuntu-LXC HUB host at $HUBIP failed. Recheck settings in this file and re-run."
-		echo ''
-		echo "=============================================="
-		echo "Fail: Test sshpass to HUB Host $HUBIP         "
-		echo "=============================================="
-		echo ''
-		sleep 5
-       		exit
+	elif [ $AwsMtu -eq 1500 ]
+	then
+        	MultiHost="$Operation:Y:X:X:$HUBIP:X:$AwsMtu:$HubUserAct:$HubSudoPwd:$GRE:$Product"
 	fi
-elif [ $Operation = 'ovs' ]
-then
-	sudo tar -vP --extract --file="$DistDir"/uekulele/archives/ubuntu-host.tar /etc/orabuntu-lxc-scripts/stop_containers.sh > /dev/null 2>&1
-	sudo chmod 755                                                             /etc/orabuntu-lxc-scripts/stop_containers.sh
-	                                                                           /etc/orabuntu-lxc-scripts/stop_containers.sh
-	cd "$DistDir"/anylinux  
-	sudo chown -R $Owner:$Group /opt/olxc
-
-        sleep 2
-
-        clear
-
-        # sudo yum -y remove openvswitch*
-
-	MultiHost="$Operation:Y:X:X:$HUBIP:X:$MTU:$HubUserAct:$HubSudoPwd:$GRE:$Product"
+else
+        MultiHost="$Operation:Y:X:X:$HUBIP:X:$MTU:$HubUserAct:$HubSudoPwd:$GRE:$Product"
+fi
+	cd "$DistDir"/anylinux
 	./anylinux-services.sh $MultiHost
+else
+        echo "The sshpass to the Orabuntu-LXC HUB host at $HUBIP failed. Recheck settings in this file and re-run."
+	echo ''
+	echo "=============================================="
+	echo "Fail: Test sshpass to HUB Host $HUBIP         "
+	echo "=============================================="
+	echo ''
+	sleep 5
+        exit
 fi
 
 exit

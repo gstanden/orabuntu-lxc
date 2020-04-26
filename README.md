@@ -10,11 +10,11 @@ Orabuntu-LXC is turnkey software for building an entire next-generation containe
 
 Orabuntu-LXC BUILDS EVERYTHING itself for the currently supported distros: 
 
-* Oracle Linux 6.x, 7.x, 8.x
-* Ubuntu 16.04, 16.10. 17.04, 17.10, 18.04, 18.10, 19.04. 19.10
-* CentOS 6.x, 7.x, 8.x
+* Oracle Linux 7.x
+* Ubuntu 16.04+
+* CentOS 7.x
 * Fedora 22-27 (tested on 27)
-* RedHat 6.x, 7.x, 8.x
+* RedHat 7.x
 * Pop_OS 17.10+ (System76)
 
 Orabuntu-LXC installer does all of the following automatically:
@@ -29,7 +29,7 @@ Orabuntu-LXC installer does all of the following automatically:
 * Replicates the LXC-containerized DNS/DHCP container to all Orabuntu-LXC physical GRE-connected hosts
 * Optionally stores LXC-containerized DNS/DHCP updates at Amazon S3 for replication
 * Automatically detects filesystem types which support lxc-snapshot overlayfs for LXC-containerized DNS/DHCP
-* Updates the LXC-containerized DNS/DHCP container replicas with the latest zone/lease updates every x minutes.
+* Updates the LXC-containerized DNS/DHCP container replicas with the latest zone and lease updates every x minutes.
 * Builds the LXC containers
 * Configures all OpenvSwitch switches and LXC containers as systemd services
 * Configures gold copy LXC containers (on a separate network) according to your specifications

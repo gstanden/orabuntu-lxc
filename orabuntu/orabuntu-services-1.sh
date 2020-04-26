@@ -391,6 +391,7 @@ then
 		echo ''
 
 		sudo /etc/network/openvswitch/del-bridges.sh >/dev/null 2>&1
+		sudo rm -f /etc/network/openvswitch/*
 
 		echo ''
 		echo "=============================================="
@@ -880,7 +881,7 @@ echo "Verify required packages status...            "
 echo "=============================================="
 echo ''
 
-if [ $UbuntuVersion = '15.10' ] || [ $UbuntuVersion = '15.04' ]
+if [ $UbuntuMajorVersion = 15 ]
 then
 	function CheckPackageInstalled {
 		echo 'facter lxc uml-utilities openvswitch-switch openvswitch-common bind9utils dnsutils apparmor-utils openssh-server uuid rpm yum hugepages ntp iotop sshpass db5.1-util'
@@ -888,7 +889,9 @@ then
 	PackageInstalled=$(CheckPackageInstalled)
 fi
 
-if [ $UbuntuVersion = '16.04' ] || [ $UbuntuVersion = '17.04' ] || [ $UbuntuVersion = '17.10' ] || [ $UbuntuVersion = '18.04' ] || [ $UbuntuVersion = '18.10' ] || [ $UbuntuVersion = '19.04' ]
+# if [ $UbuntuVersion = '16.04' ] || [ $UbuntuVersion = '17.04' ] || [ $UbuntuVersion = '17.10' ] || [ $UbuntuVersion = '18.04' ] || [ $UbuntuVersion = '18.10' ] || [ $UbuntuVersion = '19.04' ]
+
+if [ $UbuntuMajorVersion ge 16 ]
 then
 	function CheckPackageInstalled {
 		echo 'facter lxc uml-utilities openvswitch-switch openvswitch-common bind9utils dnsutils apparmor-utils openssh-server uuid rpm yum hugepages ntp iotop sshpass db5.3-util'

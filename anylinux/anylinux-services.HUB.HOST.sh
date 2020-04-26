@@ -99,10 +99,10 @@ fi
 
 if [ -z $2 ]
 then
-	Product=no-product
         Product=workspaces
-	Product=oracle-gi-18c
 	Product=oracle-db
+	Product=no-product
+	Product=oracle-gi-18c
 else
         Product=$2
 fi

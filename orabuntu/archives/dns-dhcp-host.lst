@@ -18,7 +18,7 @@
 /etc/network/openvswitch/crt_ovs_sw3.sh
 /etc/network/openvswitch/setup_gre_and_routes.sh
 /etc/network/openvswitch/ns_restore.sh
-/etc/network/openvswitch/crt_ovs_sw1.sh
 /etc/network/openvswitch/crt_ovs_sx1.sh
+/etc/network/openvswitch/crt_ovs_sw1.sh
 /etc/GNU3
 /etc/COPYING

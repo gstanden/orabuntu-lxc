@@ -115,11 +115,7 @@
 # Set these before running anylinux-services.sh
 # Leave GRE set to N for first Orabuntu-LXC host install
 
-echo $SudoPassword | sudo -S date > /dev/null 2>&1
- 
 sudo sed -i '$!N; /^\(.*\)\n\1$/!P; D'  /etc/resolv.conf
-
-function SoftwareVersion { echo "$@" | awk -F. '{ printf("%d%03d%03d%03d\n", $1,$2,$3,$4); }'; }
 
 function GetDistDir {
 	pwd | rev | cut -f2-20 -d'/' | rev
@@ -156,21 +152,47 @@ Owner=$(GetOwner)
 # user-settable parameters group 1 begin
 # set the values for the subnet triplets (e.g. 172.29.108)
 
-SeedNet1='SeedNet1Fwd:172.29.108'	# UNCOMMENT LINE IF USING CUSTOM SUBNETS
-BaseNet1='BaseNet1Fwd:10.209.53'	# UNCOMMENT LINE IF USING CUSTOM SUBNETS
-StorNet1='StorNet1Fwd:10.210.107'	# UNCOMMENT LINE IF USING CUSTOM SUBNETS
-StorNet2='StorNet2Fwd:10.211.107'	# UNCOMMENT LINE IF USING CUSTOM SUBNETS
+	SeedNet1='SeedNet1Fwd:172.29.108'	# UNCOMMENT LINE IF USING CUSTOM SUBNETS
+	BaseNet1='BaseNet1Fwd:10.209.53'	# UNCOMMENT LINE IF USING CUSTOM SUBNETS
+	StorNet1='StorNet1Fwd:10.210.107'	# UNCOMMENT LINE IF USING CUSTOM SUBNETS
+	StorNet2='StorNet2Fwd:10.211.107'	# UNCOMMENT LINE IF USING CUSTOM SUBNETS
 
-ExtrNet1='172.200.11'			# UNCOMMENT LINE IF USING CUSTOM SUBNETS
-ExtrNet2='172.201.11'			# UNCOMMENT LINE IF USING CUSTOM SUBNETS
-ExtrNet3='192.168.19'			# UNCOMMENT LINE IF USING CUSTOM SUBNETS
-ExtrNet4='192.168.20'			# UNCOMMENT LINE IF USING CUSTOM SUBNETS
-ExtrNet5='192.168.21'			# UNCOMMENT LINE IF USING CUSTOM SUBNETS
-ExtrNet6='192.168.22'			# UNCOMMENT LINE IF USING CUSTOM SUBNETS
+	ExtrNet1='172.200.11'			# UNCOMMENT LINE IF USING CUSTOM SUBNETS
+	ExtrNet2='172.201.11'			# UNCOMMENT LINE IF USING CUSTOM SUBNETS
+	ExtrNet3='192.168.19'			# UNCOMMENT LINE IF USING CUSTOM SUBNETS
+	ExtrNet4='192.168.20'			# UNCOMMENT LINE IF USING CUSTOM SUBNETS
+	ExtrNet5='192.168.21'			# UNCOMMENT LINE IF USING CUSTOM SUBNETS
+	ExtrNet6='192.168.22'			# UNCOMMENT LINE IF USING CUSTOM SUBNETS
 
 # pgroup1 end
 # user-settable parameters group 1 end
 # Custom Subnets End
+
+clear
+
+echo ''
+echo "=============================================="
+echo "Script:  anylinux-services.sh                 "
+echo "=============================================="
+
+sleep 5
+
+clear
+
+echo ''
+echo "==============================================" 
+echo "Establish sudo privileges...                  "
+echo "=============================================="
+echo ''
+
+echo $SudoPassword | sudo -S date
+
+echo ''
+echo "==============================================" 
+echo "Privileges established.                       "
+echo "=============================================="
+
+sleep 5
 
 clear
 
@@ -278,51 +300,6 @@ cp -p COPYING "$DistDir"/"$SubDirName"/archives/.
 cp -p COPYING "$DistDir"/"$SubDirName"/.
 cp -p COPYING "$DistDir"/.
 
-MultiHost=$1
-
-function GetMultiHostVar1 {
-	echo $MultiHost | cut -f1 -d':'
-}
-MultiHostVar1=$(GetMultiHostVar1)
-
-Operation=$MultiHostVar1
-
-echo ''
-echo "=============================================="
-echo "Script:  anylinux-services.sh                 "
-echo "=============================================="
-
-if [ $Operation = 'ovs' ]
-then
-	sleep 2
-else
-	sleep 5
-fi
-
-clear
-
-echo ''
-echo "==============================================" 
-echo "Establish sudo privileges...                  "
-echo "=============================================="
-echo ''
-
-echo $SudoPassword | sudo -S date
-
-echo ''
-echo "==============================================" 
-echo "Privileges established.                       "
-echo "=============================================="
-
-if [ $Operation = 'ovs' ]
-then
-	sleep 2
-else
-	sleep 5
-fi
-
-clear
-
 if [ ! -f /etc/orabuntu-lxc-terms ]
 then
 	echo ''
@@ -333,12 +310,7 @@ then
 	echo '++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
 	echo ''
 
-	if [ $Operation != 'ovs' ]
-	then
-		sleep 10
-	else
-		sleep 2
-	fi
+	sleep 5
 
 	clear
 
@@ -376,7 +348,7 @@ then
 	echo "Acknowledgements"
 	echo ''
         echo "1.  Mary Standen			(mother)	(1934-2016)"
-        echo "2.  Yelena Belyaeva-Standen		(spouse)"
+        echo "2.  Yelena Belyaeva-Standen		(spouse)	(1943-2020)"
         echo "3.  Allen the Cat			(cat)		(2001-2018)"
 	echo ''
 	echo "For their patience and support during the long hours worked in the past and the long hours to be worked in the future for Orabuntu-LXC."
@@ -387,17 +359,16 @@ then
 	echo "=============================================="
 	echo ''
 
-	if [ $Operation != 'ovs' ]
-	then
-		sleep 10
-	else
-		sleep 2
-	fi
-	
+	sleep 10
+
 	clear
 fi
 
-if [ $LinuxFlavor = 'CentOS' ] && [ $Release -eq 6 ] && [ $MultiHostVar1 != 'ovs' ]
+sleep 5
+
+clear
+
+if [ $LinuxFlavor = 'CentOS' ] && [ $Release -eq 6 ]
 then
 	function GetKernelVersion {
 		uname -r | cut -f1 -d'.'
@@ -509,7 +480,7 @@ then
 	fi
 fi
 
-if [ $LinuxFlavor != 'Ubuntu' ] && [ $LinuxFlavor != 'Pop_OS' ] && [ $MultiHostVar1 != 'ovs' ]
+if [ $LinuxFlavor != 'Ubuntu' ] && [ $LinuxFlavor != 'Pop_OS' ]
 then
 	echo ''
 	echo "==============================================" 
@@ -552,58 +523,59 @@ fi
 # user-settable parameters group 2 begin
 # set the value between 'then' and 'fi'
 
-MajorRelease=$8
-if [ -z $8 ]
-then
-	MajorRelease=8
-fi
-# echo 'Oracle Container Release  = '$MajorRelease
+	MajorRelease=$8
+	if [ -z $8 ]
+	then
+		MajorRelease=7
+	fi
+	# echo 'Oracle Container Release  = '$MajorRelease
 
-PointRelease=$2
-if [ -z $2 ]
-then
-	PointRelease=0
-fi
-echo 'Oracle Container Version  = '$MajorRelease.$PointRelease
+	PointRelease=$2
+	if [ -z $2 ]
+	then
+		PointRelease=0
+	fi
+	echo 'Oracle Container Version  = '$MajorRelease.$PointRelease
 
-NumCon=$3
-if [ -z $3 ]
-then
-	NumCon=4
-fi
-echo 'Oracle Container Count    = '$NumCon
+	NumCon=$3
+	if [ -z $3 ]
+	then
+		NumCon=4
+	fi
+	echo 'Oracle Container Count    = '$NumCon
 
-Domain1=$4
-if [ -z $4 ]
-then
-	Domain1=urdomain1.com
-fi
-echo 'Domain1                   = '$Domain1
+	Domain1=$4
+	if [ -z $4 ]
+	then
+		Domain1=urdomain1.com
+	fi
+	echo 'Domain1                   = '$Domain1
 
-Domain2=$5
-if [ -z $5 ]
-then
-	Domain2=urdomain2.com
-fi
-echo 'Domain2                   = '$Domain2
+	Domain2=$5
+	if [ -z $5 ]
+	then
+		Domain2=urdomain2.com
+	fi
+	echo 'Domain2                   = '$Domain2
 
-NameServer=$6
-if [ -z $6 ]
-then
-	NameServer=afns1
-fi
-echo 'NameServer                = '$NameServer
+	NameServer=$6
+	if [ -z $6 ]
+	then
+		NameServer=afns1
+	fi
+	echo 'NameServer                = '$NameServer
 
-OSMemRes=$7
-if [ -z $7 ]
-then
-	OSMemRes=1024
-fi
-echo 'OSMemRes                  = '$OSMemRes 
+	OSMemRes=$7
+	if [ -z $7 ]
+	then
+		OSMemRes=1024
+	fi
+	echo 'OSMemRes                  = '$OSMemRes 
 
 # pgroup2 end
 # user-settable parameters group 2 end
 
+MultiHost=$1
 if [ -z $1 ]
 then
 	# First Orabuntu-LXC host (physical or virtual):
@@ -653,45 +625,37 @@ echo 'MultiHost                 = '$MultiHost
 # user-settable parameter group 3 begin
 # set the value between 'then' and 'fi'
 
-LxcOvsVersion=$9
-if [ -z $9 ] && [ $LinuxFlavor != 'Fedora' ]
-then
-      	LxcOvsVersion="2.0.9:2.5.9"
-		
-	if [ $LinuxFlavor = 'Oracle' ] && [ $Release -eq 8 ]
+	LxcOvsVersion=$9
+	if [ -z $9 ] && [ $LinuxFlavor != 'Fedora' ]
 	then
-       		LxcOvsVersion="3.0.4:2.12.0"
-	fi
+               	LxcOvsVersion="2.0.8:2.5.4"
 			
-	if [ $LinuxFlavor = 'Oracle' ] && [ $Release -eq 7 ]
-	then
-       		LxcOvsVersion="3.0.4:2.11.1"
-	fi
-			
-	if [ $LinuxFlavor = 'Oracle' ] && [ $Release -eq 6 ]
-	then
-       		LxcOvsVersion="2.0.9:2.5.9"
-		function GetOvsVersion {
-        		echo $LxcOvsVersion | cut -f2 -d':'
-		}
-		OvsVersion=$(GetOvsVersion)
-
-		if [ $(SoftwareVersion $OvsVersion) -lt $(SoftwareVersion "2.4.0") ]
+		if [ $LinuxFlavor = 'Oracle' ] && [ $Release -eq 8 ]
 		then
-       			LxcOvsVersion="2.0.9:2.5.9"
+               		LxcOvsVersion="3.0.4:2.11.1"
+		fi
+			
+		if [ $LinuxFlavor = 'Oracle' ] && [ $Release -eq 7 ]
+		then
+               		LxcOvsVersion="2.1.1:2.11.1"
+		# 	LxcOvsVersion="2.1.1:2.5.4"  #optional
+		fi
+			
+		if [ $LinuxFlavor = 'Oracle' ] && [ $Release -eq 6 ]
+		then
+               		LxcOvsVersion="2.0.8:2.5.4"
 		fi
 	fi
-fi
 
-# Fedora MUST leave Lxc version at 2.0.9 but can change Ovs version.
+	# Fedora MUST leave Lxc version at 2.0.9 but can change Ovs version.
 
-if [ -z $9 ] && [ $LinuxFlavor = 'Fedora' ]
-then
-	if [ $RedHatVersion -eq 27 ]
+	if [ -z $9 ] && [ $LinuxFlavor = 'Fedora' ]
 	then
-		LxcOvsVersion="2.0.9:2.5.4"  # Do NOT change 2.0.9 version of LXC here.  Must use 2.0.9 for now.
+		if [ $RedHatVersion -eq 27 ]
+		then
+			LxcOvsVersion="2.0.9:2.5.4"  # Do NOT change 2.0.9 version of LXC here.  Must use 2.0.9 for now.
+		fi
 	fi
-fi
 
 # pgroup3 end
 # user-settable parameters group 3 end
@@ -770,53 +734,58 @@ else
 	echo 'ExtrNet6                  = '$ExtrNet6
 fi
 
+function GetMultiHostVar1 {
+	echo $MultiHost | cut -f1 -d':'
+}
+MultiHostVar1=$(GetMultiHostVar1)
+ 
 function GetMultiHostVar2 {
         echo $MultiHost | cut -f2 -d':'
 }
 MultiHostVar2=$(GetMultiHostVar2)
 
 function GetMultiHostVar3 {
-       	echo $MultiHost | cut -f3 -d':'
+        echo $MultiHost | cut -f3 -d':'
 }
 MultiHostVar3=$(GetMultiHostVar3)
 
 function GetMultiHostVar4 {
-       	echo $MultiHost | cut -f4 -d':'
+        echo $MultiHost | cut -f4 -d':'
 }
 MultiHostVar4=$(GetMultiHostVar4)
 
 function GetMultiHostVar5 {
-       	echo $MultiHost | cut -f5 -d':'
+        echo $MultiHost | cut -f5 -d':'
 }
 MultiHostVar5=$(GetMultiHostVar5)
 
 function GetMultiHostVar6 {
-       	echo $MultiHost | cut -f6 -d':'
+        echo $MultiHost | cut -f6 -d':'
 }
 MultiHostVar6=$(GetMultiHostVar6)
 
 function GetMultiHostVar7 {
-       	echo $MultiHost | cut -f7 -d':'
+        echo $MultiHost | cut -f7 -d':'
 }
 MultiHostVar7=$(GetMultiHostVar7)
 
 function GetMultiHostVar8 {
-       	echo $MultiHost | cut -f8 -d':'
+        echo $MultiHost | cut -f8 -d':'
 }
 MultiHostVar8=$(GetMultiHostVar8)
 
 function GetMultiHostVar9 {
-       	echo $MultiHost | cut -f9 -d':'
+        echo $MultiHost | cut -f9 -d':'
 }
 MultiHostVar9=$(GetMultiHostVar9)
 
 function GetMultiHostVar10 {
-       	echo $MultiHost | cut -f10 -d':'
+        echo $MultiHost | cut -f10 -d':'
 }
 MultiHostVar10=$(GetMultiHostVar10)
 
 function GetMultiHostVar11 {
-       	echo $MultiHost | cut -f11 -d':'
+        echo $MultiHost | cut -f11 -d':'
 }
 MultiHostVar11=$(GetMultiHostVar11)
 Product=$MultiHostVar11
@@ -842,40 +811,40 @@ then
 		echo $BaseNet1 | cut -f2 -d':'
 	}
 	Sw1Net=$(GetSw1Net)
-		
+	
 	function GetSx1Net {
 		echo $SeedNet1 | cut -f2 -d':'
 	}
 	Sx1Net=$(GetSx1Net)
 
 	ssh-keygen -R $MultiHostVar5 > /dev/null 2>&1
-	sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service systemd-resolved restart > /dev/null 2>&1"
-	sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service lxc-net restart > /dev/null 2>&1"
-	sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service dnsmasq restart > /dev/null 2>&1"
+        sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service systemd-resolved restart > /dev/null 2>&1"
+        sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service lxc-net restart > /dev/null 2>&1"
+       	sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service dnsmasq restart > /dev/null 2>&1"
         
 	Sx1Index=201
-       	function CheckHighestSx1IndexHit {
-       		sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" nslookup -timeout=1 $Sx1Net.$Sx1Index" | grep -c 'name =' 
-       	}
-       	HighestSx1IndexHit=$(CheckHighestSx1IndexHit)
+        function CheckHighestSx1IndexHit {
+        	sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" nslookup -timeout=1 $Sx1Net.$Sx1Index" | grep -c 'name =' 
+        }
+        HighestSx1IndexHit=$(CheckHighestSx1IndexHit)
 
-       	while [ $HighestSx1IndexHit = 1 ]
-       	do
-               	Sx1Index=$((Sx1Index+1))
-               	HighestSx1IndexHit=$(CheckHighestSx1IndexHit)
-       	done
+        while [ $HighestSx1IndexHit = 1 ]
+        do
+                Sx1Index=$((Sx1Index+1))
+                HighestSx1IndexHit=$(CheckHighestSx1IndexHit)
+        done
 
-       	Sw1Index=201
-       	function CheckHighestSw1IndexHit {
-       		sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" nslookup -timeout=1 $Sw1Net.$Sw1Index" | grep -c 'name ='
-       	}
-       	HighestSw1IndexHit=$(CheckHighestSw1IndexHit)
+        Sw1Index=201
+        function CheckHighestSw1IndexHit {
+        	sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" nslookup -timeout=1 $Sw1Net.$Sw1Index" | grep -c 'name ='
+        }
+        HighestSw1IndexHit=$(CheckHighestSw1IndexHit)
 
-       	while [ $HighestSw1IndexHit = 1 ]
-       	do
-               	Sw1Index=$((Sw1Index+1))
-               	HighestSw1IndexHit=$(CheckHighestSw1IndexHit)
-       	done
+        while [ $HighestSw1IndexHit = 1 ]
+        do
+                Sw1Index=$((Sw1Index+1))
+                HighestSw1IndexHit=$(CheckHighestSw1IndexHit)
+        done
 fi
 
 if [ -z $SeedNet1 ]
@@ -902,9 +871,9 @@ then
 	echo 'Switch IP (sw1)           = '$Sw1Net.$Sw1Index
 fi
 
-echo 'DistDir                   = '$DistDir
-echo 'SubDirName                = '$SubDirName
-echo 'Product                   = '$Product
+	echo 'DistDir                   = '$DistDir
+	echo 'SubDirName                = '$SubDirName
+	echo 'Product                   = '$Product
 
 if [ $LinuxFlavor != 'Ubuntu' ] && [ $LinuxFlavor != 'Pop_OS' ]
 then
@@ -916,281 +885,179 @@ echo "=============================================="
 echo "Display Installation Parameters complete.     "
 echo "=============================================="
 
-
-if [ $Operation = 'ovs' ] 
-then
-	sleep 2
-else
-	sleep 10
-fi
-
-if [ $Operation = 'ovs' ] 
-then
-	if [ $LinuxFlavor = 'Oracle' ]
-	then
-		function GetOvsVersion {
-        		echo $LxcOvsVersion | cut -f2 -d':'
-		}
-		
-		if   [ $Release -eq 6 ]
-		then
-			clear
-
-		       	LxcOvsVersion="2.0.9:2.5.9"
-			OvsVersion=$(GetOvsVersion)
-			sudo rm -rf   /opt/olxc/"$DistDir"/uekulele/openvswitch/
-			ls -l /opt/olxc/"$DistDir"/uekulele/openvswitch/
-			
-			echo ''
-			echo "=============================================="
-			echo "Set OVS $OvsVersion for $LinuxFlavor $Release "
-			echo "=============================================="
-			echo ''
-
-			sleep 2
-
-		elif [ $Release -eq 7 ]
-		then
-			clear
-
-		       	LxcOvsVersion="2.0.9:2.11.0"
-			OvsVersion=$(GetOvsVersion)
-			sudo rm -rf /opt/olxc/"$DistDir"/uekulele/openvswitch/
-			ls -l /opt/olxc/"$DistDir"/uekulele/openvswitch/
-
-			echo ''
-			echo "=============================================="
-			echo "Set OVS $OvsVersion for $LinuxFlavor $Release "
-			echo "=============================================="
-			echo ''
-			
-
-			sleep 2
-
-		elif [ $Release -eq 8 ]
-		then
-			clear
-
-		       	LxcOvsVersion="2.0.9:2.10.4"
-			OvsVersion=$(GetOvsVersion)
-			sudo rm -rf /opt/olxc/"$DistDir"/uekulele/openvswitch/
-			ls -l /opt/olxc/"$DistDir"/uekulele/openvswitch/
-
-			echo ''
-			echo "=============================================="
-			echo "Set OVS $OvsVersion for $LinuxFlavor $Release "
-			echo "=============================================="
-			echo ''
-			
-			sleep 2
-		fi
-	fi
-else
-	sleep 10
-fi
+sleep 10
 
 clear
 
-if [ $MultiHostVar1 != 'ovs' ]
+function GetMultiHostVar2 {
+	echo $MultiHost | cut -f2 -d':'
+}
+MultiHostVar2=$(GetMultiHostVar2)
+
+function GetMultiHostVar3 {
+	echo $MultiHost | cut -f3 -d':'
+}
+MultiHostVar3=$(GetMultiHostVar3)
+
+function GetMultiHostVar7 {
+	echo $MultiHost | cut -f7 -d':'
+}
+MultiHostVar7=$(GetMultiHostVar7)
+
+if [ $MultiHostVar2 = 'Y' ] && [ $MultiHostVar3 = 'X' ] && [ $GREValue = 'N' ]
 then
-	function GetMultiHostVar2 {
-		echo $MultiHost | cut -f2 -d':'
+	echo ''
+	echo "=============================================="
+	echo "Set Interface MTU...                          "
+	echo "=============================================="
+	echo ''
+
+	function GetVirtualInterfaces {
+		sudo ifconfig | grep enp | cut -f1 -d':' | cut -f1 -d' ' | sed 's/$/ /' | tr -d '\n' | sed 's/^[ \t]*//;s/[ \t]*$//'
 	}
-	MultiHostVar2=$(GetMultiHostVar2)
+	VirtualInterfaces=$(GetVirtualInterfaces)
 
-	function GetMultiHostVar3 {
-		echo $MultiHost | cut -f3 -d':'
+	function GetSw1Net {
+		echo $BaseNet1 | cut -f2 -d':'
 	}
-	MultiHostVar3=$(GetMultiHostVar3)
-
-	function GetMultiHostVar7 {
-		echo $MultiHost | cut -f7 -d':'
-	}
-	MultiHostVar7=$(GetMultiHostVar7)
-
-	if [ $MultiHostVar2 = 'Y' ] && [ $MultiHostVar3 = 'X' ] && [ $GREValue = 'N' ]
-	then
-		echo ''
-		echo "=============================================="
-		echo "Set Interface MTU...                          "
-		echo "=============================================="
-		echo ''
-
-		function GetVirtualInterfaces {
-			sudo ifconfig | grep enp | cut -f1 -d':' | cut -f1 -d' ' | sed 's/$/ /' | tr -d '\n' | sed 's/^[ \t]*//;s/[ \t]*$//'
-		}
-		VirtualInterfaces=$(GetVirtualInterfaces)
-
-		function GetSw1Net {
-			echo $BaseNet1 | cut -f2 -d':'
-		}
-		Sw1Net=$(GetSw1Net)
+	Sw1Net=$(GetSw1Net)
 	
-		function GetSx1Net {
-			echo $SeedNet1 | cut -f2 -d':'
-		}
-		Sx1Net=$(GetSx1Net)
+	function GetSx1Net {
+		echo $SeedNet1 | cut -f2 -d':'
+	}
+	Sx1Net=$(GetSx1Net)
 
-		subnet="$Sw1Net $Sx1Net"
+	subnet="$Sw1Net $Sx1Net"
 
-		for j in $subnet
-		do
-			for i in $VirtualInterfaces
-       			do
-       		        	function CheckVirtualInterfaceMtu {
-       		                	sudo ifconfig $i | grep -B1 "$j" | grep mtu | cut -f5 -d' '
-       		        	}
-       		        	VirtualInterfaceMtu=$(CheckVirtualInterfaceMtu)
-       		        	function GetCharCount {
-       		                	echo $VirtualInterfaceMtu | wc -c
-       		        	}
-       		        	CharCount=$(GetCharCount)
-       		        	if [ $CharCount -eq 5 ]
-       		        	then
-       		                	if [ $MultiHostVar7 -ne 1500 ]
-       		                	then
-						echo ''
-						echo "=============================================="
-						echo "Set NIC $i to MTU $MultiHostVar7...           "
-						echo "=============================================="
-						echo ''
+	for j in $subnet
+	do
+		for i in $VirtualInterfaces
+       		do
+       	        	function CheckVirtualInterfaceMtu {
+       	                	sudo ifconfig $i | grep -B1 "$j" | grep mtu | cut -f5 -d' '
+       	        	}
+       	        	VirtualInterfaceMtu=$(CheckVirtualInterfaceMtu)
+       	        	function GetCharCount {
+       	                	echo $VirtualInterfaceMtu | wc -c
+       	        	}
+       	        	CharCount=$(GetCharCount)
+       	        	if [ $CharCount -eq 5 ]
+       	        	then
+       	                	if [ $MultiHostVar7 -ne 1500 ]
+       	                	then
+					echo ''
+					echo "=============================================="
+					echo "Set NIC $i to MTU $MultiHostVar7...           "
+					echo "=============================================="
+					echo ''
 	
-       		                        	sudo ifconfig $i mtu $MultiHostVar7
-						sudo ifconfig $i
+       	                        	sudo ifconfig $i mtu $MultiHostVar7
+					sudo ifconfig $i
 
-						echo "=============================================="
-						echo "Done: Set NIC $i to MTU $MultiHostVar7.       "
-						echo "=============================================="
+					echo "=============================================="
+					echo "Done: Set NIC $i to MTU $MultiHostVar7.       "
+					echo "=============================================="
 				
-						sleep 5
+					sleep 5
 
-						clear
+					clear
 	
-						echo ''
-						echo "=============================================="
-						echo "Create $i-mtu manager systemd service...      "
-						echo "=============================================="
-						echo ''
+					echo ''
+					echo "=============================================="
+					echo "Create $i-mtu manager systemd service...      "
+					echo "=============================================="
+					echo ''
 
-						sudo sh -c "echo '[Unit]'						 > /etc/systemd/system/$i-mtu.service"
-						sudo sh -c "echo 'Description=$i-mtu'					>> /etc/systemd/system/$i-mtu.service"
-						sudo sh -c "echo 'After=network-online.target'				>> /etc/systemd/system/$i-mtu.service"
-						sudo sh -c "echo ''							>> /etc/systemd/system/$i-mtu.service"
-						sudo sh -c "echo '[Service]'						>> /etc/systemd/system/$i-mtu.service"
-						sudo sh -c "echo 'Type=idle'						>> /etc/systemd/system/$i-mtu.service"
-						sudo sh -c "echo 'User=root'						>> /etc/systemd/system/$i-mtu.service"
-						sudo sh -c "echo 'RemainAfterExit=yes'					>> /etc/systemd/system/$i-mtu.service"
-						sudo sh -c "echo 'ExecStart=/usr/sbin/ifconfig $i mtu $MultiHostVar7'	>> /etc/systemd/system/$i-mtu.service"
-						sudo sh -c "echo 'ExecStop=/usr/sbin/ifconfig $i mtu 1500'		>> /etc/systemd/system/$i-mtu.service"
-						sudo sh -c "echo ''							>> /etc/systemd/system/$i-mtu.service"
-						sudo sh -c "echo '[Install]'						>> /etc/systemd/system/$i-mtu.service"
-						sudo sh -c "echo 'WantedBy=network-online.target'			>> /etc/systemd/system/$i-mtu.service"
-						sudo systemctl enable $i-mtu.service
-						sudo systemctl daemon-reload
-						sudo cat /etc/systemd/system/$i-mtu.service
+					sudo sh -c "echo '[Unit]'						 > /etc/systemd/system/$i-mtu.service"
+					sudo sh -c "echo 'Description=$i-mtu'					>> /etc/systemd/system/$i-mtu.service"
+					sudo sh -c "echo 'After=network-online.target'				>> /etc/systemd/system/$i-mtu.service"
+					sudo sh -c "echo ''							>> /etc/systemd/system/$i-mtu.service"
+					sudo sh -c "echo '[Service]'						>> /etc/systemd/system/$i-mtu.service"
+					sudo sh -c "echo 'Type=idle'						>> /etc/systemd/system/$i-mtu.service"
+					sudo sh -c "echo 'User=root'						>> /etc/systemd/system/$i-mtu.service"
+					sudo sh -c "echo 'RemainAfterExit=yes'					>> /etc/systemd/system/$i-mtu.service"
+					sudo sh -c "echo 'ExecStart=/usr/sbin/ifconfig $i mtu $MultiHostVar7'	>> /etc/systemd/system/$i-mtu.service"
+					sudo sh -c "echo 'ExecStop=/usr/sbin/ifconfig $i mtu 1500'		>> /etc/systemd/system/$i-mtu.service"
+					sudo sh -c "echo ''							>> /etc/systemd/system/$i-mtu.service"
+					sudo sh -c "echo '[Install]'						>> /etc/systemd/system/$i-mtu.service"
+					sudo sh -c "echo 'WantedBy=network-online.target'			>> /etc/systemd/system/$i-mtu.service"
+					sudo systemctl enable $i-mtu.service
+					sudo systemctl daemon-reload
+					sudo cat /etc/systemd/system/$i-mtu.service
 	
-						echo ''
-						echo "=============================================="
-						echo "Done: Create $i-mtu manager systemd service.  "
-						echo "=============================================="
+					echo ''
+					echo "=============================================="
+					echo "Done: Create $i-mtu manager systemd service.  "
+					echo "=============================================="
 	
-						sleep 5
-	
-						clear
-       		                	fi
-       		        	fi
-       			done
-		done
+					sleep 5
 
-		sleep 5
+					clear
+       	                	fi
+       	        	fi
+       		done
+	done
 
-		clear
+	sleep 5
 
-		echo ''
-		echo "=============================================="
-		echo "Done:  Set Interface MTU...                   "
-		echo "=============================================="
-		echo ''
+	clear
 
-		sleep 5
+	echo ''
+	echo "=============================================="
+	echo "Done:  Set Interface MTU...                   "
+	echo "=============================================="
+	echo ''
 
-		clear
-	fi
+	sleep 5
 
-	if [ $GREValue = 'Y' ] || [ $MultiHostVar3 = 'X' ]
-	then
-		function CheckHubFileSystemTypeExt {
-			sshpass -p $MultiHostVar9 ssh -q -t -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 stat --file-system --format=%T /var/lib/lxc | grep -c ext
+	clear
+fi
+
+if [ $GREValue = 'Y' ] || [ $MultiHostVar3 = 'X' ]
+then
+	function CheckHubFileSystemTypeExt {
+		sshpass -p $MultiHostVar9 ssh -q -t -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 stat --file-system --format=%T /var/lib/lxc | grep -c ext
+	}
+	HubFileSystemTypeExt=$(CheckHubFileSystemTypeExt)
+
+	function CheckHubFileSystemTypeXfs {
+		sshpass -p $MultiHostVar9 ssh -q -t -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 stat --file-system --format=%T /var/lib/lxc | grep -c xfs
+	}
+	HubFileSystemTypeXfs=$(CheckHubFileSystemTypeXfs)
+
+        if [ $HubFileSystemTypeXfs -eq 1 ]
+        then
+		function GetHubFtype {
+			sshpass -p $MultiHostVar9 ssh -q -t -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" xfs_info / | grep -c ftype=1 | grep '0'" | cut -f2 -d':'
 		}
-		HubFileSystemTypeExt=$(CheckHubFileSystemTypeExt)
+		HubFtype=$(GetHubFtype)
 
-		function CheckHubFileSystemTypeXfs {
-			sshpass -p $MultiHostVar9 ssh -q -t -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 stat --file-system --format=%T /var/lib/lxc | grep -c xfs
-		}
-		HubFileSystemTypeXfs=$(CheckHubFileSystemTypeXfs)
+		if   [ ! -z $HubFtype ]
+		then
+			echo ''
+			echo "=============================================="
+			echo "NS $NameServer full backup at HUB...          "
+			echo "=============================================="
+			echo ''
 
-        	if [ $HubFileSystemTypeXfs -eq 1 ]
-        	then
-			function GetHubFtype {
-				sshpass -p $MultiHostVar9 ssh -q -t -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" xfs_info / | grep -c ftype=1 | grep '0'" | cut -f2 -d':'
-			}
-			HubFtype=$(GetHubFtype)
-
-			if   [ ! -z $HubFtype ]
-			then
-				echo ''
-				echo "=============================================="
-				echo "NS $NameServer full backup at HUB...          "
-				echo "=============================================="
-				echo ''
-
-				sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" lxc-stop -n $NameServer -k;echo '(Do NOT enter password...Wait...)'"
-				sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" lxc-copy -n $NameServer -N $NameServer-$HOSTNAME" >/dev/null 2>&1
-				sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" lxc-start -n $NameServer; echo ''; sudo -S <<< "$MultiHostVar9" lxc-ls -f"
+			sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" lxc-stop -n $NameServer -k;echo '(Do NOT enter password...Wait...)'"
+			sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" lxc-copy -n $NameServer -N $NameServer-$HOSTNAME" >/dev/null 2>&1
+			sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" lxc-start -n $NameServer; echo ''; sudo -S <<< "$MultiHostVar9" lxc-ls -f"
  			
-				echo ''
- 				echo "$NameServer-$HOSTNAME has been created on the Orabuntu-LXC HUB host at $MultiHostVar5"
- 				echo "$NameServer-$HOSTNAME can be restored to $NameServer if necessary using lxc-copy command."
+			echo ''
+ 			echo "$NameServer-$HOSTNAME has been created on the Orabuntu-LXC HUB host at $MultiHostVar5"
+ 			echo "$NameServer-$HOSTNAME can be restored to $NameServer if necessary using lxc-copy command."
 
-				echo ''
-				echo "=============================================="
-				echo "Done: NS $NameServer backup at HUB.           "
-				echo "=============================================="
-				echo ''
+			echo ''
+			echo "=============================================="
+			echo "Done: NS $NameServer backup at HUB.           "
+			echo "=============================================="
+			echo ''
 
-				sleep 5
+			sleep 5
 
-				clear
-			elif [ -z $Ftype ]
-			then
-				echo ''
-				echo "=============================================="
-				echo "Snapshot Nameserver $NameServer at HUB...     "
-				echo "=============================================="
-				echo ''
-
-				sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" lxc-start -n $NameServer; echo ''; sudo -S <<< "$MultiHostVar9" lxc-ls -f"
-				sleep 10
-
-				sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" lxc-stop -n $NameServer -k;echo '(Do NOT enter a password.  Wait...)'; echo '$HOSTNAME pre-install nameserver snapshot' > snap_comment; echo ''; sudo -S <<< "$MultiHostVar9" lxc-snapshot -n $NameServer -c snap_comment; sudo -S <<< "$MultiHostVar9" lxc-start -n $NameServer; echo ''; sleep 5; sudo -S <<< "$MultiHostVar9" lxc-snapshot -n $NameServer -L -C"
-				echo ''
-				echo "Snapshot of $NameServer created on the Orabuntu-LXC HUB host at $MultiHostVar5."
-				echo "Snapshot of $NameServer can be restored to $NameServer if necessary using 'lxc-snapshot -r SnapX -N $NameServer' command."
-				sudo rm -f snap_comment
-
-				echo ''
-				echo "=============================================="
-				echo "Done: Snapshot Nameserver $NameServer at HUB. "
-				echo "=============================================="
-				echo ''
-
-				sleep 5
-	
-				clear
-			fi
-		fi
-
-		if [ $HubFileSystemTypeExt -eq 1 ]
+			clear
+		elif [ -z $Ftype ]
 		then
 			echo ''
 			echo "=============================================="
@@ -1216,429 +1083,456 @@ then
 		fi
 	fi
 
-	SetNets=Y
-
-	if [ $SetNets = 'Y' ]
+	if [ $HubFileSystemTypeExt -eq 1 ]
 	then
 		echo ''
 		echo "=============================================="
-		echo "Get Subnet Regex Strings...                   "
+		echo "Snapshot Nameserver $NameServer at HUB...     "
 		echo "=============================================="
 		echo ''
 
-		cd "$DistDir"/"$SubDirName"/archives
+		sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" lxc-stop -n $NameServer -k;echo '(Do NOT enter a password.  Wait...)'; echo '$HOSTNAME pre-install nameserver snapshot' > snap_comment; echo ''; sudo -S <<< "$MultiHostVar9" lxc-snapshot -n $NameServer -c snap_comment; sudo -S <<< "$MultiHostVar9" lxc-start -n $NameServer; echo ''; sleep 5; sudo -S <<< "$MultiHostVar9" lxc-snapshot -n $NameServer -L -C"
+		echo ''
+		echo "Snapshot of $NameServer created on the Orabuntu-LXC HUB host at $MultiHostVar5."
+		echo "Snapshot of $NameServer can be restored to $NameServer if necessary using 'lxc-snapshot -r SnapX -N $NameServer' command."
+		sudo rm -f snap_comment
 
-		function GetNets {
-			echo "$SeedNet1 $BaseNet1 $StorNet1 $StorNet2"
-		}
-		Nets=$(GetNets)
-
-		for i in $Nets
-		do
-			function GetNetNamFwd {
-				echo $i | cut -f1 -d':'
-			}
-			NetNamFwd=$(GetNetNamFwd)
-		
-			function GetNetNamRev {
-				echo $i | cut -f1 -d':' | sed 's/Fwd/Rev/'
-			}
-			NetNamRev=$(GetNetNamRev)
-		
-			function GetNetFwd {
-				echo $i | cut -f2 -d':'
-			}
-			NetFwd=$(GetNetFwd)
-		
-			function GetNetRev {
-				echo "$i" | cut -f2 -d':' | awk 'BEGIN{FS="."}{print $4"."$3"."$2"."$1""}' | sed 's/.//'
-			}
-			NetRev=$(GetNetRev)
-		
-			if   [ $NetNamFwd = 'SeedNet1Fwd' ]
-			then
-				SeedNet1F=$NetFwd
-			
-				function GetNetTriplet {
-					echo $NetFwd | sed 's/\.//g'
-				}
-				NetTriplet=$(GetNetTriplet)
-		
-				function GetNetDoublet {
-					echo $NetFwd | cut -f1,2 -d'.' | sed 's/\.//g'
-				}
-				NetDoublet=$(GetNetDoublet)
-		
-				function GetEscaped {
-					echo $NetFwd | sed 's/\./\\\\\\\./g'
-				}
-				Escaped=$(GetEscaped)
-		
-				SeedNet12=$NetDoublet
-				SeedNet13=$NetTriplet
-				SeedNet1E=$Escaped
-		
-			elif [ $NetNamFwd = 'BaseNet1Fwd' ]
-			then
-				BaseNet1F=$NetFwd
-				
-				function GetNetTriplet {
-					echo $NetFwd | sed 's/\.//g'
-				}
-				NetTriplet=$(GetNetTriplet)
-	
-				function GetNetDoublet {
-					echo $NetFwd | cut -f1,2 -d'.' | sed 's/\.//g'
-				}
-				NetDoublet=$(GetNetDoublet)
-		
-				function GetEscaped {
-					echo $NetFwd | sed 's/\./\\\\\\\./g'
-				}
-				Escaped=$(GetEscaped)
-		
-				BaseNet12=$NetDoublet
-				BaseNet13=$NetTriplet
-				BaseNet1E=$Escaped
-		
-			elif [ $NetNamFwd = 'StorNet1Fwd' ]
-			then
-				StorNet1F=$NetFwd
-		
-			elif [ $NetNamFwd = 'StorNet2Fwd' ]
-			then
-				StorNet2F=$NetFwd
-			fi
-		
-			if   [ $NetNamRev = 'SeedNet1Rev' ]
-			then
-				SeedNet1R=$NetRev
-		
-			elif [ $NetNamRev = 'BaseNet1Rev' ]
-			then
-				BaseNet1R=$NetRev
-	
-			elif [ $NetNamRev = 'StorNet1Rev' ]
-			then
-				StorNet1R=$NetRev
-		
-			elif [ $NetNamRev = 'StorNet2Rev' ]
-			then
-				StorNet2R=$NetRev
-			fi
-		done
-	
-		echo 'SeedNet1F = '$SeedNet1F
-		echo 'SeedNet1R = '$SeedNet1R
-		echo 'SeedNet12 = '$SeedNet12
-		echo 'SeedNet13 = '$SeedNet13
-		echo 'SeedNet1E = '$SeedNet1E
-		echo 'BaseNet1F = '$BaseNet1F
-		echo 'BaseNet1R = '$BaseNet1R
-		echo 'BaseNet12 = '$BaseNet12
-		echo 'BaseNet13 = '$BaseNet13
-		echo 'BaseNet1E = '$BaseNet1E
-		echo 'StorNet1F = '$StorNet1F
-		echo 'StorNet1R = '$StorNet1R
-		echo 'StorNet2F = '$StorNet2F
-		echo 'StorNet2R = '$StorNet2R
-	
-		echo ''	
+		echo ''
 		echo "=============================================="
-		echo "Done: Get Subnet Regex Strings.               "
+		echo "Done: Snapshot Nameserver $NameServer at HUB. "
 		echo "=============================================="
 		echo ''
-	fi
-
-	sleep 5
-
-	clear
-
-	echo ''	
-	echo "=============================================="
-	echo "Update GNU3 and COPYING in archives...        "
-	echo "=============================================="
-	echo ''
-
-	sleep 5
-
-	cd "$DistDir"/anylinux
-	"$DistDir"/anylinux/anylinux-services-0.sh $SubDirName $Product
-	cd "$DistDir"/"$SubDirName"/archives
-
-	echo ''	
-	echo "=============================================="
-	echo "Done: Update GNU3 and COPYING in archives.    "
-	echo "=============================================="
-	echo ''
-
-	sleep 5
-
-	clear
-
-	echo ''	
-	echo "=============================================="
-	echo "Archive Orabuntu-LXC scripts...               "
-	echo "=============================================="
-	echo ''
-
-	if [ ! -d /opt/olxc ]
-	then
-		sudo mkdir -p  /opt/olxc
-		sudo chmod 777 /opt/olxc
-	fi
-
-	sudo rm  -f /opt/olxc/GNU3
-	sudo rm -rf /opt/olxc/home
-
-	cp -p $DistDir/anylinux/GNU3 /opt/olxc/GNU3
-
-	echo "$DistDir/anylinux/vercomp" 						>  "$DistDir"/"$SubDirName"/archives/"$SubDirName"-services.lst
-	echo "$DistDir/anylinux/anylinux-services-1.sh" 				>> "$DistDir"/"$SubDirName"/archives/"$SubDirName"-services.lst
-	echo "$DistDir/anylinux/dnf2yum" 						>> "$DistDir"/"$SubDirName"/archives/"$SubDirName"-services.lst
-	echo "$DistDir/$SubDirName/archives/nameserver_copy.sh" 			>> "$DistDir"/"$SubDirName"/archives/"$SubDirName"-services.lst
-	echo "$DistDir/$SubDirName/archives/docker_install_$SubDirName.sh" 		>> "$DistDir"/"$SubDirName"/archives/"$SubDirName"-services.lst
-	echo "$DistDir/$SubDirName/$SubDirName-services-0.sh"	 			>> "$DistDir"/"$SubDirName"/archives/"$SubDirName"-services.lst
-	echo "$DistDir/$SubDirName/$SubDirName-services-1.sh"	 			>> "$DistDir"/"$SubDirName"/archives/"$SubDirName"-services.lst
-	echo "$DistDir/$SubDirName/$SubDirName-services-2.sh"	 			>> "$DistDir"/"$SubDirName"/archives/"$SubDirName"-services.lst
-	echo "$DistDir/$SubDirName/$SubDirName-services-3.sh"	 			>> "$DistDir"/"$SubDirName"/archives/"$SubDirName"-services.lst
-	echo "$DistDir/$SubDirName/$SubDirName-services-4.sh"	 			>> "$DistDir"/"$SubDirName"/archives/"$SubDirName"-services.lst
-	echo "$DistDir/$SubDirName/$SubDirName-services-5.sh"	 			>> "$DistDir"/"$SubDirName"/archives/"$SubDirName"-services.lst
-	echo "$DistDir/$SubDirName/GNU3"                                                >> "$DistDir"/"$SubDirName"/archives/"$SubDirName"-services.lst
-	echo "$DistDir/$SubDirName/COPYING"                                             >> "$DistDir"/"$SubDirName"/archives/"$SubDirName"-services.lst
-	echo "$DistDir/products/$Product/$Product"					>> "$DistDir"/"$SubDirName"/archives/"$SubDirName"-services.lst
-	echo "$DistDir/products/$Product/$Product.net"					>> "$DistDir"/"$SubDirName"/archives/"$SubDirName"-services.lst
-	echo "$DistDir/products/$Product/$Product.cnf"					>> "$DistDir"/"$SubDirName"/archives/"$SubDirName"-services.lst
-
-	cd "$DistDir"/"$SubDirName"/archives
-
-	tar -cPf  "$DistDir"/"$SubDirName"/archives/"$SubDirName"-services.tar -T "$DistDir"/"$SubDirName"/archives/"$SubDirName"-services.lst --numeric-owner
-	tar -tvPf "$DistDir"/"$SubDirName"/archives/"$SubDirName"-services.tar
-
-	echo ''	
-	echo "=============================================="
-	echo "Done: Archive Orabuntu-LXC scripts.           "
-	echo "=============================================="
-	echo ''
-
-	sleep 5
-
-	clear
-
-	echo ''	
-	echo "=============================================="
-	echo "Prepare Orabuntu-LXC Files & Archives...      "
-	echo "=============================================="
-	echo ''
-
-	# GLS 20180204 Replaced by function GetArchiveNames
-	# ArchiveNames="dns-dhcp-cont.tar dns-dhcp-host.tar lxc-oracle-files.tar product.tar ubuntu-host.tar scst-files.tar tgt-files.tar $SubDirName-services.tar"
-
-	function GetArchiveNames {
-		ls *.tar | more | sed 's/$/ /' | tr -d '\n' | sed 's/^[ \t]*//;s/[ \t]*$//'
-	}
-	ArchiveNames=$(GetArchiveNames)
-	# echo $ArchiveNames
-
-	cp -p GNU3 /opt/olxc/GNU3
-	
-	for i in $ArchiveNames
-	do
-		clear
-		
-        	function GetArchiveShortName {
-                	echo $i | cut -f1 -d'.'
-        	}
-        	ArchiveShortName=$(GetArchiveShortName)
-	
-		function GetArchiveFileList {
-			sudo tar -P -tvf $i | sed 's/  */ /g' | cut -f6 -d' ' | sed 's/$/ /' > "$DistDir"/"$SubDirName"/archives/$ArchiveShortName.lst
-		}
-		ArchiveFileList=$(GetArchiveFileList)
-
-		sudo cp -p "$DistDir"/"$SubDirName"/archives/$ArchiveShortName.lst /opt/olxc/$ArchiveShortName.lst	
-
-		if [ $i != 'lxc-oracle-files.tar' ] && [ $i != 'product.tar' ]
-		then	
-			function GetTAR {
-				cat /opt/olxc/$ArchiveShortName.lst | cut -f2 -d'/' | sort -u
-			}
-		else
-			function GetTAR {
-				cat /opt/olxc/$ArchiveShortName.lst | cut -f1 -d'/' | sort -u
-			}
-		fi
-		TAR=$(GetTAR)
-	
-		sudo rm -rf /opt/olxc/"$TAR"
-
-       		sudo tar -P -tvf $i | sed 's/  */ /g' | cut -f6 -d' ' > $ArchiveShortName.lst
-
-		function GetArchiveFileVar {
-		sudo tar -P -tvf $i | sed 's/  */ /g' | cut -f6 -d' ' | sed 's/$/ /' | tr -d '\n' | sed 's/^[ \t]*//;s/[ \t]*$//'
-		}
-		ArchiveFileVar=$(GetArchiveFileVar)
-
-		if [ ! -f /opt/olxc/"$DistDir"/"$SubDirName"/archives/file-exceptions.txt ]
-		then	
-			sudo mkdir -p /opt/olxc
-			sudo chown $Owner:$Group /opt/olxc
-			sudo mkdir -p /opt/olxc/"$DistDir"/"$SubDirName"/archives/
-			sudo chown $Owner:$Group /opt/olxc/"$DistDir"/"$SubDirName"/archives/
-			sudo cp -p "$DistDir"/"$SubDirName"/archives/file-exceptions.txt /opt/olxc/"$DistDir"/"$SubDirName"/archives/file-exceptions.txt
-			sudo sed -i "s/OWNER/$Owner/g" /opt/olxc/"$DistDir"/"$SubDirName"/archives/file-exceptions.txt
-		fi
-
-		echo ''	
-		echo "=============================================="
-		echo "List GNU3 Header Exemptions...                "
-		echo "=============================================="
-		echo ''
-
-		for j in $ArchiveFileVar
-		do
-			if   [ ! -d $j ]
-			then
-				sudo tar -v --extract --file=$i -C /opt/olxc $j > /dev/null 2>&1
-
-				grep $j /opt/olxc/"$DistDir"/"$SubDirName"/archives/file-exceptions.txt
-				if [ $? -ne 0 ]
-				then
-					sudo sh -c "cat /opt/olxc/GNU3 /opt/olxc/$j > /opt/olxc/$j.gnu3"
-					sudo chmod --reference /opt/olxc/$j /opt/olxc/$j.gnu3 > /dev/null 2>&1
-					sudo chown --reference /opt/olxc/$j /opt/olxc/$j.gnu3 > /dev/null 2>&1
-					sudo mv /opt/olxc/$j.gnu3 /opt/olxc/$j
-					filename=/opt/olxc/$j
-				fi
-				if [ $i != 'dns-dhcp-cont.tar' ] && [ $i != 'dns-dhcp-host.tar' ] && [ $i != 'lxc-oracle-files.tar' ] && [ $i != 'product.tar' ] && [ $i != 'ubuntu-host.tar' ]
-				then
-					sudo chown $Owner:$Group $filename > /dev/null 2>&1
-				fi
-				filename=/opt/olxc/$j
-	
-				if [ $SetNets = 'Y' ] 
-				then
- 					sudo sed -i "s/10.207.41/$StorNet2F/g"			$filename
-					sudo sed -i "s/10.207.40/$StorNet1F/g"			$filename
-					sudo sed -i "s/10.207.39/$BaseNet1F/g"			$filename
-					sudo sed -i "s/10.207.29/$SeedNet1F/g"			$filename
-					sudo sed -i "s/39.207.10/$BaseNet1R/g"			$filename
-					sudo sed -i "s/29.207.10/$SeedNet1R/g"			$filename
-					sudo sed -i "s/1020729/$SeedNet13/g"			$filename
-					sudo sed -i "s/1020739/$BaseNet13/g"			$filename
-					sudo sed -i "s/10207/$BaseNet12/g"			$filename
-					sudo sed -i "s/10\\\.207\\\.29/$SeedNet1E/g"		$filename
-					sudo sed -i "s/10\\\.207\\\.39/$BaseNet1E/g"		$filename
-					sudo sed -i "s/172.220.40/$ExtrNet1/g"			$filename
-					sudo sed -i "s/172.221.40/$ExtrNet2/g"			$filename
-					sudo sed -i "s/192.210.39/$ExtrNet3/g"			$filename
-					sudo sed -i "s/192.211.39/$ExtrNet4/g"			$filename
-					sudo sed -i "s/192.212.39/$ExtrNet5/g"			$filename
-					sudo sed -i "s/192.213.39/$ExtrNet6/g"			$filename
-				fi
-				if [ $LinuxFlavor = 'Fedora' ] && [ $RedHatVersion -ge 22 ] && [ $i = "$SubDirName-services.tar" ]
-				then
-					sudo sed -i '/lxc-attach/!s/yum -y install/dnf -y install/g'		$filename
-					sudo sed -i "s/yum -y erase/dnf -y erase/g" 				$filename
-					sudo sed -i "s/yum -y localinstall/dnf -y localinstall/g" 		$filename
-					sudo sed -i "s/yum clean all/dnf clean all/g" 				$filename
-					sudo sed -i "s/yum provides/dnf provides/g" 				$filename
-					sudo sed -i "s/yum-utils/dnf-utils/g" 					$filename
-					sudo sed -i "s/yum-complete-transaction//g"				$filename
-				fi
-			fi
-		
-		done
-
-		echo ''	
-		echo "=============================================="
-		echo "Done: List GNU3 Header Exemptions.              "
-		echo "=============================================="
-		echo ''
-
-		sleep 1
-
-		echo "=============================================="
-		echo "Process archive $i...                         "
-		echo "=============================================="
-		echo ''
-
-		cd /opt/olxc
-
-		if [ $i != 'scst-files.tar' ] && [ $i != 'tgt-files.tar' ]
-		then
-			sudo tar -cf $i $TAR 	--numeric-owner
-			sudo tar -tvf $i 	--numeric-owner
-		
-			echo ''
-			echo "=============================================="
-			echo "Done: Process archive $i.                     "
-			echo "=============================================="
-			echo ''
-
-			if [ $i != "$SubDirName-services.tar" ]
-			then
-				sudo rm -rf $TAR
-			fi
-		else
-			sudo tar -cf $i $TAR	--numeric-owner
-			sudo tar -tvf $i	--numeric-owner
-	
-			echo ''
-			echo "=============================================="
-			echo "Done: Process archive $i.                     "
-			echo "=============================================="
-		fi
-
-		cd "$DistDir"/"$SubDirName"/archives
 
 		sleep 5
+
+		clear
+	fi
+fi
+
+SetNets=Y
+
+if [ $SetNets = 'Y' ]
+then
+	echo ''
+	echo "=============================================="
+	echo "Get Subnet Regex Strings...                   "
+	echo "=============================================="
+	echo ''
+
+	cd "$DistDir"/"$SubDirName"/archives
+
+	function GetNets {
+		echo "$SeedNet1 $BaseNet1 $StorNet1 $StorNet2"
+	}
+	Nets=$(GetNets)
+
+	for i in $Nets
+	do
+		function GetNetNamFwd {
+			echo $i | cut -f1 -d':'
+		}
+		NetNamFwd=$(GetNetNamFwd)
+	
+		function GetNetNamRev {
+			echo $i | cut -f1 -d':' | sed 's/Fwd/Rev/'
+		}
+		NetNamRev=$(GetNetNamRev)
+	
+		function GetNetFwd {
+			echo $i | cut -f2 -d':'
+		}
+		NetFwd=$(GetNetFwd)
+	
+		function GetNetRev {
+			echo "$i" | cut -f2 -d':' | awk 'BEGIN{FS="."}{print $4"."$3"."$2"."$1""}' | sed 's/.//'
+		}
+		NetRev=$(GetNetRev)
+	
+		if   [ $NetNamFwd = 'SeedNet1Fwd' ]
+		then
+			SeedNet1F=$NetFwd
+		
+			function GetNetTriplet {
+				echo $NetFwd | sed 's/\.//g'
+			}
+			NetTriplet=$(GetNetTriplet)
+	
+			function GetNetDoublet {
+				echo $NetFwd | cut -f1,2 -d'.' | sed 's/\.//g'
+			}
+			NetDoublet=$(GetNetDoublet)
+	
+			function GetEscaped {
+				echo $NetFwd | sed 's/\./\\\\\\\./g'
+			}
+			Escaped=$(GetEscaped)
+	
+			SeedNet12=$NetDoublet
+			SeedNet13=$NetTriplet
+			SeedNet1E=$Escaped
+	
+		elif [ $NetNamFwd = 'BaseNet1Fwd' ]
+		then
+			BaseNet1F=$NetFwd
+			
+			function GetNetTriplet {
+				echo $NetFwd | sed 's/\.//g'
+			}
+			NetTriplet=$(GetNetTriplet)
+
+			function GetNetDoublet {
+				echo $NetFwd | cut -f1,2 -d'.' | sed 's/\.//g'
+			}
+			NetDoublet=$(GetNetDoublet)
+	
+			function GetEscaped {
+				echo $NetFwd | sed 's/\./\\\\\\\./g'
+			}
+			Escaped=$(GetEscaped)
+	
+			BaseNet12=$NetDoublet
+			BaseNet13=$NetTriplet
+			BaseNet1E=$Escaped
+	
+		elif [ $NetNamFwd = 'StorNet1Fwd' ]
+		then
+			StorNet1F=$NetFwd
+	
+		elif [ $NetNamFwd = 'StorNet2Fwd' ]
+		then
+			StorNet2F=$NetFwd
+		fi
+	
+		if   [ $NetNamRev = 'SeedNet1Rev' ]
+		then
+			SeedNet1R=$NetRev
+	
+		elif [ $NetNamRev = 'BaseNet1Rev' ]
+		then
+			BaseNet1R=$NetRev
+	
+		elif [ $NetNamRev = 'StorNet1Rev' ]
+		then
+			StorNet1R=$NetRev
+	
+		elif [ $NetNamRev = 'StorNet2Rev' ]
+		then
+			StorNet2R=$NetRev
+		fi
 	done
+
+	echo 'SeedNet1F = '$SeedNet1F
+	echo 'SeedNet1R = '$SeedNet1R
+	echo 'SeedNet12 = '$SeedNet12
+	echo 'SeedNet13 = '$SeedNet13
+	echo 'SeedNet1E = '$SeedNet1E
+	echo 'BaseNet1F = '$BaseNet1F
+	echo 'BaseNet1R = '$BaseNet1R
+	echo 'BaseNet12 = '$BaseNet12
+	echo 'BaseNet13 = '$BaseNet13
+	echo 'BaseNet1E = '$BaseNet1E
+	echo 'StorNet1F = '$StorNet1F
+	echo 'StorNet1R = '$StorNet1R
+	echo 'StorNet2F = '$StorNet2F
+	echo 'StorNet2R = '$StorNet2R
+
+	echo ''	
+	echo "=============================================="
+	echo "Done: Get Subnet Regex Strings.               "
+	echo "=============================================="
+	echo ''
+fi
+
+sleep 5
+
+clear
+
+echo ''	
+echo "=============================================="
+echo "Update GNU3 and COPYING in archives...        "
+echo "=============================================="
+echo ''
+
+sleep 5
+
+cd "$DistDir"/anylinux
+"$DistDir"/anylinux/anylinux-services-0.sh $SubDirName $Product
+cd "$DistDir"/"$SubDirName"/archives
+
+echo ''	
+echo "=============================================="
+echo "Done: Update GNU3 and COPYING in archives.    "
+echo "=============================================="
+echo ''
+
+sleep 5
+
+clear
+
+echo ''	
+echo "=============================================="
+echo "Archive Orabuntu-LXC scripts...               "
+echo "=============================================="
+echo ''
+
+if [ ! -d /opt/olxc ]
+then
+	sudo mkdir -p  /opt/olxc
+	sudo chmod 777 /opt/olxc
+fi
+
+sudo rm  -f /opt/olxc/GNU3
+sudo rm -rf /opt/olxc/home
+
+cp -p $DistDir/anylinux/GNU3 /opt/olxc/GNU3
+
+echo "$DistDir/anylinux/vercomp" 						>  "$DistDir"/"$SubDirName"/archives/"$SubDirName"-services.lst
+echo "$DistDir/anylinux/anylinux-services-1.sh" 				>> "$DistDir"/"$SubDirName"/archives/"$SubDirName"-services.lst
+echo "$DistDir/anylinux/dnf2yum" 						>> "$DistDir"/"$SubDirName"/archives/"$SubDirName"-services.lst
+echo "$DistDir/$SubDirName/archives/nameserver_copy.sh" 			>> "$DistDir"/"$SubDirName"/archives/"$SubDirName"-services.lst
+echo "$DistDir/$SubDirName/archives/docker_install_$SubDirName.sh" 		>> "$DistDir"/"$SubDirName"/archives/"$SubDirName"-services.lst
+echo "$DistDir/$SubDirName/$SubDirName-services-0.sh"	 			>> "$DistDir"/"$SubDirName"/archives/"$SubDirName"-services.lst
+echo "$DistDir/$SubDirName/$SubDirName-services-1.sh"	 			>> "$DistDir"/"$SubDirName"/archives/"$SubDirName"-services.lst
+echo "$DistDir/$SubDirName/$SubDirName-services-2.sh"	 			>> "$DistDir"/"$SubDirName"/archives/"$SubDirName"-services.lst
+echo "$DistDir/$SubDirName/$SubDirName-services-3.sh"	 			>> "$DistDir"/"$SubDirName"/archives/"$SubDirName"-services.lst
+echo "$DistDir/$SubDirName/$SubDirName-services-4.sh"	 			>> "$DistDir"/"$SubDirName"/archives/"$SubDirName"-services.lst
+echo "$DistDir/$SubDirName/$SubDirName-services-5.sh"	 			>> "$DistDir"/"$SubDirName"/archives/"$SubDirName"-services.lst
+echo "$DistDir/$SubDirName/GNU3"                                                >> "$DistDir"/"$SubDirName"/archives/"$SubDirName"-services.lst
+echo "$DistDir/$SubDirName/COPYING"                                             >> "$DistDir"/"$SubDirName"/archives/"$SubDirName"-services.lst
+echo "$DistDir/products/$Product/$Product"					>> "$DistDir"/"$SubDirName"/archives/"$SubDirName"-services.lst
+echo "$DistDir/products/$Product/$Product.net"					>> "$DistDir"/"$SubDirName"/archives/"$SubDirName"-services.lst
+echo "$DistDir/products/$Product/$Product.cnf"					>> "$DistDir"/"$SubDirName"/archives/"$SubDirName"-services.lst
+
+cd "$DistDir"/"$SubDirName"/archives
+
+tar -cPf  "$DistDir"/"$SubDirName"/archives/"$SubDirName"-services.tar -T "$DistDir"/"$SubDirName"/archives/"$SubDirName"-services.lst --numeric-owner
+tar -tvPf "$DistDir"/"$SubDirName"/archives/"$SubDirName"-services.tar
+
+echo ''	
+echo "=============================================="
+echo "Done: Archive Orabuntu-LXC scripts.           "
+echo "=============================================="
+echo ''
+
+sleep 5
+
+clear
+
+echo ''	
+echo "=============================================="
+echo "Prepare Orabuntu-LXC Files & Archives...      "
+echo "=============================================="
+echo ''
+
+# GLS 20180204 Replaced by function GetArchiveNames
+# ArchiveNames="dns-dhcp-cont.tar dns-dhcp-host.tar lxc-oracle-files.tar product.tar ubuntu-host.tar scst-files.tar tgt-files.tar $SubDirName-services.tar"
+
+function GetArchiveNames {
+	ls *.tar | more | sed 's/$/ /' | tr -d '\n' | sed 's/^[ \t]*//;s/[ \t]*$//'
+}
+ArchiveNames=$(GetArchiveNames)
+# echo $ArchiveNames
+
+cp -p GNU3 /opt/olxc/GNU3
+	
+for i in $ArchiveNames
+do
+	clear
+	
+        function GetArchiveShortName {
+                echo $i | cut -f1 -d'.'
+        }
+        ArchiveShortName=$(GetArchiveShortName)
+	
+	function GetArchiveFileList {
+		sudo tar -P -tvf $i | sed 's/  */ /g' | cut -f6 -d' ' | sed 's/$/ /' > "$DistDir"/"$SubDirName"/archives/$ArchiveShortName.lst
+	}
+	ArchiveFileList=$(GetArchiveFileList)
+
+	sudo cp -p "$DistDir"/"$SubDirName"/archives/$ArchiveShortName.lst /opt/olxc/$ArchiveShortName.lst	
+
+	if [ $i != 'lxc-oracle-files.tar' ] && [ $i != 'product.tar' ]
+	then	
+		function GetTAR {
+			cat /opt/olxc/$ArchiveShortName.lst | cut -f2 -d'/' | sort -u
+		}
+	else
+		function GetTAR {
+			cat /opt/olxc/$ArchiveShortName.lst | cut -f1 -d'/' | sort -u
+		}
+	fi
+	TAR=$(GetTAR)
+
+	sudo rm -rf /opt/olxc/"$TAR"
+
+        sudo tar -P -tvf $i | sed 's/  */ /g' | cut -f6 -d' ' > $ArchiveShortName.lst
+
+	function GetArchiveFileVar {
+		sudo tar -P -tvf $i | sed 's/  */ /g' | cut -f6 -d' ' | sed 's/$/ /' | tr -d '\n' | sed 's/^[ \t]*//;s/[ \t]*$//'
+	}
+	ArchiveFileVar=$(GetArchiveFileVar)
+
+	if [ ! -f /opt/olxc/"$DistDir"/"$SubDirName"/archives/file-exceptions.txt ]
+	then	
+		sudo mkdir -p /opt/olxc
+		sudo chown $Owner:$Group /opt/olxc
+		sudo mkdir -p /opt/olxc/"$DistDir"/"$SubDirName"/archives/
+		sudo chown $Owner:$Group /opt/olxc/"$DistDir"/"$SubDirName"/archives/
+		sudo cp -p "$DistDir"/"$SubDirName"/archives/file-exceptions.txt /opt/olxc/"$DistDir"/"$SubDirName"/archives/file-exceptions.txt
+		sudo sed -i "s/OWNER/$Owner/g" /opt/olxc/"$DistDir"/"$SubDirName"/archives/file-exceptions.txt
+	fi
+
+	echo ''	
+	echo "=============================================="
+	echo "List GNU3 Header Exemptions...                "
+	echo "=============================================="
+	echo ''
+
+	for j in $ArchiveFileVar
+	do
+		if   [ ! -d $j ]
+		then
+			sudo tar -v --extract --file=$i -C /opt/olxc $j > /dev/null 2>&1
+
+			grep $j /opt/olxc/"$DistDir"/"$SubDirName"/archives/file-exceptions.txt
+			if [ $? -ne 0 ]
+			then
+				sudo sh -c "cat /opt/olxc/GNU3 /opt/olxc/$j > /opt/olxc/$j.gnu3"
+				sudo chmod --reference /opt/olxc/$j /opt/olxc/$j.gnu3 > /dev/null 2>&1
+				sudo chown --reference /opt/olxc/$j /opt/olxc/$j.gnu3 > /dev/null 2>&1
+				sudo mv /opt/olxc/$j.gnu3 /opt/olxc/$j
+				filename=/opt/olxc/$j
+			fi
+			if [ $i != 'dns-dhcp-cont.tar' ] && [ $i != 'dns-dhcp-host.tar' ] && [ $i != 'lxc-oracle-files.tar' ] && [ $i != 'product.tar' ] && [ $i != 'ubuntu-host.tar' ]
+			then
+				sudo chown $Owner:$Group $filename > /dev/null 2>&1
+			fi
+			filename=/opt/olxc/$j
+
+			if [ $SetNets = 'Y' ] 
+			then
+ 				sudo sed -i "s/10.207.41/$StorNet2F/g"			$filename
+				sudo sed -i "s/10.207.40/$StorNet1F/g"			$filename
+				sudo sed -i "s/10.207.39/$BaseNet1F/g"			$filename
+				sudo sed -i "s/10.207.29/$SeedNet1F/g"			$filename
+				sudo sed -i "s/39.207.10/$BaseNet1R/g"			$filename
+				sudo sed -i "s/29.207.10/$SeedNet1R/g"			$filename
+				sudo sed -i "s/1020729/$SeedNet13/g"			$filename
+				sudo sed -i "s/1020739/$BaseNet13/g"			$filename
+				sudo sed -i "s/10207/$BaseNet12/g"			$filename
+				sudo sed -i "s/10\\\.207\\\.29/$SeedNet1E/g"		$filename
+				sudo sed -i "s/10\\\.207\\\.39/$BaseNet1E/g"		$filename
+				sudo sed -i "s/172.220.40/$ExtrNet1/g"			$filename
+				sudo sed -i "s/172.221.40/$ExtrNet2/g"			$filename
+				sudo sed -i "s/192.210.39/$ExtrNet3/g"			$filename
+				sudo sed -i "s/192.211.39/$ExtrNet4/g"			$filename
+				sudo sed -i "s/192.212.39/$ExtrNet5/g"			$filename
+				sudo sed -i "s/192.213.39/$ExtrNet6/g"			$filename
+			fi
+			if [ $LinuxFlavor = 'Fedora' ] && [ $RedHatVersion -ge 22 ] && [ $i = "$SubDirName-services.tar" ]
+			then
+				sudo sed -i '/lxc-attach/!s/yum -y install/dnf -y install/g'		$filename
+				sudo sed -i "s/yum -y erase/dnf -y erase/g" 				$filename
+				sudo sed -i "s/yum -y localinstall/dnf -y localinstall/g" 		$filename
+				sudo sed -i "s/yum clean all/dnf clean all/g" 				$filename
+				sudo sed -i "s/yum provides/dnf provides/g" 				$filename
+				sudo sed -i "s/yum-utils/dnf-utils/g" 					$filename
+				sudo sed -i "s/yum-complete-transaction//g"				$filename
+			fi
+		fi
+	
+	done
+
+	echo ''	
+	echo "=============================================="
+	echo "Done: List GNU3 Header Exemptions.              "
+	echo "=============================================="
+	echo ''
+
+	sleep 1
+
+	echo "=============================================="
+	echo "Process archive $i...                         "
+	echo "=============================================="
+	echo ''
 
 	cd /opt/olxc
 
-	# sleep 5
+	if [ $i != 'scst-files.tar' ] && [ $i != 'tgt-files.tar' ]
+	then
+#		if [ $i = 'dns-dhcp-host.tar' ]
+#		then
+#			function TweakTAR {
+#				echo $TAR | sed 's/var//' | sed 's/^[ \t]*//;s/[ \t]*$//'
+#			}
+#			TAR=$(TweakTAR)
+#		fi
 
-	sudo cp -p *.lst /opt/olxc/"$DistDir"/"$SubDirName"/archives/.
-	sudo cp -p *.tar /opt/olxc/"$DistDir"/"$SubDirName"/archives/.
+		sudo tar -cf $i $TAR 	--numeric-owner
+		sudo tar -tvf $i 	--numeric-owner
+	
+		echo ''
+		echo "=============================================="
+		echo "Done: Process archive $i.                     "
+		echo "=============================================="
+		echo ''
 
-	clear
+		if [ $i != "$SubDirName-services.tar" ]
+		then
+			sudo rm -rf $TAR
+		fi
+	else
+		sudo tar -cf $i $TAR	--numeric-owner
+		sudo tar -tvf $i	--numeric-owner
+	
+		echo ''
+		echo "=============================================="
+		echo "Done: Process archive $i.                     "
+		echo "=============================================="
+	fi
 
-	sudo chown -R $Group:$Owner home
-	sudo tar -xf /opt/olxc/"$DistDir"/"$SubDirName"/archives/"$SubDirName"-services.tar -C /opt/olxc
-	sudo chown -R $Group:$Owner home
-	sudo chmod 775 /opt/olxc/"$DistDir"/"$SubDirName"/"$SubDirName"-services-*.sh
-	sudo chmod 775 /opt/olxc/"$DistDir"/anylinux/*
-	sudo chmod 775 /opt/olxc/"$DistDir"/products/$Product/$Product
+	cd "$DistDir"/"$SubDirName"/archives
+
 	sleep 5
+done
 
-	echo ''
-	echo "=============================================="
-	echo "Show permissions on /opt/olxc Staging Area ...     "
-	echo "=============================================="
-	echo ''
+cd /opt/olxc
 
-	sleep 5
+# sleep 5
 
-	ls -lR /opt/olxc/"$DistDir"/"$SubDirName"
+sudo cp -p *.lst /opt/olxc/"$DistDir"/"$SubDirName"/archives/.
+sudo cp -p *.tar /opt/olxc/"$DistDir"/"$SubDirName"/archives/.
 
-	echo ''
-	echo "=============================================="
-	echo "Done: Show permissions on /opt/olxc Staging Area   "
-	echo "=============================================="
-	echo ''
+clear
 
-	sleep 5
+sudo chown -R $Group:$Owner home
+sudo tar -xf /opt/olxc/"$DistDir"/"$SubDirName"/archives/"$SubDirName"-services.tar -C /opt/olxc
+sudo chown -R $Group:$Owner home
+sudo chmod 775 /opt/olxc/"$DistDir"/"$SubDirName"/"$SubDirName"-services-*.sh
+sudo chmod 775 /opt/olxc/"$DistDir"/anylinux/*
+sudo chmod 775 /opt/olxc/"$DistDir"/products/$Product/$Product
+sleep 5
 
-	clear
+echo ''
+echo "=============================================="
+echo "Show permissions on /opt/olxc Staging Area ...     "
+echo "=============================================="
+echo ''
 
-fi
+sleep 5
 
-if [ $Operation = 'ovs' ]
-then
-	            $DistDir/anylinux/anylinux-services-1.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $OSMemRes $NumCon $MultiHost $LxcOvsVersion $DistDir $Product $SubDirName $Sx1Net $Sw1Net
-else
-	/opt/olxc/"$DistDir"/anylinux/anylinux-services-1.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $OSMemRes $NumCon $MultiHost $LxcOvsVersion $DistDir $Product $SubDirName $Sx1Net $Sw1Net
-fi	
- 
+ls -lR /opt/olxc/"$DistDir"/"$SubDirName"
+
+echo ''
+echo "=============================================="
+echo "Done: Show permissions on /opt/olxc Staging Area   "
+echo "=============================================="
+echo ''
+
+sleep 5
+
+clear
+
+/opt/olxc/"$DistDir"/anylinux/anylinux-services-1.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $OSMemRes $NumCon $MultiHost $LxcOvsVersion $DistDir $Product $SubDirName $Sx1Net $Sw1Net
+	
 exit

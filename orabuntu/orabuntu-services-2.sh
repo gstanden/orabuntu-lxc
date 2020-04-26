@@ -212,6 +212,25 @@ clear
 
 echo ''
 echo "=============================================="
+echo "Check package yum installed ...               "
+echo "=============================================="
+echo ''
+
+wget http://launchpadlibrarian.net/193821327/yum_3.4.3-3_all.deb
+sudo dpkg -i yum_3.4.3-3_all.deb
+
+echo ''
+echo "=============================================="
+echo "Package yum installed.                        "
+echo "=============================================="
+echo ''
+
+sleep 5
+
+clear
+
+echo ''
+echo "=============================================="
 echo "   Create the LXC Oracle Linux container      "
 echo "                                              "
 echo "    Note: Depends on download speed...        "
@@ -227,7 +246,12 @@ echo ''
 
 sleep 5
 
-sudo lxc-create -n oel$OracleRelease$SeedPostfix -t oracle -- --release=$OracleVersion
+if [ UbuntuMajorVersion -ge 20 ]
+then
+	sudo lxc-create -t download -n oel$OracleRelease$SeedPostfix -- --dist oracle --release $MajorRelease --arch amd64
+else
+	sudo lxc-create -n oel$OracleRelease$SeedPostfix -t oracle -- --release=$OracleVersion
+fi
 
 if [ $(SoftwareVersion $LXCVersion) -ge $(SoftwareVersion "2.1.0") ]
 then

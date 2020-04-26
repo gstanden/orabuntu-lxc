@@ -79,33 +79,17 @@ function GetMultiHostVar1 {
 	echo $MultiHost | cut -f1 -d':'
 }
 MultiHostVar1=$(GetMultiHostVar1)
-Operation=$MultiHostVar1
 
 function GetMultiHostVar4 {
 	echo $MultiHost | cut -f4 -d':'
 }
 MultiHostVar4=$(GetMultiHostVar4)
 
-function GetMultiHostVar5 {
-	echo $MultiHost | cut -f5 -d':'
-}
-MultiHostVar5=$(GetMultiHostVar5)
-
 function GetMultiHostVar7 {
 	echo $MultiHost | cut -f7 -d':'
 }
 MultiHostVar7=$(GetMultiHostVar7)
 MTU=$MultiHostVar7
-
-function GetMultiHostVar8 {
-	echo $MultiHost | cut -f8 -d':'
-}
-MultiHostVar8=$(GetMultiHostVar8)
-
-function GetMultiHostVar9 {
-	echo $MultiHost | cut -f9 -d':'
-}
-MultiHostVar9=$(GetMultiHostVar9)
 
 GetLinuxFlavors(){
 if   [[ -e /etc/oracle-release ]]
@@ -224,6 +208,8 @@ echo "Oracle container automation.                  "
 echo "=============================================="
 echo ''
 
+sleep 5
+
 clear
 
 echo ''
@@ -239,42 +225,6 @@ echo "=============================================="
 echo "Privileges established.                       "
 echo "=============================================="
 
-if [ $Operation = 'ovs' ]
-then
-	sleep 2
-else
-	sleep 5
-fi
-
-clear
-
-echo ''
-echo "==============================================" 
-echo "Verify LXC DNS/DHCP up...                     "
-echo "=============================================="
-
-echo ''
-echo "=============================================="
-echo 'Install sshpass package...                    '
-echo "=============================================="
-echo ''
-
-sudo yum -y install sshpass
-
-echo ''
-echo "=============================================="
-echo 'Done: Install sshpass package.                '
-echo "=============================================="
-
-
-sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" lxc-start -n $NameServer >/dev/null 2>&1; echo ''; sudo -S <<< "$MultiHostVar9" lxc-ls -f | egrep '$NameServer|AUTOSTART|IPV4' | grep -iv Base" 
-
-echo ''
-echo "==============================================" 
-echo "Done: Verify LXC DNS/DHCP up.                 "
-echo "=============================================="
-echo ''
-
 sleep 5
 
 clear
@@ -284,8 +234,6 @@ echo "=============================================="
 echo "Verify networking up...                       "
 echo "=============================================="
 echo ''
-
-sleep 5
 
 n=1
 function CheckNetworkUp {
@@ -351,23 +299,7 @@ else
 	ping -c 3 yum.oracle.com
 fi
 
-echo ''
-echo "==============================================" 
-echo "Done: Verify networking up.                   "
-echo "=============================================="
-echo ''
-
-if [ $Operation = 'ovs' ]
-then
-	sudo mkdir -p 			     	/opt/olxc/"$DistDir"/anylinux/
-	sudo cp -p $DistDir/anylinux/vercomp    /opt/olxc/"$DistDir"/anylinux/.
-	sudo mkdir -p                           /opt/olxc/"$DistDir"/uekulele
-	sudo mkdir -p 			        /opt/olxc/"$DistDir"/uekulele/openvswitch/rpmbuild/RPMS/x86_64
-	sudo chown -R $Owner:$Group	        /opt/olxc
-	sleep 2
-else
-	sleep 5 
-fi
+sleep 5 
 
 clear
 
@@ -396,12 +328,7 @@ then
 	echo "=============================================="
 	echo ''
 
-	if [ $Operation = 'ovs' ]
-	then
-		sleep 2
-	else
-		sleep 5
-	fi
+	sleep 5
 
 	clear
 
@@ -416,12 +343,7 @@ then
 			echo "Script:  anylinux-services-1.sh               "
 			echo "=============================================="
 
-			if [ $Operation = 'ovs' ]
-			then
-				sleep 2
-			else
-				sleep 5a
-			fi
+			sleep 5
 			
 			clear
 			
@@ -485,13 +407,8 @@ then
 			echo "=============================================="
 			echo "OS Versions Compatibility Notice End          "
 			echo "=============================================="
-	
-			if [ $Operation = 'ovs' ]
-			then
-				sleep 2
-			else	
-				sleep 5
-			fi
+		
+			sleep 5
 
 			clear
 
@@ -522,36 +439,26 @@ then
 			echo "Check if host is physical or virtual...       "
 			echo "=============================================="
 			echo ''
-	
-			if [ $Operation = 'ovs' ]
-			then
-				sleep 2
-			else	
-				sleep 5
-			fi
-	
+
+			sleep 5
+
 			clear
-	
+
 			echo ''
 			echo "=============================================="
 			echo "Facter package required for phys/VM check...  "
 			echo "=============================================="
 			echo ''
-	
-			if [ $Operation = 'ovs' ]
-			then
-				sleep 2
-			else	
-				sleep 5
-			fi
-	
+
+			sleep 5
+
 			clear
-	
+
 			function CheckFacterInstalled {
 				sudo which facter > /dev/null 2>&1; echo $?
 			}
 			FacterInstalled=$(CheckFacterInstalled)
-	
+
 			if [ $FacterInstalled -ne 0 ] # 5
 			then
        			 	echo ''
@@ -559,9 +466,9 @@ then
        			 	echo "Install package prerequisites for facter...   "
        			 	echo "=============================================="
        			 	echo ''
-		
-       			 	sudo yum -y install which ruby curl tar yum-utils
 	
+       			 	sudo yum -y install which ruby curl tar yum-utils
+
 				if [ $LinuxFlavor != 'Fedora' ]
 				then
 					if [ $Release -le 7 ]
@@ -569,29 +476,24 @@ then
 						sudo yum-complete-transaction
 					fi
 				fi
-       		 	
+       	 	
 				echo ''
        			 	echo "=============================================="
        			 	echo "Facter package prerequisites installed.       "
        		 		echo "=============================================="
-		
-				if [ $Operation = 'ovs' ]
-				then
-					sleep 2
-				else	
-					sleep 5
-				fi
 	
+				sleep 5
+
 				clear
-	
+
        			 	echo ''
        			 	echo "=============================================="
        			 	echo "Build and install Facter from Ruby Gems...    "
        			 	echo "=============================================="
        			 	echo ''
-	
+
 				sleep 5
-	
+
 				if [ $RedHatVersion -eq 8 ]
 				then
 					sudo yum -y install rubygems
@@ -601,12 +503,12 @@ then
 					cd /opt/olxc/"$DistDir"/uekulele/facter
 					curl -s http://downloads.puppetlabs.com/facter/facter-2.4.4.tar.gz | sudo tar xz; sudo ruby facter*/install.rb
 				fi
-	
+
 				echo ''
        			 	echo "=============================================="
        			 	echo "Build and install Facter completed.           "
        			 	echo "=============================================="
-	
+
 			else
        			 	echo ''
        			 	echo "=============================================="
@@ -621,12 +523,7 @@ then
 			}
 			Facter=$(GetFacter)
 		
-			if [ $Operation = 'ovs' ]
-			then
-				sleep 2
-			else	
-				sleep 5
-			fi
+			sleep 5
 
 			clear
 
@@ -687,13 +584,7 @@ then
 						fi
 					fi
 				done
-			
-				if [ $Operation = 'ovs' ]
-				then
-					sleep 0
-				else	
-					sleep 15
-				fi
+				sleep 15
 
  				echo ''
 				echo "=============================================="
@@ -701,12 +592,7 @@ then
 				echo "=============================================="
 				echo ''
 
-				if [ $Operation = 'ovs' ]
-				then
-					sleep 2
-				else	
-					sleep 5
-				fi
+				sleep 5
 
 				clear
 
@@ -732,11 +618,6 @@ then
 #	
 #					clear
 
-					if [ $MultiHostVar1 = 'ovs' ]
-					then
- 						"$DistDir"/uekulele/uekulele-services-1.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServerBase $OSMemRes $MultiHost $LxcOvsVersion $DistDir $Sx1Net $Sw1Net $Product
-					fi
-					
 					if [ $MultiHostVar1 = 'addrelease' ]
 					then
  						/opt/olxc/"$DistDir"/uekulele/uekulele-services-2.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $MultiHost $DistDir
@@ -765,17 +646,12 @@ then
 
 				if [ ! -f /etc/orabuntu-lxc-release ] # 10
 				then
-					if [ $MultiHostVar1 = 'ovs' ]
-					then
- 						"$DistDir"/uekulele/uekulele-services-1.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServerBase $OSMemRes $MultiHost $LxcOvsVersion $DistDir $Sx1Net $Sw1Net $Product
-					else
-						/opt/olxc/"$DistDir"/uekulele/uekulele-services-1.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServerBase $OSMemRes $MultiHost $LxcOvsVersion $DistDir $Sx1Net $Sw1Net
-						/opt/olxc/"$DistDir"/uekulele/uekulele-services-2.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $MultiHost $DistDir
-						/opt/olxc/"$DistDir"/uekulele/uekulele-services-3.sh $MajorRelease $PointRelease $Domain2 $MultiHost $DistDir $Product
- 						/opt/olxc/"$DistDir"/products/$Product/$Product $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $OSMemRes $MultiHost $LxcOvsVersion $DistDir $SubDirName
-						/opt/olxc/"$DistDir"/uekulele/uekulele-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer $MultiHost $DistDir $Product
-						/opt/olxc/"$DistDir"/uekulele/uekulele-services-5.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $MultiHost $DistDir
-					fi
+					/opt/olxc/"$DistDir"/uekulele/uekulele-services-1.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServerBase $OSMemRes $MultiHost $LxcOvsVersion $DistDir $Sx1Net $Sw1Net
+					/opt/olxc/"$DistDir"/uekulele/uekulele-services-2.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $MultiHost $DistDir
+					/opt/olxc/"$DistDir"/uekulele/uekulele-services-3.sh $MajorRelease $PointRelease $Domain2 $MultiHost $DistDir $Product
+ 					/opt/olxc/"$DistDir"/products/$Product/$Product $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $OSMemRes $MultiHost $LxcOvsVersion $DistDir $SubDirName
+					/opt/olxc/"$DistDir"/uekulele/uekulele-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer $MultiHost $DistDir $Product
+					/opt/olxc/"$DistDir"/uekulele/uekulele-services-5.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $MultiHost $DistDir
 				fi # OK 10
 
  				echo ''
@@ -820,11 +696,6 @@ then
 #
 #					clear
 
-					if [ $MultiHostVar1 = 'ovs' ]
-					then
- 						"$DistDir"/uekulele/uekulele-services-1.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServerBase $OSMemRes $MultiHost $LxcOvsVersion $DistDir $Sx1Net $Sw1Net
-					fi
-					
 					if [ $MultiHostVar1 = 'addrelease' ]
 					then
  						/opt/olxc/"$DistDir"/uekulele/uekulele-services-2.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $MultiHost $DistDir
@@ -853,17 +724,12 @@ then
 		
 				if [ ! -f /etc/orabuntu-lxc-release ] # 14
 				then
-					if [ $MultiHostVar1 = 'ovs' ]
-					then
- 						"$DistDir"/uekulele/uekulele-services-1.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServerBase $OSMemRes $MultiHost $LxcOvsVersion $DistDir $Sx1Net $Sw1Net
-					else
-						/opt/olxc/"$DistDir"/uekulele/uekulele-services-1.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServerBase $OSMemRes $MultiHost $LxcOvsVersion $DistDir $Sx1Net $Sw1Net
-						/opt/olxc/"$DistDir"/uekulele/uekulele-services-2.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $MultiHost $DistDir
-						/opt/olxc/"$DistDir"/uekulele/uekulele-services-3.sh $MajorRelease $PointRelease $Domain2 $MultiHost $DistDir $Product
- 						/opt/olxc/"$DistDir"/products/$Product/$Product $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $OSMemRes $MultiHost $LxcOvsVersion $DistDir $SubDirName
-						/opt/olxc/"$DistDir"/uekulele/uekulele-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer $MultiHost $DistDir $Product
-						/opt/olxc/"$DistDir"/uekulele/uekulele-services-5.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $MultiHost $DistDir
-					fi
+					/opt/olxc/"$DistDir"/uekulele/uekulele-services-1.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServerBase $OSMemRes $MultiHost $LxcOvsVersion $DistDir $Sx1Net $Sw1Net
+					/opt/olxc/"$DistDir"/uekulele/uekulele-services-2.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $MultiHost $DistDir
+					/opt/olxc/"$DistDir"/uekulele/uekulele-services-3.sh $MajorRelease $PointRelease $Domain2 $MultiHost $DistDir $Product
+ 					/opt/olxc/"$DistDir"/products/$Product/$Product $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $OSMemRes $MultiHost $LxcOvsVersion $DistDir $SubDirName
+					/opt/olxc/"$DistDir"/uekulele/uekulele-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer $MultiHost $DistDir $Product
+					/opt/olxc/"$DistDir"/uekulele/uekulele-services-5.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $MultiHost $DistDir
 				fi # OK 14
 
 				sleep 5
