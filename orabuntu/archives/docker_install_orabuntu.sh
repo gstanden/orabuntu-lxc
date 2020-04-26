@@ -32,7 +32,7 @@ elif [ $UbuntuVersion = '16.10' ]
 then
 	sudo apt-get install docker.io
 
-elif [ $UbuntuVersion = '17.04' ] || [ $UbuntuVersion = '17.10' ] || [ $UbuntuVersion = '18.04' ] || [ $UbuntuVersion = '18.10' ] || [ $UbuntuVersion = '19.04' ]
+elif [ $UbuntuMajorVersion -gt 17 ]
 then
 	sudo apt-get -y update
 	sudo apt-get -y install apt-transport-https ca-certificates curl software-properties-common

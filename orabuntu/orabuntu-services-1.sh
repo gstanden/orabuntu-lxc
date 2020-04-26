@@ -682,10 +682,15 @@ echo ''
 
 sleep 5
 
-sudo apt-get install -y uml-utilities openvswitch-switch openvswitch-common hugepages ntp
-sudo apt-get install -y bind9utils dnsutils apparmor-utils openssh-server uuid rpm yum lxc-templates
+sudo apt-get install -y uml-utilities openvswitch-switch openvswitch-common ntp
+sudo apt-get install -y bind9utils dnsutils apparmor-utils openssh-server uuid rpm lxc-templates
 sudo apt-get install -y iotop sshpass facter iptables xfsprogs
 sudo apt-get install -y ruby
+
+if [ $UbuntuMajorVersion -lt 20 ]
+then
+	sudo apt-get install yum hugepages
+fi
 
 if [ $NetworkManagerInstalled -eq 1 ] && [ $SystemdResolvedInstalled -eq 0 ]
 then
@@ -702,9 +707,9 @@ then
 	sudo apt-get -y install db5.1 db5.1-util
 fi
 
-if [ $UbuntuVersion = '16.04' ] || [ $UbuntuVersion = '17.04' ] || [ $UbuntuVersion = '17.10' ] || [ $UbuntuVersion = '18.04' ] || [ $UbuntuVersion = '18.10' ] || [ $UbuntuVersion = '19.04' ]
+if [ $UbuntuMajorVersion -ge 16 ] && [ $UbuntuMajorVerson -le 20 ]
 then
-	sudo apt-get -y install db5.3 db5.3-util
+	sudo apt-get -y install db5.3-util
 	sudo ln -s /usr/bin/db5.3_dump /usr/bin/db5.1_dump
 fi
 sudo aa-complain /usr/bin/lxc-start
@@ -881,7 +886,7 @@ echo "Verify required packages status...            "
 echo "=============================================="
 echo ''
 
-if [ $UbuntuMajorVersion = 15 ]
+if [ $UbuntuMajorVersion -eq 15 ]
 then
 	function CheckPackageInstalled {
 		echo 'facter lxc uml-utilities openvswitch-switch openvswitch-common bind9utils dnsutils apparmor-utils openssh-server uuid rpm yum hugepages ntp iotop sshpass db5.1-util'
@@ -889,12 +894,18 @@ then
 	PackageInstalled=$(CheckPackageInstalled)
 fi
 
-# if [ $UbuntuVersion = '16.04' ] || [ $UbuntuVersion = '17.04' ] || [ $UbuntuVersion = '17.10' ] || [ $UbuntuVersion = '18.04' ] || [ $UbuntuVersion = '18.10' ] || [ $UbuntuVersion = '19.04' ]
-
-if [ $UbuntuMajorVersion ge 16 ]
+if [ $UbuntuMajorVersion -ge 16 ] && [ $UbuntuMajorVersion -lt 20 ]
 then
 	function CheckPackageInstalled {
 		echo 'facter lxc uml-utilities openvswitch-switch openvswitch-common bind9utils dnsutils apparmor-utils openssh-server uuid rpm yum hugepages ntp iotop sshpass db5.3-util'
+	}
+	PackageInstalled=$(CheckPackageInstalled)
+fi
+
+if [ $UbuntuMajorVersion -ge 20 ]
+then
+	function CheckPackageInstalled {
+		echo 'facter lxc uml-utilities openvswitch-switch openvswitch-common bind9utils dnsutils apparmor-utils openssh-server uuid rpm ntp iotop sshpass db5.3-util'
 	}
 	PackageInstalled=$(CheckPackageInstalled)
 fi
@@ -2509,7 +2520,11 @@ then
 
         clear
 
-	sudo sh -c "cat '/var/lib/lxc/$NameServerBase/delta0/root/.ssh/id_rsa.pub' >> /home/amide/.ssh/authorized_keys"
+	sudo sh -c "cat '/var/lib/lxc/$NameServer/snaps/snap0/overlay/delta/root/.ssh/id_rsa.pub' >> /home/amide/.ssh/authorized_keys"
+	sudo sh -c "cat '/var/lib/lxc/$NameServer/overlay/delta/root/.ssh/id_rsa.pub              >> /home/amide/.ssh/authorized_keys"
+
+#	sudo sh -c "cat '/var/lib/lxc/$NameServerBase/delta0/root/.ssh/id_rsa.pub' >> /home/amide/.ssh/authorized_keys"
+#	sudo sh -c "cat '/var/lib/lxc/$NameServer/delta0/root/.ssh/id_rsa.pub'     >  /home/amide/.ssh/authorized_keys"
 
 	echo ''
 	echo "=============================================="

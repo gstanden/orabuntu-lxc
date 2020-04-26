@@ -453,14 +453,16 @@ echo ''
 sudo lxc-attach -n $SeedContainerName -- uname -a
 if [ $? -ne 0 ]
 then
-echo ''
-echo "=============================================="
-echo "lxc-attach $SeedContainerName has issue.      "
-echo "lxc-attach $SeedContainerName must succeed.   "
-echo "Fix issues retry script.                      "
-echo "Script exiting.                               "
-echo "=============================================="
-exit
+	echo ''
+	echo "=============================================="
+	echo "lxc-attach $SeedContainerName has issue.      "
+	echo "lxc-attach $SeedContainerName must succeed.   "
+	echo "Fix issues retry script.                      "
+	echo "Script exiting.                               "
+	echo "=============================================="
+	exit
+else
+	sudo lxc-attach -n $SeedContainerName -- yum -y install openssh-server
 fi
 echo ''
 echo "=============================================="
