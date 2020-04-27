@@ -134,6 +134,24 @@ function CheckLxcNetRunning {
 }
 LxcNetRunning=$(CheckLxcNetRunning)
 
+echo ''
+echo "=============================================="
+echo "Install package net-tools ...                 "
+echo "=============================================="
+echo ''
+
+sudo apt-get -y install net-tools
+
+echo ''
+echo "=============================================="
+echo "Done: Install package net-tools.              "
+echo "=============================================="
+echo ''
+
+sleep 5
+
+clear
+
 function CheckSystemdResolvedInstalled {
 	sudo netstat -ulnp | grep 53 | sed 's/  */ /g' | rev | cut -f1 -d'/' | rev | sort -u | grep systemd- | wc -l
 }
@@ -315,6 +333,8 @@ echo "=============================================="
 echo ''
 
 sleep 5
+
+sudo apt-get install -y openssh-server
 
 sudo sed -i '/GSSAPIAuthentication/s/yes/no/'                                /etc/ssh/sshd_config
 sudo sed -i '/UseDNS/s/yes/no/'                                              /etc/ssh/sshd_config
@@ -707,7 +727,7 @@ then
 	sudo apt-get -y install db5.1 db5.1-util
 fi
 
-if [ $UbuntuMajorVersion -ge 16 ] && [ $UbuntuMajorVerson -le 20 ]
+if [ $UbuntuMajorVersion -ge 16 ] && [ $UbuntuMajorVersion -le 20 ]
 then
 	sudo apt-get -y install db5.3-util
 	sudo ln -s /usr/bin/db5.3_dump /usr/bin/db5.1_dump
@@ -2520,8 +2540,10 @@ then
 
         clear
 
-	sudo sh -c "cat '/var/lib/lxc/$NameServer/snaps/snap0/overlay/delta/root/.ssh/id_rsa.pub' >> /home/amide/.ssh/authorized_keys"
-	sudo sh -c "cat '/var/lib/lxc/$NameServer/overlay/delta/root/.ssh/id_rsa.pub              >> /home/amide/.ssh/authorized_keys"
+	NameServerBase=$(GetNameServerBase)
+
+	sudo sh -c "cat '/var/lib/lxc/$NameServerBase/snaps/snap0/overlay/delta/root/.ssh/id_rsa.pub' >> /home/amide/.ssh/authorized_keys"
+	sudo sh -c "cat '/var/lib/lxc/$NameServerBase/overlay/delta/root/.ssh/id_rsa.pub'             >> /home/amide/.ssh/authorized_keys"
 
 #	sudo sh -c "cat '/var/lib/lxc/$NameServerBase/delta0/root/.ssh/id_rsa.pub' >> /home/amide/.ssh/authorized_keys"
 #	sudo sh -c "cat '/var/lib/lxc/$NameServer/delta0/root/.ssh/id_rsa.pub'     >  /home/amide/.ssh/authorized_keys"

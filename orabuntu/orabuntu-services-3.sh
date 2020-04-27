@@ -463,11 +463,12 @@ then
 	exit
 else
 	sudo lxc-attach -n $SeedContainerName -- yum -y install openssh-server
+
+	echo ''
+	echo "=============================================="
+	echo "lxc-attach $SeedContainerName successful.     "
+	echo "=============================================="
 fi
-echo ''
-echo "=============================================="
-echo "lxc-attach $SeedContainerName successful.     "
-echo "=============================================="
 
 sleep 5
 
