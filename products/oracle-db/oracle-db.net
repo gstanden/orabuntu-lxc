@@ -72,8 +72,8 @@ then
 
 	if   [ $LinuxFlavor = 'Oracle' ]
 	then
-        	CutIndex=7
-        	function GetRedHatVersion {
+		CutIndex=7
+		function GetRedHatVersion {
                 	sudo cat /etc/redhat-release | cut -f"$CutIndex" -d' ' | cut -f1 -d'.'
         	}
         	RedHatVersion=$(GetRedHatVersion)
@@ -133,8 +133,8 @@ then
         	UbuntuMajorVersion=$(GetUbuntuMajorVersion)
 	fi
 
-        if [ $MultiHostVar1 = 'new' ] || [ $MultiHostVar1 = 'reinstall' ] 
-        then
+	if [ $MultiHostVar1 = 'new' ] || [ $MultiHostVar1 = 'reinstall' ]
+	then
 		if [ $Release -gt 6 ]
 		then
                 	SwitchList='sw2 sw3 sw4 sw5 sw6 sw7 sw8 sw9'

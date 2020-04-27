@@ -298,11 +298,11 @@ echo 'Page Size (in bytes) .................. '$PageSize
 
 ((shmall = MemOracleBytes / 4096))
 echo 'shmall (in 4Kb pages) ................. '$shmall
-sudo sysctl -w kernel.shmall=$shmall
+sudo sysctl -q -w kernel.shmall=$shmall
 
 ((shmmax = MemOracleBytes / 2))
 echo 'shmmax (in bytes) ..................... '$shmmax
-sudo sysctl -w kernel.shmmax=$shmmax
+sudo sysctl -q -w kernel.shmmax=$shmmax
 
 sudo sh -c "echo '# New Stack Settings'                       > /etc/sysctl.d/60-oracle.conf"
 sudo sh -c "echo ''                                          >> /etc/sysctl.d/60-oracle.conf"
@@ -351,44 +351,85 @@ sleep 5
 
 clear
 
-if [ $Release -gt 6 ]
+if [ $LinuxFlavor = 'Ubuntu' ]
 then
-	echo ''
-	echo "=============================================="
-	echo "Create 60-oracle.service in systemd...        "
-	echo "=============================================="
-	echo ''
-
-	if [ ! -f /etc/systemd/system/60-oracle.service ]
+	if [ $UbuntuMajorVersion -ge 15 ]
 	then
-		sudo sh -c "echo '[Unit]'                                    			 > /etc/systemd/system/60-oracle.service"
-		sudo sh -c "echo 'Description=60-oracle Service'            			>> /etc/systemd/system/60-oracle.service"
-		sudo sh -c "echo 'After=network.target'                     			>> /etc/systemd/system/60-oracle.service"
-		sudo sh -c "echo ''                                         			>> /etc/systemd/system/60-oracle.service"
-		sudo sh -c "echo '[Service]'                                			>> /etc/systemd/system/60-oracle.service"
-		sudo sh -c "echo 'Type=oneshot'                             			>> /etc/systemd/system/60-oracle.service"
-		sudo sh -c "echo 'User=root'                                			>> /etc/systemd/system/60-oracle.service"
-		sudo sh -c "echo 'RemainAfterExit=yes'                      			>> /etc/systemd/system/60-oracle.service"
-		sudo sh -c "echo 'ExecStart=/usr/sbin/sysctl -p /etc/sysctl.d/60-oracle.conf'	>> /etc/systemd/system/60-oracle.service"
-		sudo sh -c "echo ''                                         			>> /etc/systemd/system/60-oracle.service"
-		sudo sh -c "echo '[Install]'                                			>> /etc/systemd/system/60-oracle.service"
-		sudo sh -c "echo 'WantedBy=multi-user.target'               			>> /etc/systemd/system/60-oracle.service"
+		echo ''
+		echo "=============================================="
+		echo "Create 60-oracle.service in systemd...        "
+		echo "=============================================="
+		echo ''
 
-		sudo chmod 644 /etc/systemd/system/60-oracle.service
-		sudo systemctl enable 60-oracle
+		if [ ! -f /etc/systemd/system/60-oracle.service ]
+		then
+			sudo sh -c "echo '[Unit]'                                    			 > /etc/systemd/system/60-oracle.service"
+			sudo sh -c "echo 'Description=60-oracle Service'            			>> /etc/systemd/system/60-oracle.service"
+			sudo sh -c "echo 'After=network.target'                     			>> /etc/systemd/system/60-oracle.service"
+			sudo sh -c "echo ''                                         			>> /etc/systemd/system/60-oracle.service"
+			sudo sh -c "echo '[Service]'                                			>> /etc/systemd/system/60-oracle.service"
+			sudo sh -c "echo 'Type=oneshot'                             			>> /etc/systemd/system/60-oracle.service"
+			sudo sh -c "echo 'User=root'                                			>> /etc/systemd/system/60-oracle.service"
+			sudo sh -c "echo 'RemainAfterExit=yes'                      			>> /etc/systemd/system/60-oracle.service"
+			sudo sh -c "echo 'ExecStart=/usr/sbin/sysctl -p /etc/sysctl.d/60-oracle.conf'	>> /etc/systemd/system/60-oracle.service"
+			sudo sh -c "echo ''                                         			>> /etc/systemd/system/60-oracle.service"
+			sudo sh -c "echo '[Install]'                                			>> /etc/systemd/system/60-oracle.service"
+			sudo sh -c "echo 'WantedBy=multi-user.target'               			>> /etc/systemd/system/60-oracle.service"
+
+			sudo chmod 644 /etc/systemd/system/60-oracle.service
+			sudo systemctl enable 60-oracle
+		fi
+
+		sudo cat /etc/systemd/system/60-oracle.service
+
+		echo ''
+		echo "=============================================="
+		echo "Created 60-oracle.service in systemd.         "
+		echo "=============================================="
 	fi
-
-	sudo cat /etc/systemd/system/60-oracle.service
-
-	echo ''
-	echo "=============================================="
-	echo "Created 60-oracle.service in systemd.         "
-	echo "=============================================="
-
-	sleep 5
-
-	clear
 fi
+
+if [ $LinuxFlavor = 'Oracle' ] || [ $LinuxFlavor = 'CentOS' ] || [ $LinuxFlavor = 'Red' ]
+then
+	if [ $Release -gt 6 ]
+	then
+		echo ''
+		echo "=============================================="
+		echo "Create 60-oracle.service in systemd...        "
+		echo "=============================================="
+		echo ''
+
+		if [ ! -f /etc/systemd/system/60-oracle.service ]
+		then
+			sudo sh -c "echo '[Unit]'                                    			 > /etc/systemd/system/60-oracle.service"
+			sudo sh -c "echo 'Description=60-oracle Service'            			>> /etc/systemd/system/60-oracle.service"
+			sudo sh -c "echo 'After=network.target'                     			>> /etc/systemd/system/60-oracle.service"
+			sudo sh -c "echo ''                                         			>> /etc/systemd/system/60-oracle.service"
+			sudo sh -c "echo '[Service]'                                			>> /etc/systemd/system/60-oracle.service"
+			sudo sh -c "echo 'Type=oneshot'                             			>> /etc/systemd/system/60-oracle.service"
+			sudo sh -c "echo 'User=root'                                			>> /etc/systemd/system/60-oracle.service"
+			sudo sh -c "echo 'RemainAfterExit=yes'                      			>> /etc/systemd/system/60-oracle.service"
+			sudo sh -c "echo 'ExecStart=/usr/sbin/sysctl -p /etc/sysctl.d/60-oracle.conf'	>> /etc/systemd/system/60-oracle.service"
+			sudo sh -c "echo ''                                         			>> /etc/systemd/system/60-oracle.service"
+			sudo sh -c "echo '[Install]'                                			>> /etc/systemd/system/60-oracle.service"
+			sudo sh -c "echo 'WantedBy=multi-user.target'               			>> /etc/systemd/system/60-oracle.service"
+
+			sudo chmod 644 /etc/systemd/system/60-oracle.service
+			sudo systemctl enable 60-oracle
+		fi
+
+		sudo cat /etc/systemd/system/60-oracle.service
+
+		echo ''
+		echo "=============================================="
+		echo "Created 60-oracle.service in systemd.         "
+		echo "=============================================="
+	fi
+fi
+
+sleep 5
+
+clear
 
 echo ''
 echo "=============================================="

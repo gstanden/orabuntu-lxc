@@ -135,7 +135,7 @@ fi
 
 echo ''
 echo "=============================================="
-echo "Script: Oracle 18c GI and DB Networking.      "
+echo "Script: BlackBerry Workspaces Networking.     "
 echo "=============================================="
 echo ''
 
@@ -143,13 +143,11 @@ sleep 5
 
 clear
 
-if [ $Product = 'oracle-gi-18c' ]
+if [ $Product = 'workspaces' ]
 then
 	echo 'LXC config file adjustments are configured for this product.'
 	echo "LXC config file adjustments can be configured in the product/$Product/$Product.cnf file"
 	echo ''
-#	sudo sed -i "s/\#marker//g" /var/lib/lxc/$ContainerPrefix$CloneIndex/config
-#	sudo sed -i "s/$ContainerPrefix$CloneIndex//g" /var/lib/lxc/$ContainerPrefix$CloneIndex/rootfs/etc/hosts
 fi
 
 sleep 5
