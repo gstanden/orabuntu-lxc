@@ -350,6 +350,7 @@ then
         echo "1.  Mary Standen			(mother)	(1934-2016)"
         echo "2.  Yelena Belyaeva-Standen		(spouse)	(1943-2020)"
         echo "3.  Allen the Cat			(cat)		(2001-2018)"
+        echo "4.  Noah the (replacement) Cat		(cat)		(2018-    )"
 	echo ''
 	echo "For their patience and support during the long hours worked in the past and the long hours to be worked in the future for Orabuntu-LXC."
 	echo "Mary Standen my mother always raised me to put mission first and work first."

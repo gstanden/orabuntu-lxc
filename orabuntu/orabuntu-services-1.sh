@@ -2542,7 +2542,6 @@ then
 
 	NameServerBase=$(GetNameServerBase)
 
-	sudo sh -c "cat '/var/lib/lxc/$NameServerBase/snaps/snap0/overlay/delta/root/.ssh/id_rsa.pub' >> /home/amide/.ssh/authorized_keys"
 	sudo sh -c "cat '/var/lib/lxc/$NameServerBase/overlay/delta/root/.ssh/id_rsa.pub'             >> /home/amide/.ssh/authorized_keys"
 
 #	sudo sh -c "cat '/var/lib/lxc/$NameServerBase/delta0/root/.ssh/id_rsa.pub' >> /home/amide/.ssh/authorized_keys"
