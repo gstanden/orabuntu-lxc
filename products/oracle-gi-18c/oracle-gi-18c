@@ -593,11 +593,17 @@ sudo lxc-attach -n $SeedContainerName -- usermod --password `perl -e "print cryp
 sudo lxc-attach -n $SeedContainerName -- usermod --password `perl -e "print crypt('oracle','oracle');"` oracle
 sudo lxc-attach -n $SeedContainerName -- usermod --password `perl -e "print crypt('root','root');"` root 
 sudo lxc-attach -n $SeedContainerName -- usermod -g oinstall oracle
-sudo lxc-attach -n $SeedContainerName -- chown oracle:oinstall /home/oracle/.bash_profile
-sudo lxc-attach -n $SeedContainerName -- chown oracle:oinstall /home/oracle/.bashrc
-sudo lxc-attach -n $SeedContainerName -- chown oracle:oinstall /home/oracle/.kshrc
-sudo lxc-attach -n $SeedContainerName -- chown oracle:oinstall /home/oracle/.bash_logout
-sudo lxc-attach -n $SeedContainerName -- chown oracle:oinstall /home/oracle/.
+
+# The Oracle Linux images that LXC is using apparently don't have an oracle user so for now just redirecting this to avoid error messages on the chown.
+# Longer-term need to decide whether to go ahead and create the oracle user on the images as is done with grid.
+# This would require making some decisions about what groups, uid to assign, so its debateable whether to automate this or leave it to end user to create oracle (or another user) to own the database install.
+# GLS 2020-04-28
+
+sudo lxc-attach -n $SeedContainerName -- chown oracle:oinstall /home/oracle/.bash_profile	> /dev/null 2>&1
+sudo lxc-attach -n $SeedContainerName -- chown oracle:oinstall /home/oracle/.bashrc		> /dev/null 2>&1
+sudo lxc-attach -n $SeedContainerName -- chown oracle:oinstall /home/oracle/.kshrc		> /dev/null 2>&1
+sudo lxc-attach -n $SeedContainerName -- chown oracle:oinstall /home/oracle/.bash_logout	> /dev/null 2>&1
+sudo lxc-attach -n $SeedContainerName -- chown oracle:oinstall /home/oracle/.			> /dev/null 2>&1
 sudo lxc-attach -n $SeedContainerName -- chown grid:oinstall /home/grid/.bash_profile
 sudo lxc-attach -n $SeedContainerName -- chown grid:oinstall /home/grid/.bashrc
 sudo lxc-attach -n $SeedContainerName -- chown grid:oinstall /home/grid/.kshrc

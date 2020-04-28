@@ -227,11 +227,30 @@ echo ''
 
 sleep 5
 
+function ConfirmContainerCreated {
+	sudo lxc-ls -f | grep oel$OracleRelease$SeedPostfix | wc -l
+}
+ContainerCreated=$(ConfirmContainerCreated)
+
+n=1
+
 if [ $UbuntuMajorVersion -ge 20 ]
 then
-	sudo lxc-create -t download -n oel$OracleRelease$SeedPostfix -- --dist oracle --release $MajorRelease --arch amd64
+	while [ $ContainerCreated -eq 0 ] && [ $n -le 5 ]
+	do
+		sudo lxc-create -t download -n oel$OracleRelease$SeedPostfix -- --dist oracle --release $MajorRelease --arch amd64
+		sleep 5
+		n=$((n+1))
+		ContainerCreated=$(ConfirmContainerCreated)
+	done
 else
-	sudo lxc-create -n oel$OracleRelease$SeedPostfix -t oracle -- --release=$OracleVersion
+	while [ $ContainerCreated -eq 0 ] && [ $n -le 5 ]
+	do
+		sudo lxc-create -n oel$OracleRelease$SeedPostfix -t oracle -- --release=$OracleVersion
+		sleep 5
+		n=$((n+1))
+		ContainerCreated=$(ConfirmContainerCreated)
+	done
 fi
 
 if [ $(SoftwareVersion $LXCVersion) -ge $(SoftwareVersion "2.1.0") ]

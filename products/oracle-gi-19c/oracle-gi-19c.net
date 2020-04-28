@@ -85,6 +85,7 @@ then
         	Release=$OracleDistroRelease
         	LF=$LinuxFlavor
         	RL=$Release
+		UbuntuMajorVersion=0
 	elif [ $LinuxFlavor = 'Red' ] || [ $LinuxFlavor = 'CentOS' ]
 	then
         	if   [ $LinuxFlavor = 'Red' ]
@@ -102,6 +103,7 @@ then
         	Release=$RedHatVersion
         	LF=$LinuxFlavor
         	RL=$Release
+		UbuntuMajorVersion=0
 	elif [ $LinuxFlavor = 'Fedora' ]
 	then
         	CutIndex=3
@@ -119,6 +121,7 @@ then
         	fi
         	LF=$LinuxFlavor
         	RL=$Release
+		UbuntuMajorVersion=0
 	elif [ $LinuxFlavor = 'Ubuntu' ]
 	then
         	function GetUbuntuVersion {
@@ -131,11 +134,12 @@ then
                 	cat /etc/lsb-release | grep DISTRIB_RELEASE | cut -f2 -d'=' | cut -f1 -d'.'
         	}
         	UbuntuMajorVersion=$(GetUbuntuMajorVersion)
+		Release=0
 	fi
 
 	if [ $MultiHostVar1 = 'new' ] || [ $MultiHostVar1 = 'reinstall' ]
 	then
-		if [ $Release -gt 6 ]
+		if [ $Release -gt 6 ] || [ $UbuntuMajorVersion -ge 15 ]
 		then
                 	SwitchList='sw2 sw3 sw4 sw5 sw6 sw7 sw8 sw9'
                 	for k in $SwitchList

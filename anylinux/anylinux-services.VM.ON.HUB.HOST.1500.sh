@@ -125,7 +125,7 @@ fi
 
 if [ -z $2 ]
 then
-        SPOKEIP=10.209.53.193
+        SPOKEIP=10.209.53.14
 else
         SPOKEIP=$2
 fi
@@ -155,8 +155,8 @@ if [ -z $6 ]
 then
         Product=workspaces
         Product=no-product
-        Product=oracle-gi-18c
         Product=oracle-db
+        Product=oracle-gi-18c
 else
         Product=$6
 fi

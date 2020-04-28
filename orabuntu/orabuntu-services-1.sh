@@ -1494,7 +1494,7 @@ then
 				sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /etc/NetworkManager/dnsmasq.d/local
 			fi
 			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /etc/network/openvswitch/crt_ovs_sw1.sh
-			if [ $SystemdResolvedInstalled -gt 0 ]
+			if [ $SystemdResolvedInstalled -ge 1 ]
 			then
 				sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /etc/systemd/resolved.conf > /dev/null 2>&1
 			fi
@@ -1519,7 +1519,7 @@ then
 				sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /etc/NetworkManager/dnsmasq.d/local
 			fi
 			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /etc/network/openvswitch/crt_ovs_sw1.sh
-			if [ $SystemdResolvedInstalled -gt 0 ]
+			if [ $SystemdResolvedInstalled -ge 1 ]
 			then
 				sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /etc/systemd/resolved.conf > /dev/null 2>&1
 			fi
@@ -1532,7 +1532,7 @@ then
 			sudo mv /var/lib/lxc/$NameServer/rootfs/var/lib/bind/fwd.consultingcommandos.us /var/lib/lxc/$NameServer/rootfs/var/lib/bind/fwd.$Domain2
 			sudo mv /var/lib/lxc/$NameServer/rootfs/var/lib/bind/rev.consultingcommandos.us /var/lib/lxc/$NameServer/rootfs/var/lib/bind/rev.$Domain2
 		fi
-	elif [ $MultiHostVar2 = 'Y' ] && [ $SystemdResolvedInstalled -gt 0 ]
+	elif [ $MultiHostVar2 = 'Y' ] && [ $SystemdResolvedInstalled -ge 1 ]
 	then
 			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /etc/systemd/resolved.conf
 			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /etc/systemd/resolved.conf
@@ -2006,7 +2006,7 @@ clear
 
 # if   [ $SystemdResolvedInstalled -eq 1 ] && [ $NetworkManagerInstalled -eq 1 ] && [ $UbuntuVersion != '16.04' ]
 
-if   [ $SystemdResolvedInstalled -eq 1 ]
+if   [ $SystemdResolvedInstalled -ge 1 ]
 then
 	echo ''
 	echo "=============================================="
@@ -3005,7 +3005,7 @@ then
 	sudo sh -c "echo ' ln -sf /etc/NetworkManager/NetworkManager.conf .' 				   >> /etc/orabuntu-lxc-scripts/crt_links.sh"
 fi
 
-if	[ $SystemdResolvedInstalled -eq 1 ]
+if	[ $SystemdResolvedInstalled -ge 1 ]
 then
 	sudo sh -c "echo ' ln -sf /etc/systemd/resolved.conf .' 					   >> /etc/orabuntu-lxc-scripts/crt_links.sh"
 fi
