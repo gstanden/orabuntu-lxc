@@ -1093,13 +1093,17 @@ then
 	echo "=============================================="
 	echo ''
 
-	sudo lxc-attach -n nsa -- sudo mkdir     /root/backup-lxc-container/$NameServerBase/updates
+	sudo lxc-attach -n nsa -- sudo mkdir -p /root/backup-lxc-container/$NameServerBase/updates
 
 	echo ''
 	echo "=============================================="
 	echo "Done: Create DNS Replication Landing Zone.    "
 	echo "=============================================="
 	echo ''
+
+	sleep 5
+
+	clear
 
 	echo ''
 	echo "=============================================="
@@ -2480,7 +2484,7 @@ then
 
         clear
 
-	sudo sh -c "echo 'amide ALL=/bin/mkdir, /bin/cp' > /etc/sudoers.d/amide"
+	sudo sh -c "echo 'amide ALL=/bin/mkdir, /bin/cp, /bin/chown, /bin/mv' > /etc/sudoers.d/amide"
 	sudo chmod 0440 /etc/sudoers.d/amide
 
 	sudo lxc-attach -n $NameServer -- crontab /root/crontab.txt
