@@ -1089,6 +1089,20 @@ then
 
 	echo ''
 	echo "=============================================="
+	echo "Create DNS Replication Landing Zone ...       "
+	echo "=============================================="
+	echo ''
+
+	sudo lxc-attach -n nsa -- sudo mkdir     /root/backup-lxc-container/$NameServerBase/updates
+
+	echo ''
+	echo "=============================================="
+	echo "Done: Create DNS Replication Landing Zone.    "
+	echo "=============================================="
+	echo ''
+
+	echo ''
+	echo "=============================================="
 	echo "DNS DHCP installed in LXC container.          "
 	echo "=============================================="
 
