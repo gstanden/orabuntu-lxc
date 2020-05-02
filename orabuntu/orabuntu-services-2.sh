@@ -180,7 +180,7 @@ SeedIndex=10
 SeedPostfix=c$SeedIndex
 
 function CheckHighestSeedIndexHit {
-        sudo nslookup -timeout=1 oel$OracleRelease$SeedPostfix | grep -v '#' | grep Address | grep '10\.207\.29' | wc -l
+        sudo nslookup -timeout=10 oel$OracleRelease$SeedPostfix | grep -v '#' | grep Address | grep '10\.207\.29' | wc -l
 }
 HighestSeedIndexHit=$(CheckHighestSeedIndexHit)
 

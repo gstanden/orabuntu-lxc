@@ -582,7 +582,7 @@ then
 	}
 	ShortHost=$(GetShortHost)
 	
-	sudo nslookup -timeout=1 $HOSTNAME.$Domain1 > /dev/null 2>&1
+	sudo nslookup -timeout=10 $HOSTNAME.$Domain1 > /dev/null 2>&1
 	if [ $? -eq 1 ]
 	then
 	      	echo ''
@@ -608,7 +608,7 @@ then
 		clear
 	fi
 	
-	sudo nslookup -timeout=1 $HOSTNAME.$Domain2 > /dev/null 2>&1
+	sudo nslookup -timeout=10 $HOSTNAME.$Domain2 > /dev/null 2>&1
 	if [ $? -eq 1 ]
 	then
 	      	echo ''
@@ -686,7 +686,7 @@ then
 	echo "=============================================="
 	echo ''
 	
-	sudo nslookup $ShortHost.$Domain1
+	sudo nslookup -timeout=10 $ShortHost.$Domain1
 	
 	echo "=============================================="
 	echo "Done: nslookup $ShortHost.$Domain1            "
@@ -702,7 +702,7 @@ then
 	echo "=============================================="
 	echo ''
 	
-	sudo nslookup $ShortHost.$Domain2
+	sudo nslookup -timeout=10 $ShortHost.$Domain2
 	
 	echo "=============================================="
 	echo "Done: nslookup $ShortHost.$Domain2            "

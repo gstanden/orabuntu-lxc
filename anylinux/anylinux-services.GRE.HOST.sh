@@ -101,7 +101,7 @@ fi
 if [ -z $2 ]
 then
 	SPOKEIP='lan.ip.this.host'
- 	SPOKEIP=192.168.7.149
+ 	SPOKEIP=192.168.1.92
 else
 	SPOKEIP=$2
 fi
@@ -109,7 +109,7 @@ fi
 if [ -z $3 ]
 then
 	HUBIP='lan.ip.hub.host'
- 	HUBIP=192.168.7.151
+ 	HUBIP=192.168.1.105
 else
 	HUBIP=$3
 fi
@@ -117,7 +117,7 @@ fi
 if [ -z $4 ]
 then
 	HubUserAct=username
- 	HubUserAct=orabuntu
+ 	HubUserAct=ubuntu
 else
 	HubUserAct=$4
 fi
@@ -125,7 +125,7 @@ fi
 if [ -z $5 ]
 then
 	HubSudoPwd=password
- 	HubSudoPwd=orabuntu
+ 	HubSudoPwd=ubuntu
 else
 	HubSudoPwd=$5
 fi
@@ -134,8 +134,8 @@ if [ -z $6 ]
 then
         Product=no-product
  	Product=workspaces
-	Product=oracle-gi-18c
  	Product=oracle-db
+	Product=oracle-gi-18c
 else
 	Product=$6
 fi

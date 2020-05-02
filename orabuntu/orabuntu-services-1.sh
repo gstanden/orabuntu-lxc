@@ -1797,6 +1797,11 @@ fi
 
 sudo chmod 755 /etc/network/openvswitch/*.sh
 
+function GetNameServerShortName {
+	echo $NameServer | cut -f1 -d'-'
+}
+NameServerShortName=$(GetNameServerShortName)
+
 if   [ $MultiHostVar3 = 'X' ]
 then
         echo ''
@@ -1810,7 +1815,7 @@ then
         
 	Sx1Index=201
         function CheckHighestSx1IndexHit {
-                sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" nslookup -timeout=1 $Sx1Net.$Sx1Index" | grep -c 'name ='
+                sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" lxc-attach -n $NameServerShortName -- nslookup -timeout=10 $Sx1Net.$Sx1Index" | grep -c 'name ='
         }
         HighestSx1IndexHit=$(CheckHighestSx1IndexHit)
 
@@ -1831,7 +1836,7 @@ then
         
         Sw1Index=201
         function CheckHighestSw1IndexHit {
-                sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" nslookup -timeout=1 $Sw1Net.$Sw1Index" | grep -c 'name ='
+                sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" lxc-attach -n $NameServerShortName -- nslookup -timeout=10 $Sw1Net.$Sw1Index" | grep -c 'name ='
         }
         HighestSw1IndexHit=$(CheckHighestSw1IndexHit)
 
@@ -2729,7 +2734,7 @@ then
 		sudo ifconfig sw1 mtu $MultiHostVar7
 		sudo ifconfig sx1 mtu $MultiHostVar7
 
-                sudo nslookup -timeout=5 $HOSTNAME.$Domain1 > /dev/null 2>&1
+                sudo nslookup -timeout=10 $HOSTNAME.$Domain1 > /dev/null 2>&1
                 if [ $? -eq 1 ]
                 then
                         echo ''
@@ -2787,7 +2792,7 @@ then
 
                 fi
 
-                sudo nslookup -timeout=5 $HOSTNAME.$Domain2 > /dev/null 2>&1
+                sudo nslookup -timeout=10 $HOSTNAME.$Domain2 > /dev/null 2>&1
                 if [ $? -eq 1 ]
                 then
                         echo ''
