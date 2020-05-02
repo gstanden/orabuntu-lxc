@@ -101,7 +101,7 @@ fi
 if [ -z $2 ]
 then
 	SPOKEIP='lan.ip.this.host'
- 	SPOKEIP=192.168.1.92
+ 	SPOKEIP=192.168.1.109
 else
 	SPOKEIP=$2
 fi
