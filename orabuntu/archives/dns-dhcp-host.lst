@@ -1,7 +1,6 @@
 /etc/network/if-down.d/openvswitch/nsa-pub-ifdown-sw1
 /etc/network/if-down.d/openvswitch/nsa-pub-ifdown-sx1
 /etc/network/if-up.d/orabuntu-lxc-net
-/etc/NetworkManager/dnsmasq.d/local
 /etc/network/openvswitch/create-ovs-sw-files-v2.sh
 /etc/network/openvswitch/crt_ovs_sw4.sh
 /etc/network/openvswitch/crt_ovs_sw5.sh
@@ -16,9 +15,11 @@
 /etc/network/if-up.d/openvswitch/nsa-pub-ifup-sw1
 /etc/network/openvswitch/setup_gre_and_routes.sh
 /etc/network/openvswitch/ns_restore.sh
-/etc/network/openvswitch/crt_ovs_sx1.sh
-/etc/network/openvswitch/crt_ovs_sw1.sh
 /etc/network/openvswitch/crt_ovs_sw2.sh
 /etc/network/openvswitch/crt_ovs_sw3.sh
+/etc/network/openvswitch/crt_ovs_sw1.sh
+/etc/network/openvswitch/crt_ovs_sx1.sh
+/etc/NetworkManager/dnsmasq.d/orabuntu-local
+/etc/NetworkManager/conf.d/orabuntu-dnsmasq.conf
 /etc/GNU3
 /etc/COPYING

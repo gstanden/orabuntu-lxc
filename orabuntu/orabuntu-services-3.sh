@@ -402,7 +402,7 @@ echo "Container $SeedContainerName ping test...     "
 echo "=============================================="
 echo ''
 
-if [ $SystemdResolvedInstalled -eq 1 ] && [ $UbuntuVersion != '16.04' ]
+if [ $SystemdResolvedInstalled -eq 1 ]
 then
 	sudo service systemd-resolved restart
 fi

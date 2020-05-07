@@ -152,11 +152,6 @@ sleep 5
 
 clear
 
-function CheckSystemdResolvedInstalled {
-	sudo netstat -ulnp | grep 53 | sed 's/  */ /g' | rev | cut -f1 -d'/' | rev | sort -u | grep systemd- | wc -l
-}
-SystemdResolvedInstalled=$(CheckSystemdResolvedInstalled)
-
 GetLinuxFlavors(){
 if   [[ -e /etc/oracle-release ]]
 then
@@ -226,6 +221,37 @@ sleep 5
 
 clear
 
+echo ''
+echo "=============================================="
+echo "Activate systemd-resolved ...                 "
+echo "=============================================="
+echo 
+
+if [ $UbuntuVersion = '16.04' ]
+then
+	sudo systemctl enable systemd-resolved
+	echo ''
+	sudo systemctl start  systemd-resolved
+	echo ''
+	sudo service systemd-resolved status | cat
+	echo ''
+fi
+
+echo ''
+echo "=============================================="
+echo "Done: Activate systemd-resolved.              "
+echo "=============================================="
+
+sleep 5
+
+clear
+
+function CheckSystemdResolvedInstalled {
+	sudo netstat -ulnp | grep 53 | sed 's/  */ /g' | rev | cut -f1 -d'/' | rev | sort -u | grep systemd- | wc -l
+}
+SystemdResolvedInstalled=$(CheckSystemdResolvedInstalled)
+
+echo ''
 echo ''
 echo "=============================================="
 echo "Script:  orabuntu-services-1.sh               "
@@ -334,7 +360,7 @@ echo ''
 
 sleep 5
 
-sudo apt-get install -y openssh-server
+sudo apt-get install -y openssh-server >/dev/null 2>&1
 
 sudo sed -i '/GSSAPIAuthentication/s/yes/no/'                                /etc/ssh/sshd_config
 sudo sed -i '/UseDNS/s/yes/no/'                                              /etc/ssh/sshd_config
@@ -709,7 +735,7 @@ sudo apt-get install -y ruby
 
 if [ $UbuntuMajorVersion -lt 20 ]
 then
-	sudo apt-get install yum hugepages
+	sudo apt-get -y install yum hugepages
 fi
 
 if [ $NetworkManagerInstalled -eq 1 ] && [ $SystemdResolvedInstalled -eq 0 ]
@@ -977,6 +1003,11 @@ function GetLXCVersion {
 }
 LXCVersion=$(GetLXCVersion)
 
+function ConfirmContainerCreated {
+        sudo lxc-ls -f | grep nsa | wc -l
+}
+ContainerCreated=$(ConfirmContainerCreated)
+
 if [ $NameServerExists -eq 0 ] && [ $MultiHostVar2 = 'N' ]
 then
 	echo ''
@@ -991,7 +1022,15 @@ then
 	echo "=============================================="
 	echo ''
 
-	sudo lxc-create -t download -n nsa -- --dist ubuntu --release xenial --arch amd64
+	n=1
+
+	while [ $ContainerCreated -eq 0 ] && [ $n -le 5 ]
+	do
+		sudo lxc-create -t download -n nsa -- --dist ubuntu --release xenial --arch amd64
+		sleep 5
+		n=$((n+1))
+		ContainerCreated=$(ConfirmContainerCreated)
+	done
 	
 	if [ $(SoftwareVersion $LXCVersion) -ge $(SoftwareVersion "2.1.0") ]
 	then
@@ -1004,7 +1043,15 @@ then
 	echo "=============================================="
 	echo ''
 	
-	sudo lxc-create -n nsa -t ubuntu -- --release xenial --arch amd64
+	n=1
+
+	while [ $ContainerCreated -eq 0 ] && [ $n -le 5 ]
+	do
+		sudo lxc-create -n nsa -t ubuntu -- --release xenial --arch amd64
+		sleep 5
+		n=$((n+1))
+		ContainerCreated=$(ConfirmContainerCreated)
+	done
 
 	if [ $(SoftwareVersion $LXCVersion) -ge $(SoftwareVersion "2.1.0") ]
 	then
@@ -1150,10 +1197,10 @@ echo ''
 
 sudo tar -xvf /opt/olxc/"$DistDir"/orabuntu/archives/ubuntu-host.tar -C / --touch
 
-if	[ $SystemdResolvedInstalled -eq 0 ]
-then
-	sudo rm /etc/systemd/resolved.conf
-fi
+# if	[ $SystemdResolvedInstalled -eq 0 ]
+# then
+# 	sudo rm /etc/systemd/resolved.conf
+# fi
 
 echo ''
 echo "=============================================="
@@ -1418,7 +1465,7 @@ then
 	then
 		if [ $NetworkManagerInstalled -eq 1 ]
 		then
-			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /etc/NetworkManager/dnsmasq.d/local
+			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /etc/NetworkManager/dnsmasq.d/orabuntu-local
 		fi
 		sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /etc/network/openvswitch/crt_ovs_sw1.sh
 	fi
@@ -1427,7 +1474,7 @@ then
 	then
 		if [ $NetworkManagerInstalled -eq 1 ]
 		then
-			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /etc/NetworkManager/dnsmasq.d/local
+			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /etc/NetworkManager/dnsmasq.d/orabuntu-local
 		fi
 		sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /etc/network/openvswitch/crt_ovs_sw1.sh
 	fi
@@ -1507,16 +1554,20 @@ then
 			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/var/lib/bind/fwd.orabuntu-lxc.com
 			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/var/lib/bind/rev.orabuntu-lxc.com
 			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/etc/resolv.conf			> /dev/null 2>&1
+			
 			if [ $NetworkManagerInstalled -eq 1 ]
 			then
-				sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /etc/NetworkManager/dnsmasq.d/local
+				sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /etc/NetworkManager/dnsmasq.d/orabuntu-local
 			fi
+			
 			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /etc/network/openvswitch/crt_ovs_sw1.sh
+			
 			if [ $SystemdResolvedInstalled -ge 1 ]
 			then
 				sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /etc/systemd/resolved.conf > /dev/null 2>&1
 			fi
-#			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /run/systemd/resolve/stub-resolv.conf
+#			
+			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /run/systemd/resolve/stub-resolv.conf
 			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/etc/bind/named.conf.local
 			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/etc/dhcp/dhcpd.conf
 			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/etc/network/interfaces
@@ -1532,15 +1583,19 @@ then
 			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /var/lib/lxc/$NameServer/rootfs/var/lib/bind/fwd.consultingcommandos.us
 			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /var/lib/lxc/$NameServer/rootfs/var/lib/bind/rev.consultingcommandos.us
 			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /var/lib/lxc/$NameServer/rootfs/etc/resolv.conf	> /dev/null 2>&1
+			
 			if [ $NetworkManagerInstalled -eq 1 ]
 			then
-				sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /etc/NetworkManager/dnsmasq.d/local
+				sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /etc/NetworkManager/dnsmasq.d/orabuntu-local
 			fi
+			
 			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /etc/network/openvswitch/crt_ovs_sw1.sh
+			
 			if [ $SystemdResolvedInstalled -ge 1 ]
 			then
 				sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /etc/systemd/resolved.conf > /dev/null 2>&1
 			fi
+
 #			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /run/systemd/resolve/stub-resolv.conf
 			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /var/lib/lxc/$NameServer/rootfs/etc/bind/named.conf.local
 			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /var/lib/lxc/$NameServer/rootfs/etc/dhcp/dhcpd.conf
@@ -1552,20 +1607,18 @@ then
 		fi
 	elif [ $MultiHostVar2 = 'Y' ] && [ $SystemdResolvedInstalled -ge 1 ]
 	then
-			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /etc/systemd/resolved.conf
-			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /etc/systemd/resolved.conf
+			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" 		/etc/systemd/resolved.conf
+			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" 	/etc/systemd/resolved.conf
 	fi
 
 	# Cleanup duplicate search lines in /etc/resolv.conf if Orabuntu-LXC has been re-run
+	
 	if [ $NetworkManagerInstalled -eq 1 ]
 	then
-		sudo sed -i '$!N; /^\(.*\)\n\1$/!P; D'	/etc/resolv.conf								> /dev/null 2>&1
+		sudo sed -i '$!N; /^\(.*\)\n\1$/!P; D'	/etc/resolv.conf				> /dev/null 2>&1
 	fi
 
-	if [ $UbuntuVersion != '16.04' ]
-	then
-		sudo service systemd-resolved restart
-	fi
+	sudo service systemd-resolved restart
 
 	sudo cat /etc/resolv.conf
 
@@ -1576,7 +1629,7 @@ then
 	echo "Done:  Customize and display.                 "
 	echo "=============================================="
 			
-	sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /etc/systemd/resolved.conf > /dev/null 2>&1
+	sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /etc/systemd/resolved.conf 	> /dev/null 2>&1
 fi
 
 sleep 5
@@ -1591,7 +1644,7 @@ then
 	echo "=============================================="
 	echo ''
 
-	# So that settings in /etc/NetworkManager/dnsmasq.d/local & /etc/NetworkManager/NetworkManager.conf take effect.
+	# So that settings in /etc/NetworkManager/dnsmasq.d/orabuntu-local & /etc/NetworkManager/NetworkManager.conf take effect.
 
 	sudo cat /etc/resolv.conf
 	sudo sed -i '/plugins=ifupdown,keyfile/a dns=dnsmasq' /etc/NetworkManager/NetworkManager.conf
@@ -1632,8 +1685,6 @@ fi
 sleep 5
 
 clear
-
-# if [ $UbuntuVersion = '16.04' ] && [ $SystemdResolvedInstalled -eq 0 ] && [ $MultiHostVar1 = 'new' ] && [ $MultiHostVar2 = 'N' ]
 
 if [ $UbuntuVersion = '16.04' ] && [ $SystemdResolvedInstalled -eq 0 ]
 then
@@ -1747,24 +1798,24 @@ then
 
 	if [ $AWS -eq 1 ]
         then
-		sudo sed -i '/#/d'										/etc/resolv.conf
-                sudo sed -i '/search/d' 									/etc/resolv.conf
-		sudo sed -i '/127.0.0.1/!s/nameserver/# nameserver/g'   					/etc/resolv.conf
+		sudo sed -i '/#/d'										   /etc/resolv.conf
+                sudo sed -i '/search/d' 									   /etc/resolv.conf
+		sudo sed -i '/127.0.0.1/!s/nameserver/# nameserver/g'   					   /etc/resolv.conf
 		sudo sh  -c "echo 'nameserver 127.0.0.1' 							>> /etc/resolv.conf"
                 sudo sh  -c "echo 'search $ExistingSearchDomains $Domain1 $Domain2 gns1.$Domain1' 		>> /etc/resolv.conf"
-		sudo sed -i "/supersede domain-name/c\append domain-name \" $Domain1 $Domain2 gns1.$Domain1\"" /etc/dhcp/dhclient.conf
-		sudo sed -i '/8.8.8.8/d' 									/etc/resolv.conf
-		sudo sed -i '$!N; /^\(.*\)\n\1$/!P; D'  							/etc/resolv.conf
+		sudo sed -i "/supersede domain-name/c\append domain-name \" $Domain1 $Domain2 gns1.$Domain1\""     /etc/dhcp/dhclient.conf
+		sudo sed -i '/8.8.8.8/d' 									   /etc/resolv.conf
+		sudo sed -i '$!N; /^\(.*\)\n\1$/!P; D'  							   /etc/resolv.conf
         fi
 
         if [ $AWS -eq 0 ] && [ $SearchDomain1 -eq 0 ]
         then
-                sudo sed -i '/search/d' 									/etc/resolv.conf
-		sudo sed -i '/127.0.0.1/!s/nameserver/# nameserver/g'   					/etc/resolv.conf
-                sudo sh -c "echo 'search $Domain1 $Domain2 gns1.$Domain1' >> 					/etc/resolv.conf"
-		sudo sed -i "/supersede domain-name/c\append domain-name \" $Domain1 $Domain2 gns1.$Domain1\"" 	/etc/dhcp/dhclient.conf
-                sudo sed -i "/prepend domain-name-servers/s/#//"  						/etc/dhcp/dhclient.conf
-		sudo sed -i '$!N; /^\(.*\)\n\1$/!P; D'  							/etc/resolv.conf
+                sudo sed -i '/search/d' 									   /etc/resolv.conf
+		sudo sed -i '/127.0.0.1/!s/nameserver/# nameserver/g'   					   /etc/resolv.conf
+                sudo sh -c  "echo 'search $Domain1 $Domain2 gns1.$Domain1' >> 					   /etc/resolv.conf"
+		sudo sed -i "/supersede domain-name/c\append domain-name \" $Domain1 $Domain2 gns1.$Domain1\"" 	   /etc/dhcp/dhclient.conf
+                sudo sed -i "/prepend domain-name-servers/s/#//"  						   /etc/dhcp/dhclient.conf
+		sudo sed -i '$!N; /^\(.*\)\n\1$/!P; D'  							   /etc/resolv.conf
         fi
 
 
@@ -1793,6 +1844,11 @@ then
 	sleep 5
 
 	clear
+fi
+
+if [ $UbuntuMajorVersion -eq 16 ]
+then
+	sudo sh -c "echo 'append domain-name \" $Domain1 $Domain2 gns1.$Domain1\";' >> /etc/dhcp/dhclient.conf"
 fi
 
 sudo chmod 755 /etc/network/openvswitch/*.sh
@@ -2027,7 +2083,8 @@ sleep 5
 
 clear
 
-# if   [ $SystemdResolvedInstalled -eq 1 ] && [ $NetworkManagerInstalled -eq 1 ] && [ $UbuntuVersion != '16.04' ]
+sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" 							/etc/systemd/orabuntu-resolv.conf
+sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" 						/etc/systemd/orabuntu-resolv.conf
 
 if   [ $SystemdResolvedInstalled -ge 1 ]
 then
@@ -2037,30 +2094,32 @@ then
 	echo "=============================================="
 	echo ''
 
-	sudo sh -c "echo '[Unit]'                                                				 > /etc/systemd/system/systemd-resolved-helper.service"
-	sudo sh -c "echo 'Description=resolved Service'								>> /etc/systemd/system/systemd-resolved-helper.service"
-#	sudo sh -c "echo 'Wants=sw1.service sx1.service'							>> /etc/systemd/system/systemd-resolved-helper.service"
-#	sudo sh -c "echo 'After=sw1.service sx1.service'							>> /etc/systemd/system/systemd-resolved-helper.service"
-	sudo sh -c "echo ''											>> /etc/systemd/system/systemd-resolved-helper.service"
-	sudo sh -c "echo '[Service]'										>> /etc/systemd/system/systemd-resolved-helper.service"
-	sudo sh -c "echo 'Type=idle'										>> /etc/systemd/system/systemd-resolved-helper.service"
-	sudo sh -c "echo 'User=root'										>> /etc/systemd/system/systemd-resolved-helper.service"
-	sudo sh -c "echo 'RemainAfterExit=yes'									>> /etc/systemd/system/systemd-resolved-helper.service"
-	sudo sh -c "echo 'ExecStartPre=/bin/ln -sf /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf'	>> /etc/systemd/system/systemd-resolved-helper.service"
-	sudo sh -c "echo 'ExecStart=/usr/sbin/service systemd-resolved restart'					>> /etc/systemd/system/systemd-resolved-helper.service"
-	sudo sh -c "echo 'ExecStop=/usr/sbin/service systemd-resolved stop'					>> /etc/systemd/system/systemd-resolved-helper.service"
-	sudo sh -c "echo ''											>> /etc/systemd/system/systemd-resolved-helper.service"
-	sudo sh -c "echo '[Install]'										>> /etc/systemd/system/systemd-resolved-helper.service"
-	sudo sh -c "echo 'WantedBy=multi-user.target'								>> /etc/systemd/system/systemd-resolved-helper.service"
+	sudo sh -c "echo '[Unit]'                                                					 > /etc/systemd/system/systemd-resolved-helper.service"
+	sudo sh -c "echo 'Description=systemd-resolved-helper Service'							>> /etc/systemd/system/systemd-resolved-helper.service"
+#	sudo sh -c "echo 'Wants=sw1.service sx1.service'								>> /etc/systemd/system/systemd-resolved-helper.service"
+#	sudo sh -c "echo 'After=sw1.service sx1.service'								>> /etc/systemd/system/systemd-resolved-helper.service"
+	sudo sh -c "echo ''												>> /etc/systemd/system/systemd-resolved-helper.service"
+	sudo sh -c "echo '[Service]'											>> /etc/systemd/system/systemd-resolved-helper.service"
+	sudo sh -c "echo 'Type=idle'											>> /etc/systemd/system/systemd-resolved-helper.service"
+	sudo sh -c "echo 'User=root'											>> /etc/systemd/system/systemd-resolved-helper.service"
+	sudo sh -c "echo 'RemainAfterExit=yes'										>> /etc/systemd/system/systemd-resolved-helper.service"
+	sudo sh -c "echo 'ExecStart=/bin/ln -sf /etc/systemd/orabuntu-resolv.conf /etc/resolv.conf'			>> /etc/systemd/system/systemd-resolved-helper.service"
 
-#	sudo cp -p /etc/systemd/system/multi-user.target.wants/NetworkManager.service /etc/systemd/system/multi-user.target.wants/NetworkManager.service.original
+	if   [ $UbuntuMajorVersion -gt 16 ]
+	then
+		sudo sh -c "echo 'ExecStop=/bin/ln -sf /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf'		>> /etc/systemd/system/systemd-resolved-helper.service"
+	
+	elif [ $UbuntuMajorVersion -eq 16 ]
+	then
+		sudo sh -c "echo 'ExecStop=/bin/ln -sf /run/resolvconf/resolv.conf /etc/resolv.conf'			>> /etc/systemd/system/systemd-resolved-helper.service"
+	fi
 
-#	sudo sed -i '/systemd-resolved-helper/!s/Before=network.target/Before=network.target systemd-resolved-helper.service/g' /etc/systemd/system/multi-user.target.wants/NetworkManager.service
-#	sudo sed -i '/systemd-resolved-helper/!s/Wants=network.target/Wants=network.target systemd-resolved-helper.service/g' /etc/systemd/system/multi-user.target.wants/NetworkManager.service
+	sudo sh -c "echo ''												>> /etc/systemd/system/systemd-resolved-helper.service"
+	sudo sh -c "echo '[Install]'											>> /etc/systemd/system/systemd-resolved-helper.service"
+	sudo sh -c "echo 'WantedBy=multi-user.target'									>> /etc/systemd/system/systemd-resolved-helper.service"
 
 	sudo systemctl daemon-reload
 	sudo systemctl enable systemd-resolved-helper
-	sudo service systemd-resolved-helper stop
 	sudo service systemd-resolved-helper start
 
 	echo ''
@@ -2333,24 +2392,29 @@ then
         # Case 1 importing nameserver from an 2.1+ LXC enviro into a 2.0- LXC enviro.
 
         function CheckNameServerConfigFormat {
-                sudo grep -c lxc.net.0 /var/lib/lxc/$NameServer/config
+                sudo egrep -c 'lxc.net.0|lxc.net.1|lxc.uts.name|lxc.apparmor.profile' /var/lib/lxc/$NameServer/config
         }
         NameServerConfigFormat=$(CheckNameServerConfigFormat)
 
         function CheckNameServerBaseConfigFormat {
-                sudo grep -c lxc.net.0 /var/lib/lxc/"$NameServerBase"/config
+                sudo egrep -c 'lxc.net.0|lxc.net.1|lxc.uts.name|lxc.apparmor.profile' /var/lib/lxc/"$NameServerBase"/config
         }
         NameServerBaseConfigFormat=$(CheckNameServerBaseConfigFormat)
 
         if [ $(SoftwareVersion $LXCVersion) -lt $(SoftwareVersion 2.1.0) ] && [ $NameServerConfigFormat -gt 0 ]
         then
-                sudo sed -i 's/lxc.net.0/lxc.network/g'         /var/lib/lxc/$NameServer/config
-                sudo sed -i 's/lxc.net.1/lxc.network/g'         /var/lib/lxc/$NameServer/config
-                sudo sed -i 's/lxc.uts.name/lxc.utsname/g'      /var/lib/lxc/$NameServer/config
+                sudo sed -i 's/lxc.net.0/lxc.network/g'         	/var/lib/lxc/$NameServer/config
+                sudo sed -i 's/lxc.net.1/lxc.network/g'         	/var/lib/lxc/$NameServer/config
+                sudo sed -i 's/lxc.uts.name/lxc.utsname/g'      	/var/lib/lxc/$NameServer/config
+		sudo sed -i 's/lxc.apparmor.profile/lxc.aa_profile/g'	/var/lib/lxc/$NameServer/config
+        fi
 
-                sudo sed -i 's/lxc.net.0/lxc.network/g'         /var/lib/lxc/"$NameServer"-base/config
-                sudo sed -i 's/lxc.net.1/lxc.network/g'         /var/lib/lxc/"$NameServer"-base/config
-                sudo sed -i 's/lxc.uts.name/lxc.utsname/g'      /var/lib/lxc/"$NameServer"-base/config
+        if [ $(SoftwareVersion $LXCVersion) -lt $(SoftwareVersion 2.1.0) ] && [ $NameServerBaseConfigFormat -gt 0 ]
+        then
+                sudo sed -i 's/lxc.net.0/lxc.network/g'         	/var/lib/lxc/$NameServerBase/config
+                sudo sed -i 's/lxc.net.1/lxc.network/g'         	/var/lib/lxc/$NameServerBase/config
+                sudo sed -i 's/lxc.uts.name/lxc.utsname/g'      	/var/lib/lxc/$NameServerBase/config
+		sudo sed -i 's/lxc.apparmor.profile/lxc.aa_profile/g'	/var/lib/lxc/$NameServerBase/config
         fi
 
         # Case 2 importing nameserver from an 2.0- LXC enviro into a 2.1+ LXC enviro.
@@ -2726,6 +2790,13 @@ then
 
                 clear
 
+		if [ $UbuntuMajorVersion -eq 16 ]
+		then
+			sudo sh -c "echo 'nameserver 10.207.39.2'						>  /run/resolvconf/resolv.conf"
+			sudo sh -c "echo 'nameserver 10.207.29.2'						>> /run/resolvconf/resolv.conf"
+			sudo sh -c "echo 'search orabuntu-lxc.com consultingcommandos.us gns1.orabuntu-lxc.com'	>> /run/resolvconf/resolv.conf"
+		fi
+
                 function GetShortHost {
                         uname -n | cut -f1 -d'.'
                 }
@@ -2851,7 +2922,7 @@ then
         fi
 fi
 
-if [ $SystemdResolvedInstalled -ge 1 ] && [ $UbuntuVersion != '16.04' ]
+if [ $SystemdResolvedInstalled -ge 1 ]
 then
         echo ''
         echo "=============================================="
@@ -2861,7 +2932,7 @@ then
 
         sudo service systemd-resolved restart
         sleep 2
-        systemd-resolve --status | head -6 | tail -5
+	sudo service systemd-resolved status | cat
 
         echo ''
         echo "=============================================="
@@ -2874,7 +2945,7 @@ then
         clear
 fi
 
-if [ $LxcNetRunning -ge 1 ] && [ $UbuntuVersion != '16.04' ]
+if [ $LxcNetRunning -ge 1 ]
 then
         echo ''
         echo "=============================================="
@@ -3024,7 +3095,7 @@ sudo sh -c "echo ' ln -sf /etc/security/limits.d/70-oracle.conf .' 					   >> /e
 
 if [ $NetworkManagerInstalled -eq 1 ]
 then
-	sudo sh -c "echo ' ln -sf /etc/NetworkManager/dnsmasq.d/local .' 				   >> /etc/orabuntu-lxc-scripts/crt_links.sh"
+	sudo sh -c "echo ' ln -sf /etc/NetworkManager/dnsmasq.d/orabuntu-local .' 			   >> /etc/orabuntu-lxc-scripts/crt_links.sh"
 	sudo sh -c "echo ' ln -sf /etc/NetworkManager/NetworkManager.conf .' 				   >> /etc/orabuntu-lxc-scripts/crt_links.sh"
 fi
 

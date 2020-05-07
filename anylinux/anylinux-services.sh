@@ -822,30 +822,59 @@ then
         sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service systemd-resolved restart > /dev/null 2>&1"
         sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service lxc-net restart > /dev/null 2>&1"
        	sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service dnsmasq restart > /dev/null 2>&1"
-        
+       
+	function GetNameServerShortName {
+        	echo $NameServer | cut -f1 -d'-'
+	}
+	NameServerShortName=$(GetNameServerShortName)
+
+	sshpass -p $MultiHostVar9 ssh -M -S /tmp/orabuntu -qt -o CheckHostIP=no -o StrictHostKeyChecking=no -o ControlPersist=60s $MultiHostVar8@$MultiHostVar5 exit
+
 	Sx1Index=201
-        function CheckHighestSx1IndexHit {
-        	sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" lxc-attach -n $NameServer -- nslookup -timeout=10 $Sx1Net.$Sx1Index" | grep -c 'name =' 
-        }
-        HighestSx1IndexHit=$(CheckHighestSx1IndexHit)
+	function CheckDNSLookup {
+        	ssh -S /tmp/orabuntu $MultiHostVar5 "sudo -S <<< "$MultiHostVar9" lxc-attach -n $NameServerShortName -- nslookup -timeout=10 $Sx1Net.$Sx1Index"
+	}
+	DNSLookup=$(CheckDNSLookup)
+	DNSHit=$PIPESTATUS
 
-        while [ $HighestSx1IndexHit = 1 ]
-        do
-                Sx1Index=$((Sx1Index+1))
-                HighestSx1IndexHit=$(CheckHighestSx1IndexHit)
-        done
+	if [ $UbuntuMajorVersion -ge 16 ]
+	then
+        	while [ $DNSHit -eq 0 ]
+        	do
+                	Sx1Index=$((Sx1Index+1))
+                	DNSLookup=$(CheckDNSLookup)
+                	DNSHit=$PIPESTATUS
+                	echo $Sx1Net.$Sx1Index
+        	done
 
-        Sw1Index=201
-        function CheckHighestSw1IndexHit {
-        	sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" lxc-attach -n $NameServer -- nslookup -timeout=10 $Sw1Net.$Sw1Index" | grep -c 'name ='
-        }
-        HighestSw1IndexHit=$(CheckHighestSw1IndexHit)
+        	if [ $DNSHit -eq 1 ]
+        	then
+			echo 'IP address of sx1 OpenvSwitch: '$Sx1Net.$Sx1Index
+        	fi
+	fi
+ 
+	Sw1Index=201
+	function CheckDNSLookup {
+        	ssh -S /tmp/orabuntu $MultiHostVar5 "sudo -S <<< "$MultiHostVar9" lxc-attach -n $NameServerShortName -- nslookup -timeout=10 $Sw1Net.$Sw1Index"
+	}
+	DNSLookup=$(CheckDNSLookup)
+	DNSHit=$PIPESTATUS
 
-        while [ $HighestSw1IndexHit = 1 ]
-        do
-                Sw1Index=$((Sw1Index+1))
-                HighestSw1IndexHit=$(CheckHighestSw1IndexHit)
-        done
+	if [ $UbuntuMajorVersion -ge 16 ]
+	then
+        	while [ $DNSHit -eq 0 ]
+        	do
+                	Sw1Index=$((Sw1Index+1))
+                	DNSLookup=$(CheckDNSLookup)
+                	DNSHit=$PIPESTATUS
+                	echo $Sw1Net.$Sw1Index
+        	done
+
+        	if [ $DNSHit -eq 1 ]
+        	then
+			echo 'IP address of sw1 OpenvSwitch: '$Sw1Net.$Sw1Index
+        	fi
+	fi
 fi
 
 if [ -z $SeedNet1 ]

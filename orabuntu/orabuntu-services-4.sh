@@ -69,10 +69,46 @@ function GetMultiHostVar2 {
 }
 MultiHostVar2=$(GetMultiHostVar2)
 
+function GetMultiHostVar3 {
+        echo $MultiHost | cut -f3 -d':'
+}
+MultiHostVar3=$(GetMultiHostVar3)
+
+function GetMultiHostVar4 {
+        echo $MultiHost | cut -f4 -d':'
+}
+MultiHostVar4=$(GetMultiHostVar4)
+
+function GetMultiHostVar5 {
+        echo $MultiHost | cut -f5 -d':'
+}
+MultiHostVar5=$(GetMultiHostVar5)
+
+function GetMultiHostVar6 {
+        echo $MultiHost | cut -f6 -d':'
+}
+MultiHostVar6=$(GetMultiHostVar6)
+
 function GetMultiHostVar7 {
         echo $MultiHost | cut -f7 -d':'
 }
 MultiHostVar7=$(GetMultiHostVar7)
+
+function GetMultiHostVar8 {
+        echo $MultiHost | cut -f8 -d':'
+}
+MultiHostVar8=$(GetMultiHostVar8)
+
+function GetMultiHostVar9 {
+        echo $MultiHost | cut -f9 -d':'
+}
+MultiHostVar9=$(GetMultiHostVar9)
+
+function GetMultiHostVar10 {
+        echo $MultiHost | cut -f10 -d':'
+}
+MultiHostVar10=$(GetMultiHostVar10)
+GREValue=$MultiHostVar10
 
 if [ -f /etc/lsb-release ]
 then
@@ -126,10 +162,59 @@ fi
 ContainerPrefix=ora$1$2c
 CP=$ContainerPrefix
 
-function GetSeedContainerName {
-	sudo lxc-ls -f | grep oel$OracleRelease | cut -f1 -d' '
+if   [ $UbuntuMajorVersion -eq 16 ]
+then
+	function GetSeedContainerName {
+		sudo ls -l /var/lib/lxc | rev | cut -f1 -d' ' | rev | grep oel$OracleRelease | cut -f1 -d' '
+	}
+	SeedContainerName=$(GetSeedContainerName)
+elif [ $UbuntuMajorVersion -gt 16 ]
+then
+	function GetSeedContainerName {
+		sudo lxc-ls -f | grep oel$OracleRelease | cut -f1 -d' '
+	}
+	SeedContainerName=$(GetSeedContainerName)
+fi
+
+echo ''
+echo "=============================================="
+echo "Update config if LXC v2.0 or lower...          "
+echo "=============================================="
+echo ''
+
+# Case 1 Creating Oracle Seed Container in 2.0- LXC enviro.
+
+function CheckOracleSeedConfigFormat {
+        sudo egrep -c 'lxc.net.0|lxc.net.1|lxc.uts.name|lxc.apparmor.profile' /var/lib/lxc/$SeedContainerName/config
 }
-SeedContainerName=$(GetSeedContainerName)
+OracleSeedConfigFormat=$(CheckOracleSeedConfigFormat)
+
+if [ $(SoftwareVersion $LXCVersion) -lt $(SoftwareVersion 2.1.0) ] && [ $OracleSeedConfigFormat -gt 0 ]
+then
+        sudo sed -i 's/lxc.net.0/lxc.network/g'                 /var/lib/lxc/$SeedContainerName/config
+        sudo sed -i 's/lxc.net.1/lxc.network/g'                 /var/lib/lxc/$SeedContainerName/config
+        sudo sed -i 's/lxc.uts.name/lxc.utsname/g'              /var/lib/lxc/$SeedContainerName/config
+        sudo sed -i 's/lxc.apparmor.profile/lxc.aa_profile/g'   /var/lib/lxc/$SeedContainerName/config
+fi
+
+# Case 2 importing nameserver from an 2.0- LXC enviro into a 2.1+ LXC enviro (typically this if-then will never be called).
+
+if [ $(SoftwareVersion $LXCVersion) -ge $(SoftwareVersion 2.1.0) ] && [ $OracleSeedConfigFormat -eq 0 ]
+then
+       sudo lxc-update-config -c /var/lib/lxc/$SeedContainerName/config
+fi
+
+sudo lxc-ls -f
+
+echo ''
+echo "=============================================="
+echo "Done: Update config if LXC v2.0 or lower.      "
+echo "=============================================="
+echo ''
+
+sleep 5
+
+clear
 
 echo ''
 echo "=============================================="
@@ -230,25 +315,46 @@ while [ $CopyCompleted -lt $NumCon ]
 do
 	# GLS 20160707 updated to use lxc-copy instead of lxc-clone for Ubuntu 16.04
 	# GLS 20160707 continues to use lxc-clone for Ubuntu 15.04 and 15.10
+	# GLS 20200504 Using sshpass to create a short-duration socket for nslookups.  Reference: https://jrs-s.net/2017/07/01/slow-ssh-logins/
 
 	function CheckSystemdResolvedInstalled {
 		sudo netstat -ulnp | grep 53 | sed 's/  */ /g' | rev | cut -f1 -d'/' | rev | sort -u | grep systemd- | wc -l
 	}
 	SystemdResolvedInstalled=$(CheckSystemdResolvedInstalled)
 
-        function CheckDNSLookup {
-                sudo nslookup -timeout=1 $ContainerPrefix$CloneIndex | grep -v '#' | grep Address | grep '10\.207\.39' | wc -l
-        }
-        DNSLookup=$(CheckDNSLookup)
+	if [ $MultiHostVar3 = 'X' ] && [ $GREValue = 'Y' ]
+	then
+		function GetNameServerShortName {
+			echo $NameServer | cut -f1 -d'-'
+		}
+		NameServerShortName=$(GetNameServerShortName)
 
+		sshpass -p $MultiHostVar9 ssh -M -S /tmp/orabuntu -qt -o CheckHostIP=no -o StrictHostKeyChecking=no -o ControlPersist=60s $MultiHostVar8@$MultiHostVar5 exit
+
+        	function CheckDNSLookup {
+			ssh -S /tmp/orabuntu $MultiHostVar5 "sudo -S <<< "$MultiHostVar9" lxc-attach -n $NameServerShortName -- nslookup -timeout=5 $ContainerPrefix$CloneIndex"	
+        	}
+        	DNSLookup=$(CheckDNSLookup)
+		DNSHit=$PIPESTATUS
+	else
+        	function CheckDNSLookup {
+                	sudo nslookup -timeout=1 $ContainerPrefix$CloneIndex | grep -v '#' | grep Address | grep '10\.207\.39'
+        	}
+        	DNSLookup=$(CheckDNSLookup)
+		DNSHit=$PIPESTATUS
+	fi
+		
 	if [ $UbuntuMajorVersion -ge 16 ]
 	then
-		while [ $DNSLookup -eq 1 ]
-		do
-			CloneIndex=$((CloneIndex+1))
-			DNSLookup=$(CheckDNSLookup)
-		done
-		if [ $DNSLookup -eq 0 ]
+       		while [ $DNSHit -eq 0 ]
+       		do
+               		CloneIndex=$((CloneIndex+1))
+               		DNSLookup=$(CheckDNSLookup)
+			DNSHit=$PIPESTATUS
+			echo $ContainerPrefix$CloneIndex
+       		done
+		
+		if [ $DNSHit -eq 1 ]
 		then
 			echo ''
 			echo "=============================================="
@@ -258,16 +364,19 @@ do
 
 			echo "Clone Container Name = $ContainerPrefix$CloneIndex"
 
+			sleep 5
+
       			sudo lxc-copy -n $SeedContainerName -N $ContainerPrefix$CloneIndex
 		
 			if [ $MajorRelease -eq 7 ]
 			then	
 				sudo sed -i "s/$SeedContainerName/$ContainerPrefix$CloneIndex/g"	/var/lib/lxc/$ContainerPrefix$CloneIndex/rootfs/etc/hostname
 			fi
-			sudo sed -i "s/$SeedContainerName/$ContainerPrefix$CloneIndex/g"	/var/lib/lxc/$ContainerPrefix$CloneIndex/rootfs/etc/sysconfig/network-scripts/ifcfg-eth0
-			sudo sed -i "s/HostName/$ContainerPrefix$CloneIndex/g"                  /var/lib/lxc/$ContainerPrefix$CloneIndex/rootfs/etc/sysconfig/network-scripts/ifcfg-eth0
-			sudo sed -i "s/$SeedContainerName/$ContainerPrefix$CloneIndex/g"	/var/lib/lxc/$ContainerPrefix$CloneIndex/rootfs/etc/sysconfig/network
-			sudo sed -i "s/$SeedContainerName/$ContainerPrefix$CloneIndex/g"	/var/lib/lxc/$ContainerPrefix$CloneIndex/rootfs/etc/hosts
+
+			sudo sed -i "s/$SeedContainerName/$ContainerPrefix$CloneIndex/g"		/var/lib/lxc/$ContainerPrefix$CloneIndex/rootfs/etc/sysconfig/network-scripts/ifcfg-eth0
+			sudo sed -i "s/HostName/$ContainerPrefix$CloneIndex/g"                  	/var/lib/lxc/$ContainerPrefix$CloneIndex/rootfs/etc/sysconfig/network-scripts/ifcfg-eth0
+			sudo sed -i "s/$SeedContainerName/$ContainerPrefix$CloneIndex/g"		/var/lib/lxc/$ContainerPrefix$CloneIndex/rootfs/etc/sysconfig/network
+			sudo sed -i "s/$SeedContainerName/$ContainerPrefix$CloneIndex/g"		/var/lib/lxc/$ContainerPrefix$CloneIndex/rootfs/etc/hosts
 		fi
 	fi
 

@@ -153,7 +153,7 @@ then
 	sudo sed -i "s/lxc\.net\.5/lxc\.network/g"		/var/lib/lxc/$ContainerPrefix$CloneIndex/config
 	sudo sed -i "s/lxc\.net\.6/lxc\.network/g"		/var/lib/lxc/$ContainerPrefix$CloneIndex/config
 	sudo sed -i "s/\#marker//g" 				/var/lib/lxc/$ContainerPrefix$CloneIndex/config
-	sudo lxc-update-config -c				/var/lib/lxc/$ContainerPrefix$CloneIndex/config
+#	sudo lxc-update-config -c				/var/lib/lxc/$ContainerPrefix$CloneIndex/config
 	sudo sed -i "s/$ContainerPrefix$CloneIndex//g"		/var/lib/lxc/$ContainerPrefix$CloneIndex/rootfs/etc/hosts
 fi
 

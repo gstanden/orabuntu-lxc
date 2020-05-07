@@ -305,10 +305,7 @@ ClonedContainersExist=$(CheckClonedContainersExist)
 # sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service systemd-resolved restart > /dev/null 2>&1"
 # sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service dnsmasq restart > /dev/null 2>&1"
 
-if [ $UbuntuVersion != '16.04' ]
-then
-	sudo service systemd-resolved restart > /dev/null 2>&1
-fi
+sudo service systemd-resolved restart > /dev/null 2>&1
 
 for j in $ClonedContainersExist
 do
@@ -350,10 +347,7 @@ do
 			echo ''
 			sudo /etc/network/openvswitch/veth_cleanups.sh $j
 			echo ''
-			if [ $UbuntuVersion != '16.04' ]
-			then
-				sudo service systemd-resolved restart > /dev/null 2>&1
-			fi
+			sudo service systemd-resolved restart > /dev/null 2>&1
 			sleep 2
 			sudo lxc-start -n $j
 			sleep 5
@@ -381,7 +375,7 @@ sleep 5
 
 clear
 
-if   [ $SystemdResolvedInstalled -ge 1 ] && [ $UbuntuVersion != '16.04' ]
+if   [ $SystemdResolvedInstalled -ge 1 ]
 then
 	echo ''
 	echo "=============================================="
@@ -391,7 +385,7 @@ then
 	
 	sudo service systemd-resolved restart
 	sleep 2
-	systemd-resolve --status | head -6 | tail -5
+	sudo service systemd-resolved status | cat
 	
 	echo ''
 	echo "=============================================="
@@ -634,7 +628,7 @@ then
 		clear
 	fi
 	
-	if [ $SystemdResolvedInstalled -ge 1 ] && [ $UbuntuVersion != '16.04' ]
+	if [ $SystemdResolvedInstalled -ge 1 ]
 	then
 		echo ''
 		echo "=============================================="
@@ -644,7 +638,7 @@ then
 	
 		sudo service systemd-resolved restart
 		sleep 2
-		systemd-resolve --status | head -6 | tail -5
+		sudo service systemd-resolved status | cat
 	
 		echo ''
 		echo "=============================================="
@@ -826,7 +820,7 @@ then
 
                 sleep 5
         
-                if   [ $SystemdResolvedInstalled -ge 1 ] && [ $UbuntuVersion != '16.04' ]
+                if   [ $SystemdResolvedInstalled -ge 1 ]
                 then
                         echo ''
                         echo "=============================================="
@@ -836,7 +830,7 @@ then
         
                         sudo service systemd-resolved restart 
                         sleep 2 
-                        systemd-resolve --status | head -6 | tail -5 
+                        sudo service systemd-resolved status | cat
                         
                         echo '' 
                         echo "=============================================="

@@ -63,6 +63,8 @@ then
         	cat /sys/hypervisor/uuid | cut -c1-3 | grep -c ec2
 	}
 	AWS=$(CheckAWS)
+else
+	AWS=0
 fi
 
 function SoftwareVersion { echo "$@" | awk -F. '{ printf("%d%03d%03d%03d\n", $1,$2,$3,$4); }'; }
@@ -126,7 +128,7 @@ function GetMultiHostVar10 {
         echo $MultiHost | cut -f10 -d':'
 }
 MultiHostVar10=$(GetMultiHostVar10)
-GRE=$MultiHostVar10
+GREValue=$MultiHostVar10
 
 function CheckSystemdResolvedInstalled {
 	sudo netstat -ulnp | grep 53 | sed 's/  */ /g' | rev | cut -f1 -d'/' | rev | sort -u | grep systemd- | wc -l
@@ -150,7 +152,7 @@ then
         UbuntuMajorVersion=$(GetUbuntuMajorVersion)
 fi
 
-if [ $SystemdResolvedInstalled -gt 0 ] && [ $UbuntuVersion != '16.04' ]
+if [ $SystemdResolvedInstalled -ge 1 ]
 then
 	echo ''
 	echo "=============================================="
@@ -158,7 +160,7 @@ then
 	echo "=============================================="
 	echo ''
 
-	sudo service systemd-resolved-helper restart
+#	sudo service systemd-resolved-helper restart
 	echo ''
 	sleep 5
 	sudo service systemd-resolved status | tail -100
@@ -176,21 +178,59 @@ then
 	clear
 fi
 
-SeedIndex=10
-SeedPostfix=c$SeedIndex
-
-function CheckHighestSeedIndexHit {
-        sudo nslookup -timeout=10 oel$OracleRelease$SeedPostfix | grep -v '#' | grep Address | grep '10\.207\.29' | wc -l
-}
-HighestSeedIndexHit=$(CheckHighestSeedIndexHit)
-
-while [ $HighestSeedIndexHit = 1 ]
-do
-	SeedIndex=$((SeedIndex+1))
+if   [ $MultiHostVar3 = 'X' ] && [ $GREValue = 'Y' ]
+then
+	SeedIndex=10
 	SeedPostfix=c$SeedIndex
+
+	function GetNameServerShortName {
+		echo $NameServer | cut -f1 -d'-'
+	}
+	NameServerShortName=$(GetNameServerShortName)
+
+	sshpass -p $MultiHostVar9 ssh -M -S /tmp/orabuntu -qt -o CheckHostIP=no -o StrictHostKeyChecking=no -o ControlPersist=60s $MultiHostVar8@$MultiHostVar5 exit
+
+	function CheckDNSLookup {
+		ssh -S /tmp/orabuntu $MultiHostVar5 "sudo -S <<< "$MultiHostVar9" lxc-attach -n $NameServerShortName -- nslookup -timeout=10 oel$OracleRelease$SeedPostfix"	
+	}
+	DNSLookup=$(CheckDNSLookup)
+	DNSHit=$PIPESTATUS
+
+	if [ $UbuntuMajorVersion -ge 16 ]
+	then
+       		while [ $DNSHit -eq 0 ]
+       		do
+               		SeedIndex=$((SeedIndex+1))
+			SeedPostfix=c$SeedIndex
+               		DNSLookup=$(CheckDNSLookup)
+			DNSHit=$PIPESTATUS
+			echo oel$OracleRelease$SeedPostfix
+       		done
+		
+		if [ $DNSHit -eq 1 ]
+		then
+			SeedPostfix=c$SeedIndex
+		fi
+	fi
+
+elif [ $MultiHostVar3 -eq 1 ] && [ $GREValue = 'N' ]
+then
+	SeedIndex=10
+	SeedPostfix=c$SeedIndex
+
+	function CheckHighestSeedIndexHit {
+        	sudo nslookup -timeout=10 oel$OracleRelease$SeedPostfix | grep -v '#' | grep Address | grep '10\.207\.29' | wc -l
+	}
 	HighestSeedIndexHit=$(CheckHighestSeedIndexHit)
-done
-SeedPostfix=c$SeedIndex
+
+	while [ $HighestSeedIndexHit = 1 ]
+	do
+        	SeedIndex=$((SeedIndex+1))
+        	SeedPostfix=c$SeedIndex
+        	HighestSeedIndexHit=$(CheckHighestSeedIndexHit)
+	done
+	SeedPostfix=c$SeedIndex
+fi
 
 echo ''
 echo "=============================================="
@@ -253,10 +293,10 @@ else
 	done
 fi
 
-if [ $(SoftwareVersion $LXCVersion) -ge $(SoftwareVersion "2.1.0") ]
-then
-	sudo lxc-update-config -c /var/lib/lxc/oel$OracleRelease$SeedPostfix/config
-fi
+# if [ $(SoftwareVersion $LXCVersion) -ge $(SoftwareVersion "2.1.0") ]
+# then
+#  	sudo lxc-update-config -c /var/lib/lxc/oel$OracleRelease$SeedPostfix/config
+# fi
 
 echo ''
 echo "=============================================="
@@ -463,14 +503,49 @@ clear
 
 # fi
 
- sleep 5
+sleep 5
 
- clear
+clear
+
+echo ''
+echo "=============================================="
+echo "Update config if LXC v2.0 or lower...          "
+echo "=============================================="
+echo ''
+
+# Case 1 Creating Oracle Seed Container in 2.0- LXC enviro.
+
+function CheckOracleSeedConfigFormat {
+        sudo egrep -c 'lxc.net.0|lxc.net.1|lxc.uts.name|lxc.apparmor.profile' /var/lib/lxc/oel$OracleRelease$SeedPostfix/config
+}
+OracleSeedConfigFormat=$(CheckOracleSeedConfigFormat)
+
+if [ $(SoftwareVersion $LXCVersion) -lt $(SoftwareVersion 2.1.0) ] && [ $OracleSeedConfigFormat -gt 0 ]
+then
+        sudo sed -i 's/lxc.net.0/lxc.network/g'                 /var/lib/lxc/oel$OracleRelease$SeedPostfix/config
+        sudo sed -i 's/lxc.net.1/lxc.network/g'                 /var/lib/lxc/oel$OracleRelease$SeedPostfix/config
+        sudo sed -i 's/lxc.uts.name/lxc.utsname/g'              /var/lib/lxc/oel$OracleRelease$SeedPostfix/config
+        sudo sed -i 's/lxc.apparmor.profile/lxc.aa_profile/g'   /var/lib/lxc/oel$OracleRelease$SeedPostfix/config
+fi
+
+# Case 2 Creating Oracle Seed Container in 2.1+ LXC enviro.
 
 if [ $(SoftwareVersion $LXCVersion) -ge $(SoftwareVersion "2.1.0") ]
 then
-	sudo lxc-update-config -c /var/lib/lxc/oel$OracleRelease$SeedPostfix/config
+       sudo lxc-update-config -c /var/lib/lxc/oel$OracleRelease$SeedPostfix/config
 fi
+
+sudo lxc-ls -f
+
+echo ''
+echo "=============================================="
+echo "Done: Update config if LXC v2.0 or lower.      "
+echo "=============================================="
+echo ''
+
+sleep 5
+
+clear
 
 echo ''
 echo "=============================================="
@@ -511,14 +586,14 @@ echo ''
 
 sleep 5
 
-sudo sed -i 's/sw1/sx1/' /etc/network/if-up.d/openvswitch/oel$OracleRelease$SeedPostfix*
-sudo sed -i 's/sw1/sx1/' /etc/network/if-down.d/openvswitch/oel$OracleRelease$SeedPostfix*
-sudo sed -i 's/tag=10/tag=11/' /etc/network/if-up.d/openvswitch/oel$OracleRelease$SeedPostfix*
-sudo sed -i 's/tag=10/tag=11/' /etc/network/if-down.d/openvswitch/oel$OracleRelease$SeedPostfix*
-sudo sed -i "s/mtu = 1500/mtu = $MultiHostVar7/" /var/lib/lxc/oel$OracleRelease$SeedPostfix/config
-sudo sed -i "s/MtuSetting/$MultiHostVar7/" 	 /var/lib/lxc/oel$OracleRelease$SeedPostfix/config
+sudo sed -i 's/sw1/sx1/' 				/etc/network/if-up.d/openvswitch/oel$OracleRelease$SeedPostfix*
+sudo sed -i 's/sw1/sx1/' 				/etc/network/if-down.d/openvswitch/oel$OracleRelease$SeedPostfix*
+sudo sed -i 's/tag=10/tag=11/' 				/etc/network/if-up.d/openvswitch/oel$OracleRelease$SeedPostfix*
+sudo sed -i 's/tag=10/tag=11/' 				/etc/network/if-down.d/openvswitch/oel$OracleRelease$SeedPostfix*
+sudo sed -i "s/mtu = 1500/mtu = $MultiHostVar7/" 	/var/lib/lxc/oel$OracleRelease$SeedPostfix/config
+sudo sed -i "s/MtuSetting/$MultiHostVar7/" 	 	/var/lib/lxc/oel$OracleRelease$SeedPostfix/config
 
-if [ $ContainerUp != 'RUNNING' ] || [ $PublicIP != 1020729 ]
+if [ $ContainerUp != 'RUNNING' ] || [ $PublicIP != 17229108 ]
 then
 	function CheckContainersExist {
 	sudo ls /var/lib/lxc | grep -v $NameServer | grep oel$OracleRelease$SeedPostfix | sort -V | sed 's/$/ /' | tr -d '\n' | sed 's/^[ \t]*//;s/[ \t]*$//'
@@ -541,7 +616,7 @@ then
 		echo ''
 		sudo lxc-start -n $j > /dev/null 2>&1
 		i=1
-		while [ "$PublicIPIterative" != 1020729 ] && [ "$i" -le 10 ]
+		while [ "$PublicIPIterative" != 17229108 ] && [ "$i" -le 10 ]
 		do
 			echo "Waiting for $j Public IP to come up..."
 			echo ''
@@ -589,8 +664,15 @@ SearchDomain1=$(CheckSearchDomain1)
 
 if [ $SearchDomain1 -eq 0 ] && [ $AWS -eq 0 ]
 then
-        sudo sed -i '/search/d' /etc/resolv.conf
-        sudo sh -c "echo 'search $Domain1 $Domain2 gns1.$Domain1' >> /etc/resolv.conf"
+	if [ $UbuntuMajorVersion -eq 16 ]
+	then
+		sudo sed -i 's/\bsearch\b/& urdomain1.com urdomain2.com gns.urdomain1.com/' /run/resolvconf/resolv.conf
+	else
+		sudo sed -i 's/\bsearch\b/& urdomain1.com urdomain2.com gns.urdomain1.com/' /run/systemd/resolve/stub-resolv.conf
+	fi
+
+#       sudo sed -i '/search/d' /etc/resolv.conf
+#       sudo sh -c "echo 'search $Domain1 $Domain2 gns1.$Domain1' >> /etc/resolv.conf"
 fi
 
 echo ''
@@ -599,7 +681,7 @@ echo "Container oel$OracleRelease$SeedPostfix ping test..."
 echo "=============================================="
 echo ''
 
-if [ $SystemdResolvedInstalled -eq 1 ] && [ $UbuntuVersion != '16.04' ]
+if [ $SystemdResolvedInstalled -eq 1 ]
 then
 	        sudo service systemd-resolved restart
 fi
@@ -615,7 +697,7 @@ NetworkUp=$(CheckNetworkUp)
 n=$((n+1))
 done
 
-if [ $SystemdResolvedInstalled -eq 1 ] && [ $UbuntuVersion != '16.04' ]
+if [ $SystemdResolvedInstalled -eq 1 ]
 then
 	sudo service systemd-resolved restart > /dev/null 2>&1
 	sleep 2
