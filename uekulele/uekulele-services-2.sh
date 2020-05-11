@@ -70,10 +70,20 @@ function GetLXCVersion {
 }
 LXCVersion=$(GetLXCVersion)
 
+function GetMultiHostVar1 {
+        echo $MultiHost | cut -f1 -d':'
+}
+MultiHostVar1=$(GetMultiHostVar1)
+
 function GetMultiHostVar2 {
         echo $MultiHost | cut -f2 -d':'
 }
 MultiHostVar2=$(GetMultiHostVar2)
+
+function GetMultiHostVar3 {
+        echo $MultiHost | cut -f3 -d':'
+}
+MultiHostVar3=$(GetMultiHostVar3)
 
 function GetMultiHostVar4 {
         echo $MultiHost | cut -f4 -d':'
@@ -96,11 +106,21 @@ function GetMultiHostVar7 {
 MultiHostVar7=$(GetMultiHostVar7)
 MTU=$MultiHostVar7
 
+function GetMultiHostVar8 {
+        echo $MultiHost | cut -f8 -d':'
+}
+MultiHostVar8=$(GetMultiHostVar8)
+
+function GetMultiHostVar9 {
+        echo $MultiHost | cut -f9 -d':'
+}
+MultiHostVar9=$(GetMultiHostVar9)
+
 function GetMultiHostVar10 {
         echo $MultiHost | cut -f10 -d':'
 }
 MultiHostVar10=$(GetMultiHostVar10)
-GRE=$MultiHostVar10
+GREValue=$MultiHostVar10
 
 GetLinuxFlavors(){
 if   [[ -e /etc/oracle-release ]]
@@ -151,6 +171,7 @@ then
         LF=$LinuxFlavor
         RL=$Release
 	SubDirName=uekulele
+	UbuntuMajorVersion=0
 elif [ $LinuxFlavor = 'Red' ] || [ $LinuxFlavor = 'CentOS' ]
 then
         if   [ $LinuxFlavor = 'Red' ]
@@ -171,6 +192,7 @@ then
         LF=$LinuxFlavor
         RL=$Release
 	SubDirName=uekulele
+	UbuntuMajorVersion=0
 elif [ $LinuxFlavor = 'Fedora' ]
 then
         CutIndex=3
@@ -188,6 +210,7 @@ then
         LF=$LinuxFlavor
         RL=$Release
 	SubDirName=uekulele
+	UbuntuMajorVersion=0
 elif [ $LinuxFlavor = 'Ubuntu' ]
 then
         function GetUbuntuVersion {
@@ -199,23 +222,63 @@ then
         function GetUbuntuMajorVersion {
                 cat /etc/lsb-release | grep DISTRIB_RELEASE | cut -f2 -d'=' | cut -f1 -d'.'
         }
+	SubDirName=orabuntu
         UbuntuMajorVersion=$(GetUbuntuMajorVersion)
+	Release=0
 fi
 
-SeedIndex=10
-SeedPostfix=c$SeedIndex
-function CheckHighestSeedIndexHit {
-	nslookup -timeout=1 oel$OracleRelease$SeedPostfix | grep -v '#' | grep Address | grep '10\.207\.29' | wc -l
-}
-HighestSeedIndexHit=$(CheckHighestSeedIndexHit)
+if   [ $MultiHostVar3 = 'X' ] && [ $GREValue = 'Y' ]
+then
+        SeedIndex=10
+        SeedPostfix=c$SeedIndex
 
-while [ $HighestSeedIndexHit = 1 ]
-do
-	SeedIndex=$((SeedIndex+1))
-	SeedPostfix=c$SeedIndex
-	HighestSeedIndexHit=$(CheckHighestSeedIndexHit)
-done
-SeedPostfix=c$SeedIndex
+        function GetNameServerShortName {
+                echo $NameServer | cut -f1 -d'-'
+        }
+        NameServerShortName=$(GetNameServerShortName)
+
+        sshpass -p $MultiHostVar9 ssh -M -S /tmp/orabuntu -qt -o CheckHostIP=no -o StrictHostKeyChecking=no -o ControlPersist=60s $MultiHostVar8@$MultiHostVar5 exit
+
+        function CheckDNSLookup {
+                ssh -S /tmp/orabuntu $MultiHostVar5 "sudo -S --prompt='' <<< "$MultiHostVar9" lxc-attach -n $NameServerShortName -- nslookup -timeout=10 oel$OracleRelease$SeedPostfix"
+        }
+        DNSLookup=$(CheckDNSLookup)
+        DNSHit=$PIPESTATUS
+
+        if [ $UbuntuMajorVersion -ge 16 ] || [ $Release -ge 6 ]
+        then
+                while [ $DNSHit -eq 0 ]
+                do
+                        SeedIndex=$((SeedIndex+1))
+                        SeedPostfix=c$SeedIndex
+                        DNSLookup=$(CheckDNSLookup)
+                        DNSHit=$PIPESTATUS
+                done
+
+                if [ $DNSHit -eq 1 ]
+                then
+                        SeedPostfix=c$SeedIndex
+                fi
+        fi
+
+elif [ $MultiHostVar3 -eq 1 ] && [ $GREValue = 'N' ]
+then
+        SeedIndex=10
+        SeedPostfix=c$SeedIndex
+
+        function CheckHighestSeedIndexHit {
+                sudo nslookup -timeout=10 oel$OracleRelease$SeedPostfix | grep -v '#' | grep Address | grep '10\.207\.29' | wc -l
+        }
+        HighestSeedIndexHit=$(CheckHighestSeedIndexHit)
+
+        while [ $HighestSeedIndexHit -eq 1 ]
+        do
+                SeedIndex=$((SeedIndex+1))
+                SeedPostfix=c$SeedIndex
+                HighestSeedIndexHit=$(CheckHighestSeedIndexHit)
+        done
+        SeedPostfix=c$SeedIndex
+fi
 
 sleep 5
 
@@ -506,7 +569,7 @@ echo "=============================================="
 cd /etc/network/if-up.d/openvswitch
 sudo sed -i "s/ContainerName/oel$OracleRelease$SeedPostfix/g" /var/lib/lxc/oel$OracleRelease$SeedPostfix/config
 
-if [ $GRE = 'Y' ]
+if [ $GREValue = 'Y' ]
 then
 	sudo sed -i "/mtu/s/1500/$MTU/" /var/lib/lxc/oel$OracleRelease$SeedPostfix/config
 fi

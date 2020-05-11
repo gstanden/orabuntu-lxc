@@ -241,6 +241,7 @@ then
         LF=$LinuxFlavor
         RL=$Release
 	SubDirName=uekulele
+	UbuntuMajorVersion=0
 elif [ $LinuxFlavor = 'Red' ] || [ $LinuxFlavor = 'CentOS' ]
 then
         if   [ $LinuxFlavor = 'Red' ]
@@ -261,6 +262,7 @@ then
         LF=$LinuxFlavor
         RL=$Release
 	SubDirName=uekulele
+	UbuntuMajorVersion=0
 elif [ $LinuxFlavor = 'Fedora' ]
 then
         CutIndex=3
@@ -278,6 +280,7 @@ then
         LF=$LinuxFlavor
         RL=$Release
 	SubDirName=uekulele
+	UbuntuMajorVersion=0
 elif [ $LinuxFlavor = 'Ubuntu' ] || [ $LinuxFlavor = 'Pop_OS' ]
 then
         function GetUbuntuVersion {
@@ -832,12 +835,12 @@ then
 
 	Sx1Index=201
 	function CheckDNSLookup {
-        	ssh -S /tmp/orabuntu $MultiHostVar5 "sudo -S <<< "$MultiHostVar9" lxc-attach -n $NameServerShortName -- nslookup -timeout=10 $Sx1Net.$Sx1Index"
+        	ssh -S /tmp/orabuntu $MultiHostVar5 "sudo -S --prompt='' <<< "$MultiHostVar9" lxc-attach -n $NameServerShortName -- nslookup -timeout=10 $Sx1Net.$Sx1Index"
 	}
 	DNSLookup=$(CheckDNSLookup)
 	DNSHit=$PIPESTATUS
 
-	if [ $UbuntuMajorVersion -ge 16 ]
+	if [ $UbuntuMajorVersion -ge 16 ] || [ $Release -ge 6 ]
 	then
         	while [ $DNSHit -eq 0 ]
         	do
@@ -847,20 +850,20 @@ then
                 	echo $Sx1Net.$Sx1Index
         	done
 
-        	if [ $DNSHit -eq 1 ]
-        	then
-			echo 'IP address of sx1 OpenvSwitch: '$Sx1Net.$Sx1Index
-        	fi
+#        	if [ $DNSHit -eq 1 ]
+#        	then
+#			echo 'IP address of sx1 OpenvSwitch: '$Sx1Net.$Sx1Index
+#        	fi
 	fi
  
 	Sw1Index=201
 	function CheckDNSLookup {
-        	ssh -S /tmp/orabuntu $MultiHostVar5 "sudo -S <<< "$MultiHostVar9" lxc-attach -n $NameServerShortName -- nslookup -timeout=10 $Sw1Net.$Sw1Index"
+        	ssh -S /tmp/orabuntu $MultiHostVar5 "sudo -S --prompt='' <<< "$MultiHostVar9" lxc-attach -n $NameServerShortName -- nslookup -timeout=10 $Sw1Net.$Sw1Index"
 	}
 	DNSLookup=$(CheckDNSLookup)
 	DNSHit=$PIPESTATUS
 
-	if [ $UbuntuMajorVersion -ge 16 ]
+	if [ $UbuntuMajorVersion -ge 16 ] || [ $Release -ge 6 ]
 	then
         	while [ $DNSHit -eq 0 ]
         	do
@@ -870,10 +873,10 @@ then
                 	echo $Sw1Net.$Sw1Index
         	done
 
-        	if [ $DNSHit -eq 1 ]
-        	then
-			echo 'IP address of sw1 OpenvSwitch: '$Sw1Net.$Sw1Index
-        	fi
+#        	if [ $DNSHit -eq 1 ]
+#        	then
+#			echo 'IP address of sw1 OpenvSwitch: '$Sw1Net.$Sw1Index
+#        	fi
 	fi
 fi
 

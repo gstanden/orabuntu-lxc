@@ -816,10 +816,13 @@ then
 	clear
 
 	echo ''
-	echo "=============================================="
+		echo "=============================================="
 	echo "Start LXC and libvirt...                      "
 	echo "=============================================="
 	echo ''
+
+	echo 'Release = '$Release
+	sleep 10
 
 	if [ $Release -ge 7 ] 
 	then
@@ -2992,7 +2995,7 @@ then
        	 	HighestSw1IndexHit=$(CheckHighestSw1IndexHit)
 	done
 
-elif [ $MultiHostVar3 = 'X' ]  && [ $GRE = 'N' ] && [ $MultiHostVar2 = 'Y' ]
+elif [ $MultiHostVar3 = 'X' ]  && [ $GRE = 'N' ] && [ $MultiHostVar2 = 'Y' ] && [ -f /etc/network/openvswitch/sx1.info ] && [ -f /etc/network/openvswitch/sw1.info ]
 then
 	if   [ $Release -eq 7 ] || [ $Release -eq 8 ]
 	then
@@ -3784,15 +3787,24 @@ then
 #	GLS 20170904 Switches sx1 and sw1 are set earlier (around lines 1988,1989) so they are not set here.
 
 	# sudo cat /etc/network/openvswitch/sx1.info | cut -f2 -d':' | cut -f4 -d'.'
-	function GetSx1Index {
-		sudo sh -c "cat '/etc/network/openvswitch/sx1.info' | cut -f2 -d':' | cut -f4 -d'.'"
-	}
-	Sx1Index=$(GetSx1Index)
+
+	if [ -f /etc/network/openvswitch/sx1.info ]
+	then
+		function GetSx1Index {
+			sudo sh -c "cat '/etc/network/openvswitch/sx1.info' | cut -f2 -d':' | cut -f4 -d'.'"
+		}
+		Sx1Index=$(GetSx1Index)
+	fi
 
 	# sudo cat /etc/network/openvswitch/sw1.info | cut -f2 -d':' | cut -f4 -d'.'
-	function GetSw1Index {
-		sudo sh -c "cat '/etc/network/openvswitch/sw1.info' | cut -f2 -d':' | cut -f4 -d'.'"
-	}
+
+	if [ -f /etc/network/openvswitch/sw1.info ]
+	then
+		function GetSw1Index {
+			sudo sh -c "cat '/etc/network/openvswitch/sw1.info' | cut -f2 -d':' | cut -f4 -d'.'"
+		}
+		Sw1Index=$(GetSx1Index)
+	fi
 
 	sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw2.sh
 	sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw3.sh
@@ -3922,9 +3934,10 @@ then
 		fi
 
 		sshpass -p $MultiHostVar9 ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" ls -l ~/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh"
+		
 		if [ $? -eq 0 ]
 		then
-		sshpass -p $MultiHostVar9 ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" ~/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh"
+			sshpass -p $MultiHostVar9 ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" ~/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh"
 		fi
 
                 echo ''
@@ -3945,121 +3958,119 @@ then
 		sudo ifconfig sw1 mtu $MultiHostVar7
 		sudo ifconfig sx1 mtu $MultiHostVar7
 
-		nslookup -timeout=5 $HOSTNAME.$Domain1 > /dev/null 2>&1
-		if [ $? -eq 1 ]
-		then		
-			echo ''
-			echo "=============================================="
-			echo "Create ADD DNS $ShortHost.$Domain1...         "
-			echo "=============================================="
-			echo ''
+		echo ''
+		echo "=============================================="
+		echo "Create ADD DNS $ShortHost.$Domain1...         "
+		echo "=============================================="
+		echo ''
 
-			sudo sh -c "echo 'echo \"server 10.207.39.2'								    	>  /etc/network/openvswitch/nsupdate_domain1_add_$ShortHost.sh"
-			sudo sh -c "echo 'update add $ShortHost.orabuntu-lxc.com 3600 IN A 10.207.39.$Sw1Index'		    		>> /etc/network/openvswitch/nsupdate_domain1_add_$ShortHost.sh"
-			sudo sh -c "echo 'send'											    	>> /etc/network/openvswitch/nsupdate_domain1_add_$ShortHost.sh"
-			sudo sh -c "echo 'update add $Sw1Index.39.207.10.in-addr.arpa 3600 IN PTR $ShortHost.orabuntu-lxc.com' 		>> /etc/network/openvswitch/nsupdate_domain1_add_$ShortHost.sh"
-			sudo sh -c "echo 'send'											    	>> /etc/network/openvswitch/nsupdate_domain1_add_$ShortHost.sh"
-			sudo sh -c "echo 'quit'											    	>> /etc/network/openvswitch/nsupdate_domain1_add_$ShortHost.sh"
-			sudo sh -c "echo '\" | nsupdate -k /etc/bind/rndc.key'							    	>> /etc/network/openvswitch/nsupdate_domain1_add_$ShortHost.sh"
+		sleep 5
 
-			sudo chmod 777 						/etc/network/openvswitch/nsupdate_domain1_add_$ShortHost.sh
-			sudo ls -l     						/etc/network/openvswitch/nsupdate_domain1_add_$ShortHost.sh
-			sudo sed -i "s/orabuntu-lxc\.com/$Domain1/g"		/etc/network/openvswitch/nsupdate_domain1_add_$ShortHost.sh
+		sudo sh -c "echo 'echo \"server 10.207.39.2'								    	>  /etc/network/openvswitch/nsupdate_domain1_add_$ShortHost.sh"
+		sudo sh -c "echo 'update add $ShortHost.orabuntu-lxc.com 3600 IN A 10.207.39.$Sw1Index'		    		>> /etc/network/openvswitch/nsupdate_domain1_add_$ShortHost.sh"
+		sudo sh -c "echo 'send'											    	>> /etc/network/openvswitch/nsupdate_domain1_add_$ShortHost.sh"
+		sudo sh -c "echo 'update add $Sw1Index.39.207.10.in-addr.arpa 3600 IN PTR $ShortHost.orabuntu-lxc.com' 		>> /etc/network/openvswitch/nsupdate_domain1_add_$ShortHost.sh"
+		sudo sh -c "echo 'send'											    	>> /etc/network/openvswitch/nsupdate_domain1_add_$ShortHost.sh"
+		sudo sh -c "echo 'quit'											    	>> /etc/network/openvswitch/nsupdate_domain1_add_$ShortHost.sh"
+		sudo sh -c "echo '\" | nsupdate -k /etc/bind/rndc.key'							    	>> /etc/network/openvswitch/nsupdate_domain1_add_$ShortHost.sh"
 
-			echo ''
-			echo "=============================================="
-			echo "Create DEL DNS $ShortHost.$Domain1...         "
-			echo "=============================================="
-			echo ''
+		sudo chmod 777 						/etc/network/openvswitch/nsupdate_domain1_add_$ShortHost.sh
+		sudo ls -l     						/etc/network/openvswitch/nsupdate_domain1_add_$ShortHost.sh
+		sudo sed -i "s/orabuntu-lxc\.com/$Domain1/g"		/etc/network/openvswitch/nsupdate_domain1_add_$ShortHost.sh
 
-			sudo sh -c "echo 'echo \"server 10.207.39.2'								    	>  /etc/network/openvswitch/nsupdate_domain1_del_$ShortHost.sh"
-			sudo sh -c "echo 'update delete $ShortHost.orabuntu-lxc.com. A'					    		>> /etc/network/openvswitch/nsupdate_domain1_del_$ShortHost.sh"
-			sudo sh -c "echo 'send'											    	>> /etc/network/openvswitch/nsupdate_domain1_del_$ShortHost.sh"
-			sudo sh -c "echo 'update delete $Sw1Index.39.207.10.in-addr.arpa. PTR'				 		>> /etc/network/openvswitch/nsupdate_domain1_del_$ShortHost.sh"
-			sudo sh -c "echo 'send'											    	>> /etc/network/openvswitch/nsupdate_domain1_del_$ShortHost.sh"
-			sudo sh -c "echo 'quit'											    	>> /etc/network/openvswitch/nsupdate_domain1_del_$ShortHost.sh"
-			sudo sh -c "echo '\" | nsupdate -k /etc/bind/rndc.key'							    	>> /etc/network/openvswitch/nsupdate_domain1_del_$ShortHost.sh"
+		sleep 5
 
-			sudo chmod 777 						/etc/network/openvswitch/nsupdate_domain1_del_$ShortHost.sh
-			sudo ls -l     						/etc/network/openvswitch/nsupdate_domain1_del_$ShortHost.sh
-			sudo sed -i "s/orabuntu-lxc\.com/$Domain1/g"		/etc/network/openvswitch/nsupdate_domain1_del_$ShortHost.sh
+		echo ''
+		echo "=============================================="
+		echo "Create DEL DNS $ShortHost.$Domain1...         "
+		echo "=============================================="
+		echo ''
 
-		        ssh-keygen -R 10.207.39.2
-		        sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.39.2 "sudo -S <<< "ubuntu" mkdir -p ~/Downloads"
-		        sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.39.2 "sudo -S <<< "ubuntu" chown ubuntu:ubuntu Downloads"
-		        sshpass -p ubuntu scp    -o CheckHostIP=no -o StrictHostKeyChecking=no -p /etc/network/openvswitch/nsupdate_domain1_add_$ShortHost.sh ubuntu@10.207.39.2:~/Downloads/.
-		        sshpass -p ubuntu scp    -o CheckHostIP=no -o StrictHostKeyChecking=no -p /etc/network/openvswitch/nsupdate_domain1_del_$ShortHost.sh ubuntu@10.207.39.2:~/Downloads/.
-		        sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.39.2 "sudo -S <<< "ubuntu" ~/Downloads/nsupdate_domain1_add_$ShortHost.sh"
+		sleep 5
+
+		sudo sh -c "echo 'echo \"server 10.207.39.2'								    	>  /etc/network/openvswitch/nsupdate_domain1_del_$ShortHost.sh"
+		sudo sh -c "echo 'update delete $ShortHost.orabuntu-lxc.com. A'					    		>> /etc/network/openvswitch/nsupdate_domain1_del_$ShortHost.sh"
+		sudo sh -c "echo 'send'											    	>> /etc/network/openvswitch/nsupdate_domain1_del_$ShortHost.sh"
+		sudo sh -c "echo 'update delete $Sw1Index.39.207.10.in-addr.arpa. PTR'				 		>> /etc/network/openvswitch/nsupdate_domain1_del_$ShortHost.sh"
+		sudo sh -c "echo 'send'											    	>> /etc/network/openvswitch/nsupdate_domain1_del_$ShortHost.sh"
+		sudo sh -c "echo 'quit'											    	>> /etc/network/openvswitch/nsupdate_domain1_del_$ShortHost.sh"
+		sudo sh -c "echo '\" | nsupdate -k /etc/bind/rndc.key'							    	>> /etc/network/openvswitch/nsupdate_domain1_del_$ShortHost.sh"
+
+		sudo chmod 777 						/etc/network/openvswitch/nsupdate_domain1_del_$ShortHost.sh
+		sudo ls -l     						/etc/network/openvswitch/nsupdate_domain1_del_$ShortHost.sh
+		sudo sed -i "s/orabuntu-lxc\.com/$Domain1/g"		/etc/network/openvswitch/nsupdate_domain1_del_$ShortHost.sh
+
+	        ssh-keygen -R 10.207.39.2
+	        sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.39.2 "sudo -S <<< "ubuntu" mkdir -p ~/Downloads"
+	        sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.39.2 "sudo -S <<< "ubuntu" chown ubuntu:ubuntu Downloads"
+	        sshpass -p ubuntu scp    -o CheckHostIP=no -o StrictHostKeyChecking=no -p /etc/network/openvswitch/nsupdate_domain1_add_$ShortHost.sh ubuntu@10.207.39.2:~/Downloads/.
+	        sshpass -p ubuntu scp    -o CheckHostIP=no -o StrictHostKeyChecking=no -p /etc/network/openvswitch/nsupdate_domain1_del_$ShortHost.sh ubuntu@10.207.39.2:~/Downloads/.
+	        sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.39.2 "sudo -S <<< "ubuntu" ~/Downloads/nsupdate_domain1_add_$ShortHost.sh"
+
+		sleep 5
 	
-		        echo ''
-		        echo "=============================================="
-		        echo "Done: Create ADD/DEL DNS $ShortHost.$Domain1  "
-		        echo "=============================================="
-		        echo ''
+	        echo ''
+	        echo "=============================================="
+	        echo "Done: Create ADD/DEL DNS $ShortHost.$Domain1  "
+	        echo "=============================================="
+	        echo ''
 	
-		        sleep 5
+	        sleep 5
 	
-		        clear
+	        clear
 
-		fi
+		echo ''
+		echo "=============================================="
+		echo "Create ADD DNS $ShortHost.$Domain2 ...        "
+		echo "=============================================="
+		echo ''
 
-		nslookup -timeout=5 $HOSTNAME.$Domain2 > /dev/null 2>&1
-		if [ $? -eq 1 ]
-		then		
-			echo ''
-			echo "=============================================="
-			echo "Create ADD DNS $ShortHost.$Domain2 ...        "
-			echo "=============================================="
-			echo ''
+		sudo sh -c "echo 'echo \"server 10.207.29.2'								    	>  /etc/network/openvswitch/nsupdate_domain2_add_$ShortHost.sh"
+		sudo sh -c "echo 'update add $ShortHost.consultingcommandos.us 3600 IN A 10.207.29.$Sx1Index'		    	>> /etc/network/openvswitch/nsupdate_domain2_add_$ShortHost.sh"
+		sudo sh -c "echo 'send'											    	>> /etc/network/openvswitch/nsupdate_domain2_add_$ShortHost.sh"
+		sudo sh -c "echo 'update add $Sx1Index.29.207.10.in-addr.arpa 3600 IN PTR $ShortHost.consultingcommandos.us' 	>> /etc/network/openvswitch/nsupdate_domain2_add_$ShortHost.sh"
+		sudo sh -c "echo 'send'											    	>> /etc/network/openvswitch/nsupdate_domain2_add_$ShortHost.sh"
+		sudo sh -c "echo 'quit'											    	>> /etc/network/openvswitch/nsupdate_domain2_add_$ShortHost.sh"
+		sudo sh -c "echo '\" | nsupdate -k /etc/bind/rndc.key'							    	>> /etc/network/openvswitch/nsupdate_domain2_add_$ShortHost.sh"
 
-			sudo sh -c "echo 'echo \"server 10.207.29.2'								    	>  /etc/network/openvswitch/nsupdate_domain2_add_$ShortHost.sh"
-			sudo sh -c "echo 'update add $ShortHost.consultingcommandos.us 3600 IN A 10.207.29.$Sx1Index'		    	>> /etc/network/openvswitch/nsupdate_domain2_add_$ShortHost.sh"
-			sudo sh -c "echo 'send'											    	>> /etc/network/openvswitch/nsupdate_domain2_add_$ShortHost.sh"
-			sudo sh -c "echo 'update add $Sx1Index.29.207.10.in-addr.arpa 3600 IN PTR $ShortHost.consultingcommandos.us' 	>> /etc/network/openvswitch/nsupdate_domain2_add_$ShortHost.sh"
-			sudo sh -c "echo 'send'											    	>> /etc/network/openvswitch/nsupdate_domain2_add_$ShortHost.sh"
-			sudo sh -c "echo 'quit'											    	>> /etc/network/openvswitch/nsupdate_domain2_add_$ShortHost.sh"
-			sudo sh -c "echo '\" | nsupdate -k /etc/bind/rndc.key'							    	>> /etc/network/openvswitch/nsupdate_domain2_add_$ShortHost.sh"
+		sudo chmod 777 						/etc/network/openvswitch/nsupdate_domain2_add_$ShortHost.sh
+		sudo ls -l     						/etc/network/openvswitch/nsupdate_domain2_add_$ShortHost.sh
+		sudo sed -i "s/consultingcommandos\.us/$Domain2/g"	/etc/network/openvswitch/nsupdate_domain2_add_$ShortHost.sh
 
-			sudo chmod 777 						/etc/network/openvswitch/nsupdate_domain2_add_$ShortHost.sh
-			sudo ls -l     						/etc/network/openvswitch/nsupdate_domain2_add_$ShortHost.sh
-			sudo sed -i "s/consultingcommandos\.us/$Domain2/g"	/etc/network/openvswitch/nsupdate_domain2_add_$ShortHost.sh
+		echo ''
+		echo "=============================================="
+		echo "Create DEL DNS $ShortHost.$Domain2...         "
+		echo "=============================================="
+		echo ''
 
-			echo ''
-			echo "=============================================="
-			echo "Create DEL DNS $ShortHost.$Domain2...         "
-			echo "=============================================="
-			echo ''
+		sudo sh -c "echo 'echo \"server 10.207.29.2'				    		>  /etc/network/openvswitch/nsupdate_domain2_del_$ShortHost.sh"
+		sudo sh -c "echo 'update delete $ShortHost.consultingcommandos.us. A'  			>> /etc/network/openvswitch/nsupdate_domain2_del_$ShortHost.sh"
+		sudo sh -c "echo 'send'							    		>> /etc/network/openvswitch/nsupdate_domain2_del_$ShortHost.sh"
+		sudo sh -c "echo 'update delete $Sx1Index.29.207.10.in-addr.arpa. PTR' 			>> /etc/network/openvswitch/nsupdate_domain2_del_$ShortHost.sh"
+		sudo sh -c "echo 'send'							    		>> /etc/network/openvswitch/nsupdate_domain2_del_$ShortHost.sh"
+		sudo sh -c "echo 'quit'							    		>> /etc/network/openvswitch/nsupdate_domain2_del_$ShortHost.sh"
+		sudo sh -c "echo '\" | nsupdate -k /etc/bind/rndc.key'			    		>> /etc/network/openvswitch/nsupdate_domain2_del_$ShortHost.sh"
 
-			sudo sh -c "echo 'echo \"server 10.207.29.2'				    		>  /etc/network/openvswitch/nsupdate_domain2_del_$ShortHost.sh"
-			sudo sh -c "echo 'update delete $ShortHost.consultingcommandos.us. A'  			>> /etc/network/openvswitch/nsupdate_domain2_del_$ShortHost.sh"
-			sudo sh -c "echo 'send'							    		>> /etc/network/openvswitch/nsupdate_domain2_del_$ShortHost.sh"
-			sudo sh -c "echo 'update delete $Sx1Index.29.207.10.in-addr.arpa. PTR' 			>> /etc/network/openvswitch/nsupdate_domain2_del_$ShortHost.sh"
-			sudo sh -c "echo 'send'							    		>> /etc/network/openvswitch/nsupdate_domain2_del_$ShortHost.sh"
-			sudo sh -c "echo 'quit'							    		>> /etc/network/openvswitch/nsupdate_domain2_del_$ShortHost.sh"
-			sudo sh -c "echo '\" | nsupdate -k /etc/bind/rndc.key'			    		>> /etc/network/openvswitch/nsupdate_domain2_del_$ShortHost.sh"
+		sudo chmod 777 						/etc/network/openvswitch/nsupdate_domain2_del_$ShortHost.sh
+		sudo ls -l     						/etc/network/openvswitch/nsupdate_domain2_del_$ShortHost.sh
+		sudo sed -i "s/consultingcommandos\.us/$Domain2/g"	/etc/network/openvswitch/nsupdate_domain2_del_$ShortHost.sh
 
-			sudo chmod 777 						/etc/network/openvswitch/nsupdate_domain2_del_$ShortHost.sh
-			sudo ls -l     						/etc/network/openvswitch/nsupdate_domain2_del_$ShortHost.sh
-			sudo sed -i "s/consultingcommandos\.us/$Domain2/g"	/etc/network/openvswitch/nsupdate_domain2_del_$ShortHost.sh
-
-		        ssh-keygen -R 10.207.29.2
-		        sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.29.2 "sudo -S <<< "ubuntu" mkdir -p ~/Downloads"
-		        sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.29.2 "sudo -S <<< "ubuntu" chown ubuntu:ubuntu Downloads"
-		        sshpass -p ubuntu scp    -o CheckHostIP=no -o StrictHostKeyChecking=no -p /etc/network/openvswitch/nsupdate_domain2_add_$ShortHost.sh ubuntu@10.207.29.2:~/Downloads/.
-		        sshpass -p ubuntu scp    -o CheckHostIP=no -o StrictHostKeyChecking=no -p /etc/network/openvswitch/nsupdate_domain2_del_$ShortHost.sh ubuntu@10.207.29.2:~/Downloads/.
-		        sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.29.2 "sudo -S <<< "ubuntu" ~/Downloads/nsupdate_domain2_add_$ShortHost.sh"
+	        ssh-keygen -R 10.207.29.2
+	        sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.29.2 "sudo -S <<< "ubuntu" mkdir -p ~/Downloads"
+	        sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.29.2 "sudo -S <<< "ubuntu" chown ubuntu:ubuntu Downloads"
+	        sshpass -p ubuntu scp    -o CheckHostIP=no -o StrictHostKeyChecking=no -p /etc/network/openvswitch/nsupdate_domain2_add_$ShortHost.sh ubuntu@10.207.29.2:~/Downloads/.
+	        sshpass -p ubuntu scp    -o CheckHostIP=no -o StrictHostKeyChecking=no -p /etc/network/openvswitch/nsupdate_domain2_del_$ShortHost.sh ubuntu@10.207.29.2:~/Downloads/.
+	        sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.29.2 "sudo -S <<< "ubuntu" ~/Downloads/nsupdate_domain2_add_$ShortHost.sh"
 	
-		        echo ''
-		        echo "=============================================="
-		        echo "Done: Create ADD/DEL DNS $ShortHost.$Domain2  "
-		        echo "=============================================="
-		        echo ''
+	        echo ''
+	        echo "=============================================="
+	        echo "Done: Create ADD/DEL DNS $ShortHost.$Domain2  "
+	        echo "=============================================="
+	        echo ''
 	
-		        sleep 5
+	        sleep 5
 	
-		        clear
-
-		fi
+	        clear
 	fi
 fi
 

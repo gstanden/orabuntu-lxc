@@ -71,8 +71,15 @@ then
 
 		sudo yum-config-manager --enable public_ol6_addons
 		sudo yum -y install docker-engine
+		sleep 5
+		sudo sh -c "service docker start"
+		sleep 5
 		sudo service docker start
+		sleep 5
 		sudo chkconfig docker on
+		sleep 5
+		sudo sh -c "service docker status"
+		sleep 5
 	fi
 fi
 

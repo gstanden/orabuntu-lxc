@@ -313,7 +313,7 @@ clear
 
 if [ -f /var/lib/lxc/$SeedContainerName/rootfs/root/lxc-services.sh ]
 then
-        sudo sed -i 's/yum install/yum -y install/g' /var/lib/lxc/$SeedContainerName/rootfs/root/lxc-services.sh
+        sudo sed -i 's/yum install/yum -y install/g' /var/lib/lxc/$SeedContainerName/rootfs/root/lxc-services.sh >/dev/null 2>&1
 fi
 
 sleep 5
