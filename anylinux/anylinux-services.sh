@@ -229,6 +229,12 @@ then
 	if   [ $OracleDistroRelease -eq 7 ] || [ $OracleDistroRelease -eq 6 ]
 	then
 		CutIndex=7
+
+		if [ -f /usr/bin/ol_yum_configure.sh ]
+		then
+			/usr/bin/ol_yum_configure.sh
+		fi
+
 	elif [ $OracleDistroRelease -eq 8 ]
 	then
 		CutIndex=6
