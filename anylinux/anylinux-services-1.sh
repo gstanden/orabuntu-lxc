@@ -502,7 +502,7 @@ then
 				else
 					mkdir -p /opt/olxc/"$DistDir"/uekulele/facter
 					cd /opt/olxc/"$DistDir"/uekulele/facter
-					curl -s --happy-eyeballs-timeout-ms http://downloads.puppetlabs.com/facter/facter-2.4.4.tar.gz | sudo tar xz; sudo ruby facter*/install.rb
+					curl -s --ipv4 http://downloads.puppetlabs.com/facter/facter-2.4.4.tar.gz | sudo tar xz; sudo ruby facter*/install.rb
 				fi
 
 				echo ''
