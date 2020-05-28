@@ -512,7 +512,7 @@ echo "=============================================="
 echo ''
 
 sudo useradd  -u 1098 grid 		>/dev/null 2>&1
-sudo useradd  -u 500  oracle 		>/dev/null 2>&1
+sudo useradd  -u 1100 oracle 		>/dev/null 2>&1
 sudo groupadd -g 1100 asmadmin		>/dev/null 2>&1
 sudo usermod  -a -G   asmadmin grid	>/dev/null 2>&1
 
