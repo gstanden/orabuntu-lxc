@@ -212,6 +212,7 @@ then
                 cat /etc/lsb-release | grep DISTRIB_RELEASE | cut -f2 -d'=' | cut -f1 -d'.'
         }
         UbuntuMajorVersion=$(GetUbuntuMajorVersion)
+	Release=0
 fi
 
 if [ $Release -ge 7 ]
@@ -511,10 +512,10 @@ echo "Verify existence of Oracle and Grid users...  "
 echo "=============================================="
 echo ''
 
-sudo useradd  -u 1098 grid 		>/dev/null 2>&1
-sudo useradd  -u 1100 oracle 		>/dev/null 2>&1
-sudo groupadd -g 1100 asmadmin		>/dev/null 2>&1
-sudo usermod  -a -G   asmadmin grid	>/dev/null 2>&1
+sudo groupadd asmadmin
+sudo groupadd oinstall        
+sudo useradd -g asmadmin grid
+sudo useradd -g oinstall oracle
 
 id grid
 id oracle
@@ -564,6 +565,31 @@ sudo chown root:root /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/root/lxc-
 sudo chmod 755 /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/root/lxc-services.sh
 sudo chown root:root /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/root/create_users.sh
 sudo chmod 755 /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/root/create_users.sh
+
+function GetOracleUserUID {
+	cat /etc/passwd | grep oracle | cut -f3 -d':'
+}
+OracleUserUID=$(GetOracleUserUID)
+
+function GetGridUserUID {
+	cat /etc/passwd | grep grid | cut -f3 -d':'
+}
+GridUserUID=$(GetGridUserUID)
+
+function GetAsmAdminGID {
+	cat /etc/group  | grep asmadmin | cut -f3 -d':'
+}
+AsmAdminGID=$(GetAsmAdminGID)
+
+function GetOinstallGID {
+	cat /etc/group  | grep oinstall | cut -f3 -d':'
+}
+OinstallGID=$(GetOinstallGID)
+
+sudo sed -i "s/OINSTALL_GID/$OinstallGID/g" /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/root/create_users.sh
+sudo sed -i "s/ASMADMIN_GID/$AsmAdminGID/g" /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/root/create_users.sh
+sudo sed -i "s/ORACLE_UID/$OracleUserUID/g" /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/root/create_users.sh
+sudo sed -i "s/GRID_UID/$GridUserUID/g"     /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/root/create_users.sh
 
 echo ''
 echo "=============================================="
