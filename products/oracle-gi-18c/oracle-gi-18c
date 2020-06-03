@@ -622,6 +622,7 @@ sudo lxc-attach -n $SeedContainerName -- usermod --password `perl -e "print cryp
 sudo lxc-attach -n $SeedContainerName -- usermod --password `perl -e "print crypt('oracle','oracle');"` oracle
 sudo lxc-attach -n $SeedContainerName -- usermod --password `perl -e "print crypt('root','root');"` root 
 sudo lxc-attach -n $SeedContainerName -- usermod -g oinstall oracle
+sudo lxc-attach -n $SeedContainerName -- chmod 4755 /bin/ping
 
 # The Oracle Linux images that LXC is using apparently don't have an oracle user so for now just redirecting this to avoid error messages on the chown.
 # Longer-term need to decide whether to go ahead and create the oracle user on the images as is done with grid.
