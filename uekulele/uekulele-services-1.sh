@@ -2341,7 +2341,7 @@ then
        			echo "=============================================="
 			echo ''
 
- 			sudo lxc-create -t download -n nsa -- --dist ubuntu --release xenial --arch amd64
+ 			sudo lxc-create -t download -n nsa -- --dist ubuntu --release xenial --arch amd64 --keyserver hkp://keyserver.ubuntu.com
 
 			n=$((n+1))
 			NSARunning=$(CheckNSARunning)

@@ -608,6 +608,12 @@ sudo cp -p /var/lib/lxc/$SeedContainerName/config 				/var/lib/lxc/$SeedContaine
 sudo cp -p /var/lib/lxc/$SeedContainerName/rootfs/config.asm.flex.cluster	/var/lib/lxc/$SeedContainerName/config.asm.flex.cluster
 sudo sed -i "s/MtuSetting/9000/g" 	  	  				/var/lib/lxc/$SeedContainerName/config.asm.flex.cluster
 sudo sed -i "s/ContainerName/$SeedContainerName/g" 				/var/lib/lxc/$SeedContainerName/config.asm.flex.cluster
+
+if [ $Release -eq 7 ]
+then
+        sudo sed -i "s/ipv4/ipv4\.address/g"                                    /var/lib/lxc/$SeedContainerName/config.asm.flex.cluster
+fi
+
 sudo bash -c "cat /var/lib/lxc/$SeedContainerName/config 			/var/lib/lxc/$SeedContainerName/config.asm.flex.cluster > /var/lib/lxc/$SeedContainerName/config.ora-gi-19c"
 sudo cp -p /var/lib/lxc/$SeedContainerName/config.ora-gi-19c			/var/lib/lxc/$SeedContainerName/config
 sudo sed -i '/supersede/{/oracle-gi/!d;}'					/var/lib/lxc/$SeedContainerName/rootfs/etc/dhcp/dhclient.conf

@@ -500,6 +500,11 @@ then
 
 	sleep 5
 
+	if [ $LinuxFlavor = 'Oracle' ] && [ $Release -eq 7 ]
+	then
+		sudo yum -y install unbound-libs-1.6.6-1*
+	fi
+
 	sudo yum -y install libvirt
 
 	echo ''
