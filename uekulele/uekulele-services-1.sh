@@ -178,11 +178,19 @@ then
         then
                 CutIndex=6
         fi
-        function GetRedHatVersion {
+         
+	function GetRedHatVersion {
                 sudo cat /etc/redhat-release | cut -f"$CutIndex" -d' ' | cut -f1 -d'.'
         }
+	
+	function GetRedHatMinorVersion {
+		sudo cat /etc/redhat-release | cut -f"$CutIndex" -d' ' | cut -f2 -d'.'
+	}
+
         RedHatVersion=$(GetRedHatVersion)
+	RedHatMinorVersion=$(GetRedHatMinorVersion)
 	RHV=$RedHatVersion
+	RHMV=$RedHatMinorVersion
         function GetOracleDistroRelease {
                 sudo cat /etc/oracle-release | cut -f5 -d' ' | cut -f1 -d'.'
         }
@@ -2051,10 +2059,22 @@ then
 				sleep 5
 			fi
 
-			if [ $Release -eq 7 ] && [ $(SoftwareVersion $OvsVersion) -eq $(SoftwareVersion "2.11.1") ]
+			if [ $Release -eq 7 ] && [ $(SoftwareVersion $OvsVersion) -eq $(SoftwareVersion "2.12.1") ]
 			then
 				cd /opt/olxc/"$DistDir"/uekulele/openvswitch/rpmbuild/SOURCES
 				tar -zxvf openvswitch-"$OvsVersion".tar.gz
+
+				# if [ $RHMV -ge 8 ] && [ $RHMV -le 9 ]
+				# then
+				# 	cp -p /home/ubuntu/0001-compat-add-SCTP-netfilter-states-for-older-kernels.patch /opt/olxc/"$DistDir"/uekulele/openvswitch/rpmbuild/SOURCES/openvswitch-"$OvsVersion"/.
+				# 	cd ./openvswitch-"$OvsVersion"
+				# 	patch -p1 < 0001-compat-add-SCTP-netfilter-states-for-older-kernels.patch
+				# 	cd ../.
+				#	git format-patch -1 8c7130da98c5
+				#	git apply --stat 0001-compat-add-SCTP-netfilter-states-for-older-kernels.patch
+				# 	sleep 10
+				# fi
+
 				cp -p openvswitch-"$OvsVersion"/rhel/*.spec /opt/olxc/"$DistDir"/uekulele/openvswitch/.
 				cd /opt/olxc/"$DistDir"/uekulele/openvswitch
 				sudo yum-config-manager --enable ol7_latest
@@ -2095,7 +2115,7 @@ then
 				sed -i 's/python >= 2.7/python27/g'	  				openvswitch.spec
 				sleep 5
 			fi
-
+		
 			rpmbuild --define "_topdir /opt/olxc/"$DistDir"/uekulele/openvswitch/rpmbuild" -ba --without check openvswitch.spec
 
 			echo ''
