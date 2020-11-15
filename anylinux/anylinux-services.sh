@@ -353,6 +353,10 @@ then
 	echo "12. 'Make systemd service last service on boot' SimonPe https://superuser.com/questions/544399/how-do-you-make-a-systemd-service-as-the-last-service-on-boot"
 	echo "13. 'Temporarily increase sudo timeout' Rockallite https://serverfault.com/questions/266039/temporarily-increasing-sudos-timeout-for-the-duration-of-an-install-script"
 	echo "14. 'Failed to allocate peer tty device #1552' Christian Brauner https://github.com/lxc/lxc/issues/1552"
+	echo "15. 'LXC ERROR: Unable to fetch GPG key from keyserver' Simos https://discuss.linuxcontainers.org/t/lxc-error-unable-to-fetch-gpg-key-from-keyserver/5434/2"
+	echo "16. 'Apply patch when asked File to patch what should I do?' Kaz https://unix.stackexchange.com/questions/307487/apply-patch-when-asked-file-to-patch-what-should-i-do"
+	echo "17. 'Re: [ovs-discuss] Build OpenvSwitch on Oracle Linux 8' Gilbert Standen https://www.mail-archive.com/ovs-discuss@openvswitch.org/msg06322.html"
+	echo "18. 'DNS Not Resolving under Network [CentOS8] #957' lfiraza  https://github.com/docker/for-linux/issues/957"
 	echo ''
 	echo "Acknowledgements"
 	echo ''
@@ -505,6 +509,15 @@ then
 		sudo yum -y install unbound-libs-1.6.6-1*
 	fi
 
+	if [ $LinuxFlavor = 'Oracle' ] && [ $Release -eq 8 ]
+	then
+		sudo yum -y install tar
+		sudo firewall-cmd --zone=public --add-masquerade 
+		sudo firewall-cmd --runtime-to-permanent
+		sudo service firewalld stop
+		sudo service firewalld start
+	fi
+	
 	sudo yum -y install libvirt
 
 	echo ''
@@ -920,7 +933,7 @@ fi
 
 if [ $LinuxFlavor != 'Ubuntu' ] && [ $LinuxFlavor != 'Pop_OS' ]
 then
-	echo 'RPM libvirt installed     = '`rpm -qa | grep libvirt-[01234] | grep -v client`
+	echo 'RPM libvirt installed     = '`rpm -qa | grep libvirt-[0123456] | grep -v client`
 fi
 
 echo ''

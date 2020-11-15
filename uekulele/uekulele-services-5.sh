@@ -1056,7 +1056,7 @@ then
 		echo ''
 	
 		function GetFacter {
-			facter virtual
+			facter --no-ruby virtual
 		}
 		Facter=$(GetFacter)
 		if [ $Facter = 'physical' ]

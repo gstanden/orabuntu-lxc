@@ -46,7 +46,7 @@ Sx1Net=${10}
 Sw1Net=${11}
 
 function CheckFacterValue {
-        facter virtual
+        facter --no-ruby virtual
 }
 FacterValue=$(CheckFacterValue)
 
@@ -1344,7 +1344,7 @@ then
 				sudo yum-config-manager --enable ol8_u0_baseos_base
 				sudo yum-config-manager --enable ol8_baseos_latest
 			 	sudo yum-config-manager --enable ol8_addons
-				wget http://mirror.centos.org/centos/7/os/x86_64/Packages/bridge-utils-1.5-9.el7.x86_64.rpm
+				wget --inet4-only http://mirror.centos.org/centos/7/os/x86_64/Packages/bridge-utils-1.5-9.el7.x86_64.rpm
 			fi
 
 			sudo yum -y install rpm-build wget openssl-devel gcc make docbook2X xmlto automake graphviz libtool
@@ -1382,7 +1382,7 @@ then
 				sudo mkdir -p /opt/olxc/"$DistDir"/uekulele/lxc-templates
 				sudo chown -R $Owner:$Group /opt/olxc
 				cd /opt/olxc/"$DistDir"/uekulele/lxc-templates
-				wget --timeout=5 --tries=10 https://linuxcontainers.org/downloads/lxc/lxc-templates-"$LxcVersion".tar.gz
+				wget --timeout=5 --tries=10 https://linuxcontainers.org/downloads/lxc/lxc-templates-"$LxcVersion".tar.gz -4
 				sudo mkdir -p /opt/olxc/"$DistDir"/uekulele/lxc-templates/rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
 				sudo chown -R $Owner:$Group /opt/olxc/"$DistDir"/uekulele/lxc-templates/rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
 				cp -p lxc-templates-"$LxcVersion".tar.gz /opt/olxc/"$DistDir"/uekulele/lxc-templates/rpmbuild/SOURCES/.
@@ -1411,9 +1411,9 @@ then
 
 			sleep 5
 	
-			ping -c 10 linuxcontainers.org
+			ping -c 10 linuxcontainers.org -4
 			echo ''
-			wget --timeout=5 --tries=10 https://linuxcontainers.org/downloads/lxc/lxc-"$LxcVersion".tar.gz
+			wget --timeout=5 --tries=10 https://linuxcontainers.org/downloads/lxc/lxc-"$LxcVersion".tar.gz -4
 			sudo mkdir -p /opt/olxc/"$DistDir"/uekulele/lxc/rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
 			sudo chown -R $Owner:$Group /opt/olxc/
 			cp -p lxc-"$LxcVersion".tar.gz /opt/olxc/"$DistDir"/uekulele/lxc/rpmbuild/SOURCES/.
@@ -1534,7 +1534,7 @@ then
 			sudo yum -y install rpm-build wget openssl-devel gcc make docbook2X xmlto automake graphviz libtool
 			sudo mkdir -p /opt/olxc/"$DistDir"/uekulele/lxc
 			sudo chown -R $Owner:$Group /opt/olxc
-			wget --timeout=5 --tries=10 https://linuxcontainers.org/downloads/lxc/lxc-"$LxcVersion".tar.gz
+			wget --timeout=5 --tries=10 https://linuxcontainers.org/downloads/lxc/lxc-"$LxcVersion".tar.gz -4
 			sudo mkdir -p /opt/olxc/"$DistDir"/uekulele/lxc/rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
 			sudo chown -R $Owner:$Group /opt/olxc
 			cp -p lxc-"$LxcVersion".tar.gz /opt/olxc/"$DistDir"/uekulele/lxc/rpmbuild/SOURCES/.
@@ -1707,7 +1707,13 @@ sudo yum -y install bind-utils
 
 if [ $Release -eq 8 ]
 then
-	wget https://rpmfind.net/linux/epel/7/x86_64/Packages/w/wireless-tools-29-13.el7.x86_64.rpm
+	wget https://rpmfind.net/linux/epel/7/x86_64/Packages/w/wireless-tools-29-13.el7.x86_64.rpm -4
+
+	if [ $? -ne 0 ]
+	then
+		sudo cp -p "$DistDir"/uekulele/archives/wireless-tools-29-13.el7.x86_64.rpm .
+	fi
+
 	sudo yum -y localinstall wireless-tools-29-13.el7.x86_64.rpm 
 else
 	sudo yum -y install wireless-tools
@@ -1931,7 +1937,7 @@ then
 			echo ''
 
 			cd /opt/olxc/"$DistDir"/uekulele/openvswitch
-			wget --timeout=5 --tries=10 http://openvswitch.org/releases/openvswitch-"$OvsVersion".tar.gz
+			wget --timeout=5 --tries=10 http://openvswitch.org/releases/openvswitch-"$OvsVersion".tar.gz -4
 			mkdir -p /opt/olxc/"$DistDir"/uekulele/openvswitch/rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
 			cp -p openvswitch-"$OvsVersion".tar.gz /opt/olxc/"$DistDir"/uekulele/openvswitch/rpmbuild/SOURCES/.
  			tar -xzf openvswitch-"$OvsVersion".tar.gz
@@ -1948,7 +1954,7 @@ then
 			sudo yum -y install rpm-build wget openssl-devel gcc make
 			mkdir -p /opt/olxc/"$DistDir"/uekulele/openvswitch
 			cd /opt/olxc/"$DistDir"/uekulele/openvswitch
-			wget --timeout=5 --tries=10 http://openvswitch.org/releases/openvswitch-"$OvsVersion".tar.gz
+			wget --timeout=5 --tries=10 http://openvswitch.org/releases/openvswitch-"$OvsVersion".tar.gz -4
 			mkdir -p /opt/olxc/"$DistDir"/uekulele/openvswitch/rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
 			cp -p openvswitch-"$OvsVersion".tar.gz /opt/olxc/"$DistDir"/uekulele/openvswitch/rpmbuild/SOURCES/.
 		fi
@@ -2099,7 +2105,13 @@ then
 				tar -zxvf openvswitch-"$OvsVersion".tar.gz
 				cp -p openvswitch-"$OvsVersion"/rhel/*.spec /opt/olxc/"$DistDir"/uekulele/openvswitch/.
 				cd /opt/olxc/"$DistDir"/uekulele/openvswitch
-				wget https://rpmfind.net/linux/centos/7.7.1908/os/x86_64/Packages/python-six-1.9.0-2.el7.noarch.rpm
+				wget https://rpmfind.net/linux/centos/7.9.2009/os/x86_64/Packages/python-six-1.9.0-2.el7.noarch.rpm -4
+
+				if [ $? -ne 0 ]
+				then
+					sudo cp -p "$DistDir"/uekulele/archives/python-six-1.9.0-2.el7.noarch.rpm .
+				fi
+
 				sudo yum -y localinstall python-six-1.9.0-2.el7.noarch.rpm
 				sudo yum -y install python3-sphinx
 				sudo yum -y install python3-six
@@ -2345,64 +2357,73 @@ then
 		echo "Create LXC DNS DHCP container...              "
 		echo "=============================================="
 		echo ''
+
+#		sudo tar -xzvPf "$DistDir"/uekulele/archives/nsa.tar.gz
 	
-		function CheckNSARunning {
-			sudo lxc-ls -f | grep nsa | grep -c RUNNING
-		}
-		NSARunning=$(CheckNSARunning)
-
-		n=1
-		while [ $NSARunning -ne 1 ] && [ "$n" -le 3 ]
-		do
-			echo "=============================================="
-			echo "Try #$n of the primary method...              "
-       			echo "                                              "
-       			echo "Patience...download of rootfs takes time...   "
-       			echo "=============================================="
-			echo ''
-
- 			sudo lxc-create -t download -n nsa -- --dist ubuntu --release xenial --arch amd64 --keyserver hkp://keyserver.ubuntu.com
-
-			n=$((n+1))
-			NSARunning=$(CheckNSARunning)
-
-			clear
-		done
-
-		if [ $(SoftwareVersion $LXCVersion) -ge $(SoftwareVersion "2.1.0") ]
+ 		function CheckNSARunning {
+ 			sudo lxc-ls -f | grep nsa | grep -c RUNNING
+ 		}
+ 		NSARunning=$(CheckNSARunning)
+ 
+ 		n=1
+ 		while [ $NSARunning -ne 1 ] && [ "$n" -le 3 ]
+ 		do
+ 			echo "=============================================="
+ 			echo "Try #$n of the primary method...              "
+        		echo "                                              "
+        		echo "Patience...download of rootfs takes time...   "
+			echo "THIS STEP HAS BEEN QUITE SLOW LATELY.  IT DOES"
+			echo "NOT SEEM TO BE AN IPV6 ISSUE.  IT IS PROBABLY "
+			echo "DUE TO SLOW SERVER AT CANONICAL AND POSSIBLY  "
+			echo "HEAVY USE OF INTERNET BACKBONE DUE TO COVID.  "
+			echo "                                              "
+			echo "This step can easily take 10-15 minutes so    "
+			echo "go get a cup of tea or coffee and be PATIENT! "
+        		echo "=============================================="
+ 			echo ''
+ 
+  			sudo lxc-create -t download -n nsa -- --dist ubuntu --release xenial --arch amd64 --keyserver hkp://keyserver.ubuntu.com
+ 
+ 			n=$((n+1))
+ 			NSARunning=$(CheckNSARunning)
+ 
+ 			clear
+ 		done
+ 
+ 		if [ $(SoftwareVersion $LXCVersion) -ge $(SoftwareVersion "2.1.0") ]
        		then
        	        	sudo lxc-update-config -c /var/lib/lxc/nsa/config
        		fi
-	
-		echo ''
-		echo "=============================================="
-		echo "Method 1 complete.                            "
-		echo "=============================================="
-		echo ''
-		echo "=============================================="
-		echo "Establish sudo privileges...                  "
-		echo "=============================================="
-		echo ''
-
-		echo $MultiHostVar4 | sudo -S date
-
-		echo ''
-		echo "=============================================="
-		echo "Privileges established.                       "
-		echo "=============================================="
-		echo ''
-		echo "=============================================="
-		echo "Trying alternate method...                    "
-		echo "=============================================="
-		echo ''
-
- 		sudo lxc-create -n nsa -t ubuntu -- --release xenial --arch amd64
-
-		if [ $(SoftwareVersion $LXCVersion) -ge $(SoftwareVersion "2.1.0") ]
-		then
-			sudo lxc-update-config -c /var/lib/lxc/nsa/config
-		fi
-
+ 	
+ 		echo ''
+ 		echo "=============================================="
+ 		echo "Method 1 complete.                            "
+ 		echo "=============================================="
+ 		echo ''
+ 		echo "=============================================="
+ 		echo "Establish sudo privileges...                  "
+ 		echo "=============================================="
+ 		echo ''
+ 
+ 		echo $MultiHostVar4 | sudo -S date
+ 
+ 		echo ''
+ 		echo "=============================================="
+ 		echo "Privileges established.                       "
+ 		echo "=============================================="
+ 		echo ''
+ 		echo "=============================================="
+ 		echo "Trying alternate method...                    "
+ 		echo "=============================================="
+ 		echo ''
+ 
+  		sudo lxc-create -n nsa -t ubuntu -- --release xenial --arch amd64
+ 
+ 		if [ $(SoftwareVersion $LXCVersion) -ge $(SoftwareVersion "2.1.0") ]
+ 		then
+ 			sudo lxc-update-config -c /var/lib/lxc/nsa/config
+ 		fi
+ 
 	echo ''
 	echo "=============================================="
 	echo "Create LXC DNS DHCP container complete.       "
@@ -2412,39 +2433,39 @@ then
 
 	clear
 
-	echo ''
-	echo "=============================================="
-	echo "Establish sudo privileges...                  "
-	echo "=============================================="
-	echo ''
-
-	echo $MultiHostVar4 | sudo -S date
-
-	echo ''
-	echo "=============================================="
-	echo "Privileges established.                       "
-	echo "=============================================="
-
-	sleep 5
-
-	clear
-
-	echo ''
-	echo "=============================================="
-	echo "Install & configure DNS DHCP LXC container... "
-	echo "=============================================="
-
-	echo ''
-	sudo touch /var/lib/lxc/nsa/rootfs/etc/resolv.conf > /dev/null 2>&1
-	sudo sed -i '0,/.*nameserver.*/s/.*nameserver.*/nameserver 8.8.8.8\n&/' /var/lib/lxc/nsa/rootfs/etc/resolv.conf > /dev/null 2>&1
-	
-	sudo lxc-start -n nsa
-
-	echo ''
-
-	sleep 10
-
-	clear
+ 	echo ''
+ 	echo "=============================================="
+ 	echo "Establish sudo privileges...                  "
+ 	echo "=============================================="
+ 	echo ''
+ 
+ 	echo $MultiHostVar4 | sudo -S date
+ 
+ 	echo ''
+ 	echo "=============================================="
+ 	echo "Privileges established.                       "
+ 	echo "=============================================="
+ 
+ 	sleep 5
+ 
+ 	clear
+ 
+ 	echo ''
+ 	echo "=============================================="
+ 	echo "Install & configure DNS DHCP LXC container... "
+ 	echo "=============================================="
+ 
+ 	echo ''
+ 	sudo touch /var/lib/lxc/nsa/rootfs/etc/resolv.conf > /dev/null 2>&1
+ 	sudo sed -i '0,/.*nameserver.*/s/.*nameserver.*/nameserver 8.8.8.8\n&/' /var/lib/lxc/nsa/rootfs/etc/resolv.conf > /dev/null 2>&1
+ 	
+ 	sudo lxc-start -n nsa
+ 
+ 	echo ''
+ 
+ 	sleep 10
+ 
+ 	clear
 
 	echo ''
 	echo "=============================================="
@@ -2483,7 +2504,7 @@ then
  	sudo lxc-attach -n nsa -- sudo apt-get -y update
  	sudo lxc-attach -n nsa -- sudo apt-get -y install bind9 isc-dhcp-server bind9utils dnsutils openssh-server man awscli sshpass
 
-	sleep 2
+ 	sleep 2
 
  	sudo lxc-attach -n nsa -- sudo service isc-dhcp-server start
  	sudo lxc-attach -n nsa -- sudo service bind9 start

@@ -645,7 +645,7 @@ sudo cp -p /var/lib/lxc/$SeedContainerName/rootfs/config.asm.flex.cluster	/var/l
 sudo sed -i "s/MtuSetting/9000/g" 	  	  				/var/lib/lxc/$SeedContainerName/config.asm.flex.cluster
 sudo sed -i "s/ContainerName/$SeedContainerName/g" 				/var/lib/lxc/$SeedContainerName/config.asm.flex.cluster
 
-if [ $Release -eq 7 ]
+if [ $Release -eq 7 ] || [ $Release -eq 8 ]
 then
         sudo sed -i "s/ipv4/ipv4\.address/g"                                    /var/lib/lxc/$SeedContainerName/config.asm.flex.cluster
 fi

@@ -472,10 +472,10 @@ echo "Ping test  google.com...                      "
 echo "=============================================="
 echo ''
 
-ping -c 3 google.com
+ping -c 3 yum.oracle.com -4
 
 function CheckNetworkUp {
-ping -c 3 google.com | grep packet | cut -f3 -d',' | sed 's/ //g'
+ping -c 3 google.com -4 | grep packet | cut -f3 -d',' | sed 's/ //g'
 }
 NetworkUp=$(CheckNetworkUp)
 n=1

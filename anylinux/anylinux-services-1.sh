@@ -467,8 +467,14 @@ then
        			 	echo "Install package prerequisites for facter...   "
        			 	echo "=============================================="
        			 	echo ''
-	
-       			 	sudo yum -y install which ruby curl tar yum-utils
+
+				if [ $Release -eq 8 ]
+				then
+					sudo yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
+					sudo yum update
+				else
+       			 		sudo yum -y install which ruby curl tar yum-utils
+				fi
 
 				if [ $LinuxFlavor != 'Fedora' ]
 				then
@@ -489,7 +495,7 @@ then
 
        			 	echo ''
        			 	echo "=============================================="
-       			 	echo "Build and install Facter from Ruby Gems...    "
+       			 	echo "Build and install Facter ...                  "
        			 	echo "=============================================="
        			 	echo ''
 
@@ -497,8 +503,7 @@ then
 
 				if [ $RedHatVersion -eq 8 ]
 				then
-					sudo yum -y install rubygems
-					sudo gem install facter -v 2.5.1
+					sudo yum -y install facter ruby curl tar yum-utils which
 				else
 					mkdir -p /opt/olxc/"$DistDir"/uekulele/facter
 					cd /opt/olxc/"$DistDir"/uekulele/facter
@@ -520,7 +525,7 @@ then
 			fi # OK 5
 
 			function GetFacter {
-				facter virtual
+				facter --no-ruby virtual
 			}
 			Facter=$(GetFacter)
 		
