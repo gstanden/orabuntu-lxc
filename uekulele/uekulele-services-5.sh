@@ -1054,11 +1054,20 @@ then
 		echo "Apply selected selinux adjustments for lxc... "
 		echo "=============================================="
 		echo ''
-	
-		function GetFacter {
-			facter --no-ruby virtual
-		}
-		Facter=$(GetFacter)
+
+		if [ $Release -gt 7 ] && [ $LinuxFlavor = 'Oracle' ]
+		then	
+			function GetFacter {
+				facter --no-ruby virtual
+			}
+			Facter=$(GetFacter)
+		else
+			function GetFacter {
+				facter virtual
+			}
+			Facter=$(GetFacter)
+		fi
+
 		if [ $Facter = 'physical' ]
 		then
 			sudo setenforce 0

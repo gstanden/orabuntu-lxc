@@ -45,10 +45,10 @@ DistDir=$9
 Sx1Net=${10}
 Sw1Net=${11}
 
-function CheckFacterValue {
-        facter --no-ruby virtual
-}
-FacterValue=$(CheckFacterValue)
+# function CheckFacterValue {
+#         facter --no-ruby virtual
+# }
+# FacterValue=$(CheckFacterValue)
 
 if [ -e /sys/hypervisor/uuid ]
 then

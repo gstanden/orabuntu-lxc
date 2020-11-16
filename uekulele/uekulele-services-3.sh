@@ -209,12 +209,26 @@ echo "Ping yum.oracle.com test...               "
 echo "=============================================="
 echo ''
 
-ping -c 3 yum.oracle.com -4
+if [ $Release -gt 6 ] && [ $LinuxFlavor = 'Oracle' ]
+then
+	ping -c 3 yum.oracle.com -4
+else
+	ping -c 3 yum.oracle.com
+fi
 
-function CheckNetworkUp {
-	ping -c 3 yum.oracle.com -4 | grep packet | cut -f3 -d',' | sed 's/ //g'
-}
-NetworkUp=$(CheckNetworkUp)
+if [ $Release -gt 6 ] && [ $LinuxFlavor = 'Oracle' ]
+then
+	function CheckNetworkUp {
+		ping -c 3 yum.oracle.com -4 | grep packet | cut -f3 -d',' | sed 's/ //g'
+	}
+	NetworkUp=$(CheckNetworkUp)
+else
+	function CheckNetworkUp {
+		ping -c 3 yum.oracle.com | grep packet | cut -f3 -d',' | sed 's/ //g'
+	}
+	NetworkUp=$(CheckNetworkUp)
+fi
+
 n=1
 while [ "$NetworkUp" !=  "0%packetloss" ] && [ "$n" -le 5 ]
 do
@@ -226,10 +240,12 @@ if [ "$NetworkUp" != '0%packetloss' ]
 then
 echo ''
 echo "=============================================="
-echo "Ping yum.oracle.com not reliable.                 "
+echo "Ping yum.oracle.com not reliable.             "
 echo "Script exiting.                               "
 echo "=============================================="
+
 exit
+
 else
 echo ''
 echo "=============================================="

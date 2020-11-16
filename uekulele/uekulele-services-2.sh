@@ -472,12 +472,27 @@ echo "Ping test  google.com...                      "
 echo "=============================================="
 echo ''
 
-ping -c 3 yum.oracle.com -4
+if [ $Release -gt 6 ] && [ $LinuxFlavor = 'Oracle' ]
+then
+	ping -c 3 yum.oracle.com -4
+else
+	ping -c 3 yum.oracle.com
+fi
 
-function CheckNetworkUp {
-ping -c 3 google.com -4 | grep packet | cut -f3 -d',' | sed 's/ //g'
-}
-NetworkUp=$(CheckNetworkUp)
+
+if [ $Release -gt 6 ] && [ $LinuxFlavor = 'Oracle' ]
+then
+	function CheckNetworkUp {
+		ping -c 3 yum.oracle.com -4 | grep packet | cut -f3 -d',' | sed 's/ //g'
+	}
+	NetworkUp=$(CheckNetworkUp)
+else
+	function CheckNetworkUp {
+		ping -c 3 yum.oracle.com | grep packet | cut -f3 -d',' | sed 's/ //g'
+	}
+	NetworkUp=$(CheckNetworkUp)
+fi
+
 n=1
 while [ "$NetworkUp" !=  "0%packetloss" ] && [ "$n" -le 5 ]
 do

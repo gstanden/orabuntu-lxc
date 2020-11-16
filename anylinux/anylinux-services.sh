@@ -232,7 +232,7 @@ then
 
 		if [ -f /usr/bin/ol_yum_configure.sh ]
 		then
-			/usr/bin/ol_yum_configure.sh
+			/usr/bin/ol_yum_configure.sh > /dev/null 2>&1
 		fi
 
 	elif [ $OracleDistroRelease -eq 8 ]

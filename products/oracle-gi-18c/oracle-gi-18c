@@ -645,7 +645,10 @@ sudo cp -p /var/lib/lxc/$SeedContainerName/rootfs/config.asm.flex.cluster	/var/l
 sudo sed -i "s/MtuSetting/9000/g" 	  	  				/var/lib/lxc/$SeedContainerName/config.asm.flex.cluster
 sudo sed -i "s/ContainerName/$SeedContainerName/g" 				/var/lib/lxc/$SeedContainerName/config.asm.flex.cluster
 
-if [ $Release -eq 7 ] || [ $Release -eq 8 ]
+# GLS 20170927 credit yairchu
+function SoftwareVersion { echo "$@" | awk -F. '{ printf("%d%03d%03d%03d\n", $1,$2,$3,$4); }'; }
+
+if [ $(SoftwareVersion $LxcVersion) -ge $(SoftwareVersion "2.1.0") ]
 then
         sudo sed -i "s/ipv4/ipv4\.address/g"                                    /var/lib/lxc/$SeedContainerName/config.asm.flex.cluster
 fi
@@ -660,9 +663,6 @@ if [ $LinuxFlavor = 'Ubuntu' ]
 then
 	sudo sh -c "echo 'lxc.apparmor.profile = unconfined'		     >>	/var/lib/lxc/$SeedContainerName/config"
 fi
-
-# GLS 20170927 credit yairchu
-function SoftwareVersion { echo "$@" | awk -F. '{ printf("%d%03d%03d%03d\n", $1,$2,$3,$4); }'; }
 
 if [ $(SoftwareVersion $LxcVersion) -ge $(SoftwareVersion "2.1.0") ]
 then

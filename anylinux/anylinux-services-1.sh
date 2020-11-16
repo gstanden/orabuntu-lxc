@@ -236,10 +236,20 @@ echo "=============================================="
 echo ''
 
 n=1
-function CheckNetworkUp {
-	ping -c 3 yum.oracle.com > /dev/null 2>&1
-	echo $?
-}
+
+if [ $Release -gt 6 ] && [ $LinuxFlavor = 'Oracle' ]
+then
+	function CheckNetworkUp {
+		ping -c 3 yum.oracle.com -4 > /dev/null 2>&1
+		echo $?
+	}
+else
+	function CheckNetworkUp {
+		ping -c 3 yum.oracle.com > /dev/null 2>&1
+		echo $?
+	}
+fi
+
 NetworkUp=$(CheckNetworkUp)
 if [ "$NetworkUp" -ne 0 ]
 then
@@ -278,7 +288,14 @@ then
                 done
 		n=1
 		echo ''
-		ping -c 3 yum.oracle.com
+
+		if [ $Release -gt 6 ] && [ $LinuxFlavor = 'Oracle' ]
+		then
+			ping -c 3 yum.oracle.com -4
+		else
+			ping -c 3 yum.oracle.com
+		fi
+
 		echo ''
 		echo "=============================================="
 	        echo "Network ping test verification complete.      "
@@ -296,7 +313,12 @@ then
                 exit
         fi
 else
-	ping -c 3 yum.oracle.com
+	if [ $Release -gt 6 ] && [ $LinuxFlavor = 'Oracle' ]
+	then
+		ping -c 3 yum.oracle.com -4
+	else
+		ping -c 3 yum.oracle.com
+	fi
 fi
 
 sleep 5 
@@ -524,11 +546,19 @@ then
 	
 			fi # OK 5
 
-			function GetFacter {
-				facter --no-ruby virtual
-			}
-			Facter=$(GetFacter)
-		
+			if [ $Release -gt 7 ] && [ $LinuxFlavor = 'Oracle' ]
+			then
+				function GetFacter {
+					facter --no-ruby virtual
+				}
+				Facter=$(GetFacter)
+			else
+				function GetFacter {
+					facter virtual
+				}
+				Facter=$(GetFacter)
+			fi
+
 			sleep 5
 
 			clear
