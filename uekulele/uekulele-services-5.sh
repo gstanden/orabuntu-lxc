@@ -1177,8 +1177,21 @@ then
         		echo "=============================================="
         		echo ''
 
-        		sudo docker ps -a
+			function CheckDockerInstalled {
+				sudo rpm -qa | grep -c docker
+			}
+			DockerInstalled=$(CheckDockerInstalled)
 
+			if [ $DockerInstalled -gt 0 ]
+			then
+        			sudo docker ps -a
+			else
+        			echo "=============================================="
+				echo "Docker not installed on this system.          "
+        			echo "=============================================="
+			fi
+			
+			echo ''
         		echo "=============================================="
 			echo "Done: List Application (docker) Containers.   "
         		echo "=============================================="
