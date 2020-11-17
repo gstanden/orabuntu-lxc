@@ -1277,7 +1277,7 @@ if [ -d "$DistDir"/installs/logs ]
 then
 	cd "$DistDir"/installs/logs
 	LOGEXT=`date +"%Y-%m-%d.%R:%S"`
-	sudo cp -p /opt/olxc/installs/logs/$USER.log /opt/olxc/installs/logs/$USER.orabuntu-lxc.install.$LOGEXT
+	sudo cp -p /opt/olxc/installs/logs/$USER.log /opt/olxc/installs/logs/$USER.orabuntu-lxc.install.$LOGEXT > /dev/null 2>&1
 fi
 cd $DistDir/anylinux
 
