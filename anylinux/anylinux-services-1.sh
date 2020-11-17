@@ -925,7 +925,7 @@ then
        				echo "=============================================="
        				echo ''
 
-       	 			sudo apt-get -y update	
+       	 			apt-get -o Acquire::ForceIPv4=true update
 				sudo apt-get -y install facter
 
 				echo ''

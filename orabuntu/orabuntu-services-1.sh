@@ -1026,7 +1026,7 @@ then
 
 	while [ $ContainerCreated -eq 0 ] && [ $n -le 5 ]
 	do
-		sudo lxc-create -t download -n nsa -- --dist ubuntu --release xenial --arch amd64
+		sudo lxc-create -t download -n nsa -- --dist ubuntu --release xenial --arch amd64 --keyserver hkp://keyserver.ubuntu.com
 		sleep 5
 		n=$((n+1))
 		ContainerCreated=$(ConfirmContainerCreated)
@@ -1985,7 +1985,7 @@ then
 			sudo systemctl daemon-reload
        			sudo systemctl enable $k.service
 			sudo service $k start
-			sudo service $k status
+			sudo service $k status | cat
 
 			echo ''
 			echo "=============================================="
