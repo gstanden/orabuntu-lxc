@@ -409,14 +409,14 @@ clear
 
 echo ''
 echo "=============================================="
-echo "Ping test  google.com...                      "
+echo "Ping test  yum.oracle.com...                  "
 echo "=============================================="
 echo ''
 
-ping -c 3 google.com
+ping -c 3 yum.oracle.com
 
 function CheckNetworkUp {
-ping -c 3 google.com | grep packet | cut -f3 -d',' | sed 's/ //g'
+ping -c 3 yum.oracle.com | grep packet | cut -f3 -d',' | sed 's/ //g'
 }
 NetworkUp=$(CheckNetworkUp)
 n=1
@@ -430,14 +430,14 @@ if [ "$NetworkUp" != '0%packetloss' ]
 then
 echo ''
 echo "=============================================="
-echo "Ping google.com not reliably pingable.        "
+echo "Ping yum.oracle.com not reliably pingable.    "
 echo "Script exiting.                               "
 echo "=============================================="
 exit
 else
 echo ''
 echo "=============================================="
-echo "Ping google.com reliable.                     "
+echo "Ping yum.oracle.com reliable.                 "
 echo "=============================================="
 echo ''
 fi

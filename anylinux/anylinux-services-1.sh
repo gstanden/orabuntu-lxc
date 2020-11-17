@@ -191,6 +191,7 @@ then
                 cat /etc/lsb-release | grep DISTRIB_RELEASE | cut -f2 -d'=' | cut -f1 -d'.'
         }
         UbuntuMajorVersion=$(GetUbuntuMajorVersion)
+	Release=0
 fi
 
 echo ''
