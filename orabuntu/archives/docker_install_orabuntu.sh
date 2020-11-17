@@ -20,27 +20,34 @@ echo ''
 
 if   [ $UbuntuVersion = '16.04' ]
 then
-	sudo apt-get -y update
-	sudo apt-get -y install apt-transport-https ca-certificates curl software-properties-common
-	curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-	sudo apt-key fingerprint 0EBFCD88
-	sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-	sudo apt-get -y update
-	sudo apt-get -y install docker-ce
+#	apt-get -o Acquire::ForceIPv4=true update
+#	sudo apt-get -y install apt-transport-https ca-certificates curl software-properties-common
+#	curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+#	sudo apt-key fingerprint 0EBFCD88
+#	sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+#	sudo apt-get -y update
+#	sudo apt-get -y install docker-ce
+        sudo apt-get -o Acquire::ForceIPv4=true update
+        sudo apt-get -o Acquire::ForceIPv4=true -y install apt-transport-https ca-certificates curl software-properties-common
+        sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+        sudo apt-key fingerprint 0EBFCD88
+        sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+        sudo apt-get -o Acquire::ForceIPv4=true update
+        sudo apt-get -o Acquire::ForceIPv4=true -y install docker-ce
 
 elif [ $UbuntuVersion = '16.10' ]
 then
-	sudo apt-get install docker.io
+	sudo apt-get -y install docker.io
 
 elif [ $UbuntuMajorVersion -gt 17 ]
 then
-	sudo apt-get -y update
-	sudo apt-get -y install apt-transport-https ca-certificates curl software-properties-common
-	curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+	sudo apt-get -o Acquire::ForceIPv4=true update
+	sudo apt-get -o Acquire::ForceIPv4=true -y install apt-transport-https ca-certificates curl software-properties-common
+	sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
 	sudo apt-key fingerprint 0EBFCD88
 	sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu zesty stable"
-	sudo apt-get -y update
-	sudo apt-get -y install docker-ce
+	sudo apt-get -o Acquire::ForceIPv4=true update
+	sudo apt-get -o Acquire::ForceIPv4=true -y install docker-ce
 fi
 
 echo ''
