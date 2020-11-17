@@ -1917,7 +1917,7 @@ then
 				}
 				UEKVersion=$(CheckUEKVersion)
 
-				if [ $UEKVersion - eq 3 ]
+				if [ $UEKVersion -eq 3 ]
 				then
 					sudo sh -c "echo '[PUIAS_6_computational]'   >> /etc/yum.repos.d/puias-computational.repo"
 					sudo sh -c "echo 'name=PUIAS computational Base $releasever - $basearch'   >> /etc/yum.repos.d/puias-computational.repo"
