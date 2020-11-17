@@ -1897,7 +1897,7 @@ then
 			
 			echo ''
 			echo "=============================================="
-			echo "Install Python27 SCL...                       "
+			echo "Install Python27 for $LinuxFlavor $Release ..."
 			echo "=============================================="
 			echo ''
 
@@ -1912,11 +1912,31 @@ then
 
 			elif [ $LinuxFlavor = 'Oracle' ]
 			then
-				sudo yum -y install yum-utils
-				sudo yum -y install scl-utils
-				sudo yum-config-manager --enable public_ol6_software_collections
-				sudo yum -y install python27
-				source /opt/rh/python27/enable
+				function CheckUEKVersion {
+					sudo /opt/olxc/"$DistDir"/anylinux/vercomp | cut -f2 -d"'" | cut -f1 -d' ' | cut -f1 -d'.'
+				}
+				UEKVersion=$(CheckUEKVersion)
+
+				if [ $UEKVersion - eq 3 ]
+				then
+					sudo sh -c "echo '[PUIAS_6_computational]'   >> /etc/yum.repos.d/puias-computational.repo"
+					sudo sh -c "echo 'name=PUIAS computational Base $releasever - $basearch'   >> /etc/yum.repos.d/puias-computational.repo"
+					sudo sh -c "echo 'mirrorlist=http://puias.math.ias.edu/data/puias/computational/\$releasever/\$basearch/mirrorlist'   >> /etc/yum.repos.d/puias-computational.repo"
+					sudo sh -c "echo 'gpgcheck=1'   >> /etc/yum.repos.d/puias-computational.repo"
+					sudo sh -c "echo 'gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-puias'   >> /etc/yum.repos.d/puias-computational.repo"
+					cd /etc/pki/rpm-gpg/
+					sudo wget -q http://springdale.math.ias.edu/data/puias/6/x86_64/os/RPM-GPG-KEY-puias
+					sudo rpm --import RPM-GPG-KEY-puias
+					sudo yum install python27 python27-devel python27-libs python27-setuptools
+
+				elif [ $UEKVersion -eq 4 ]
+				then
+					sudo yum -y install yum-utils
+					sudo yum -y install scl-utils
+					sudo yum-config-manager --enable public_ol6_software_collections
+					sudo yum -y install python27
+					source /opt/rh/python27/enable
+				fi
 			fi
 
 			
@@ -3431,7 +3451,7 @@ then
 
 		if [ $FileSystemTypeExt -eq 1 ]
 		then
-			if [ $LinuxFlavor = 'CentOS' ]
+			if   [ $LinuxFlavor = 'CentOS' ]
 			then
 				if   [ $Release -ge 7 ]
 				then
@@ -3448,6 +3468,30 @@ then
 					NameServer=$NameServerBase
 					sudo lxc-start -n $NameServer
 				fi
+			elif [ $LinuxFlavor = 'Oracle' ] 
+			then
+				if   [ $Release -eq 6 ] && [ $RHMV -eq 10 ]
+				then
+					function CheckUEKVersion {
+						sudo /opt/olxc/"$DistDir"/anylinux/vercomp | cut -f2 -d"'" | cut -f1 -d' ' | cut -f1 -d'.'
+					}
+					UEKVersion=$(CheckUEKVersion)
+
+					if   [ $UEKVersion -eq 3 ]
+					then
+						sudo lxc-stop -n $NameServer > /dev/null 2>&1
+						sudo lxc-copy -n $NameServer -N $NameServerBase
+						NameServer=$NameServerBase
+						sudo lxc-start -n $NameServer
+
+					elif [ $UEKVersion -eq 4 ]
+					then
+						sudo lxc-stop -n $NameServer > /dev/null 2>&1
+						sudo lxc-copy -n $NameServer -N $NameServerBase -B overlayfs -s
+						NameServer=$NameServerBase
+						sudo lxc-start -n $NameServer
+					fi
+				fi
 			else
 				sudo lxc-stop -n $NameServer > /dev/null 2>&1
 				sudo lxc-copy -n $NameServer -N $NameServerBase -B overlayfs -s
@@ -3455,7 +3499,7 @@ then
 				sudo lxc-start -n $NameServer
 			fi
 		fi
-		
+	
 		if [ $FileSystemTypeBtrfs -eq 1 ]
 		then
 			sudo lxc-copy  -n $NameServer -N $NameServerBase -B overlayfs -s
@@ -3812,6 +3856,8 @@ then
 	clear
 
 	sudo sh -c "cat '/var/lib/lxc/$NameServerBase/delta0/root/.ssh/id_rsa.pub' >> /home/amide/.ssh/authorized_keys"
+	sudo sh -c "cat '/var/lib/lxc/$NameServer/delta0/root/.ssh/id_rsa.pub' >> /home/amide/.ssh/authorized_keys"
+	sleep 5
                
 	echo ''
 	echo "=============================================="

@@ -1339,6 +1339,9 @@ fi
 
 sudo rm  -f /opt/olxc/GNU3
 sudo rm -rf /opt/olxc/home
+sudo mkdir -p /opt/olxc/home/scst-files
+sudo cp -p "$DistDir"/anylinux/vercomp /opt/olxc/home/scst-files/.
+sudo chmod +x $DistDir"/anylinux/vercomp /opt/olxc/home/scst-files/vercomp
 
 cp -p $DistDir/anylinux/GNU3 /opt/olxc/GNU3
 

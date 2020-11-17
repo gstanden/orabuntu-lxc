@@ -33,6 +33,7 @@
 
 LinuxFlavor=$1
     Release=$2
+    DistDir=$3
 
 if [ $LinuxFlavor = 'Oracle' ]
 then
@@ -63,23 +64,36 @@ then
 
 	elif [ $Release -eq 6 ]
 	then
-		echo ''
-		echo "=============================================="
-		echo "Install docker-ce...                          "
-		echo "=============================================="
-		echo ''
+		function CheckUEKVersion {
+			sudo /opt/olxc/"$DistDir"/anylinux/vercomp | cut -f2 -d"'" | cut -f1 -d' ' | cut -f1 -d'.'
+		}
+		UEKVersion=$(CheckUEKVersion)
 
-		sudo yum-config-manager --enable public_ol6_addons
-		sudo yum -y install docker-engine
-		sleep 5
-		sudo sh -c "service docker start"
-		sleep 5
-		sudo service docker start
-		sleep 5
-		sudo chkconfig docker on
-		sleep 5
-		sudo sh -c "service docker status"
-		sleep 5
+		if [ $UEKVersion -ge 4 ]
+		then
+			echo ''
+			echo "=============================================="
+			echo "Install docker-ce...                          "
+			echo "=============================================="
+			echo ''
+
+			sudo yum-config-manager --enable public_ol6_addons
+			sudo yum -y install docker-engine
+			sleep 5
+			sudo sh -c "service docker start"
+			sleep 5
+			sudo service docker start
+			sleep 5
+			sudo chkconfig docker on
+			sleep 5
+			sudo sh -c "service docker status"
+			sleep 5
+		else
+			echo "=============================================="
+			echo "Docker unsupported on UEK $UEKVersion kernels."
+			echo "=============================================="
+			sleep 5
+		fi
 	fi
 fi
 
@@ -145,7 +159,7 @@ fi
 
 # Install alpine-nettools
 
-if   [ $Release -le 7 ]
+if   [ $Release -le 7 ] && [ $UEKVersion -ge 4 ]
 then
 	sudo docker run -d oraclelinux:7.3
 	sudo docker run -d -p 2200:22 raesene/alpine-nettools
