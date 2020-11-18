@@ -233,7 +233,7 @@ then
 	echo ''
 	sudo systemctl start  systemd-resolved
 	echo ''
-	sudo service systemd-resolved status | cat
+	sudo service systemd-resolved status | head -50
 	echo ''
 fi
 
@@ -1985,7 +1985,7 @@ then
 			sudo systemctl daemon-reload
        			sudo systemctl enable $k.service
 			sudo service $k start
-			sudo service $k status | cat
+			sudo service $k status | head -50
 
 			echo ''
 			echo "=============================================="
@@ -2177,7 +2177,7 @@ sleep 2
 echo ''
 sudo ifconfig sw1
 echo ''
-sudo service sw1 status
+sudo service sw1 status | head -50
 
 echo ''
 echo "=============================================="
@@ -2202,7 +2202,7 @@ sleep 2
 echo ''
 sudo ifconfig sx1
 echo ''
-sudo service sx1 status
+sudo service sx1 status | head -50
 
 echo ''
 echo "=============================================="
@@ -2932,7 +2932,7 @@ then
 
         sudo service systemd-resolved restart
         sleep 2
-	sudo service systemd-resolved status | cat
+	sudo service systemd-resolved status | head -50
 
         echo ''
         echo "=============================================="
@@ -2955,7 +2955,7 @@ then
 
         sudo service lxc-net restart
         sleep 2
-        sudo service lxc-net status | cat
+        sudo service lxc-net status | head -50
 
         echo ''
         echo "=============================================="
