@@ -1927,7 +1927,7 @@ then
 					cd /etc/pki/rpm-gpg/
 					sudo wget -q http://springdale.math.ias.edu/data/puias/6/x86_64/os/RPM-GPG-KEY-puias
 					sudo rpm --import RPM-GPG-KEY-puias
-					sudo yum install python27 python27-devel python27-libs python27-setuptools
+					sudo yum -y install python27 python27-devel python27-libs python27-setuptools
 
 				elif [ $UEKVersion -eq 4 ]
 				then

@@ -404,7 +404,7 @@ then
 			echo "DISTRO RELEASE	KERN	  TYPE EDITION      "
 			echo "CentOS Linux 6.x	ELREPO-4  V,P 	ALL         "
 			echo "CentOS Linux 7.x	ALL	  V,P 	ALL         "
-			echo "Fedora Linux 27	ALL	  V,P 	ALL "
+			echo "Fedora Linux 27	  ALL       V,P   ALL       "
 			echo "Oracle Linux 6.x	RHEL,UEK  V,P 	ALL         "
 			echo "Oracle Linux 7.x	RHEL,UEK  V,P 	ALL         "
 			echo "Oracle Linux 8.x	RHEL,UEK  V,P 	ALL         "
