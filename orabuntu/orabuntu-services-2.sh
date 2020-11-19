@@ -278,7 +278,7 @@ if [ $UbuntuMajorVersion -ge 20 ]
 then
 	while [ $ContainerCreated -eq 0 ] && [ $n -le 5 ]
 	do
-		sudo lxc-create -t download -n oel$OracleRelease$SeedPostfix -- --dist oracle --release $MajorRelease --arch amd64
+		sudo lxc-create -t download -n oel$OracleRelease$SeedPostfix -- --dist oracle --release $MajorRelease --arch amd64 --keyserver hkp://keyserver.ubuntu.com
 		sleep 5
 		n=$((n+1))
 		ContainerCreated=$(ConfirmContainerCreated)
