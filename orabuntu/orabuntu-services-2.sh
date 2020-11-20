@@ -330,23 +330,31 @@ echo ''
 
 sudo mkdir -p /var/lib/lxc/oel$OracleRelease$SeedPostfix 
 cd /opt/olxc/"$DistDir"/orabuntu/archives
-sudo tar -xvf /opt/olxc/"$DistDir"/orabuntu/archives/lxc-oracle-files.tar -C /var/lib/lxc/oel$OracleRelease$SeedPostfix --touch
 
-sudo chown root:root /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/etc/dhcp/dhclient.conf
-sudo chmod 644 /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/etc/dhcp/dhclient.conf
-sudo sed -i "s/HOSTNAME=ContainerName/HOSTNAME=oel$OracleRelease$SeedPostfix/g" /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/etc/sysconfig/network
-# sudo rm /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/etc/ntp.conf
-
-if [ -n $Domain1 ]
+if   [ $MajorRelease -ge 8 ]
 then
-        sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/etc/NetworkManager/dnsmasq.d/local
-	sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/etc/dhcp/dhclient.conf
-fi
+# 	sudo mkdir -p /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs
+	sudo tar -vP --extract --file=lxc-oracle-files.tar --directory /var/lib/lxc/oel$OracleRelease$SeedPostfix rootfs/config.oracle.bak.oel$MajorRelease
 
-if [ -n $Domain2 ]
+elif [ $MajorRelease -eq 7 ] || [ $MajorRelease -eq 6 ]
 then
-        sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/etc/NetworkManager/dnsmasq.d/local
-	sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/etc/dhcp/dhclient.conf
+	sudo tar -xvf /opt/olxc/"$DistDir"/orabuntu/archives/lxc-oracle-files.tar -C /var/lib/lxc/oel$OracleRelease$SeedPostfix --touch
+	sudo chown root:root /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/etc/dhcp/dhclient.conf
+	sudo chmod 644 /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/etc/dhcp/dhclient.conf
+	sudo sed -i "s/HOSTNAME=ContainerName/HOSTNAME=oel$OracleRelease$SeedPostfix/g" /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/etc/sysconfig/network
+	# sudo rm /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/etc/ntp.conf
+
+	if [ -n $Domain1 ]
+	then
+        	sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/etc/NetworkManager/dnsmasq.d/local
+		sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/etc/dhcp/dhclient.conf
+	fi
+
+	if [ -n $Domain2 ]
+	then
+        	sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/etc/NetworkManager/dnsmasq.d/local
+		sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/etc/dhcp/dhclient.conf
+	fi
 fi
 
 echo ''
@@ -358,39 +366,43 @@ sleep 5
 
 clear
 
-echo ''
-echo "=============================================="
-echo "Begin LXC container MAC address reset...      "
-echo "=============================================="
-echo ''
+if [ $MajorRelease -ge 6 ]
+then
+	echo ''
+	echo "=============================================="
+	echo "Begin LXC container MAC address reset...      "
+	echo "=============================================="
+	echo ''
 
-sudo cp /var/lib/lxc/oel$OracleRelease$SeedPostfix/config /var/lib/lxc/oel$OracleRelease$SeedPostfix/config.original.bak
+	sudo cp /var/lib/lxc/oel$OracleRelease$SeedPostfix/config /var/lib/lxc/oel$OracleRelease$SeedPostfix/config.original.bak
 
-function GetOriginalHwaddr {
-	sudo cat /var/lib/lxc/oel$OracleRelease$SeedPostfix/config | grep hwaddr | tail -1 | sed 's/\./\\\./g'
-}
-OriginalHwaddr=$(GetOriginalHwaddr)
-echo $OriginalHwaddr | sed 's/\\//g'
+	function GetOriginalHwaddr {
+		sudo cat /var/lib/lxc/oel$OracleRelease$SeedPostfix/config | grep hwaddr | tail -1 | sed 's/\./\\\./g'
+	}
+	OriginalHwaddr=$(GetOriginalHwaddr)
+	echo $OriginalHwaddr | sed 's/\\//g'
 
-sudo cp -p /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/config.oracle.bak.oel$MajorRelease /var/lib/lxc/oel$OracleRelease$SeedPostfix/config.oracle
+	sudo cp -p /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/config.oracle.bak.oel$MajorRelease /var/lib/lxc/oel$OracleRelease$SeedPostfix/config.oracle
+	sleep 10
 
-sudo sed -i "s/lxc\.network\.hwaddr.*/$OriginalHwaddr/" /var/lib/lxc/oel$OracleRelease$SeedPostfix/config.oracle
-sudo cp -p /var/lib/lxc/oel$OracleRelease$SeedPostfix/config.oracle /var/lib/lxc/oel$OracleRelease$SeedPostfix/config
+	sudo sed -i "s/lxc\.network\.hwaddr.*/$OriginalHwaddr/" /var/lib/lxc/oel$OracleRelease$SeedPostfix/config.oracle
+	sudo cp -p /var/lib/lxc/oel$OracleRelease$SeedPostfix/config.oracle /var/lib/lxc/oel$OracleRelease$SeedPostfix/config
 
-# sudo sed -i "s/lxc\.mount\.entry = \/dev\/lxc_luns/#lxc\.mount\.entry = \/dev\/lxc_luns/g" /var/lib/lxc/oel$OracleRelease$SeedPostfix/config
+	# sudo sed -i "s/lxc\.mount\.entry = \/dev\/lxc_luns/#lxc\.mount\.entry = \/dev\/lxc_luns/g" /var/lib/lxc/oel$OracleRelease$SeedPostfix/config
 
-echo ''
-echo "These should match..."
-echo ''
-sudo grep hwaddr /var/lib/lxc/oel$OracleRelease$SeedPostfix/config.original.bak | tail -1
-sudo grep hwaddr /var/lib/lxc/oel$OracleRelease$SeedPostfix/config.oracle
+	echo ''
+	echo "These should match..."
+	echo ''
+	sudo grep hwaddr /var/lib/lxc/oel$OracleRelease$SeedPostfix/config.original.bak | tail -1
+	sudo grep hwaddr /var/lib/lxc/oel$OracleRelease$SeedPostfix/config.oracle
 
-sudo chmod 644 /var/lib/lxc/oel$OracleRelease$SeedPostfix/config
+	sudo chmod 644 /var/lib/lxc/oel$OracleRelease$SeedPostfix/config
 
-echo ''
-echo "=============================================="
-echo "LXC container MAC address reset complete.     "
-echo "=============================================="
+	echo ''
+	echo "=============================================="
+	echo "LXC container MAC address reset complete.     "
+	echo "=============================================="
+fi
 
 sleep 5
 
