@@ -278,15 +278,27 @@ if [ $UbuntuMajorVersion -ge 20 ]
 then
 	while [ $ContainerCreated -eq 0 ] && [ $n -le 5 ]
 	do
-		sudo lxc-create -t download -n oel$OracleRelease$SeedPostfix -- --dist oracle --release $MajorRelease --arch amd64 --keyserver hkp://keyserver.ubuntu.com
+		sudo lxc-create -t download -n oel$OracleRelease$SeedPostfix -- --dist oracle --release $MajorRelease --arch amd64 --keyserver hkp://p80.pool.sks-keyservers.net:80
+		
+		if [ $? -ne 0 ]
+		then
+			sudo lxc-create -t download -n oel$OracleRelease$SeedPostfix -- --dist oracle --release $MajorRelease --arch amd64 --keyserver hkp://keyserver.ubuntu.com:80
+			
+			if [ $? -ne 0 ]
+			then
+				sudo lxc-create -t download -n oel$OracleRelease$SeedPostfix -- --dist oracle --release $MajorRelease --arch amd64 --no-validate
+			fi
+		fi
+                
 		sleep 5
-		n=$((n+1))
-		ContainerCreated=$(ConfirmContainerCreated)
-	done
+                n=$((n+1))
+                ContainerCreated=$(ConfirmContainerCreated)
+        done
 else
 	while [ $ContainerCreated -eq 0 ] && [ $n -le 5 ]
 	do
 		sudo lxc-create -n oel$OracleRelease$SeedPostfix -t oracle -- --release=$OracleVersion
+		
 		sleep 5
 		n=$((n+1))
 		ContainerCreated=$(ConfirmContainerCreated)
