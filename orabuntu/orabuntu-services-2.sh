@@ -274,15 +274,15 @@ ContainerCreated=$(ConfirmContainerCreated)
 
 n=1
 
-if [ $UbuntuMajorVersion -ge 20 ]
+if [ $UbuntuMajorVersion -ge 20 ] # Because yum is no longer available in Ubuntu 20
 then
 	while [ $ContainerCreated -eq 0 ] && [ $n -le 5 ]
 	do
-		sudo lxc-create -t download -n oel$OracleRelease$SeedPostfix -- --dist oracle --release $MajorRelease --arch amd64 --keyserver hkp://p80.pool.sks-keyservers.net:80
+		sudo lxc-create -t download -n oel$OracleRelease$SeedPostfix -- --dist oracle --release $MajorRelease --arch amd64 --keyserver hkp://p80.pool.sks-keyservers.net:80 --keyserver-options "timeout=30"
 		
 		if [ $? -ne 0 ]
 		then
-			sudo lxc-create -t download -n oel$OracleRelease$SeedPostfix -- --dist oracle --release $MajorRelease --arch amd64 --keyserver hkp://keyserver.ubuntu.com:80
+			sudo lxc-create -t download -n oel$OracleRelease$SeedPostfix -- --dist oracle --release $MajorRelease --arch amd64 --keyserver hkp://keyserver.ubuntu.com:80 --keyserver-options "timeout=30"
 			
 			if [ $? -ne 0 ]
 			then
@@ -297,8 +297,15 @@ then
 else
 	while [ $ContainerCreated -eq 0 ] && [ $n -le 5 ]
 	do
-		sudo lxc-create -n oel$OracleRelease$SeedPostfix -t oracle -- --release=$OracleVersion
-		
+		if   [ $MajorRelease -le 7 ]
+		then
+			sudo lxc-create -n oel$OracleRelease$SeedPostfix -t oracle -- --release=$OracleVersion
+
+		elif [ $MajorRelease -eq 8 ] #Because only image download is availalbe for Oracle Linux 8
+		then
+			sudo lxc-create -t download -n oel$OracleRelease$SeedPostfix -- --dist oracle --release $MajorRelease --arch amd64 --keyserver hkp://p80.pool.sks-keyservers.net:80 --keyserver-options "timeout=30"
+		fi
+
 		sleep 5
 		n=$((n+1))
 		ContainerCreated=$(ConfirmContainerCreated)
@@ -331,12 +338,14 @@ echo ''
 sudo mkdir -p /var/lib/lxc/oel$OracleRelease$SeedPostfix 
 cd /opt/olxc/"$DistDir"/orabuntu/archives
 
-if   [ $MajorRelease -ge 8 ]
-then
-# 	sudo mkdir -p /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs
-	sudo tar -vP --extract --file=lxc-oracle-files.tar --directory /var/lib/lxc/oel$OracleRelease$SeedPostfix rootfs/config.oracle.bak.oel$MajorRelease
+# if [ $MajorRelease -ge 8 ]
+# then
+# 	sudo tar -vP --extract --file=lxc-oracle-files.tar --directory /var/lib/lxc/oel$OracleRelease$SeedPostfix rootfs/config.oracle.bak.oel$MajorRelease
+# fi
 
-elif [ $MajorRelease -eq 7 ] || [ $MajorRelease -eq 6 ]
+# if [ $MajorRelease -eq 7 ] || [ $MajorRelease -eq 6 ]
+
+if [ $MajorRelease -ge 6 ]
 then
 	sudo tar -xvf /opt/olxc/"$DistDir"/orabuntu/archives/lxc-oracle-files.tar -C /var/lib/lxc/oel$OracleRelease$SeedPostfix --touch
 	sudo chown root:root /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/etc/dhcp/dhclient.conf

@@ -1567,7 +1567,7 @@ then
 				sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /etc/systemd/resolved.conf > /dev/null 2>&1
 			fi
 #			
-			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /run/systemd/resolve/stub-resolv.conf
+			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /run/systemd/resolve/stub-resolv.conf > /dev/null 2>&1
 			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/etc/bind/named.conf.local
 			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/etc/dhcp/dhcpd.conf
 			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/etc/network/interfaces
@@ -2629,10 +2629,9 @@ then
 
 	NameServerBase=$(GetNameServerBase)
 
-	sudo sh -c "cat '/var/lib/lxc/$NameServerBase/overlay/delta/root/.ssh/id_rsa.pub'             >> /home/amide/.ssh/authorized_keys"
-
-#	sudo sh -c "cat '/var/lib/lxc/$NameServerBase/delta0/root/.ssh/id_rsa.pub' >> /home/amide/.ssh/authorized_keys"
-#	sudo sh -c "cat '/var/lib/lxc/$NameServer/delta0/root/.ssh/id_rsa.pub'     >  /home/amide/.ssh/authorized_keys"
+#	sudo sh -c "cat '/var/lib/lxc/$NameServerBase/overlay/delta/root/.ssh/id_rsa.pub'             	>> /home/amide/.ssh/authorized_keys"
+#	sudo sh -c "cat '/var/lib/lxc/$NameServerBase/delta0/root/.ssh/id_rsa.pub' 			>> /home/amide/.ssh/authorized_keys"
+#	sudo sh -c "cat '/var/lib/lxc/$NameServer/delta0/root/.ssh/id_rsa.pub'     			>  /home/amide/.ssh/authorized_keys"
 
 	echo ''
 	echo "=============================================="
