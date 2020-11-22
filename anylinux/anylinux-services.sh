@@ -867,10 +867,10 @@ then
 	then
         	while [ $DNSHit -eq 0 ]
         	do
-                	Sx1Index=$((Sx1Index+1))
-                	DNSLookup=$(CheckDNSLookup)
-                	DNSHit=$PIPESTATUS
-                	echo $Sx1Net.$Sx1Index
+			Sx1Index=$((Sx1Index+1))
+			DNSLookup=$(CheckDNSLookup)
+			DNSHit=$PIPESTATUS
+#			echo $Sx1Net.$Sx1Index
         	done
 
 #        	if [ $DNSHit -eq 1 ]
@@ -890,10 +890,10 @@ then
 	then
         	while [ $DNSHit -eq 0 ]
         	do
-                	Sw1Index=$((Sw1Index+1))
-                	DNSLookup=$(CheckDNSLookup)
-                	DNSHit=$PIPESTATUS
-                	echo $Sw1Net.$Sw1Index
+			Sw1Index=$((Sw1Index+1))
+			DNSLookup=$(CheckDNSLookup)
+			DNSHit=$PIPESTATUS
+#			echo $Sw1Net.$Sw1Index
         	done
 
 #        	if [ $DNSHit -eq 1 ]

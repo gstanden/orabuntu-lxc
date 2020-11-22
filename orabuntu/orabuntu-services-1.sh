@@ -1030,10 +1030,16 @@ then
 
 		if [ $? -ne 0 ]
 		then
+			sudo lxc-stop -n nsa -k
+			sudo lxc-destroy -n nsa
+			sudo rm -rf /var/lib/lxc/nsa
 			sudo lxc-create -t download -n nsa -- --dist ubuntu --release xenial --arch amd64 --keyserver hkp://p80.pool.sks-keyservers.net:80
 
 			if [ $? -ne 0 ]
 			then
+				sudo lxc-stop -n nsa -k
+				sudo lxc-destroy -n nsa
+				sudo rm -rf /var/lib/lxc/nsa
                                 sudo lxc-create -t download -n nsa -- --dist ubuntu --release xenial --arch amd64 --no-validate
 			fi
 		fi

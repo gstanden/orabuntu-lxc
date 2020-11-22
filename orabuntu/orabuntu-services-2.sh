@@ -213,7 +213,7 @@ then
 		fi
 	fi
 
-elif [ $MultiHostVar3 -eq 1 ] && [ $GREValue = 'N' ]
+elif [ $MultiHostVar3 = '1' ] && [ $GREValue = 'N' ]
 then
 	SeedIndex=10
 	SeedPostfix=c$SeedIndex
@@ -282,10 +282,16 @@ then
 		
 		if [ $? -ne 0 ]
 		then
+			sudo lxc-stop -n oel$OracleRelease$SeedPostfix -k
+			sudo lxc-destroy -n oel$OracleRelease$SeedPostfix
+			sudo rm -rf /var/lib/lxc/oel$OracleRelease$SeedPostfix
 			sudo lxc-create -t download -n oel$OracleRelease$SeedPostfix -- --dist oracle --release $MajorRelease --arch amd64 --keyserver hkp://keyserver.ubuntu.com:80
 			
 			if [ $? -ne 0 ]
 			then
+				sudo lxc-stop -n oel$OracleRelease$SeedPostfix -k
+				sudo lxc-destroy -n oel$OracleRelease$SeedPostfix
+				sudo rm -rf /var/lib/lxc/oel$OracleRelease$SeedPostfix
 				sudo lxc-create -t download -n oel$OracleRelease$SeedPostfix -- --dist oracle --release $MajorRelease --arch amd64 --no-validate
 			fi
 		fi
@@ -304,6 +310,21 @@ else
 		elif [ $MajorRelease -eq 8 ] #Because only image download is availalbe for Oracle Linux 8
 		then
 			sudo lxc-create -t download -n oel$OracleRelease$SeedPostfix -- --dist oracle --release $MajorRelease --arch amd64 --keyserver hkp://p80.pool.sks-keyservers.net:80
+			if [ $? -ne 0 ]
+			then
+				sudo lxc-stop -n oel$OracleRelease$SeedPostfix -k
+				sudo lxc-destroy -n oel$OracleRelease$SeedPostfix
+				sudo rm -rf /var/lib/lxc/oel$OracleRelease$SeedPostfix
+				sudo lxc-create -t download -n oel$OracleRelease$SeedPostfix -- --dist oracle --release $MajorRelease --arch amd64 --keyserver hkp://keyserver.ubuntu.com:80
+
+				if [ $? -ne 0 ]
+				then
+					sudo lxc-stop -n oel$OracleRelease$SeedPostfix -k
+					sudo lxc-destroy -n oel$OracleRelease$SeedPostfix
+					sudo rm -rf /var/lib/lxc/oel$OracleRelease$SeedPostfix
+					sudo lxc-create -t download -n oel$OracleRelease$SeedPostfix -- --dist oracle --release $MajorRelease --arch amd64 --no-validate
+				fi
+			fi
 		fi
 
 		sleep 5
@@ -341,6 +362,8 @@ cd /opt/olxc/"$DistDir"/orabuntu/archives
 if [ $MajorRelease -ge 8 ]
 then
 	sudo tar -vP --extract --file=lxc-oracle-files.tar --directory /var/lib/lxc/oel$OracleRelease$SeedPostfix rootfs/config.oracle.bak.oel$MajorRelease
+	sudo tar -vP --extract --file=lxc-oracle-files.tar --directory /var/lib/lxc/oel$OracleRelease$SeedPostfix rootfs/etc/ntp.conf
+	sudo tar -vP --extract --file=lxc-oracle-files.tar --directory /var/lib/lxc/oel$OracleRelease$SeedPostfix rootfs/etc/sysconfig/ntpd
 fi
 
 if [ $MajorRelease -eq 7 ] || [ $MajorRelease -eq 6 ]
