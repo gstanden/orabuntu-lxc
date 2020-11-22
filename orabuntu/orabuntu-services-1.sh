@@ -1026,7 +1026,18 @@ then
 
 	while [ $ContainerCreated -eq 0 ] && [ $n -le 5 ]
 	do
-		sudo lxc-create -t download -n nsa -- --dist ubuntu --release xenial --arch amd64 --keyserver hkp://keyserver.ubuntu.com
+		sudo lxc-create -t download -n nsa -- --dist ubuntu --release xenial --arch amd64 --keyserver hkp://keyserver.ubuntu.com:80
+
+		if [ $? -ne 0 ]
+		then
+			sudo lxc-create -t download -n nsa -- --dist ubuntu --release xenial --arch amd64 --keyserver hkp://p80.pool.sks-keyservers.net:80
+
+			if [ $? -ne 0 ]
+			then
+                                sudo lxc-create -t download -n nsa -- --dist ubuntu --release xenial --arch amd64 --no-validate
+			fi
+		fi
+
 		sleep 5
 		n=$((n+1))
 		ContainerCreated=$(ConfirmContainerCreated)
