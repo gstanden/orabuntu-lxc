@@ -218,18 +218,23 @@ then
 	SeedIndex=10
 	SeedPostfix=c$SeedIndex
 
-	function CheckHighestSeedIndexHit {
-        	sudo nslookup -timeout=10 oel$OracleRelease$SeedPostfix | grep -v '#' | grep Address | grep '10\.207\.29' | wc -l
-	}
-	HighestSeedIndexHit=$(CheckHighestSeedIndexHit)
+	if [ $ContainerCreated -gt 0 ]
+	then
+		function CheckHighestSeedIndexHit {
+        		sudo host -W1 oel$OracleRelease$SeedPostfix | grep '10\.207\.29' | wc -l
+		}
+		HighestSeedIndexHit=$(CheckHighestSeedIndexHit)
 
-	while [ $HighestSeedIndexHit = 1 ]
-	do
-        	SeedIndex=$((SeedIndex+1))
-        	SeedPostfix=c$SeedIndex
-        	HighestSeedIndexHit=$(CheckHighestSeedIndexHit)
-	done
-	SeedPostfix=c$SeedIndex
+		while [ $HighestSeedIndexHit = 1 ]
+		do
+        		SeedIndex=$((SeedIndex+1))
+        		SeedPostfix=c$SeedIndex
+        		HighestSeedIndexHit=$(CheckHighestSeedIndexHit)
+		done
+		SeedPostfix=c$SeedIndex
+	else
+		SeedPostfix=c$SeedIndex
+	fi
 fi
 
 echo ''
@@ -740,37 +745,38 @@ then
 	        sudo service systemd-resolved restart
 fi
 
-function CheckNetworkUp {
-ping -c 3 oel$OracleRelease$SeedPostfix.$Domain2 | grep packet | cut -f3 -d',' | sed 's/ //g'
-}
-NetworkUp=$(CheckNetworkUp)
-n=1
-while [ "$NetworkUp" !=  "0%packetloss" ] && [ "$n" -le 5 ]
-do
-NetworkUp=$(CheckNetworkUp)
-n=$((n+1))
-done
+# function CheckNetworkUp {
+# 	ping -c 3 oel$OracleRelease$SeedPostfix.$Domain2 | grep packet | cut -f3 -d',' | sed 's/ //g'
+# }
+# NetworkUp=$(CheckNetworkUp)
+# n=1
+# while [ "$NetworkUp" !=  "0%packetloss" ] && [ "$n" -le 5 ]
+# do
+# NetworkUp=$(CheckNetworkUp)
+# n=$((n+1))
+# done
 
-if [ $SystemdResolvedInstalled -eq 1 ]
-then
-	sudo service systemd-resolved restart > /dev/null 2>&1
-	sleep 2
-fi
-ping -c 3 oel$OracleRelease$SeedPostfix.$Domain2
+# if [ $SystemdResolvedInstalled -eq 1 ]
+# then
+# 	sudo service systemd-resolved restart > /dev/null 2>&1
+# 	sleep 2
+# fi
 
-if [ "$NetworkUp" != '0%packetloss' ]
-then
-echo ''
-echo "=============================================="
-echo "Container oel$OracleRelease$SeedPostfix not pinging."
-echo "=============================================="
-else
-echo ''
-echo "=============================================="
-echo "Container oel$OracleRelease$SeedPostfix is pingable."
-echo "=============================================="
-echo ''
-fi
+# ping -c 3 oel$OracleRelease$SeedPostfix.$Domain2
+
+# if [ "$NetworkUp" != '0%packetloss' ]
+# then
+# echo ''
+# echo "=============================================="
+# echo "Container oel$OracleRelease$SeedPostfix not pinging."
+# echo "=============================================="
+# else
+# echo ''
+# echo "=============================================="
+# echo "Container oel$OracleRelease$SeedPostfix is pingable."
+# echo "=============================================="
+# echo ''
+# fi
 
 sleep 5
 
