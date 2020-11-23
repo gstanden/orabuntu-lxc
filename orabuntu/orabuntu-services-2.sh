@@ -178,6 +178,11 @@ then
 	clear
 fi
 
+function ConfirmContainerCreated {
+	sudo lxc-ls -f | grep oel$OracleRelease$SeedPostfix | wc -l
+}
+ContainerCreated=$(ConfirmContainerCreated)
+
 if   [ $MultiHostVar3 = 'X' ] && [ $GREValue = 'Y' ]
 then
 	SeedIndex=10
@@ -271,11 +276,6 @@ echo ''
 # sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" lxc-stop -n $NameServer -k; sudo -S <<< "$MultiHostVar9" lxc-start -n $NameServer"
 
 sleep 5
-
-function ConfirmContainerCreated {
-	sudo lxc-ls -f | grep oel$OracleRelease$SeedPostfix | wc -l
-}
-ContainerCreated=$(ConfirmContainerCreated)
 
 n=1
 
