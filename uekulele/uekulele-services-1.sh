@@ -3762,6 +3762,7 @@ then
 	sudo useradd -m -p $(openssl passwd -1 ${PASSWORD}) -s /bin/bash ${USERNAME}
 	sudo mkdir -p  /home/${USERNAME}/Downloads /home/${USERNAME}/Manage-Orabuntu
 	sudo chown ${USERNAME}:${USERNAME} /home/${USERNAME}/Downloads /home/${USERNAME}/Manage-Orabuntu
+	sudo sed -i "/lxc\.mount\.entry/s/#/ /" /var/lib/lxc/$NameServer/config
 	
 	echo ''
 	echo "=============================================="
@@ -3962,7 +3963,7 @@ then
 	sudo chown ${USERNAME}:${USERNAME} /home/${USERNAME}/Downloads /home/${USERNAME}/Manage-Orabuntu
 	sudo runuser -l amide -c "ssh-keygen -f /home/amide/.ssh/id_rsa -t rsa -N ''"
 	sudo sh -c "cat '/var/lib/lxc/$NameServerBase/delta0/root/.ssh/id_rsa.pub' >> /home/amide/.ssh/authorized_keys"
-
+	sudo sed -i "/lxc\.mount\.entry/s/#/ /" /var/lib/lxc/$NameServer/config
 	sudo sh -c "echo 'amide ALL=/bin/mkdir, /bin/cp' > /etc/sudoers.d/amide"
 	sudo chmod 0440 /etc/sudoers.d/amide
 

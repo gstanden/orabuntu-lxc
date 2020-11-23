@@ -2552,6 +2552,7 @@ then
  	sudo useradd -m -p $(openssl passwd -1 ${PASSWORD}) -s /bin/bash ${USERNAME}
 	sudo mkdir -p  /home/${USERNAME}/Downloads /home/${USERNAME}/Manage-Orabuntu
 	sudo chown ${USERNAME}:${USERNAME} /home/${USERNAME}/Downloads /home/${USERNAME}/Manage-Orabuntu
+	sudo sed -i "/lxc\.mount\.entry/s/#/ /" /var/lib/lxc/$NameServer/config
 
         echo ''
         echo "=============================================="
@@ -2731,7 +2732,7 @@ then
         sudo chown ${USERNAME}:${USERNAME} /home/${USERNAME}/Downloads /home/${USERNAME}/Manage-Orabuntu
 	sudo runuser -l amide -c "ssh-keygen -f /home/amide/.ssh/id_rsa -t rsa -N ''"
 	sudo sh -c "cat '/var/lib/lxc/$NameServerBase/delta0/root/.ssh/id_rsa.pub' >> /home/amide/.ssh/authorized_keys"
-
+	sudo sed -i "/lxc\.mount\.entry/s/#/ /" /var/lib/lxc/$NameServer/config
 	sudo sh -c "echo 'amide ALL=/bin/mkdir, /bin/cp' > /etc/sudoers.d/amide"
         sudo chmod 0440 /etc/sudoers.d/amide
 
@@ -2747,9 +2748,9 @@ then
 
 	if [ $GRE = 'Y' ]
 	then
-                sudo sed -i "/route add -net/s/#/ /"                            /etc/network/openvswitch/crt_ovs_sw1.sh
-                sudo sed -i "/REMOTE_GRE_ENDPOINT/s/#/ /"                       /etc/network/openvswitch/crt_ovs_sw1.sh
-                sudo sed -i "s/REMOTE_GRE_ENDPOINT/$MultiHostVar5/g"            /etc/network/openvswitch/crt_ovs_sw1.sh
+        #       sudo sed -i "/route add -net/s/#/ /"                            /etc/network/openvswitch/crt_ovs_sw1.sh
+        #       sudo sed -i "/REMOTE_GRE_ENDPOINT/s/#/ /"                       /etc/network/openvswitch/crt_ovs_sw1.sh
+        #       sudo sed -i "s/REMOTE_GRE_ENDPOINT/$MultiHostVar5/g"            /etc/network/openvswitch/crt_ovs_sw1.sh
 
                 sudo ovs-vsctl add-port sw1 gre$Sw1Index -- set interface gre$Sw1Index type=gre options:remote_ip=$MultiHostVar5
 
