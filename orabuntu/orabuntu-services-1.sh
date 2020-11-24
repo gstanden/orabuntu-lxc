@@ -2563,6 +2563,20 @@ then
 
         echo ''
         echo "=============================================="
+	echo "Debug of new file transfer mechanism ..."
+        echo "=============================================="
+	echo ''
+
+	sudo lxc-attach -n $NameServer -- sudo touch /root/backup-lxc-container/afns1/updates/testfile
+	sudo ls -l /home/amide/Manage-Orabuntu/backup-lxc-container/afns1/updates
+	sudo lxc-attach -n $NameServer -- ls -l /root/backup-lxc-container/afns1/updates
+
+	echo "sleeping for 30 seconds ..."
+
+	sleep 30
+
+        echo ''
+        echo "=============================================="
         echo "Create amide user RSA key...                  "
         echo "=============================================="
         echo ''
@@ -2616,7 +2630,21 @@ then
 #	sleep 5
 	
 	sudo lxc-attach -n $NameServer -- tar -cvzPf /root/backup-lxc-container/$NameServer/updates/backup_"$NameServer"_ns_update.tar.gz -T /root/ns_backup_update.lst --numeric-owner
-        sudo tar -v --extract --file=/opt/olxc/"$DistDir"/orabuntu/archives/dns-dhcp-cont.tar -C / var/lib/lxc/nsa/rootfs/etc/systemd/system/dns-sync.service
+        
+	echo ''
+        echo "=============================================="
+	echo "Debug of new file transfer mechanism ..."
+        echo "=============================================="
+	echo ''
+
+	sudo ls -l /home/amide/Manage-Orabuntu/backup-lxc-container/afns1/updates
+	sudo lxc-attach -n $NameServer -- ls -l /root/backup-lxc-container/afns1/updates
+
+	echo "sleeping for 30 seconds ..."
+
+	sleep 30
+
+	sudo tar -v --extract --file=/opt/olxc/"$DistDir"/orabuntu/archives/dns-dhcp-cont.tar -C / var/lib/lxc/nsa/rootfs/etc/systemd/system/dns-sync.service
         sudo tar -v --extract --file=/opt/olxc/"$DistDir"/orabuntu/archives/dns-dhcp-cont.tar -C / var/lib/lxc/nsa/rootfs/etc/systemd/system/dns-thaw.service
         sudo mv /var/lib/lxc/nsa/rootfs/etc/systemd/system/dns-sync.service /var/lib/lxc/"$NameServer"-base/rootfs/etc/systemd/system/dns-sync.service
         sudo mv /var/lib/lxc/nsa/rootfs/etc/systemd/system/dns-thaw.service /var/lib/lxc/"$NameServer"-base/rootfs/etc/systemd/system/dns-thaw.service
