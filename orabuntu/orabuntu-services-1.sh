@@ -2552,9 +2552,16 @@ then
  	sudo useradd -m -p $(openssl passwd -1 ${PASSWORD}) -s /bin/bash ${USERNAME}
 	sudo mkdir -p /home/${USERNAME}/Downloads
 	sudo mkdir -p /home/${USERNAME}/Manage-Orabuntu/backup-lxc-container/$NameServer/updates
+
+	function CutOffBase {
+		echo $NameServer | cut -f1 -d'-'
+	}
+	OffBase=$(CutOffBase)
+
+	sudo mkdir -p /home/${USERNAME}/Manage-Orabuntu/backup-lxc-container/$OffBase/updates
 	sudo chown -R ${USERNAME}:${USERNAME} /home/${USERNAME}/Downloads 
 	sudo shown -R ${USERNAME}:${USERNAME} /home/${USERNAME}/Manage-Orabuntu
-	sudo chmod -R 755 /home/${USERNAME}/Manage-Orabuntu
+	sudo chmod -R 777 /home/${USERNAME}/Manage-Orabuntu
 
 	sudo sed -i "/lxc\.mount\.entry/s/#/ /"              /var/lib/lxc/$NameServer/config
 	sudo sed -i "/Manage\-Orabuntu/s/afns1\-base/afns1/" /var/lib/lxc/$NameServer/config
@@ -2568,8 +2575,9 @@ then
 	echo "Debug of new file transfer mechanism ..."
         echo "=============================================="
 	echo ''
-	
-	echo ${USERNAME}
+
+	echo "NameServer = "$NameServer	
+	echo "USERNAME   = "${USERNAME}
 	sudo ls -l /home/${USERNAME}/Manage-Orabuntu
 	sudo ls -l /home/${USERNAME}/Manage-Orabuntu/backup-lxc-container/
 	sudo ls -l /home/${USERNAME}/Manage-Orabuntu/backup-lxc-container/$NameServer
@@ -2775,7 +2783,9 @@ then
         PASSWORD=$AmidePassword
 
         sudo useradd -m -p $(openssl passwd -1 ${PASSWORD}) -s /bin/bash ${USERNAME}
-        sudo mkdir -p  /home/${USERNAME}/Downloads /home/${USERNAME}/Manage-Orabuntu/backup-lxc-container/$NameServer/updates
+        sudo mkdir -p /home/${USERNAME}/Downloads
+	sudo mkdir -p /home/${USERNAME}/Manage-Orabuntu/backup-lxc-container/$NameServer/updates
+	sudo mkdir -p /home/${USERNAME}/Manage-Orabuntu/backup-lxc-container/$OffBase/updates
         sudo chown ${USERNAME}:${USERNAME} /home/${USERNAME}/Downloads /home/${USERNAME}/Manage-Orabuntu
 	sudo runuser -l amide -c "ssh-keygen -f /home/amide/.ssh/id_rsa -t rsa -N ''"
 	sudo sh -c "cat '/var/lib/lxc/$NameServerBase/delta0/root/.ssh/id_rsa.pub' >> /home/amide/.ssh/authorized_keys"
@@ -2783,6 +2793,25 @@ then
 	sudo sh -c "echo 'amide ALL=/bin/mkdir, /bin/cp' > /etc/sudoers.d/amide"
         sudo chmod 0440 /etc/sudoers.d/amide
 
+        echo ''
+        echo "=============================================="
+	echo "Debug of new file transfer mechanism ..."
+        echo "=============================================="
+	echo ''
+
+	echo "NameServer = "$NameServer	
+	echo "USERNAME   = "${USERNAME}
+	sudo ls -l /home/${USERNAME}/Manage-Orabuntu
+	sudo ls -l /home/${USERNAME}/Manage-Orabuntu/backup-lxc-container/
+	sudo ls -l /home/${USERNAME}/Manage-Orabuntu/backup-lxc-container/$NameServer
+	sudo ls -l /home/${USERNAME}/Manage-Orabuntu/backup-lxc-container/$NameServer/updates
+	sudo lxc-attach -n $NameServer -- sudo touch /root/backup-lxc-container/afns1/updates/testfile
+	sudo ls -l /home/amide/Manage-Orabuntu/backup-lxc-container/afns1/updates
+	sudo lxc-attach -n $NameServer -- ls -l /root/backup-lxc-container/afns1/updates
+
+	echo "sleeping for 30 seconds ..."
+
+	sleep 30
 	echo ''
         echo "=============================================="
         echo "Done: Configure NS Replication Account.       "
