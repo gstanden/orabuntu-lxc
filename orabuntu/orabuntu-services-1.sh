@@ -2804,7 +2804,10 @@ then
 
 	sleep 30
 
-        sudo chown ${USERNAME}:${USERNAME} /home/${USERNAME}/Downloads /home/${USERNAME}/Manage-Orabuntu
+	sudo chown -R ${USERNAME}:${USERNAME} /home/${USERNAME}/Downloads 
+	sudo shown -R ${USERNAME}:${USERNAME} /home/${USERNAME}/Manage-Orabuntu
+	sudo chmod -R 744 /home/${USERNAME}/Manage-Orabuntu
+	sudo chmod -R 744 /home/${USERNAME}/Downloads
 	sudo runuser -l amide -c "ssh-keygen -f /home/amide/.ssh/id_rsa -t rsa -N ''"
 	sudo sh -c "cat '/var/lib/lxc/$NameServerBase/delta0/root/.ssh/id_rsa.pub' >> /home/amide/.ssh/authorized_keys"
 	sudo sed -i "/lxc\.mount\.entry/s/#/ /" /var/lib/lxc/$NameServer/config

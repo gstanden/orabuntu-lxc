@@ -787,8 +787,19 @@ then
                 echo "=============================================="
                 echo ''
 
-                ssh-keygen -R 10.207.39.2
-                ssh-keygen -R $NameServer
+		function CutOffBase {
+			echo $NameServer | cut -f1 -d'-'
+		}
+		OffBase=$(CutOffBase)
+
+		sudo rm -rf    /home/amide/Manage-Orabuntu/
+		sudo mkdir -p  /home/amide/Manage-Orabuntu/backup-lxc-container/$OffBase/updates
+		sudo mkdir -p  /home/amide/Manage-Orabuntu/backup-lxc-container/$NameServer/updates
+		sudo chown -R   amide:amide /home/amide
+		sudo chmod 744 /home/amide
+                ssh-keygen -R  10.207.39.2
+                ssh-keygen -R  $NameServer
+
 		sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ubuntu@10.207.39.2 "sudo -S <<< "ubuntu" echo $HOSTNAME > ~/new_gre_host.txt"
                 
                 echo ''
@@ -814,8 +825,19 @@ then
                 echo "=============================================="
                 echo ''
 
+		function CutOffBase {
+			echo $NameServer | cut -f1 -d'-'
+		}
+		OffBase=$(CutOffBase)
+
+		sudo rm -rf    /home/amide/Manage-Orabuntu/
+		sudo mkdir -p  /home/amide/Manage-Orabuntu/backup-lxc-container/$OffBase/updates
+		sudo mkdir -p  /home/amide/Manage-Orabuntu/backup-lxc-container/$NameServer/updates
+		sudo chown -R   amide:amide /home/amide
+		sudo chmod 744 /home/amide
                 ssh-keygen -R 10.207.39.2
                 ssh-keygen -R $NameServer
+
 		sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ubuntu@10.207.39.2 "sudo -S <<< "ubuntu" echo $HOSTNAME > ~/new_gre_host.txt"
 
                 sleep 5
