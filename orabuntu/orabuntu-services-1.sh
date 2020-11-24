@@ -2551,14 +2551,20 @@ then
 
  	sudo useradd -m -p $(openssl passwd -1 ${PASSWORD}) -s /bin/bash ${USERNAME}
 	sudo mkdir -p /home/${USERNAME}/Downloads
-	sudo mkdir -p /home/${USERNAME}/Manage-Orabuntu/backup-lxc-container/$NameServer/updates
 
 	function CutOffBase {
 		echo $NameServer | cut -f1 -d'-'
 	}
 	OffBase=$(CutOffBase)
 
+	sudo mkdir -p /home/${USERNAME}/Manage-Orabuntu/backup-lxc-container/$NameServer/updates
 	sudo mkdir -p /home/${USERNAME}/Manage-Orabuntu/backup-lxc-container/$OffBase/updates
+
+	echo "sudo mkdir -p /home/${USERNAME}/Manage-Orabuntu/backup-lxc-container/$OffBase/updates"
+	echo "sudo mkdir -p /home/${USERNAME}/Manage-Orabuntu/backup-lxc-container/$NameServer/updates"a
+
+	sleep 30
+
 	sudo chown -R ${USERNAME}:${USERNAME} /home/${USERNAME}/Downloads 
 	sudo shown -R ${USERNAME}:${USERNAME} /home/${USERNAME}/Manage-Orabuntu
 	sudo chmod -R 777 /home/${USERNAME}/Manage-Orabuntu
@@ -2784,8 +2790,20 @@ then
 
         sudo useradd -m -p $(openssl passwd -1 ${PASSWORD}) -s /bin/bash ${USERNAME}
         sudo mkdir -p /home/${USERNAME}/Downloads
+
+	function CutOffBase {
+		echo $NameServer | cut -f1 -d'-'
+	}
+	OffBase=$(CutOffBase)
+
 	sudo mkdir -p /home/${USERNAME}/Manage-Orabuntu/backup-lxc-container/$NameServer/updates
 	sudo mkdir -p /home/${USERNAME}/Manage-Orabuntu/backup-lxc-container/$OffBase/updates
+
+	echo "sudo mkdir -p /home/${USERNAME}/Manage-Orabuntu/backup-lxc-container/$OffBase/updates"
+	echo "sudo mkdir -p /home/${USERNAME}/Manage-Orabuntu/backup-lxc-container/$NameServer/updates"a
+
+	sleep 30
+
         sudo chown ${USERNAME}:${USERNAME} /home/${USERNAME}/Downloads /home/${USERNAME}/Manage-Orabuntu
 	sudo runuser -l amide -c "ssh-keygen -f /home/amide/.ssh/id_rsa -t rsa -N ''"
 	sudo sh -c "cat '/var/lib/lxc/$NameServerBase/delta0/root/.ssh/id_rsa.pub' >> /home/amide/.ssh/authorized_keys"
