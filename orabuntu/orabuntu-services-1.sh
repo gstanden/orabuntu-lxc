@@ -2550,9 +2550,11 @@ then
 	sudo sed -i "s/Pass=ubuntu/Pass=$password/"	/var/lib/lxc/"$NameServer"-base/rootfs/root/ns_backup_update.sh
 
  	sudo useradd -m -p $(openssl passwd -1 ${PASSWORD}) -s /bin/bash ${USERNAME}
-	sudo mkdir -p /home/${USERNAME}/Downloads /home/${USERNAME}/Manage-Orabuntu/backup-lxc-container/$NameServer/updates
-	sudo chown -R ${USERNAME}:${USERNAME} /home/${USERNAME}/Downloads /home/${USERNAME}/Manage-Orabuntu
-	sudo chmod -R 777 /home/${USERNAME}/Manage-Orabuntu
+	sudo mkdir -p /home/${USERNAME}/Downloads
+	sudo mkdir -p /home/${USERNAME}/Manage-Orabuntu/backup-lxc-container/$NameServer/updates
+	sudo chown -R ${USERNAME}:${USERNAME} /home/${USERNAME}/Downloads 
+	sudo shown -R ${USERNAME}:${USERNAME} /home/${USERNAME}/Manage-Orabuntu
+	sudo chmod -R 755 /home/${USERNAME}/Manage-Orabuntu
 
 	sudo sed -i "/lxc\.mount\.entry/s/#/ /"              /var/lib/lxc/$NameServer/config
 	sudo sed -i "/Manage\-Orabuntu/s/afns1\-base/afns1/" /var/lib/lxc/$NameServer/config
@@ -2566,7 +2568,12 @@ then
 	echo "Debug of new file transfer mechanism ..."
         echo "=============================================="
 	echo ''
-
+	
+	echo ${USERNAME}
+	sudo ls -l /home/${USERNAME}/Manage-Orabuntu
+	sudo ls -l /home/${USERNAME}/Manage-Orabuntu/backup-lxc-container/
+	sudo ls -l /home/${USERNAME}/Manage-Orabuntu/backup-lxc-container/$NameServer
+	sudo ls -l /home/${USERNAME}/Manage-Orabuntu/backup-lxc-container/$NameServer/updates
 	sudo lxc-attach -n $NameServer -- sudo touch /root/backup-lxc-container/afns1/updates/testfile
 	sudo ls -l /home/amide/Manage-Orabuntu/backup-lxc-container/afns1/updates
 	sudo lxc-attach -n $NameServer -- ls -l /root/backup-lxc-container/afns1/updates
