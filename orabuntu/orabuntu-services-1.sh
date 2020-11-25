@@ -2560,10 +2560,10 @@ then
 	sudo mkdir -p /home/${USERNAME}/Manage-Orabuntu/backup-lxc-container/$NameServer/updates
 	sudo mkdir -p /home/${USERNAME}/Manage-Orabuntu/backup-lxc-container/$OffBase/updates
 
-	echo "sudo mkdir -p /home/${USERNAME}/Manage-Orabuntu/backup-lxc-container/$OffBase/updates"
-	echo "sudo mkdir -p /home/${USERNAME}/Manage-Orabuntu/backup-lxc-container/$NameServer/updates"a
+#	echo "sudo mkdir -p /home/${USERNAME}/Manage-Orabuntu/backup-lxc-container/$OffBase/updates"
+#	echo "sudo mkdir -p /home/${USERNAME}/Manage-Orabuntu/backup-lxc-container/$NameServer/updates"a
 
-	sleep 30
+#	sleep 30
 
 	sudo chown -R ${USERNAME}:${USERNAME} /home/${USERNAME}/Downloads 
 	sudo shown -R ${USERNAME}:${USERNAME} /home/${USERNAME}/Manage-Orabuntu
@@ -2576,25 +2576,25 @@ then
 	sleep 5
 	sudo lxc-start -n $NameServer
 
-        echo ''
-        echo "=============================================="
-	echo "Debug of new file transfer mechanism ..."
-        echo "=============================================="
-	echo ''
+#       echo ''
+#       echo "=============================================="
+#	echo "Debug of new file transfer mechanism ..."
+#       echo "=============================================="
+#	echo ''
 
-	echo "NameServer = "$NameServer	
-	echo "USERNAME   = "${USERNAME}
-	sudo ls -l /home/${USERNAME}/Manage-Orabuntu
-	sudo ls -l /home/${USERNAME}/Manage-Orabuntu/backup-lxc-container/
-	sudo ls -l /home/${USERNAME}/Manage-Orabuntu/backup-lxc-container/$NameServer
-	sudo ls -l /home/${USERNAME}/Manage-Orabuntu/backup-lxc-container/$NameServer/updates
-	sudo lxc-attach -n $NameServer -- sudo touch /root/backup-lxc-container/afns1/updates/testfile
-	sudo ls -l /home/amide/Manage-Orabuntu/backup-lxc-container/afns1/updates
-	sudo lxc-attach -n $NameServer -- ls -l /root/backup-lxc-container/afns1/updates
+#	echo "NameServer = "$NameServer	
+#	echo "USERNAME   = "${USERNAME}
+#	sudo ls -l /home/${USERNAME}/Manage-Orabuntu
+#	sudo ls -l /home/${USERNAME}/Manage-Orabuntu/backup-lxc-container/
+#	sudo ls -l /home/${USERNAME}/Manage-Orabuntu/backup-lxc-container/$NameServer
+#	sudo ls -l /home/${USERNAME}/Manage-Orabuntu/backup-lxc-container/$NameServer/updates
+#	sudo lxc-attach -n $NameServer -- sudo touch /root/backup-lxc-container/afns1/updates/testfile
+#	sudo ls -l /home/amide/Manage-Orabuntu/backup-lxc-container/afns1/updates
+#	sudo lxc-attach -n $NameServer -- ls -l /root/backup-lxc-container/afns1/updates
 
-	echo "sleeping for 30 seconds ..."
+#	echo "sleeping for 30 seconds ..."
 
-	sleep 30
+#	sleep 30
 
         echo ''
         echo "=============================================="
@@ -2652,18 +2652,18 @@ then
 	
 	sudo lxc-attach -n $NameServer -- tar -cvzPf /root/backup-lxc-container/$NameServer/updates/backup_"$NameServer"_ns_update.tar.gz -T /root/ns_backup_update.lst --numeric-owner
         
-	echo ''
-        echo "=============================================="
-	echo "Debug of new file transfer mechanism ..."
-        echo "=============================================="
-	echo ''
+#	echo ''
+#       echo "=============================================="
+#	echo "Debug of new file transfer mechanism ..."
+#       echo "=============================================="
+#	echo ''
 
-	sudo ls -l /home/amide/Manage-Orabuntu/backup-lxc-container/afns1/updates
-	sudo lxc-attach -n $NameServer -- ls -l /root/backup-lxc-container/afns1/updates
+#	sudo ls -l /home/amide/Manage-Orabuntu/backup-lxc-container/afns1/updates
+#	sudo lxc-attach -n $NameServer -- ls -l /root/backup-lxc-container/afns1/updates
 
-	echo "sleeping for 30 seconds ..."
+#	echo "sleeping for 30 seconds ..."
 
-	sleep 30
+#	sleep 30
 
 	sudo tar -v --extract --file=/opt/olxc/"$DistDir"/orabuntu/archives/dns-dhcp-cont.tar -C / var/lib/lxc/nsa/rootfs/etc/systemd/system/dns-sync.service
         sudo tar -v --extract --file=/opt/olxc/"$DistDir"/orabuntu/archives/dns-dhcp-cont.tar -C / var/lib/lxc/nsa/rootfs/etc/systemd/system/dns-thaw.service
@@ -2814,25 +2814,26 @@ then
 	sudo sh -c "echo 'amide ALL=/bin/mkdir, /bin/cp' > /etc/sudoers.d/amide"
         sudo chmod 0440 /etc/sudoers.d/amide
 
-        echo ''
-        echo "=============================================="
-	echo "Debug of new file transfer mechanism ..."
-        echo "=============================================="
-	echo ''
+#       echo ''
+#       echo "=============================================="
+#	echo "Debug of new file transfer mechanism ..."
+#       echo "=============================================="
+#	echo ''
 
-	echo "NameServer = "$NameServer	
-	echo "USERNAME   = "${USERNAME}
-	sudo ls -l /home/${USERNAME}/Manage-Orabuntu
-	sudo ls -l /home/${USERNAME}/Manage-Orabuntu/backup-lxc-container/
-	sudo ls -l /home/${USERNAME}/Manage-Orabuntu/backup-lxc-container/$NameServer
-	sudo ls -l /home/${USERNAME}/Manage-Orabuntu/backup-lxc-container/$NameServer/updates
-	sudo lxc-attach -n $NameServer -- sudo touch /root/backup-lxc-container/afns1/updates/testfile
-	sudo ls -l /home/amide/Manage-Orabuntu/backup-lxc-container/afns1/updates
-	sudo lxc-attach -n $NameServer -- ls -l /root/backup-lxc-container/afns1/updates
+#	echo "NameServer = "$NameServer	
+#	echo "USERNAME   = "${USERNAME}
+#	sudo ls -l /home/${USERNAME}/Manage-Orabuntu
+#	sudo ls -l /home/${USERNAME}/Manage-Orabuntu/backup-lxc-container/
+#	sudo ls -l /home/${USERNAME}/Manage-Orabuntu/backup-lxc-container/$NameServer
+#	sudo ls -l /home/${USERNAME}/Manage-Orabuntu/backup-lxc-container/$NameServer/updates
+#	sudo lxc-attach -n $NameServer -- sudo touch /root/backup-lxc-container/afns1/updates/testfile
+#	sudo ls -l /home/amide/Manage-Orabuntu/backup-lxc-container/afns1/updates
+#	sudo lxc-attach -n $NameServer -- ls -l /root/backup-lxc-container/afns1/updates
 
-	echo "sleeping for 30 seconds ..."
+#	echo "sleeping for 30 seconds ..."
 
-	sleep 30
+#	sleep 30
+
 	echo ''
         echo "=============================================="
         echo "Done: Configure NS Replication Account.       "
@@ -2845,9 +2846,9 @@ then
 
 	if [ $GRE = 'Y' ]
 	then
-        #       sudo sed -i "/route add -net/s/#/ /"                            /etc/network/openvswitch/crt_ovs_sw1.sh
-        #       sudo sed -i "/REMOTE_GRE_ENDPOINT/s/#/ /"                       /etc/network/openvswitch/crt_ovs_sw1.sh
-        #       sudo sed -i "s/REMOTE_GRE_ENDPOINT/$MultiHostVar5/g"            /etc/network/openvswitch/crt_ovs_sw1.sh
+                sudo sed -i "/route add -net/s/#/ /"                            /etc/network/openvswitch/crt_ovs_sw1.sh
+                sudo sed -i "/REMOTE_GRE_ENDPOINT/s/#/ /"                       /etc/network/openvswitch/crt_ovs_sw1.sh
+                sudo sed -i "s/REMOTE_GRE_ENDPOINT/$MultiHostVar5/g"            /etc/network/openvswitch/crt_ovs_sw1.sh
 
                 sudo ovs-vsctl add-port sw1 gre$Sw1Index -- set interface gre$Sw1Index type=gre options:remote_ip=$MultiHostVar5
 
