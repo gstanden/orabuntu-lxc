@@ -132,10 +132,10 @@ fi
 
 if [ -z $6 ]
 then
-        Product=no-product
  	Product=workspaces
  	Product=oracle-db
 	Product=oracle-gi-18c
+        Product=no-product
 else
 	Product=$6
 fi
