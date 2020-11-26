@@ -443,12 +443,17 @@ then
 			echo ''
 
 			#GLS 20180405 Credit: Gerald Clark https://www.centos.org/forums/viewtopic.php?t=3155
-			sudo sed -i 's/DEFAULTKERNEL=kernel/DEFAULTKERNEL=kernel-ml/g' /etc/sysconfig/kernel
-			
-			#GLS 20180405 Credit: https://portal.cloudunboxed.net/knowledgebase/17/Installing-the-latest-mainline-kernel-on-CentOS-6-and-7.html
+			sudo sed -i 's/DEFAULTKERNEL=kernel/DEFAULTKERNEL=kernel-lt/g' /etc/sysconfig/kernel
+		
+		#	GLS 20180405 Credit: https://portal.cloudunboxed.net/knowledgebase/17/Installing-the-latest-mainline-kernel-on-CentOS-6-and-7.html
+		#	GLS 20201126 Updated to use kernel-lt as kernel-ml no longer available
+
 			sudo rpm --import https://www.elrepo.org/RPM-GPG-KEY-elrepo.org
-			sudo rpm -Uvh http://www.elrepo.org/elrepo-release-6-8.el6.elrepo.noarch.rpm
-			sudo yum --enablerepo=elrepo-kernel install kernel-ml
+			sudo rpm  -Uvh    https://www.elrepo.org/elrepo-release-6.el6.elrepo.noarch.rpm
+			sudo yum --enablerepo=elrepo-kernel install kernel-lt
+
+		#	sudo rpm  -Uvh http://www.elrepo.org/elrepo-release-6-8.el6.elrepo.noarch.rpm
+		#	sudo yum --enablerepo=elrepo-kernel install kernel-ml
 
 			echo ''
 			echo "==============================================" 
