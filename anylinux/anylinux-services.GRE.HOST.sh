@@ -101,7 +101,7 @@ fi
 if [ -z $2 ]
 then
 	SPOKEIP='lan.ip.this.host'
- 	SPOKEIP=192.168.1.20
+ 	SPOKEIP=192.168.1.51
 else
 	SPOKEIP=$2
 fi
@@ -109,7 +109,7 @@ fi
 if [ -z $3 ]
 then
 	HUBIP='lan.ip.hub.host'
- 	HUBIP=192.168.1.33
+ 	HUBIP=192.168.1.6
 else
 	HUBIP=$3
 fi
@@ -117,7 +117,7 @@ fi
 if [ -z $4 ]
 then
 	HubUserAct=username
- 	HubUserAct=ubuntu
+ 	HubUserAct=orabuntu
 else
 	HubUserAct=$4
 fi
@@ -125,7 +125,7 @@ fi
 if [ -z $5 ]
 then
 	HubSudoPwd=password
- 	HubSudoPwd=ubuntu
+ 	HubSudoPwd=orabuntu
 else
 	HubSudoPwd=$5
 fi

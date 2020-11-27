@@ -967,7 +967,7 @@ then
 		sudo mkdir -p			/home/amide/Manage-Orabuntu/backup-lxc-container/$OffBase/updates
 		sudo mkdir -p			/home/amide/Manage-Orabuntu/backup-lxc-container/$NameServer/updates
 		sudo chown -R amide:amide	/home/amide
-		sudo chmod -R 744		/home/amide
+		sudo chmod -R 777		/home/amide
 
                 ssh-keygen -R 10.207.39.2
                 ssh-keygen -R $NameServer
