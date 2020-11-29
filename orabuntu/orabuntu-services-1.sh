@@ -124,6 +124,16 @@ function GetMultiHostVar10 {
 MultiHostVar10=$(GetMultiHostVar10)
 GRE=$MultiHostVar10
 
+function GetMultiHostVar11 {
+	echo $MultiHost | cut -f11 -d':'
+}
+MultiHostVar11=$(GetMultiHostVar11)
+
+function GetMultiHostVar12 {
+	echo $MultiHost | cut -f12 -d':'
+}
+MultiHostVar12=$(GetMultiHostVar12)
+
 function CheckNetworkManagerInstalled {
 	sudo dpkg -l | grep -v  network-manager- | grep network-manager | wc -l
 }
@@ -1263,6 +1273,72 @@ clear
 
 echo ''
 echo "=============================================="
+echo "Install OvsVethCleanup.service                "
+echo "=============================================="
+echo ''
+
+sudo sh -c "echo '[Unit]'                                                               >  /etc/systemd/system/OvsVethCleanup.service"
+sudo sh -c "echo 'Description=OvsVethCleanup job'                                       >> /etc/systemd/system/OvsVethCleanup.service"
+sudo sh -c "echo ''                                                                     >> /etc/systemd/system/OvsVethCleanup.service"
+sudo sh -c "echo '[Service]'                                                            >> /etc/systemd/system/OvsVethCleanup.service"
+sudo sh -c "echo 'Type=oneshot'                                                         >> /etc/systemd/system/OvsVethCleanup.service"
+sudo sh -c "echo 'User=root'								>> /etc/systemd/system/OvsVethCleanup.service"
+sudo sh -c "echo 'ExecStart=/usr/bin/bash /etc/network/openvswitch/OvsVethCleanup.sh'   >> /etc/systemd/system/OvsVethCleanup.service"
+
+sudo cat /etc/systemd/system/OvsVethCleanup.service
+
+echo ''
+echo "=============================================="
+echo "Done: Install OvsVethCleanup.service          "
+echo "=============================================="
+echo ''
+
+sleep 5
+
+clear
+
+echo ''
+echo "=============================================="
+echo "Install OvsVethCleanup.timer                  "
+echo "=============================================="
+echo ''
+
+sudo sh -c "echo '[Unit]'                                                               >  /etc/systemd/system/OvsVethCleanup.timer"
+sudo sh -c "echo 'Description=OvsVethCleanup'                                           >> /etc/systemd/system/OvsVethCleanup.timer"
+sudo sh -c "echo ''                                                                     >> /etc/systemd/system/OvsVethCleanup.timer"
+sudo sh -c "echo '[Timer]'                                                              >> /etc/systemd/system/OvsVethCleanup.timer"
+sudo sh -c "echo 'OnUnitActiveSec=60s'                                                  >> /etc/systemd/system/OvsVethCleanup.timer"
+sudo sh -c "echo 'OnBootSec=60s'                                                        >> /etc/systemd/system/OvsVethCleanup.timer"
+sudo sh -c "echo ''                                                                     >> /etc/systemd/system/OvsVethCleanup.timer"
+sudo sh -c "echo '[Install]'                                                            >> /etc/systemd/system/OvsVethCleanup.timer"
+sudo sh -c "echo 'WantedBy=timers.target'                                               >> /etc/systemd/system/OvsVethCleanup.timer"
+
+sudo cat /etc/systemd/system/OvsVethCleanup.timer
+
+echo ''
+
+sudo systemctl daemon-reload
+sudo systemctl enable OvsVethCleanup.timer
+sudo systemctl start  OvsVethCleanup.timer
+
+echo ''
+
+sudo systemctl list-timers --all
+
+sleep 5
+
+echo ''
+echo "=============================================="
+echo "Done: Install OvsVethCleanup.timer                  "
+echo "=============================================="
+echo ''
+
+sleep 5
+
+clear
+
+echo ''
+echo "=============================================="
 echo "Creating /etc/sysctl.d/60-olxc.conf file ...  "
 echo "=============================================="
 echo ''
@@ -1531,10 +1607,16 @@ then
 			sudo sed -i "/nsa/s/nsa/$NameServerBase/g" 	/var/lib/lxc/nsa/rootfs/root/ns_backup.start.sh
 			sudo sed -i "/nsa/s/nsa/$NameServerBase/g" 	/var/lib/lxc/nsa/rootfs/root/dns-sync.sh
 
+			echo 'NameServerBase = '$NameServerBase
+			sleep 20
+
 			function GetNameServerShortName {
 				echo $NameServer | cut -f1 -d'-'
 			}
 			NameServerShortName=$(GetNameServerShortName)
+
+			echo 'NameServerShortName = '$NameServerShortName
+			sleep 20
 
 			sudo sed -i "/nsa/s/nsa/$NameServerShortName/g" /var/lib/lxc/nsa/rootfs/root/ns_backup_update.sh
 			sudo sed -i "/nsa/s/nsa/$NameServerShortName/g" /var/lib/lxc/nsa/rootfs/root/ns_backup.start.sh
@@ -2292,28 +2374,35 @@ then
                 }
                 FileSystemTypeExt=$(CheckFileSystemTypeExt)
 
-                if [ $FileSystemTypeXfs -eq 1 ]
-                then
-                        function GetFtype {
-                                xfs_info / | grep -c ftype=1
-                        }
-                        Ftype=$(GetFtype)
+		if [ $MultiHostVar12 = 'A' ]
+		then
+			sudo lxc-stop  -n $NameServer > /dev/null 2>&1
+			sudo lxc-copy  -n $NameServer -N $NameServerBase
+			NameServer=$NameServerBase
+			sudo lxc-start -n $NameServer
 
-                        if   [ $Ftype -eq 0 ]
-                        then
-                                sudo lxc-stop  -n $NameServer > /dev/null 2>&1
-                                sudo lxc-copy  -n $NameServer -N $NameServerBase
-                                NameServer=$NameServerBase
-                                sudo lxc-start -n $NameServer
+		elif [ $FileSystemTypeXfs -eq 1 ]
+		then
+              		function GetFtype {
+                               	xfs_info / | grep -c ftype=1
+                       	}
+                       	Ftype=$(GetFtype)
 
-                        elif [ $Ftype -eq 1 ]
-                        then
-                                sudo lxc-stop  -n $NameServer > /dev/null 2>&1
-                                sudo lxc-copy  -n $NameServer -N $NameServerBase -B overlayfs -s
-                                NameServer=$NameServerBase
-                                sudo lxc-start -n $NameServer
-                        fi
-                fi
+                       	if   [ $Ftype -eq 0 ]
+                       	then
+                               	sudo lxc-stop  -n $NameServer > /dev/null 2>&1
+                               	sudo lxc-copy  -n $NameServer -N $NameServerBase
+                               	NameServer=$NameServerBase
+                               	sudo lxc-start -n $NameServer
+
+                       	elif [ $Ftype -eq 1 ]
+                       	then
+                               	sudo lxc-stop  -n $NameServer > /dev/null 2>&1
+                               	sudo lxc-copy  -n $NameServer -N $NameServerBase -B overlayfs -s
+                               	NameServer=$NameServerBase
+                               	sudo lxc-start -n $NameServer
+                       	fi
+               	fi
 
                 if [ $FileSystemTypeExt -eq 1 ]
                 then
@@ -2566,7 +2655,7 @@ then
 #	sleep 30
 
 	sudo chown -R ${USERNAME}:${USERNAME} /home/${USERNAME}/Downloads 
-	sudo shown -R ${USERNAME}:${USERNAME} /home/${USERNAME}/Manage-Orabuntu
+	sudo chown -R ${USERNAME}:${USERNAME} /home/${USERNAME}/Manage-Orabuntu
 	sudo chmod -R 777 /home/${USERNAME}/Manage-Orabuntu
 
 	sudo sed -i "/lxc\.mount\.entry/s/#/ /"              /var/lib/lxc/$NameServer/config
@@ -2779,6 +2868,8 @@ then
         echo "Configure NS Replication Account...           "
         echo "=============================================="
         echo ''
+	echo 'Can take 20 or 30 seconds ... be patient ...  '
+	echo ''
 
         function GetAmidePassword {
 		sudo sh -c "cat /var/lib/lxc/$NameServer/rootfs/root/ns_backup_update.sh" | grep 'Pass=' | cut -f2 -d'='
@@ -2799,17 +2890,18 @@ then
 	sudo mkdir -p /home/${USERNAME}/Manage-Orabuntu/backup-lxc-container/$NameServer/updates
 	sudo mkdir -p /home/${USERNAME}/Manage-Orabuntu/backup-lxc-container/$OffBase/updates
 
-	echo "sudo mkdir -p /home/${USERNAME}/Manage-Orabuntu/backup-lxc-container/$OffBase/updates"
-	echo "sudo mkdir -p /home/${USERNAME}/Manage-Orabuntu/backup-lxc-container/$NameServer/updates"a
+# 	Debug
+#	echo "sudo mkdir -p /home/${USERNAME}/Manage-Orabuntu/backup-lxc-container/$OffBase/updates"
+#	echo "sudo mkdir -p /home/${USERNAME}/Manage-Orabuntu/backup-lxc-container/$NameServer/updates"a
 
 	sleep 30
 
 	sudo chown -R ${USERNAME}:${USERNAME} /home/${USERNAME}/Downloads 
-	sudo shown -R ${USERNAME}:${USERNAME} /home/${USERNAME}/Manage-Orabuntu
+	sudo chown -R ${USERNAME}:${USERNAME} /home/${USERNAME}/Manage-Orabuntu
 	sudo chmod -R 744 /home/${USERNAME}/Manage-Orabuntu
 	sudo chmod -R 744 /home/${USERNAME}/Downloads
 	sudo runuser -l amide -c "ssh-keygen -f /home/amide/.ssh/id_rsa -t rsa -N ''"
-	sudo sh -c "cat '/var/lib/lxc/$NameServerBase/delta0/root/.ssh/id_rsa.pub' >> /home/amide/.ssh/authorized_keys"
+	sudo sh -c "cat '/var/lib/lxc/$NameServerBase/delta0/root/.ssh/id_rsa.pub' >> /home/amide/.ssh/authorized_keys" > /dev/null 2>&1
 	sudo sed -i "/lxc\.mount\.entry/s/#/ /" /var/lib/lxc/$NameServer/config
 	sudo sh -c "echo 'amide ALL=/bin/mkdir, /bin/cp' > /etc/sudoers.d/amide"
         sudo chmod 0440 /etc/sudoers.d/amide

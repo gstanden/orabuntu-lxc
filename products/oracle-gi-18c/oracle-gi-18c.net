@@ -153,7 +153,7 @@ then
                         	then
                                 	sudo sh -c "echo '[Unit]'                                                > /etc/systemd/system/$k.service"
                                 	sudo sh -c "echo 'Description=$k Service'                               >> /etc/systemd/system/$k.service"
-                                	sudo sh -c "echo 'After=network-online.target'                          >> /etc/systemd/system/$k.service"
+                                	sudo sh -c "echo 'After=network-online.target sw1.service'              >> /etc/systemd/system/$k.service"
                                 	sudo sh -c "echo ''                                                     >> /etc/systemd/system/$k.service"
                                 	sudo sh -c "echo '[Service]'                                            >> /etc/systemd/system/$k.service"
 

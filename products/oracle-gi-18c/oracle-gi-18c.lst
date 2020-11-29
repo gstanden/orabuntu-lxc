@@ -18,5 +18,6 @@ rootfs/etc/security/limits.conf
 rootfs/etc/sysctl.conf
 rootfs/etc/fstab
 rootfs/config.asm.flex.cluster
+rootfs/config.asm.flex.cluster.lxd
 rootfs/COPYING
 rootfs/GNU3
