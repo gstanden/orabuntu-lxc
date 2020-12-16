@@ -10,6 +10,10 @@ End Update:  May 14, 2019
 
 Update:  December 16, 2020 
 
+Visit the new Orabuntu-LXC v7.0.0-beta AMIDE Documentation Site:
+
+* https://sites.google.com/a/orabuntu-lxc.com/documentation/quick-start/orabuntu-lxc-v7-0-0-beta-amide
+
 This branch introduces support for LXD as well as LXC. 
 
 * This initial release of 7.0.0-beta AMIDE uses the LXD snap feature lxd.lxc-to-lxd to copy/convert all created LXC containers to LXD containers.
