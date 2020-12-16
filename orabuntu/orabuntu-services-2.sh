@@ -317,8 +317,11 @@ while [ $ContainerCreated -eq 0 ] && [ $n -le 5 ]
 do
 	### new ###
 
+<<<<<<< HEAD
 	wget https://github.com/gstanden/orabuntu-lxc/raw/to-lxd/lxcimage/ora"$MajorRelease"xc00.tar.gz -P $DistDir/lxcimage
 	mv $DistDir/lxcimage/.ora"$MajorRelease"xc00.tar.gz.1 $DistDir/lxcimage/ora"$MajorRelease"xc00.tar.gz
+=======
+>>>>>>> 0a6eb4275991baad5573f71e5c4758b8953dd359
         sudo tar -xzPf $DistDir/lxcimage/ora"$MajorRelease"xc00.tar.gz
 
         sudo mv /var/lib/lxc/ora"$MajorRelease"xc00                     /var/lib/lxc/oel$OracleRelease$SeedPostfix

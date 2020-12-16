@@ -38,13 +38,13 @@ genpasswd() {
 }
 password=$(genpasswd)
 mkdir -p ../installs/logs
-echo $password > ../installs/logs/ubuntu-password.txt
+echo $password > ../installs/logs/orabuntu-password.txt
 
-USERNAME=ubuntu
-PASSWORD=ubuntu
+USERNAME=orabuntu
+PASSWORD=orabuntu
 # PASSWORD=$password
 
-sudo groupadd -g 1000 ubuntu
-sudo useradd -g ubuntu -u 1000 -m -p $(openssl passwd -1 ${PASSWORD}) -s /bin/bash -G wheel ${USERNAME}
+sudo groupadd -g 1000 orabuntu
+sudo useradd -g orabuntu -u 1000 -m -p $(openssl passwd -1 ${PASSWORD}) -s /bin/bash -G wheel ${USERNAME}
 sudo mkdir -p  /home/${USERNAME}/Downloads /home/${USERNAME}/Manage-Orabuntu
 sudo chown ${USERNAME}:${USERNAME} /home/${USERNAME}/Downloads /home/${USERNAME}/Manage-Orabuntu

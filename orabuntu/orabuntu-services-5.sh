@@ -132,6 +132,46 @@ function GetMultiHostVar10 {
 MultiHostVar10=$(GetMultiHostVar10)
 GRE=$MultiHostVar10
 
+function GetMultiHostVar11 {
+	echo $MultiHost | cut -f11 -d':'
+}
+MultiHostVar11=$(GetMultiHostVar11)
+
+function GetMultiHostVar12 {
+	echo $MultiHost | cut -f12 -d':'
+}
+MultiHostVar12=$(GetMultiHostVar12)
+LXD=$MultiHostVar12
+
+function GetMultiHostVar13 {
+	echo $MultiHost | cut -f13 -d':'
+}
+MultiHostVar13=$(GetMultiHostVar13)
+
+function GetMultiHostVar14 {
+        echo $MultiHost | cut -f14 -d':'
+}
+MultiHostVar14=$(GetMultiHostVar14)
+PreSeed=$MultiHostVar14
+
+function GetMultiHostVar15 {
+        echo $MultiHost | cut -f15 -d':'
+}
+MultiHostVar15=$(GetMultiHostVar15)
+LXDCluster=$MultiHostVar15
+
+function GetMultiHostVar16 {
+        echo $MultiHost | cut -f16 -d':'
+}
+MultiHostVar16=$(GetMultiHostVar16)
+StorageDriver=$MultiHostVar16
+
+function GetMultiHostVar17 {
+        echo $MultiHost | cut -f17 -d':'
+}
+MultiHostVar17=$(GetMultiHostVar17)
+StoragePoolName=$MultiHostVar17
+
 function SoftwareVersion { echo "$@" | awk -F. '{ printf("%d%03d%03d%03d\n", $1,$2,$3,$4); }'; }
 
 function GetLXCVersion {
@@ -195,7 +235,7 @@ then
 	if [ $UbuntuMajorVersion -ge 16 ]
 	then
 		sudo chmod 775 /opt/olxc/"$DistDir"/orabuntu/archives/docker_install_orabuntu.sh
-		/opt/olxc/"$DistDir"/orabuntu/archives/docker_install_orabuntu.sh
+		               /opt/olxc/"$DistDir"/orabuntu/archives/docker_install_orabuntu.sh $MultiHostVar13
 	fi
 
 	echo ''
@@ -209,87 +249,19 @@ then
 	clear
 fi
 
-# if [ $MultiHostVar1 = 'new' ] || [ $MultiHostVar1 = 'reinstall' ]
-# then
-# 	echo ''
-# 	echo "=============================================="
-# 	echo "Create additional OpenvSwitch networks...     "
-# 	echo "=============================================="
-# 	echo ''
-
-# 	sleep 5
-
-# 	clear
-
-# 	SwitchList='sw2 sw3 sw4 sw5 sw6 sw7 sw8 sw9'
-# 	for k in $SwitchList
-# 	do
-# 		echo ''
-# 		echo "=============================================="
-# 		echo "Create systemd OpenvSwitch $k service...      "
-# 		echo "=============================================="
-#
-#		if [ ! -f /etc/systemd/system/$k.service ]
-#		then
-#			sudo sh -c "echo '[Unit]'						 > /etc/systemd/system/$k.service"
-#			sudo sh -c "echo 'Description=$k Service'				>> /etc/systemd/system/$k.service"
-#			sudo sh -c "echo 'After=network-online.target'				>> /etc/systemd/system/$k.service"
-#			sudo sh -c "echo ''							>> /etc/systemd/system/$k.service"
-#			sudo sh -c "echo '[Service]'						>> /etc/systemd/system/$k.service"
-#
-#			if [ $AWS -eq 1 ]
-#			then
-#				sudo sh -c "echo 'Type=idle'					>> /etc/systemd/system/$k.service"
-#			else
-#				sudo sh -c "echo 'Type=oneshot'					>> /etc/systemd/system/$k.service"
-#			fi
-#
-#			sudo sh -c "echo 'User=root'						>> /etc/systemd/system/$k.service"
-#			sudo sh -c "echo 'RemainAfterExit=yes'					>> /etc/systemd/system/$k.service"
-#			sudo sh -c "echo 'ExecStart=/etc/network/openvswitch/crt_ovs_$k.sh' 	>> /etc/systemd/system/$k.service"
-#			sudo sh -c "echo ''							>> /etc/systemd/system/$k.service"
-#			sudo sh -c "echo '[Install]'						>> /etc/systemd/system/$k.service"
-#			sudo sh -c "echo 'WantedBy=multi-user.target'				>> /etc/systemd/system/$k.service"
-#		fi
-#	
-#		echo ''
-#		echo "=============================================="
-#		echo "Start OpenvSwitch $k ...                      "
-#		echo "=============================================="
-#		echo ''
-#
-#		sudo chmod 644 /etc/systemd/system/$k.service
-#		sudo systemctl enable $k.service
-#		sudo service $k stop
-#		sudo service $k start
-#		sudo service $k status
-#
-#		echo ''
-#		echo "=============================================="
-#		echo "OpenvSwitch $k is up.                         "
-#		echo "=============================================="
-#	
-#		sleep 3
-#
-#		clear
-#	done
-#
-#	echo ''
-#	echo "=============================================="
-#	echo "Openvswitch networks installed & configured.  "
-#	echo "=============================================="
-#	echo ''
-#fi
-
 sleep 5
 
 clear
 
 echo ''
 echo "=============================================="
-echo "Starting LXC cloned containers for Oracle...  "
+echo "Starting LXC LXD containers for Oracle...     "
 echo "=============================================="
 echo ''
+
+sleep 5
+
+clear
 
 function GetSeedPostfix {
         sudo lxc-ls -f | grep ora"$OracleRelease"c | cut -f1 -d' ' | cut -f2 -d'c' | sed 's/^/c/'
@@ -314,27 +286,197 @@ do
 
 #	sudo /etc/network/openvswitch/veth_cleanups.sh $j > /dev/null 2>&1
 
-	echo "Starting container $j ..."
-
 	if [ $UbuntuMajorVersion -ge 16 ]
 	then
-		function CheckPublicIPIterative {
-			sudo lxc-info -n $j -iH | cut -f1-3 -d'.' | sed 's/\.//g' | head -1
-		}
-	fi
+		if [ $MultiHostVar12 = 'S' ] || [ $MultiHostVar12 = 'N' ]
+		then
+			clear
+
+			echo ''
+			echo "=============================================="
+			echo "Convert $j LXC-to-LXD ...                     "
+			echo "=============================================="
+			echo ''
+
+			echo "Stopping LXC container $j ..."
+
+			sudo lxc-stop -n $j
+
+			sleep 5
+
+        		function GetShortHostName {
+                		hostname -s
+        		}
+        		ShortHostName=$(GetShortHostName)
+
+                        function AlreadyConverted {
+                                lxc list $j | grep -c $j
+                        }
+                        Converted=$(AlreadyConverted)
+
+                        if [ $Converted -eq 0 ]
+                        then
+				function GetOldMacAddress {
+				        sudo cat /var/lib/lxc/$j/config | grep hwaddr | cut -f3 -d' '
+				}
+				OldMacAddress=$(GetOldMacAddress)
+
+				function GetNewMacAddress {
+				        echo -n 00:16:3e; dd bs=1 count=3 if=/dev/random 2>/dev/null | hexdump -v -e '/1 ":%02x"'
+				}
+				NewMacAddress=$(GetNewMacAddress)
+
+			 	sudo sed -i 's/sw1a/lxdbr0/g' 				/var/lib/lxc/$j/config
+                		sudo sed -i "s/\(hwaddr = \).*/\1$NewMacAddress/"       /var/lib/lxc/$j/config
+
+                        #       sudo lxd.lxc-to-lxd --lxcpath /var/lib/lxc --containers $j --storage $ShortHostName-$StoragePoolName --debug
+                                sudo lxd.lxc-to-lxd --lxcpath /var/lib/lxc --containers $j --debug
+
+			 	sudo sed -i 's/lxdbr0/sw1a/g' /var/lib/lxc/$j/config
+                		sudo sed -i "s/\(hwaddr = \).*/\1$OldMacAddress/"       /var/lib/lxc/$j/config
+                        fi
+
+			echo ''
+			echo "=============================================="
+			echo "Done: Convert $j LXC-to-LXD                   "
+			echo "=============================================="
+			echo ''
+
+			sleep 5
+
+                        function GetLXDName {
+                                echo $j | sed 's/c/d/'
+                        }
+                        LXDName=$(GetLXDName)
+
+                        lxc move $j $LXDName
+                        lxc file delete $LXDName/etc/machine-id 		> /dev/null 2>&1
+                        lxc file delete $LXDName/var/lib/dbus/machine-id 	> /dev/null 2>&1
+
+                        lxc start $LXDName
+
+                        if   [ $MajorRelease -ge 7 ]
+                        then
+				sleep 10
+                                lxc exec $LXDName -- hostnamectl set-hostname $LXDName
+				lxc exec $LXDName -- uname -a
+                                lxc exec $LXDName -- sed -i "s/$j/$LXDName/g" /etc/hosts
+                                lxc exec $LXDName -- sed -i "s/$j/$LXDName/g" /etc/sysconfig/network
+                                lxc exec $LXDName -- sed -i "s/$j/$LXDName/g" /etc/sysconfig/network-scripts/ifcfg-eth0
+
+                        elif [ $MajorRelease -eq 6 ]
+                        then
+                                lxc exec $LXDName
+                                lxc exec $LXDName -- sed -i "s/$j/$LXDName/g" /etc/hosts
+                                lxc exec $LXDName -- sed -i "s/$j/$LXDName/g" /etc/sysconfig/network
+                                lxc exec $LXDName -- sed -i "s/$j/$LXDName/g" /etc/sysconfig/network-scripts/ifcfg-eth0
+                        fi
+
+                        echo ''
+                        echo "=============================================="
+                        echo "Generate new LXD machine-id for container ... "
+                        echo "=============================================="
+                        echo ''
+
+                        echo 'These values should differ ...'
+                        echo ''
+                        echo "=============================================="
+
+                        lxc exec $LXDName -- systemd-machine-id-setup
+
+                        sleep 5
+
+                        lxc exec $LXDName -- cat /etc/machine-id
+                        sudo cat /var/lib/lxc/$j/rootfs/etc/machine-id
+                        
+			echo "=============================================="
+
+                        echo ''
+                        echo "=============================================="
+                        echo "Done: Generate LXD machine-id for container.  "
+                        echo "=============================================="
+
+                        sleep 5
+
+                        lxc stop $LXDName
+                        sleep 5
+                        lxc start $LXDName
+                fi
+        fi
+
+	echo "Starting container $j ..."
+
+	sudo lxc-start -n $j
+
+	function CheckPublicIPIterative {
+		sudo lxc-info -n $j -iH | cut -f1-3 -d'.' | sed 's/\.//g' | head -1
+	}
 	PublicIPIterative=$(CheckPublicIPIterative)
-	echo $j | grep oel > /dev/null 2>&1
-	if [ $? -eq 0 ]
-	then
-		sudo bash -c "cat $Config|grep ipv4|cut -f2 -d'='|sed 's/^[ \t]*//;s/[ \t]*$//'|cut -f4 -d'.'|sed 's/^/\./'|xargs -I '{}' sed -i "/ipv4/s/\{}/\.1$OR/g" $Config"
-	fi
-	sudo lxc-start -n $j > /dev/null 2>&1
-	sleep 5
+
+	if   [ $LXD = 'N' ]
+        then
+                echo $j | grep oel > /dev/null 2>&1
+
+        elif [ $LXD = 'S' ] || [ $LXD = 'A' ] || [ $LXD = 'E' ]
+        then
+                echo $LXDName | grep oel > /dev/null 2>&1
+        fi
+#       if [ $? -eq 0 ]
+#       then
+#               sudo bash -c "cat $Config|grep ipv4|cut -f2 -d'='|sed 's/^[ \t]*//;s/[ \t]*$//'|cut -f4 -d'.'|sed 's/^/\./'|xargs -I '{}' sed -i "/ipv4/s/\{}/\.1$OR/g" $Config"
+#       fi
+
+        if [ $LXD = 'S' ] || [ $LXD = 'A' ] || [ $LXD = 'E' ]
+        then
+                clear
+
+                echo ''
+                echo "=============================================="
+                echo "LXD Container $LXDName Started                "
+                echo "=============================================="
+                echo ''
+
+                sudo lxc list $LXDName
+
+                echo '' 
+                echo "=============================================="
+                echo ''
+
+                sleep 5
+
+        elif [ $LXD = 'N' ]
+        then
+                echo ''
+                echo "=============================================="
+                echo "LXC Container $j Started                      "
+                echo "=============================================="
+                echo ''
+
+                sudo lxc-ls -f | egrep 'NAME | $j'
+
+                echo '' 
+                echo "=============================================="
+                echo ''
+
+                sleep 5
+        fi
+
+        sleep 5
+
+        clear
+
 	i=1
+
 	while [ "$PublicIPIterative" != 1020739 ] && [ "$i" -le 10 ]
 	do
-		echo "Waiting for $j Public IP to come up..."
-		sleep 10
+                echo ''
+                echo "=============================================="
+                echo "Waiting for $j Public IP to come up..."
+                echo "=============================================="
+                echo ''
+
+                sleep 5
+
 		PublicIPIterative=$(CheckPublicIPIterative)
 		if [ $i -eq 5 ]
 		then
@@ -367,7 +509,7 @@ clear
 
 echo ''
 echo "=============================================="
-echo "LXC clone containers for Oracle started.      "
+echo "LXC LXD clone containers for Oracle started.  "
 echo "=============================================="
 echo ''
 
@@ -452,7 +594,7 @@ then
 	echo ''
 	
 	sudo touch /etc/orabuntu-lxc-release
-	sudo sh -c "echo 'Orabuntu-LXC v6.13.18-beta AMIDE' > /etc/orabuntu-lxc-release"
+	sudo sh -c "echo 'Orabuntu-LXC v7.0.0-beta AMIDE' > /etc/orabuntu-lxc-release"
 	sudo ls -l /etc/orabuntu-lxc-release
 	echo ''
 	sudo cat /etc/orabuntu-lxc-release
@@ -899,14 +1041,35 @@ then
 	echo "List Containers...                            "
 	echo "=============================================="
 	echo ''
+#	echo "=============================================="
+#	echo "LXC  Containers...                            "
+#	echo "=============================================="
+#	echo ''
+
+	if [ $MultiHostVar12 = 'S' ] || [ $MultiHostVar12 = 'N' ]
+	then
+		echo "=============================================="
+		echo "LXD Containers.. .                            "
+		echo "=============================================="
+		echo ''
+
+		lxc list
+
+		echo ''
+		echo "=============================================="
+	fi
+		
+	echo ''
 	echo "=============================================="
-	echo "LXC  Containers...                            "
+	echo "LXC Containers...                             "
 	echo "=============================================="
 	echo ''
-
+		
 	sudo lxc-ls -f
 
+	echo "=============================================="
 	echo ''
+	
 	echo "=============================================="
 	echo "Docker Containers...                          "
 	echo "=============================================="

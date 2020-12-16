@@ -110,6 +110,46 @@ function GetMultiHostVar10 {
 MultiHostVar10=$(GetMultiHostVar10)
 GREValue=$MultiHostVar10
 
+function GetMultiHostVar11 {
+        echo $MultiHost | cut -f11 -d':'
+}
+MultiHostVar11=$(GetMultiHostVar11)
+
+function GetMultiHostVar12 {
+        echo $MultiHost | cut -f12 -d':'
+}
+MultiHostVar12=$(GetMultiHostVar12)
+LXDValue=$MultiHostVar12
+
+function GetMultiHostVar13 {
+        echo $MultiHost | cut -f13 -d':'
+}
+MultiHostVar13=$(GetMultiHostVar13)
+
+function GetMultiHostVar14 {
+        echo $MultiHost | cut -f14 -d':'
+}
+MultiHostVar14=$(GetMultiHostVar14)
+PreSeed=$MultiHostVar14
+
+function GetMultiHostVar15 {
+        echo $MultiHost | cut -f15 -d':'
+}
+MultiHostVar15=$(GetMultiHostVar15)
+LXDCluster=$MultiHostVar15
+
+function GetMultiHostVar16 {
+        echo $MultiHost | cut -f16 -d':'
+}
+MultiHostVar16=$(GetMultiHostVar16)
+StorageDriver=$MultiHostVar16
+
+function GetMultiHostVar17 {
+        echo $MultiHost | cut -f17 -d':'
+}
+MultiHostVar17=$(GetMultiHostVar17)
+StoragePoolName=$MultiHostVar17
+
 if [ -f /etc/lsb-release ]
 then
         function GetUbuntuVersion {
@@ -244,9 +284,10 @@ echo "=============================================="
 echo ''
 
 function CheckContainerUp {
-sudo lxc-ls -f | grep $SeedContainerName | sed 's/  */ /g' | egrep 'RUNNING|STOPPED'  | cut -f2 -d' '
+	sudo lxc-ls -f | grep $SeedContainerName | sed 's/  */ /g' | egrep 'RUNNING|STOPPED'  | cut -f2 -d' '
 }
 ContainerUp=$(CheckContainerUp)
+
 sudo lxc-stop -n $SeedContainerName > /dev/null 2>&1
 
 while [ "$ContainerUp" = 'RUNNING' ]
@@ -307,6 +348,8 @@ echo "=============================================="
 echo "Clone $SeedContainerName to $NumCon containers"
 echo "=============================================="
 echo ''
+echo 'Finding next available container name ...     '
+echo ''
 
 let CloneIndex=10
 let CopyCompleted=0
@@ -332,7 +375,7 @@ do
 		sshpass -p $MultiHostVar9 ssh -M -S /tmp/orabuntu -qt -o CheckHostIP=no -o StrictHostKeyChecking=no -o ControlPersist=60s $MultiHostVar8@$MultiHostVar5 exit
 
         	function CheckDNSLookup {
-			ssh -S /tmp/orabuntu $MultiHostVar5 "sudo -S <<< "$MultiHostVar9" lxc-attach -n $NameServerShortName -- nslookup -timeout=5 $ContainerPrefix$CloneIndex"	
+			sshpass -p $MultiHostVar8 ssh -S /tmp/orabuntu $MultiHostVar5 "sudo -S --prompt='' <<< "$MultiHostVar9" lxc-attach -n $NameServerShortName -- nslookup -timeout=5 $ContainerPrefix$CloneIndex"	
         	}
         	DNSLookup=$(CheckDNSLookup)
 		DNSHit=$PIPESTATUS
@@ -351,11 +394,13 @@ do
                		CloneIndex=$((CloneIndex+1))
                		DNSLookup=$(CheckDNSLookup)
 			DNSHit=$PIPESTATUS
-			echo $ContainerPrefix$CloneIndex
+		#	echo $ContainerPrefix$CloneIndex
        		done
 		
 		if [ $DNSHit -eq 1 ]
 		then
+			clear
+
 			echo ''
 			echo "=============================================="
 			echo "Clone $SeedContainerName to $CP$CloneIndex    "
@@ -368,10 +413,10 @@ do
 
       			sudo lxc-copy -n $SeedContainerName -N $ContainerPrefix$CloneIndex
 		
-			if [ $MajorRelease -eq 7 ]
-			then	
-				sudo sed -i "s/$SeedContainerName/$ContainerPrefix$CloneIndex/g"	/var/lib/lxc/$ContainerPrefix$CloneIndex/rootfs/etc/hostname
-			fi
+#			if [ $MajorRelease -eq 7 ]
+#			then	
+#				sudo sed -i "s/$SeedContainerName/$ContainerPrefix$CloneIndex/g"	/var/lib/lxc/$ContainerPrefix$CloneIndex/rootfs/etc/hostname
+#			fi
 
 			sudo sed -i "s/$SeedContainerName/$ContainerPrefix$CloneIndex/g"		/var/lib/lxc/$ContainerPrefix$CloneIndex/rootfs/etc/sysconfig/network-scripts/ifcfg-eth0
 			sudo sed -i "s/HostName/$ContainerPrefix$CloneIndex/g"                  	/var/lib/lxc/$ContainerPrefix$CloneIndex/rootfs/etc/sysconfig/network-scripts/ifcfg-eth0
@@ -382,7 +427,16 @@ do
 
 	sudo sed -i "s/$SeedContainerName/$ContainerPrefix$CloneIndex/g" /var/lib/lxc/$ContainerPrefix$CloneIndex/config
 	sudo sed -i "s/\.10/\.$CloneIndex/g" /var/lib/lxc/$ContainerPrefix$CloneIndex/config
-	sudo sed -i 's/sx1/sw1/g' /var/lib/lxc/$ContainerPrefix$CloneIndex/config
+
+	if   [ $MultiHostVar12 = 'N' ]
+	then
+		sudo sed -i 's/sx1/sw1/g' /var/lib/lxc/$ContainerPrefix$CloneIndex/config
+
+	elif [ $MultiHostVar12 = 'S' ] || [ $MultiHostVar12 = 'A' ]
+	then
+		sudo sed -i 's/sx1a/sw1a/g' /var/lib/lxc/$ContainerPrefix$CloneIndex/config
+	fi
+
 	sudo sed -i "s/mtu = 1500/mtu = $MultiHostVar7/g" /var/lib/lxc/$ContainerPrefix$CloneIndex/config
 #	sudo sed -i "s/lxc\.mount\.entry = \/dev\/lxc_luns/#lxc\.mount\.entry = \/dev\/lxc_luns/g" /var/lib/lxc/$ContainerPrefix$CloneIndex/config
 #	sudo sed -i "/domain-name-servers/s/10.207.29.2/10.207.39.2/g" /var/lib/lxc/$ContainerPrefix$CloneIndex/rootfs/etc/dhcp/dhclient.conf
@@ -402,6 +456,10 @@ do
         echo ''
 
         sleep 5
+
+	# Added
+
+	clear
 
 	function GetHostName (){ echo $ContainerPrefix$CloneIndex\1; }
 	HostName=$(GetHostName)
@@ -527,6 +585,172 @@ then
 	echo "Done: Update config for LXC 2.1.0+            "
 	echo "=============================================="
 	echo ''
+fi
+
+sleep 5
+
+clear
+
+if [ $MultiHostVar12 = 'S' ] || [ $MultiHostVar12 = 'A' ]
+then
+
+        echo ''
+        echo "=============================================="
+        echo "Install LXD ...                               "
+        echo "=============================================="
+        echo ''
+
+        sleep 5
+
+        sudo chmod 775 	/opt/olxc/"$DistDir"/orabuntu/archives/lxd_install_orabuntu.sh
+			/opt/olxc/"$DistDir"/orabuntu/archives/lxd_install_orabuntu.sh $PreSeed $LXDCluster $MultiHostVar2 $MultiHostVar10
+
+        echo ''
+        echo "=============================================="
+        echo "Done: Install LXD.                            "
+        echo "=============================================="
+        echo ''
+
+	sleep 5
+
+	clear
+
+	echo ''
+	echo "=============================================="
+	echo "Convert $SeedContainerName LXC-to-LXD ...     "
+	echo "=============================================="
+	echo ''
+
+	sleep 5
+
+	function GetShortHostName {
+		hostname -s
+	}
+	ShortHostName=$(GetShortHostName)
+
+        function AlreadyConverted {
+                lxc list $SeedContainerName | grep -c $SeedContainerName
+        }
+        Converted=$(AlreadyConverted)
+
+        if [ $Converted -eq 0 ]
+        then
+		function GetOldMacAddress {
+			sudo cat /var/lib/lxc/$SeedContainerName/config | grep hwaddr | cut -f3 -d' '
+		}
+		OldMacAddress=$(GetOldMacAddress)
+
+	        function GetNewMacAddress {
+                	echo -n 00:16:3e; dd bs=1 count=3 if=/dev/random 2>/dev/null | hexdump -v -e '/1 ":%02x"'
+        	}
+        	NewMacAddress=$(GetNewMacAddress)
+
+	 	sudo sed -i 's/sx1a/lxdbr0/g' 				/var/lib/lxc/$SeedContainerName/config
+        	sudo sed -i "s/\(hwaddr = \).*/\1$NewMacAddress/"	/var/lib/lxc/$SeedContainerName/config
+
+	#	sudo lxd.lxc-to-lxd --lxcpath /var/lib/lxc --containers $SeedContainerName --storage $ShortHostName-$StoragePoolName --debug
+		sudo lxd.lxc-to-lxd --lxcpath /var/lib/lxc --containers $SeedContainerName --debug
+
+	 	sudo sed -i 's/lxdbr0/sx1a/g' 				/var/lib/lxc/$SeedContainerName/config
+		sudo sed -i "s/\(hwaddr = \).*/\1$OldMacAddress/"	/var/lib/lxc/$SeedContainerName/config
+	fi
+
+        echo ''
+        echo "=============================================="
+        echo "Done: Convert $SeedContainerName LXC-to-LXD   "
+        echo "=============================================="
+        echo ''
+
+        function GetLXDName {
+                    echo $SeedContainerName | sed 's/c/d/'
+        }
+        LXDName=$(GetLXDName)
+
+        lxc move $SeedContainerName $LXDName
+        lxc file delete $LXDName/etc/machine-id
+        lxc file delete $LXDName/var/lib/dbus/machine-id
+
+        if [ $MultiHostVar2 = 'N' ]
+        then
+                sudo lxc-stop -n $NameServer
+        fi
+
+        sleep 5
+
+        lxc start $LXDName
+
+        if   [ $MajorRelease -ge 7 ]
+        then
+		sleep 10
+                lxc exec $LXDName -- hostnamectl set-hostname $LXDName
+                lxc exec $LXDName -- uname -a
+                lxc exec $LXDName -- sed -i "s/$SeedContainerName/$LXDName/g" /etc/hosts
+
+                echo ''
+                echo "=============================================="
+                echo "Generate new LXD machine-id for container ... "
+                echo "=============================================="
+
+                echo ''
+
+                echo 'These values should differ ...'
+
+                echo ''
+
+                lxc exec $LXDName -- systemd-machine-id-setup
+
+                echo ''
+
+                echo "=============================================="
+                lxc exec $LXDName -- cat /etc/machine-id
+                sudo cat /var/lib/lxc/$SeedContainerName/rootfs/etc/machine-id
+                echo "=============================================="
+
+                echo ''
+                echo "=============================================="
+                echo "Done: Generate LXD machine-id for container.  "
+                echo "=============================================="
+
+                sleep 5
+
+                clear
+
+                lxc exec $LXDName -- sed -i "s/$SeedContainerName/$LXDName/g" /etc/sysconfig/network
+                sleep 5
+                lxc exec $LXDName -- sed -i "s/$SeedContainerName/$LXDName/g" /etc/sysconfig/network-scripts/ifcfg-eth0
+                sleep 5
+
+        elif [ $MajorRelease -eq 6 ]
+        then
+                lxc exec $LXDName -- sed -i "s/$SeedContainerName/$LXDName/g" /etc/hosts
+                lxc exec $LXDName -- sed -i "s/$SeedContainerName/$LXDName/g" /etc/sysconfig/network
+                lxc exec $LXDName -- sed -i "s/$SeedContainerName/$LXDName/g" /etc/sysconfig/network-scripts/ifcfg-eth0
+        fi
+
+        lxc stop $LXDName
+
+        if [ $MultiHostVar2 = 'N' ]
+        then
+                sudo lxc-start -n $NameServer
+        fi
+
+        sleep 5
+
+        lxc start $LXDName
+
+        echo ''
+        echo "=============================================="
+        echo "Display LXD uname -a ...                      "
+        echo "=============================================="
+        echo ''
+
+        lxc exec $LXDName -- uname -a
+
+        echo ''
+        echo "=============================================="
+        echo "Done: Display LXD uname -a                    "
+        echo "=============================================="
+        echo ''
 fi
 
 sleep 5

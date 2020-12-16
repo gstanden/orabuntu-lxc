@@ -1065,8 +1065,11 @@ then
 	
 	while [ $ContainerCreated -eq 0 ] && [ $n -le 5 ]
 	do
+<<<<<<< HEAD
 		wget https://github.com/gstanden/orabuntu-lxc/raw/to-lxd/lxcimage/nsa.tar.gz -P $DistDir/lxcimage
 		mv $DistDir/lxcimage/nsa.tar.gz.1 $DistDir/lxcimage/nsa.tar.gz
+=======
+>>>>>>> 0a6eb4275991baad5573f71e5c4758b8953dd359
 		sudo tar -xzPf $DistDir/lxcimage/nsa.tar.gz
 		sleep 5
 		sudo lxc-ls -f

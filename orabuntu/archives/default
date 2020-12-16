@@ -1,0 +1,33 @@
+config:
+  core.https_address: 192.168.1.224:8443
+  core.trust_password: ubuntu
+networks: []
+storage_pools:
+- config:
+    source: olxc-001
+  description: ""
+  name: local
+  driver: zfs
+profiles:
+- config: {}
+  description: ""
+  devices:
+    eth0:
+      name: eth0
+      nictype: bridged
+      parent: lxcbr0
+      type: nic
+    root:
+      path: /
+      pool: local
+      type: disk
+  name: default
+cluster:
+  server_name: u20sv6
+  enabled: true
+  member_config: []
+  cluster_address: ""
+  cluster_certificate: ""
+  server_address: ""
+  cluster_password: ""
+

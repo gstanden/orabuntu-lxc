@@ -117,6 +117,16 @@ function GetMultiHostVar10 {
 MultiHostVar10=$(GetMultiHostVar10)
 GRE=$MultiHostVar10
 
+function GetMultiHostVar11 {
+	echo $MultiHost | cut -f11 -d':'
+}
+MultiHostVar11=$(GetMultiHostVar11)
+
+function GetMultiHostVar12 {
+	echo $MultiHost | cut -f12 -d':'
+}
+MultiHostVar12=$(GetMultiHostVar12)
+
 function CheckSystemdResolvedInstalled {
         sudo netstat -ulnp | grep 53 | sed 's/  */ /g' | rev | cut -f1 -d'/' | rev | sort -u | grep systemd- | wc -l
 }
@@ -640,41 +650,60 @@ sudo lxc-attach -n $SeedContainerName -- chown grid:oinstall /home/grid/.kshrc
 sudo lxc-attach -n $SeedContainerName -- chown grid:oinstall /home/grid/.bash_logout
 sudo lxc-attach -n $SeedContainerName -- chown grid:oinstall /home/grid/.
 
-sudo cp -p /var/lib/lxc/$SeedContainerName/config 				/var/lib/lxc/$SeedContainerName/config.$BEXT
-sudo cp -p /var/lib/lxc/$SeedContainerName/rootfs/config.asm.flex.cluster	/var/lib/lxc/$SeedContainerName/config.asm.flex.cluster
-sudo sed -i "s/MtuSetting/9000/g" 	  	  				/var/lib/lxc/$SeedContainerName/config.asm.flex.cluster
-sudo sed -i "s/ContainerName/$SeedContainerName/g" 				/var/lib/lxc/$SeedContainerName/config.asm.flex.cluster
+sudo cp -p /var/lib/lxc/$SeedContainerName/config 					/var/lib/lxc/$SeedContainerName/config.$BEXT
+
+if [ $MultiHostVar12 = 'S' ] || [ $MultiHostVar12 = 'A' ]
+then
+	sudo cp -p /var/lib/lxc/$SeedContainerName/rootfs/config.asm.flex.cluster.lxd	/var/lib/lxc/$SeedContainerName/config.asm.flex.cluster.lxd
+	sudo sed -i "s/MtuSetting/9000/g" 	  	  				/var/lib/lxc/$SeedContainerName/config.asm.flex.cluster.lxd
+	sudo sed -i "s/ContainerName/$SeedContainerName/g" 				/var/lib/lxc/$SeedContainerName/config.asm.flex.cluster.lxd
+else
+	sudo cp -p /var/lib/lxc/$SeedContainerName/rootfs/config.asm.flex.cluster	/var/lib/lxc/$SeedContainerName/config.asm.flex.cluster
+	sudo sed -i "s/MtuSetting/9000/g" 	  	  				/var/lib/lxc/$SeedContainerName/config.asm.flex.cluster
+	sudo sed -i "s/ContainerName/$SeedContainerName/g" 				/var/lib/lxc/$SeedContainerName/config.asm.flex.cluster
+fi
 
 # GLS 20170927 credit yairchu
 function SoftwareVersion { echo "$@" | awk -F. '{ printf("%d%03d%03d%03d\n", $1,$2,$3,$4); }'; }
 
 if [ $(SoftwareVersion $LxcVersion) -ge $(SoftwareVersion "2.1.0") ]
 then
-        sudo sed -i "s/ipv4/ipv4\.address/g"                                    /var/lib/lxc/$SeedContainerName/config.asm.flex.cluster
+	if [ $MultiHostVar12 = 'S' ] || [ $MultiHostVar12 = 'A' ]
+	then
+        	sudo sed -i "s/ipv4/ipv4\.address/g"                                    /var/lib/lxc/$SeedContainerName/config.asm.flex.cluster.lxd
+	else
+        	sudo sed -i "s/ipv4/ipv4\.address/g"                                    /var/lib/lxc/$SeedContainerName/config.asm.flex.cluster
+	fi
 fi
 
-sudo bash -c "cat /var/lib/lxc/$SeedContainerName/config 			/var/lib/lxc/$SeedContainerName/config.asm.flex.cluster > /var/lib/lxc/$SeedContainerName/config.ora-gi-18c"
-sudo cp -p /var/lib/lxc/$SeedContainerName/config.ora-gi-18c			/var/lib/lxc/$SeedContainerName/config
-sudo sed -i '/supersede/{/oracle-gi/!d;}'					/var/lib/lxc/$SeedContainerName/rootfs/etc/dhcp/dhclient.conf
-sudo sed -i 's/# oracle-gi //g'							/var/lib/lxc/$SeedContainerName/rootfs/etc/dhcp/dhclient.conf
+if [ $MultiHostVar12 = 'S' ] || [ $MultiHostVar12 = 'A' ]
+then
+	sudo bash -c "cat /var/lib/lxc/$SeedContainerName/config 			/var/lib/lxc/$SeedContainerName/config.asm.flex.cluster.lxd > /var/lib/lxc/$SeedContainerName/config.ora-gi-18c"
+else
+	sudo bash -c "cat /var/lib/lxc/$SeedContainerName/config 			/var/lib/lxc/$SeedContainerName/config.asm.flex.cluster     > /var/lib/lxc/$SeedContainerName/config.ora-gi-18c"
+fi
+
+sudo cp -p /var/lib/lxc/$SeedContainerName/config.ora-gi-18c				/var/lib/lxc/$SeedContainerName/config
+sudo sed -i '/supersede/{/oracle-gi/!d;}'						/var/lib/lxc/$SeedContainerName/rootfs/etc/dhcp/dhclient.conf
+sudo sed -i 's/# oracle-gi //g'								/var/lib/lxc/$SeedContainerName/rootfs/etc/dhcp/dhclient.conf
 
 
 if [ $LinuxFlavor = 'Ubuntu' ]
 then
-	sudo sh -c "echo 'lxc.apparmor.profile = unconfined'		     >>	/var/lib/lxc/$SeedContainerName/config"
+	sudo sh -c "echo 'lxc.apparmor.profile = unconfined'		     >>		/var/lib/lxc/$SeedContainerName/config"
 fi
 
 if [ $(SoftwareVersion $LxcVersion) -ge $(SoftwareVersion "2.1.0") ]
 then
-	sudo sed -i "s/net\.0/network/g"                                        /var/lib/lxc/$SeedContainerName/config
-	sudo sed -i "s/\#marker//g"                                             /var/lib/lxc/$SeedContainerName/config
-	sudo lxc-update-config -c                                               /var/lib/lxc/$SeedContainerName/config
-	sudo sed -i "s/lxc\.net\.1/#markerlxc\.net\.1/g"          		/var/lib/lxc/$SeedContainerName/config
-	sudo sed -i "s/lxc\.net\.2/#markerlxc\.net\.2/g"          		/var/lib/lxc/$SeedContainerName/config
-	sudo sed -i "s/lxc\.net\.3/#markerlxc\.net\.3/g"          		/var/lib/lxc/$SeedContainerName/config
-	sudo sed -i "s/lxc\.net\.4/#markerlxc\.net\.4/g"          		/var/lib/lxc/$SeedContainerName/config
-	sudo sed -i "s/lxc\.net\.5/#markerlxc\.net\.5/g"          		/var/lib/lxc/$SeedContainerName/config
-	sudo sed -i "s/lxc\.net\.6/#markerlxc\.net\.6/g"          		/var/lib/lxc/$SeedContainerName/config
+	sudo sed -i "s/net\.0/network/g"                                        	/var/lib/lxc/$SeedContainerName/config
+	sudo sed -i "s/\#marker//g"                                             	/var/lib/lxc/$SeedContainerName/config
+	sudo lxc-update-config -c                                               	/var/lib/lxc/$SeedContainerName/config
+	sudo sed -i "s/lxc\.net\.1/#markerlxc\.net\.1/g"          			/var/lib/lxc/$SeedContainerName/config
+	sudo sed -i "s/lxc\.net\.2/#markerlxc\.net\.2/g"          			/var/lib/lxc/$SeedContainerName/config
+	sudo sed -i "s/lxc\.net\.3/#markerlxc\.net\.3/g"          			/var/lib/lxc/$SeedContainerName/config
+	sudo sed -i "s/lxc\.net\.4/#markerlxc\.net\.4/g"          			/var/lib/lxc/$SeedContainerName/config
+	sudo sed -i "s/lxc\.net\.5/#markerlxc\.net\.5/g"          			/var/lib/lxc/$SeedContainerName/config
+	sudo sed -i "s/lxc\.net\.6/#markerlxc\.net\.6/g"          			/var/lib/lxc/$SeedContainerName/config
 fi
 
 sleep 5
@@ -687,9 +716,9 @@ echo "Configure NTP to run in LXC containers ...    "
 echo "=============================================="
 echo ''
 
-sudo touch 									   /usr/share/lxc/config/common.conf.d/01-oracle-gi-ntp.conf
-sudo sh -c "echo 'lxc.cap.drop ='						>> /usr/share/lxc/config/common.conf.d/01-oracle-gi-ntp.conf"
-sudo sh -c "echo 'lxc.cap.drop = mac_admin mac_override sys_module sys_rawio'	>> /usr/share/lxc/config/common.conf.d/01-oracle-gi-ntp.conf" 
+sudo touch 									   	/usr/share/lxc/config/common.conf.d/01-oracle-gi-ntp.conf
+sudo sh -c "echo 'lxc.cap.drop ='						>> 	/usr/share/lxc/config/common.conf.d/01-oracle-gi-ntp.conf"
+sudo sh -c "echo 'lxc.cap.drop = mac_admin mac_override sys_module sys_rawio'	>> 	/usr/share/lxc/config/common.conf.d/01-oracle-gi-ntp.conf" 
 sudo cat /usr/share/lxc/config/common.conf.d/01-oracle-gi-ntp.conf
 echo ''
 
