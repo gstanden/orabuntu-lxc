@@ -14,7 +14,7 @@ This branch introduces support for LXD as well as LXC.
 
 * This initial release of 7.0.0-beta AMIDE uses the LXD snap feature lxd.lxc-to-lxd to copy/convert all created LXC containers to LXD containers.
 * This initial release of 7.0.0-beta AMIDE only runs on Ubuntu 20.04.  Other version and linux flavor support is under current development.
-* The LXD cluster feature is built automatically by Orabuntu-LXC
+* The LXD cluster feature is built automatically by Orabuntu-LXC using LXD preseed files to configure the LXD cluster when lxd init is run automatically
 * The LXD containers are bridged with the lxdbr0 bridge, but it is possible to bridge them on the sw1a bridge (although this is still under development)
 * The LXC containers are bridged with the sw1a bridge
 * The server-side scripts for connecting the LXC containers to OpenvSwitch have been replaced by the lxc.net.0.link = sw1a method
