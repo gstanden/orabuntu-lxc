@@ -1,4 +1,0 @@
-nsa.tar.gz filter=lfs diff=lfs merge=lfs -text
-ora6xc00.tar.gz filter=lfs diff=lfs merge=lfs -text
-ora7xc00.tar.gz filter=lfs diff=lfs merge=lfs -text
-ora8xc00.tar.gz filter=lfs diff=lfs merge=lfs -text
