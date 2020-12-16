@@ -124,6 +124,47 @@ function GetMultiHostVar10 {
 MultiHostVar10=$(GetMultiHostVar10)
 GRE=$MultiHostVar10
 
+function GetMultiHostVar11 {
+	echo $MultiHost | cut -f11 -d':'
+}
+MultiHostVar11=$(GetMultiHostVar11)
+
+function GetMultiHostVar12 {
+	echo $MultiHost | cut -f12 -d':'
+}
+MultiHostVar12=$(GetMultiHostVar12)
+LXD=$MultiHostVar12
+
+function GetMultiHostVar13 {
+	echo $MultiHost | cut -f13 -d':'
+}
+MultiHostVar13=$(GetMultiHostVar13)
+K8S=$MultiHostVar13
+
+function GetMultiHostVar14 {
+	echo $MultiHost | cut -f14 -d':'
+}
+MultiHostVar14=$(GetMultiHostVar14)
+PreSeed=$MultiHostVar14
+
+function GetMultiHostVar15 {
+	echo $MultiHost | cut -f15 -d':'
+}
+MultiHostVar15=$(GetMultiHostVar15)
+LXDCluster=$MultiHostVar15
+
+function GetMultiHostVar16 {
+	echo $MultiHost | cut -f16 -d':'
+}
+MultiHostVar16=$(GetMultiHostVar16)
+StorageDriver=$MultiHostVar16
+
+function GetMultiHostVar17 {
+	echo $MultiHost | cut -f17 -d':'
+}
+MultiHostVar17=$(GetMultiHostVar17)
+StoragePoolName=$MultiHostVar17
+
 function CheckNetworkManagerInstalled {
 	sudo dpkg -l | grep -v  network-manager- | grep network-manager | wc -l
 }
@@ -1017,6 +1058,27 @@ then
 	echo ''
 	echo "=============================================="
 	echo "Trying Method 1...                            "
+	echo "=============================================="
+	echo ''
+
+	n=1
+	
+	while [ $ContainerCreated -eq 0 ] && [ $n -le 5 ]
+	do
+		wget https://github.com/gstanden/orabuntu-lxc/raw/to-lxd/lxcimage/nsa.tar.gz -P $DistDir/lxcimage
+		mv $DistDir/lxcimage/nsa.tar.gz.1 $DistDir/lxcimage/nsa.tar.gz
+		sudo tar -xzPf $DistDir/lxcimage/nsa.tar.gz
+		sleep 5
+		sudo lxc-ls -f
+		
+		sleep 5
+		n=$((n+1))
+		ContainerCreated=$(ConfirmContainerCreated)
+	done
+
+	echo ''
+	echo "=============================================="
+	echo "Trying Method 2...                            "
 	echo "                                              "
 	echo "Patience...download of rootfs takes time...   "
 	echo "=============================================="
@@ -1056,7 +1118,9 @@ then
 
 	echo ''
 	echo "=============================================="
-	echo "Trying Method 2...                            "
+	echo "Trying Method 3...                            "
+	echo "                                              "
+	echo "Patience...download of rootfs takes time...   "
 	echo "=============================================="
 	echo ''
 	
@@ -1084,10 +1148,19 @@ then
 
 	clear
 
-	echo ''
-	echo "=============================================="
-	echo "Install & configure DNS DHCP LXC container... "
-	echo "=============================================="
+#	echo ''
+#	echo "=============================================="
+#	echo "Backup LXC DNS DHCP container...              "
+#	echo "=============================================="
+#	echo ''
+#
+#	sudo lxc-stop -n nsa
+#	sudo tar -cvzPf ~/Downloads/nsa.tar /var/lib/lxc/nsa
+
+#	echo ''
+#	echo "=============================================="
+#	echo "Install & configure DNS DHCP LXC container... "
+#	echo "=============================================="
 
 	echo ''
 	sudo touch /var/lib/lxc/nsa/rootfs/etc/resolv.conf > /dev/null 2>&1
@@ -1254,6 +1327,72 @@ clear
 echo ''
 echo "=============================================="
 echo "Custom files for $LF Linux $RL installed.     "
+echo "=============================================="
+echo ''
+
+sleep 5
+
+clear
+
+echo ''
+echo "=============================================="
+echo "Install OvsVethCleanup.service                "
+echo "=============================================="
+echo ''
+
+sudo sh -c "echo '[Unit]'                                                               >  /etc/systemd/system/OvsVethCleanup.service"
+sudo sh -c "echo 'Description=OvsVethCleanup job'                                       >> /etc/systemd/system/OvsVethCleanup.service"
+sudo sh -c "echo ''                                                                     >> /etc/systemd/system/OvsVethCleanup.service"
+sudo sh -c "echo '[Service]'                                                            >> /etc/systemd/system/OvsVethCleanup.service"
+sudo sh -c "echo 'Type=oneshot'                                                         >> /etc/systemd/system/OvsVethCleanup.service"
+sudo sh -c "echo 'User=root'								>> /etc/systemd/system/OvsVethCleanup.service"
+sudo sh -c "echo 'ExecStart=/usr/bin/bash /etc/network/openvswitch/OvsVethCleanup.sh'   >> /etc/systemd/system/OvsVethCleanup.service"
+
+sudo cat /etc/systemd/system/OvsVethCleanup.service
+
+echo ''
+echo "=============================================="
+echo "Done: Install OvsVethCleanup.service          "
+echo "=============================================="
+echo ''
+
+sleep 5
+
+clear
+
+echo ''
+echo "=============================================="
+echo "Install OvsVethCleanup.timer                  "
+echo "=============================================="
+echo ''
+
+sudo sh -c "echo '[Unit]'                                                               >  /etc/systemd/system/OvsVethCleanup.timer"
+sudo sh -c "echo 'Description=OvsVethCleanup'                                           >> /etc/systemd/system/OvsVethCleanup.timer"
+sudo sh -c "echo ''                                                                     >> /etc/systemd/system/OvsVethCleanup.timer"
+sudo sh -c "echo '[Timer]'                                                              >> /etc/systemd/system/OvsVethCleanup.timer"
+sudo sh -c "echo 'OnUnitActiveSec=60s'                                                  >> /etc/systemd/system/OvsVethCleanup.timer"
+sudo sh -c "echo 'OnBootSec=60s'                                                        >> /etc/systemd/system/OvsVethCleanup.timer"
+sudo sh -c "echo ''                                                                     >> /etc/systemd/system/OvsVethCleanup.timer"
+sudo sh -c "echo '[Install]'                                                            >> /etc/systemd/system/OvsVethCleanup.timer"
+sudo sh -c "echo 'WantedBy=timers.target'                                               >> /etc/systemd/system/OvsVethCleanup.timer"
+
+sudo cat /etc/systemd/system/OvsVethCleanup.timer
+
+echo ''
+
+sudo systemctl daemon-reload
+sudo systemctl enable OvsVethCleanup.timer
+sudo systemctl start  OvsVethCleanup.timer
+
+echo ''
+
+sudo systemctl list-timers --all
+
+sleep 5
+
+echo ''
+echo "=============================================="
+echo "Done: Install OvsVethCleanup.timer                  "
 echo "=============================================="
 echo ''
 
@@ -1531,10 +1670,16 @@ then
 			sudo sed -i "/nsa/s/nsa/$NameServerBase/g" 	/var/lib/lxc/nsa/rootfs/root/ns_backup.start.sh
 			sudo sed -i "/nsa/s/nsa/$NameServerBase/g" 	/var/lib/lxc/nsa/rootfs/root/dns-sync.sh
 
+			echo 'NameServerBase = '$NameServerBase
+			sleep 20
+
 			function GetNameServerShortName {
 				echo $NameServer | cut -f1 -d'-'
 			}
 			NameServerShortName=$(GetNameServerShortName)
+
+			echo 'NameServerShortName = '$NameServerShortName
+			sleep 20
 
 			sudo sed -i "/nsa/s/nsa/$NameServerShortName/g" /var/lib/lxc/nsa/rootfs/root/ns_backup_update.sh
 			sudo sed -i "/nsa/s/nsa/$NameServerShortName/g" /var/lib/lxc/nsa/rootfs/root/ns_backup.start.sh
@@ -1946,6 +2091,48 @@ sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw7.sh
 sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw8.sh
 sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw9.sh
 
+# echo '==================================='
+# echo 'LXDCluster = '$LXDCluster
+# echo 'PreSeed    = '$PreSeed
+# echo '==================================='
+
+# sleep 20
+
+if [ $LXDCluster = 'Y' ]
+then
+	sudo apt-get -y install expect
+	sudo sed -i "s/HOSTNAME/$HOSTNAME/g"  	/etc/network/openvswitch/lxd-init-node1.sh
+#	sudo cat 				/etc/network/openvswitch/lxd-init-node1.sh
+#	sleep 20
+
+	if   [ $PreSeed = 'Y' ]
+	then
+		function GetShortHostName {
+			hostname -s
+		}
+		ShortHostName=$(GetShortHostName)
+
+		if   [ $GRE = 'N' ]
+		then
+			sudo sed -i "s/SWITCH_IP/$Sw1Index/g"      						/etc/network/openvswitch/preseed.sw1a.olxc.001.lxd.cluster
+			sudo sed -i "s/HOSTNAME/$ShortHostName/g"  						/etc/network/openvswitch/preseed.sw1a.olxc.001.lxd.cluster
+			sudo sed -i "s/STORAGE-DRIVER/$StorageDriver/g"						/etc/network/openvswitch/preseed.sw1a.olxc.001.lxd.cluster
+			sudo sed -i "s/POOL/$StoragePoolName/g"							/etc/network/openvswitch/preseed.sw1a.olxc.001.lxd.cluster
+
+		elif [ $GRE = 'Y' ]
+		then
+			sshpass -p $MultiHostVar8 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S --prompt='' <<< "$MultiHostVar8" lxc info | sed -n '/BEGIN.*-/,/END.*-/p'" > /tmp/cert.txt
+			
+			sudo sed -i "s/SWITCH_IP/$Sw1Index/g"      						/etc/network/openvswitch/preseed.sw1a.olxc.002.lxd.cluster
+			sudo sed -i "s/HOSTNAME/$ShortHostName/g"  						/etc/network/openvswitch/preseed.sw1a.olxc.002.lxd.cluster
+			sudo sed -i "s/STORAGE-DRIVER/$StorageDriver/g"						/etc/network/openvswitch/preseed.sw1a.olxc.002.lxd.cluster
+			sudo sed -i "s/POOL/$StoragePoolName/g"							/etc/network/openvswitch/preseed.sw1a.olxc.002.lxd.cluster
+			sudo sed -i -e '/-----BEGIN/,/-----END/!b' -e '/-----END/!d;r /tmp/cert.txt' -e 'd'	/etc/network/openvswitch/preseed.sw1a.olxc.002.lxd.cluster
+			sudo rm -f /tmp/cert.txt
+		fi
+	fi
+fi
+
 sudo sed -i "s/MULTIHOSTVAR7/$MultiHostVar7/g"	/etc/network/openvswitch/crt_ovs_sw1.sh
 sudo sed -i "s/MULTIHOSTVAR7/$MultiHostVar7/g"	/etc/network/openvswitch/crt_ovs_sx1.sh
 
@@ -2292,28 +2479,35 @@ then
                 }
                 FileSystemTypeExt=$(CheckFileSystemTypeExt)
 
-                if [ $FileSystemTypeXfs -eq 1 ]
-                then
-                        function GetFtype {
-                                xfs_info / | grep -c ftype=1
-                        }
-                        Ftype=$(GetFtype)
+		if [ $MultiHostVar12 = 'A' ]
+		then
+			sudo lxc-stop  -n $NameServer > /dev/null 2>&1
+			sudo lxc-copy  -n $NameServer -N $NameServerBase
+			NameServer=$NameServerBase
+			sudo lxc-start -n $NameServer
 
-                        if   [ $Ftype -eq 0 ]
-                        then
-                                sudo lxc-stop  -n $NameServer > /dev/null 2>&1
-                                sudo lxc-copy  -n $NameServer -N $NameServerBase
-                                NameServer=$NameServerBase
-                                sudo lxc-start -n $NameServer
+		elif [ $FileSystemTypeXfs -eq 1 ]
+		then
+              		function GetFtype {
+                               	xfs_info / | grep -c ftype=1
+                       	}
+                       	Ftype=$(GetFtype)
 
-                        elif [ $Ftype -eq 1 ]
-                        then
-                                sudo lxc-stop  -n $NameServer > /dev/null 2>&1
-                                sudo lxc-copy  -n $NameServer -N $NameServerBase -B overlayfs -s
-                                NameServer=$NameServerBase
-                                sudo lxc-start -n $NameServer
-                        fi
-                fi
+                       	if   [ $Ftype -eq 0 ]
+                       	then
+                               	sudo lxc-stop  -n $NameServer > /dev/null 2>&1
+                               	sudo lxc-copy  -n $NameServer -N $NameServerBase
+                               	NameServer=$NameServerBase
+                               	sudo lxc-start -n $NameServer
+
+                       	elif [ $Ftype -eq 1 ]
+                       	then
+                               	sudo lxc-stop  -n $NameServer > /dev/null 2>&1
+                               	sudo lxc-copy  -n $NameServer -N $NameServerBase -B overlayfs -s
+                               	NameServer=$NameServerBase
+                               	sudo lxc-start -n $NameServer
+                       	fi
+               	fi
 
                 if [ $FileSystemTypeExt -eq 1 ]
                 then
@@ -2560,13 +2754,13 @@ then
 	sudo mkdir -p /home/${USERNAME}/Manage-Orabuntu/backup-lxc-container/$NameServer/updates
 	sudo mkdir -p /home/${USERNAME}/Manage-Orabuntu/backup-lxc-container/$OffBase/updates
 
-	echo "sudo mkdir -p /home/${USERNAME}/Manage-Orabuntu/backup-lxc-container/$OffBase/updates"
-	echo "sudo mkdir -p /home/${USERNAME}/Manage-Orabuntu/backup-lxc-container/$NameServer/updates"a
+#	echo "sudo mkdir -p /home/${USERNAME}/Manage-Orabuntu/backup-lxc-container/$OffBase/updates"
+#	echo "sudo mkdir -p /home/${USERNAME}/Manage-Orabuntu/backup-lxc-container/$NameServer/updates"a
 
-	sleep 30
+#	sleep 30
 
 	sudo chown -R ${USERNAME}:${USERNAME} /home/${USERNAME}/Downloads 
-	sudo shown -R ${USERNAME}:${USERNAME} /home/${USERNAME}/Manage-Orabuntu
+	sudo chown -R ${USERNAME}:${USERNAME} /home/${USERNAME}/Manage-Orabuntu
 	sudo chmod -R 777 /home/${USERNAME}/Manage-Orabuntu
 
 	sudo sed -i "/lxc\.mount\.entry/s/#/ /"              /var/lib/lxc/$NameServer/config
@@ -2576,25 +2770,25 @@ then
 	sleep 5
 	sudo lxc-start -n $NameServer
 
-        echo ''
-        echo "=============================================="
-	echo "Debug of new file transfer mechanism ..."
-        echo "=============================================="
-	echo ''
+#       echo ''
+#       echo "=============================================="
+#	echo "Debug of new file transfer mechanism ..."
+#       echo "=============================================="
+#	echo ''
 
-	echo "NameServer = "$NameServer	
-	echo "USERNAME   = "${USERNAME}
-	sudo ls -l /home/${USERNAME}/Manage-Orabuntu
-	sudo ls -l /home/${USERNAME}/Manage-Orabuntu/backup-lxc-container/
-	sudo ls -l /home/${USERNAME}/Manage-Orabuntu/backup-lxc-container/$NameServer
-	sudo ls -l /home/${USERNAME}/Manage-Orabuntu/backup-lxc-container/$NameServer/updates
-	sudo lxc-attach -n $NameServer -- sudo touch /root/backup-lxc-container/afns1/updates/testfile
-	sudo ls -l /home/amide/Manage-Orabuntu/backup-lxc-container/afns1/updates
-	sudo lxc-attach -n $NameServer -- ls -l /root/backup-lxc-container/afns1/updates
+#	echo "NameServer = "$NameServer	
+#	echo "USERNAME   = "${USERNAME}
+#	sudo ls -l /home/${USERNAME}/Manage-Orabuntu
+#	sudo ls -l /home/${USERNAME}/Manage-Orabuntu/backup-lxc-container/
+#	sudo ls -l /home/${USERNAME}/Manage-Orabuntu/backup-lxc-container/$NameServer
+#	sudo ls -l /home/${USERNAME}/Manage-Orabuntu/backup-lxc-container/$NameServer/updates
+#	sudo lxc-attach -n $NameServer -- sudo touch /root/backup-lxc-container/afns1/updates/testfile
+#	sudo ls -l /home/amide/Manage-Orabuntu/backup-lxc-container/afns1/updates
+#	sudo lxc-attach -n $NameServer -- ls -l /root/backup-lxc-container/afns1/updates
 
-	echo "sleeping for 30 seconds ..."
+#	echo "sleeping for 30 seconds ..."
 
-	sleep 30
+#	sleep 30
 
         echo ''
         echo "=============================================="
@@ -2652,18 +2846,18 @@ then
 	
 	sudo lxc-attach -n $NameServer -- tar -cvzPf /root/backup-lxc-container/$NameServer/updates/backup_"$NameServer"_ns_update.tar.gz -T /root/ns_backup_update.lst --numeric-owner
         
-	echo ''
-        echo "=============================================="
-	echo "Debug of new file transfer mechanism ..."
-        echo "=============================================="
-	echo ''
+#	echo ''
+#       echo "=============================================="
+#	echo "Debug of new file transfer mechanism ..."
+#       echo "=============================================="
+#	echo ''
 
-	sudo ls -l /home/amide/Manage-Orabuntu/backup-lxc-container/afns1/updates
-	sudo lxc-attach -n $NameServer -- ls -l /root/backup-lxc-container/afns1/updates
+#	sudo ls -l /home/amide/Manage-Orabuntu/backup-lxc-container/afns1/updates
+#	sudo lxc-attach -n $NameServer -- ls -l /root/backup-lxc-container/afns1/updates
 
-	echo "sleeping for 30 seconds ..."
+#	echo "sleeping for 30 seconds ..."
 
-	sleep 30
+#	sleep 30
 
 	sudo tar -v --extract --file=/opt/olxc/"$DistDir"/orabuntu/archives/dns-dhcp-cont.tar -C / var/lib/lxc/nsa/rootfs/etc/systemd/system/dns-sync.service
         sudo tar -v --extract --file=/opt/olxc/"$DistDir"/orabuntu/archives/dns-dhcp-cont.tar -C / var/lib/lxc/nsa/rootfs/etc/systemd/system/dns-thaw.service
@@ -2799,40 +2993,40 @@ then
 	sudo mkdir -p /home/${USERNAME}/Manage-Orabuntu/backup-lxc-container/$NameServer/updates
 	sudo mkdir -p /home/${USERNAME}/Manage-Orabuntu/backup-lxc-container/$OffBase/updates
 
-	echo "sudo mkdir -p /home/${USERNAME}/Manage-Orabuntu/backup-lxc-container/$OffBase/updates"
-	echo "sudo mkdir -p /home/${USERNAME}/Manage-Orabuntu/backup-lxc-container/$NameServer/updates"a
-
-	sleep 30
+# 	Debug
+#	echo "sudo mkdir -p /home/${USERNAME}/Manage-Orabuntu/backup-lxc-container/$OffBase/updates"
+#	echo "sudo mkdir -p /home/${USERNAME}/Manage-Orabuntu/backup-lxc-container/$NameServer/updates"a
 
 	sudo chown -R ${USERNAME}:${USERNAME} /home/${USERNAME}/Downloads 
-	sudo shown -R ${USERNAME}:${USERNAME} /home/${USERNAME}/Manage-Orabuntu
+	sudo chown -R ${USERNAME}:${USERNAME} /home/${USERNAME}/Manage-Orabuntu
 	sudo chmod -R 744 /home/${USERNAME}/Manage-Orabuntu
 	sudo chmod -R 744 /home/${USERNAME}/Downloads
 	sudo runuser -l amide -c "ssh-keygen -f /home/amide/.ssh/id_rsa -t rsa -N ''"
-	sudo sh -c "cat '/var/lib/lxc/$NameServerBase/delta0/root/.ssh/id_rsa.pub' >> /home/amide/.ssh/authorized_keys"
+	sudo sh -c "cat '/var/lib/lxc/$NameServerBase/delta0/root/.ssh/id_rsa.pub' >> /home/amide/.ssh/authorized_keys" > /dev/null 2>&1
 	sudo sed -i "/lxc\.mount\.entry/s/#/ /" /var/lib/lxc/$NameServer/config
 	sudo sh -c "echo 'amide ALL=/bin/mkdir, /bin/cp' > /etc/sudoers.d/amide"
         sudo chmod 0440 /etc/sudoers.d/amide
 
-        echo ''
-        echo "=============================================="
-	echo "Debug of new file transfer mechanism ..."
-        echo "=============================================="
-	echo ''
+#       echo ''
+#       echo "=============================================="
+#	echo "Debug of new file transfer mechanism ..."
+#       echo "=============================================="
+#	echo ''
 
-	echo "NameServer = "$NameServer	
-	echo "USERNAME   = "${USERNAME}
-	sudo ls -l /home/${USERNAME}/Manage-Orabuntu
-	sudo ls -l /home/${USERNAME}/Manage-Orabuntu/backup-lxc-container/
-	sudo ls -l /home/${USERNAME}/Manage-Orabuntu/backup-lxc-container/$NameServer
-	sudo ls -l /home/${USERNAME}/Manage-Orabuntu/backup-lxc-container/$NameServer/updates
-	sudo lxc-attach -n $NameServer -- sudo touch /root/backup-lxc-container/afns1/updates/testfile
-	sudo ls -l /home/amide/Manage-Orabuntu/backup-lxc-container/afns1/updates
-	sudo lxc-attach -n $NameServer -- ls -l /root/backup-lxc-container/afns1/updates
+#	echo "NameServer = "$NameServer	
+#	echo "USERNAME   = "${USERNAME}
+#	sudo ls -l /home/${USERNAME}/Manage-Orabuntu
+#	sudo ls -l /home/${USERNAME}/Manage-Orabuntu/backup-lxc-container/
+#	sudo ls -l /home/${USERNAME}/Manage-Orabuntu/backup-lxc-container/$NameServer
+#	sudo ls -l /home/${USERNAME}/Manage-Orabuntu/backup-lxc-container/$NameServer/updates
+#	sudo lxc-attach -n $NameServer -- sudo touch /root/backup-lxc-container/afns1/updates/testfile
+#	sudo ls -l /home/amide/Manage-Orabuntu/backup-lxc-container/afns1/updates
+#	sudo lxc-attach -n $NameServer -- ls -l /root/backup-lxc-container/afns1/updates
 
-	echo "sleeping for 30 seconds ..."
+#	echo "sleeping for 30 seconds ..."
 
-	sleep 30
+#	sleep 30
+
 	echo ''
         echo "=============================================="
         echo "Done: Configure NS Replication Account.       "
@@ -2845,9 +3039,9 @@ then
 
 	if [ $GRE = 'Y' ]
 	then
-        #       sudo sed -i "/route add -net/s/#/ /"                            /etc/network/openvswitch/crt_ovs_sw1.sh
-        #       sudo sed -i "/REMOTE_GRE_ENDPOINT/s/#/ /"                       /etc/network/openvswitch/crt_ovs_sw1.sh
-        #       sudo sed -i "s/REMOTE_GRE_ENDPOINT/$MultiHostVar5/g"            /etc/network/openvswitch/crt_ovs_sw1.sh
+                sudo sed -i "/route add -net/s/#/ /"                            /etc/network/openvswitch/crt_ovs_sw1.sh
+                sudo sed -i "/REMOTE_GRE_ENDPOINT/s/#/ /"                       /etc/network/openvswitch/crt_ovs_sw1.sh
+                sudo sed -i "s/REMOTE_GRE_ENDPOINT/$MultiHostVar5/g"            /etc/network/openvswitch/crt_ovs_sw1.sh
 
                 sudo ovs-vsctl add-port sw1 gre$Sw1Index -- set interface gre$Sw1Index type=gre options:remote_ip=$MultiHostVar5
 
