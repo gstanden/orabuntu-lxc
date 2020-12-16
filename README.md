@@ -1,10 +1,26 @@
-# What is Orabuntu-LXC v6.0-beta AMIDE Edition ?
+# What is Orabuntu-LXC v7.0-beta AMIDE Edition ?
 
-Update:  May 14, 2019  Visit the new Orabuntu-LXC Documentation Site:
+Update:  May 14, 2019  
+
+Visit the new Orabuntu-LXC Documentation Site:
 
 https://sites.google.com/a/orabuntu-lxc.com/documentation/
 
-Orabuntu-LXC v6.0-beta AMIDE Edition stands for "Amazon Mult-I-host Docker Enterprise" Edition.  
+End Update:  May 14, 2019
+
+Update:  December 16, 2020 
+
+This branch introduces support for LXD as well as LXC. 
+
+This initial release of 7.0.0-beta AMIDE uses the LXD snap feature lxd.lxd-to-lxd to convert all created LXC containers created by Orabuntu-LXC to LXD containers.
+The LXD containers are bridged with the lxdbr0 bridge, but it is possible to bridge them on the sw1a bridge (although this is still under development)
+The LXC containers are bridged with the sw1a bridge
+The server-side scripts for connecting the LXC containers to OpenvSwitch have been replaced by the lxc.net.0.link = sw1a method
+The VLAN structures of Orabuntu-LXC have been preserved in v7.0.0-beta
+
+Orabuntu-LXC v7.0-beta AMIDE Edition stands for "Amazon Mult-I-host LXD Docker Enterprise" Edition.  
+
+End Update December 16, 2020
 
 Orabuntu-LXC is turnkey software for building an entire next-generation container infrastructure spanning multiple hosts, including LXC Linux Containers, Docker containers, VM's, and physical hosts, all running on OpenvSwitch Software Defined Networks (SDNs), all networked to each other, and with container friendly block devices storage (SCST Linux SAN) available for direct-attachment (if needed) to the LXC Linux containers with everything running at bare-metal performance of network, CPU, and storage.  
 
