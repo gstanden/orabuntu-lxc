@@ -101,32 +101,26 @@ if [ $LinuxFlavor = 'CentOS' ]
 then
 	if   [ $Release -eq 6 ]
 	then
-		echo ''
-		echo "=============================================="
-		echo "Docker unsupported on CentOS Linux $Release.  "
-		echo "=============================================="
-		echo ''
-		sleep 5
-	#	sudo yum -y install docker-io
-	#	sleep 2
-	#	sudo service docker start
-	#	sudo chkconfig docker on
+		sudo yum -y install docker-io
+		sleep 2
+		sudo service docker start
+		sudo chkconfig docker on
 
-	#	function CheckDockerRunning {
-	#		ps -ef | grep -c 'docker \-d'
-	#	}
-	#	DockerRunning=$(CheckDockerRunning)
+		function CheckDockerRunning {
+			ps -ef | grep -c 'docker \-d'
+		}
+		DockerRunning=$(CheckDockerRunning)
 
-	#	d=1
-	#	while [ $DockerRunning -eq 0 ] && [ $d -le 5 ]
-	#	do
-	#		sleep 5
-	#		sudo service docker start
-	#		echo ''
-	#		DockerRunning=$(CheckDockerRunning)
-	#		ps -ef | grep docker
-	#		d=$((d+1))
-	#	done
+		d=1
+		while [ $DockerRunning -eq 0 ] && [ $d -le 5 ]
+		do
+			sleep 5
+			sudo service docker start
+			echo ''
+			DockerRunning=$(CheckDockerRunning)
+			ps -ef | grep docker
+			d=$((d+1))
+		done
 
  	elif [ $Release -eq 7 ]
  	then
@@ -157,15 +151,15 @@ fi
 # echo "=============================================="
 # echo "Done: Install docker-ce.                      "
 # echo "=============================================="
-echo ''
-echo "=============================================="
-echo "Install User-Settable Docker Containers...    "
-echo "=============================================="
-echo ''
+# echo ''
+# echo "=============================================="
+# echo "Install User-Settable Docker Containers...    "
+# echo "=============================================="
+# echo ''
 
 # Install alpine-nettools
 
-if   [ $Release -eq 7 ] 
+if   [ $Release -le 7 ] && [ $UEKVersion -ge 4 ]
 then
 	sudo docker run -d oraclelinux:7.3
 	sudo docker run -d -p 2200:22 raesene/alpine-nettools

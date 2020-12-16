@@ -357,11 +357,6 @@ then
 	echo "16. 'Apply patch when asked File to patch what should I do?' Kaz https://unix.stackexchange.com/questions/307487/apply-patch-when-asked-file-to-patch-what-should-i-do"
 	echo "17. 'Re: [ovs-discuss] Build OpenvSwitch on Oracle Linux 8' Gilbert Standen https://www.mail-archive.com/ovs-discuss@openvswitch.org/msg06322.html"
 	echo "18. 'DNS Not Resolving under Network [CentOS8] #957' lfiraza  https://github.com/docker/for-linux/issues/957"
-	echo "19. 'Lxd.lxc-to-lxd in snap on Ubuntu 20.04' stgraber https://discuss.linuxcontainers.org/t/lxd-lxc-to-lxd-in-snap-on-ubuntu-20-04/9560/6"
-	echo "20. 'LXD OpenVSwitch and VLANs' Nilesh  https://nileshgr.com/2019/07/05/lxd-openvswitch-and-vlans"
-	echo "21. 'VLANs with Open vSwitch Fake Bridges' Scott Lowe https://blog.scottlowe.org/2012/10/19/vlans-with-open-vswitch-fake-bridges/"
-	echo "22. 'About ELREPO Project' ELREPO http://elrepo.org/tiki/HomePage"
-	echo "22. 'Using static IPs with LXD' stgraber https://discuss.linuxcontainers.org/t/using-static-ips-with-lxd/1291/5"
 	echo ''
 	echo "Acknowledgements"
 	echo ''
@@ -448,17 +443,12 @@ then
 			echo ''
 
 			#GLS 20180405 Credit: Gerald Clark https://www.centos.org/forums/viewtopic.php?t=3155
-			sudo sed -i 's/DEFAULTKERNEL=kernel/DEFAULTKERNEL=kernel-lt/g' /etc/sysconfig/kernel
-		
-		#	GLS 20180405 Credit: https://portal.cloudunboxed.net/knowledgebase/17/Installing-the-latest-mainline-kernel-on-CentOS-6-and-7.html
-		#	GLS 20201126 Updated to use kernel-lt as kernel-ml no longer available
-
+			sudo sed -i 's/DEFAULTKERNEL=kernel/DEFAULTKERNEL=kernel-ml/g' /etc/sysconfig/kernel
+			
+			#GLS 20180405 Credit: https://portal.cloudunboxed.net/knowledgebase/17/Installing-the-latest-mainline-kernel-on-CentOS-6-and-7.html
 			sudo rpm --import https://www.elrepo.org/RPM-GPG-KEY-elrepo.org
-			sudo rpm  -Uvh    https://www.elrepo.org/elrepo-release-6.el6.elrepo.noarch.rpm
-			sudo yum --enablerepo=elrepo-kernel install kernel-lt
-
-		#	sudo rpm  -Uvh http://www.elrepo.org/elrepo-release-6-8.el6.elrepo.noarch.rpm
-		#	sudo yum --enablerepo=elrepo-kernel install kernel-ml
+			sudo rpm -Uvh http://www.elrepo.org/elrepo-release-6-8.el6.elrepo.noarch.rpm
+			sudo yum --enablerepo=elrepo-kernel install kernel-ml
 
 			echo ''
 			echo "==============================================" 
@@ -827,12 +817,6 @@ function GetMultiHostVar11 {
 MultiHostVar11=$(GetMultiHostVar11)
 Product=$MultiHostVar11
 
-function GetMultiHostVar12 {
-        echo $MultiHost | cut -f12 -d':'
-}
-MultiHostVar12=$(GetMultiHostVar12)
-LXD=$MultiHostVar12
-
 if   [ $MultiHostVar3 = 'X' ] && [ $GREValue = 'Y' ]
 then
 	function GetMultiHostVar5 {
@@ -950,13 +934,6 @@ fi
 if [ $LinuxFlavor != 'Ubuntu' ] && [ $LinuxFlavor != 'Pop_OS' ]
 then
 	echo 'RPM libvirt installed     = '`rpm -qa | grep libvirt-[0123456] | grep -v client`
-fi
-
-if [ $LXD = 'N' ]
-then
-	echo 'Containerization	  = LXC'
-else
-	echo 'Containerization	  = LXC LXD' 
 fi
 
 echo ''
@@ -1373,7 +1350,6 @@ echo "$DistDir/anylinux/anylinux-services-1.sh" 				>> "$DistDir"/"$SubDirName"/
 echo "$DistDir/anylinux/dnf2yum" 						>> "$DistDir"/"$SubDirName"/archives/"$SubDirName"-services.lst
 echo "$DistDir/$SubDirName/archives/nameserver_copy.sh" 			>> "$DistDir"/"$SubDirName"/archives/"$SubDirName"-services.lst
 echo "$DistDir/$SubDirName/archives/docker_install_$SubDirName.sh" 		>> "$DistDir"/"$SubDirName"/archives/"$SubDirName"-services.lst
-echo "$DistDir/$SubDirName/archives/lxd_install_$SubDirName.sh" 		>> "$DistDir"/"$SubDirName"/archives/"$SubDirName"-services.lst
 echo "$DistDir/$SubDirName/$SubDirName-services-0.sh"	 			>> "$DistDir"/"$SubDirName"/archives/"$SubDirName"-services.lst
 echo "$DistDir/$SubDirName/$SubDirName-services-1.sh"	 			>> "$DistDir"/"$SubDirName"/archives/"$SubDirName"-services.lst
 echo "$DistDir/$SubDirName/$SubDirName-services-2.sh"	 			>> "$DistDir"/"$SubDirName"/archives/"$SubDirName"-services.lst

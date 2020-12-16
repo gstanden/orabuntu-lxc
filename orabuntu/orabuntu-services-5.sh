@@ -132,21 +132,6 @@ function GetMultiHostVar10 {
 MultiHostVar10=$(GetMultiHostVar10)
 GRE=$MultiHostVar10
 
-function GetMultiHostVar11 {
-	echo $MultiHost | cut -f11 -d':'
-}
-MultiHostVar11=$(GetMultiHostVar11)
-
-function GetMultiHostVar12 {
-	echo $MultiHost | cut -f12 -d':'
-}
-MultiHostVar12=$(GetMultiHostVar12)
-
-function GetMultiHostVar13 {
-	echo $MultiHost | cut -f13 -d':'
-}
-MultiHostVar13=$(GetMultiHostVar13)
-
 function SoftwareVersion { echo "$@" | awk -F. '{ printf("%d%03d%03d%03d\n", $1,$2,$3,$4); }'; }
 
 function GetLXCVersion {
@@ -210,7 +195,7 @@ then
 	if [ $UbuntuMajorVersion -ge 16 ]
 	then
 		sudo chmod 775 /opt/olxc/"$DistDir"/orabuntu/archives/docker_install_orabuntu.sh
-		               /opt/olxc/"$DistDir"/orabuntu/archives/docker_install_orabuntu.sh $MultiHostVar13
+		/opt/olxc/"$DistDir"/orabuntu/archives/docker_install_orabuntu.sh
 	fi
 
 	echo ''
@@ -222,28 +207,6 @@ then
 	sleep 5
 
 	clear
-
-#	if [ $MultiHostVar12 = 'S' ] || [ $MultiHostVar12 = 'A' ]
-#	then
-	
-#		echo ''
-#		echo "=============================================="
-#		echo "Install LXD ...                               "
-#		echo "=============================================="
-#		echo ''
-
-#		sleep 5
-
-#		sudo chmod 775 /opt/olxc/"$DistDir"/orabuntu/archives/lxd_install_orabuntu.sh
-		               /opt/olxc/"$DistDir"/orabuntu/archives/lxd_install_orabuntu.sh
-			       
-#		echo ''
-#		echo "=============================================="
-#		echo "Done: Install LXD.                            "
-#		echo "=============================================="
-#		echo ''
-#	fi
-
 fi
 
 # if [ $MultiHostVar1 = 'new' ] || [ $MultiHostVar1 = 'reinstall' ]
@@ -324,13 +287,9 @@ clear
 
 echo ''
 echo "=============================================="
-echo "Starting LXC LXD containers for Oracle...     "
+echo "Starting LXC cloned containers for Oracle...  "
 echo "=============================================="
 echo ''
-
-sleep 5
-
-clear
 
 function GetSeedPostfix {
         sudo lxc-ls -f | grep ora"$OracleRelease"c | cut -f1 -d' ' | cut -f2 -d'c' | sed 's/^/c/'
@@ -355,100 +314,22 @@ do
 
 #	sudo /etc/network/openvswitch/veth_cleanups.sh $j > /dev/null 2>&1
 
+	echo "Starting container $j ..."
+
 	if [ $UbuntuMajorVersion -ge 16 ]
 	then
-		if [ $MultiHostVar12 = 'S' ] || [ $MultiHostVar12 = 'N' ]
-		then
-			clear
-
-			echo ''
-			echo "=============================================="
-			echo "Convert $j LXC-to-LXD ...                     "
-			echo "=============================================="
-			echo ''
-
-			echo "Stopping LXC container $j ..."
-
-			sudo lxc-stop -n $j
-
-			sleep 5
-
-			sudo lxd.lxc-to-lxd --lxcpath /var/lib/lxc --containers $j --debug
-
-			echo ''
-			echo "=============================================="
-			echo "Done: Convert $j LXC-to-LXD                   "
-			echo "=============================================="
-			echo ''
-
-			sleep 5
-
-			lxc start $j
-
-			sleep 5
-
-			sudo lxc-start -n $j
-
-			sleep 5
-
-			function CheckPublicIPIterative {
-				lxc list | grep $j | cut -f4 -d'|' | sed 's/^[ \t]*//;s/[ \t]*$//' | cut -f1-3 -d'.' | sed 's/\.//g'
-			}
-		else
-			echo "Starting container $j ..."
-
-			sudo lxc-start -n $j
-
-			function CheckPublicIPIterative {
-				sudo lxc-info -n $j -iH | cut -f1-3 -d'.' | sed 's/\.//g' | head -1
-			}
-		fi
+		function CheckPublicIPIterative {
+			sudo lxc-info -n $j -iH | cut -f1-3 -d'.' | sed 's/\.//g' | head -1
+		}
 	fi
-
 	PublicIPIterative=$(CheckPublicIPIterative)
-
 	echo $j | grep oel > /dev/null 2>&1
 	if [ $? -eq 0 ]
 	then
 		sudo bash -c "cat $Config|grep ipv4|cut -f2 -d'='|sed 's/^[ \t]*//;s/[ \t]*$//'|cut -f4 -d'.'|sed 's/^/\./'|xargs -I '{}' sed -i "/ipv4/s/\{}/\.1$OR/g" $Config"
 	fi
-
-	if [ $MultiHostVar12 = 'S' ] || [ $MultiHostVar12 = 'N' ]
-	then
-		clear
-
-		echo ''
-		echo "=============================================="
-		echo "LXD Container $j Started                      "
-		echo "=============================================="
-		echo ''
-
-		sudo lxc list $j
-	
-		echo ''	
-		echo "=============================================="
-		echo ''
-
-		sleep 5
-	else
-		echo ''
-		echo "=============================================="
-		echo "LXC Container $j Started                      "
-		echo "=============================================="
-		echo ''
-
-	#	sudo lxc-ls -n $j > /dev/null 2>&1
-		sudo lxc-ls -f | egrep 'NAME | $j' 
-	
-		echo ''	
-		echo "=============================================="
-		echo ''
-
-		sleep 5
-	fi
-
+	sudo lxc-start -n $j > /dev/null 2>&1
 	sleep 5
-
 	i=1
 	while [ "$PublicIPIterative" != 1020739 ] && [ "$i" -le 10 ]
 	do
@@ -486,7 +367,7 @@ clear
 
 echo ''
 echo "=============================================="
-echo "LXC LXD clone containers for Oracle started.  "
+echo "LXC clone containers for Oracle started.      "
 echo "=============================================="
 echo ''
 
@@ -571,7 +452,7 @@ then
 	echo ''
 	
 	sudo touch /etc/orabuntu-lxc-release
-	sudo sh -c "echo 'Orabuntu-LXC v7.0.0-beta AMIDE' > /etc/orabuntu-lxc-release"
+	sudo sh -c "echo 'Orabuntu-LXC v6.13.18-beta AMIDE' > /etc/orabuntu-lxc-release"
 	sudo ls -l /etc/orabuntu-lxc-release
 	echo ''
 	sudo cat /etc/orabuntu-lxc-release
@@ -1018,35 +899,14 @@ then
 	echo "List Containers...                            "
 	echo "=============================================="
 	echo ''
-#	echo "=============================================="
-#	echo "LXC  Containers...                            "
-#	echo "=============================================="
-#	echo ''
-
-	if [ $MultiHostVar12 = 'S' ] || [ $MultiHostVar12 = 'N' ]
-	then
-		echo "=============================================="
-		echo "LXD Containers.. .                            "
-		echo "=============================================="
-		echo ''
-
-		lxc list
-
-		echo ''
-		echo "=============================================="
-	fi
-		
-	echo ''
 	echo "=============================================="
-	echo "LXC Containers...                             "
+	echo "LXC  Containers...                            "
 	echo "=============================================="
 	echo ''
-		
+
 	sudo lxc-ls -f
 
-	echo "=============================================="
 	echo ''
-	
 	echo "=============================================="
 	echo "Docker Containers...                          "
 	echo "=============================================="

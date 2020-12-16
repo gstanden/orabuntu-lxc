@@ -110,17 +110,6 @@ function GetMultiHostVar10 {
 MultiHostVar10=$(GetMultiHostVar10)
 GREValue=$MultiHostVar10
 
-function GetMultiHostVar11 {
-        echo $MultiHost | cut -f11 -d':'
-}
-MultiHostVar11=$(GetMultiHostVar11)
-
-function GetMultiHostVar12 {
-        echo $MultiHost | cut -f12 -d':'
-}
-MultiHostVar12=$(GetMultiHostVar12)
-LXDValue=$MultiHostVar12
-
 if [ -f /etc/lsb-release ]
 then
         function GetUbuntuVersion {
@@ -255,10 +244,9 @@ echo "=============================================="
 echo ''
 
 function CheckContainerUp {
-	sudo lxc-ls -f | grep $SeedContainerName | sed 's/  */ /g' | egrep 'RUNNING|STOPPED'  | cut -f2 -d' '
+sudo lxc-ls -f | grep $SeedContainerName | sed 's/  */ /g' | egrep 'RUNNING|STOPPED'  | cut -f2 -d' '
 }
 ContainerUp=$(CheckContainerUp)
-
 sudo lxc-stop -n $SeedContainerName > /dev/null 2>&1
 
 while [ "$ContainerUp" = 'RUNNING' ]
@@ -319,8 +307,6 @@ echo "=============================================="
 echo "Clone $SeedContainerName to $NumCon containers"
 echo "=============================================="
 echo ''
-echo 'Finding next available container name ...     '
-echo ''
 
 let CloneIndex=10
 let CopyCompleted=0
@@ -346,7 +332,7 @@ do
 		sshpass -p $MultiHostVar9 ssh -M -S /tmp/orabuntu -qt -o CheckHostIP=no -o StrictHostKeyChecking=no -o ControlPersist=60s $MultiHostVar8@$MultiHostVar5 exit
 
         	function CheckDNSLookup {
-			sshpass -p $MultiHostVar8 ssh -S /tmp/orabuntu $MultiHostVar5 "sudo -S --prompt='' <<< "$MultiHostVar9" lxc-attach -n $NameServerShortName -- nslookup -timeout=5 $ContainerPrefix$CloneIndex"	
+			ssh -S /tmp/orabuntu $MultiHostVar5 "sudo -S <<< "$MultiHostVar9" lxc-attach -n $NameServerShortName -- nslookup -timeout=5 $ContainerPrefix$CloneIndex"	
         	}
         	DNSLookup=$(CheckDNSLookup)
 		DNSHit=$PIPESTATUS
@@ -365,13 +351,11 @@ do
                		CloneIndex=$((CloneIndex+1))
                		DNSLookup=$(CheckDNSLookup)
 			DNSHit=$PIPESTATUS
-		#	echo $ContainerPrefix$CloneIndex
+			echo $ContainerPrefix$CloneIndex
        		done
 		
 		if [ $DNSHit -eq 1 ]
 		then
-			clear
-
 			echo ''
 			echo "=============================================="
 			echo "Clone $SeedContainerName to $CP$CloneIndex    "
@@ -384,10 +368,10 @@ do
 
       			sudo lxc-copy -n $SeedContainerName -N $ContainerPrefix$CloneIndex
 		
-#			if [ $MajorRelease -eq 7 ]
-#			then	
-#				sudo sed -i "s/$SeedContainerName/$ContainerPrefix$CloneIndex/g"	/var/lib/lxc/$ContainerPrefix$CloneIndex/rootfs/etc/hostname
-#			fi
+			if [ $MajorRelease -eq 7 ]
+			then	
+				sudo sed -i "s/$SeedContainerName/$ContainerPrefix$CloneIndex/g"	/var/lib/lxc/$ContainerPrefix$CloneIndex/rootfs/etc/hostname
+			fi
 
 			sudo sed -i "s/$SeedContainerName/$ContainerPrefix$CloneIndex/g"		/var/lib/lxc/$ContainerPrefix$CloneIndex/rootfs/etc/sysconfig/network-scripts/ifcfg-eth0
 			sudo sed -i "s/HostName/$ContainerPrefix$CloneIndex/g"                  	/var/lib/lxc/$ContainerPrefix$CloneIndex/rootfs/etc/sysconfig/network-scripts/ifcfg-eth0
@@ -398,16 +382,7 @@ do
 
 	sudo sed -i "s/$SeedContainerName/$ContainerPrefix$CloneIndex/g" /var/lib/lxc/$ContainerPrefix$CloneIndex/config
 	sudo sed -i "s/\.10/\.$CloneIndex/g" /var/lib/lxc/$ContainerPrefix$CloneIndex/config
-
-	if   [ $MultiHostVar12 = 'N' ]
-	then
-		sudo sed -i 's/sx1/sw1/g' /var/lib/lxc/$ContainerPrefix$CloneIndex/config
-
-	elif [ $MultiHostVar12 = 'S' ] || [ $MultiHostVar12 = 'A' ]
-	then
-		sudo sed -i 's/sx1a/sw1a/g' /var/lib/lxc/$ContainerPrefix$CloneIndex/config
-	fi
-
+	sudo sed -i 's/sx1/sw1/g' /var/lib/lxc/$ContainerPrefix$CloneIndex/config
 	sudo sed -i "s/mtu = 1500/mtu = $MultiHostVar7/g" /var/lib/lxc/$ContainerPrefix$CloneIndex/config
 #	sudo sed -i "s/lxc\.mount\.entry = \/dev\/lxc_luns/#lxc\.mount\.entry = \/dev\/lxc_luns/g" /var/lib/lxc/$ContainerPrefix$CloneIndex/config
 #	sudo sed -i "/domain-name-servers/s/10.207.29.2/10.207.39.2/g" /var/lib/lxc/$ContainerPrefix$CloneIndex/rootfs/etc/dhcp/dhclient.conf
@@ -427,10 +402,6 @@ do
         echo ''
 
         sleep 5
-
-	# Added
-
-	clear
 
 	function GetHostName (){ echo $ContainerPrefix$CloneIndex\1; }
 	HostName=$(GetHostName)
@@ -561,51 +532,6 @@ fi
 sleep 5
 
 clear
-
-if [ $MultiHostVar12 = 'S' ] || [ $MultiHostVar12 = 'A' ]
-then
-
-        echo ''
-        echo "=============================================="
-        echo "Install LXD ...                               "
-        echo "=============================================="
-        echo ''
-
-        sleep 5
-
-        sudo chmod 775 /opt/olxc/"$DistDir"/orabuntu/archives/lxd_install_orabuntu.sh
-                       /opt/olxc/"$DistDir"/orabuntu/archives/lxd_install_orabuntu.sh
-
-        echo ''
-        echo "=============================================="
-        echo "Done: Install LXD.                            "
-        echo "=============================================="
-        echo ''
-
-	sleep 5
-
-	clear
-
-	echo ''
-	echo "=============================================="
-	echo "Convert $SeedContainerName LXC-to-LXD ...     "
-	echo "=============================================="
-	echo ''
-
-	sleep 5
-
-	sudo lxd.lxc-to-lxd --lxcpath /var/lib/lxc --containers $SeedContainerName --debug
-
-	echo ''
-	echo "=============================================="
-	echo "Done: Convert $SeedContainerName LXC-to-LXD   "
-	echo "=============================================="
-	echo ''
-
-	sleep 5
-
-	clear
-fi
 
 echo ''
 echo "=============================================="

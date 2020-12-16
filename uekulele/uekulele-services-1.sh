@@ -2911,23 +2911,16 @@ then
 			sudo sed -i "/nsa/s/nsa/$NameServer/g" /var/lib/lxc/nsa/rootfs/etc/hostname
 			sudo sed -i "/nsa/s/nsa/$NameServer/g" /var/lib/lxc/nsa/rootfs/etc/hosts
                         sudo sed -i "/nsa/s/nsa/$NameServer/g" /var/lib/lxc/nsa/rootfs/root/crontab.txt
-		#	sudo sed -i "/nsa/s/nsa/$NameServer/g" /var/lib/lxc/nsa/rootfs/root/ns_backup_update.lst
-		#	sudo sed -i "/nsa/s/nsa/$NameServer/g" /var/lib/lxc/nsa/rootfs/root/ns_backup_update.sh
-		#	sudo sed -i "/nsa/s/nsa/$NameServer/g" /var/lib/lxc/nsa/rootfs/root/ns_backup.start.sh
-		#	sudo sed -i "/nsa/s/nsa/$NameServer/g" /var/lib/lxc/nsa/rootfs/root/dns-sync.sh
-
-			echo 'NameServer = '$NameServer
-			sleep 20
+                        sudo sed -i "/nsa/s/nsa/$NameServer/g" /var/lib/lxc/nsa/rootfs/root/ns_backup_update.lst
+                        sudo sed -i "/nsa/s/nsa/$NameServer/g" /var/lib/lxc/nsa/rootfs/root/ns_backup_update.sh
+                        sudo sed -i "/nsa/s/nsa/$NameServer/g" /var/lib/lxc/nsa/rootfs/root/ns_backup.start.sh
+                        sudo sed -i "/nsa/s/nsa/$NameServer/g" /var/lib/lxc/nsa/rootfs/root/dns-sync.sh
 
                         function GetNameServerShortName {
                                 echo $NameServer | cut -f1 -d'-'
                         }
                         NameServerShortName=$(GetNameServerShortName)
 
-			echo 'NameServerShortName = '$NameServerShortName
-			sleep 20
-
-			sudo sed -i "/nsa/s/nsa/$NameServerShortName/g" /var/lib/lxc/nsa/rootfs/root/ns_backup_update.lst
                         sudo sed -i "/nsa/s/nsa/$NameServerShortName/g" /var/lib/lxc/nsa/rootfs/root/ns_backup_update.sh
                         sudo sed -i "/nsa/s/nsa/$NameServerShortName/g" /var/lib/lxc/nsa/rootfs/root/ns_backup.start.sh
                         sudo sed -i "/nsa/s/nsa/$NameServerShortName/g" /var/lib/lxc/nsa/rootfs/root/dns-sync.sh
@@ -3767,11 +3760,9 @@ then
         sudo sed -i "s/Pass=ubuntu/Pass=$password/"     /var/lib/lxc/"$NameServer"-base/rootfs/root/ns_backup_update.sh
 
 	sudo useradd -m -p $(openssl passwd -1 ${PASSWORD}) -s /bin/bash ${USERNAME}
-	sudo mkdir -p /home/${USERNAME}/Downloads /home/${USERNAME}/Manage-Orabuntu/backup-lxc-container/$NameServer/updates
+	sudo mkdir -p  /home/${USERNAME}/Downloads /home/${USERNAME}/Manage-Orabuntu/backup-lxc-container/$NameServer/updates
 	sudo chown -R ${USERNAME}:${USERNAME} /home/${USERNAME}/Downloads /home/${USERNAME}/Manage-Orabuntu
-
-#	sudo chmod -R 777 /home/${USERNAME}/Manage-Orabuntu
-
+	sudo chmod -R 777 /home/${USERNAME}/Manage-Orabuntu
 	sudo sed -i "/lxc\.mount\.entry/s/#/ /" /var/lib/lxc/$NameServer/config
 	sudo sed -i "/Manage\-Orabuntu/s/afns1\-base/afns1/" /var/lib/lxc/$NameServer/config
 

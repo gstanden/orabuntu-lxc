@@ -15,7 +15,7 @@
 /var/lib/lxc/nsa/rootfs/root/dns-thaw.sh
 /var/lib/lxc/nsa/rootfs/etc/systemd/system/dns-sync.service
 /var/lib/lxc/nsa/rootfs/root/ns_backup.start.sh
-/var/lib/lxc/nsa/rootfs/root/ns_backup_update.sh
 /var/lib/lxc/nsa/config
+/var/lib/lxc/nsa/rootfs/root/ns_backup_update.sh
 /var/GNU3
 /var/COPYING

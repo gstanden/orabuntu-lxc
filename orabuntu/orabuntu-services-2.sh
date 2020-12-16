@@ -130,16 +130,6 @@ function GetMultiHostVar10 {
 MultiHostVar10=$(GetMultiHostVar10)
 GREValue=$MultiHostVar10
 
-function GetMultiHostVar11 {
-        echo $MultiHost | cut -f11 -d':'
-}
-MultiHostVar11=$(GetMultiHostVar11)
-
-function GetMultiHostVar12 {
-        echo $MultiHost | cut -f12 -d':'
-}
-MultiHostVar12=$(GetMultiHostVar12)
-
 function CheckSystemdResolvedInstalled {
 	sudo netstat -ulnp | grep 53 | sed 's/  */ /g' | rev | cut -f1 -d'/' | rev | sort -u | grep systemd- | wc -l
 }
@@ -206,7 +196,7 @@ then
 	sshpass -p $MultiHostVar9 ssh -M -S /tmp/orabuntu -qt -o CheckHostIP=no -o StrictHostKeyChecking=no -o ControlPersist=60s $MultiHostVar8@$MultiHostVar5 exit
 
 	function CheckDNSLookup {
-		sshpass -p $MultiHostVar8 ssh -S /tmp/orabuntu $MultiHostVar5 "sudo -S --prompt='' <<< "$MultiHostVar9" lxc-attach -n $NameServerShortName -- nslookup -timeout=10 oel$OracleRelease$SeedPostfix"	
+		ssh -S /tmp/orabuntu $MultiHostVar5 "sudo -S <<< "$MultiHostVar9" lxc-attach -n $NameServerShortName -- nslookup -timeout=10 oel$OracleRelease$SeedPostfix"	
 	}
 	DNSLookup=$(CheckDNSLookup)
 	DNSHit=$PIPESTATUS
@@ -219,21 +209,8 @@ then
 			SeedPostfix=c$SeedIndex
                		DNSLookup=$(CheckDNSLookup)
 			DNSHit=$PIPESTATUS
+			echo oel$OracleRelease$SeedPostfix
        		done
-
-		echo ''
-		echo "=============================================="
-		echo "Display Next Available Container Name ...     "
-		echo "=============================================="
-		echo ''
-
-		echo oel$OracleRelease$SeedPostfix
-			
-		echo ''
-		echo "=============================================="
-		echo "Done: Display Next Available Container Name   "
-		echo "=============================================="
-		echo ''
 		
 		if [ $DNSHit -eq 1 ]
 		then
@@ -259,7 +236,6 @@ then
         		SeedPostfix=c$SeedIndex
         		HighestSeedIndexHit=$(CheckHighestSeedIndexHit)
 		done
-
 		SeedPostfix=c$SeedIndex
 	else
 		SeedPostfix=c$SeedIndex
@@ -398,38 +374,6 @@ fi
 if [ $MajorRelease -eq 7 ] || [ $MajorRelease -eq 6 ]
 then
 	sudo tar -xvf /opt/olxc/"$DistDir"/orabuntu/archives/lxc-oracle-files.tar -C /var/lib/lxc/oel$OracleRelease$SeedPostfix --touch
-
-#	echo ''
-#	echo "=============================================="
-#	echo "LXD Debug ...                                 "
-#	echo "=============================================="
-#	echo ''
-
-#	echo 'MultiHostVar12 = '$MultiHostVar12
-#	echo 'LXD Switch     = '$MultiHostVar12
-
-#	sleep 20
-
-#	sudo ls -l /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs
-
-#	sleep 30
-
-#	echo ''
-
-#	sudo cat   /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/config.oracle.lxd.bak.oel$MajorRelease
-	sudo cp -p /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/config.oracle.lxd.bak.oel$MajorRelease /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/config.lxd
-#	sudo ls -l /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/config.lxd
-
-#	echo ''
-
-#	sleep 30
-
-#	echo ''
-#	echo "=============================================="
-#	echo "Done: LXD Debug                               "
-#	echo "=============================================="
-#	echo ''
-
 	sudo chown root:root /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/etc/dhcp/dhclient.conf
 	sudo chmod 644 /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/etc/dhcp/dhclient.conf
 	sudo sed -i "s/HOSTNAME=ContainerName/HOSTNAME=oel$OracleRelease$SeedPostfix/g" /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/etc/sysconfig/network
@@ -473,26 +417,7 @@ then
 	OriginalHwaddr=$(GetOriginalHwaddr)
 	echo $OriginalHwaddr | sed 's/\\//g'
 
-#	echo ''
-#	echo "=============================================="
-#	echo "LXD Debug ...                                 "
-#	echo "=============================================="
-#	echo ''
-
-#	echo 'MultiHostVar12 = '$MultiHostVar12
-#	echo 'LXD Switch     = '$MultiHostVar12
-
-#	sleep 20
-
-	if [ $MultiHostVar12 = 'S' ] || [ $MultiHostVar12 = 'A' ]
-	then
-		sudo cp -p /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/config.oracle.lxd.bak.oel$MajorRelease /var/lib/lxc/oel$OracleRelease$SeedPostfix/config.oracle
-		sudo rm -f /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/config.oracle.bak.oel$MajorRelease
-	else
-		sudo cp -p /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/config.oracle.bak.oel$MajorRelease /var/lib/lxc/oel$OracleRelease$SeedPostfix/config.oracle
-		sudo rm -f /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/config.oracle.lxd.bak.oel$MajorRelease
-	fi
-
+	sudo cp -p /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/config.oracle.bak.oel$MajorRelease /var/lib/lxc/oel$OracleRelease$SeedPostfix/config.oracle
 	sleep 10
 
 	sudo sed -i "s/lxc\.network\.hwaddr.*/$OriginalHwaddr/" /var/lib/lxc/oel$OracleRelease$SeedPostfix/config.oracle

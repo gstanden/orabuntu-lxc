@@ -65,8 +65,6 @@ fi
 
 trap "exit" INT TERM; trap "kill 0" EXIT; sudo -v || exit $?; sleep 1; while true; do sleep 60; sudo -nv; done 2>/dev/null &
 
-K8S=Y
-LXD=S
 GRE=Y 
 MTU=1420
 LOGEXT=`date +"%Y-%m-%d.%R:%S"`
@@ -103,7 +101,7 @@ fi
 if [ -z $2 ]
 then
 	SPOKEIP='lan.ip.this.host'
- 	SPOKEIP=192.168.1.10
+ 	SPOKEIP=192.168.1.20
 else
 	SPOKEIP=$2
 fi
@@ -111,7 +109,7 @@ fi
 if [ -z $3 ]
 then
 	HUBIP='lan.ip.hub.host'
- 	HUBIP=192.168.1.5
+ 	HUBIP=192.168.1.33
 else
 	HUBIP=$3
 fi
@@ -134,9 +132,9 @@ fi
 
 if [ -z $6 ]
 then
+        Product=no-product
  	Product=workspaces
  	Product=oracle-db
-        Product=no-product
 	Product=oracle-gi-18c
 else
 	Product=$6
@@ -436,7 +434,7 @@ then
                 	MultiHost="$Operation:Y:X:X:$HUBIP:$SPOKEIP:1420:$HubUserAct:$HubSudoPwd:$GRE:$Product"
                 fi
         else
-                MultiHost="$Operation:Y:X:X:$HUBIP:$SPOKEIP:$MTU:$HubUserAct:$HubSudoPwd:$GRE:$Product:$LXD:$K8S"
+                MultiHost="$Operation:Y:X:X:$HUBIP:$SPOKEIP:$MTU:$HubUserAct:$HubSudoPwd:$GRE:$Product"
         fi
 
 	sleep 5
