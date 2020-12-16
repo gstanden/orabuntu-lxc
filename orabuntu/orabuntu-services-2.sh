@@ -311,74 +311,67 @@ echo "Trying Method 1...                            "
 echo "=============================================="
 echo ''
 
-n=1
+#=1
 
-while [ $ContainerCreated -eq 0 ] && [ $n -le 5 ]
-do
-	### new ###
+#hile [ $ContainerCreated -eq 0 ] && [ $n -le 5 ]
+#o
+#       sudo tar -xzPf $DistDir/lxcimage/ora"$MajorRelease"xc00.tar.gz
 
-<<<<<<< HEAD
-	wget https://github.com/gstanden/orabuntu-lxc/raw/to-lxd/lxcimage/ora"$MajorRelease"xc00.tar.gz -P $DistDir/lxcimage
-	mv $DistDir/lxcimage/.ora"$MajorRelease"xc00.tar.gz.1 $DistDir/lxcimage/ora"$MajorRelease"xc00.tar.gz
-=======
->>>>>>> 0a6eb4275991baad5573f71e5c4758b8953dd359
-        sudo tar -xzPf $DistDir/lxcimage/ora"$MajorRelease"xc00.tar.gz
+#       sudo mv /var/lib/lxc/ora"$MajorRelease"xc00                     /var/lib/lxc/oel$OracleRelease$SeedPostfix
 
-        sudo mv /var/lib/lxc/ora"$MajorRelease"xc00                     /var/lib/lxc/oel$OracleRelease$SeedPostfix
+#       TempName=ora"$MajorRelease"xc00
 
-        TempName=ora"$MajorRelease"xc00
+#       sudo sed -i "s/$TempName/oel$OracleRelease$SeedPostfix/g"       /var/lib/lxc/oel$OracleRelease$SeedPostfix/config
 
-        sudo sed -i "s/$TempName/oel$OracleRelease$SeedPostfix/g"       /var/lib/lxc/oel$OracleRelease$SeedPostfix/config
+#sudo lxc-start    -n oel$OracleRelease$SeedPostfix
+#       sleep 5
+#sudo lxc-attach   -n oel$OracleRelease$SeedPostfix -- hostnamectl set-hostname oel$OracleRelease$SeedPostfix
+#       sudo lxc-attach   -n oel$OracleRelease$SeedPostfix -- sed -i       "s/ora7xc00/oel$OracleRelease$SeedPostfix/g" /etc/hosts
+#       sudo lxc-attach   -n oel$OracleRelease$SeedPostfix -- sed -i       "s/ora7xc00/oel$OracleRelease$SeedPostfix/g" /etc/sysconfig/network
+#       sudo lxc-attach   -n oel$OracleRelease$SeedPostfix -- sed -i       "s/ora7xc00/oel$OracleRelease$SeedPostfix/g" /etc/sysconfig/network-scripts/ifcfg-eth0
 
-	sudo lxc-start    -n oel$OracleRelease$SeedPostfix
-        sleep 5
-	sudo lxc-attach   -n oel$OracleRelease$SeedPostfix -- hostnamectl set-hostname oel$OracleRelease$SeedPostfix
-        sudo lxc-attach   -n oel$OracleRelease$SeedPostfix -- sed -i       "s/ora7xc00/oel$OracleRelease$SeedPostfix/g" /etc/hosts
-        sudo lxc-attach   -n oel$OracleRelease$SeedPostfix -- sed -i       "s/ora7xc00/oel$OracleRelease$SeedPostfix/g" /etc/sysconfig/network
-        sudo lxc-attach   -n oel$OracleRelease$SeedPostfix -- sed -i       "s/ora7xc00/oel$OracleRelease$SeedPostfix/g" /etc/sysconfig/network-scripts/ifcfg-eth0
+#echo ''
+#       echo "=============================================="
+#       echo "Display Oracle /etc/hosts                  "
+#       echo "=============================================="
+#       echo ''
 
-	echo ''
-        echo "=============================================="
-        echo "Display Oracle /etc/hosts                  "
-        echo "=============================================="
-        echo ''
+#sudo lxc-attach   -n oel$OracleRelease$SeedPostfix -- cat /etc/hosts
 
-	sudo lxc-attach   -n oel$OracleRelease$SeedPostfix -- cat /etc/hosts
+#echo ''
+#       echo "=============================================="
+#       echo "Display Oracle /etc/sysconfig/network      "
+#       echo "=============================================="
+#       echo ''
 
-	echo ''
-        echo "=============================================="
-        echo "Display Oracle /etc/sysconfig/network      "
-        echo "=============================================="
-        echo ''
+#sudo lxc-attach   -n oel$OracleRelease$SeedPostfix -- cat /etc/sysconfig/network
 
-	sudo lxc-attach   -n oel$OracleRelease$SeedPostfix -- cat /etc/sysconfig/network
+#       echo ''
+#       echo "=============================================="
+#       echo "Display Oracle default config ...             "
+#       echo "=============================================="
+#       echo ''
 
-        echo ''
-        echo "=============================================="
-        echo "Display Oracle default config ...             "
-        echo "=============================================="
-        echo ''
+#       sudo cat                                                        /var/lib/lxc/oel$OracleRelease$SeedPostfix/config
+#       sudo lxc-stop     -n oel$OracleRelease$SeedPostfix
 
-        sudo cat                                                        /var/lib/lxc/oel$OracleRelease$SeedPostfix/config
-        sudo lxc-stop     -n oel$OracleRelease$SeedPostfix
+#       echo ''
+#       echo "=============================================="
+#       echo "Display LXC containers ...                    "
+#       echo "=============================================="
+#       echo ''
 
-        echo ''
-        echo "=============================================="
-        echo "Display LXC containers ...                    "
-        echo "=============================================="
-        echo ''
+#       sudo lxc-ls -f
 
-        sudo lxc-ls -f
-
-        echo "=============================================="
+#       echo "=============================================="
 
 
-	### new ###
+#### new ###
 
-        sleep 5
+#       sleep 5
         n=$((n+1))
-        ContainerCreated=$(ConfirmContainerCreated)
-done
+#       ContainerCreated=$(ConfirmContainerCreated)
+#one
 
 echo ''
 echo "=============================================="

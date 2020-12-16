@@ -1058,30 +1058,6 @@ then
 	echo ''
 	echo "=============================================="
 	echo "Trying Method 1...                            "
-	echo "=============================================="
-	echo ''
-
-	n=1
-	
-	while [ $ContainerCreated -eq 0 ] && [ $n -le 5 ]
-	do
-<<<<<<< HEAD
-		wget https://github.com/gstanden/orabuntu-lxc/raw/to-lxd/lxcimage/nsa.tar.gz -P $DistDir/lxcimage
-		mv $DistDir/lxcimage/nsa.tar.gz.1 $DistDir/lxcimage/nsa.tar.gz
-=======
->>>>>>> 0a6eb4275991baad5573f71e5c4758b8953dd359
-		sudo tar -xzPf $DistDir/lxcimage/nsa.tar.gz
-		sleep 5
-		sudo lxc-ls -f
-		
-		sleep 5
-		n=$((n+1))
-		ContainerCreated=$(ConfirmContainerCreated)
-	done
-
-	echo ''
-	echo "=============================================="
-	echo "Trying Method 2...                            "
 	echo "                                              "
 	echo "Patience...download of rootfs takes time...   "
 	echo "=============================================="
@@ -1121,7 +1097,7 @@ then
 
 	echo ''
 	echo "=============================================="
-	echo "Trying Method 3...                            "
+	echo "Trying Method 2...                            "
 	echo "                                              "
 	echo "Patience...download of rootfs takes time...   "
 	echo "=============================================="
