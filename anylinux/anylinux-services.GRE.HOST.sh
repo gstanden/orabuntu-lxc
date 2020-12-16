@@ -65,7 +65,7 @@ fi
 
 trap "exit" INT TERM; trap "kill 0" EXIT; sudo -v || exit $?; sleep 1; while true; do sleep 60; sudo -nv; done 2>/dev/null &
 
-StoragePoolName=olxc-003
+StoragePoolName=olxc-002
 StorageDriver=zfs
 PreSeed=Y
 K8S=Y
