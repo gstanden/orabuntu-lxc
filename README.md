@@ -2,9 +2,9 @@
 
 Update:  May 14, 2019  
 
-* Visit the new Orabuntu-LXC Documentation Site:
+Visit the new Orabuntu-LXC Documentation Site:
 
-https://sites.google.com/a/orabuntu-lxc.com/documentation/
+* https://sites.google.com/a/orabuntu-lxc.com/documentation/
 
 End Update:  May 14, 2019
 
