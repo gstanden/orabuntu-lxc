@@ -12,5 +12,8 @@ rootfs/etc/ntp.conf
 rootfs/etc/dhcp/dhclient.conf
 rootfs/config.oracle.bak.oel7
 rootfs/config.oracle.bak.oel8
+rootfs/config.oracle.lxd.bak.oel6
+rootfs/config.oracle.lxd.bak.oel7
+rootfs/config.oracle.lxd.bak.oel8
 rootfs/GNU3
 rootfs/COPYING

@@ -65,6 +65,12 @@ fi
 
 trap "exit" INT TERM; trap "kill 0" EXIT; sudo -v || exit $?; sleep 1; while true; do sleep 60; sudo -nv; done 2>/dev/null &
 
+StoragePoolName=olxc-001
+StorageDriver=zfs
+PreSeed=Y
+K8S=Y
+LXD=S
+LXDCluster=Y
 GRE=N 
 MTU=1500
 LOGEXT=`date +"%Y-%m-%d.%R:%S"`
@@ -149,7 +155,7 @@ then
 		MultiHost="$Operation:N:1:X:X:X:$AwsMtu:X:X:$GRE:$Product"
 	fi
 else
-	MultiHost="$Operation:N:1:X:X:X:$MTU:X:X:$GRE:$Product"
+	MultiHost="$Operation:N:1:X:X:X:$MTU:X:X:$GRE:$Product:$LXD:$K8S:$PreSeed:$LXDCluster:$StorageDriver:$StoragePoolName"
 fi
 
 ./anylinux-services.sh $MultiHost 

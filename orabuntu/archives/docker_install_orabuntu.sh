@@ -12,6 +12,9 @@ function GetUbuntuMajorVersion {
 }
 UbuntuMajorVersion=$(GetUbuntuMajorVersion)
 
+MultiHostVar13=$1
+K8S=$MultiHostVar13
+
 echo ''
 echo "=============================================="
 echo "Install Docker...                             "
@@ -47,53 +50,85 @@ then
 	sudo apt-key fingerprint 0EBFCD88
 	sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu zesty stable"
 	sudo apt-get -o Acquire::ForceIPv4=true update
-	sudo apt-get -o Acquire::ForceIPv4=true -y install docker-cea
+	sudo apt-get -o Acquire::ForceIPv4=true -y install docker-ce
+
 elif [ $UbuntuMajorVersion -ge 18 ]
 then
+	if [ $K8S = 'Y' ]
+	then
+		echo ''
+		echo "=============================================="
+		echo "Install Snap Microk8s (Kubernetes) ...        "
+		echo "=============================================="
+		echo ''
+
+		sudo snap install microk8s --classic
+		
+		echo ''
+		echo "=============================================="
+		echo "Done: Install Snap Microk8s (Kubernetes)      "
+		echo "=============================================="
+		echo ''
+
+		sleep 5
+
+		clear
+
+		echo ''
+		echo "=============================================="
+		echo "Display Microk8s Snap Info ...                "
+		echo "=============================================="
+		echo ''
+
+		sleep 5
+
+		sudo snap info microk8s
+
+		echo ''
+		echo "=============================================="
+		echo "Done: Display Microk8s Snap Info              "
+		echo "=============================================="
+		echo ''
+	
+		sleep 5
+
+		clear
+	fi
+
 	echo ''
 	echo "=============================================="
-	echo "Installing Snap Microk8s (Kubernetes)         "
+	echo "Install Snap Docker ...                       "
 	echo "=============================================="
 	echo ''
 
-	sudo snap install microk8s --classic
-
-	sleep 5
-
-	clear
-
-	echo ''
-	echo "=============================================="
-	echo "Installing Snap Docker ...                    "
-	echo "=============================================="
-	echo ''
-
-	sudo snap install docker   --edge
+	sudo snap install docker --edge
 	sudo snap services docker
 
+	echo ''
+	echo "=============================================="
+	echo "Done: Install Snap Docker                     "
+	echo "=============================================="
+	echo ''
+
 	sleep 5
 
 	clear
 
 	echo ''
 	echo "=============================================="
-	echo "Docker Snap Info ...                          "
+	echo "Display Docker Snap Info ...                  "
 	echo "=============================================="
 	echo ''
+
+	sleep 5
 
 	sudo snap info docker
-
-	sleep 5
-
-	clear
-
+	
 	echo ''
 	echo "=============================================="
-	echo "Microk8s Snap Info ...                        "
+	echo "Done: Display Docker Snap Info                "
 	echo "=============================================="
 	echo ''
-
-	sudo snap info microk8s
 
 	sleep 5
 

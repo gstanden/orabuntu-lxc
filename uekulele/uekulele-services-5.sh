@@ -537,7 +537,7 @@ then
 	echo ''
 
         sudo touch /etc/orabuntu-lxc-release
-        sudo sh -c "echo 'Orabuntu-LXC v6.13.18-beta AMIDE' > /etc/orabuntu-lxc-release"
+        sudo sh -c "echo 'Orabuntu-LXC v7.0.0-beta AMIDE' > /etc/orabuntu-lxc-release"
 	sudo ls -l /etc/orabuntu-lxc-release
 	echo ''
 	sudo cat /etc/orabuntu-lxc-release
@@ -957,6 +957,17 @@ then
                 echo "Configure replica nameserver $NameServer...   "
                 echo "=============================================="
                 echo ''
+
+		function CutOffBase {
+			echo $NameServer | cut -f1 -d'-'
+		}
+		OffBase=$(CutOffBase)
+
+		sudo rm -rf			/home/amide/Manage-Orabuntu/
+		sudo mkdir -p			/home/amide/Manage-Orabuntu/backup-lxc-container/$OffBase/updates
+		sudo mkdir -p			/home/amide/Manage-Orabuntu/backup-lxc-container/$NameServer/updates
+		sudo chown -R amide:amide	/home/amide
+		sudo chmod -R 777		/home/amide
 
                 ssh-keygen -R 10.207.39.2
                 ssh-keygen -R $NameServer
