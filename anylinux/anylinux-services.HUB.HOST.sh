@@ -107,8 +107,8 @@ if [ -z $2 ]
 then
         Product=workspaces
 	Product=oracle-db
-	Product=no-product
 	Product=oracle-gi-18c
+	Product=no-product
 else
         Product=$2
 fi
