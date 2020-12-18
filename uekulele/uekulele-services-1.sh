@@ -728,15 +728,19 @@ then
 
                         elif [ $Release -eq 6 ]
                         then
-                                wget --timeout=5 --tries=10 https://dl.fedoraproject.org/pub/epel/epel-release-latest-6.noarch.rpm
-                                sudo rpm -ivh epel-release-latest-6.noarch.rpm
+                                wget https://ftp.tu-chemnitz.de/pub/linux/dag/redhat/el6/en/x86_64/rpmforge/RPMS/docbook2x-0.8.8-1.el6.rf.x86_64.rpm -4
+                                wget https://ftp.tu-chemnitz.de/pub/linux/dag/redhat/el6/en/i386/rpmforge/RPMS/sshpass-1.05-1.el6.rf.i686.rpm -4
+                                sudo yum -y localinstall docbook2x-0.8.8-1.el6.rf.x86_64.rpm
+                                sudo yum -y localinstall sshpass-1.05-1.el6.rf.i686.rpm
+			#	wget --timeout=5 --tries=10 https://dl.fedoraproject.org/pub/epel/epel-release-latest-6.noarch.rpm
+			#	sudo rpm -ivh epel-release-latest-6.noarch.rpm
                         fi
 
                         sudo yum provides lxc | sed '/^\s*$/d' | grep Repo | sort -u
                         sudo yum -y install docbook2X
 
 			function CheckDocBook2XInstalled {
-				rpm -qa | grep -c docbook2X
+				rpm -qa | grep -ic docbook2X
 			}
 			DocBook2XInstalled=$(CheckDocBook2XInstalled)
 
@@ -1109,15 +1113,19 @@ then
 
                         elif [ $Release -eq 6 ]
                         then
-                                wget --timeout=5 --tries=10 https://dl.fedoraproject.org/pub/epel/epel-release-latest-6.noarch.rpm
-                                sudo rpm -ivh epel-release-latest-6.noarch.rpm
+                                wget https://ftp.tu-chemnitz.de/pub/linux/dag/redhat/el6/en/x86_64/rpmforge/RPMS/docbook2x-0.8.8-1.el6.rf.x86_64.rpm -4
+                                wget https://ftp.tu-chemnitz.de/pub/linux/dag/redhat/el6/en/i386/rpmforge/RPMS/sshpass-1.05-1.el6.rf.i686.rpm -4
+                                sudo yum -y localinstall docbook2x-0.8.8-1.el6.rf.x86_64.rpm
+                                sudo yum -y localinstall sshpass-1.05-1.el6.rf.i686.rpm
+			#	wget --timeout=5 --tries=10 https://dl.fedoraproject.org/pub/epel/epel-release-latest-6.noarch.rpm
+			#	sudo rpm -ivh epel-release-latest-6.noarch.rpm
                         fi
 
                         sudo yum provides lxc | sed '/^\s*$/d' | grep Repo | sort -u
                         sudo yum -y install docbook2X
 
 			function CheckDocBook2XInstalled {
-				rpm -qa | grep -c docbook2X
+				rpm -qa | grep -ic docbook2X
 			}
 			DocBook2XInstalled=$(CheckDocBook2XInstalled)
 
@@ -2314,7 +2322,7 @@ PackageInstalled=$(CheckPackageInstalled)
 
 for i in $PackageInstalled
 do
-sudo rpm -qa | grep $i | tail -1 | sed 's/^/Installed: /' 
+sudo rpm -qa | grep -i $i | tail -1 | sed 's/^/Installed: /' 
 done
 
 echo ''

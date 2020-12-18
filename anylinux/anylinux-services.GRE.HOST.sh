@@ -301,8 +301,13 @@ then
                                 sudo rpm -ivh epel-release-latest-7.noarch.rpm
                         elif [ $Release -eq 6 ]
                         then
-                                wget --timeout=5 --tries=10 https://dl.fedoraproject.org/pub/epel/epel-release-latest-6.noarch.rpm
-                                sudo rpm -ivh epel-release-latest-6.noarch.rpm
+			#	GLS 20201217 EPEL seems unavailable for Linux 6
+			#	wget --timeout=5 --tries=10 https://dl.fedoraproject.org/pub/epel/epel-release-latest-6.noarch.rpm
+			#	sudo rpm -ivh epel-release-latest-6.noarch.rpm
+				wget https://ftp.tu-chemnitz.de/pub/linux/dag/redhat/el6/en/x86_64/rpmforge/RPMS/docbook2x-0.8.8-1.el6.rf.x86_64.rpm -4
+				wget https://ftp.tu-chemnitz.de/pub/linux/dag/redhat/el6/en/i386/rpmforge/RPMS/sshpass-1.05-1.el6.rf.i686.rpm -4
+				sudo yum -y localinstall docbook2x-0.8.8-1.el6.rf.x86_64.rpm
+				sudo yum -y localinstall sshpass-1.05-1.el6.rf.i686.rpm
                         fi
                         sudo yum provides lxc | sed '/^\s*$/d' | grep Repo | sort -u
                         sudo yum -y install docbook2X
