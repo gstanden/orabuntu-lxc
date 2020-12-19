@@ -101,7 +101,7 @@ fi
 if [ -z $2 ]
 then
 	SPOKEIP='lan.ip.this.host'
- 	SPOKEIP=192.168.1.20
+ 	SPOKEIP=192.168.1.238
 else
 	SPOKEIP=$2
 fi
@@ -109,7 +109,7 @@ fi
 if [ -z $3 ]
 then
 	HUBIP='lan.ip.hub.host'
- 	HUBIP=192.168.1.33
+ 	HUBIP=192.168.1.127
 else
 	HUBIP=$3
 fi
@@ -308,13 +308,20 @@ then
 				wget https://ftp.tu-chemnitz.de/pub/linux/dag/redhat/el6/en/i386/rpmforge/RPMS/sshpass-1.05-1.el6.rf.i686.rpm -4
 				sudo yum -y localinstall docbook2x-0.8.8-1.el6.rf.x86_64.rpm
 				sudo yum -y localinstall sshpass-1.05-1.el6.rf.i686.rpm
+			elif [ $Release -eq 8 ]
+			then
+				sudo yum -y install oracle-epel-release-el8
+				sudo yum -y install yum-utils
+				sudo yum-config-manager --enable ol8_codeready_builder
+				sudo yum-config-manager --enable ol8_addons
+				sudo yum -y install docbook2X
                         fi
                         sudo yum provides lxc | sed '/^\s*$/d' | grep Repo | sort -u
                         sudo yum -y install docbook2X
                 fi
 
                 function CheckDocBook2XInstalled {
-                        rpm -qa | grep -c docbook2X
+                        rpm -qa | grep -ic docbook2X
                 }
                 DocBook2XInstalled=$(CheckDocBook2XInstalled)
 

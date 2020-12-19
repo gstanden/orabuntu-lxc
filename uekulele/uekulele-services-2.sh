@@ -237,28 +237,20 @@ then
         }
         NameServerShortName=$(GetNameServerShortName)
 
-        sshpass -p $MultiHostVar9 ssh -M -S /tmp/orabuntu -qt -o CheckHostIP=no -o StrictHostKeyChecking=no -o ControlPersist=60s $MultiHostVar8@$MultiHostVar5 exit
-
         function CheckDNSLookup {
-                ssh -S /tmp/orabuntu $MultiHostVar5 "sudo -S --prompt='' <<< "$MultiHostVar9" lxc-attach -n $NameServerShortName -- nslookup -timeout=10 oel$OracleRelease$SeedPostfix"
-        }
+        	sudo host -W1 oel$OracleRelease$SeedPostfix | grep '10\.207\.29' | wc -l
+	}
         DNSLookup=$(CheckDNSLookup)
-        DNSHit=$PIPESTATUS
 
         if [ $UbuntuMajorVersion -ge 16 ] || [ $Release -ge 6 ]
         then
-                while [ $DNSHit -eq 0 ]
+                while [ $DNSLookup -eq 1 ]
                 do
                         SeedIndex=$((SeedIndex+1))
                         SeedPostfix=c$SeedIndex
                         DNSLookup=$(CheckDNSLookup)
-                        DNSHit=$PIPESTATUS
                 done
-
-                if [ $DNSHit -eq 1 ]
-                then
-                        SeedPostfix=c$SeedIndex
-                fi
+                SeedPostfix=c$SeedIndex
         fi
 
 elif [ $MultiHostVar3 -eq 1 ] && [ $GREValue = 'N' ]
@@ -267,7 +259,7 @@ then
         SeedPostfix=c$SeedIndex
 
         function CheckHighestSeedIndexHit {
-                sudo nslookup -timeout=10 oel$OracleRelease$SeedPostfix | grep -v '#' | grep Address | grep '10\.207\.29' | wc -l
+                sudo host -W1 oel$OracleRelease$SeedPostfix | grep '10\.207\.29' | wc -l
         }
         HighestSeedIndexHit=$(CheckHighestSeedIndexHit)
 

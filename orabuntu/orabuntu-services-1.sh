@@ -2563,8 +2563,6 @@ then
 	echo "sudo mkdir -p /home/${USERNAME}/Manage-Orabuntu/backup-lxc-container/$OffBase/updates"
 	echo "sudo mkdir -p /home/${USERNAME}/Manage-Orabuntu/backup-lxc-container/$NameServer/updates"a
 
-	sleep 30
-
 	sudo chown -R ${USERNAME}:${USERNAME} /home/${USERNAME}/Downloads 
 	sudo shown -R ${USERNAME}:${USERNAME} /home/${USERNAME}/Manage-Orabuntu
 	sudo chmod -R 777 /home/${USERNAME}/Manage-Orabuntu
@@ -2591,10 +2589,6 @@ then
 	sudo lxc-attach -n $NameServer -- sudo touch /root/backup-lxc-container/afns1/updates/testfile
 	sudo ls -l /home/amide/Manage-Orabuntu/backup-lxc-container/afns1/updates
 	sudo lxc-attach -n $NameServer -- ls -l /root/backup-lxc-container/afns1/updates
-
-	echo "sleeping for 30 seconds ..."
-
-	sleep 30
 
         echo ''
         echo "=============================================="
@@ -2660,10 +2654,6 @@ then
 
 	sudo ls -l /home/amide/Manage-Orabuntu/backup-lxc-container/afns1/updates
 	sudo lxc-attach -n $NameServer -- ls -l /root/backup-lxc-container/afns1/updates
-
-	echo "sleeping for 30 seconds ..."
-
-	sleep 30
 
 	sudo tar -v --extract --file=/opt/olxc/"$DistDir"/orabuntu/archives/dns-dhcp-cont.tar -C / var/lib/lxc/nsa/rootfs/etc/systemd/system/dns-sync.service
         sudo tar -v --extract --file=/opt/olxc/"$DistDir"/orabuntu/archives/dns-dhcp-cont.tar -C / var/lib/lxc/nsa/rootfs/etc/systemd/system/dns-thaw.service
@@ -2802,8 +2792,6 @@ then
 	echo "sudo mkdir -p /home/${USERNAME}/Manage-Orabuntu/backup-lxc-container/$OffBase/updates"
 	echo "sudo mkdir -p /home/${USERNAME}/Manage-Orabuntu/backup-lxc-container/$NameServer/updates"a
 
-	sleep 30
-
 	sudo chown -R ${USERNAME}:${USERNAME} /home/${USERNAME}/Downloads 
 	sudo shown -R ${USERNAME}:${USERNAME} /home/${USERNAME}/Manage-Orabuntu
 	sudo chmod -R 744 /home/${USERNAME}/Manage-Orabuntu
@@ -2830,9 +2818,6 @@ then
 	sudo ls -l /home/amide/Manage-Orabuntu/backup-lxc-container/afns1/updates
 	sudo lxc-attach -n $NameServer -- ls -l /root/backup-lxc-container/afns1/updates
 
-	echo "sleeping for 30 seconds ..."
-
-	sleep 30
 	echo ''
         echo "=============================================="
         echo "Done: Configure NS Replication Account.       "

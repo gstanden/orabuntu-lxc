@@ -512,10 +512,13 @@ then
 	if [ $LinuxFlavor = 'Oracle' ] && [ $Release -eq 8 ]
 	then
 		sudo yum -y install tar
-		sudo firewall-cmd --zone=public --add-masquerade 
-		sudo firewall-cmd --runtime-to-permanent
-		sudo service firewalld stop
-		sudo service firewalld start
+		sudo sed -i "s/FirewallBackend=nftables/FirewallBackend=iptables/g" /etc/firewalld/firewalld.conf
+		sudo systemctl restart firewalld.service
+		sleep 5
+	#	sudo firewall-cmd --zone=public --add-masquerade 
+	#	sudo firewall-cmd --runtime-to-permanent
+	#	sudo service firewalld stop
+	#	sudo service firewalld start
 	fi
 	
 	sudo yum -y install libvirt
@@ -854,14 +857,12 @@ then
 	}
 	NameServerShortName=$(GetNameServerShortName)
 
-	sshpass -p $MultiHostVar9 ssh -M -S /tmp/orabuntu -qt -o CheckHostIP=no -o StrictHostKeyChecking=no -o ControlPersist=60s $MultiHostVar8@$MultiHostVar5 exit
-
 	Sx1Index=201
 	function CheckDNSLookup {
-        	ssh -S /tmp/orabuntu $MultiHostVar5 "sudo -S --prompt='' <<< "$MultiHostVar9" lxc-attach -n $NameServerShortName -- nslookup -timeout=10 $Sx1Net.$Sx1Index"
+		sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" host -W1 $Sx1Net.$Sx1Index"
 	}
 	DNSLookup=$(CheckDNSLookup)
-	DNSHit=$PIPESTATUS
+	DNSHit=$?
 
 	if [ $UbuntuMajorVersion -ge 16 ] || [ $Release -ge 6 ]
 	then
@@ -869,22 +870,16 @@ then
         	do
 			Sx1Index=$((Sx1Index+1))
 			DNSLookup=$(CheckDNSLookup)
-			DNSHit=$PIPESTATUS
-#			echo $Sx1Net.$Sx1Index
+			DNSHit=$?
         	done
-
-#        	if [ $DNSHit -eq 1 ]
-#        	then
-#			echo 'IP address of sx1 OpenvSwitch: '$Sx1Net.$Sx1Index
-#        	fi
 	fi
  
 	Sw1Index=201
 	function CheckDNSLookup {
-        	ssh -S /tmp/orabuntu $MultiHostVar5 "sudo -S --prompt='' <<< "$MultiHostVar9" lxc-attach -n $NameServerShortName -- nslookup -timeout=10 $Sw1Net.$Sw1Index"
+		sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" host -W1 $Sw1Net.$Sw1Index"
 	}
 	DNSLookup=$(CheckDNSLookup)
-	DNSHit=$PIPESTATUS
+	DNSHit=$?
 
 	if [ $UbuntuMajorVersion -ge 16 ] || [ $Release -ge 6 ]
 	then
@@ -892,14 +887,8 @@ then
         	do
 			Sw1Index=$((Sw1Index+1))
 			DNSLookup=$(CheckDNSLookup)
-			DNSHit=$PIPESTATUS
-#			echo $Sw1Net.$Sw1Index
+			DNSHit=$?
         	done
-
-#        	if [ $DNSHit -eq 1 ]
-#        	then
-#			echo 'IP address of sw1 OpenvSwitch: '$Sw1Net.$Sw1Index
-#        	fi
 	fi
 fi
 
@@ -1121,11 +1110,16 @@ then
 			echo "=============================================="
 			echo ''
 
-			sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" lxc-stop -n $NameServer -k;echo '(Do NOT enter a password.  Wait...)'; echo '$HOSTNAME pre-install nameserver snapshot' > snap_comment; echo ''; sudo -S <<< "$MultiHostVar9" lxc-snapshot -n $NameServer -c snap_comment; sudo -S <<< "$MultiHostVar9" lxc-start -n $NameServer; echo ''; sleep 5; sudo -S <<< "$MultiHostVar9" lxc-snapshot -n $NameServer -L -C"
-			echo ''
-			echo "Snapshot of $NameServer created on the Orabuntu-LXC HUB host at $MultiHostVar5."
-			echo "Snapshot of $NameServer can be restored to $NameServer if necessary using 'lxc-snapshot -r SnapX -N $NameServer' command."
-			sudo rm -f snap_comment
+			if [ $Release -ne 6 ]
+			then
+				sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" lxc-stop -n $NameServer -k;echo '(Do NOT enter a password.  Wait...)'; echo '$HOSTNAME pre-install nameserver snapshot' > snap_comment; echo ''; sudo -S <<< "$MultiHostVar9" lxc-snapshot -n $NameServer -c snap_comment; sudo -S <<< "$MultiHostVar9" lxc-start -n $NameServer; echo ''; sleep 5; sudo -S <<< "$MultiHostVar9" lxc-snapshot -n $NameServer -L -C"
+				echo ''
+				echo "Snapshot of $NameServer created on the Orabuntu-LXC HUB host at $MultiHostVar5."
+				echo "Snapshot of $NameServer can be restored to $NameServer if necessary using 'lxc-snapshot -r SnapX -N $NameServer' command."
+				sudo rm -f snap_comment
+			else
+				echo "LXC Snapshot not supported on Linux $Release."
+			fi
 
 			echo ''
 			echo "=============================================="
@@ -1147,11 +1141,16 @@ then
 		echo "=============================================="
 		echo ''
 
-		sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" lxc-stop -n $NameServer -k;echo '(Do NOT enter a password.  Wait...)'; echo '$HOSTNAME pre-install nameserver snapshot' > snap_comment; echo ''; sudo -S <<< "$MultiHostVar9" lxc-snapshot -n $NameServer -c snap_comment; sudo -S <<< "$MultiHostVar9" lxc-start -n $NameServer; echo ''; sleep 5; sudo -S <<< "$MultiHostVar9" lxc-snapshot -n $NameServer -L -C"
-		echo ''
-		echo "Snapshot of $NameServer created on the Orabuntu-LXC HUB host at $MultiHostVar5."
-		echo "Snapshot of $NameServer can be restored to $NameServer if necessary using 'lxc-snapshot -r SnapX -N $NameServer' command."
-		sudo rm -f snap_comment
+		if [ $Release -ne 6 ]
+		then
+			sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" lxc-stop -n $NameServer -k;echo '(Do NOT enter a password.  Wait...)'; echo '$HOSTNAME pre-install nameserver snapshot' > snap_comment; echo ''; sudo -S <<< "$MultiHostVar9" lxc-snapshot -n $NameServer -c snap_comment; sudo -S <<< "$MultiHostVar9" lxc-start -n $NameServer; echo ''; sleep 5; sudo -S <<< "$MultiHostVar9" lxc-snapshot -n $NameServer -L -C"
+			echo ''
+			echo "Snapshot of $NameServer created on the Orabuntu-LXC HUB host at $MultiHostVar5."
+			echo "Snapshot of $NameServer can be restored to $NameServer if necessary using 'lxc-snapshot -r SnapX -N $NameServer' command."
+			sudo rm -f snap_comment
+		else
+			echo "LXC Snapshot not supported on Linux $Release."
+		fi
 
 		echo ''
 		echo "=============================================="

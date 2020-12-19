@@ -494,7 +494,7 @@ then
 				if [ $Release -eq 8 ]
 				then
 					sudo yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
-					sudo yum update
+					sudo yum -y install yum-utils
 				else
        			 		sudo yum -y install which ruby curl tar yum-utils
 				fi
