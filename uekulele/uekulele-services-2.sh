@@ -227,6 +227,11 @@ then
 	Release=0
 fi
 
+function ConfirmContainerCreated {
+        sudo lxc-ls -f | grep oel$OracleRelease$SeedPostfix | wc -l
+}
+ContainerCreated=$(ConfirmContainerCreated)
+
 if   [ $MultiHostVar3 = 'X' ] && [ $GREValue = 'Y' ]
 then
         SeedIndex=10
@@ -258,18 +263,23 @@ then
         SeedIndex=10
         SeedPostfix=c$SeedIndex
 
-        function CheckHighestSeedIndexHit {
-                sudo host -W1 oel$OracleRelease$SeedPostfix | grep '10\.207\.29' | wc -l
-        }
-        HighestSeedIndexHit=$(CheckHighestSeedIndexHit)
+	if [ $ContainerCreated -gt 0 ]
+	then
+        	function CheckHighestSeedIndexHit {
+                	sudo host -W1 oel$OracleRelease$SeedPostfix | grep '10\.207\.29' | wc -l
+        	}
+        	HighestSeedIndexHit=$(CheckHighestSeedIndexHit)
 
-        while [ $HighestSeedIndexHit -eq 1 ]
-        do
-                SeedIndex=$((SeedIndex+1))
-                SeedPostfix=c$SeedIndex
-                HighestSeedIndexHit=$(CheckHighestSeedIndexHit)
-        done
-        SeedPostfix=c$SeedIndex
+        	while [ $HighestSeedIndexHit -eq 1 ]
+        	do
+                	SeedIndex=$((SeedIndex+1))
+                	SeedPostfix=c$SeedIndex
+                	HighestSeedIndexHit=$(CheckHighestSeedIndexHit)
+        	done
+        	SeedPostfix=c$SeedIndex
+	else
+		SeedPostfix=$cSeedIndex
+	fi
 fi
 
 sleep 5

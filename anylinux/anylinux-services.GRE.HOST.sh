@@ -101,7 +101,7 @@ fi
 if [ -z $2 ]
 then
 	SPOKEIP='lan.ip.this.host'
- 	SPOKEIP=192.168.1.238
+ 	SPOKEIP=192.168.1.240
 else
 	SPOKEIP=$2
 fi
@@ -109,7 +109,7 @@ fi
 if [ -z $3 ]
 then
 	HUBIP='lan.ip.hub.host'
- 	HUBIP=192.168.1.127
+ 	HUBIP=192.168.1.223
 else
 	HUBIP=$3
 fi
@@ -416,7 +416,7 @@ echo "=============================================="
 echo ''
 
 ssh-keygen -R $HUBIP > /dev/null 2>&1
-sshpass -p $HubSudoPwd ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $HubUserAct@$HUBIP "sudo -S <<< "$HubSudoPwd" echo '(Do NOT enter password...Wait...)'; echo ''; uname -a; echo '';sudo -S <<< "$HubSudoPwd" lxc-ls -f"
+sshpass -p $HubSudoPwd ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no $HubUserAct@$HUBIP "sudo -S -p' '  <<< "$HubSudoPwd"  echo '';uname -a; echo '';sudo -S <<< "$HubSudoPwd" lxc-ls -f"
 if [ $? -eq 0 ]
 then
 	echo ''
