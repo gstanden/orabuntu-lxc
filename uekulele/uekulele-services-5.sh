@@ -170,19 +170,18 @@ then
         RL=$Release
 elif [ $LinuxFlavor = 'Red' ] || [ $LinuxFlavor = 'CentOS' ]
 then
-        if   [ $LinuxFlavor = 'Red' ]
+	if   [ $LinuxFlavor = 'Red' ]
         then
-		function GetRedHatVersion {
-                	sudo cat /etc/redhat-release | cut -f7 -d' ' | cut -f1 -d'.'
-        	}
-        	RedHatVersion=$(GetRedHatVersion)
+                function GetRedHatVersion {
+                        sudo cat /etc/redhat-release | rev | cut -f2 -d' ' | cut -f2 -d'.'
+                }
         elif [ $LinuxFlavor = 'CentOS' ]
         then
                 function GetRedHatVersion {
                         cat /etc/redhat-release | sed 's/ Linux//' | cut -f1 -d'.' | rev | cut -f1 -d' '
                 }
-        	RedHatVersion=$(GetRedHatVersion)
         fi
+	RedHatVersion=$(GetRedHatVersion)
 	RHV=$RedHatVersion
         Release=$RedHatVersion
         LF=$LinuxFlavor
@@ -195,7 +194,10 @@ then
         }
         RedHatVersion=$(GetRedHatVersion)
 	RHV=$RedHatVersion
-        if [ $RedHatVersion -ge 19 ]
+        if   [ $RedHatVersion -ge 28 ]
+        then
+                Release=8
+        elif [ $RedHatVersion -ge 19 ] && [ $RedHatVersion -le 27 ]
         then
                 Release=7
         elif [ $RedHatVersion -ge 12 ] && [ $RedHatVersion -le 18 ]
@@ -236,7 +238,7 @@ sleep 5
 
 clear
 
-if [ $MultiHostVar1 = 'new' ]
+if [ $MultiHostVar1 = 'new' ] && [ $LinuxFlavor != 'Fedora' ]
 then
 	echo ''
 	echo "=============================================="
@@ -441,6 +443,7 @@ do
                         echo ''
 			sudo /etc/network/openvswitch/veth_cleanups.sh $j
 			echo ''
+
 			sudo systemctl daemon-reload
 
 			if [ $LinuxFlavor != 'Fedora' ] && [ $LinuxFlavor != 'CentOS' ] && [ $LinuxFlavor != 'Red' ]
@@ -461,6 +464,7 @@ do
 		fi
 	sleep 1
 	i=$((i+1))
+	echo "Container $j has been started ..."
 	done
 done
 
@@ -478,7 +482,7 @@ sleep 5
 
 clear
 
-if   [ $SystemdResolvedInstalled -ge 1 ]
+if   [ $SystemdResolvedInstalled -ge 1 ] && [ $LinuxFlavor != 'Fedora' ]
 then
         echo ''
         echo "=============================================="
@@ -661,7 +665,7 @@ then
 	}
 	ShortHost=$(GetShortHost)
 	
-	nslookup -timeout=1 $HOSTNAME.$Domain1 > /dev/null 2>&1
+	nslookup $HOSTNAME.$Domain1 $NameServer > /dev/null 2>&1
 	if [ $? -eq 1 ]
 	then
 	        echo ''
@@ -687,7 +691,7 @@ then
 	        clear
 	fi
 	
-	nslookup -timeout=1 $HOSTNAME.$Domain2 > /dev/null 2>&1
+	nslookup $HOSTNAME.$Domain2 $NameServer > /dev/null 2>&1
 	if [ $? -eq 1 ]
 	then
 	        echo ''
@@ -713,7 +717,7 @@ then
 	        clear
 	fi
 	
-	if   [ $SystemdResolvedInstalled -ge 1 ]
+	if   [ $SystemdResolvedInstalled -ge 1 ] && [ $LinuxFlavor != 'Fedora' ]
 	then
 	        echo ''
 	        echo "=============================================="
@@ -738,14 +742,14 @@ then
 	
 	echo ''
 	echo "=============================================="
-	echo "nslookup $ShortHost.$Domain1                  "
+	echo "nslookup $ShortHost.$Domain1             "
 	echo "=============================================="
 	echo ''
 	
-	nslookup $ShortHost.$Domain1
+	nslookup $ShortHost.$Domain1 $NameServer
 	
 	echo "=============================================="
-	echo "Done: nslookup $ShortHost.$Domain1            "
+	echo "Done: nslookup $ShortHost.$Domain1        "
 	echo "=============================================="
 	
 	sleep 5
@@ -758,7 +762,7 @@ then
 	echo "=============================================="
 	echo ''
 	
-	nslookup $ShortHost.$Domain2
+	nslookup $ShortHost.$Domain2 $NameServer
 	
 	echo "=============================================="
 	echo "Done: nslookup $ShortHost.$Domain2            "
@@ -963,14 +967,14 @@ then
 		sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.39.2 "sudo -S <<< "ubuntu" echo $HOSTNAME > ~/new_gre_host.txt"
 		sleep 5
 	
-		if   [ $SystemdResolvedInstalled -ge 1 ]
+		if   [ $SystemdResolvedInstalled -ge 1 ] && [ $LinuxFlavor != 'Fedora' ]
 		then
 		        echo ''
 	        	echo "=============================================="
 	        	echo "Restart systemd-resolved...                   "
 	        	echo "=============================================="
 	        	echo ''
-	
+	  
 	        	sudo service systemd-resolved restart
 	        	sleep 2
 	        	systemd-resolve --status | head -6 | tail -5
@@ -1203,7 +1207,7 @@ then
         		echo "                                              "
         		echo "=============================================="
 
-		elif [ $Release -ge 8 ]
+		elif [ $Release -ge 8 ] && [ $LinuxFlavor != 'Fedora' ]
 		then
         		echo ''
         		echo "=============================================="

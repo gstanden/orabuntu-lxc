@@ -136,6 +136,9 @@ then
         sudo chmod 0440 /etc/sudoers.d/orabuntu-lxc
 fi
 
+sudo yum -y     install net-tools > /dev/null 2>&1
+sudo apt-get -y install net-tools > /dev/null 2>&1
+
 if [ $AWS -eq 1 ]
 then
         if   [ $AwsMtu -ge 9000 ]

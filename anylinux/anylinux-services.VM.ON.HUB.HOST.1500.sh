@@ -225,19 +225,18 @@ then
 	SubDirName=uekulele
 elif [ $LinuxFlavor = 'Red' ] || [ $LinuxFlavor = 'CentOS' ]
 then
-        if   [ $LinuxFlavor = 'Red' ]
+	if   [ $LinuxFlavor = 'Red' ]
         then
                 function GetRedHatVersion {
-                        sudo cat /etc/redhat-release | cut -f7 -d' ' | cut -f1 -d'.'
+                        sudo cat /etc/redhat-release | rev | cut -f2 -d' ' | cut -f2 -d'.'
                 }
-                RedHatVersion=$(GetRedHatVersion)
         elif [ $LinuxFlavor = 'CentOS' ]
         then
                 function GetRedHatVersion {
                         cat /etc/redhat-release | sed 's/ Linux//' | cut -f1 -d'.' | rev | cut -f1 -d' '
                 }
-                RedHatVersion=$(GetRedHatVersion)
         fi
+	RedHatVersion=$(GetRedHatVersion)
         RHV=$RedHatVersion
         Release=$RedHatVersion
         LF=$LinuxFlavor
@@ -250,7 +249,10 @@ then
                 sudo cat /etc/redhat-release | cut -f"$CutIndex" -d' ' | cut -f1 -d'.'
         }
         RedHatVersion=$(GetRedHatVersion)
-        if [ $RedHatVersion -ge 19 ]
+        if   [ $RedHatVersion -ge 28 ]
+        then
+                Release=8
+        elif [ $RedHatVersion -ge 19 ] && [ $RedHatVersion -le 27 ]
         then
                 Release=7
         elif [ $RedHatVersion -ge 12 ] && [ $RedHatVersion -le 18 ]
@@ -429,6 +431,9 @@ then
 	echo ''
 	sleep 5
 	echo ''
+
+sudo yum -y     install net-tools > /dev/null 2>&1
+sudo apt-get -y install net-tools > /dev/null 2>&1
 
 if [ $AWS -eq 1 ]
 then

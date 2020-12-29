@@ -174,19 +174,18 @@ then
 	UbuntuMajorVersion=0
 elif [ $LinuxFlavor = 'Red' ] || [ $LinuxFlavor = 'CentOS' ]
 then
-        if   [ $LinuxFlavor = 'Red' ]
+	if   [ $LinuxFlavor = 'Red' ]
         then
                 function GetRedHatVersion {
-                        sudo cat /etc/redhat-release | cut -f7 -d' ' | cut -f1 -d'.'
+                        sudo cat /etc/redhat-release | rev | cut -f2 -d' ' | cut -f2 -d'.'
                 }
-                RedHatVersion=$(GetRedHatVersion)
         elif [ $LinuxFlavor = 'CentOS' ]
         then
                 function GetRedHatVersion {
                         cat /etc/redhat-release | sed 's/ Linux//' | cut -f1 -d'.' | rev | cut -f1 -d' '
                 }
-                RedHatVersion=$(GetRedHatVersion)
         fi
+	RedHatVersion=$(GetRedHatVersion)
 	RHV=$RedHatVersion
         Release=$RedHatVersion
         LF=$LinuxFlavor
@@ -200,7 +199,10 @@ then
                 sudo cat /etc/redhat-release | cut -f"$CutIndex" -d' ' | cut -f1 -d'.'
         }
         RedHatVersion=$(GetRedHatVersion)
-        if [ $RedHatVersion -ge 19 ]
+        if   [ $RedHatVersion -ge 28 ]
+        then
+                Release=8
+        elif [ $RedHatVersion -ge 19 ] && [ $RedHatVersion -le 27 ]
         then
                 Release=7
         elif [ $RedHatVersion -ge 12 ] && [ $RedHatVersion -le 18 ]
@@ -227,11 +229,6 @@ then
 	Release=0
 fi
 
-function ConfirmContainerCreated {
-        sudo lxc-ls -f | grep oel$OracleRelease$SeedPostfix | wc -l
-}
-ContainerCreated=$(ConfirmContainerCreated)
-
 if   [ $MultiHostVar3 = 'X' ] && [ $GREValue = 'Y' ]
 then
         SeedIndex=10
@@ -243,7 +240,7 @@ then
         NameServerShortName=$(GetNameServerShortName)
 
         function CheckDNSLookup {
-        	sudo host -W1 oel$OracleRelease$SeedPostfix | grep '10\.207\.29' | wc -l
+        	sudo nslookup oel$OracleRelease$SeedPostfix $NameServer | grep '10\.207\.29' | wc -l
 	}
         DNSLookup=$(CheckDNSLookup)
 
@@ -263,23 +260,18 @@ then
         SeedIndex=10
         SeedPostfix=c$SeedIndex
 
-	if [ $ContainerCreated -gt 0 ]
-	then
-        	function CheckHighestSeedIndexHit {
-                	sudo host -W1 oel$OracleRelease$SeedPostfix | grep '10\.207\.29' | wc -l
-        	}
-        	HighestSeedIndexHit=$(CheckHighestSeedIndexHit)
+        function CheckHighestSeedIndexHit {
+               	sudo nslookup oel$OracleRelease$SeedPostfix $NameServer | grep '10\.207\.29' | wc -l
+        }
+        HighestSeedIndexHit=$(CheckHighestSeedIndexHit)
 
-        	while [ $HighestSeedIndexHit -eq 1 ]
-        	do
-                	SeedIndex=$((SeedIndex+1))
-                	SeedPostfix=c$SeedIndex
-                	HighestSeedIndexHit=$(CheckHighestSeedIndexHit)
-        	done
-        	SeedPostfix=c$SeedIndex
-	else
-		SeedPostfix=$cSeedIndex
-	fi
+        while [ $HighestSeedIndexHit -eq 1 ]
+        do
+               	SeedIndex=$((SeedIndex+1))
+               	SeedPostfix=c$SeedIndex
+               	HighestSeedIndexHit=$(CheckHighestSeedIndexHit)
+        done
+        SeedPostfix=c$SeedIndex
 fi
 
 sleep 5
@@ -343,18 +335,150 @@ then
 	clear
 fi
 
-echo ''
-echo "=============================================="
-echo "   Create the LXC Oracle Linux container      "
-echo "                                              "
-echo "    Note: Depends on download speed...        "
-echo "    Patience at downloading packages !        "
-echo "=============================================="
-echo ''
+if [ -f $DistDir/lxcimage/ora"$MajorRelease"xc00.tar.gz ]
+then
+	echo ''
+	echo "=============================================="
+	echo "   Create the LXC Oracle Linux container      "
+	echo "                                              "
+	echo "    Note: Depends on download speed...        "
+	echo "    Patience at downloading packages !        "
+	echo "=============================================="
+	echo ''
+
+        sudo tar -xzPf $DistDir/lxcimage/ora"$MajorRelease"xc00.tar.gz
+
+        sudo mv /var/lib/lxc/ora"$MajorRelease"xc00                     /var/lib/lxc/oel$OracleRelease$SeedPostfix
+
+        TempName=ora"$MajorRelease"xc00
+
+        sudo sed -i "s/$TempName/oel$OracleRelease$SeedPostfix/g"       /var/lib/lxc/oel$OracleRelease$SeedPostfix/config
+
+        sudo lxc-start    -n oel$OracleRelease$SeedPostfix
+        sleep 5
+        sudo lxc-attach   -n oel$OracleRelease$SeedPostfix -- hostnamectl set-hostname oel$OracleRelease$SeedPostfix
+        sudo lxc-attach   -n oel$OracleRelease$SeedPostfix -- sed -i       "s/ora7xc00/oel$OracleRelease$SeedPostfix/g" /etc/hosts
+        sudo lxc-attach   -n oel$OracleRelease$SeedPostfix -- sed -i       "s/ora7xc00/oel$OracleRelease$SeedPostfix/g" /etc/sysconfig/network
+        sudo lxc-attach   -n oel$OracleRelease$SeedPostfix -- sed -i       "s/ora7xc00/oel$OracleRelease$SeedPostfix/g" /etc/sysconfig/network-scripts/ifcfg-eth0
+
+        echo ''
+        echo "=============================================="
+        echo "Display Oracle /etc/hosts                  "
+        echo "=============================================="
+        echo ''
+
+        sudo lxc-attach -n oel$OracleRelease$SeedPostfix -- cat /etc/hosts
+
+        echo ''
+        echo "=============================================="
+        echo "Display Oracle /etc/sysconfig/network      "
+        echo "=============================================="
+        echo ''
+
+        sudo lxc-attach -n oel$OracleRelease$SeedPostfix -- cat /etc/sysconfig/network
+
+        echo ''
+        echo "=============================================="
+        echo "Display Oracle default config ...             "
+        echo "=============================================="
+        echo ''
+
+        sudo cat /var/lib/lxc/oel$OracleRelease$SeedPostfix/config
+        sudo lxc-stop -n oel$OracleRelease$SeedPostfix
+
+        echo ''
+        echo "=============================================="
+        echo "Display LXC containers ...                    "
+        echo "=============================================="
+        echo ''
+
+        sudo lxc-ls -f
+
+        echo "=============================================="
+fi
 
 sleep 5
 
-sudo lxc-create -n oel$OracleRelease$SeedPostfix -t oracle -- --release=$OracleVersion
+function ConfirmContainerCreated {
+        sudo lxc-ls -f | grep oel$OracleRelease$SeedPostfix | wc -l
+}
+ContainerCreated=$(ConfirmContainerCreated)
+
+n=1
+
+while [ $ContainerCreated -eq 0 ] && [ $n -le 5 ]
+do
+	echo ''
+	echo "=============================================="
+	echo "   Create the LXC Oracle Linux container      "
+	echo "                                              "
+	echo "    Note: Depends on download speed...        "
+	echo "    Patience at downloading packages !        "
+	echo "=============================================="
+	echo ''
+
+	if   [ $LinuxFlavor = 'Fedora' ] && [ $Release -eq 8 ]
+	then
+		sudo lxc-create -n oel$OracleRelease$SeedPostfix --template download -- -d oracle -r $MajorRelease -a amd64
+		if [ $? -ne 0 ]
+		then
+                       	sudo lxc-stop -n oel$OracleRelease$SeedPostfix -k
+                       	sudo lxc-destroy -n oel$OracleRelease$SeedPostfix
+                       	sudo rm -rf /var/lib/lxc/oel$OracleRelease$SeedPostfix
+                       	sudo lxc-create -t download -n oel$OracleRelease$SeedPostfix -- --dist oracle --release $MajorRelease --arch amd64 --keyserver hkp://p80.pool.sks-keyservers.net:80
+
+                       	if [ $? -ne 0 ]
+                       	then
+                               	sudo lxc-stop -n oel$OracleRelease$SeedPostfix -k
+                               	sudo lxc-destroy -n oel$OracleRelease$SeedPostfix
+                               	sudo rm -rf /var/lib/lxc/oel$OracleRelease$SeedPostfix
+                               	sudo lxc-create -t download -n oel$OracleRelease$SeedPostfix -- --dist oracle --release $MajorRelease --arch amd64 --no-validate
+                       	fi
+                fi
+
+	elif [ $LinuxFlavor = 'Fedora' ] && [ $Release -eq 7 ]
+	then
+		sudo lxc-create -t download -n oel$OracleRelease$SeedPostfix -- --dist oracle --release $MajorRelease --arch amd64 --keyserver hkp://keyserver.ubuntu.com:80
+		if [ $? -ne 0 ]
+		then
+                       	sudo lxc-stop -n oel$OracleRelease$SeedPostfix -k
+                       	sudo lxc-destroy -n oel$OracleRelease$SeedPostfix
+                       	sudo rm -rf /var/lib/lxc/oel$OracleRelease$SeedPostfix
+                       	sudo lxc-create -t download -n oel$OracleRelease$SeedPostfix -- --dist oracle --release $MajorRelease --arch amd64 --keyserver hkp://p80.pool.sks-keyservers.net:80
+
+                       	if [ $? -ne 0 ]
+                       	then
+                               	sudo lxc-stop -n oel$OracleRelease$SeedPostfix -k
+                               	sudo lxc-destroy -n oel$OracleRelease$SeedPostfix
+                               	sudo rm -rf /var/lib/lxc/oel$OracleRelease$SeedPostfix
+                              	sudo lxc-create -t download -n oel$OracleRelease$SeedPostfix -- --dist oracle --release $MajorRelease --arch amd64 --no-validate
+                       	fi
+                fi
+	else
+		sudo lxc-create -n oel$OracleRelease$SeedPostfix -t oracle -- --release=$OracleVersion
+		if [ $? -ne 0 ]
+		then
+			if [ $? -ne 0 ]
+                	then
+                        	sudo lxc-stop -n oel$OracleRelease$SeedPostfix -k
+                        	sudo lxc-destroy -n oel$OracleRelease$SeedPostfix
+                        	sudo rm -rf /var/lib/lxc/oel$OracleRelease$SeedPostfix
+                        	sudo lxc-create -t download -n oel$OracleRelease$SeedPostfix -- --dist oracle --release $MajorRelease --arch amd64 --keyserver hkp://p80.pool.sks-keyservers.net:80
+                        	if [ $? -ne 0 ]
+                        	then
+                                	sudo lxc-stop -n oel$OracleRelease$SeedPostfix -k
+                                	sudo lxc-destroy -n oel$OracleRelease$SeedPostfix
+                                	sudo rm -rf /var/lib/lxc/oel$OracleRelease$SeedPostfix
+                                	sudo lxc-create -t download -n oel$OracleRelease$SeedPostfix -- --dist oracle --release $MajorRelease --arch amd64 --no-validate
+                        	fi
+                	fi
+		fi
+	fi
+
+	sleep 5
+       	n=$((n+1))
+       	ContainerCreated=$(ConfirmContainerCreated)
+done
 
 if [ $(SoftwareVersion $LXCVersion) -ge $(SoftwareVersion "2.1.0") ]
 then
@@ -584,22 +708,11 @@ echo "Initialize Oracle Linux seed container...     "
 echo "=============================================="
 
 cd /etc/network/if-up.d/openvswitch
-sudo sed -i "s/ContainerName/oel$OracleRelease$SeedPostfix/g" /var/lib/lxc/oel$OracleRelease$SeedPostfix/config
 
 if [ $GREValue = 'Y' ]
 then
 	sudo sed -i "/mtu/s/1500/$MTU/" /var/lib/lxc/oel$OracleRelease$SeedPostfix/config
 fi
-
-function CheckContainerUp {
-sudo lxc-ls -f | grep oel$OracleRelease$SeedPostfix | sed 's/  */ /g' | egrep 'RUNNING|STOPPED'  | cut -f2 -d' '
-}
-ContainerUp=$(CheckContainerUp)
-
-function CheckPublicIP {
-	sudo lxc-info -n oel$OracleRelease$SeedPostfix -iH | cut -f1-3 -d'.' | sed 's/\.//g'
-}
-PublicIP=$(CheckPublicIP)
 
 # GLS 20151217 Veth Pair Cleanups Scripts Create
 
@@ -614,12 +727,24 @@ echo "Start Oracle Linux seed LXC container...      "
 echo "=============================================="
 echo ''
 
-sudo sed -i 's/sw1/sx1/' /etc/network/if-up.d/openvswitch/oel$OracleRelease$SeedPostfix*
-sudo sed -i 's/sw1/sx1/' /etc/network/if-down.d/openvswitch/oel$OracleRelease$SeedPostfix*
-sudo sed -i 's/tag=10/tag=11/' /etc/network/if-up.d/openvswitch/oel$OracleRelease$SeedPostfix*
-sudo sed -i 's/tag=10/tag=11/' /etc/network/if-down.d/openvswitch/oel$OracleRelease$SeedPostfix*
-sudo sed -i "s/mtu = 1500/mtu = $MultiHostVar7/" /var/lib/lxc/oel$OracleRelease$SeedPostfix/config
-sudo sed -i "s/MtuSetting/$MultiHostVar7/" 	 /var/lib/lxc/oel$OracleRelease$SeedPostfix/config
+sudo sed -i 's/sw1/sx1/' 					/etc/network/if-up.d/openvswitch/oel$OracleRelease$SeedPostfix*
+sudo sed -i 's/sw1/sx1/' 					/etc/network/if-down.d/openvswitch/oel$OracleRelease$SeedPostfix*
+sudo sed -i 's/tag=10/tag=11/' 					/etc/network/if-up.d/openvswitch/oel$OracleRelease$SeedPostfix*
+sudo sed -i 's/tag=10/tag=11/' 					/etc/network/if-down.d/openvswitch/oel$OracleRelease$SeedPostfix*
+sudo sed -i "s/mtu = 1500/mtu = $MultiHostVar7/" 		/var/lib/lxc/oel$OracleRelease$SeedPostfix/config
+sudo sed -i "s/MtuSetting/$MultiHostVar7/" 	 		/var/lib/lxc/oel$OracleRelease$SeedPostfix/config
+sudo sed -i 's/oracle\.common\.conf/common\.conf/' 		/var/lib/lxc/oel$OracleRelease$SeedPostfix/config
+sudo sed -i "s/ContainerName/oel$OracleRelease$SeedPostfix/g" 	/var/lib/lxc/oel$OracleRelease$SeedPostfix/config
+
+function CheckContainerUp {
+	sudo lxc-ls -f | grep oel$OracleRelease$SeedPostfix | sed 's/  */ /g' | egrep 'RUNNING|STOPPED'  | cut -f2 -d' '
+}
+ContainerUp=$(CheckContainerUp)
+
+function CheckPublicIP {
+	sudo lxc-info -n oel$OracleRelease$SeedPostfix -iH | cut -f1-3 -d'.' | sed 's/\.//g'
+}
+PublicIP=$(CheckPublicIP)
 
 if [ $ContainerUp != 'RUNNING' ] || [ $PublicIP != 1020729 ]
 then

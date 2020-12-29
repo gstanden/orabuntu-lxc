@@ -101,7 +101,7 @@ fi
 if [ -z $2 ]
 then
 	SPOKEIP='lan.ip.this.host'
- 	SPOKEIP=192.168.1.240
+ 	SPOKEIP=192.168.1.242
 else
 	SPOKEIP=$2
 fi
@@ -109,7 +109,7 @@ fi
 if [ -z $3 ]
 then
 	HUBIP='lan.ip.hub.host'
- 	HUBIP=192.168.1.223
+ 	HUBIP=192.168.1.241
 else
 	HUBIP=$3
 fi
@@ -232,14 +232,13 @@ then
                 function GetRedHatVersion {
                         sudo cat /etc/redhat-release | cut -f7 -d' ' | cut -f1 -d'.'
                 }
-                RedHatVersion=$(GetRedHatVersion)
         elif [ $LinuxFlavor = 'CentOS' ]
         then
                 function GetRedHatVersion {
                         cat /etc/redhat-release | sed 's/ Linux//' | cut -f1 -d'.' | rev | cut -f1 -d' '
                 }
-                RedHatVersion=$(GetRedHatVersion)
         fi
+        RedHatVersion=$(GetRedHatVersion)
         RHV=$RedHatVersion
         Release=$RedHatVersion
         LF=$LinuxFlavor
@@ -252,7 +251,10 @@ then
                 sudo cat /etc/redhat-release | cut -f"$CutIndex" -d' ' | cut -f1 -d'.'
         }
         RedHatVersion=$(GetRedHatVersion)
-        if [ $RedHatVersion -ge 19 ]
+        if   [ $RedHatVersion -ge 28 ]
+        then
+                Release=8
+        elif [ $RedHatVersion -ge 19 ] && [ $RedHatVersion -le 27 ]
         then
                 Release=7
         elif [ $RedHatVersion -ge 12 ] && [ $RedHatVersion -le 18 ]
@@ -306,8 +308,8 @@ then
 			#	sudo rpm -ivh epel-release-latest-6.noarch.rpm
 				wget https://ftp.tu-chemnitz.de/pub/linux/dag/redhat/el6/en/x86_64/rpmforge/RPMS/docbook2x-0.8.8-1.el6.rf.x86_64.rpm -4
 				wget https://ftp.tu-chemnitz.de/pub/linux/dag/redhat/el6/en/i386/rpmforge/RPMS/sshpass-1.05-1.el6.rf.i686.rpm -4
-				sudo yum -y localinstall docbook2x-0.8.8-1.el6.rf.x86_64.rpm
-				sudo yum -y localinstall sshpass-1.05-1.el6.rf.i686.rpm
+				sudo rpm -ivh docbook2x-0.8.8-1.el6.rf.x86_64.rpm
+				sudo rpm -ivh sshpass-1.05-1.el6.rf.i686.rpm
 			elif [ $Release -eq 8 ]
 			then
 				sudo yum -y install oracle-epel-release-el8
@@ -414,6 +416,9 @@ echo "=============================================="
 echo "Test sshpass to HUB Host $HUBIP               "
 echo "=============================================="
 echo ''
+
+sudo yum -y     install net-tools > /dev/null 2>&1
+sudo apt-get -y install net-tools > /dev/null 2>&1
 
 ssh-keygen -R $HUBIP > /dev/null 2>&1
 sshpass -p $HubSudoPwd ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no $HubUserAct@$HUBIP "sudo -S -p' '  <<< "$HubSudoPwd"  echo '';uname -a; echo '';sudo -S <<< "$HubSudoPwd" lxc-ls -f"

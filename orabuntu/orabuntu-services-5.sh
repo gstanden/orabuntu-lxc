@@ -576,7 +576,7 @@ then
 	}
 	ShortHost=$(GetShortHost)
 	
-	sudo nslookup -timeout=10 $HOSTNAME.$Domain1 > /dev/null 2>&1
+	sudo getent hosts $HOSTNAME.$Domain1 > /dev/null 2>&1
 	if [ $? -eq 1 ]
 	then
 	      	echo ''
@@ -602,7 +602,7 @@ then
 		clear
 	fi
 	
-	sudo nslookup -timeout=10 $HOSTNAME.$Domain2 > /dev/null 2>&1
+	sudo getent hosts $HOSTNAME.$Domain2 > /dev/null 2>&1
 	if [ $? -eq 1 ]
 	then
 	      	echo ''
@@ -676,14 +676,14 @@ then
 	
 	echo ''
 	echo "=============================================="
-	echo "nslookup $ShortHost.$Domain1                  "
+	echo "getent hosts $ShortHost.$Domain1                  "
 	echo "=============================================="
 	echo ''
 	
-	sudo nslookup -timeout=10 $ShortHost.$Domain1
+	sudo getent hosts $ShortHost.$Domain1
 	
 	echo "=============================================="
-	echo "Done: nslookup $ShortHost.$Domain1            "
+	echo "Done: getent hosts $ShortHost.$Domain1            "
 	echo "=============================================="
 	
 	sleep 5
@@ -692,14 +692,14 @@ then
 	
 	echo ''
 	echo "=============================================="
-	echo "nslookup $ShortHost.$Domain2                  "
+	echo "getent hosts $ShortHost.$Domain2                  "
 	echo "=============================================="
 	echo ''
 	
-	sudo nslookup -timeout=10 $ShortHost.$Domain2
+	sudo getent hosts $ShortHost.$Domain2
 	
 	echo "=============================================="
-	echo "Done: nslookup $ShortHost.$Domain2            "
+	echo "Done: getent hosts $ShortHost.$Domain2            "
 	echo "=============================================="
 
         sleep 5

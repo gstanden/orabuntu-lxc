@@ -115,19 +115,18 @@ then
         RL=$Release
 elif [ $LinuxFlavor = 'Red' ] || [ $LinuxFlavor = 'CentOS' ]
 then
-        if   [ $LinuxFlavor = 'Red' ]
+	if   [ $LinuxFlavor = 'Red' ]
         then
                 function GetRedHatVersion {
-                        sudo cat /etc/redhat-release | cut -f7 -d' ' | cut -f1 -d'.'
+                        sudo cat /etc/redhat-release | rev | cut -f2 -d' ' | cut -f2 -d'.'
                 }
-                RedHatVersion=$(GetRedHatVersion)
         elif [ $LinuxFlavor = 'CentOS' ]
         then
                 function GetRedHatVersion {
                         cat /etc/redhat-release | sed 's/ Linux//' | cut -f1 -d'.' | rev | cut -f1 -d' '
                 }
-                RedHatVersion=$(GetRedHatVersion)
         fi
+	RedHatVersion=$(GetRedHatVersion)
 	RHV=$RedHatVersion
         Release=$RedHatVersion
         LF=$LinuxFlavor
@@ -140,7 +139,10 @@ then
         }
         RedHatVersion=$(GetRedHatVersion)
 	RHV=$RedHatVersion
-        if [ $RedHatVersion -ge 19 ]
+        if   [ $RedHatVersion -ge 28 ]
+        then
+                Release=8
+        elif [ $RedHatVersion -ge 19 ] && [ $RedHatVersion -le 27 ]
         then
                 Release=7
         elif [ $RedHatVersion -ge 12 ] && [ $RedHatVersion -le 18 ]
@@ -337,7 +339,7 @@ do
 	RedHatVersion=$(GetRedHatVersion)
 
 	function CheckDNSLookup {
-		nslookup -timeout=1 $ContainerPrefix$CloneIndex | grep -v '#' | grep Address | grep '10\.207\.39' | wc -l
+		nslookup $ContainerPrefix$CloneIndex $NameServer | grep -v '#' | grep Address | grep '10\.207\.39' | wc -l
 	}
 	DNSLookup=$(CheckDNSLookup)
 

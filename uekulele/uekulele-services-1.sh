@@ -200,19 +200,18 @@ then
         RL=$Release
 elif [ $LinuxFlavor = 'Red' ] || [ $LinuxFlavor = 'CentOS' ]
 then
-        if   [ $LinuxFlavor = 'Red' ]
+	if   [ $LinuxFlavor = 'Red' ]
         then
                 function GetRedHatVersion {
-                        sudo cat /etc/redhat-release | cut -f7 -d' ' | cut -f1 -d'.'
+                        sudo cat /etc/redhat-release | rev | cut -f2 -d' ' | cut -f2 -d'.'
                 }
-                RedHatVersion=$(GetRedHatVersion)
         elif [ $LinuxFlavor = 'CentOS' ]
         then
                 function GetRedHatVersion {
                         cat /etc/redhat-release | sed 's/ Linux//' | cut -f1 -d'.' | rev | cut -f1 -d' '
                 }
-                RedHatVersion=$(GetRedHatVersion)
         fi
+	RedHatVersion=$(GetRedHatVersion)
 	RHV=$RedHatVersion
         Release=$RedHatVersion
         LF=$LinuxFlavor
@@ -225,7 +224,10 @@ then
         }
         RedHatVersion=$(GetRedHatVersion)
 	RHV=$RedHatVersion
-        if [ $RedHatVersion -ge 19 ]
+        if   [ $RedHatVersion -ge 28 ]
+        then
+                Release=8
+        elif [ $RedHatVersion -ge 19 ] && [ $RedHatVersion -le 27 ]
         then
                 Release=7
         elif [ $RedHatVersion -ge 12 ] && [ $RedHatVersion -le 18 ]
@@ -728,10 +730,8 @@ then
 
                         elif [ $Release -eq 6 ]
                         then
-                                wget https://ftp.tu-chemnitz.de/pub/linux/dag/redhat/el6/en/x86_64/rpmforge/RPMS/docbook2x-0.8.8-1.el6.rf.x86_64.rpm -4
-                                wget https://ftp.tu-chemnitz.de/pub/linux/dag/redhat/el6/en/i386/rpmforge/RPMS/sshpass-1.05-1.el6.rf.i686.rpm -4
-                                sudo yum -y localinstall docbook2x-0.8.8-1.el6.rf.x86_64.rpm
-                                sudo yum -y localinstall sshpass-1.05-1.el6.rf.i686.rpm
+                                sudo rpm -ivh "$DistDir"/rpmstage/docbook2x-0.8.8-1.el6.rf.x86_64.rpm
+                                sudo rpm -ivh "$DistDir"/rpmstage/sshpass-1.05-1.el6.rf.i686.rpm
 			#	wget --timeout=5 --tries=10 https://dl.fedoraproject.org/pub/epel/epel-release-latest-6.noarch.rpm
 			#	sudo rpm -ivh epel-release-latest-6.noarch.rpm
                         fi
@@ -810,7 +810,7 @@ then
 
 	if [ $LinuxFlavor = 'Fedora' ]
 	then
-		sudo dnf -y install lxc lxc-templates debootstrap qemu-kvm libvirt virt-install bridge-utils perl gpg
+		sudo dnf -y install lxc lxc-* debootstrap qemu-kvm libvirt virt-install bridge-utils perl gpg
 
 	elif [ $LinuxFlavor = 'CentOS' ] || [ $LinuxFlavor = 'Red' ]
 	then
@@ -828,13 +828,10 @@ then
 	clear
 
 	echo ''
-		echo "=============================================="
+	echo "=============================================="
 	echo "Start LXC and libvirt...                      "
 	echo "=============================================="
 	echo ''
-
-	echo 'Release = '$Release
-	sleep 10
 
 	if [ $Release -ge 7 ] 
 	then
@@ -1113,10 +1110,8 @@ then
 
                         elif [ $Release -eq 6 ]
                         then
-                                wget https://ftp.tu-chemnitz.de/pub/linux/dag/redhat/el6/en/x86_64/rpmforge/RPMS/docbook2x-0.8.8-1.el6.rf.x86_64.rpm -4
-                                wget https://ftp.tu-chemnitz.de/pub/linux/dag/redhat/el6/en/i386/rpmforge/RPMS/sshpass-1.05-1.el6.rf.i686.rpm -4
-                                sudo yum -y localinstall docbook2x-0.8.8-1.el6.rf.x86_64.rpm
-                                sudo yum -y localinstall sshpass-1.05-1.el6.rf.i686.rpm
+                                sudo rpm -ivh "$DistDir"/rpmstage/docbook2x-0.8.8-1.el6.rf.x86_64.rpm
+                                sudo rpm -ivh "$DistDir"/rpmstage/sshpass-1.05-1.el6.rf.i686.rpm
 			#	wget --timeout=5 --tries=10 https://dl.fedoraproject.org/pub/epel/epel-release-latest-6.noarch.rpm
 			#	sudo rpm -ivh epel-release-latest-6.noarch.rpm
                         fi
@@ -1176,9 +1171,25 @@ then
 		sudo yum -y install lxc libcap-devel libcgroup wget bridge-utils 
 	fi
 
-	if [ $LinuxFlavor = 'Fedora' ]
+	if [ $LinuxFlavor = 'Fedora' ] && [ $Release -ge 7 ]
 	then
-		sudo dnf -y install lxc lxc-templates lxc-extra debootstrap libvirt perl gpg
+		sudo dnf -y install lxc lxc-* lxc-extra debootstrap libvirt perl gpg
+		
+		if [ $Release -eq 8 ]
+		then
+			sudo systemctl enable dnsmasq
+			sudo systemctl start  dnsmasq
+			sudo sed -i 's/#LXC/LXC/g'				/etc/sysconfig/lxc-net 
+			sudo sed -i 's/LXC_DHCP_CONFILE/#LXC_DHCP_CONFILE/g'	/etc/sysconfig/lxc-net
+			sudo sed -i 's/LXC_DOMAIN/#LXC_DOMAIN/g'		/etc/sysconfig/lxc-net
+			sudo systemctl enable lxc-net
+			sudo systemctl start  lxc-net
+			sudo service lxc-net stop
+			sudo service lxc-net start
+		#	sudo firewall-cmd --permanent --zone=trusted --add-interface=lxcbr0
+		#	sudo firewall-cmd --permanent --zone=trusted --add-masquerade
+			sudo firewall-cmd --reload
+		fi
 	fi
 
 	echo ''
@@ -1197,24 +1208,46 @@ then
 	echo "=============================================="
 	echo ''
 
+        if [ $Release -eq 8 ] && [ $LinuxFlavor = 'Red' ]
+        then
+                sudo dnf -y install lxc lxc-* libcap-devel libcgroup wget
+		sudo systemctl start lxc
+		sudo systemctl enable lxc
+        fi
+
+        if [ $Release -eq 8 ] && [ $LinuxFlavor = 'Oracle' ]
+        then
+		sudo yum -y install libcgroup rsync wget libcap-devel
+                sudo dnf -y install lxc lxc-* 
+        fi
+
 	if [ $Release -ge 7 ] 
 	then
 		sudo systemctl daemon-reload
+		sudo systemctl enable lxc
+		sudo systemctl start  lxc
+		sudo systemctl status lxc
 
-		if [ $Release -eq 7 ]
-		then
-			sudo systemctl start lxc.service
-			sudo systemctl status lxc.service
-			echo ''
-		fi
+	#	if [ $Release -eq 7 ]
+	#	then
+	#		sudo systemctl start  lxc
+	#		sudo systemctl status lxc
+	#		echo ''
+	#	fi
 		
 		sudo setenforce permissive
 		sudo systemctl start libvirtd
 		sleep 2
 		sudo systemctl stop libvirtd
 		sleep 2
-		sudo systemctl start libvirtd
+		sudo systemctl start  libvirtd
+		sleep 2
 		sudo systemctl status libvirtd
+		echo ''
+		sudo systemctl start lxc
+		sleep 2
+		echo ''	
+		sudo service lxc status
 		sleep 2
 		sudo cp -p /etc/lxc/default.conf /etc/lxc/default.conf.bak
 
@@ -1296,6 +1329,13 @@ else
 	LXCVersion=0.1.0
 fi
 
+if [ $Release -ge 8 ]
+then
+	function GetLXCVersion {
+        	lxc-create --version
+	}
+	LXCVersion=$(GetLXCVersion)
+fi
 
 if [ $(SoftwareVersion $LXCVersion) -lt $(SoftwareVersion $LxcVersion) ]
 then
@@ -1335,6 +1375,13 @@ then
 	do
 		if [ $Release -ge 7 ]
 		then
+
+			if [ $LinuxFlavor = 'Redhat' ] && [ $Release -eq 7 ]
+			then
+				sudo subscription-manager repos --enable rhel-7-server-optional-rpms
+				sudo yum -y install unbound-devel
+			fi
+
 			echo ''
 			echo "=============================================="
 			echo "Install required packages and prepare...      "
@@ -1352,14 +1399,13 @@ then
 				sudo yum-config-manager --enable ol8_u0_baseos_base
 				sudo yum-config-manager --enable ol8_baseos_latest
 			 	sudo yum-config-manager --enable ol8_addons
-				wget --inet4-only http://mirror.centos.org/centos/7/os/x86_64/Packages/bridge-utils-1.5-9.el7.x86_64.rpm
 			fi
 
 			sudo yum -y install rpm-build wget openssl-devel gcc make docbook2X xmlto automake graphviz libtool
 
 			if [ $Release -ge 8 ]
 			then
-				sudo yum -y localinstall bridge-utils-1.5-9.el7.x86_64.rpm
+				sudo rpm -ivh "$DistDir"/rpmstage/bridge-utils-1.5-9.el7.x86_64.rpm
 				sudo yum -y install libcap-devel
 			fi
 
@@ -1398,7 +1444,7 @@ then
 				cp -p "$DistDir"/uekulele/archives/lxc-templates.spec /opt/olxc/"$DistDir"/uekulele/lxc-templates/.
 				sudo sed -i "s/LxcVersion/$LxcVersion/" /opt/olxc/"$DistDir"/uekulele/lxc-templates/lxc-templates.spec
 				rpmbuild --define "_topdir /opt/olxc/"$DistDir"/uekulele/lxc-templates/rpmbuild" -ba lxc-templates.spec
-				sudo yum -y localinstall /opt/olxc/"$DistDir"/uekulele/lxc-templates/rpmbuild/RPMS/x86_64/lxc-templates-"$LxcVersion"-1.el8.x86_64.rpm
+				sudo rpm -ivh /opt/olxc/"$DistDir"/uekulele/lxc-templates/rpmbuild/RPMS/x86_64/lxc-templates-"$LxcVersion"-1.el8.x86_64.rpm
 				
 				echo ''
 				echo "=============================================="
@@ -1471,13 +1517,38 @@ then
 			echo ''
 
 			cd /opt/olxc/"$DistDir"/uekulele/lxc/rpmbuild/RPMS/x86_64
-			if [ $LinuxFlavor = 'CentOS' ] || [ $LinuxFlavor = 'Red' ]
+
+			if [ $LinuxFlavor = 'CentOS' ] || [ $LinuxFlavor = 'Red' ] || [ $LinuxFlavor = 'Fedora' ]
 			then
 				sudo yum -y erase lxc-libs
 			fi
+
+			if [ $LinuxFlavor = 'Oracle' ] && [ $Release -eq 7 ]
+			then
+				sudo yum -y remove lxc-libs-1.1.5*
+			fi
+
+			if [ $LinuxFlavor = 'Red' ] && [ $Release -eq 7 ]
+			then
+				sudo yum -y remove lxc* lxc-debuginfo*
+			fi
+
+                        if [ $LinuxFlavor = 'Oracle' ] && [ $Release -ge 8 ]
+                        then
+                                sudo yum - y install libcgroup rsync
+				sudo yum -y remove lxc-libs* lxc* lxc-*
+				sudo rpm -ivh lxc* 
+                        fi
+
+	
+
 			sleep 5
-			sudo yum -y localinstall *.rpm
+			sudo rpm -ivh *.rpm
 			cd /opt/olxc/"$DistDir"/uekulele/lxc
+			sudo systemctl daemon-reload
+			sudo systemct  enable lxc
+			sudo systemctl start  lxc
+			sudo service lxc-net start 
 
 			echo ''
 			echo "=============================================="
@@ -1500,44 +1571,6 @@ then
 			sudo chown -R $Owner:$Group /opt/olxc/"$DistDir"/uekulele/lxc
 			cd /opt/olxc/"$DistDir"/uekulele/lxc
 	
-#  			if [ ! -f glibc-2.17-55.el6.x86_64.rpm ]
-#  			then
-#				sudo yum -y install kernel-uek-headers
-#  				wget http://copr-be.cloud.fedoraproject.org/results/mosquito/myrepo-el6/epel-6-x86_64/glibc-2.17-55.fc20/glibc-2.17-55.el6.x86_64.rpm
-#  				wget http://copr-be.cloud.fedoraproject.org/results/mosquito/myrepo-el6/epel-6-x86_64/glibc-2.17-55.fc20/glibc-common-2.17-55.el6.x86_64.rpm
-#  				wget http://copr-be.cloud.fedoraproject.org/results/mosquito/myrepo-el6/epel-6-x86_64/glibc-2.17-55.fc20/glibc-devel-2.17-55.el6.x86_64.rpm
-#  				wget http://copr-be.cloud.fedoraproject.org/results/mosquito/myrepo-el6/epel-6-x86_64/glibc-2.17-55.fc20/glibc-headers-2.17-55.el6.x86_64.rpm
-#  				sudo rpm -Uvh glibc-2.17-55.el6.x86_64.rpm \
-#  				glibc-common-2.17-55.el6.x86_64.rpm \
-#  				glibc-devel-2.17-55.el6.x86_64.rpm \
-#  				glibc-headers-2.17-55.el6.x86_64.rpm
-#  			fi
-
-#			echo ''
-#			echo "=============================================="
-#			echo "Build /opt/glibc-2.17 for LXC build...        "
-#			echo "=============================================="
-#			echo ''
-
-#			mkdir glibc
-#			cd glibc
-#			wget https://ftp.gnu.org/gnu/glibc/glibc-2.17.tar.gz
-#			tar -xzvf glibc-2.17.tar.gz 
-#			mkdir build
-#			cd build
-#			../glibc-2.17/configure --prefix=/opt/glibc-2.17
-#			make -j4
-#			sudo make install
-#			export LD_LIBRARY_PATH=/opt/glibc-2.17/lib
-#			cd /opt/olxc/"$DistDir"/uekulele/lxc
-
-#			echo ''
-#			echo "=============================================="
-#			echo "Done: Build /opt/glibc-2.17 for LXC build.    "
-#			echo "=============================================="
-
-			sleep 5
-
 			sudo touch /etc/rpm/macros
 			sudo yum -y install rpm-build wget openssl-devel gcc make docbook2X xmlto automake graphviz libtool
 			sudo mkdir -p /opt/olxc/"$DistDir"/uekulele/lxc
@@ -1570,7 +1603,7 @@ then
 
 			rpmbuild --define "_topdir /opt/olxc/"$DistDir"/uekulele/lxc/rpmbuild" -ba lxc.spec
 			cd /opt/olxc/"$DistDir"/uekulele/lxc/rpmbuild/RPMS/x86_64
-			sudo yum -y localinstall lxc*
+			sudo rpm -ivh lxc*
 			export LD_LIBRARY_PATH=''
 			cd /opt/olxc/"$DistDir"/uekulele/lxc
 		fi
@@ -1622,20 +1655,28 @@ then
 
  	echo ''
  	echo "=============================================="
-	echo "Display AUX Bridge for LXC (non-OvS)...     "
+	echo "Display AUX Bridge(s) for LXC (non-OvS)...    "
  	echo "=============================================="
  	echo ''
 
  	sleep 5
 
-	sudo ifconfig virbr0
+	sudo service libvirtd start 	> /dev/null 2>&1
+	sudo ifconfig virbr0 		> /dev/null 2>&1
 	if [ $? -eq 0 ]
 	then
 		sudo sed -i "s/lxcbr0/virbr0/g" /etc/lxc/default.conf
+		sudo ifconfig virbr0
+	fi
+
+	sudo ifconfig lxcbr0 		> /dev/null 2>&1
+	if [ $? -eq 0 ]
+	then
+		sudo ifconfig lxcbr0
 	fi
 
  	echo "=============================================="
-	echo "Done: Display AUX Bridge for LXC (non-OvS).   "
+	echo "Done: Display AUX Bridge(s) for LXC (non-OvS)."
  	echo "=============================================="
 
  	sleep 5
@@ -1674,20 +1715,28 @@ fi
 
 echo ''
 echo "=============================================="
-echo "Display AUX Bridge for LXC (non-OvS)...     "
+echo "Display AUX Bridge(s) for LXC (non-OvS)...    "
 echo "=============================================="
 echo ''
 
-sudo service libvirtd start > /dev/null 2>&1
 sleep 5
-sudo ifconfig virbr0
+
+sudo service libvirtd start 	> /dev/null 2>&1
+sudo ifconfig virbr0 		> /dev/null 2>&1
 if [ $? -eq 0 ]
 then
 	sudo sed -i "s/lxcbr0/virbr0/g" /etc/lxc/default.conf
+	sudo ifconfig virbr0
+fi
+
+sudo ifconfig lxcbr0 		> /dev/null 2>&1
+if [ $? -eq 0 ]
+then
+	sudo ifconfig lxcbr0
 fi
 
 echo "=============================================="
-echo "Done: Display AUX Bridge for LXC (non-OvS).   "
+echo "Done: Display AUX Bridge(s) for LXC (non-OvS)."
 echo "=============================================="
 
 sleep 5
@@ -1715,14 +1764,7 @@ sudo yum -y install bind-utils
 
 if [ $Release -eq 8 ]
 then
-	wget https://rpmfind.net/linux/epel/7/x86_64/Packages/w/wireless-tools-29-13.el7.x86_64.rpm -4
-
-	if [ $? -ne 0 ]
-	then
-		sudo cp -p "$DistDir"/uekulele/archives/wireless-tools-29-13.el7.x86_64.rpm .
-	fi
-
-	sudo yum -y localinstall wireless-tools-29-13.el7.x86_64.rpm 
+	sudo rpm -ivh "$DistDir"/rpmstage/wireless-tools-29-13.el7.x86_64.rpm 
 else
 	sudo yum -y install wireless-tools
 fi
@@ -1855,6 +1897,89 @@ echo "=============================================="
 sleep 5
 
 clear
+
+if [ $Release -eq 8 ] && [ $LinuxFlavor = 'Fedora' ]
+then
+	echo ''
+	echo "=============================================="
+	echo "Install OpenvSwitch for $LF $RHV...           "
+	echo "=============================================="
+	echo ''
+
+		if   [ $LinuxFlavor = 'Fedora' ]
+		then
+			sudo dnf -y install lxc lxc-* openvswitch openvswitch-devel openvswitch-ipsec openvswitch-test python3-openvswitch
+		fi
+
+	echo ''
+	echo "=============================================="
+	echo "Done: Install OpenvSwitch for $LF $RHV.       "
+	echo "=============================================="
+	echo ''
+
+	sleep 5
+
+	clear
+
+	echo ''
+	echo "=============================================="
+	echo "Create OpenvSwitch database...                "
+	echo "=============================================="
+	echo ''
+
+	cd /usr/local/etc
+	sudo mkdir openvswitch
+	sudo ovsdb-tool create /usr/local/etc/openvswitch/conf.db
+	sudo ls -l /usr/local/etc/openvswitch/conf.db
+
+	echo ''
+	echo "=============================================="
+	echo "Done: Create OpenvSwitch database.            "
+	echo "=============================================="
+	echo ''
+
+	sleep 5
+
+	clear
+
+	echo ''
+	echo "=============================================="
+	echo "Start and Enable OpenvSwitch database...      "
+	echo "=============================================="
+	echo ''
+
+	sudo systemctl start openvswitch
+	sudo systemctl enable openvswitch
+	sudo service openvswitch status
+
+	echo ''
+	echo "=============================================="
+	echo "Done: Start and Enable OpenvSwitch database.  "
+	echo "=============================================="
+	echo ''
+	
+	sleep 5
+
+	clear
+
+	echo ''
+	echo "=============================================="
+	echo "Display OpenvSwitch Version...                "
+	echo "=============================================="
+	echo ''
+
+	sudo ovs-vsctl show
+
+	echo ''
+	echo "=============================================="
+	echo "Done: Display OpenvSwitch Version.            "
+	echo "=============================================="
+	echo ''
+
+	sleep 5
+
+	clear
+fi
 
 which ovs-vsctl > /dev/null 2>&1
 if [ $? -ne 0 ]
@@ -2042,7 +2167,7 @@ then
 			echo ''
 
 			cd /opt/olxc/"$DistDir"/uekulele/openvswitch/rpmbuild/RPMS/x86_64
-			sudo yum -y localinstall openvswitch* 
+			sudo rpm -ivh openvswitch* 
 			OVSPackageCount=$(GetOVSPackageCount)
 			cd /opt/olxc/"$DistDir"/uekulele/openvswitch
 			
@@ -2116,33 +2241,22 @@ then
 				sudo yum -y install python3
 				sudo yum -y install python3-sphinx
 				sudo yum -y install python-six
-				sudo yum -y install selinux-policy-devel unbound-devel
- 				sudo alternatives --set python /usr/bin/python3
- 				python3 -m venv py36env
- 				source py36env/bin/activate
- 				python3 -m pip install --upgrade pip
- 				python3 -m pip install six
- 				python3 -m pip install sphinx
-				sed -i 's/BuildRequires: python-sphinx/BuildRequires: python3-sphinx/g' openvswitch.spec
-				sleep 5
-			fi
-				
- 			if [ $Release -eq 8 ]
- 			then
-				cd /opt/olxc/"$DistDir"/uekulele/openvswitch/rpmbuild/SOURCES
-				tar -zxvf openvswitch-"$OvsVersion".tar.gz
-				cp -p openvswitch-"$OvsVersion"/rhel/*.spec /opt/olxc/"$DistDir"/uekulele/openvswitch/.
-				cd /opt/olxc/"$DistDir"/uekulele/openvswitch
-				wget https://rpmfind.net/linux/centos/7.9.2009/os/x86_64/Packages/python-six-1.9.0-2.el7.noarch.rpm -4
 
-				if [ $? -ne 0 ]
+			        if [ $LinuxFlavor = 'Oracle' ] && [ $Release -eq 7 ]
 				then
-					sudo cp -p "$DistDir"/uekulele/archives/python-six-1.9.0-2.el7.noarch.rpm .
+					echo "ok dealing with unbound-libs issue here ..."
+					sleep 30
+			                sudo yum -y remove   unbound-libs-1.6.6-5* > /dev/null 2>&1
+			                sudo yum -y install  unbound-libs-1.6.6-1* > /dev/null 2>&1
+			                sudo yum -y install unbound-devel-1.6.6-1* > /dev/null 2>&1
+					sleep 30
+			        fi
+
+				if [ $LinuxFlavor = 'Red' ] && [ $Release -eq 7 ]
+				then
+					sudo subscription-manager repos --enable rhel-7-server-optional-rpms
 				fi
 
-				sudo yum -y localinstall python-six-1.9.0-2.el7.noarch.rpm
-				sudo yum -y install python3-sphinx
-				sudo yum -y install python3-six
 				sudo yum -y install selinux-policy-devel unbound-devel
  				sudo alternatives --set python /usr/bin/python3
  				python3 -m venv py36env
@@ -2150,62 +2264,327 @@ then
  				python3 -m pip install --upgrade pip
  				python3 -m pip install six
  				python3 -m pip install sphinx
-				sed -i 's/BuildRequires: python-six/BuildRequires: python3-six/g'       openvswitch.spec
 				sed -i 's/BuildRequires: python-sphinx/BuildRequires: python3-sphinx/g' openvswitch.spec
-				sed -i 's/python >= 2.7/python27/g'	  				openvswitch.spec
 				sleep 5
 			fi
-		
-			rpmbuild --define "_topdir /opt/olxc/"$DistDir"/uekulele/openvswitch/rpmbuild" -ba --without check openvswitch.spec
-
-			echo ''
-			echo "=============================================="
-			echo "Done: Build OpenvSwitch RPMs                  "
-			echo "=============================================="
-
-			sleep 5
-
-			clear
-	
-			echo ''
-			echo "=============================================="
-			echo "Establish sudo privileges...                  "
-			echo "=============================================="
-			echo ''
-
-			echo $MultiHostVar4 | sudo -S date
-
-			echo ''
-			echo "=============================================="
-			echo "Privileges established.                       "
-			echo "=============================================="
-
-			sleep 5
-
-			clear
-
-			echo ''
-			echo "=============================================="
-			echo "Install OpenvSwitch RPMs...                   "
-			echo "=============================================="
-			echo ''
-
-			cd /opt/olxc/"$DistDir"/uekulele/openvswitch/rpmbuild/RPMS/x86_64
-#			sudo yum -y localinstall openvswitch* 
-			sudo rpm -ivh openvswitch-*
-			OVSPackageCount=$(GetOVSPackageCount)
-			cd /opt/olxc/"$DistDir"/uekulele/openvswitch
 			
-			echo ''
-			echo "=============================================="
-			echo "Done: Install OpenvSwitch RPMs.               "
-			echo "=============================================="
-			echo ''
+ 			if [ $Release -eq 8 ]
+ 			then
+				if [ $(SoftwareVersion $OvsVersion) -eq $(SoftwareVersion "2.14.0") ]
+				then
+					cd /opt/olxc/"$DistDir"/uekulele/openvswitch
+			
+					echo ''
+					echo "==============================================" 
+					echo "Install Packages...                           "
+					echo "==============================================" 
+					echo ''
 
-			sleep 5
+					sudo yum -y install checkpolicy selinux-policy-devel unbound-devel
+					sudo yum -y install python3-sphinx
+					sudo yum -y install gcc-c++ groff libcap-ng-devel python3-devel unbound
+			
+					echo ''
+					echo "==============================================" 
+					echo "Install Packages...                           "
+					echo "==============================================" 
+					echo ''
+					
+					sleep 5
 
-			clear
+					clear
+
+					echo ''
+					echo "=============================================="
+					echo "Untar source code...                          "
+					echo "=============================================="
+					echo ''
+
+					wget https://www.openvswitch.org/releases/openvswitch-2.14.0.tar.gz
+					tar -xzvf openvswitch-2.14.0.tar.gz 
+
+					echo ''
+					echo "=============================================="
+					echo "Done: Untar source code.                      "
+					echo "=============================================="
+					echo ''
+
+					sleep 5
+
+					clear
+
+					echo ''
+					echo "==============================================" 
+					echo "Build OpenvSwitch RPM's...                    "
+					echo "==============================================" 
+					echo ''
+
+					cd openvswitch-2.14.0
+					./configure
+					make rpm-fedora
+
+					echo ''
+					echo "==============================================" 
+					echo "Done: Build OpenvSwitch RPM's.                "
+					echo "==============================================" 
+					echo ''
+
+					sleep 5
+					
+					clear
+
+					echo ''
+					echo "==============================================" 
+					echo "Install OpenvSwitch RPM's.                    "
+					echo "==============================================" 
+					echo ''
+
+					sudo yum -y remove openvswitch-devel-*
+					sudo yum -y remove openvswitch-*
+					sudo yum -y install network-scripts libreswan
+					cd /opt/olxc/"$DistDir"/uekulele/openvswitch/openvswitch-"$OvsVersion"/rpm/rpmbuild/RPMS/noarch
+					sudo rpm -ivh python3-openvswitch-"$OvsVersion"*.el8.noarch.rpm
+					sudo rpm -ivh openvswitch-selinux-policy-"$OvsVersion"*.el8.noarch.rpm
+					sudo rpm -ivh /opt/olxc/"$DistDir"/uekulele/openvswitch/openvswitch-"$OvsVersion"/rpm/rpmbuild/RPMS/noarch/python3-openvswitch-"$OvsVersion".el8.noarch.rpm
+					sudo rpm -ivh /opt/olxc/"$DistDir"/uekulele/openvswitch/openvswitch-"$OvsVersion"/rpm/rpmbuild/RPMS/noarch/openvswitch-selinux-policy-"$OvsVersion".el8.noarch.rpm
+					sudo rpm -ivh /opt/olxc/"$DistDir"/uekulele/openvswitch/openvswitch-"$OvsVersion"/rpm/rpmbuild/RPMS/x86_64/openvswitch-* 
+					sudo rpm -ivh /opt/olxc/"$DistDir"/uekulele/openvswitch/openvswitch-"$OvsVersion"/rpm/rpmbuild/RPMS/x86_64/openvswitch-debuginfo*
+					sudo rpm -ivh /opt/olxc/"$DistDir"/uekulele/openvswitch/openvswitch-"$OvsVersion"/rpm/rpmbuild/RPMS/x86_64/openvswitch-debugsource*
+					sudo rpm -ivh /opt/olxc/"$DistDir"/uekulele/openvswitch/openvswitch-"$OvsVersion"/rpm/rpmbuild/RPMS/x86_64/openvswitch-devel*
+					sudo rpm -ivh /opt/olxc/"$DistDir"/uekulele/openvswitch/openvswitch-"$OvsVersion"/rpm/rpmbuild/RPMS/x86_64/openvswitch-ipsec*
+					cd /opt/olxc/"$DistDir"/uekulele/openvswitch
+					
+					echo ''
+					echo "==============================================" 
+					echo "Done: Install OpenvSwitch RPM's.              "
+					echo "==============================================" 
+					echo ''
+
+				elif [ $(SoftwareVersion $OvsVersion) -eq $(SoftwareVersion "2.12.1") ]
+				then
+					cd /opt/olxc/"$DistDir"/uekulele/openvswitch/rpmbuild/SOURCES
+					tar -zxvf openvswitch-"$OvsVersion".tar.gz
+					cp -p openvswitch-"$OvsVersion"/rhel/*.spec /opt/olxc/"$DistDir"/uekulele/openvswitch/.
+					cd /opt/olxc/"$DistDir"/uekulele/openvswitch
+
+					echo ''
+					echo "=============================================="
+					echo "Done: Untar source code.                      "
+					echo "=============================================="
+					echo ''
+
+					sleep 5
+
+					clear
+			
+					echo ''
+					echo "==============================================" 
+					echo "Install Packages...                           "
+					echo "==============================================" 
+					echo ''
+
+					sudo yum -y install selinux-policy-devel unbound-devel
+					sudo yum -y install rpm-build yum-utils tar wget
+					sudo alternatives --set python /usr/bin/python3
+					python3 -m venv py36env
+					source py36env/bin/activate
+			
+				#	echo ''
+				#	echo "==============================================" 
+				#	echo "Install Python3 PIP Packages (takes awhile)..."
+				#	echo "==============================================" 
+				#	echo ''
+
+ 				#	python3 -m pip install --upgrade pip
+ 				#	python3 -m pip install six
+ 				#	python3 -m pip install sphinx
+				#	sleep 5
+				
+					echo ''
+					echo "==============================================" 
+					echo "Done: Install Packages...                     "
+					echo "==============================================" 
+					echo ''
+
+					sleep 5
+
+					clear
+	
+				#	echo ''
+				#	echo "==============================================" 
+				#	echo "Build RPM python-six from Source...           "
+				#	echo "==============================================" 
+				#	echo ''
+	
+				#	wget https://kojipkgs.fedoraproject.org//packages/python-six/1.15.0/1.fc33/src/python-six-1.15.0-1.fc33.src.rpm
+				#	rpm -ivh python-six-1.15.0-1.fc33.src.rpm
+				#	cd ~/rpmbuild/SOURCES/
+				#	tar -xzvf six-1.15.0.tar.gz
+				#	cd ~/rpmbuild/SOURCES/six-1.15.0
+				#	sed -i '/setup/s/six/python-six/g' setup.py
+				#	python setup.py bdist_rpm
+			
+				#	echo ''
+				#	echo "==============================================" 
+				#	echo "Done: Build RPM python-six from Source...     "
+				#	echo "==============================================" 
+				#	echo ''
+
+				#	sleep 5
+
+				#	clear
+
+					echo ''
+					echo "==============================================" 
+					echo "Install RPM python-six...                     "
+					echo "==============================================" 
+					echo ''
+
+					sudo dnf -y install "$DistDir"/rpmstage/python-six-1.9.0-2.el7.noarch.rpm
+				#	sudo rpm -ivh ~/rpmbuild/SOURCES/six-1.15.0/dist/python-six-1.15.0-1.noarch.rpm
+
+					echo ''
+					echo "==============================================" 
+					echo "Install RPM python-six...                     "
+					echo "==============================================" 
+					echo ''
+
+					sleep 5 
+	
+					clear
+
+                                        echo ''
+                                        echo "==============================================" 
+                                        echo "Install from codeready_builder repo...    "
+                                        echo "==============================================" 
+                                        echo ''
+
+                                        if [ $LinuxFlavor = 'Oracle' ]
+                                        then
+                                                sudo yum-config-manager --enable ol8_codeready_builder
+
+                                        elif [ $LinuxFlavor = 'Red' ]
+                                        then
+                                                sudo yum-config-manager --enable codeready-builder-for-rhel-8-x86_64-rpms
+                                        fi
+
+                                        sudo yum -y install python3-sphinx
+                                        sudo rpm -qa | egrep 'python-six|python3-sphinx'
+
+                                        echo ''
+                                        echo "==============================================" 
+                                        echo "Done: Install from codeready_builder repo."
+                                        echo "==============================================" 
+                                        echo ''
+
+                                        sleep 5
+
+                                        clear
+
+					echo ''
+					echo "==============================================" 
+					echo "Edit openvswitch.spec for python3-sphinx...   "
+					echo "==============================================" 
+					echo ''
+
+					cd /opt/olxc/"$DistDir"/uekulele/openvswitch
+				 	sed -i 's/BuildRequires: python-six/BuildRequires: python3-six/g'       openvswitch.spec
+					sed -i 's/BuildRequires: python-sphinx/BuildRequires: python3-sphinx/g' openvswitch.spec
+				 	sed -i 's/python >= 2.7/python27/g'	  				openvswitch.spec
+
+					cat openvswitch.spec | grep BuildRequires | egrep 'python3-six|python3-sphinx'
+
+					echo ''
+					echo "==============================================" 
+					echo "Done: Edit openvswitch.spec for python3-sphinx"
+					echo "==============================================" 
+					echo ''
+
+					sleep 5
+
+					clear
+
+					echo ''
+					echo "==============================================" 
+					echo "Build OpenvSwitch RPM's...                    "
+					echo "==============================================" 
+					echo ''
+
+					rpmbuild --define "_topdir /opt/olxc/"$DistDir"/uekulele/openvswitch/rpmbuild" -ba --without check openvswitch.spec
+					cd /opt/olxc/"$DistDir"/uekulele/openvswitch/rpmbuild/RPMS/x86_64/
+					sudo rpm -ivh *.rpm
+					sudo rpm -ivh openvswitch-"$OvsVersion"-1.x86_64.rpm
+					sudo rpm -ivh openvswitch-*
+					sudo rpm -ivh openvswitch-debug*
+	
+					echo ''
+					echo "=============================================="
+					echo "Done: Build OpenvSwitch RPMs                  "
+					echo "=============================================="
+				fi
+			fi
+
+			if [ $Release -eq 6 ] || [ $Release -eq 7 ]
+			then
+				echo ''
+				echo "==============================================" 
+				echo "Build OpenvSwitch RPM's...                    "
+				echo "==============================================" 
+				echo ''
+
+				rpmbuild --define "_topdir /opt/olxc/"$DistDir"/uekulele/openvswitch/rpmbuild" -ba --without check openvswitch.spec
+	
+				echo ''
+				echo "=============================================="
+				echo "Done: Build OpenvSwitch RPMs                  "
+				echo "=============================================="
+
+				sleep 5
+
+				clear
+	
+				echo ''
+				echo "=============================================="
+				echo "Establish sudo privileges...                  "
+				echo "=============================================="
+				echo ''
+
+				echo $MultiHostVar4 | sudo -S date
+
+				echo ''
+				echo "=============================================="
+				echo "Privileges established.                       "
+				echo "=============================================="
+
+				sleep 5
+
+				clear
+
+				echo ''
+				echo "=============================================="
+				echo "Install OpenvSwitch RPMs...                   "
+				echo "=============================================="
+				echo ''
+
+				cd /opt/olxc/"$DistDir"/uekulele/openvswitch/rpmbuild/RPMS/x86_64
+			#	sudo yum -y localinstall openvswitch* 
+				sudo rpm -ivh openvswitch-*
+				OVSPackageCount=$(GetOVSPackageCount)
+				cd /opt/olxc/"$DistDir"/uekulele/openvswitch
+			
+				echo ''
+				echo "=============================================="
+				echo "Done: Install OpenvSwitch RPMs.               "
+				echo "=============================================="
+				echo ''
+
+				sleep 5
+
+				clear
+			fi
 		fi
+	
+	OVSPackageCount=$(GetOVSPackageCount)
 	done
 
 	if [ $OVSPackageCount -ge 2 ]
@@ -2229,7 +2608,7 @@ then
 	sleep 5
 
 	cd /opt/olxc/"$DistDir"/uekulele/openvswitch/rpmbuild/RPMS/x86_64
-	sudo yum -y localinstall openvswitch*
+	sudo rpm -ivh openvswitch*
 
 	echo ''
 	echo "=============================================="
@@ -2364,7 +2743,7 @@ clear
 # fi
 
 function CheckNameServerExists {
-	sudo lxc-ls -f | grep -c "$NameServer"
+	sudo lxc-ls -f | egrep -c "$NameServer | nsa"
 }
 NameServerExists=$(CheckNameServerExists)
 
@@ -2378,6 +2757,31 @@ then
 	sudo cp -p /etc/lxc/default.conf.bak /etc/lxc/default.conf
 fi
 
+if [ -f $DistDir/lxcimage/nsa.tar.gz ] && [ $Release -gt 6 ]
+then
+	sudo tar -xzPf $DistDir/lxcimage/nsa.tar.gz
+
+	if [ $LinuxFlavor = 'Oracle' ] && [ $Release -ge 7 ]
+	then
+		sudo sed -i 's/lxcbr0/virbr0/g' /var/lib/lxc/nsa/config
+	fi
+	
+	if [ $LinuxFlavor = 'Red' ] && [ $Release -ge 7 ]
+	then
+		sudo sed -i 's/lxcbr0/virbr0/g' /var/lib/lxc/nsa/config
+	fi
+	
+	if [ $LinuxFlavor = 'Fedora' ] && [ $Release -eq 8 ]
+	then
+		sudo sed -i 's/lxcbr0/virbr0/g' /var/lib/lxc/nsa/config
+	fi
+
+	if [ $(SoftwareVersion $LXCVersion) -ge $(SoftwareVersion "2.1.0") ]
+	then
+		sudo lxc-update-config -c /var/lib/lxc/nsa/config
+	fi
+fi
+
 if   [ $NameServerExists -eq 0 ] && [ $MultiHostVar2 = 'N' ]
 then
 		echo ''
@@ -2386,7 +2790,6 @@ then
 		echo "=============================================="
 		echo ''
 
-#		sudo tar -xzvPf "$DistDir"/uekulele/archives/nsa.tar.gz
 	
  		function CheckNSARunning {
  			sudo lxc-ls -f | grep nsa | grep -c RUNNING
@@ -2400,19 +2803,25 @@ then
  			echo "Try #$n of the primary method...              "
         		echo "                                              "
         		echo "Patience...download of rootfs takes time...   "
-			echo "THIS STEP HAS BEEN QUITE SLOW LATELY.  IT DOES"
-			echo "NOT SEEM TO BE AN IPV6 ISSUE.  IT IS PROBABLY "
-			echo "DUE TO SLOW SERVER AT CANONICAL.              "
+			echo "                                              "
+			echo "THIS STEP SOMETIMES TAKES AWHILE.             "
+			echo "IT DEPENDS ON DOWNLOAD SPEED AT SOURCE AND    "
+			echo "DESTINATION.                                  "
 			echo "                                              "
 			echo "SEE ALSO:                                     "
 			echo "https://github.com/lxc/lxd/issues/7136        "
 			echo "                                              "
-			echo "This step can easily take 10-15 minutes so    "
-			echo "go get a cup of tea or coffee and be PATIENT! "
+			echo "This step can 1 minute or 15 minutes so ...   "
+			echo "go get a cup of tea and be PATIENT if needed! "
         		echo "=============================================="
  			echo ''
- 
-  			sudo lxc-create -t download -n nsa -- --dist ubuntu --release xenial --arch amd64 --keyserver hkp://keyserver.ubuntu.com
+
+			if [ $LinuxFlavor = 'Fedora' ] && [ $Release -ge 8 ]
+			then
+				sudo lxc-create -n nsa --template download -- -d ubuntu -r xenial -a amd64
+			else
+  				sudo lxc-create -t download -n nsa -- --dist ubuntu --release xenial --arch amd64 --keyserver hkp://keyserver.ubuntu.com
+			fi
  
  			n=$((n+1))
  			NSARunning=$(CheckNSARunning)
@@ -2443,18 +2852,17 @@ then
  		echo "=============================================="
  		echo ''
  		echo "=============================================="
- 		echo "Trying alternate method...                    "
+ 		echo "Trying alternate method if necessary...       "
  		echo "=============================================="
  		echo ''
  
-  		sudo lxc-create -n nsa -t ubuntu -- --release xenial --arch amd64
+#  		sudo lxc-create -n nsa -t ubuntu -- --release xenial --arch amd64
  
  		if [ $(SoftwareVersion $LXCVersion) -ge $(SoftwareVersion "2.1.0") ]
  		then
  			sudo lxc-update-config -c /var/lib/lxc/nsa/config
  		fi
  
-	echo ''
 	echo "=============================================="
 	echo "Create LXC DNS DHCP container complete.       "
 	echo "=============================================="
@@ -2854,6 +3262,7 @@ then
 		echo ''
 	
 		sudo tar -xvf /opt/olxc/"$DistDir"/uekulele/archives/dns-dhcp-cont.tar -C / --touch
+		sudo sed -i 's/ubuntu\.common\.conf/common\.conf/' /var/lib/lxc/nsa/config
 #		sudo sed -i '/nameserver/d' /etc/resolv.conf
 
 		echo ''
@@ -2972,6 +3381,7 @@ then
 			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/root/dns-thaw.sh
 			sudo mv /var/lib/lxc/$NameServer/rootfs/var/lib/bind/fwd.orabuntu-lxc.com /var/lib/lxc/$NameServer/rootfs/var/lib/bind/fwd.$Domain1
 			sudo mv /var/lib/lxc/$NameServer/rootfs/var/lib/bind/rev.orabuntu-lxc.com /var/lib/lxc/$NameServer/rootfs/var/lib/bind/rev.$Domain1
+			
 			if [ $Release -eq 6 ]
 			then
 				sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /etc/dhcp/dhclient.conf
@@ -3002,7 +3412,6 @@ then
 
 	# Cleanup duplicate search lines in /etc/resolv.conf if Orabuntu-LXC has been re-run
 	sudo sed -i '$!N; /^\(.*\)\n\1$/!P; D' /etc/resolv.conf
-
 	sudo cat /etc/resolv.conf
 
 	sleep 5
@@ -3398,6 +3807,24 @@ then
         sudo lxc-update-config -c /var/lib/lxc/$NameServer/config
 fi
 
+echo ''
+echo "=============================================="
+echo "Install Packages for Filesystem Check...      "
+echo "=============================================="
+echo ''
+
+sudo yum -y install xfsprogs xfsdump xfsprogs-devel xfsprogs-qa-devel
+
+echo ''
+echo "=============================================="
+echo "Done: Install Packages for Filesystem Check.  "
+echo "=============================================="
+echo ''
+
+sleep 5
+
+clear
+
 if [ $MultiHostVar2 = 'N' ]
 then
 	echo ''
@@ -3410,11 +3837,25 @@ then
 	then
 		if [ $Release -ge 7 ]
 		then
- 			sudo service sw1 restart
- 			sudo service sx1 restart
-		fi
+			echo ''
+			echo "=============================================="
+			echo "Restart OpenvSwitches...                      "
+			echo "=============================================="
+			echo ''
 
-		sudo yum -y install xfsprogs xfsdump xfsprogs-devel xfsprogs-qa-devel
+ 			sudo service sw1 restart 
+ 			sudo service sx1 restart
+			
+			echo ''
+			echo "=============================================="
+			echo "Done: Restart OpenvSwitches...                "
+			echo "=============================================="
+			echo ''
+
+			sleep 5
+
+			clear
+		fi
 
 	        function CheckFileSystemTypeXfs {
 			stat --file-system --format=%T /var/lib/lxc | grep -c xfs
@@ -3452,10 +3893,18 @@ then
 
 			elif [ $Ftype -eq 1 ]
 			then
-	                	sudo lxc-stop -n $NameServer > /dev/null 2>&1
-				sudo lxc-copy -n $NameServer -N $NameServerBase -B overlayfs -s
-				NameServer=$NameServerBase
-				sudo lxc-start -n $NameServer
+				if [ $LinuxFlavor = 'Fedora' ] && [ $Release -eq 8 ]
+				then				
+	                		sudo lxc-stop -n $NameServer > /dev/null 2>&1
+					sudo lxc-copy -n $NameServer -N $NameServerBase -B overlayfs -s
+					NameServer=$NameServerBase
+					sudo lxc-start -n $NameServer
+				else
+	                		sudo lxc-stop -n $NameServer > /dev/null 2>&1
+					sudo lxc-copy -n $NameServer -N $NameServerBase -B overlayfs -s
+					NameServer=$NameServerBase
+					sudo lxc-start -n $NameServer
+				fi	
 			fi
 		fi
 
@@ -3520,6 +3969,20 @@ then
 			sudo lxc-start -n $NameServer
 		fi
 	fi
+
+	echo ''
+	echo "=============================================="
+	echo "Display $NameServer Info...                   "
+	echo "=============================================="
+	echo ''
+
+	sudo lxc-info $NameServer
+
+	echo ''
+	echo "=============================================="
+	echo "Done: Display $NameServer Info.               "
+	echo "=============================================="
+	echo ''
 
 	sleep 5
 
@@ -3774,8 +4237,8 @@ then
 	sudo sed -i "/lxc\.mount\.entry/s/#/ /" /var/lib/lxc/$NameServer/config
 	sudo sed -i "/Manage\-Orabuntu/s/afns1\-base/afns1/" /var/lib/lxc/$NameServer/config
 
-        sudo lxc-stop -n $NameServer
-        sleep 5
+        sudo lxc-stop -n  $NameServer
+	sleep 5
         sudo lxc-start -n $NameServer
 
 #       echo ''
@@ -4219,10 +4682,11 @@ then
         echo "=============================================="
         echo ''
 
-        sudo service systemd-resolved restart
-        sleep 2
-        systemd-resolve --status | head -6 | tail -5
+	sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" 		/etc/systemd/resolved.conf
+	sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" 	/etc/systemd/resolved.conf
 
+        sudo service systemd-resolved restart
+	
         echo ''
         echo "=============================================="
         echo "Done: Restart systemd-resolved.               "
@@ -4342,7 +4806,8 @@ then
 
 		echo ''
 		sleep 2
-		nslookup $NameServer
+		
+		nslookup $NameServer $NameServer
 		ping -c 3 $NameServer
 	
 		echo ''
@@ -4637,3 +5102,4 @@ echo ''
 echo "=============================================="
 echo "Next script to run: orabuntu-services-2.sh    "
 echo "=============================================="
+

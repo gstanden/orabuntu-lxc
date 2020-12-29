@@ -232,7 +232,7 @@ then
 
 		if [ -f /usr/bin/ol_yum_configure.sh ]
 		then
-			/usr/bin/ol_yum_configure.sh 
+			sudo /usr/bin/ol_yum_configure.sh > /dev/null 2>&1
 		fi
 
 	elif [ $OracleDistroRelease -eq 8 ]
@@ -248,22 +248,20 @@ then
         RL=$Release
 	SubDirName=uekulele
 	UbuntuMajorVersion=0
-	Release=0
 elif [ $LinuxFlavor = 'Red' ] || [ $LinuxFlavor = 'CentOS' ]
 then
-        if   [ $LinuxFlavor = 'Red' ]
+	if   [ $LinuxFlavor = 'Red' ]
         then
                 function GetRedHatVersion {
-                        sudo cat /etc/redhat-release | cut -f7 -d' ' | cut -f1 -d'.'
+                        sudo cat /etc/redhat-release | rev | cut -f2 -d' ' | cut -f2 -d'.'
                 }
-                RedHatVersion=$(GetRedHatVersion)
         elif [ $LinuxFlavor = 'CentOS' ]
         then
                 function GetRedHatVersion {
                         cat /etc/redhat-release | sed 's/ Linux//' | cut -f1 -d'.' | rev | cut -f1 -d' '
                 }
-                RedHatVersion=$(GetRedHatVersion)
         fi
+	RedHatVersion=$(GetRedHatVersion)
         RHV=$RedHatVersion
         Release=$RedHatVersion
         LF=$LinuxFlavor
@@ -277,7 +275,10 @@ then
                 sudo cat /etc/redhat-release | cut -f"$CutIndex" -d' ' | cut -f1 -d'.'
         }
         RedHatVersion=$(GetRedHatVersion)
-        if [ $RedHatVersion -ge 19 ]
+	if   [ $RedHatVersion -ge 28 ]
+	then
+		Release=8
+        elif [ $RedHatVersion -ge 19 ] && [ $RedHatVersion -le 27 ]
         then
                 Release=7
         elif [ $RedHatVersion -ge 12 ] && [ $RedHatVersion -le 18 ]
@@ -286,6 +287,7 @@ then
         fi
         LF=$LinuxFlavor
         RL=$Release
+	RHV=$RedHatVersion
 	SubDirName=uekulele
 	UbuntuMajorVersion=0
 elif [ $LinuxFlavor = 'Ubuntu' ] || [ $LinuxFlavor = 'Pop_OS' ]
@@ -300,8 +302,201 @@ then
                 cat /etc/lsb-release | grep DISTRIB_RELEASE | cut -f2 -d'=' | cut -f1 -d'.'
         }
         UbuntuMajorVersion=$(GetUbuntuMajorVersion)
-	Release=0
 	SubDirName=orabuntu
+	Release=0
+fi
+
+function GetFirewalldBackend {
+	sudo grep 'nftables' /etc/firewalld/firewalld.conf | grep FirewallBackend | grep -vc '#'
+}
+FirewalldBackend=$(GetFirewalldBackend)
+
+function GetCGH {
+	sudo grubby --info=ALL | grep -c 'systemd.unified_cgroup_hierarchy=0'
+}
+CGH=$(GetCGH)
+
+if [ $LinuxFlavor = 'Fedora' ] && [ $RedHatVersion -ge 31 ]
+then
+	if [ $FirewalldBackend -eq 1 ] || [ $CGH -eq 0 ]
+	then
+		echo ''
+		echo "=============================================="
+		echo "                                              "
+		echo "              !!  NOTICE !!                   "
+		echo "                                              "
+		echo "      Fedora 31 & higher use cgroupv2         "
+		echo " Orabuntu-LXC supports only cgroupv1 installs "
+		echo "                                              "
+		echo " This issue is documented extensively:        "
+		echo "                                              "
+		echo "    https://fedoramagazine.org/docker-and-fedora-32/"
+		echo "    https://poweruser.blog/how-to-install-docker-on-fedora-32-f2606c6934f1"
+		echo "    https://fedoraproject.org/wiki/Changes/CGroupsV2"
+		echo "    https://www.redhat.com/sysadmin/fedora-31-control-group-v2"
+		echo "                                              "
+		echo " In particular:                               "
+		echo "     https://linuxcontainers.org/lxc/news/    "
+		echo "     See note at above linuxcontainers.org:   "
+		echo "    'LXC 4 lacks support for pure cgroupv2'   "
+		echo "                                              "
+		echo " More on this here:                           "
+		echo "     https://wiki.debian.org/LXC/CGroupV2     "
+		echo "                                              "
+		echo "  Orabuntu-LXC can switch Fedora to cgroupv1  "
+		echo " Answer Y below to prepare Fedora for install "
+		echo "                                              "
+		echo "              !! IMPORTANT !!                 "
+		echo "                                              "
+		echo "   VALIDATE CHANGES TO KERNEL AND FIREWALL    "
+		echo "       ON TEST OR DEVELOPMENT FIRST!!         "
+		echo "                                              "
+		echo "  THE CHANGES THAT ARE ABOUT TO BE MADE ARE:  "
+		echo "                                              "
+		echo "  1.  Edit /etc/firewalld/firewalld.conf to   "
+		echo "      use FirewallBackend=iptables            "
+		echo "  2.  Run the following command to switch to  "
+		echo "      cgroupv1:                               "
+		echo "                                              "
+		echo '  sudo grubby --update-kernel=ALL             '
+		echo '  --args="systemd.unified_cgroup_hierarchy=0" '
+		echo "                                              "
+		echo "   To REJECT this update ANSWER 'N' below.    "
+		echo "   To ACCEPT this update ANSWER 'Y' below.    "
+		echo "                                              "
+		echo "   Answer 'Y' will cause AUTOMATIC UPDATE!    "
+		echo "   Answer 'Y' will cause AUTOMATIC REBOOT!    "
+		echo "                                              "
+		echo " After reboot login again as 'root' & re-run: "
+		echo "                                              "
+		echo "      'anylinux-services.HUB.HOST.sh'         "
+		echo "                    or                        "
+		echo "      'anylinux-services.GRE.HOST.sh'         "
+		echo "                                              "
+		echo "=============================================="
+		echo "                                              "
+		read -e -p "Fedora $RedHatVersion Re-Config [Y/N]   " -i "N" F8Update
+		echo "                                              "
+		echo "=============================================="
+		echo ''
+
+	        if [ $F8Update = 'Y' ]
+        	then
+                	sudo grubby --update-kernel=ALL --args="systemd.unified_cgroup_hierarchy=0"
+                	echo ''
+                	sudo sed -i 's/=nftables/=iptables/g' /etc/firewalld/firewalld.conf
+                	echo ''
+                	sleep 5
+                	sudo reboot
+		fi
+	
+	elif [ $FirewalldBackend -eq 0 ] || [ $CGH -gt 0 ]
+	then
+		echo ''
+        	echo "=============================================="
+		echo "$LinuxFlavor $RHV running iptables/cgroupv1.  "
+        	echo "=============================================="
+		echo ''
+
+		sleep 5
+
+		clear
+	else
+        	echo "=============================================="
+		echo "Orabuntu-LXC cannot be installed on current   "
+		echo "configuration of $LinuxFlavor $RedHatVersion. "
+		echo "Exiting ...                                   "
+        	echo "=============================================="
+		exit
+        fi
+fi
+
+if [ $LinuxFlavor = 'Red' ] && [ $Release -ge 8 ]
+then
+	if [ $FirewalldBackend -eq 1 ] 
+	then
+		echo ''
+		echo "=============================================="
+		echo "                                              "
+		echo "              !!  NOTICE !!                   "
+		echo "                                              "
+		echo "      RedHat 8 & higher use nftables          "
+		echo "    Orabuntu-LXC supports only iptables       "
+		echo "                                              "
+		echo "              !! IMPORTANT !!                 "
+		echo "                                              "
+		echo "        VALIDATE CHANGES TO FIREWALL          "
+		echo "       ON TEST OR DEVELOPMENT FIRST!!         "
+		echo "                                              "
+		echo "  THE CHANGES THAT ARE ABOUT TO BE MADE ARE:  "
+		echo "                                              "
+		echo "  1.  Edit /etc/firewalld/firewalld.conf to   "
+		echo "      use FirewallBackend=iptables            "
+		echo "                                              "
+		echo "   To REJECT this update ANSWER 'N' below.    "
+		echo "   To ACCEPT this update ANSWER 'Y' below.    "
+		echo "                                              "
+		echo "   Answer 'Y' will cause AUTOMATIC UPDATE!    "
+		echo "   Answer 'Y' will cause AUTOMATIC REBOOT!    "
+		echo "                                              "
+		echo " After reboot login again as 'root' & re-run: "
+		echo "                                              "
+		echo "      'anylinux-services.HUB.HOST.sh'         "
+		echo "                    or                        "
+		echo "      'anylinux-services.GRE.HOST.sh'         "
+		echo "                                              "
+		echo "=============================================="
+		echo "                                              "
+		read -e -p "RedHat $RedHatVersion Re-Config [Y/N]   " -i "N" R8Update
+		echo "                                              "
+		echo "=============================================="
+		echo ''
+
+	        if [ $R8Update = 'Y' ]
+        	then
+                	sudo sed -i 's/=nftables/=iptables/g' /etc/firewalld/firewalld.conf
+                	echo ''
+                	sleep 5
+                	sudo reboot
+		fi
+	
+	elif [ $FirewalldBackend -eq 0 ] 
+	then
+		echo ''
+        	echo "=============================================="
+		echo "$LinuxFlavor $RHV running iptables/cgroupv1.  "
+        	echo "=============================================="
+		echo ''
+
+		sleep 5
+
+		clear
+	else
+        	echo "=============================================="
+		echo "Orabuntu-LXC cannot be installed on current   "
+		echo "configuration of $LinuxFlavor $RedHatVersion. "
+		echo "Exiting ...                                   "
+        	echo "=============================================="
+		exit
+        fi
+fi
+
+if [ $LinuxFlavor = 'CentOS' ] && [ $Release -ge 7 ]
+then
+	echo ''
+	echo "==============================================" 
+	echo "Set firewalld on $LinuxFlavor $Release...     "
+	echo "=============================================="
+	echo ''
+
+	sudo firewall-cmd --zone=public  --add-masquerade --permanent
+	sudo firewall-cmd --reload
+	
+	echo ''
+	echo "==============================================" 
+	echo "Done: Set firewalld on $LinuxFlavor $Release. "
+	echo "=============================================="
+	echo ''
 fi
 
 cp -p GNU3 "$DistDir"/"$SubDirName"/archives/.
@@ -508,7 +703,9 @@ then
 
 	if [ $LinuxFlavor = 'Oracle' ] && [ $Release -eq 7 ]
 	then
-		sudo yum -y install unbound-libs-1.6.6-1*
+		sudo yum -y remove   unbound-libs-1.6.6-5* > /dev/null 2>&1
+		sudo yum -y install  unbound-libs-1.6.6-1* > /dev/null 2>&1
+		sudo yum -y install unbound-devel-1.6.6-1* > /dev/null 2>&1
 	fi
 
 	if [ $LinuxFlavor = 'Oracle' ] && [ $Release -eq 8 ]
@@ -662,6 +859,16 @@ echo 'MultiHost                 = '$MultiHost
 	if [ -z $9 ] && [ $LinuxFlavor != 'Fedora' ]
 	then
                	LxcOvsVersion="2.0.8:2.5.4"
+
+		if [ $LinuxFlavor = 'CentOS' ] && [ $Release -eq 7 ]
+		then
+               		LxcOvsVersion="2.0.8:2.12.1"
+		fi
+			
+		if [ $LinuxFlavor = 'Red' ] && [ $Release -eq 8 ]
+		then
+               		LxcOvsVersion="3.0.4:2.12.1"
+		fi
 			
 		if [ $LinuxFlavor = 'Oracle' ] && [ $Release -eq 8 ]
 		then
@@ -673,26 +880,32 @@ echo 'MultiHost                 = '$MultiHost
                		LxcOvsVersion="2.1.1:2.12.1"
 		fi
 			
+		if [ $LinuxFlavor = 'Red' ] && [ $Release -eq 7 ]
+		then
+               		LxcOvsVersion="2.1.1:2.12.1"
+		fi
+			
 		if [ $LinuxFlavor = 'Oracle' ] && [ $Release -eq 6 ]
 		then
                		LxcOvsVersion="2.0.8:2.5.4"
 		fi
 	fi
 
-	# Fedora MUST leave Lxc version at 2.0.9 but can change Ovs version.
-
 	if [ -z $9 ] && [ $LinuxFlavor = 'Fedora' ]
 	then
-		if [ $RedHatVersion -eq 27 ]
+		if   [ $RedHatVersion -ge 19 ] && [ $RedHatVersion -le 27 ]
 		then
-			LxcOvsVersion="2.0.9:2.5.4"  # Do NOT change 2.0.9 version of LXC here.  Must use 2.0.9 for now.
+			LxcOvsVersion="2.0.9:2.5.4"   # Do NOT change 2.0.9 version of LXC here.  Must use 2.0.9 for now.
+		elif [ $RedHatVersion -ge 28 ]
+		then
+			LxcOvsVersion="4.0.5:2.14.0"  # Do NOT change 4.0.5 version of LXC here.  Must use 4.0.5 for now.
 		fi
 	fi
 
 # pgroup3 end
 # user-settable parameters group 3 end
 
-if   [ $LinuxFlavor = 'RedHat' ] || [ $LinuxFlavor = 'CentOS' ] || [ $LinuxFlavor = 'Fedora' ]
+if   [ $LinuxFlavor = 'Red' ] || [ $LinuxFlavor = 'CentOS' ] || [ $LinuxFlavor = 'Fedora' ]
 then
 	echo 'LxcOvsVersion             = '$LxcOvsVersion
 elif [ $LinuxFlavor = 'Oracle' ]
@@ -861,7 +1074,7 @@ then
 
 	Sx1Index=201
 	function CheckDNSLookup {
-		sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" host -W1 $Sx1Net.$Sx1Index"
+		sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" getent hosts $Sx1Net.$Sx1Index"
 	}
 	DNSLookup=$(CheckDNSLookup)
 	DNSHit=$?
@@ -878,7 +1091,7 @@ then
  
 	Sw1Index=201
 	function CheckDNSLookup {
-		sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" host -W1 $Sw1Net.$Sw1Index"
+		sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" getent hosts $Sw1Net.$Sw1Index"
 	}
 	DNSLookup=$(CheckDNSLookup)
 	DNSHit=$?
@@ -950,6 +1163,9 @@ function GetMultiHostVar7 {
 	echo $MultiHost | cut -f7 -d':'
 }
 MultiHostVar7=$(GetMultiHostVar7)
+
+sudo yum -y     install net-tools > /dev/null 2>&1
+sudo apt-get -y install net-tools > /dev/null 2>&1
 
 if [ $MultiHostVar2 = 'Y' ] && [ $MultiHostVar3 = 'X' ] && [ $GREValue = 'N' ]
 then

@@ -121,6 +121,7 @@ then
                 sudo cat /etc/oracle-release | cut -f5 -d' ' | cut -f1 -d'.'
         }
         OracleDistroRelease=$(GetOracleDistroRelease)
+
 	if   [ $OracleDistroRelease -eq 7 ] || [ $OracleDistroRelease -eq 6 ]
 	then
 		CutIndex=7
@@ -128,26 +129,31 @@ then
 	then
 		CutIndex=6
 	fi
+
 	LF=$LinuxFlavor
 	LFA=$LinuxFlavor
+
         function GetRedHatVersion {
                 sudo cat /etc/redhat-release | cut -f"$CutIndex" -d' ' | cut -f1 -d'.'
         }
         RedHatVersion=$(GetRedHatVersion)
+
 	RHV=$RedHatVersion
         Release=$OracleDistroRelease
         RL=$Release
+
 elif [ $LinuxFlavor = 'Red' ] || [ $LinuxFlavor = 'CentOS' ]
 then
         if   [ $LinuxFlavor = 'Red' ]
         then
                 function GetRedHatVersion {
-                        sudo cat /etc/redhat-release | cut -f7 -d' ' | cut -f1 -d'.'
+                	sudo cat /etc/redhat-release | rev | cut -f2 -d' ' | cut -f2 -d'.'
                 }
                 RedHatVersion=$(GetRedHatVersion)
 		LF=$LinuxFlavor'Hat'
 		LinuxFlavor=$LF
 		LFA=$LinuxFlavor
+
         elif [ $LinuxFlavor = 'CentOS' ]
         then
                 function GetRedHatVersion {
@@ -168,7 +174,10 @@ then
         }
         RedHatVersion=$(GetRedHatVersion)
 	RHV=$RedHatVersion
-        if [ $RedHatVersion -ge 19 ]
+        if   [ $RedHatVersion -ge 28 ]
+        then
+                Release=8
+        elif [ $RedHatVersion -ge 19 ] && [ $RedHatVersion -le 27 ]
         then
                 Release=7
         elif [ $RedHatVersion -ge 12 ] && [ $RedHatVersion -le 18 ]
@@ -389,43 +398,41 @@ then
 			echo "=============================================="
 			echo ''	
 			echo "=============================================="
-			echo "OS Versions Compabtibility Notice Begin       "
+			echo "OS Versions Compatibility Notice Begin        "
 			echo "=============================================="
 			echo ''
 			echo "=============================================="
 			echo "              !!! NOTICE !!!                  "
 			echo "                                              "
-			echo "All OS version compabibility tests shown below"
+			echo "All OS version compatibility tests shown below"
 			echo "done on NEW FRESH INSTALL physical or VM hosts"
-			echo "AFTER ALL UPDATES applied.                    "
+			echo "AFTER ALL UPDATES applied and using LVM.      "
 			echo "=============================================="
 			echo ''
 			echo "=============================================="
-			echo "DISTRO RELEASE	KERN	  TYPE EDITION      "
-			echo "CentOS Linux 6.x	ELREPO-4  V,P 	ALL         "
-			echo "CentOS Linux 7.x	ALL	  V,P 	ALL         "
-			echo "Fedora Linux 27	  ALL       V,P   ALL       "
-			echo "Oracle Linux 6.x	RHEL,UEK  V,P 	ALL         "
-			echo "Oracle Linux 7.x	RHEL,UEK  V,P 	ALL         "
-			echo "Oracle Linux 8.x	RHEL,UEK  V,P 	ALL         "
-			echo "RedHat Linux 7.x	ALL       V,P 	ALL,AWS     "
-			echo "Ubuntu Linux 16.x	ALL       V,P 	S,D,AWS     "
-			echo "Ubuntu Linux 17.x	ALL       V,P 	S,D         "
-			echo "Ubuntu Linux 18.x	ALL       V,P 	S,D         "
-			echo "Ubuntu Linux 19.x	ALL       V,P 	S,D         "
-			echo "Ubuntu Linux 20.x	ALL       V,P 	S,D         "
-			echo "Pop_OS Linux 17.x	ALL       V,P 	ALL         "
+			echo "DISTRO RELEASE		KERNEL		    "
+			echo "CentOS Linux 6.10	ELREPO-4	    	    "
+			echo "CentOS Linux 7		ALL		    "
+			echo "CentOS Linux 8		ALL		    "
+			echo "Fedora Linux 22-33 	ALL		    "
+			echo "Oracle Linux 6.10	RH,UEK		    	    "
+			echo "Oracle Linux 7		RH,UEK		    "
+			echo "Oracle Linux 8		RH,UEK		    "
+			echo "RedHat Linux 6.10	ALL		    	    "
+			echo "RedHat Linux 7		ALL		    "
+			echo "RedHat Linux 8		ALL		    "
+			echo "Ubuntu Linux 16		ALL,AWS		    "
+			echo "Ubuntu Linux 17		ALL		    "
+			echo "Ubuntu Linux 18		ALL		    "
+			echo "Ubuntu Linux 19		ALL		    "
+			echo "Ubuntu Linux 20		ALL		    "
 			echo "                                              "
 			echo "Legend:                                       "
 			echo "                                              "
-			echo "	V=Virtual Host                              "
-			echo "	P=Physical Host                             "
-			echo "	S=Server Edition                            "
-			echo "	D=Desktop Edition                           "
 			echo "	ALL=All Editions			    "
-			echo "	AWS=Amazon Web Services			    "
-			echo "	REL=Release                                 "
-			echo "	KERN=Kernel Version                         "
+			echo "	AWS=Amazon Web Services EC2		    "
+			echo "	UEK=Oracle Unbreakable Enterprise Kernel    "
+			echo "  RH=RedHat                                   "
 			echo "=============================================="
 			echo ''
 			echo "=============================================="
@@ -485,84 +492,118 @@ then
 
 			if [ $FacterInstalled -ne 0 ] # 5
 			then
-       			 	echo ''
-       			 	echo "=============================================="
-       			 	echo "Install package prerequisites for facter...   "
-       			 	echo "=============================================="
-       			 	echo ''
+				if [ $LinuxFlavor = 'Fedora' ] && [ $RedHatVersion -ge 28 ]
+				then	
+       			 		echo ''
+       			 		echo "=============================================="
+       			 		echo "Install Facter on $LF $RedHatVersion...       "
+       			 		echo "=============================================="
+       			 		echo ''
 
-				if [ $Release -eq 8 ]
-				then
-					sudo yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
-					sudo yum -y install yum-utils
+					sudo dnf -y install facter
+       			 	
+					echo ''
+       			 		echo "=============================================="
+       			 		echo "Done: Install Facter on $LF $RedHatVersion.   "
+       			 		echo "=============================================="
+       			 		echo ''
 				else
-       			 		sudo yum -y install which ruby curl tar yum-utils
-				fi
+       			 		echo ''
+       			 		echo "=============================================="
+       			 		echo "Install package prerequisites for facter...   "
+       			 		echo "=============================================="
+       			 		echo ''
 
-				if [ $LinuxFlavor != 'Fedora' ]
-				then
-					if [ $Release -le 7 ]
+					if [ $Release -eq 8 ] && [ $LinuxFlavor != 'Fedora' ]
+					then
+						sudo yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
+						sudo yum -y install ruby curl tar yum-utils which facter
+					else
+       				 		sudo yum -y install which ruby curl tar yum-utils
+						curl -s --ipv4 http://downloads.puppetlabs.com/facter/facter-2.4.4.tar.gz | sudo tar xz; sudo ruby facter*/install.rb
+					fi
+
+					if [ $Release -le 7 ] && [ $LinuxFlavor != 'Fedora' ]
 					then
 						sudo yum-complete-transaction
 					fi
-				fi
+
+					if [ $Release -eq 7 ] && [ $LinuxFlavor = 'Fedora' ]
+					then
+						sudo dnf -y install ruby facter
+					fi
        	 	
-				echo ''
-       			 	echo "=============================================="
-       			 	echo "Facter package prerequisites installed.       "
-       		 		echo "=============================================="
-	
-				sleep 5
+					echo ''
+       				 	echo "=============================================="
+       				 	echo "Facter package prerequisites installed.       "
+       			 		echo "=============================================="
+		
+					sleep 5
 
-				clear
+					clear
 
-       			 	echo ''
-       			 	echo "=============================================="
-       			 	echo "Build and install Facter ...                  "
-       			 	echo "=============================================="
-       			 	echo ''
+       				 	echo ''
+       				 	echo "=============================================="
+       				 	echo "Build and install Facter ...                  "
+       				 	echo "=============================================="
+       				 	echo ''
 
-				sleep 5
+					sleep 5
 
-				if [ $RedHatVersion -eq 8 ]
-				then
-					sudo yum -y install facter ruby curl tar yum-utils which
-				else
-					mkdir -p /opt/olxc/"$DistDir"/uekulele/facter
-					cd /opt/olxc/"$DistDir"/uekulele/facter
-					curl -s --ipv4 http://downloads.puppetlabs.com/facter/facter-2.4.4.tar.gz | sudo tar xz; sudo ruby facter*/install.rb
+					if [ $RedHatVersion -eq 8 ]
+					then
+						if [ $LinuxFlavor = 'Oracle' ]
+						then
+							sudo yum -y install facter ruby curl tar yum-utils which
+
+						elif [ $LinuxFlavor = 'Red' ]
+						then
+							sudo yum -y install ruby curl tar yum-utils which
+							curl -s --ipv4 http://downloads.puppetlabs.com/facter/facter-2.4.4.tar.gz | sudo tar xz; sudo ruby facter*/install.rb
+						fi
+					else
+						mkdir -p /opt/olxc/"$DistDir"/uekulele/facter
+						cd /opt/olxc/"$DistDir"/uekulele/facter
+						curl -s --ipv4 http://downloads.puppetlabs.com/facter/facter-2.4.4.tar.gz | sudo tar xz; sudo ruby facter*/install.rb
+					fi
+
+					echo ''
+       				 	echo "=============================================="
+       				 	echo "Build and install Facter completed.           "
+       				 	echo "=============================================="
 				fi
-
-				echo ''
-       			 	echo "=============================================="
-       			 	echo "Build and install Facter completed.           "
-       			 	echo "=============================================="
-
 			else
-       			 	echo ''
-       			 	echo "=============================================="
+			 	echo ''
+       	 			echo "=============================================="
        			 	echo "Facter already installed.                     "
-       			 	echo "=============================================="
+       	 			echo "=============================================="
        			 	echo ''
-	
+
 			fi # OK 5
 
-			if [ $Release -gt 7 ] && [ $LinuxFlavor = 'Oracle' ]
+			if   [ $Release -gt 7 ] && [ $LinuxFlavor = 'Oracle' ]
 			then
 				function GetFacter {
 					facter --no-ruby virtual
 				}
-				Facter=$(GetFacter)
+			elif [ $Release -ge 8 ] && [ $LinuxFlavor = 'Fedora' ]
+			then
+				function GetFacter {
+					facter --no-ruby virtual
+				}
 			else
 				function GetFacter {
 					facter virtual
 				}
-				Facter=$(GetFacter)
 			fi
+			Facter=$(GetFacter)
 
-			sleep 5
+			sleep 2
 
 			clear
+
+			sudo yum -y     install net-tools > /dev/null 2>&1
+			sudo apt-get -y install net-tools > /dev/null 2>&1
 
 			if [ $Facter != 'physical' ] # 6
 			then
@@ -621,7 +662,8 @@ then
 						fi
 					fi
 				done
-				sleep 15
+
+				sleep 5
 
  				echo ''
 				echo "=============================================="
@@ -821,44 +863,43 @@ then
 			echo "=============================================="
 			echo ''	
 			echo "=============================================="
-			echo "OS Versions Compabtibility Notice Begin       "
+			echo "OS Versions Compatibility Notice Begin        "
 			echo "=============================================="
 			echo ''
 			echo "=============================================="
 			echo "              !!! NOTICE !!!                  "
 			echo "                                              "
-			echo "All OS version compabibility tests shown below"
+			echo "All OS version compatibility tests shown below"
 			echo "done on NEW FRESH INSTALL physical or VM hosts"
-			echo "AFTER ALL UPDATES applied.                    "
+			echo "AFTER ALL UPDATES applied and using LVM.      "
 			echo "=============================================="
 			echo ''
 			echo "=============================================="
-			echo "DISTRO RELEASE	KERN	  TYPE EDITION      "
-			echo "--------------	----	  ------------	    "
-			echo "CentOS Linux 6.x	ELREPO-4  V,P 	ALL         "
-			echo "CentOS Linux 7.x	ALL	  V,P 	ALL         "
-			echo "Fedora Linux 27		ALL	  V,P 	ALL "
-			echo "Oracle Linux 6.x	UEK4      V,P 	ALL         "
-			echo "Oracle Linux 7.x	RHEL,UEK4 V,P 	ALL         "
-			echo "Oracle Linux 8.x	RHEL	  V,P 	ALL         "
-			echo "RedHat Linux 7.x	ALL       V,P 	ALL,AWS     "
-			echo "Ubuntu Linux 16.x	ALL       V,P 	S,D,AWS     "
-			echo "Ubuntu Linux 17.x	ALL       V,P 	S,D         "
-			echo "Ubuntu Linux 18.x	ALL       V,P 	S,D         "
-			echo "Ubuntu Linux 19.x	ALL       V,P 	S,D         "
-			echo "Ubuntu Linux 20.x	ALL       V,P 	S,D         "
-			echo "Pop_OS Linux 17.x	ALL       V,P 	ALL         "
+			echo "DISTRO RELEASE		KERNEL		    "
+			echo "CentOS Linux 6.10		ELREPO4		    "
+			echo "CentOS Linux 7		ALL		    "
+			echo "CentOS Linux 8		ALL		    "
+			echo "Fedora Linux 27-33 	ALL		    "
+			echo "Oracle Linux 6.10		RH,UEK		    "
+			echo "Oracle Linux 7		RH,UEK		    "
+			echo "Oracle Linux 8		RH,UEK		    "
+			echo "RedHat Linux 6.10		ALL		    "
+			echo "RedHat Linux 7		ALL		    "
+			echo "RedHat Linux 8		ALL		    "
+			echo "Ubuntu Linux 16		ALL		    "
+			echo "Ubuntu Linux 17		ALL		    "
+			echo "Ubuntu Linux 18		ALL		    "
+			echo "Ubuntu Linux 19		ALL		    "
+			echo "Ubuntu Linux 20		ALL		    "
 			echo "                                              "
 			echo "Legend:                                       "
 			echo "                                              "
-			echo "	V=Virtual Host                              "
-			echo "	P=Physical Host                             "
-			echo "	S=Server Edition                            "
-			echo "	D=Desktop Edition                           "
+			echo "Legend:                                       "
+			echo "                                              "
 			echo "	ALL=All Editions			    "
-			echo "	AWS=Amazon Web Services			    "
-			echo "	REL=Release                                 "
-			echo "	KERN=Kernel Version                         "
+			echo "	AWS=Amazon Web Services EC2		    "
+			echo "	UEK=Oracle Unbreakable Enterprise Kernel    "
+			echo "  RH=RedHat                                   "
 			echo "=============================================="
 			echo ''
 			echo "=============================================="

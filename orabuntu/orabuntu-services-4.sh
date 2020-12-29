@@ -315,7 +315,6 @@ while [ $CopyCompleted -lt $NumCon ]
 do
 	# GLS 20160707 updated to use lxc-copy instead of lxc-clone for Ubuntu 16.04
 	# GLS 20160707 continues to use lxc-clone for Ubuntu 15.04 and 15.10
-	# GLS 20200504 Using sshpass to create a short-duration socket for nslookups.  Reference: https://jrs-s.net/2017/07/01/slow-ssh-logins/
 
 	function CheckSystemdResolvedInstalled {
 		sudo netstat -ulnp | grep 53 | sed 's/  */ /g' | rev | cut -f1 -d'/' | rev | sort -u | grep systemd- | wc -l
@@ -332,13 +331,13 @@ do
 		sshpass -p $MultiHostVar9 ssh -M -S /tmp/orabuntu -qt -o CheckHostIP=no -o StrictHostKeyChecking=no -o ControlPersist=60s $MultiHostVar8@$MultiHostVar5 exit
 
         	function CheckDNSLookup {
-			ssh -S /tmp/orabuntu $MultiHostVar5 "sudo -S <<< "$MultiHostVar9" lxc-attach -n $NameServerShortName -- nslookup -timeout=5 $ContainerPrefix$CloneIndex"	
+			ssh -S /tmp/orabuntu $MultiHostVar5 "sudo -S <<< "$MultiHostVar9" lxc-attach -n $NameServerShortName -- getent hosts $ContainerPrefix$CloneIndex"	
         	}
         	DNSLookup=$(CheckDNSLookup)
 		DNSHit=$PIPESTATUS
 	else
         	function CheckDNSLookup {
-                	sudo nslookup -timeout=1 $ContainerPrefix$CloneIndex | grep -v '#' | grep Address | grep '10\.207\.39'
+                	sudo getent hosts $ContainerPrefix$CloneIndex | grep -v '#' | grep Address | grep '10\.207\.39'
         	}
         	DNSLookup=$(CheckDNSLookup)
 		DNSHit=$PIPESTATUS
