@@ -762,7 +762,7 @@ fi
 	MajorRelease=$8
 	if [ -z $8 ]
 	then
-		MajorRelease=6
+		MajorRelease=7
 	fi
 	# echo 'Oracle Container Release  = '$MajorRelease
 
