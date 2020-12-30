@@ -676,14 +676,14 @@ then
 	
 	echo ''
 	echo "=============================================="
-	echo "getent hosts $ShortHost.$Domain1                  "
+	echo "nslookup $ShortHost.$Domain1                  "
 	echo "=============================================="
 	echo ''
 	
-	sudo getent hosts $ShortHost.$Domain1
+	nslookup $ShortHost.$Domain1
 	
 	echo "=============================================="
-	echo "Done: getent hosts $ShortHost.$Domain1            "
+	echo "Done: nslookup hosts $ShortHost.$Domain1      "
 	echo "=============================================="
 	
 	sleep 5
@@ -692,14 +692,14 @@ then
 	
 	echo ''
 	echo "=============================================="
-	echo "getent hosts $ShortHost.$Domain2                  "
+	echo "nslookup hosts $ShortHost.$Domain2            "
 	echo "=============================================="
 	echo ''
 	
-	sudo getent hosts $ShortHost.$Domain2
+	nslookup $ShortHost.$Domain2
 	
 	echo "=============================================="
-	echo "Done: getent hosts $ShortHost.$Domain2            "
+	echo "Done: nslookup hosts $ShortHost.$Domain2      "
 	echo "=============================================="
 
         sleep 5

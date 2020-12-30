@@ -221,30 +221,30 @@ sleep 5
 
 clear
 
-echo ''
-echo "=============================================="
-echo "Activate systemd-resolved ...                 "
-echo "=============================================="
-echo 
-
 if [ $UbuntuVersion = '16.04' ]
 then
+	echo ''
+	echo "=============================================="
+	echo "Activate systemd-resolved ...                 "
+	echo "=============================================="
+	echo 
+
 	sudo systemctl enable systemd-resolved
 	echo ''
 	sudo systemctl start  systemd-resolved
 	echo ''
-	sudo service systemd-resolved status | head -50
+	sudo systemd-resolve --status
 	echo ''
+
+	echo ''
+	echo "=============================================="
+	echo "Done: Activate systemd-resolved.              "
+	echo "=============================================="
+
+	sleep 5
+
+	clear
 fi
-
-echo ''
-echo "=============================================="
-echo "Done: Activate systemd-resolved.              "
-echo "=============================================="
-
-sleep 5
-
-clear
 
 function CheckSystemdResolvedInstalled {
 	sudo netstat -ulnp | grep 53 | sed 's/  */ /g' | rev | cut -f1 -d'/' | rev | sort -u | grep systemd- | wc -l
@@ -994,7 +994,7 @@ sleep 5
 clear
 
 function CheckNameServerExists {
-	sudo lxc-ls -f | grep -c "$NameServer"
+	sudo lxc-ls -f | grep -c $NameServer
 }
 NameServerExists=$(CheckNameServerExists)
 
@@ -1017,24 +1017,58 @@ then
 	echo ''
 	echo "=============================================="
 	echo "Trying Method 1...                            "
-	echo "                                              "
-	echo "Patience...download of rootfs takes time...   "
 	echo "=============================================="
 	echo ''
 
+	dig +short us.images.linuxcontainers.org
+
+	m=1
 	n=1
-
-	while [ $ContainerCreated -eq 0 ] && [ $n -le 5 ]
+	p=1
+	while [ $ContainerCreated -eq 0 ] && [ $m -le 3 ]
 	do
-		sudo lxc-create -t download -n nsa -- --dist ubuntu --release xenial --arch amd64 --keyserver hkp://keyserver.ubuntu.com:80
+		sudo rm -f ~/Downloads/orabuntu-lxc-master/lxcimage/nsa/*
+		sudo rm -f index.html
+		mkdir -p $DistDir/lxcimage/nsa
+		DistDir="/home/ubuntu/Downloads/orabuntu-lxc-master"
+		rm -f index.html
+		wget -4 -q https://us.images.linuxcontainers.org/images/ubuntu/xenial/amd64/default/
+		function GetBuildDate {
+       			grep folder.gif index.html | tail -1 | awk -F "\"" '{print $8}' | sed 's/\///g' | sed 's/\.//g'
+		}
+		BuildDate=$(GetBuildDate)
+		wget -4 -q https://us.images.linuxcontainers.org/images/ubuntu/xenial/amd64/default/"$BuildDate"/SHA256SUMS    -P "$DistDir"/lxcimage/nsa
 
+		for i in rootfs.tar.xz meta.tar.xz
+		do
+			rm -f $DistDir/lxcimage/nsa/$i
+			wget -4 -q --show-progress https://us.images.linuxcontainers.org/images/ubuntu/xenial/amd64/default/"$BuildDate"/$i -P "$DistDir"/lxcimage/nsa
+			diff <(shasum -a 256 "$DistDir"/lxcimage/nsa/$i | cut -f1,8 -d'/' | sed 's/  */ /g' | sed 's/\///' | sed 's/  */ /g') <(grep $i "$DistDir"/lxcimage/nsa/SHA256SUMS)
+		done
+		if [ $? -eq 0 ]
+		then
+			sudo lxc-create -t local -n nsa -- -m $DistDir/lxcimage/nsa/meta.tar.xz -f $DistDir/lxcimage/nsa/rootfs.tar.xz
+		else
+			m=$((m+1))
+		fi
+	ContainerCreated=$(ConfirmContainerCreated)
+	done
+	
+	while [ $ContainerCreated -eq 0 ] && [ $p -le 3 ]
+	do
+		echo ''
+		echo "=============================================="
+		echo "Trying Method 2...                            "
+		echo "=============================================="
+		echo ''
+	
+		sudo lxc-create -t download -n nsa -- --dist ubuntu --release xenial --arch amd64 --keyserver hkp://keyserver.ubuntu.com:80
 		if [ $? -ne 0 ]
 		then
 			sudo lxc-stop -n nsa -k
 			sudo lxc-destroy -n nsa
 			sudo rm -rf /var/lib/lxc/nsa
 			sudo lxc-create -t download -n nsa -- --dist ubuntu --release xenial --arch amd64 --keyserver hkp://p80.pool.sks-keyservers.net:80
-
 			if [ $? -ne 0 ]
 			then
 				sudo lxc-stop -n nsa -k
@@ -1044,35 +1078,33 @@ then
 			fi
 		fi
 
-		sleep 5
-		n=$((n+1))
+		p=$((p+1))
 		ContainerCreated=$(ConfirmContainerCreated)
 	done
 	
-	if [ $(SoftwareVersion $LXCVersion) -ge $(SoftwareVersion "2.1.0") ]
-	then
-		sudo lxc-update-config -c /var/lib/lxc/nsa/config
-	fi
-
 	echo ''
 	echo "=============================================="
-	echo "Trying Method 2...                            "
+	echo "Trying Method 3...                            "
 	echo "=============================================="
 	echo ''
 	
-	n=1
-
-	while [ $ContainerCreated -eq 0 ] && [ $n -le 5 ]
+	q=1
+	while [ $ContainerCreated -eq 0 ] && [ $q -le 3 ]
 	do
 		sudo lxc-create -n nsa -t ubuntu -- --release xenial --arch amd64
 		sleep 5
-		n=$((n+1))
+		q=$((q+1))
 		ContainerCreated=$(ConfirmContainerCreated)
 	done
 
 	if [ $(SoftwareVersion $LXCVersion) -ge $(SoftwareVersion "2.1.0") ]
 	then
 		sudo lxc-update-config -c /var/lib/lxc/nsa/config
+	else
+                sudo sed -i 's/lxc.net.0/lxc.network/g'         	/var/lib/lxc/$NameServer/config
+                sudo sed -i 's/lxc.net.1/lxc.network/g'         	/var/lib/lxc/$NameServer/config
+                sudo sed -i 's/lxc.uts.name/lxc.utsname/g'      	/var/lib/lxc/$NameServer/config
+		sudo sed -i 's/lxc.apparmor.profile/lxc.aa_profile/g'	/var/lib/lxc/$NameServer/config
 	fi
 
 	echo ''
@@ -2564,7 +2596,7 @@ then
 	echo "sudo mkdir -p /home/${USERNAME}/Manage-Orabuntu/backup-lxc-container/$NameServer/updates"a
 
 	sudo chown -R ${USERNAME}:${USERNAME} /home/${USERNAME}/Downloads 
-	sudo shown -R ${USERNAME}:${USERNAME} /home/${USERNAME}/Manage-Orabuntu
+	sudo chown -R ${USERNAME}:${USERNAME} /home/${USERNAME}/Manage-Orabuntu
 	sudo chmod -R 777 /home/${USERNAME}/Manage-Orabuntu
 
 	sudo sed -i "/lxc\.mount\.entry/s/#/ /"              /var/lib/lxc/$NameServer/config
@@ -2573,22 +2605,6 @@ then
 	sudo lxc-stop -n $NameServer
 	sleep 5
 	sudo lxc-start -n $NameServer
-
-        echo ''
-        echo "=============================================="
-	echo "Debug of new file transfer mechanism ..."
-        echo "=============================================="
-	echo ''
-
-	echo "NameServer = "$NameServer	
-	echo "USERNAME   = "${USERNAME}
-	sudo ls -l /home/${USERNAME}/Manage-Orabuntu
-	sudo ls -l /home/${USERNAME}/Manage-Orabuntu/backup-lxc-container/
-	sudo ls -l /home/${USERNAME}/Manage-Orabuntu/backup-lxc-container/$NameServer
-	sudo ls -l /home/${USERNAME}/Manage-Orabuntu/backup-lxc-container/$NameServer/updates
-	sudo lxc-attach -n $NameServer -- sudo touch /root/backup-lxc-container/afns1/updates/testfile
-	sudo ls -l /home/amide/Manage-Orabuntu/backup-lxc-container/afns1/updates
-	sudo lxc-attach -n $NameServer -- ls -l /root/backup-lxc-container/afns1/updates
 
         echo ''
         echo "=============================================="
@@ -2646,15 +2662,6 @@ then
 	
 	sudo lxc-attach -n $NameServer -- tar -cvzPf /root/backup-lxc-container/$NameServer/updates/backup_"$NameServer"_ns_update.tar.gz -T /root/ns_backup_update.lst --numeric-owner
         
-	echo ''
-        echo "=============================================="
-	echo "Debug of new file transfer mechanism ..."
-        echo "=============================================="
-	echo ''
-
-	sudo ls -l /home/amide/Manage-Orabuntu/backup-lxc-container/afns1/updates
-	sudo lxc-attach -n $NameServer -- ls -l /root/backup-lxc-container/afns1/updates
-
 	sudo tar -v --extract --file=/opt/olxc/"$DistDir"/orabuntu/archives/dns-dhcp-cont.tar -C / var/lib/lxc/nsa/rootfs/etc/systemd/system/dns-sync.service
         sudo tar -v --extract --file=/opt/olxc/"$DistDir"/orabuntu/archives/dns-dhcp-cont.tar -C / var/lib/lxc/nsa/rootfs/etc/systemd/system/dns-thaw.service
         sudo mv /var/lib/lxc/nsa/rootfs/etc/systemd/system/dns-sync.service /var/lib/lxc/"$NameServer"-base/rootfs/etc/systemd/system/dns-sync.service

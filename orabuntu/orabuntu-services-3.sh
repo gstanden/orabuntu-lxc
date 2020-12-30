@@ -272,9 +272,6 @@ echo "=============================================="
 
 cd /etc/network/if-up.d/openvswitch
 
-# GLS 20151222 I don't think this step does anything anymore.  Commenting for now, removal pending.
-# sudo sed -i "s/lxcora01/oel$OracleRelease$SeedPostfix/" /var/lib/lxc/oel$OracleRelease$SeedPostfix/config
-
 function GetSeedPostfix {
         sudo lxc-ls -f | grep oel"$OracleRelease"c | cut -f1 -d' ' | cut -f2 -d'c' | sed 's/^/c/'
 }

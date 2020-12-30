@@ -255,29 +255,80 @@ sleep 5
 
 clear
 
-echo ''
-echo "=============================================="
-echo "   Create the LXC Oracle Linux container      "
-echo "                                              "
-echo "    Note: Depends on download speed...        "
-echo "    Patience at downloading packages !        "
-echo "=============================================="
-echo ''
+m=1
+while [ $ContainerCreated -eq 0 ] && [ $m -le 3 ]
+do
+	echo ''
+	echo "=============================================="
+	echo "   Create the LXC Oracle Linux container      "
+	echo "                                              "
+	echo "      Note: Depends on download speed         "
+	echo "                                              "
+	echo "                 Method 1                     "
+	echo "=============================================="
+	echo ''
 
-# GLS 20180410 
-# Band-aid needs better solution/root cause analysis.  HUB host DNS/DHCP LXC container picks up a "ghost" DHCP IP that has to be cleared by a stop/start before Oracle container comes up on GRE host.
-# GLS 20180412 
-# This is no longer needed.  Problem was the the lxc.net.ipv4 was commented out in the config for the nameserver which was causing DHCP addresses to be issued instead of static.
-# sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" lxc-stop -n $NameServer -k; sudo -S <<< "$MultiHostVar9" lxc-start -n $NameServer"
+	dig +short us.images.linuxcontainers.org
+
+	echo ''
+
+	if [ -d ~/Downloads/orabuntu-lxc-master/lxcimage/oracle"$MajorRelease" ]
+	then
+		sudo rm -f ~/Downloads/orabuntu-lxc-master/lxcimage/oracle"$MajorRelease"/*
+	fi
+
+	mkdir -p "$DistDir"/lxcimage/oracle"$MajorRelease"
+	cd       "$DistDir"/lxcimage/oracle"$MajorRelease"
+	sudo rm -f index.html
+	wget -4 -q https://us.images.linuxcontainers.org/images/oracle/"$MajorRelease"/amd64/default/ -P "$DistDir"/lxcimage/oracle"$MajorRelease"
+	function GetBuildDate {
+		grep folder.gif index.html | tail -1 | awk -F "\"" '{print $8}' | sed 's/\///g' | sed 's/\.//g'
+	}
+	BuildDate=$(GetBuildDate)
+	wget -4 -q https://us.images.linuxcontainers.org/images/oracle/"$MajorRelease"/amd64/default/"$BuildDate"/SHA256SUMS -P "$DistDir"/lxcimage/oracle"$MajorRelease"
+	for i in rootfs.tar.xz meta.tar.xz
+	do
+		rm -f $DistDir/lxcimage/oracle"$MajorRelease"/$i
+		wget -4 -q --show-progress https://us.images.linuxcontainers.org/images/oracle/"$MajorRelease"/amd64/default/"$BuildDate"/$i -P "$DistDir"/lxcimage/oracle"$MajorRelease"
+		diff <(shasum -a 256 "$DistDir"/lxcimage/oracle"$MajorRelease"/$i | cut -f1,8 -d'/' | sed 's/  */ /g' | sed 's/\///' | sed 's/  */ /g') <(grep $i "$DistDir"/lxcimage/oracle"$MajorRelease"/SHA256SUMS)
+	done
+	if [ $? -eq 0 ]
+	then
+		sudo lxc-create -t local -n oel$OracleRelease$SeedPostfix -- -m $DistDir/lxcimage/oracle"$MajorRelease"/meta.tar.xz -f $DistDir/lxcimage/oracle"$MajorRelease"/rootfs.tar.xz
+
+		if [ $(SoftwareVersion $LXCVersion) -ge $(SoftwareVersion "2.1.0") ]
+		then
+  			sudo lxc-update-config -c /var/lib/lxc/oel$OracleRelease$SeedPostfix/config
+		fi
+		sudo lxc-ls -f
+	fi
+
+	ContainerCreated=$(ConfirmContainerCreated)
+	rm -f index.html
+	m=$((m+1))
+done
 
 sleep 5
 
-n=1
+clear
 
+n=1
 if [ $UbuntuMajorVersion -ge 20 ] # Because yum is no longer available in Ubuntu 20
 then
 	while [ $ContainerCreated -eq 0 ] && [ $n -le 5 ]
 	do
+		echo ''
+		echo "=============================================="
+		echo "   Create the LXC Oracle Linux container      "
+		echo "                                              "
+		echo "      Note: Depends on download speed         "
+		echo "                                              "
+		echo "                 Method 2                     "
+		echo "=============================================="
+		echo ''
+
+		sleep 5
+
 		sudo lxc-create -t download -n oel$OracleRelease$SeedPostfix -- --dist oracle --release $MajorRelease --arch amd64 --keyserver hkp://p80.pool.sks-keyservers.net:80
 		
 		if [ $? -ne 0 ]
@@ -303,6 +354,18 @@ then
 else
 	while [ $ContainerCreated -eq 0 ] && [ $n -le 5 ]
 	do
+		echo ''
+		echo "=============================================="
+		echo "   Create the LXC Oracle Linux container      "
+		echo "                                              "
+		echo "      Note: Depends on download speed         "
+		echo "                                              "
+		echo "                 Method 2                     "
+		echo "=============================================="
+		echo ''
+
+		sleep 5
+
 		if   [ $MajorRelease -le 7 ]
 		then
 			sudo lxc-create -n oel$OracleRelease$SeedPostfix -t oracle -- --release=$OracleVersion
@@ -356,12 +419,10 @@ echo "Extracting oracle-specific files to container."
 echo "=============================================="
 echo ''
 
-sudo mkdir -p /var/lib/lxc/oel$OracleRelease$SeedPostfix 
 cd /opt/olxc/"$DistDir"/orabuntu/archives
 
 if [ $MajorRelease -ge 8 ]
 then
-	sudo tar -vP --extract --file=lxc-oracle-files.tar --directory /var/lib/lxc/oel$OracleRelease$SeedPostfix rootfs/config.oracle.bak.oel$MajorRelease
 	sudo tar -vP --extract --file=lxc-oracle-files.tar --directory /var/lib/lxc/oel$OracleRelease$SeedPostfix rootfs/etc/ntp.conf
 	sudo tar -vP --extract --file=lxc-oracle-files.tar --directory /var/lib/lxc/oel$OracleRelease$SeedPostfix rootfs/etc/sysconfig/ntpd
 fi
@@ -400,62 +461,36 @@ if [ $MajorRelease -ge 6 ]
 then
 	echo ''
 	echo "=============================================="
-	echo "Begin LXC container MAC address reset...      "
+	echo "LXC config updates...                         "
 	echo "=============================================="
 	echo ''
 
-	sudo cp /var/lib/lxc/oel$OracleRelease$SeedPostfix/config /var/lib/lxc/oel$OracleRelease$SeedPostfix/config.original.bak
+	function GetNewMacAddress {
+        	echo -n 00:16:3e; dd bs=1 count=3 if=/dev/random 2>/dev/null | hexdump -v -e '/1 ":%02x"'
+        }
+        NewMacAddress=$(GetNewMacAddress)
 
-	function GetOriginalHwaddr {
-		sudo cat /var/lib/lxc/oel$OracleRelease$SeedPostfix/config | grep hwaddr | tail -1 | sed 's/\./\\\./g'
-	}
-	OriginalHwaddr=$(GetOriginalHwaddr)
-	echo $OriginalHwaddr | sed 's/\\//g'
+	sudo cp -p /etc/network/if-up.d/openvswitch/lxcora00-pub-ifup-sw1 	/etc/network/if-up.d/openvswitch/oel$OracleRelease$SeedPostfix-pub-ifup-sx1
+	sudo cp -p /etc/network/if-down.d/openvswitch/lxcora00-pub-ifdown-sw1 	/etc/network/if-down.d/openvswitch/oel$OracleRelease$SeedPostfix-pub-ifdown-sx1
 
-	sudo cp -p /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/config.oracle.bak.oel$MajorRelease /var/lib/lxc/oel$OracleRelease$SeedPostfix/config.oracle
-	sleep 10
+	sudo sh -c "echo 'lxc.net.0.mtu = $MultiHostVar7'											>> /var/lib/lxc/oel$OracleRelease$SeedPostfix/config"
+	sudo sh -c "echo 'lxc.net.0.script.up = /etc/network/if-up.d/openvswitch/ContainerName-pub-ifup-sx1' 					>> /var/lib/lxc/oel$OracleRelease$SeedPostfix/config"
+	sudo sh -c "echo 'lxc.net.0.script.down = /etc/network/if-down.d/openvswitch/ContainerName-pub-ifdown-sx1' 				>> /var/lib/lxc/oel$OracleRelease$SeedPostfix/config"
+	sudo sh -c "echo '# lxc.mount.entry = /dev/lxc_luns /var/lib/lxc/ContainerName/rootfs/dev/lxc_luns none defaults,bind,create=dir 0 0'	>> /var/lib/lxc/oel$OracleRelease$SeedPostfix/config"
+	sudo sh -c "echo '# lxc.mount.entry = shm dev/shm tmpfs size=3500m,nosuid,nodev,noexec,create=dir 0 0'					>> /var/lib/lxc/oel$OracleRelease$SeedPostfix/config"
+	sudo sed -i "s/ContainerName/oel$OracleRelease$SeedPostfix/g" 										   /var/lib/lxc/oel$OracleRelease$SeedPostfix/config
+	sudo sed -i 's/lxc\.net\.0\.link/\# lxc\.net\.0\.link/' 										   /var/lib/lxc/oel$OracleRelease$SeedPostfix/config	
+	sudo sed -i "s/\(hwaddr = \).*/\1$NewMacAddress/"               									   /var/lib/lxc/oel$OracleRelease$SeedPostfix/config
 
-	sudo sed -i "s/lxc\.network\.hwaddr.*/$OriginalHwaddr/" /var/lib/lxc/oel$OracleRelease$SeedPostfix/config.oracle
-	sudo cp -p /var/lib/lxc/oel$OracleRelease$SeedPostfix/config.oracle /var/lib/lxc/oel$OracleRelease$SeedPostfix/config
-
-	# sudo sed -i "s/lxc\.mount\.entry = \/dev\/lxc_luns/#lxc\.mount\.entry = \/dev\/lxc_luns/g" /var/lib/lxc/oel$OracleRelease$SeedPostfix/config
-
-	echo ''
-	echo "These should match..."
-	echo ''
-	sudo grep hwaddr /var/lib/lxc/oel$OracleRelease$SeedPostfix/config.original.bak | tail -1
-	sudo grep hwaddr /var/lib/lxc/oel$OracleRelease$SeedPostfix/config.oracle
-
-	sudo chmod 644 /var/lib/lxc/oel$OracleRelease$SeedPostfix/config
+	sudo sed -i 's/sw1/sx1/g' 						/etc/network/if-up.d/openvswitch/oel$OracleRelease$SeedPostfix-pub-ifup-sx1
+	sudo sed -i 's/tag=10/tag=11/g' 					/etc/network/if-up.d/openvswitch/oel$OracleRelease$SeedPostfix-pub-ifup-sx1
+	sudo sed -i 's/sw1/sx1/g' 						/etc/network/if-down.d/openvswitch/oel$OracleRelease$SeedPostfix-pub-ifdown-sx1
 
 	echo ''
 	echo "=============================================="
-	echo "LXC container MAC address reset complete.     "
+	echo "Done: LXC config updates.                     "
 	echo "=============================================="
 fi
-
-sleep 5
-
-clear
-
-echo ''
-echo "=============================================="
-echo "Legacy script cleanups...                     "
-echo "=============================================="
-echo ''
-
-sudo cp -p /etc/network/if-up.d/openvswitch/lxcora00-pub-ifup-sw1 /etc/network/if-up.d/openvswitch/oel$OracleRelease$SeedPostfix-pub-ifup-sx1
-sudo cp -p /etc/network/if-down.d/openvswitch/lxcora00-pub-ifdown-sw1 /etc/network/if-down.d/openvswitch/oel$OracleRelease$SeedPostfix-pub-ifdown-sx1
-
-sudo sed -i 's/-sw1/-sx1/g' /var/lib/lxc/oel$OracleRelease$SeedPostfix/config
-
-sudo ls -l /etc/network/if-up.d/openvswitch/oel$OracleRelease$SeedPostfix*
-sudo ls -l /etc/network/if-down.d/openvswitch/oel$OracleRelease$SeedPostfix*
-
-echo ''
-echo "=============================================="
-echo "Legacy script cleanups complete               "
-echo "=============================================="
 
 sleep 5
 
@@ -470,90 +505,54 @@ echo ''
 ping -c 3 yum.oracle.com
 
 function CheckNetworkUp {
-ping -c 3 yum.oracle.com | grep packet | cut -f3 -d',' | sed 's/ //g'
+	ping -c 3 yum.oracle.com | grep packet | cut -f3 -d',' | sed 's/ //g'
 }
 NetworkUp=$(CheckNetworkUp)
+
 n=1
 while [ "$NetworkUp" !=  "0%packetloss" ] && [ "$n" -le 5 ]
 do
-NetworkUp=$(CheckNetworkUp)
-n=$((n+1))
+	NetworkUp=$(CheckNetworkUp)
+	n=$((n+1))
 done
 
 if [ "$NetworkUp" != '0%packetloss' ]
 then
-echo ''
-echo "=============================================="
-echo "Ping yum.oracle.com not reliably pingable.    "
-echo "Script exiting.                               "
-echo "=============================================="
-exit
+	echo ''
+	echo "=============================================="
+	echo "Ping yum.oracle.com not reliably pingable.    "
+	echo "Script exiting.                               "
+	echo "=============================================="
+	exit
 else
-echo ''
-echo "=============================================="
-echo "Ping yum.oracle.com reliable.                 "
-echo "=============================================="
-echo ''
+	echo ''
+	echo "=============================================="
+	echo "Ping yum.oracle.com reliable.                 "
+	echo "=============================================="
+	echo ''
 fi
 
 sleep 5
 
 clear
 
-# if [ $MajorRelease -eq 7 ]
-# then
-# 	echo ''
-# 	echo "=============================================="
-# 	echo "Create LXC NTP service file...                "
-# 	echo "=============================================="
-# 	echo ''
+echo ''
+echo "=============================================="
+echo "Set NTP '-x' option in ntpd file...           "
+echo "=============================================="
+echo ''
 
-# 	Wants=ntpd.service
-# 	Before=ntpd.service
+# sudo sed -i -e '/OPTIONS/{ s/.*/OPTIONS="-g -x"/ }' /etc/sysconfig/ntpd
+sudo sed -i -e '/OPTIONS/{ s/.*/OPTIONS="-g -x"/ }' /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/etc/sysconfig/ntpd
 
-# 	sudo sh -c "echo '[Unit]'             	         		 		>  /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/etc/systemd/system/ntp.service"
-# 	sudo sh -c "echo 'Description=ntp Service'					>> /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/etc/systemd/system/ntp.service"
-# 	sudo sh -c "echo 'Wants=ntpd.service'						>> /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/etc/systemd/system/ntp.service"
-# 	sudo sh -c "echo 'Before=ntpd.service'						>> /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/etc/systemd/system/ntp.service"
-# 	sudo sh -c "echo ''								>> /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/etc/systemd/system/ntp.service"
-# 	sudo sh -c "echo '[Service]'							>> /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/etc/systemd/system/ntp.service"
-# 	sudo sh -c "echo 'Type=oneshot'							>> /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/etc/systemd/system/ntp.service"
-# 	sudo sh -c "echo 'User=root'							>> /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/etc/systemd/system/ntp.service"
-# 	sudo sh -c "echo 'RemainAfterExit=yes'						>> /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/etc/systemd/system/ntp.service"
-# 	sudo sh -c "echo 'ExecStart=/usr/sbin/ntpd -x'					>> /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/etc/systemd/system/ntp.service"
-# 	sudo sh -c "echo 'ExecStop=/bin/bash /usr/sbin/service /usr/sbin/ntpd stop'	>> /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/etc/systemd/system/ntp.service"
-# 	sudo sh -c "echo ''								>> /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/etc/systemd/system/ntp.service"
-# 	sudo sh -c "echo '[Install]'							>> /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/etc/systemd/system/ntp.service"
-# 	sudo sh -c "echo 'WantedBy=multi-user.target'					>> /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/etc/systemd/system/ntp.service"
+sleep 5
 
-# 	sudo cat /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/etc/systemd/system/ntp.service
-
-# 	echo ''
-# 	echo "=============================================="
-# 	echo "Created LXC NTP service file.                 "
-# 	echo "=============================================="
-
-# 	sleep 5
-
-# 	clear
+clear
 	
- 	echo ''
- 	echo "=============================================="
- 	echo "Set NTP '-x' option in ntpd file...           "
- 	echo "=============================================="
- 	echo ''
-
-#	sudo sed -i -e '/OPTIONS/{ s/.*/OPTIONS="-g -x"/ }' /etc/sysconfig/ntpd
- 	sudo sed -i -e '/OPTIONS/{ s/.*/OPTIONS="-g -x"/ }' /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/etc/sysconfig/ntpd
-
-	sleep 5
-
-	clear
-	
- 	echo ''
- 	echo "=============================================="
- 	echo "Done: Set NTP '-x' option in ntpd file.       "
- 	echo "=============================================="
+echo ''
+echo "=============================================="
+echo "Done: Set NTP '-x' option in ntpd file.       "
+echo "=============================================="
 
 # fi
 
@@ -582,7 +581,7 @@ then
         sudo sed -i 's/lxc.apparmor.profile/lxc.aa_profile/g'   /var/lib/lxc/oel$OracleRelease$SeedPostfix/config
 fi
 
-# Case 2 Creating Oracle Seed Container in 2.1+ LXC enviro.
+# Case 2 Creating Oracle Seed Container in 2.1.0+ LXC enviro.
 
 if [ $(SoftwareVersion $LXCVersion) -ge $(SoftwareVersion "2.1.0") ]
 then
@@ -607,22 +606,21 @@ echo "Initialize LXC Seed Container on OpenvSwitch.."
 echo "=============================================="
 
 cd /etc/network/if-up.d/openvswitch
-sudo sed -i "s/ContainerName/oel$OracleRelease$SeedPostfix/g" /var/lib/lxc/oel$OracleRelease$SeedPostfix/config
 
 function CheckContainerUp {
-sudo lxc-ls -f | grep oel$OracleRelease$SeedPostfix | sed 's/  */ /g' | egrep 'RUNNING|STOPPED'  | cut -f2 -d' '
+	sudo lxc-ls -f | grep oel$OracleRelease$SeedPostfix | sed 's/  */ /g' | egrep 'RUNNING|STOPPED'  | cut -f2 -d' '
 }
 ContainerUp=$(CheckContainerUp)
 
 function CheckPublicIP {
-sudo lxc-ls -f | sed 's/  */ /g' | grep oel$OracleRelease$SeedPostfix | cut -f3 -d' ' | sed 's/,//' | cut -f1-3 -d'.' | sed 's/\.//g'
+	sudo lxc-ls -f | sed 's/  */ /g' | grep oel$OracleRelease$SeedPostfix | cut -f3 -d' ' | sed 's/,//' | cut -f1-3 -d'.' | sed 's/\.//g'
 }
 PublicIP=$(CheckPublicIP)
 
 # GLS 20151217 Veth Pair Cleanups Scripts Create
 
 sudo chown root:root /etc/network/openvswitch/veth_cleanups.sh
-sudo chmod 755 /etc/network/openvswitch/veth_cleanups.sh
+sudo chmod 755       /etc/network/openvswitch/veth_cleanups.sh
 
 # GLS 20151217 Veth Pair Cleanups Scripts Create End
 
@@ -632,20 +630,12 @@ echo "Starting LXC Seed Container for Oracle        "
 echo "=============================================="
 echo ''
 
-# GLS 20180410 
-# Band-aid needs better solution/root cause analysis.  HUB host DNS/DHCP LXC container picks up a "ghost" DHCP IP that has to be cleared by a stop/start before Oracle container comes up on GRE host.
-# GLS 20180412 
-# This is no longer needed.  Problem was the the lxc.net.ipv4 was commented out in the config for the nameserver which was causing DHCP addresses to be issued instead of static.
-# sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" lxc-stop -n $NameServer -k; sudo -S <<< "$MultiHostVar9" lxc-start -n $NameServer"
-
 sleep 5
 
 sudo sed -i 's/sw1/sx1/' 				/etc/network/if-up.d/openvswitch/oel$OracleRelease$SeedPostfix*
 sudo sed -i 's/sw1/sx1/' 				/etc/network/if-down.d/openvswitch/oel$OracleRelease$SeedPostfix*
 sudo sed -i 's/tag=10/tag=11/' 				/etc/network/if-up.d/openvswitch/oel$OracleRelease$SeedPostfix*
 sudo sed -i 's/tag=10/tag=11/' 				/etc/network/if-down.d/openvswitch/oel$OracleRelease$SeedPostfix*
-sudo sed -i "s/mtu = 1500/mtu = $MultiHostVar7/" 	/var/lib/lxc/oel$OracleRelease$SeedPostfix/config
-sudo sed -i "s/MtuSetting/$MultiHostVar7/" 	 	/var/lib/lxc/oel$OracleRelease$SeedPostfix/config
 
 if [ $ContainerUp != 'RUNNING' ] || [ $PublicIP != 17229108 ]
 then
@@ -668,7 +658,15 @@ then
 		PublicIPIterative=$(CheckPublicIPIterative)
 		echo "Starting container $j ..."
 		echo ''
-		sudo lxc-start -n $j > /dev/null 2>&1
+		sudo lxc-start  -n $j
+
+		if [ $MajorRelease -eq 8 ]
+		then 
+			sudo lxc-attach -n $j -- sudo hostnamectl set-hostname oel$OracleRelease$SeedPostfix
+			sudo lxc-stop   -n $j
+			sudo lxc-start  -n $j
+		fi
+
 		i=1
 		while [ "$PublicIPIterative" != 17229108 ] && [ "$i" -le 10 ]
 		do
@@ -740,50 +738,17 @@ then
 	        sudo service systemd-resolved restart
 fi
 
-# function CheckNetworkUp {
-# 	ping -c 3 oel$OracleRelease$SeedPostfix.$Domain2 | grep packet | cut -f3 -d',' | sed 's/ //g'
-# }
-# NetworkUp=$(CheckNetworkUp)
-# n=1
-# while [ "$NetworkUp" !=  "0%packetloss" ] && [ "$n" -le 5 ]
-# do
-# NetworkUp=$(CheckNetworkUp)
-# n=$((n+1))
-# done
-
-# if [ $SystemdResolvedInstalled -eq 1 ]
-# then
-# 	sudo service systemd-resolved restart > /dev/null 2>&1
-# 	sleep 2
-# fi
-
-# ping -c 3 oel$OracleRelease$SeedPostfix.$Domain2
-
-# if [ "$NetworkUp" != '0%packetloss' ]
-# then
-# echo ''
-# echo "=============================================="
-# echo "Container oel$OracleRelease$SeedPostfix not pinging."
-# echo "=============================================="
-# else
-# echo ''
-# echo "=============================================="
-# echo "Container oel$OracleRelease$SeedPostfix is pingable."
-# echo "=============================================="
-# echo ''
-# fi
-
 sleep 5
 
 clear
 
 echo ''
 echo "=============================================="
-echo "Testing connectivity to oel$OracleRelease$SeedPostfix..."
+echo "Testing connectivity ...                      "
 echo "=============================================="
 echo ''
 echo "=============================================="
-echo "Output of 'uname -a' in oel$OracleRelease$SeedPostfix..."
+echo "Output of 'uname -a'                          "
 echo "=============================================="
 echo ''
 
@@ -791,16 +756,17 @@ sudo lxc-attach -n oel$OracleRelease$SeedPostfix -- uname -a
 
 if [ $? -ne 0 ]
 then
-echo ''
-echo "=============================================="
-echo "lxc-attach is failing...see if selinux is set."
-echo "Script exiting.                               "
-echo "=============================================="
-exit
+	echo ''
+	echo "=============================================="
+	echo "lxc-attach is failing...see if selinux is set."
+	echo "Script exiting.                               "
+	echo "=============================================="
+	exit
 fi
+
 echo ''
 echo "=============================================="
-echo "Test lxc-attach oel$OracleRelease$SeedPostfix successful. "
+echo "Test lxc-attach successful.                   "
 echo "=============================================="
 
 sleep 5

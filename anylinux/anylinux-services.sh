@@ -306,15 +306,22 @@ then
 	Release=0
 fi
 
-function GetFirewalldBackend {
-	sudo grep 'nftables' /etc/firewalld/firewalld.conf | grep FirewallBackend | grep -vc '#'
-}
-FirewalldBackend=$(GetFirewalldBackend)
+if [ -f /etc/firewalld/firewalld.conf ]
+then
+	function GetFirewalldBackend {
+		sudo grep 'nftables' /etc/firewalld/firewalld.conf | grep FirewallBackend | grep -vc '#'
+	}
+	FirewalldBackend=$(GetFirewalldBackend)
+fi
 
-function GetCGH {
-	sudo grubby --info=ALL | grep -c 'systemd.unified_cgroup_hierarchy=0'
-}
-CGH=$(GetCGH)
+if [ $LinuxFlavor != 'Ubuntu' ] && [ $LinuxFlavor != 'Pop_OS' ]
+then
+	sudo yum -y install grubby
+	function GetCGH {
+		sudo grubby --info=ALL | grep -c 'systemd.unified_cgroup_hierarchy=0'
+	}
+	CGH=$(GetCGH)
+fi
 
 if [ $LinuxFlavor = 'Fedora' ] && [ $RedHatVersion -ge 31 ]
 then
@@ -336,11 +343,10 @@ then
 		echo "    https://www.redhat.com/sysadmin/fedora-31-control-group-v2"
 		echo "                                              "
 		echo " In particular:                               "
+		echo "                                              "
 		echo "     https://linuxcontainers.org/lxc/news/    "
 		echo "     See note at above linuxcontainers.org:   "
 		echo "    'LXC 4 lacks support for pure cgroupv2'   "
-		echo "                                              "
-		echo " More on this here:                           "
 		echo "     https://wiki.debian.org/LXC/CGroupV2     "
 		echo "                                              "
 		echo "  Orabuntu-LXC can switch Fedora to cgroupv1  "
@@ -756,14 +762,14 @@ fi
 	MajorRelease=$8
 	if [ -z $8 ]
 	then
-		MajorRelease=7
+		MajorRelease=6
 	fi
 	# echo 'Oracle Container Release  = '$MajorRelease
 
 	PointRelease=$2
 	if [ -z $2 ]
 	then
-		PointRelease=3
+		PointRelease=9
 	fi
 	echo 'Oracle Container Version  = '$MajorRelease.$PointRelease
 

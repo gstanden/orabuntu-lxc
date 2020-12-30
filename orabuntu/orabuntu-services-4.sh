@@ -568,8 +568,15 @@ do
 	then
 		sudo rm -f /var/lib/lxc/$j/rootfs/var/run/dhclient.pid
 	fi
-	sudo lxc-start -n $j
-	sleep 10
+	sudo lxc-start  -n $j
+
+	if [ $MajorRelease -ge 8 ]
+	then
+		sudo lxc-attach -n $j -- hostnamectl set-hostname $j
+		sudo lxc-stop   -n $j
+		sudo lxc-start  -n $j
+	fi
+
 	sudo lxc-ls -f
 	echo ''
 done

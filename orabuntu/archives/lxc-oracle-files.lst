@@ -5,12 +5,8 @@ rootfs/etc/ssh/sshd_config
 rootfs/etc/sysconfig/network
 rootfs/etc/sysconfig/network-scripts/ifcfg-eth0
 rootfs/etc/sysconfig/ntpd
-rootfs/config.oracle.bak.oel5
-rootfs/config.oracle.bak.oel6
 rootfs/etc/rc.d/rc.local
 rootfs/etc/ntp.conf
 rootfs/etc/dhcp/dhclient.conf
-rootfs/config.oracle.bak.oel7
-rootfs/config.oracle.bak.oel8
 rootfs/GNU3
 rootfs/COPYING

@@ -68,7 +68,7 @@ then
 	echo "=============================================="
 	echo ''
 
-	sudo snap install docker   --edge
+	sudo snap install  docker --edge
 	sudo snap services docker
 
 	sleep 5
@@ -121,6 +121,7 @@ echo "Install User-Settable Docker Containers...    "
 echo "=============================================="
 echo ''
 
+docker create ubuntu:16:04
 # Install alpine-nettools
 sudo docker run -d -p 2200:22 raesene/alpine-nettools
 
