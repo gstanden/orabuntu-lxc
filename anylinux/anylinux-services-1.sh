@@ -239,6 +239,24 @@ sleep 5
 
 clear
 
+function CheckAptProcessRunning {
+        ps -ef | grep -v '_apt' | grep apt | grep -v grep | wc -l
+}
+AptProcessRunning=$(CheckAptProcessRunning)
+
+while [ $AptProcessRunning -gt 0 ]
+do
+        echo 'Waiting for running apt update process(es) to finish...sleeping for 10 seconds'
+        echo ''
+        ps -ef | grep -v '_apt' | grep apt | grep -v grep
+        sleep 10
+        AptProcessRunning=$(CheckAptProcessRunning)
+done
+
+sleep 5
+
+clear
+
 echo ''
 echo "==============================================" 
 echo "Verify networking up...                       "
