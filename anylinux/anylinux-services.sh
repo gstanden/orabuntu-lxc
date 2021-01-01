@@ -230,11 +230,6 @@ then
 	then
 		CutIndex=7
 
-		if [ -f /usr/bin/ol_yum_configure.sh ]
-		then
-			sudo /usr/bin/ol_yum_configure.sh > /dev/null 2>&1
-		fi
-
 	elif [ $OracleDistroRelease -eq 8 ]
 	then
 		CutIndex=6
@@ -762,7 +757,7 @@ fi
 	MajorRelease=$8
 	if [ -z $8 ]
 	then
-		MajorRelease=7
+		MajorRelease=6
 	fi
 	# echo 'Oracle Container Release  = '$MajorRelease
 
@@ -864,36 +859,50 @@ echo 'MultiHost                 = '$MultiHost
 	LxcOvsVersion=$9
 	if [ -z $9 ] && [ $LinuxFlavor != 'Fedora' ]
 	then
-               	LxcOvsVersion="2.0.8:2.5.4"
+	#	LxcOvsVersion="2.0.8:2.5.4"
+               	LxcOvsVersion="2.1.1:2.5.4"
 
-		if [ $LinuxFlavor = 'CentOS' ] && [ $Release -eq 7 ]
-		then
-               		LxcOvsVersion="2.0.8:2.12.1"
-		fi
-			
-		if [ $LinuxFlavor = 'Red' ] && [ $Release -eq 8 ]
+		if [ $Release -eq 8 ] && [ $LinuxFlavor = 'Red' ]
 		then
                		LxcOvsVersion="3.0.4:2.12.1"
 		fi
 			
-		if [ $LinuxFlavor = 'Oracle' ] && [ $Release -eq 8 ]
+		if [ $Release -eq 8 ] && [ $LinuxFlavor = 'Oracle' ]
 		then
                		LxcOvsVersion="3.0.4:2.12.1"
 		fi
 			
-		if [ $LinuxFlavor = 'Oracle' ] && [ $Release -eq 7 ]
+		if [ $Release -eq 8 ] && [ $LinuxFlavor = 'CentOS' ]
+		then
+               		LxcOvsVersion="3.0.4:2.12.1"
+		fi
+			
+		if [ $Release -eq 7 ] && [ $LinuxFlavor = 'Red' ]
 		then
                		LxcOvsVersion="2.1.1:2.12.1"
 		fi
 			
-		if [ $LinuxFlavor = 'Red' ] && [ $Release -eq 7 ]
+		if [ $Release -eq 7 ] && [ $LinuxFlavor = 'Oracle' ]
 		then
                		LxcOvsVersion="2.1.1:2.12.1"
 		fi
 			
-		if [ $LinuxFlavor = 'Oracle' ] && [ $Release -eq 6 ]
+		if [ $Release -eq 7 ] && [ $LinuxFlavor = 'CentOS' ]
 		then
-               		LxcOvsVersion="2.0.8:2.5.4"
+               	#	LxcOvsVersion="2.0.8:2.12.1"
+               		LxcOvsVersion="2.1.1:2.12.1"
+		fi
+			
+		if [ $Release -eq 6 ] && [ $LinuxFlavor = 'Oracle' ]
+		then
+               	#	LxcOvsVersion="2.0.8:2.5.4"
+               		LxcOvsVersion="2.1.1:2.5.4"
+		fi
+		
+		if [ $Release -eq 6 ] && [ $LinuxFlavor = 'CentOS' ]
+		then
+               	#	LxcOvsVersion="2.0.8:2.5.4"
+               		LxcOvsVersion="2.1.1:2.5.4"
 		fi
 	fi
 
@@ -902,6 +911,7 @@ echo 'MultiHost                 = '$MultiHost
 		if   [ $RedHatVersion -ge 19 ] && [ $RedHatVersion -le 27 ]
 		then
 			LxcOvsVersion="2.0.9:2.5.4"   # Do NOT change 2.0.9 version of LXC here.  Must use 2.0.9 for now.
+
 		elif [ $RedHatVersion -ge 28 ]
 		then
 			LxcOvsVersion="4.0.5:2.14.0"  # Do NOT change 4.0.5 version of LXC here.  Must use 4.0.5 for now.

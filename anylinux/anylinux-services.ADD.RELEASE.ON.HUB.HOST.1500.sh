@@ -45,6 +45,121 @@ echo "Script: ADD.RELEASE.ON.HUB.HOST.1500.sh       "
 echo "=============================================="
 echo ''
 
+function GetDistDir {
+        pwd | rev | cut -f2-20 -d'/' | rev
+}
+DistDir=$(GetDistDir)
+
+GetLinuxFlavors(){
+if   [[ -e /etc/oracle-release ]]
+then
+        LinuxFlavors=$(cat /etc/oracle-release | cut -f1 -d' ')
+elif [[ -e /etc/redhat-release ]]
+then
+        LinuxFlavors=$(cat /etc/redhat-release | cut -f1 -d' ')
+elif [[ -e /usr/bin/lsb_release ]]
+then
+        LinuxFlavors=$(lsb_release -d | awk -F ':' '{print $2}' | cut -f1 -d' ')
+elif [[ -e /etc/issue ]]
+then
+        LinuxFlavors=$(cat /etc/issue | cut -f1 -d' ')
+else
+        LinuxFlavors=$(cat /proc/version | cut -f1 -d' ')
+fi
+}
+GetLinuxFlavors
+
+function TrimLinuxFlavors {
+echo $LinuxFlavors | sed 's/^[ \t]//;s/[ \t]$//' | sed 's/\!//'
+}
+LinuxFlavor=$(TrimLinuxFlavors)
+
+if   [ $LinuxFlavor = 'Oracle' ]
+then
+        function GetOracleDistroRelease {
+                sudo cat /etc/oracle-release | cut -f5 -d' ' | cut -f1 -d'.'
+        }
+        OracleDistroRelease=$(GetOracleDistroRelease)
+        if   [ $OracleDistroRelease -eq 7 ] || [ $OracleDistroRelease -eq 6 ]
+        then
+                CutIndex=7
+
+                if [ -f /usr/bin/ol_yum_configure.sh ]
+                then
+                        sudo /usr/bin/ol_yum_configure.sh > /dev/null 2>&1
+                fi
+
+        elif [ $OracleDistroRelease -eq 8 ]
+        then
+                CutIndex=6
+        fi
+        function GetRedHatVersion {
+                sudo cat /etc/redhat-release | cut -f"$CutIndex" -d' ' | cut -f1 -d'.'
+        }
+        RedHatVersion=$(GetRedHatVersion)
+        Release=$OracleDistroRelease
+        LF=$LinuxFlavor
+        RL=$Release
+        SubDirName=uekulele
+        UbuntuMajorVersion=0
+elif [ $LinuxFlavor = 'Red' ] || [ $LinuxFlavor = 'CentOS' ]
+then
+        if   [ $LinuxFlavor = 'Red' ]
+        then
+                function GetRedHatVersion {
+                        sudo cat /etc/redhat-release | rev | cut -f2 -d' ' | cut -f2 -d'.'
+                }
+        elif [ $LinuxFlavor = 'CentOS' ]
+        then
+                function GetRedHatVersion {
+                        cat /etc/redhat-release | sed 's/ Linux//' | cut -f1 -d'.' | rev | cut -f1 -d' '
+                }
+        fi
+        RedHatVersion=$(GetRedHatVersion)
+        RHV=$RedHatVersion
+        Release=$RedHatVersion
+        LF=$LinuxFlavor
+        RL=$Release
+        SubDirName=uekulele
+        UbuntuMajorVersion=0
+elif [ $LinuxFlavor = 'Fedora' ]
+then
+        CutIndex=3
+        function GetRedHatVersion {
+                sudo cat /etc/redhat-release | cut -f"$CutIndex" -d' ' | cut -f1 -d'.'
+        }
+        RedHatVersion=$(GetRedHatVersion)
+        if   [ $RedHatVersion -ge 28 ]
+        then
+                Release=8
+        elif [ $RedHatVersion -ge 19 ] && [ $RedHatVersion -le 27 ]
+        then
+                Release=7
+        elif [ $RedHatVersion -ge 12 ] && [ $RedHatVersion -le 18 ]
+        then
+                Release=6
+        fi
+        LF=$LinuxFlavor
+        RL=$Release
+        RHV=$RedHatVersion
+        SubDirName=uekulele
+        UbuntuMajorVersion=0
+elif [ $LinuxFlavor = 'Ubuntu' ] || [ $LinuxFlavor = 'Pop_OS' ]
+then
+        function GetUbuntuVersion {
+                cat /etc/lsb-release | grep DISTRIB_RELEASE | cut -f2 -d'='
+        }
+        UbuntuVersion=$(GetUbuntuVersion)
+        LF=$LinuxFlavor
+        RL=$UbuntuVersion
+        function GetUbuntuMajorVersion {
+                cat /etc/lsb-release | grep DISTRIB_RELEASE | cut -f2 -d'=' | cut -f1 -d'.'
+        }
+        UbuntuMajorVersion=$(GetUbuntuMajorVersion)
+        SubDirName=orabuntu
+        Release=0
+fi
+
 if [ -e /sys/hypervisor/uuid ]
 then
         function CheckAWS {
@@ -69,8 +184,8 @@ GRE=N
 MTU=1500
 LOGEXT=`date +"%Y-%m-%d.%R:%S"`
 
-Operation=addrelease
-OpType=add
+# Operation=addrelease
+# OpType=add
 
 if [ -z $1 ]
 then
@@ -85,7 +200,7 @@ then
         echo "                                              "
         echo "=============================================="
         echo "                                              "
-        read -e -p "Install Type [new/rei/add]:             " -i "new" OpType
+        read -e -p "Install Type [new/rei/add]:             " -i "add" OpType
         echo "                                              "
         echo "=============================================="
 else
@@ -105,10 +220,10 @@ fi
 
 if [ -z $2 ]
 then
-        Product=no-product
         Product=workspaces
         Product=oracle-db
 	Product=oracle-gi-18c
+        Product=no-product
 else
         Product=$2
 fi
@@ -156,7 +271,83 @@ else
 	MultiHost="$Operation:N:X:X:X:X:$MTU:X:X:$GRE:$Product"
 fi
 
-./anylinux-services.sh $MultiHost 
+if [ $OpType = 'add' ]
+then
+	echo ''
+	echo "=============================================="
+	echo "Display Installation Parameters ...           "
+	echo "=============================================="
+	echo ''
+
+	echo 'Linux Host Flavor         = '$LinuxFlavor
+
+	if [ $LinuxFlavor != 'Ubuntu' ] && [ $LinuxFlavor != 'Pop_OS' ]
+	then
+        	echo 'Linux Host Release        = '$RedHatVersion
+        	echo 'Linux Host Base Release   = '$Release
+	else
+        	echo 'Linux Host Release        = '$UbuntuVersion
+        	echo 'Linux Host Base Release   = '$UbuntuMajorVersion
+	fi
+
+        MajorRelease=$8
+        if [ -z $8 ]
+        then
+                MajorRelease=8
+        fi
+        # echo 'Oracle Container Release  = '$MajorRelease
+
+        PointRelease=$2
+        if [ -z $2 ]
+        then
+                PointRelease=3
+        fi
+        echo 'Oracle Container Version  = '$MajorRelease.$PointRelease
+
+        NumCon=$3
+        if [ -z $3 ]
+        then
+                NumCon=2
+        fi
+        echo 'Oracle Container Count    = '$NumCon
+
+        Domain1=$4
+        if [ -z $4 ]
+        then
+                Domain1=urdomain1.com
+        fi
+        echo 'Domain1                   = '$Domain1
+
+        Domain2=$5
+        if [ -z $5 ]
+        then
+                Domain2=urdomain2.com
+        fi
+        echo 'Domain2                   = '$Domain2
+
+        NameServer=$6
+        if [ -z $6 ]
+        then
+                NameServer=afns1
+        fi
+        echo 'NameServer                = '$NameServer
+
+	/opt/olxc/home/ubuntu/Downloads/orabuntu-lxc-master/orabuntu/archives/product.tar
+
+        /opt/olxc/"$DistDir"/uekulele/uekulele-services-2.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $MultiHost $DistDir
+        /opt/olxc/"$DistDir"/uekulele/uekulele-services-3.sh $MajorRelease $PointRelease $Domain2 $MultiHost $DistDir $Product
+        /opt/olxc/"$DistDir"/products/$Product/$Product $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $OSMemRes $MultiHost $LxcOvsVersion $DistDir $SubDirName
+        /opt/olxc/"$DistDir"/uekulele/uekulele-services-4.sh $MajorRelease $PointRelease $NumCon $NameServer $MultiHost $DistDir $Product
+        /opt/olxc/"$DistDir"/uekulele/uekulele-services-5.sh $MajorRelease $PointRelease $Domain1 $Domain2 $NameServer $MultiHost $DistDir
+
+echo ''
+echo "=============================================="
+echo "Display Installation Parameters complete.     "
+echo "=============================================="
+
+else
+	./anylinux-services.sh $MultiHost 
+fi
 
 exit
 

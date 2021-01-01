@@ -146,15 +146,3 @@ echo ''
 sleep 5
 
 clear
-
-if [ $Product = 'no-product' ]
-then
-	echo 'LXC config file adjustments are configured for this product.'
-	echo "LXC config file adjustments can be configured in the product/$Product/$Product.cnf file"
-	echo ''
-fi
-
-sleep 5
-
-clear
-

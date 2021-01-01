@@ -260,10 +260,7 @@ echo "=============================================="
 echo ''
 
 sudo lxc-attach -n $SeedContainerName -- usermod --password `perl -e "print crypt('root','root');"` root
-sudo lxc-attach -n $SeedContainerName -- yum install -y openssh-server
-sudo lxc-stop   -n $SeedContainerName
-sudo lxc-start  -n $SeedContainerName
-sudo tar -xvf /opt/olxc/"$DistDir"/"$SubDirName"/archives/product.tar -C /var/lib/lxc/oel$OracleRelease$SeedPostfix --touch
+sudo tar -xvf /opt/olxc/"$DistDir"/"$SubDirName"/archives/product.tar -C /var/lib/lxc/$SeedContainerName --touch
 
 echo ''
 echo "=============================================="

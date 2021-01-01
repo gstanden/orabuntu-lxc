@@ -215,45 +215,6 @@ sleep 5
 
 clear
 
-echo ''
-echo "=============================================="
-echo "Ping yum.oracle.com test...                       "
-echo "=============================================="
-echo ''
-
-ping -c 3 yum.oracle.com
-
-function CheckNetworkUp {
-	ping -c 3 yum.oracle.com | grep packet | cut -f3 -d',' | sed 's/ //g'
-}
-NetworkUp=$(CheckNetworkUp)
-n=1
-while [ "$NetworkUp" !=  "0%packetloss" ] && [ "$n" -le 5 ]
-do
-NetworkUp=$(CheckNetworkUp)
-n=$((n+1))
-done
-
-if [ "$NetworkUp" != '0%packetloss' ]
-then
-echo ''
-echo "=============================================="
-echo "Ping yum.oracle.com not reliable.                 "
-echo "Script exiting.                               "
-echo "=============================================="
-exit
-else
-echo ''
-echo "=============================================="
-echo "Ping yum.oracle.com is reliable.                  "
-echo "=============================================="
-echo ''
-fi
-
-sleep 5
-
-clear
-
 function CheckSearchDomain2 {
         grep -c $Domain2 /etc/resolv.conf
 }
@@ -395,50 +356,6 @@ clear
 
 echo ''
 echo "=============================================="
-echo "Container $SeedContainerName ping test...     "
-echo "=============================================="
-echo ''
-
-if [ $SystemdResolvedInstalled -eq 1 ]
-then
-	sudo service systemd-resolved restart
-fi
-
-ping -c 3 $SeedContainerName
-
-function CheckNetworkUp {
-ping -c 3 $SeedContainerName | grep packet | cut -f3 -d',' | sed 's/ //g'
-}
-NetworkUp=$(CheckNetworkUp)
-n=1
-while [ "$NetworkUp" !=  "0%packetloss" ] && [ "$n" -le 5 ]
-do
-NetworkUp=$(CheckNetworkUp)
-n=$((n+1))
-done
-
-if [ "$NetworkUp" != '0%packetloss' ]
-then
-echo ''
-echo "=============================================="
-echo "Container $SeedContainerName not pingable.    "
-echo "Script exiting.                               "
-echo "=============================================="
-exit
-else
-echo ''
-echo "=============================================="
-echo "Container $SeedContainerName is pingable.     "
-echo "=============================================="
-echo ''
-fi
-
-sleep 5
-
-clear
-
-echo ''
-echo "=============================================="
 echo "Testing connectivity to $SeedContainerName... "
 echo "=============================================="
 echo ''
@@ -448,24 +365,9 @@ echo "=============================================="
 echo ''
 
 sudo lxc-attach -n $SeedContainerName -- uname -a
-if [ $? -ne 0 ]
-then
-	echo ''
-	echo "=============================================="
-	echo "lxc-attach $SeedContainerName has issue.      "
-	echo "lxc-attach $SeedContainerName must succeed.   "
-	echo "Fix issues retry script.                      "
-	echo "Script exiting.                               "
-	echo "=============================================="
-	exit
-else
-	sudo lxc-attach -n $SeedContainerName -- yum -y install openssh-server
-
-	echo ''
-	echo "=============================================="
-	echo "lxc-attach $SeedContainerName successful.     "
-	echo "=============================================="
-fi
+sudo lxc-attach -n $SeedContainerName -- usermod --password `perl -e "print crypt('root','root');"` root
+sudo lxc-attach -n $SeedContainerName -- yum -y install openssh-server
+sudo lxc-attach -n $SeedContainerName -- service sshd restart
 
 sleep 5
 
