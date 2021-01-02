@@ -1431,7 +1431,7 @@ then
 				echo ''
 
 				sleep 5
-				
+
 				sudo yum -y install automake gcc make rpmdevtools git
 				sudo mkdir -p /opt/olxc/"$DistDir"/uekulele/lxc-templates
 				sudo chown -R $Owner:$Group /opt/olxc
@@ -1444,7 +1444,7 @@ then
 				cp -p "$DistDir"/uekulele/archives/lxc-templates.spec /opt/olxc/"$DistDir"/uekulele/lxc-templates/.
 				sudo sed -i "s/LxcVersion/$LxcVersion/" /opt/olxc/"$DistDir"/uekulele/lxc-templates/lxc-templates.spec
 				rpmbuild --define "_topdir /opt/olxc/"$DistDir"/uekulele/lxc-templates/rpmbuild" -ba lxc-templates.spec
-				sudo rpm -ivh /opt/olxc/"$DistDir"/uekulele/lxc-templates/rpmbuild/RPMS/x86_64/lxc-templates-"$LxcVersion"-1.el8.x86_64.rpm
+				sudo rpm -ivh /opt/olxc/"$DistDir"/uekulele/lxc-templates/rpmbuild/RPMS/x86_64/lxc-templates*.rpm
 				
 				echo ''
 				echo "=============================================="
@@ -1452,7 +1452,7 @@ then
 				echo "=============================================="
 				echo ''
 
-				sleep 5
+				sleep 300
 
 				clear
 			fi
@@ -1499,7 +1499,17 @@ then
 				sudo sed -i '/^\%prep/i \%define debug_package \%\{nil\}'     /opt/olxc/"$DistDir"/uekulele/lxc/lxc.spec
 			fi
 
-			rpmbuild --define "_topdir /opt/olxc/"$DistDir"/uekulele/lxc/rpmbuild" -ba lxc.spec
+			if [ $LinuxFlavor = 'CentOS' ] && [ $Release -eq 7 ]
+			then
+				cd /opt/olxc/"$DistDir"/uekulele/lxc/rpmbuild/SOURCES
+				tar -xvf lxc-"$LxcVersion".tar.gz
+				cd lxc-"$LxcVersion"
+				./configure
+				make rpm
+			#	sudo rpm -ivh ~/rpmbuild/RPMS/x86_64/lxc-*.rpm
+			else
+				rpmbuild --define "_topdir /opt/olxc/"$DistDir"/uekulele/lxc/rpmbuild" -ba lxc.spec
+			fi
 
 			echo ''
 			echo "=============================================="
@@ -1518,9 +1528,19 @@ then
 
 			cd /opt/olxc/"$DistDir"/uekulele/lxc/rpmbuild/RPMS/x86_64
 
-			if [ $LinuxFlavor = 'CentOS' ] || [ $LinuxFlavor = 'Red' ] || [ $LinuxFlavor = 'Fedora' ]
+			if [ $LinuxFlavor = 'CentOS' ] && [ $Release -eq 7 ]
 			then
-				sudo yum -y erase lxc-libs
+				sudo yum -y remove lxc-1.0.11* lxc-libs*
+			fi
+				
+			if [ $LinuxFlavor = 'Red' ] || [ $LinuxFlavor = 'Fedora' ]
+			then
+				sudo yum -y erase lxc* lxc-libs*
+			fi
+
+			if [ $LinuxFlavor = 'CentOS' ] && [ $Release -eq 8 ]
+			then
+				sudo yum -y erase lxc* lxc-libs*
 			fi
 
 			if [ $LinuxFlavor = 'Oracle' ] && [ $Release -eq 7 ]
@@ -1540,10 +1560,15 @@ then
 				sudo rpm -ivh lxc* 
                         fi
 
-	
-
 			sleep 5
-			sudo rpm -ivh *.rpm
+		
+			if [ $LinuxFlavor = 'CentOS' ] && [ $Release -eq 7 ]
+			then
+				sudo rpm -ivh ~/rpmbuild/RPMS/x86_64/lxc-*.rpm
+			else
+				sudo rpm -ivh *.rpm
+			fi
+
 			cd /opt/olxc/"$DistDir"/uekulele/lxc
 			sudo systemctl daemon-reload
 			sudo systemct  enable lxc
@@ -2261,10 +2286,11 @@ then
  				sudo alternatives --set python /usr/bin/python3
  				python3 -m venv py36env
  				source py36env/bin/activate
- 				python3 -m pip install --upgrade pip
- 				python3 -m pip install six
- 				python3 -m pip install sphinx
-				sed -i 's/BuildRequires: python-sphinx/BuildRequires: python3-sphinx/g' openvswitch.spec
+ 			#	python3 -m pip install --upgrade pip
+ 			#	python3 -m pip install six
+ 			#	python3 -m pip install sphinx
+				sudo yum -y install python-sphinx
+			#	sed -i 's/BuildRequires: python-sphinx/BuildRequires: python3-sphinx/g' openvswitch.spec
 				sleep 5
 			fi
 			
@@ -2743,7 +2769,7 @@ clear
 # fi
 
 function CheckNameServerExists {
-	sudo lxc-ls -f | egrep -c "$NameServer | nsa"
+	sudo lxc-ls -f | egrep -c "$NameServer|nsa"
 }
 NameServerExists=$(CheckNameServerExists)
 
@@ -2757,112 +2783,142 @@ then
 	sudo cp -p /etc/lxc/default.conf.bak /etc/lxc/default.conf
 fi
 
-if [ -f $DistDir/lxcimage/nsa.tar.gz ] && [ $Release -gt 6 ]
-then
-	sudo tar -xzPf $DistDir/lxcimage/nsa.tar.gz
+sleep 5
 
-	if [ $LinuxFlavor = 'Oracle' ] && [ $Release -ge 7 ]
-	then
-		sudo sed -i 's/lxcbr0/virbr0/g' /var/lib/lxc/nsa/config
-	fi
+clear
+
+echo ''
+echo "=============================================="
+echo "Establish sudo privileges ...                 "
+echo "=============================================="
+echo ''
+
+sudo date
+
+echo ''
+echo "=============================================="
+echo "Establish sudo privileges successful.         "
+echo "=============================================="
+echo ''
+
+sleep 5
+
+clear
+
+function CheckNameServerExists {
+	sudo lxc-ls -f | egrep -c "$NameServer|nsa"
+}
+NameServerExists=$(CheckNameServerExists)
+
+function GetLXCVersion {
+        lxc-create --version
+}
+LXCVersion=$(GetLXCVersion)
+
+function ConfirmContainerCreated {
+        sudo lxc-ls -f | grep nsa | wc -l
+}
+ContainerCreated=$(ConfirmContainerCreated)
+
+if [ $NameServerExists -eq 0 ] && [ $MultiHostVar2 = 'N' ]
+then
+	echo ''
+	echo "=============================================="
+	echo "Create LXC DNS DHCP container...              "
+	echo "=============================================="
+	echo ''
+	echo "=============================================="
+	echo "Trying Method 1...                            "
+	echo "=============================================="
+	echo ''
+
+	dig +short us.images.linuxcontainers.org
+
+	m=1
+	n=1
+	p=1
+	while [ $ContainerCreated -eq 0 ] && [ $m -le 3 ]
+	do
+		sudo rm -f ~/Downloads/orabuntu-lxc-master/lxcimage/nsa/*
+		mkdir -p $DistDir/lxcimage/nsa
+		cd $DistDir/lxcimage/nsa
+		sudo rm -f index.html
+		wget -4 -q https://us.images.linuxcontainers.org/images/ubuntu/xenial/amd64/default/ -P "$DistDir"/lxcimage/nsa
+		function GetBuildDate {
+       			grep folder.gif index.html | tail -1 | awk -F "\"" '{print $8}' | sed 's/\///g' | sed 's/\.//g'
+		}
+		BuildDate=$(GetBuildDate)
+		wget -4 -q https://us.images.linuxcontainers.org/images/ubuntu/xenial/amd64/default/"$BuildDate"/SHA256SUMS    -P "$DistDir"/lxcimage/nsa
+
+		for i in rootfs.tar.xz meta.tar.xz
+		do
+			rm -f $DistDir/lxcimage/nsa/$i
+			wget -4 -q https://us.images.linuxcontainers.org/images/ubuntu/xenial/amd64/default/"$BuildDate"/$i -P "$DistDir"/lxcimage/nsa
+			diff <(shasum -a 256 "$DistDir"/lxcimage/nsa/$i | cut -f1,8 -d'/' | sed 's/  */ /g' | sed 's/\///' | sed 's/  */ /g') <(grep $i "$DistDir"/lxcimage/nsa/SHA256SUMS)
+		done
+		if [ $? -eq 0 ]
+		then
+			sudo lxc-create -t local -n nsa -- -m $DistDir/lxcimage/nsa/meta.tar.xz -f $DistDir/lxcimage/nsa/rootfs.tar.xz
+		else
+			m=$((m+1))
+		fi
+	ContainerCreated=$(ConfirmContainerCreated)
+	done
 	
-	if [ $LinuxFlavor = 'Red' ] && [ $Release -ge 7 ]
-	then
-		sudo sed -i 's/lxcbr0/virbr0/g' /var/lib/lxc/nsa/config
-	fi
+	while [ $ContainerCreated -eq 0 ] && [ $p -le 3 ]
+	do
+		echo ''
+		echo "=============================================="
+		echo "Trying Method 2...                            "
+		echo "=============================================="
+		echo ''
 	
-	if [ $LinuxFlavor = 'Fedora' ] && [ $Release -eq 8 ]
-	then
-		sudo sed -i 's/lxcbr0/virbr0/g' /var/lib/lxc/nsa/config
-	fi
+		sudo lxc-create -t download -n nsa -- --dist ubuntu --release xenial --arch amd64 --keyserver hkp://keyserver.ubuntu.com:80
+		if [ $? -ne 0 ]
+		then
+			sudo lxc-stop -n nsa -k
+			sudo lxc-destroy -n nsa
+			sudo rm -rf /var/lib/lxc/nsa
+			sudo lxc-create -t download -n nsa -- --dist ubuntu --release xenial --arch amd64 --keyserver hkp://p80.pool.sks-keyservers.net:80
+			if [ $? -ne 0 ]
+			then
+				sudo lxc-stop -n nsa -k
+				sudo lxc-destroy -n nsa
+				sudo rm -rf /var/lib/lxc/nsa
+                                sudo lxc-create -t download -n nsa -- --dist ubuntu --release xenial --arch amd64 --no-validate
+			fi
+		fi
+
+		p=$((p+1))
+		ContainerCreated=$(ConfirmContainerCreated)
+	done
+	
+	echo ''
+	echo "=============================================="
+	echo "Trying Method 3...                            "
+	echo "=============================================="
+	echo ''
+	
+	q=1
+	while [ $ContainerCreated -eq 0 ] && [ $q -le 3 ]
+	do
+		sudo lxc-create -n nsa -t ubuntu -- --release xenial --arch amd64
+		sleep 5
+		q=$((q+1))
+		ContainerCreated=$(ConfirmContainerCreated)
+	done
 
 	if [ $(SoftwareVersion $LXCVersion) -ge $(SoftwareVersion "2.1.0") ]
 	then
 		sudo lxc-update-config -c /var/lib/lxc/nsa/config
+	else
+                sudo sed -i 's/lxc.net.0/lxc.network/g'         	/var/lib/lxc/$NameServer/config
+                sudo sed -i 's/lxc.net.1/lxc.network/g'         	/var/lib/lxc/$NameServer/config
+                sudo sed -i 's/lxc.uts.name/lxc.utsname/g'      	/var/lib/lxc/$NameServer/config
+		sudo sed -i 's/lxc.apparmor.profile/lxc.aa_profile/g'	/var/lib/lxc/$NameServer/config
 	fi
-fi
 
-if   [ $NameServerExists -eq 0 ] && [ $MultiHostVar2 = 'N' ]
-then
-		echo ''
-		echo "=============================================="
-		echo "Create LXC DNS DHCP container...              "
-		echo "=============================================="
-		echo ''
-
-	
- 		function CheckNSARunning {
- 			sudo lxc-ls -f | grep nsa | grep -c RUNNING
- 		}
- 		NSARunning=$(CheckNSARunning)
- 
- 		n=1
- 		while [ $NSARunning -ne 1 ] && [ "$n" -le 3 ]
- 		do
- 			echo "=============================================="
- 			echo "Try #$n of the primary method...              "
-        		echo "                                              "
-        		echo "Patience...download of rootfs takes time...   "
-			echo "                                              "
-			echo "THIS STEP SOMETIMES TAKES AWHILE.             "
-			echo "IT DEPENDS ON DOWNLOAD SPEED AT SOURCE AND    "
-			echo "DESTINATION.                                  "
-			echo "                                              "
-			echo "SEE ALSO:                                     "
-			echo "https://github.com/lxc/lxd/issues/7136        "
-			echo "                                              "
-			echo "This step can 1 minute or 15 minutes so ...   "
-			echo "go get a cup of tea and be PATIENT if needed! "
-        		echo "=============================================="
- 			echo ''
-
-			if [ $LinuxFlavor = 'Fedora' ] && [ $Release -ge 8 ]
-			then
-				sudo lxc-create -n nsa --template download -- -d ubuntu -r xenial -a amd64
-			else
-  				sudo lxc-create -t download -n nsa -- --dist ubuntu --release xenial --arch amd64 --keyserver hkp://keyserver.ubuntu.com
-			fi
- 
- 			n=$((n+1))
- 			NSARunning=$(CheckNSARunning)
- 
- 			clear
- 		done
- 
- 		if [ $(SoftwareVersion $LXCVersion) -ge $(SoftwareVersion "2.1.0") ]
-       		then
-       	        	sudo lxc-update-config -c /var/lib/lxc/nsa/config
-       		fi
- 	
- 		echo ''
- 		echo "=============================================="
- 		echo "Method 1 complete.                            "
- 		echo "=============================================="
- 		echo ''
- 		echo "=============================================="
- 		echo "Establish sudo privileges...                  "
- 		echo "=============================================="
- 		echo ''
- 
- 		echo $MultiHostVar4 | sudo -S date
- 
- 		echo ''
- 		echo "=============================================="
- 		echo "Privileges established.                       "
- 		echo "=============================================="
- 		echo ''
- 		echo "=============================================="
- 		echo "Trying alternate method if necessary...       "
- 		echo "=============================================="
- 		echo ''
- 
-#  		sudo lxc-create -n nsa -t ubuntu -- --release xenial --arch amd64
- 
- 		if [ $(SoftwareVersion $LXCVersion) -ge $(SoftwareVersion "2.1.0") ]
- 		then
- 			sudo lxc-update-config -c /var/lib/lxc/nsa/config
- 		fi
- 
+	echo ''
 	echo "=============================================="
 	echo "Create LXC DNS DHCP container complete.       "
 	echo "=============================================="
@@ -2871,39 +2927,20 @@ then
 
 	clear
 
- 	echo ''
- 	echo "=============================================="
- 	echo "Establish sudo privileges...                  "
- 	echo "=============================================="
- 	echo ''
- 
- 	echo $MultiHostVar4 | sudo -S date
- 
- 	echo ''
- 	echo "=============================================="
- 	echo "Privileges established.                       "
- 	echo "=============================================="
- 
- 	sleep 5
- 
- 	clear
- 
- 	echo ''
- 	echo "=============================================="
- 	echo "Install & configure DNS DHCP LXC container... "
- 	echo "=============================================="
- 
- 	echo ''
- 	sudo touch /var/lib/lxc/nsa/rootfs/etc/resolv.conf > /dev/null 2>&1
- 	sudo sed -i '0,/.*nameserver.*/s/.*nameserver.*/nameserver 8.8.8.8\n&/' /var/lib/lxc/nsa/rootfs/etc/resolv.conf > /dev/null 2>&1
- 	
- 	sudo lxc-start -n nsa
- 
- 	echo ''
- 
- 	sleep 10
- 
- 	clear
+	echo ''
+	echo "=============================================="
+	echo "Install & configure DNS DHCP LXC container... "
+	echo "=============================================="
+
+	echo ''
+	sudo touch /var/lib/lxc/nsa/rootfs/etc/resolv.conf > /dev/null 2>&1
+	sudo sed -i '0,/.*nameserver.*/s/.*nameserver.*/nameserver 8.8.8.8\n&/' /var/lib/lxc/nsa/rootfs/etc/resolv.conf > /dev/null 2>&1
+	sudo lxc-start -n nsa
+	echo ''
+
+	sleep 5 
+
+	clear
 
 	echo ''
 	echo "=============================================="
@@ -2939,13 +2976,13 @@ then
 	echo "=============================================="
 	echo ''
 
- 	sudo lxc-attach -n nsa -- sudo apt-get -y update
- 	sudo lxc-attach -n nsa -- sudo apt-get -y install bind9 isc-dhcp-server bind9utils dnsutils openssh-server man awscli sshpass
+	sudo lxc-attach -n nsa -- sudo apt-get -y update
+	sudo lxc-attach -n nsa -- sudo apt-get -y install bind9 isc-dhcp-server bind9utils dnsutils openssh-server man awscli sshpass
 
- 	sleep 2
+	sleep 2
 
- 	sudo lxc-attach -n nsa -- sudo service isc-dhcp-server start
- 	sudo lxc-attach -n nsa -- sudo service bind9 start
+	sudo lxc-attach -n nsa -- sudo service isc-dhcp-server start
+	sudo lxc-attach -n nsa -- sudo service bind9 start
 
 	echo ''
 	echo "=============================================="
@@ -2959,16 +2996,17 @@ then
 
 	echo ''
 	echo "=============================================="
-	echo "Establish sudo privileges...                  "
+	echo "Create DNS Replication Landing Zone ...       "
 	echo "=============================================="
 	echo ''
 
-	echo $MultiHostVar4 | sudo -S date
+#	sudo lxc-attach -n nsa -- sudo mkdir -p /root/backup-lxc-container/$NameServerBase/updates
 
 	echo ''
 	echo "=============================================="
-	echo "Privileges established.                       "
+	echo "Done: Create DNS Replication Landing Zone.    "
 	echo "=============================================="
+	echo ''
 
 	sleep 5
 
@@ -2989,13 +3027,7 @@ then
 	echo "=============================================="
 	echo ''
 
-	if [ $LinuxFlavor = 'CentOS' ] && [ $Release -eq 6 ]
-	then
-		sudo lxc-stop -n nsa -k
-	else
-		sudo lxc-stop -n nsa
-	fi
-
+	sudo lxc-stop -n nsa
 	sudo lxc-info -n nsa
 
 	echo ''

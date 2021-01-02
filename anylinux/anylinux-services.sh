@@ -329,7 +329,24 @@ fi
 
 if [ $LinuxFlavor != 'Ubuntu' ] && [ $LinuxFlavor != 'Pop_OS' ]
 then
+	echo ''
+	echo "=============================================="
+	echo "Install package grubby ...                    "
+	echo "=============================================="
+	echo ''
+
 	sudo yum -y install grubby
+	
+	echo ''
+	echo "=============================================="
+	echo "Install package grubby ...                    "
+	echo "=============================================="
+	echo ''
+
+	sleep 5
+
+	clear
+
 	function GetCGH {
 		sudo grubby --info=ALL | grep -c 'systemd.unified_cgroup_hierarchy=0'
 	}
@@ -502,6 +519,10 @@ fi
 
 if [ $LinuxFlavor = 'CentOS' ] && [ $Release -ge 7 ]
 then
+	sleep 5
+
+	clear
+
 	echo ''
 	echo "==============================================" 
 	echo "Set firewalld on $LinuxFlavor $Release...     "
@@ -516,6 +537,10 @@ then
 	echo "Done: Set firewalld on $LinuxFlavor $Release. "
 	echo "=============================================="
 	echo ''
+
+	sleep 5
+
+	clear
 fi
 
 cp -p GNU3 "$DistDir"/"$SubDirName"/archives/.
@@ -775,14 +800,14 @@ fi
 	MajorRelease=$8
 	if [ -z $8 ]
 	then
-		MajorRelease=6
+		MajorRelease=8
 	fi
 	# echo 'Oracle Container Release  = '$MajorRelease
 
 	PointRelease=$2
 	if [ -z $2 ]
 	then
-		PointRelease=9
+		PointRelease=3
 	fi
 	echo 'Oracle Container Version  = '$MajorRelease.$PointRelease
 
@@ -908,7 +933,7 @@ echo 'MultiHost                 = '$MultiHost
 		if [ $Release -eq 7 ] && [ $LinuxFlavor = 'CentOS' ]
 		then
                	#	LxcOvsVersion="2.0.8:2.12.1"
-               		LxcOvsVersion="2.1.1:2.12.1"
+               		LxcOvsVersion="3.0.4:2.12.1"
 		fi
 			
 		if [ $Release -eq 6 ] && [ $LinuxFlavor = 'Oracle' ]

@@ -198,63 +198,9 @@ function GetLXCVersion {
 LXCVersion=$(GetLXCVersion)
 
 function CheckSystemdResolvedInstalled {
-                sudo netstat -ulnp | grep 53 | sed 's/  */ /g' | rev | cut -f1 -d'/' | rev | sort -u | grep systemd- | wc -l
-        }
+	sudo netstat -ulnp | grep 53 | sed 's/  */ /g' | rev | cut -f1 -d'/' | rev | sort -u | grep systemd- | wc -l
+}
 SystemdResolvedInstalled=$(CheckSystemdResolvedInstalled)
-
-sleep 5
-
-clear
-echo ''
-echo "=============================================="
-echo "Ping yum.oracle.com test...               "
-echo "=============================================="
-echo ''
-
-if [ $Release -gt 6 ] && [ $LinuxFlavor = 'Oracle' ]
-then
-	ping -c 3 yum.oracle.com -4
-else
-	ping -c 3 yum.oracle.com
-fi
-
-if [ $Release -gt 6 ] && [ $LinuxFlavor = 'Oracle' ]
-then
-	function CheckNetworkUp {
-		ping -c 3 yum.oracle.com -4 | grep packet | cut -f3 -d',' | sed 's/ //g'
-	}
-	NetworkUp=$(CheckNetworkUp)
-else
-	function CheckNetworkUp {
-		ping -c 3 yum.oracle.com | grep packet | cut -f3 -d',' | sed 's/ //g'
-	}
-	NetworkUp=$(CheckNetworkUp)
-fi
-
-n=1
-while [ "$NetworkUp" !=  "0%packetloss" ] && [ "$n" -le 5 ]
-do
-NetworkUp=$(CheckNetworkUp)
-n=$((n+1))
-done
-
-if [ "$NetworkUp" != '0%packetloss' ]
-then
-echo ''
-echo "=============================================="
-echo "Ping yum.oracle.com not reliable.             "
-echo "Script exiting.                               "
-echo "=============================================="
-
-exit
-
-else
-echo ''
-echo "=============================================="
-echo "Ping google.com is reliable.                  "
-echo "=============================================="
-echo ''
-fi
 
 sleep 5
 
@@ -398,75 +344,6 @@ clear
 
 echo ''
 echo "=============================================="
-echo "Container $SeedContainerName ping test...     "
-echo "=============================================="
-echo ''
-
-function GetDhcpRange {
-	cat /etc/sysconfig/lxc-net | grep LXC_DHCP_RANGE | cut -f2 -d'=' | sed 's/"//g' 
-}
-DhcpRange=$(GetDhcpRange)
-DHR="$DhcpRange"
-sudo sed -i "s/DHCP-RANGE-OLXC/dhcp-range=$DHR/" /etc/dnsmasq.conf
-
-if [ $Release -ge 7 ]
-then
-	sudo systemctl daemon-reload
-fi
-
-sudo service lxc-net restart > /dev/null 2>&1
-
-ping -c 3 $SeedContainerName
-
-function CheckNetworkUp {
-ping -c 3 $SeedContainerName | grep packet | cut -f3 -d',' | sed 's/ //g'
-}
-NetworkUp=$(CheckNetworkUp)
-n=1
-while [ "$NetworkUp" !=  "0%packetloss" ] && [ "$n" -le 5 ]
-do
-NetworkUp=$(CheckNetworkUp)
-n=$((n+1))
-done
-
-if [ "$NetworkUp" != '0%packetloss' ]
-then
-	echo ''
-	echo "=============================================="
-	echo "Container $SeedContainerName not pingable.    "
-	echo "Script exiting.                               "
-	echo "=============================================="
-else
-	echo ''
-	echo "=============================================="
-	echo "Container $SeedContainerName is pingable.     "
-	echo "=============================================="
-	echo ''
-fi
-
-sleep 5
-
-clear
-
-echo ''
-echo "=============================================="
-echo "Establish sudo privileges...                  "
-echo "=============================================="
-echo ''
-
-echo $MultiHostVar4 | sudo -S date
-
-echo ''
-echo "=============================================="
-echo "Privileges established.                       "
-echo "=============================================="
-
-sleep 5
-
-clear
-
-echo ''
-echo "=============================================="
 echo "Testing connectivity to $SeedContainerName... "
 echo "=============================================="
 echo ''
@@ -476,111 +353,10 @@ echo "=============================================="
 echo ''
 
 sudo lxc-attach -n $SeedContainerName -- uname -a
-if [ $? -ne 0 ]
-then
-	echo ''
-	echo "=============================================="
-	echo "lxc-attach to $SeedContainerName as issue.    "
-	echo "lxc-attach to $SeedContainerName must succeed."
-	echo "Fix issues retry script.                      "
-	echo "Script exiting.                               "
-	echo "=============================================="
-	exit
-else
-	# GLS 20180204 Make sure MTU is set correctly in container.
-
-	if [ $MultiHostVar2 = 'Y' ]
-	then
-		sudo lxc-attach -n $SeedContainerName -- ip link set eth0 mtu $MultiHostVar7
-	fi
-
-	echo ''
-	echo "=============================================="
-	echo "lxc-attach $SeedContainerName successful.     "
-	echo "=============================================="
-	echo ''
-fi
-
-sleep 5
-
-clear
-
-# echo ''
-# echo "=============================================="
-# echo "Configuring $SeedContainerName for Oracle...  "
-# echo "=============================================="
-# echo ''
-# echo "=============================================="
-# echo "Note: sendmail install takes awhile (patience)"
-# echo "The install may seem to hang at sendmail...   "
-# echo "Give it a minute or two...it's working        "
-# echo "=============================================="
-# echo ''
-
-# sleep 5
-
-# sudo lxc-attach -n $SeedContainerName -- /root/packages.sh
-# sudo lxc-attach -n $SeedContainerName -- /root/create_users.sh
-# sudo lxc-attach -n $SeedContainerName -- /root/lxc-services.sh
-# sudo lxc-attach -n $SeedContainerName -- usermod --password `perl -e "print crypt('grid','grid');"` grid
-# sudo lxc-attach -n $SeedContainerName -- usermod --password `perl -e "print crypt('oracle','oracle');"` oracle
-# sudo lxc-attach -n $SeedContainerName -- usermod -g oinstall oracle
-# sudo lxc-attach -n $SeedContainerName -- chown oracle:oinstall /home/oracle/.bash_profile
-# sudo lxc-attach -n $SeedContainerName -- chown oracle:oinstall /home/oracle/.bashrc
-# sudo lxc-attach -n $SeedContainerName -- chown oracle:oinstall /home/oracle/.kshrc
-# sudo lxc-attach -n $SeedContainerName -- chown oracle:oinstall /home/oracle/.bash_logout
-# sudo lxc-attach -n $SeedContainerName -- chown oracle:oinstall /home/oracle/.
-# sudo lxc-attach -n $SeedContainerName -- chown grid:oinstall /home/grid/.bash_profile
-# sudo lxc-attach -n $SeedContainerName -- chown grid:oinstall /home/grid/.bashrc
-# sudo lxc-attach -n $SeedContainerName -- chown grid:oinstall /home/grid/.kshrc
-# sudo lxc-attach -n $SeedContainerName -- chown grid:oinstall /home/grid/.bash_logout
-# sudo lxc-attach -n $SeedContainerName -- chown grid:oinstall /home/grid/.
-
-# echo ''  
-# echo "=============================================="
-# echo "$SeedContainerName configured for Oracle.     "
-# echo "=============================================="
-# echo ''
-
-# sleep 5
-
-# clear
-
-# if [ $MajorRelease -ge 7 ]
-# then
-# 	echo ''
-# 	echo "=============================================="
-# 	echo "Start NTP service...                          "
-# 	echo "=============================================="
-# 	echo ''
-
-#  	sudo lxc-attach -n $SeedContainerName -- ntpd -x
-
-# 	sudo lxc-attach -n $SeedContainerName -- ntpd -x
-# 	sudo lxc-attach -n $SeedContainerName -- chmod +x /etc/systemd/system/ntp.service
-# 	sudo lxc-attach -n $SeedContainerName -- systemctl enable ntp.service
-# 	sudo lxc-attach -n $SeedContainerName -- service ntp start
-# 	sudo lxc-attach -n $SeedContainerName -- service ntpd start
-#	sudo lxc-attach -n $SeedContainerName -- service ntp status
-# 	sudo lxc-attach -n $SeedContainerName -- chkconfig ntp on
-# 	sudo lxc-attach -n $SeedContainerName -- chkconfig ntpd on
-
-#	sleep 5
-
-#	clear
-
-# 	echo ''
-# 	echo "=============================================="
-# 	echo "Done: Start NTP service.                      "
-# 	echo "=============================================="
-
-# 	sleep 5
-
-# 	clear
-# elif [ $MajorRelease -eq 6 ] || [ $MajorRelease -eq 5 ]
-# then
-# 	sudo lxc-attach -n $SeedContainerName -- ntpd -x
-# fi
+sudo lxc-attach -n $SeedContainerName -- usermod --password `perl -e "print crypt('root','root');"` root
+sudo lxc-attach -n $SeedContainerName -- yum -y install openssh-server
+sudo lxc-attach -n $SeedContainerName -- service sshd restart
+sudo lxc-attach -n $SeedContainerName -- ip link set eth0 mtu $MultiHostVar7
 
 sleep 5
 
@@ -592,3 +368,4 @@ echo "Next script to run: $Product                  "
 echo "=============================================="
 
 sleep 5
+
