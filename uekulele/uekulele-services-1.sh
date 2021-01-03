@@ -1588,7 +1588,25 @@ then
 				sleep 5
 
 				clear
-				
+			
+				echo ''
+				echo "=============================================="
+				echo "Remove current lxc version...                 "
+				echo "=============================================="
+				echo ''
+	
+				sudo yum remove lxc-libs* lxc*	
+			
+				echo ''
+				echo "=============================================="
+				echo "Done: Remove current lxc version.             "
+				echo "=============================================="
+				echo ''
+
+				sleep 5
+
+				clear
+	
 				echo ''
 				echo "=============================================="
 				echo "Install lxc-templates RPM...                  "
@@ -1675,7 +1693,7 @@ then
 			echo "=============================================="
 			echo ''
 
-			echo 'Edits will be make to the lxc.spec file if needed.'
+			echo 'Edits to the lxc.spec file go here if needed.'
 
 			cd /opt/olxc/"$DistDir"/uekulele/lxc
 
@@ -1712,69 +1730,72 @@ then
 
 			clear
 
-			if [ $LinuxFlavor = 'CentOS' ] && [ $Release -eq 7 ]
+			if [ $Release -eq 7 ]
 			then
-				echo ''
-				echo "=============================================="
-				echo "Untar LXC source code...                      "
-				echo "=============================================="
-				echo ''
+				if [ $LinuxFlavor = 'CentOS' ] || [ $LinuxFlavor = 'Oracle' ]
+				then
+					echo ''
+					echo "=============================================="
+					echo "Untar LXC source code...                      "
+					echo "=============================================="
+					echo ''
 
-				sleep 5
+					sleep 5
 
-				cd /opt/olxc/"$DistDir"/uekulele/lxc/rpmbuild/SOURCES
-				tar -xvf lxc-"$LxcVersion".tar.gz
+					cd /opt/olxc/"$DistDir"/uekulele/lxc/rpmbuild/SOURCES
+					tar -xvf lxc-"$LxcVersion".tar.gz
 				
-				echo ''
-				echo "=============================================="
-				echo "Untar LXC source code...                      "
-				echo "=============================================="
-				echo ''
+					echo ''
+					echo "=============================================="
+					echo "Untar LXC source code...                      "
+					echo "=============================================="
+					echo ''
 
-				sleep 5
+					sleep 5
 
-				clear
+					clear
 
-				echo ''
-				echo "=============================================="
-				echo "Configure LXC source build...                 "
-				echo "=============================================="
-				echo ''
+					echo ''
+					echo "=============================================="
+					echo "Configure LXC source build...                 "
+					echo "=============================================="
+					echo ''
 
-				sleep 5
+					sleep 5
 
-				cd lxc-"$LxcVersion"
-				./configure
+					cd lxc-"$LxcVersion"
+					./configure
+	
+					echo ''
+					echo "=============================================="
+					echo "Configure LXC source build...                 "
+					echo "=============================================="
+					echo ''
 
-				echo ''
-				echo "=============================================="
-				echo "Configure LXC source build...                 "
-				echo "=============================================="
-				echo ''
+					sleep 5
 
-				sleep 5
+					clear
 
-				clear
+					echo ''
+					echo "=============================================="
+					echo "Build LXC RPM...                              "
+					echo "=============================================="
+					echo ''
 
-				echo ''
-				echo "=============================================="
-				echo "Build LXC RPM...                              "
-				echo "=============================================="
-				echo ''
+					sleep 5
 
-				sleep 5
+					make rpm
 
-				make rpm
+					echo ''
+					echo "=============================================="
+					echo "Build LXC RPM...                              "
+					echo "=============================================="
+					echo ''
 
-				echo ''
-				echo "=============================================="
-				echo "Build LXC RPM...                              "
-				echo "=============================================="
-				echo ''
+					sleep 5
 
-				sleep 5
-
-				clear
+					clear
+				fi
 			else
 				rpmbuild --define "_topdir /opt/olxc/"$DistDir"/uekulele/lxc/rpmbuild" -ba lxc.spec
 			fi
@@ -1959,25 +1980,28 @@ then
 
 			sleep 5
 		
-			if [ $LinuxFlavor = 'CentOS' ] && [ $Release -eq 7 ]
+			if [ $Release -eq 7 ]
 			then
-				echo ''
-				echo "=============================================="
-				echo "Install LXC RPM's...                          "
-				echo "=============================================="
-				echo ''
+				if [ $LinuxFlavor = 'CentOS' ] || [ $LinuxFlavor = 'Oracle' ]
+				then
+					echo ''
+					echo "=============================================="
+					echo "Install LXC RPM's...                          "
+					echo "=============================================="
+					echo ''
 
-				sudo rpm -ivh ~/rpmbuild/RPMS/x86_64/lxc-*.rpm
+					sudo rpm -ivh ~/rpmbuild/RPMS/x86_64/lxc-*.rpm
 				
-				echo ''
-				echo "=============================================="
-				echo "Done: Install LXC RPM's.                      "
-				echo "=============================================="
-				echo ''
+					echo ''
+					echo "=============================================="
+					echo "Done: Install LXC RPM's.                      "
+					echo "=============================================="
+					echo ''
 
-				sleep 5
+					sleep 5
 
-				clear
+					clear
+				fi
 			else
 				echo ''
 				echo "=============================================="
@@ -2846,6 +2870,7 @@ then
 			                sudo yum -y remove   unbound-libs-1.6.6-5* > /dev/null 2>&1
 			                sudo yum -y install  unbound-libs-1.6.6-1* > /dev/null 2>&1
 			                sudo yum -y install unbound-devel-1.6.6-1* > /dev/null 2>&1
+					rpm -qa | egrep 'unbound-libs|unbound-devel'
 					
 					echo ''
 					echo "==============================================" 
