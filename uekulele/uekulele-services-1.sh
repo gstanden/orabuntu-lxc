@@ -1595,7 +1595,7 @@ then
 				echo "=============================================="
 				echo ''
 	
-				sudo yum remove lxc-libs* lxc*	
+				sudo yum -y remove lxc-libs* lxc*	
 			
 				echo ''
 				echo "=============================================="
@@ -2624,11 +2624,27 @@ then
 
 			clear
 
+			echo ''
+			echo "=============================================="
+			echo "Prepare OpenvSwitch Source ...                "
+			echo "=============================================="
+			echo ''
+
 			mkdir -p /opt/olxc/"$DistDir"/uekulele/openvswitch
 			cd /opt/olxc/"$DistDir"/uekulele/openvswitch
 			wget --timeout=5 --tries=10 http://openvswitch.org/releases/openvswitch-"$OvsVersion".tar.gz -4
 			mkdir -p /opt/olxc/"$DistDir"/uekulele/openvswitch/rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
 			cp -p openvswitch-"$OvsVersion".tar.gz /opt/olxc/"$DistDir"/uekulele/openvswitch/rpmbuild/SOURCES/.
+
+			echo ''
+			echo "=============================================="
+			echo "Done: Prepare OpenvSwitch Source.             "
+			echo "=============================================="
+			echo ''
+
+			sleep 5
+
+			clear
 		fi
 
 		echo ''
