@@ -1225,30 +1225,17 @@ then
 	then
 		sudo systemctl daemon-reload
 		sudo systemctl enable lxc
+		echo ''
 		sudo systemctl start  lxc
 		sudo systemctl status lxc
 
-	#	if [ $Release -eq 7 ]
-	#	then
-	#		sudo systemctl start  lxc
-	#		sudo systemctl status lxc
-	#		echo ''
-	#	fi
 		
 		sudo setenforce permissive
-		sudo systemctl start libvirtd
-		sleep 2
-		sudo systemctl stop libvirtd
-		sleep 2
-		sudo systemctl start  libvirtd
-		sleep 2
-		sudo systemctl status libvirtd
+		sudo systemctl enable libvirtd
 		echo ''
-		sudo systemctl start lxc
-		sleep 2
-		echo ''	
-		sudo service lxc status
-		sleep 2
+		sudo systemctl start  libvirtd
+		sudo systemctl status libvirtd
+		
 		sudo cp -p /etc/lxc/default.conf /etc/lxc/default.conf.bak
 
 	elif [ $Release -eq 6 ]
@@ -1256,6 +1243,8 @@ then
 #		sudo service lxc start
 		echo ''
 		sudo chkconfig --list | grep lxc
+		echo ''
+		sudo service lxc status
 		echo ''
 		sudo setenforce permissive
 		sudo service libvirtd start
@@ -1378,8 +1367,41 @@ then
 
 			if [ $LinuxFlavor = 'Redhat' ] && [ $Release -eq 7 ]
 			then
+				echo ''
+				echo "=============================================="
+				echo "Enable Required Repos...                      "
+				echo "=============================================="
+				echo ''
+
 				sudo subscription-manager repos --enable rhel-7-server-optional-rpms
+				
+				echo ''
+				echo "=============================================="
+				echo "Enable Required Repos...                      "
+				echo "=============================================="
+				echo ''
+
+				sleep 5
+
+				clear
+
+				echo ''
+				echo "=============================================="
+				echo "Install packages...                           "
+				echo "=============================================="
+				echo ''
+
 				sudo yum -y install unbound-devel
+
+				echo ''
+				echo "=============================================="
+				echo "Done: Install packages.                       "
+				echo "=============================================="
+				echo ''
+
+				sleep 5
+
+				clear
 			fi
 
 			echo ''
@@ -1394,19 +1416,63 @@ then
 
 			if [ $Release -ge 8 ]
 			then
+				echo ''
+				echo "=============================================="
+				echo "Enable Required Repos...                      "
+				echo "=============================================="
+				echo ''
+
 				sudo yum-config-manager --enable ol8_codeready_builder
 				sudo yum-config-manager --enable ol8_appstream
 				sudo yum-config-manager --enable ol8_u0_baseos_base
 				sudo yum-config-manager --enable ol8_baseos_latest
 			 	sudo yum-config-manager --enable ol8_addons
+				
+				echo ''
+				echo "=============================================="
+				echo "Done: Enable Required Repos.                  "
+				echo "=============================================="
+				echo ''
 			fi
+
+			echo ''
+			echo "=============================================="
+			echo "Install packages...                           "
+			echo "=============================================="
+			echo ''
 
 			sudo yum -y install rpm-build wget openssl-devel gcc make docbook2X xmlto automake graphviz libtool
 
+			echo ''
+			echo "=============================================="
+			echo "Done: Install packages.                       "
+			echo "=============================================="
+			echo ''
+
+			sleep 5
+
+			clear
+
 			if [ $Release -ge 8 ]
 			then
+				echo ''
+				echo "=============================================="
+				echo "Install packages...                           "
+				echo "=============================================="
+				echo ''
+
 				sudo rpm -ivh "$DistDir"/rpmstage/bridge-utils-1.5-9.el7.x86_64.rpm
 				sudo yum -y install libcap-devel
+				
+				echo ''
+				echo "=============================================="
+				echo "Done: Install packages.                       "
+				echo "=============================================="
+				echo ''
+
+				sleep 5
+
+				clear
 			fi
 
 			sudo mkdir -p /opt/olxc/"$DistDir"/uekulele/lxc
@@ -1432,47 +1498,184 @@ then
 
 				sleep 5
 
+				clear
+
+				echo ''
+				echo "=============================================="
+				echo "Install packages...                           "
+				echo "=============================================="
+				echo ''
+
+				sleep 5
+
 				sudo yum -y install automake gcc make rpmdevtools git
+
+				echo ''
+				echo "=============================================="
+				echo "Done: Install packages.                       "
+				echo "=============================================="
+				echo ''
+
+				sleep 5
+
+				clear
+
 				sudo mkdir -p /opt/olxc/"$DistDir"/uekulele/lxc-templates
 				sudo chown -R $Owner:$Group /opt/olxc
 				cd /opt/olxc/"$DistDir"/uekulele/lxc-templates
+
+				echo ''
+				echo "=============================================="
+				echo "Get Source Code...                            "
+				echo "=============================================="
+				echo ''
+
 				wget --timeout=5 --tries=10 https://linuxcontainers.org/downloads/lxc/lxc-templates-"$LxcVersion".tar.gz -4
+
+				echo ''
+				echo "=============================================="
+				echo "Done: Get Source Code.                        "
+				echo "=============================================="
+				echo ''
+
+				sleep 5
+
+				clear
+
 				sudo mkdir -p /opt/olxc/"$DistDir"/uekulele/lxc-templates/rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
 				sudo chown -R $Owner:$Group /opt/olxc/"$DistDir"/uekulele/lxc-templates/rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
 				cp -p lxc-templates-"$LxcVersion".tar.gz /opt/olxc/"$DistDir"/uekulele/lxc-templates/rpmbuild/SOURCES/.
+			
+				echo ''
+				echo "=============================================="
+				echo "Untar lxc-templates source...                 "
+				echo "=============================================="
+				echo ''
+
+				sleep 5
+
 				tar -zxvf lxc-templates-"$LxcVersion".tar.gz
+			
+				echo ''
+				echo "=============================================="
+				echo "Done: Untar lxc-templates source.             "
+				echo "=============================================="
+				echo ''
+
+				sleep 5
+
+				clear
+
 				cp -p "$DistDir"/uekulele/archives/lxc-templates.spec /opt/olxc/"$DistDir"/uekulele/lxc-templates/.
 				sudo sed -i "s/LxcVersion/$LxcVersion/" /opt/olxc/"$DistDir"/uekulele/lxc-templates/lxc-templates.spec
+				
+				echo ''
+				echo "=============================================="
+				echo "Build lxc-templates RPM...                      "
+				echo "=============================================="
+				echo ''
+
+				sleep 5
+	
 				rpmbuild --define "_topdir /opt/olxc/"$DistDir"/uekulele/lxc-templates/rpmbuild" -ba lxc-templates.spec
+				
+				echo ''
+				echo "=============================================="
+				echo "Done: Build lxc-templates RPM.                "
+				echo "=============================================="
+				echo ''
+	
+				sleep 5
+
+				clear
+				
+				echo ''
+				echo "=============================================="
+				echo "Install lxc-templates RPM...                  "
+				echo "=============================================="
+				echo ''
+
 				sudo rpm -ivh /opt/olxc/"$DistDir"/uekulele/lxc-templates/rpmbuild/RPMS/x86_64/lxc-templates*.rpm
 				
 				echo ''
 				echo "=============================================="
-				echo "Done: Build and Install lxc-templates RPM.    "
+				echo "Done: Install lxc-templates RPM.              "
 				echo "=============================================="
 				echo ''
 
-				sleep 300
+				sleep 5
 
 				clear
 			fi
 			
 			echo ''
 			echo "=============================================="
-			echo "Untar source code and build LXC RPM...        "
+			echo "Ping linuxcontainers.org...                   "
+			echo "=============================================="
+			echo ''
+	
+			ping -c 5 linuxcontainers.org -4
+			echo ''
+			
+			echo ''
+			echo "=============================================="
+			echo "Done: Ping linuxcontainers.org.               "
 			echo "=============================================="
 			echo ''
 
 			sleep 5
-	
-			ping -c 10 linuxcontainers.org -4
+
+			clear
+
 			echo ''
+			echo "=============================================="
+			echo "Get LXC source code...                        "
+			echo "=============================================="
+			echo ''
+
 			wget --timeout=5 --tries=10 https://linuxcontainers.org/downloads/lxc/lxc-"$LxcVersion".tar.gz -4
+
+			echo ''
+			echo "=============================================="
+			echo "Done: Get LXC source code.                    "
+			echo "=============================================="
+			echo ''
+
+			sleep 5
+
+			clear
+
+			echo ''
+			echo "=============================================="
+			echo "Untar LXC source code...                      "
+			echo "=============================================="
+			echo ''
+
+			sleep 5
+
 			sudo mkdir -p /opt/olxc/"$DistDir"/uekulele/lxc/rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
 			sudo chown -R $Owner:$Group /opt/olxc/
 			cp -p lxc-"$LxcVersion".tar.gz /opt/olxc/"$DistDir"/uekulele/lxc/rpmbuild/SOURCES/.
 			tar -zxvf lxc-"$LxcVersion".tar.gz
 			cp -p lxc-"$LxcVersion"/lxc.spec /opt/olxc/"$DistDir"/uekulele/lxc/.
+
+			echo ''
+			echo "=============================================="
+			echo "Done: Untar LXC source code.                  "
+			echo "=============================================="
+			echo ''
+
+			sleep 5
+
+			clear
+
+			echo ''
+			echo "=============================================="
+			echo "Edits to lxc.spec file (if needed)...         "
+			echo "=============================================="
+			echo ''
+
+			echo 'Edits will be make to the lxc.spec file if needed.'
 
 			cd /opt/olxc/"$DistDir"/uekulele/lxc
 
@@ -1499,14 +1702,79 @@ then
 				sudo sed -i '/^\%prep/i \%define debug_package \%\{nil\}'     /opt/olxc/"$DistDir"/uekulele/lxc/lxc.spec
 			fi
 
+			echo ''
+			echo "=============================================="
+			echo "Done: Edits to lxc.spec file (if needed).     "
+			echo "=============================================="
+			echo ''
+
+			sleep 5
+
+			clear
+
 			if [ $LinuxFlavor = 'CentOS' ] && [ $Release -eq 7 ]
 			then
+				echo ''
+				echo "=============================================="
+				echo "Untar LXC source code...                      "
+				echo "=============================================="
+				echo ''
+
+				sleep 5
+
 				cd /opt/olxc/"$DistDir"/uekulele/lxc/rpmbuild/SOURCES
 				tar -xvf lxc-"$LxcVersion".tar.gz
+				
+				echo ''
+				echo "=============================================="
+				echo "Untar LXC source code...                      "
+				echo "=============================================="
+				echo ''
+
+				sleep 5
+
+				clear
+
+				echo ''
+				echo "=============================================="
+				echo "Configure LXC source build...                 "
+				echo "=============================================="
+				echo ''
+
+				sleep 5
+
 				cd lxc-"$LxcVersion"
 				./configure
+
+				echo ''
+				echo "=============================================="
+				echo "Configure LXC source build...                 "
+				echo "=============================================="
+				echo ''
+
+				sleep 5
+
+				clear
+
+				echo ''
+				echo "=============================================="
+				echo "Build LXC RPM...                              "
+				echo "=============================================="
+				echo ''
+
+				sleep 5
+
 				make rpm
-			#	sudo rpm -ivh ~/rpmbuild/RPMS/x86_64/lxc-*.rpm
+
+				echo ''
+				echo "=============================================="
+				echo "Build LXC RPM...                              "
+				echo "=============================================="
+				echo ''
+
+				sleep 5
+
+				clear
 			else
 				rpmbuild --define "_topdir /opt/olxc/"$DistDir"/uekulele/lxc/rpmbuild" -ba lxc.spec
 			fi
@@ -1526,54 +1794,234 @@ then
 			echo "=============================================="
 			echo ''
 
-			cd /opt/olxc/"$DistDir"/uekulele/lxc/rpmbuild/RPMS/x86_64
+			sleep 5
+
+			clear
 
 			if [ $LinuxFlavor = 'CentOS' ] && [ $Release -eq 7 ]
 			then
+				echo ''
+				echo "=============================================="
+				echo "Remove Previous Version LXC RPM's...          "
+				echo "=============================================="
+				echo ''
+
+				sleep 5
+
 				sudo yum -y remove lxc-1.0.11* lxc-libs*
+				
+				echo ''
+				echo "=============================================="
+				echo "Done: Remove Previous Version LXC RPM's.      "
+				echo "=============================================="
+				echo ''
+
+				sleep 5
+
+				clear
 			fi
 				
 			if [ $LinuxFlavor = 'Red' ] || [ $LinuxFlavor = 'Fedora' ]
 			then
+				echo ''
+				echo "=============================================="
+				echo "Remove Previous Version LXC RPM's...          "
+				echo "=============================================="
+				echo ''
+
+				sleep 5
+
 				sudo yum -y erase lxc* lxc-libs*
+				
+				echo ''
+				echo "=============================================="
+				echo "Done: Remove Previous Version LXC RPM's.      "
+				echo "=============================================="
+				echo ''
+
+				sleep 5
+
+				clear
 			fi
 
 			if [ $LinuxFlavor = 'CentOS' ] && [ $Release -eq 8 ]
 			then
+				echo ''
+				echo "=============================================="
+				echo "Remove Previous Version LXC RPM's...          "
+				echo "=============================================="
+				echo ''
+
+				sleep 5
+
 				sudo yum -y erase lxc* lxc-libs*
+				
+				echo ''
+				echo "=============================================="
+				echo "Done: Remove Previous Version LXC RPM's.      "
+				echo "=============================================="
+				echo ''
+
+				sleep 5
+
+				clear
 			fi
 
 			if [ $LinuxFlavor = 'Oracle' ] && [ $Release -eq 7 ]
 			then
+				echo ''
+				echo "=============================================="
+				echo "Remove Previous Version LXC RPM's...          "
+				echo "=============================================="
+				echo ''
+
+				sleep 5
+
 				sudo yum -y remove lxc-libs-1.1.5*
+				
+				echo ''
+				echo "=============================================="
+				echo "Done: Remove Previous Version LXC RPM's.      "
+				echo "=============================================="
+				echo ''
+
+				sleep 5
+
+				clear
 			fi
 
 			if [ $LinuxFlavor = 'Red' ] && [ $Release -eq 7 ]
 			then
+				echo ''
+				echo "=============================================="
+				echo "Remove Previous Version LXC RPM's...          "
+				echo "=============================================="
+				echo ''
+
+				sleep 5
+
 				sudo yum -y remove lxc* lxc-debuginfo*
+				
+				echo ''
+				echo "=============================================="
+				echo "Done: Remove Previous Version LXC RPM's.      "
+				echo "=============================================="
+				echo ''
+
+				sleep 5
+
+				clear
 			fi
 
                         if [ $LinuxFlavor = 'Oracle' ] && [ $Release -ge 8 ]
                         then
+				echo ''
+				echo "=============================================="
+				echo "Install packages...                           "
+				echo "=============================================="
+				echo ''
+
+				sleep 5
+
                                 sudo yum - y install libcgroup rsync
+				
+				echo ''
+				echo "=============================================="
+				echo "Install packages...                           "
+				echo "=============================================="
+				echo ''
+
+				sleep 5
+
+				clear
+				
+				echo ''
+				echo "=============================================="
+				echo "Remove Previous Version LXC RPM's...          "
+				echo "=============================================="
+				echo ''
+
+				sleep 5
+
 				sudo yum -y remove lxc-libs* lxc* lxc-*
 				sudo rpm -ivh lxc* 
+				
+				echo ''
+				echo "=============================================="
+				echo "Done: Remove Previous Version LXC RPM's.      "
+				echo "=============================================="
+				echo ''
+
+				sleep 5
+
+				clear
                         fi
 
 			sleep 5
 		
 			if [ $LinuxFlavor = 'CentOS' ] && [ $Release -eq 7 ]
 			then
+				echo ''
+				echo "=============================================="
+				echo "Install LXC RPM's...                          "
+				echo "=============================================="
+				echo ''
+
 				sudo rpm -ivh ~/rpmbuild/RPMS/x86_64/lxc-*.rpm
+				
+				echo ''
+				echo "=============================================="
+				echo "Done: Install LXC RPM's.                      "
+				echo "=============================================="
+				echo ''
+
+				sleep 5
+
+				clear
 			else
+				echo ''
+				echo "=============================================="
+				echo "Install LXC RPM's...                          "
+				echo "=============================================="
+				echo ''
+
+				cd /opt/olxc/"$DistDir"/uekulele/lxc/rpmbuild/RPMS/x86_64
 				sudo rpm -ivh *.rpm
+				
+				echo ''
+				echo "=============================================="
+				echo "Done: Install LXC RPM's.                      "
+				echo "=============================================="
+				echo ''
+
+				sleep 5
+
+				clear
 			fi
 
 			cd /opt/olxc/"$DistDir"/uekulele/lxc
+			
+			echo ''
+			echo "=============================================="
+			echo "Enable and Start LXC...                       "
+			echo "=============================================="
+			echo ''
+
 			sudo systemctl daemon-reload
-			sudo systemct  enable lxc
+			sudo systemctl enable lxc
+			echo ''
 			sudo systemctl start  lxc
-			sudo service lxc-net start 
+			sudo systemctl status lxc
+
+			echo ''
+			echo "=============================================="
+			echo "Done: Enable and Start LXC.                   "
+			echo "=============================================="
+			echo ''
+
+			sleep 5
+
+			clear
 
 			echo ''
 			echo "=============================================="
@@ -2036,6 +2484,8 @@ then
 		echo ''
 
 		sleep 5
+
+		clear
 		
 		if    [ $Release -eq 6 ]
 		then
@@ -2126,10 +2576,30 @@ then
 			echo "=============================================="
 			echo ''
 
+			sleep 5
+
+			clear
+
 		elif [ $Release -ge 7 ]
 		then
+			echo ''
+			echo "=============================================="
+			echo "Install packages...                           "
+			echo "=============================================="
+			echo ''
 
 			sudo yum -y install rpm-build wget openssl-devel gcc make
+			
+			echo ''
+			echo "=============================================="
+			echo "Done: Install packages.                       "
+			echo "=============================================="
+			echo ''
+
+			sleep 5
+
+			clear
+
 			mkdir -p /opt/olxc/"$DistDir"/uekulele/openvswitch
 			cd /opt/olxc/"$DistDir"/uekulele/openvswitch
 			wget --timeout=5 --tries=10 http://openvswitch.org/releases/openvswitch-"$OvsVersion".tar.gz -4
@@ -2234,6 +2704,10 @@ then
 			echo "=============================================="
 			echo ''
 
+			sleep 5
+
+			clear
+
 			if [ $Release -eq 7 ] && [ $(SoftwareVersion $OvsVersion) -eq $(SoftwareVersion "2.5.4") ]
 			then
 				cd /opt/olxc/"$DistDir"/uekulele/openvswitch/rpmbuild/SOURCES
@@ -2245,8 +2719,34 @@ then
 
 			if [ $Release -eq 7 ] && [ $(SoftwareVersion $OvsVersion) -eq $(SoftwareVersion "2.12.1") ]
 			then
+				echo ''
+				echo "==============================================" 
+				echo "Prepare Source Code...                        "
+				echo "==============================================" 
+				echo ''
+
+				sleep 5
+
 				cd /opt/olxc/"$DistDir"/uekulele/openvswitch/rpmbuild/SOURCES
 				tar -zxvf openvswitch-"$OvsVersion".tar.gz
+
+				echo ''
+				echo "==============================================" 
+				echo "Done: Prepare Source Code.                    "
+				echo "==============================================" 
+				echo ''
+
+				sleep 5
+
+				clear
+
+				echo ''
+				echo "==============================================" 
+				echo "Apply Code Patch(es) if needed...             "
+				echo "==============================================" 
+				echo ''
+
+				echo "No patches currently required for Release $Release and OpenvSwitch $OvsVersion."
 
 				# if [ $RHMV -ge 8 ] && [ $RHMV -le 9 ]
 				# then
@@ -2259,39 +2759,228 @@ then
 				# 	sleep 10
 				# fi
 
+				echo ''
+				echo "==============================================" 
+				echo "Done: Apply Code Patch(es) if needed.         "
+				echo "==============================================" 
+				echo ''
+
+				sleep 5
+
+				clear
+
+				echo ''
+				echo "==============================================" 
+				echo "Copy OpenvSwitch spec files...                "
+				echo "==============================================" 
+				echo ''
+
 				cp -p openvswitch-"$OvsVersion"/rhel/*.spec /opt/olxc/"$DistDir"/uekulele/openvswitch/.
 				cd /opt/olxc/"$DistDir"/uekulele/openvswitch
-				sudo yum-config-manager --enable ol7_latest
-				sudo yum-config-manager --enable ol7_optional_archive
+				sudo ls -l /opt/olxc/"$DistDir"/uekulele/openvswitch/*.spec
+
+				echo ''
+				echo "==============================================" 
+				echo "Done: Copy OpenvSwitch spec files.            "
+				echo "==============================================" 
+				echo ''
+
+				sleep 5
+
+				clear
+		
+				if [ $LinuxFlavor = 'Oracle' ] && [ $Release -eq 7 ]
+				then	
+					echo ''
+					echo "==============================================" 
+					echo "Configure repos...                            "
+					echo "==============================================" 
+					echo ''
+
+					sudo yum-config-manager --enable ol7_latest
+					sudo yum-config-manager --enable ol7_optional_archive
+			
+					echo ''
+					echo "==============================================" 
+					echo "Done: Configure repos.                        "
+					echo "==============================================" 
+					echo ''
+
+					sleep 5
+
+					clear
+				fi
+
+				echo ''
+				echo "==============================================" 
+				echo "Install Python Packages...                    "
+				echo "==============================================" 
+				echo ''
+
+				sleep 5
+
 				sudo yum -y install python3
 				sudo yum -y install python3-sphinx
 				sudo yum -y install python-six
 
+				echo ''
+				echo "==============================================" 
+				echo "Done: Install Python Packages.                "
+				echo "==============================================" 
+				echo ''
+				
+				sleep 5
+
+				clear
+
 			        if [ $LinuxFlavor = 'Oracle' ] && [ $Release -eq 7 ]
 				then
-					echo "ok dealing with unbound-libs issue here ..."
-					sleep 30
+					echo ''
+					echo "==============================================" 
+					echo "Re-version unbound-libs...                    "
+					echo "==============================================" 
+					echo ''
+
+					sleep 5
+
 			                sudo yum -y remove   unbound-libs-1.6.6-5* > /dev/null 2>&1
 			                sudo yum -y install  unbound-libs-1.6.6-1* > /dev/null 2>&1
 			                sudo yum -y install unbound-devel-1.6.6-1* > /dev/null 2>&1
-					sleep 30
+					
+					echo ''
+					echo "==============================================" 
+					echo "Done: Re-version unbound-libs.                "
+					echo "==============================================" 
+					echo ''
+
+					sleep 5
+
+					clear
 			        fi
 
 				if [ $LinuxFlavor = 'Red' ] && [ $Release -eq 7 ]
 				then
+					echo ''
+					echo "==============================================" 
+					echo "Configure repos...                            "
+					echo "==============================================" 
+					echo ''
+
+					sleep 5
+
 					sudo subscription-manager repos --enable rhel-7-server-optional-rpms
+					
+					echo ''
+					echo "==============================================" 
+					echo "Configure repos...                            "
+					echo "==============================================" 
+					echo ''
 				fi
 
+				echo ''
+				echo "==============================================" 
+				echo "Install Packages...                           "
+				echo "==============================================" 
+				echo ''
+
+				sleep 5
+
 				sudo yum -y install selinux-policy-devel unbound-devel
- 				sudo alternatives --set python /usr/bin/python3
+				
+				echo ''
+				echo "==============================================" 
+				echo "Done: Install Packages.                       "
+				echo "==============================================" 
+				echo ''
+
+				sleep 5
+
+				clear
+
+				echo ''
+				echo "==============================================" 
+				echo "Set Python Build Environment...               "
+				echo "==============================================" 
+				echo ''
+
+				sleep 5
+
+ 				sudo alternatives --set python /usr/bin/python3 > /dev/null 2>&1
  				python3 -m venv py36env
  				source py36env/bin/activate
+				python --version
+
+				echo ''
+				echo "==============================================" 
+				echo "Done: Set Python Build Environment.           "
+				echo "==============================================" 
+				echo ''
+
+				sleep 5
+
+				clear
+
+				echo ''
+				echo "==============================================" 
+				echo "Python3 pip ops (if needed)...                "
+				echo "==============================================" 
+				echo ''
+
+				echo "No pip ops currently required for Release $Release and OpenvSwitch $OvsVersion."
+
  			#	python3 -m pip install --upgrade pip
  			#	python3 -m pip install six
  			#	python3 -m pip install sphinx
-				sudo yum -y install python-sphinx
-			#	sed -i 's/BuildRequires: python-sphinx/BuildRequires: python3-sphinx/g' openvswitch.spec
+
+				echo ''
+				echo "==============================================" 
+				echo "Done: Python3 pip ops.                        "
+				echo "==============================================" 
+				echo ''
+
 				sleep 5
+
+				clear
+
+				echo ''
+				echo "==============================================" 
+				echo "Install python-sphinx...                      "
+				echo "==============================================" 
+				echo ''
+
+				sleep 5
+
+				sudo yum -y install python-sphinx
+
+				echo ''
+				echo "==============================================" 
+				echo "Done: Install python-sphinx.                  "
+				echo "==============================================" 
+				echo ''
+
+				sleep 5
+
+				clear
+
+				echo ''
+				echo "==============================================" 
+				echo "Edits to openvswitch.spec (if needed)...      "
+				echo "==============================================" 
+				echo ''
+
+				echo "No edits to openvswitch.spec currently required for Release $Release and OpenvSwitch $OvsVersion."
+
+			#	sed -i 's/BuildRequires: python-sphinx/BuildRequires: python3-sphinx/g' openvswitch.spec
+
+				echo ''
+				echo "==============================================" 
+				echo "Done: Edits to openvswitch.spec.              "
+				echo "==============================================" 
+				echo ''
+
+				sleep 5
+
+				clear
 			fi
 			
  			if [ $Release -eq 8 ]
@@ -2312,7 +3001,7 @@ then
 			
 					echo ''
 					echo "==============================================" 
-					echo "Install Packages...                           "
+					echo "Done: Install Packages.                       "
 					echo "==============================================" 
 					echo ''
 					
@@ -2344,6 +3033,8 @@ then
 					echo "Build OpenvSwitch RPM's...                    "
 					echo "==============================================" 
 					echo ''
+
+					sleep 5
 
 					cd openvswitch-2.14.0
 					./configure
@@ -2536,6 +3227,8 @@ then
 					echo "==============================================" 
 					echo ''
 
+					sleep 5
+
 					rpmbuild --define "_topdir /opt/olxc/"$DistDir"/uekulele/openvswitch/rpmbuild" -ba --without check openvswitch.spec
 					cd /opt/olxc/"$DistDir"/uekulele/openvswitch/rpmbuild/RPMS/x86_64/
 					sudo rpm -ivh *.rpm
@@ -2557,6 +3250,8 @@ then
 				echo "Build OpenvSwitch RPM's...                    "
 				echo "==============================================" 
 				echo ''
+
+				sleep 5
 
 				rpmbuild --define "_topdir /opt/olxc/"$DistDir"/uekulele/openvswitch/rpmbuild" -ba --without check openvswitch.spec
 	
@@ -2664,11 +3359,11 @@ then
 		sudo chkconfig openvswitch on
 	fi
 
-#	sudo ls -l /usr/local/etc/openvswitch/conf.db
+ 	sudo ls -l /usr/local/etc/openvswitch/conf.db
 
 	echo ''
 	echo "=============================================="
-	echo "OpenvSwitch database created.                 "
+	echo "Done: Create OpenvSwitch database...          "
 	echo "=============================================="
 	
 	sleep 5
@@ -2828,41 +3523,62 @@ then
 	echo "=============================================="
 	echo ''
 	echo "=============================================="
-	echo "Trying Method 1...                            "
+	echo "Trying Method 1 (give it a minute...)         "
 	echo "=============================================="
 	echo ''
 
 	dig +short us.images.linuxcontainers.org
+	echo ''
 
 	m=1
 	n=1
 	p=1
 	while [ $ContainerCreated -eq 0 ] && [ $m -le 3 ]
 	do
-		sudo rm -f ~/Downloads/orabuntu-lxc-master/lxcimage/nsa/*
-		mkdir -p $DistDir/lxcimage/nsa
-		cd $DistDir/lxcimage/nsa
-		sudo rm -f index.html
-		wget -4 -q https://us.images.linuxcontainers.org/images/ubuntu/xenial/amd64/default/ -P "$DistDir"/lxcimage/nsa
+		if [ ! -d /opt/olxc/"$DistDir"/lxcimage/nsa ]
+		then
+			sudo mkdir -p /opt/olxc/"$DistDir"/lxcimage/nsa
+		else
+			echo "Directory already exists: /opt/olxc/"$DistDir"/lxcimage/nsa"
+			echo ''	
+		fi
+
+		sudo rm -f /opt/olxc/"$DistDir"/lxcimage/nsa/*
+		cd         /opt/olxc/"$DistDir"/lxcimage/nsa
+		
+		wget -4 -q https://us.images.linuxcontainers.org/images/ubuntu/xenial/amd64/default/ -P /opt/olxc/"$DistDir"/lxcimage/nsa
+
 		function GetBuildDate {
        			grep folder.gif index.html | tail -1 | awk -F "\"" '{print $8}' | sed 's/\///g' | sed 's/\.//g'
 		}
 		BuildDate=$(GetBuildDate)
-		wget -4 -q https://us.images.linuxcontainers.org/images/ubuntu/xenial/amd64/default/"$BuildDate"/SHA256SUMS    -P "$DistDir"/lxcimage/nsa
+
+		wget -4 --no-verbose --progress=bar https://us.images.linuxcontainers.org/images/ubuntu/xenial/amd64/default/"$BuildDate"/SHA256SUMS -P /opt/olxc/"$DistDir"/lxcimage/nsa
 
 		for i in rootfs.tar.xz meta.tar.xz
 		do
-			rm -f $DistDir/lxcimage/nsa/$i
-			wget -4 -q https://us.images.linuxcontainers.org/images/ubuntu/xenial/amd64/default/"$BuildDate"/$i -P "$DistDir"/lxcimage/nsa
-			diff <(shasum -a 256 "$DistDir"/lxcimage/nsa/$i | cut -f1,8 -d'/' | sed 's/  */ /g' | sed 's/\///' | sed 's/  */ /g') <(grep $i "$DistDir"/lxcimage/nsa/SHA256SUMS)
+			if [ -f /opt/olxc/"$DistDir"/lxcimage/nsa/$i ]
+			then
+				rm -f /opt/olxc/"$DistDir"/lxcimage/nsa/$i
+			fi
+
+			echo ''
+			echo "Downloading $i ..."
+			echo ''
+
+			wget -4 --no-verbose --progress=bar https://us.images.linuxcontainers.org/images/ubuntu/xenial/amd64/default/"$BuildDate"/$i -P /opt/olxc/"$DistDir"/lxcimage/nsa
+			diff <(shasum -a 256 /opt/olxc/"$DistDir"/lxcimage/nsa/$i | cut -f1,11 -d'/' | sed 's/  */ /g' | sed 's/\///' | sed 's/  */ /g') <(grep $i /opt/olxc/"$DistDir"/lxcimage/nsa/SHA256SUMS)
 		done
 		if [ $? -eq 0 ]
 		then
-			sudo lxc-create -t local -n nsa -- -m $DistDir/lxcimage/nsa/meta.tar.xz -f $DistDir/lxcimage/nsa/rootfs.tar.xz
+			echo ''
+			sudo lxc-create -t local -n nsa -- -m /opt/olxc/"$DistDir"/lxcimage/nsa/meta.tar.xz -f /opt/olxc/"$DistDir"/lxcimage/nsa/rootfs.tar.xz
 		else
 			m=$((m+1))
 		fi
+
 	ContainerCreated=$(ConfirmContainerCreated)
+
 	done
 	
 	while [ $ContainerCreated -eq 0 ] && [ $p -le 3 ]
@@ -2893,15 +3609,15 @@ then
 		ContainerCreated=$(ConfirmContainerCreated)
 	done
 	
-	echo ''
-	echo "=============================================="
-	echo "Trying Method 3...                            "
-	echo "=============================================="
-	echo ''
-	
 	q=1
 	while [ $ContainerCreated -eq 0 ] && [ $q -le 3 ]
 	do
+		echo ''
+		echo "=============================================="
+		echo "Trying Method 3...                            "
+		echo "=============================================="
+		echo ''
+
 		sudo lxc-create -n nsa -t ubuntu -- --release xenial --arch amd64
 		sleep 5
 		q=$((q+1))
@@ -2994,23 +3710,23 @@ then
 
 	clear
 
-	echo ''
-	echo "=============================================="
-	echo "Create DNS Replication Landing Zone ...       "
-	echo "=============================================="
-	echo ''
+#	echo ''
+#	echo "=============================================="
+#	echo "Create DNS Replication Landing Zone ...       "
+#	echo "=============================================="
+#	echo ''
 
 #	sudo lxc-attach -n nsa -- sudo mkdir -p /root/backup-lxc-container/$NameServerBase/updates
 
-	echo ''
-	echo "=============================================="
-	echo "Done: Create DNS Replication Landing Zone.    "
-	echo "=============================================="
-	echo ''
+#	echo ''
+#	echo "=============================================="
+#	echo "Done: Create DNS Replication Landing Zone.    "
+#	echo "=============================================="
+#	echo ''
 
-	sleep 5
+#	sleep 5
 
-	clear
+#	clear
 
 	echo ''
 	echo "=============================================="
@@ -4008,7 +4724,7 @@ then
 	echo "=============================================="
 	echo ''
 
-	sudo lxc-info $NameServer
+	sudo lxc-info $NameServer | head -3
 
 	echo ''
 	echo "=============================================="
@@ -4247,7 +4963,6 @@ then
 	echo "=============================================="
         echo "Configure jobs in $NameServer...              "
 	echo "=============================================="
-	echo ''
 
         genpasswd() { 
                 local l=$1 
@@ -5132,6 +5847,6 @@ clear
 
 echo ''
 echo "=============================================="
-echo "Next script to run: orabuntu-services-2.sh    "
+echo "Next script to run: uekulele-services-2.sh    "
 echo "=============================================="
 

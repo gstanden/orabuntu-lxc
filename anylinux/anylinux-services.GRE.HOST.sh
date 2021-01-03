@@ -163,14 +163,22 @@ function GetOwner {
 }
 Owner=$(GetOwner)
 
-if [ ! -d "$DistDir"/installs/logs ]
+### new ###
+
+if [ ! -d /opt/olxc ]
 then
-        sudo mkdir -p "$DistDir"/installs/logs
+        sudo mkdir -p  /opt/olxc
+        sudo chmod 777 /opt/olxc
 fi
 
-if [ -f "$DistDir"/installs/logs/$USER.log ]
+if [ ! -d /opt/olxc/"$DistDir"/installs/logs ]
 then
-        sudo mv "$DistDir"/installs/logs/$USER.log "$DistDir"/installs/logs/$USER.log.$LOGEXT
+        sudo mkdir -p /opt/olxc/"$DistDir"/installs/logs
+fi
+
+if [ -f /opt/olxc/"$DistDir"/installs/logs/$USER.log ]
+then
+        sudo mv /opt/olxc/"$DistDir"/installs/logs/$USER.log /opt/olxc/"$DistDir"/installs/logs/$USER.log.$LOGEXT
 fi
 
 if [ ! -d /var/log/sudo-io ]
@@ -180,7 +188,7 @@ fi
 
 if [ ! -f /etc/sudoers.d/orabuntu-lxc ]
 then
-        sudo sh -c "echo 'Defaults      logfile=\"$DistDir/installs/logs/$USER.log\"'   >> /etc/sudoers.d/orabuntu-lxc"
+        sudo sh -c "echo 'Defaults      logfile=\"/opt/olxc/$DistDir/installs/logs/$USER.log\"'                         >> /etc/sudoers.d/orabuntu-lxc"
         sudo sh -c "echo 'Defaults      log_input,log_output'                                                           >> /etc/sudoers.d/orabuntu-lxc"
         sudo sh -c "echo 'Defaults      iolog_dir=/var/log/sudo-io/%{user}'                                             >> /etc/sudoers.d/orabuntu-lxc"
         sudo chmod 0440 /etc/sudoers.d/orabuntu-lxc

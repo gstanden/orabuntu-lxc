@@ -49,10 +49,6 @@ echo "This script creates oracle container.         "
 echo "=============================================="
 echo ''
 
-sleep 5
-
-clear
-
 function GetShortHost {
         uname -n | cut -f1 -d'.'
 }
@@ -374,29 +370,46 @@ do
 
 	echo ''
 
-	if [ -d ~/Downloads/orabuntu-lxc-master/lxcimage/oracle"$MajorRelease" ]
+	if [ -d /opt/olxc/"$DistDir"/lxcimage/oracle"$MajorRelease" ]
 	then
-		sudo rm -f ~/Downloads/orabuntu-lxc-master/lxcimage/oracle"$MajorRelease"/*
+		sudo rm -f /opt/olxc/"$DistDir"/lxcimage/oracle"$MajorRelease"/*
 	fi
 
-	mkdir -p "$DistDir"/lxcimage/oracle"$MajorRelease"
-	cd       "$DistDir"/lxcimage/oracle"$MajorRelease"
-	sudo rm -f index.html
-	wget -4 -q https://us.images.linuxcontainers.org/images/oracle/"$MajorRelease"/amd64/default/ -P "$DistDir"/lxcimage/oracle"$MajorRelease"
+	if [ ! -d /opt/olxc/"$DistDir"/lxcimage/oracle"$MajorRelease" ]
+	then
+		mkdir -p /opt/olxc/"$DistDir"/lxcimage/oracle"$MajorRelease"
+	fi
+
+	cd /opt/olxc/"$DistDir"/lxcimage/oracle"$MajorRelease"
+	sudo rm -f *
+
+	wget -4 -q https://us.images.linuxcontainers.org/images/oracle/"$MajorRelease"/amd64/default/ -P /opt/olxc/"$DistDir"/lxcimage/oracle"$MajorRelease"
+	
 	function GetBuildDate {
 		grep folder.gif index.html | tail -1 | awk -F "\"" '{print $8}' | sed 's/\///g' | sed 's/\.//g'
 	}
 	BuildDate=$(GetBuildDate)
-	wget -4 -q https://us.images.linuxcontainers.org/images/oracle/"$MajorRelease"/amd64/default/"$BuildDate"/SHA256SUMS -P "$DistDir"/lxcimage/oracle"$MajorRelease"
+
+	wget -4 --no-verbose --progress=bar https://us.images.linuxcontainers.org/images/oracle/"$MajorRelease"/amd64/default/"$BuildDate"/SHA256SUMS -P /opt/olxc/"$DistDir"/lxcimage/oracle"$MajorRelease"
+
 	for i in rootfs.tar.xz meta.tar.xz
 	do
-		rm -f $DistDir/lxcimage/oracle"$MajorRelease"/$i
-		wget -4 -q https://us.images.linuxcontainers.org/images/oracle/"$MajorRelease"/amd64/default/"$BuildDate"/$i -P "$DistDir"/lxcimage/oracle"$MajorRelease"
-		diff <(shasum -a 256 "$DistDir"/lxcimage/oracle"$MajorRelease"/$i | cut -f1,8 -d'/' | sed 's/  */ /g' | sed 's/\///' | sed 's/  */ /g') <(grep $i "$DistDir"/lxcimage/oracle"$MajorRelease"/SHA256SUMS)
+		if [ -f /opt/olxc/$DistDir/lxcimage/oracle"$MajorRelease"/$i ]
+		then
+			rm -f /opt/olxc/$DistDir/lxcimage/oracle"$MajorRelease"/$i
+		fi
+
+		echo ''
+		echo "Downloading $i ..."
+		echo ''
+
+		wget -4 --no-verbose --progress=bar https://us.images.linuxcontainers.org/images/oracle/"$MajorRelease"/amd64/default/"$BuildDate"/$i -P /opt/olxc/"$DistDir"/lxcimage/oracle"$MajorRelease"
+		diff <(shasum -a 256 /opt/olxc/"$DistDir"/lxcimage/oracle"$MajorRelease"/$i | cut -f1,11 -d'/' | sed 's/  */ /g' | sed 's/\///' | sed 's/  */ /g') <(grep $i /opt/olxc/"$DistDir"/lxcimage/oracle"$MajorRelease"/SHA256SUMS)
 	done
 	if [ $? -eq 0 ]
 	then
-		sudo lxc-create -t local -n oel$OracleRelease$SeedPostfix -- -m $DistDir/lxcimage/oracle"$MajorRelease"/meta.tar.xz -f $DistDir/lxcimage/oracle"$MajorRelease"/rootfs.tar.xz
+		echo ''
+		sudo lxc-create -t local -n oel$OracleRelease$SeedPostfix -- -m /opt/olxc/$DistDir/lxcimage/oracle"$MajorRelease"/meta.tar.xz -f /opt/olxc/$DistDir/lxcimage/oracle"$MajorRelease"/rootfs.tar.xz
 
 		if [ $(SoftwareVersion $LXCVersion) -ge $(SoftwareVersion "2.1.0") ]
 		then
@@ -413,10 +426,6 @@ if [ $(SoftwareVersion $LXCVersion) -ge $(SoftwareVersion "2.1.0") ]
 then
 	sudo lxc-update-config -c /var/lib/lxc/oel$OracleRelease$SeedPostfix/config
 fi
-
-sleep 5
-
-clear
 
 n=1
 while [ $ContainerCreated -eq 0 ] && [ $n -le 5 ]
@@ -511,8 +520,6 @@ sleep 5
 
 clear
 
-### new ###
-
 if [ $(SoftwareVersion $LXCVersion) -ge $(SoftwareVersion "2.1.0") ]
 then
   	sudo lxc-update-config -c /var/lib/lxc/oel$OracleRelease$SeedPostfix/config
@@ -520,23 +527,11 @@ fi
 
 echo ''
 echo "=============================================="
-echo "Create the LXC oracle container complete      "
-echo "(Passwords are the same as the usernames)     "
-echo "Sleeping 5 seconds...                         "
-echo "=============================================="
-echo ''
-
-sleep 5
-
-clear
-
-echo ''
-echo "=============================================="
 echo "Extracting oracle-specific files to container."
 echo "=============================================="
 echo ''
 
-cd /opt/olxc/"$DistDir"/orabuntu/archives
+cd /opt/olxc/"$DistDir"/uekulele/archives
 
 if [ $MajorRelease -ge 8 ]
 then
@@ -603,6 +598,10 @@ then
 	sudo sed -i 's/tag=10/tag=11/g' 					/etc/network/if-up.d/openvswitch/oel$OracleRelease$SeedPostfix-pub-ifup-sx1
 	sudo sed -i 's/sw1/sx1/g' 						/etc/network/if-down.d/openvswitch/oel$OracleRelease$SeedPostfix-pub-ifdown-sx1
 
+	sudo cat /var/lib/lxc/oel$OracleRelease$SeedPostfix/config
+
+	sleep 5
+
 	echo ''
 	echo "=============================================="
 	echo "Done: LXC config updates.                     "
@@ -619,12 +618,8 @@ echo "Set NTP '-x' option in ntpd file...           "
 echo "=============================================="
 echo ''
 
-sudo sed -i -e '/OPTIONS/{ s/.*/OPTIONS="-g -x"/ }' /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/etc/sysconfig/ntpd
+# sudo sed -i -e '/OPTIONS/{ s/.*/OPTIONS="-g -x"/ }' /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/etc/sysconfig/ntpd
 
-sleep 5
-
-clear
-	
 echo ''
 echo "=============================================="
 echo "Done: Set NTP '-x' option in ntpd file.       "
@@ -718,7 +713,7 @@ sudo sed -i 's/tag=10/tag=11/' 				/etc/network/if-down.d/openvswitch/oel$Oracle
 if [ $ContainerUp != 'RUNNING' ] || [ $PublicIP != 17229108 ]
 then
 	function CheckContainersExist {
-	sudo ls /var/lib/lxc | grep -v $NameServer | grep oel$OracleRelease$SeedPostfix | sort -V | sed 's/$/ /' | tr -d '\n' | sed 's/^[ \t]*//;s/[ \t]*$//'
+		sudo ls /var/lib/lxc | grep -v $NameServer | grep oel$OracleRelease$SeedPostfix | sort -V | sed 's/$/ /' | tr -d '\n' | sed 's/^[ \t]*//;s/[ \t]*$//'
 	}
 	ContainersExist=$(CheckContainersExist)
 	sleep 5
@@ -728,10 +723,11 @@ then
 		echo "Starting container $j ..."
 		echo ''
 		sudo lxc-start  -n $j
+		sleep 5
 
-		if [ $MajorRelease -eq 8 ]
+		if [ $MajorRelease -ge 7 ]
 		then 
-			sudo lxc-attach -n $j -- sudo hostnamectl set-hostname $j
+			sudo lxc-attach -n $j -- hostnamectl set-hostname $j
 			sudo lxc-stop   -n $j
 			sudo lxc-start  -n $j
 		fi

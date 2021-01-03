@@ -531,13 +531,17 @@ then
        			 		echo "=============================================="
        			 		echo ''
 
-					if [ $Release -eq 8 ] && [ $LinuxFlavor != 'Fedora' ]
+					if   [ $Release -eq 8 ] && [ $LinuxFlavor != 'Fedora' ]
 					then
 						sudo yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
 						sudo yum -y install ruby curl tar yum-utils which facter
+
+					elif [ $Release -eq 7 ] && [ $LinuxFlavor = 'CentOS' ]
+					then
+       				 		sudo yum -y install which ruby curl tar yum-utils
+
 					else
        				 		sudo yum -y install which ruby curl tar yum-utils
-						curl -s --ipv4 http://downloads.puppetlabs.com/facter/facter-2.4.4.tar.gz | sudo tar xz; sudo ruby facter*/install.rb
 					fi
 
 					if [ $Release -le 7 ] && [ $LinuxFlavor != 'Fedora' ]
@@ -579,9 +583,27 @@ then
 							curl -s --ipv4 http://downloads.puppetlabs.com/facter/facter-2.4.4.tar.gz | sudo tar xz; sudo ruby facter*/install.rb
 						fi
 					else
+       				 		echo ''
+       				 		echo "=============================================="
+       				 		echo "Build and install Facter (Ruby Method)...     "
+       				 		echo "=============================================="
+       				 		echo ''
+
+						sleep 5
+
 						mkdir -p /opt/olxc/"$DistDir"/uekulele/facter
 						cd /opt/olxc/"$DistDir"/uekulele/facter
 						curl -s --ipv4 http://downloads.puppetlabs.com/facter/facter-2.4.4.tar.gz | sudo tar xz; sudo ruby facter*/install.rb
+       				 		
+						echo ''
+       				 		echo "=============================================="
+       				 		echo "Done: Build and install Facter (Ruby Method). "
+       				 		echo "=============================================="
+       				 		echo ''
+
+						sleep 5
+
+						clear
 					fi
 
 					echo ''

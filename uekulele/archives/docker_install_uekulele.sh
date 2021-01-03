@@ -159,6 +159,16 @@ fi
 
 # Install alpine-nettools
 
+if [ $LinuxFlavor = 'Oracle' ]
+then
+	function CheckUEKVersion {
+		sudo /opt/olxc/"$DistDir"/anylinux/vercomp | cut -f2 -d"'" | cut -f1 -d' ' | cut -f1 -d'.'
+	}
+	UEKVersion=$(CheckUEKVersion)
+else
+	UEKVersion=0
+fi
+
 if   [ $Release -le 7 ] && [ $UEKVersion -ge 4 ]
 then
 	sudo docker run -d oraclelinux:7.3

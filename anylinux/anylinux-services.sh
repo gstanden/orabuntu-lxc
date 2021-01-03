@@ -327,7 +327,7 @@ then
 	FirewalldBackend=$(GetFirewalldBackend)
 fi
 
-if [ $LinuxFlavor != 'Ubuntu' ] && [ $LinuxFlavor != 'Pop_OS' ]
+if [ $LinuxFlavor = 'Fedora' ] && [ $RedHatVersion -ge 31 ]
 then
 	echo ''
 	echo "=============================================="
@@ -1616,8 +1616,8 @@ then
 	sudo chmod 777 /opt/olxc
 fi
 
-sudo rm  -f /opt/olxc/GNU3
-sudo rm -rf /opt/olxc/home
+# sudo rm  -f /opt/olxc/GNU3
+# sudo rm -rf /opt/olxc/home
 sudo mkdir -p /opt/olxc/home/scst-files
 sudo cp -p "$DistDir"/anylinux/vercomp /opt/olxc/home/scst-files/.
 sudo chmod +x "$DistDir"/anylinux/vercomp /opt/olxc/home/scst-files/vercomp
@@ -1640,6 +1640,11 @@ echo "$DistDir/$SubDirName/COPYING"                                             
 echo "$DistDir/products/$Product/$Product"					>> "$DistDir"/"$SubDirName"/archives/"$SubDirName"-services.lst
 echo "$DistDir/products/$Product/$Product.net"					>> "$DistDir"/"$SubDirName"/archives/"$SubDirName"-services.lst
 echo "$DistDir/products/$Product/$Product.cnf"					>> "$DistDir"/"$SubDirName"/archives/"$SubDirName"-services.lst
+echo "$DistDir/lxcimage/SHA256SUMS"						>> "$DistDir"/"$SubDirName"/archives/"$SubDirName"-services.lst
+echo "$DistDir/lxcimage/oracle6/SHA256SUMS"					>> "$DistDir"/"$SubDirName"/archives/"$SubDirName"-services.lst
+echo "$DistDir/lxcimage/oracle7/SHA256SUMS"					>> "$DistDir"/"$SubDirName"/archives/"$SubDirName"-services.lst
+echo "$DistDir/lxcimage/oracle8/SHA256SUMS"					>> "$DistDir"/"$SubDirName"/archives/"$SubDirName"-services.lst
+echo "$DistDir/lxcimage/nsa/SHA256SUMS"						>> "$DistDir"/"$SubDirName"/archives/"$SubDirName"-services.lst
 
 cd "$DistDir"/"$SubDirName"/archives
 

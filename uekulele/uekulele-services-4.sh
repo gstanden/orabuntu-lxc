@@ -592,17 +592,18 @@ do
                 sudo rm -f /var/lib/lxc/$j/rootfs/var/run/dhclient.pid
         fi
         sudo lxc-start  -n $j
-
-        if [ $MajorRelease -ge 8 ]
+	sleep 5
+        if [ $MajorRelease -ge 7 ]
         then
                 sudo lxc-attach -n $j -- hostnamectl set-hostname $j
                 sudo lxc-stop   -n $j
                 sudo lxc-start  -n $j
+		sleep 5
         fi
 
         sudo lxc-ls -f
         echo ''
-        sleep 10
+        sleep 5
 done
 
 echo "=============================================="

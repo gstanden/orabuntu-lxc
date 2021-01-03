@@ -344,7 +344,7 @@ clear
 
 echo ''
 echo "=============================================="
-echo "Testing connectivity to $SeedContainerName... "
+echo "Done: Test connect to $SeedContainerName...   "
 echo "=============================================="
 echo ''
 echo "=============================================="
@@ -353,10 +353,33 @@ echo "=============================================="
 echo ''
 
 sudo lxc-attach -n $SeedContainerName -- uname -a
+
+echo ''
+echo "=============================================="
+echo "Done: Test connect to $SeedContainerName...   "
+echo "=============================================="
+echo ''
+
+sleep 5
+
+clear
+
+echo ''
+echo "=============================================="
+echo "Install openssh-server...                     "
+echo "=============================================="
+echo ''
+
 sudo lxc-attach -n $SeedContainerName -- usermod --password `perl -e "print crypt('root','root');"` root
 sudo lxc-attach -n $SeedContainerName -- yum -y install openssh-server
 sudo lxc-attach -n $SeedContainerName -- service sshd restart
 sudo lxc-attach -n $SeedContainerName -- ip link set eth0 mtu $MultiHostVar7
+
+echo ''
+echo "=============================================="
+echo "Done: Install openssh-server.                 "
+echo "=============================================="
+echo ''
 
 sleep 5
 
