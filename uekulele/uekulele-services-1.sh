@@ -1204,7 +1204,7 @@ then
 
 	echo ''
 	echo "=============================================="
-	echo "Start LXC and related services...             "
+	echo "Start LXC and libvirt (give it a minute)...   "
 	echo "=============================================="
 	echo ''
 
@@ -1254,7 +1254,7 @@ then
 
 	echo ''
 	echo "=============================================="
-	echo "LXC and related services started.             "
+	echo "Done: Start LXC and libvirt                   "
 	echo "=============================================="
 
 	sleep 5
@@ -1365,11 +1365,11 @@ then
 		if [ $Release -ge 7 ]
 		then
 
-			if [ $LinuxFlavor = 'Redhat' ] && [ $Release -eq 7 ]
+			if [ $LinuxFlavor = 'Red' ] && [ $Release -eq 7 ]
 			then
 				echo ''
 				echo "=============================================="
-				echo "Enable Required Repos...                      "
+				echo "Enable Required Repos (give it a minute)...   "
 				echo "=============================================="
 				echo ''
 
@@ -1377,7 +1377,7 @@ then
 				
 				echo ''
 				echo "=============================================="
-				echo "Enable Required Repos...                      "
+				echo "Done: Enable Required Repos.                  "
 				echo "=============================================="
 				echo ''
 
@@ -1732,7 +1732,7 @@ then
 
 			if [ $Release -eq 7 ]
 			then
-				if [ $LinuxFlavor = 'CentOS' ] || [ $LinuxFlavor = 'Oracle' ]
+				if [ $LinuxFlavor = 'CentOS' ] || [ $LinuxFlavor = 'Oracle' ] || [ $LinuxFlavor = 'Red' ]
 				then
 					echo ''
 					echo "=============================================="
@@ -1982,7 +1982,7 @@ then
 		
 			if [ $Release -eq 7 ]
 			then
-				if [ $LinuxFlavor = 'CentOS' ] || [ $LinuxFlavor = 'Oracle' ]
+				if [ $LinuxFlavor = 'CentOS' ] || [ $LinuxFlavor = 'Oracle' ] || [ $LinuxFlavor = 'Red' ]
 				then
 					echo ''
 					echo "=============================================="
@@ -2656,13 +2656,13 @@ then
 
 		clear
 
-		echo ''
-		echo "=============================================="
-		echo "Untar source code and build openvswitch RPM..."
-		echo "=============================================="
-		echo ''
+#		echo ''
+#		echo "=============================================="
+#		echo "Untar source code and build openvswitch RPM..."
+#		echo "=============================================="
+#		echo ''
 
-		sleep 5
+#		sleep 5
 
 		if    [ $Release -eq 6 ]
 		then
@@ -2916,6 +2916,10 @@ then
 					echo "Configure repos...                            "
 					echo "==============================================" 
 					echo ''
+
+					sleep 5
+
+					clear
 				fi
 
 				echo ''
@@ -3147,11 +3151,13 @@ then
 					python3 -m venv py36env
 					source py36env/bin/activate
 			
-				#	echo ''
-				#	echo "==============================================" 
-				#	echo "Install Python3 PIP Packages (takes awhile)..."
-				#	echo "==============================================" 
-				#	echo ''
+					echo ''
+					echo "==============================================" 
+					echo "Python3 pip ops (if needed)...                "
+					echo "==============================================" 
+					echo ''
+
+					echo "No pip ops currently required for Release $Release and OpenvSwitch $OvsVersion."
 
  				#	python3 -m pip install --upgrade pip
  				#	python3 -m pip install six
@@ -3160,7 +3166,7 @@ then
 				
 					echo ''
 					echo "==============================================" 
-					echo "Done: Install Packages...                     "
+					echo "Done: Python3 pip ops (if needed).            "
 					echo "==============================================" 
 					echo ''
 

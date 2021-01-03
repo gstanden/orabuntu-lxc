@@ -922,7 +922,7 @@ echo 'MultiHost                 = '$MultiHost
 			
 		if [ $Release -eq 7 ] && [ $LinuxFlavor = 'Red' ]
 		then
-               		LxcOvsVersion="2.1.1:2.12.1"
+               		LxcOvsVersion="3.0.4:2.12.1"
 		fi
 			
 		if [ $Release -eq 7 ] && [ $LinuxFlavor = 'Oracle' ]

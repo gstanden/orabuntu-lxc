@@ -541,7 +541,7 @@ fi
 
 if [ $MajorRelease -eq 7 ] || [ $MajorRelease -eq 6 ]
 then
-	sudo tar -xvf /opt/olxc/"$DistDir"/orabuntu/archives/lxc-oracle-files.tar -C /var/lib/lxc/oel$OracleRelease$SeedPostfix --touch
+	sudo tar -xvf /opt/olxc/"$DistDir"/"$SubDirName"/archives/lxc-oracle-files.tar -C /var/lib/lxc/oel$OracleRelease$SeedPostfix --touch
 	sudo chown root:root /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/etc/dhcp/dhclient.conf
 	sudo chmod 644 /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/etc/dhcp/dhclient.conf
 	sudo sed -i "s/HOSTNAME=ContainerName/HOSTNAME=oel$OracleRelease$SeedPostfix/g" /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/etc/sysconfig/network
@@ -797,7 +797,7 @@ clear
 
 echo ''
 echo "==============================================" 
-echo "Next script to run: orabuntu-services-3.sh    "
+echo "Next script to run: uekulele-services-3.sh    "
 echo "=============================================="
 
 sleep 5
