@@ -800,14 +800,14 @@ fi
 	MajorRelease=$8
 	if [ -z $8 ]
 	then
-		MajorRelease=8
+		MajorRelease=6
 	fi
 	# echo 'Oracle Container Release  = '$MajorRelease
 
 	PointRelease=$2
 	if [ -z $2 ]
 	then
-		PointRelease=3
+		PointRelease=9
 	fi
 	echo 'Oracle Container Version  = '$MajorRelease.$PointRelease
 

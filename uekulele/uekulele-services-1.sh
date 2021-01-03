@@ -1416,23 +1416,30 @@ then
 
 			if [ $Release -ge 8 ]
 			then
-				echo ''
-				echo "=============================================="
-				echo "Enable Required Repos...                      "
-				echo "=============================================="
-				echo ''
+				if [ $LinuxFlavor = 'Oracle' ]
+				then
+					echo ''
+					echo "=============================================="
+					echo "Enable Required Repos...                      "
+					echo "=============================================="
+					echo ''
 
-				sudo yum-config-manager --enable ol8_codeready_builder
-				sudo yum-config-manager --enable ol8_appstream
-				sudo yum-config-manager --enable ol8_u0_baseos_base
-				sudo yum-config-manager --enable ol8_baseos_latest
-			 	sudo yum-config-manager --enable ol8_addons
+					sudo yum-config-manager --enable ol8_codeready_builder
+					sudo yum-config-manager --enable ol8_appstream
+					sudo yum-config-manager --enable ol8_u0_baseos_base
+					sudo yum-config-manager --enable ol8_baseos_latest
+				 	sudo yum-config-manager --enable ol8_addons
 				
-				echo ''
-				echo "=============================================="
-				echo "Done: Enable Required Repos.                  "
-				echo "=============================================="
-				echo ''
+					echo ''
+					echo "=============================================="
+					echo "Done: Enable Required Repos.                  "
+					echo "=============================================="
+					echo ''
+
+				elif [ $LinuxFlavor = 'CentOS' ]
+				then
+					sudo yum config-manager --set-enabled powertools
+				fi
 			fi
 
 			echo ''
@@ -1460,10 +1467,14 @@ then
 				echo "Install packages...                           "
 				echo "=============================================="
 				echo ''
-
-				sudo rpm -ivh "$DistDir"/rpmstage/bridge-utils-1.5-9.el7.x86_64.rpm
-				sudo yum -y install libcap-devel
-				
+					if [ $LinuxFlavor = 'CentOS' ]
+					then
+						sudo dnf -y install openjade texinfo perl-XML-SAX docbook2X libcap-devel libcgroup
+						sudo rpm -ivh "$DistDir"/rpmstage/bridge-utils-1.5-9.el7.x86_64.rpm
+					else
+						sudo rpm -ivh "$DistDir"/rpmstage/bridge-utils-1.5-9.el7.x86_64.rpm
+						sudo yum -y install libcap-devel
+					fi
 				echo ''
 				echo "=============================================="
 				echo "Done: Install packages.                       "
@@ -3222,6 +3233,8 @@ then
                                         echo "Install from codeready_builder repo...    "
                                         echo "==============================================" 
                                         echo ''
+
+					sleep 5
 
                                         if [ $LinuxFlavor = 'Oracle' ]
                                         then
