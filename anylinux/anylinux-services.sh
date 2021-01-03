@@ -319,7 +319,8 @@ then
 	Release=0
 fi
 
-if [ -f /etc/firewalld/firewalld.conf ]
+sudo test -f /etc/firewalld/firewalld.conf 
+if [ $? -eq 0 ]
 then
 	function GetFirewalldBackend {
 		sudo grep 'nftables' /etc/firewalld/firewalld.conf | grep FirewallBackend | grep -vc '#'
@@ -437,14 +438,7 @@ then
 		sleep 5
 
 		clear
-	else
-        	echo "=============================================="
-		echo "Orabuntu-LXC cannot be installed on current   "
-		echo "configuration of $LinuxFlavor $RedHatVersion. "
-		echo "Exiting ...                                   "
-        	echo "=============================================="
-		exit
-        fi
+	fi
 fi
 
 if [ $LinuxFlavor = 'Red' ] && [ $Release -ge 8 ]
@@ -507,13 +501,6 @@ then
 		sleep 5
 
 		clear
-	else
-        	echo "=============================================="
-		echo "Orabuntu-LXC cannot be installed on current   "
-		echo "configuration of $LinuxFlavor $RedHatVersion. "
-		echo "Exiting ...                                   "
-        	echo "=============================================="
-		exit
         fi
 fi
 
@@ -800,14 +787,14 @@ fi
 	MajorRelease=$8
 	if [ -z $8 ]
 	then
-		MajorRelease=6
+		MajorRelease=8
 	fi
 	# echo 'Oracle Container Release  = '$MajorRelease
 
 	PointRelease=$2
 	if [ -z $2 ]
 	then
-		PointRelease=9
+		PointRelease=3
 	fi
 	echo 'Oracle Container Version  = '$MajorRelease.$PointRelease
 
