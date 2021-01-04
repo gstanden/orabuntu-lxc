@@ -593,7 +593,7 @@ do
         fi
         sudo lxc-start  -n $j
 	sleep 5
-        if [ $MajorRelease -ge 7 ]
+        if [ $MajorRelease -ge 7 ] && [ $Release -ge 7 ]
         then
                 sudo lxc-attach -n $j -- hostnamectl set-hostname $j
                 sudo lxc-stop   -n $j

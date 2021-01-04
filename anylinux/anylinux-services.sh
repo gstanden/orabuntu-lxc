@@ -787,7 +787,7 @@ fi
 	MajorRelease=$8
 	if [ -z $8 ]
 	then
-		MajorRelease=8
+		MajorRelease=7
 	fi
 	# echo 'Oracle Container Release  = '$MajorRelease
 
@@ -925,7 +925,7 @@ echo 'MultiHost                 = '$MultiHost
 		if [ $Release -eq 6 ] && [ $LinuxFlavor = 'Oracle' ]
 		then
                	#	LxcOvsVersion="2.0.8:2.5.4"
-               		LxcOvsVersion="2.1.1:2.5.4"
+               		LxcOvsVersion="2.0.8:2.5.4"
 		fi
 		
 		if [ $Release -eq 6 ] && [ $LinuxFlavor = 'CentOS' ]

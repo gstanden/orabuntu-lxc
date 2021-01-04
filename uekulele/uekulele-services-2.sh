@@ -353,15 +353,18 @@ function ConfirmContainerCreated {
 }
 ContainerCreated=$(ConfirmContainerCreated)
 
+echo ''
+echo "=============================================="
+echo "   Create the LXC Oracle Linux container      "
+echo "                                              "
+echo "      Note: Depends on download speed         "
+echo "=============================================="
+echo ''
+
 m=1
-while [ $ContainerCreated -eq 0 ] && [ $m -le 3 ]
+while [ $ContainerCreated -eq 0 ] && [ $m -le 3 ] && [ $Release -ge 7 ]
 do
-	echo ''
 	echo "=============================================="
-	echo "   Create the LXC Oracle Linux container      "
-	echo "                                              "
-	echo "      Note: Depends on download speed         "
-	echo "                                              "
 	echo "                 Method 1                     "
 	echo "=============================================="
 	echo ''
@@ -430,12 +433,7 @@ fi
 n=1
 while [ $ContainerCreated -eq 0 ] && [ $n -le 5 ]
 do
-	echo ''
 	echo "=============================================="
-	echo "   Create the LXC Oracle Linux container      "
-	echo "                                              "
-	echo "      Note: Depends on download speed         "
-	echo "                                              "
 	echo "                 Method 2                     "
 	echo "=============================================="
 	echo ''
@@ -591,7 +589,16 @@ then
 	sudo sh -c "echo '# lxc.mount.entry = /dev/lxc_luns /var/lib/lxc/ContainerName/rootfs/dev/lxc_luns none defaults,bind,create=dir 0 0'	>> /var/lib/lxc/oel$OracleRelease$SeedPostfix/config"
 	sudo sh -c "echo '# lxc.mount.entry = shm dev/shm tmpfs size=3500m,nosuid,nodev,noexec,create=dir 0 0'					>> /var/lib/lxc/oel$OracleRelease$SeedPostfix/config"
 	sudo sed -i "s/ContainerName/oel$OracleRelease$SeedPostfix/g" 										   /var/lib/lxc/oel$OracleRelease$SeedPostfix/config
-	sudo sed -i 's/lxc\.net\.0\.link/\# lxc\.net\.0\.link/' 										   /var/lib/lxc/oel$OracleRelease$SeedPostfix/config	
+
+	if   [ $Release -ge 7 ]
+	then
+		sudo sed -i 's/lxc\.net\.0\.link/\# lxc\.net\.0\.link/' 									   /var/lib/lxc/oel$OracleRelease$SeedPostfix/config
+
+	elif [ $Release -eq 6 ]
+	then
+		sudo sed -i 's/lxc\.network\.link/\# lxc\.network\.link/' 									   /var/lib/lxc/oel$OracleRelease$SeedPostfix/config
+	fi
+
 	sudo sed -i "s/\(hwaddr = \).*/\1$NewMacAddress/"               									   /var/lib/lxc/oel$OracleRelease$SeedPostfix/config
 
 	sudo sed -i 's/sw1/sx1/g' 						/etc/network/if-up.d/openvswitch/oel$OracleRelease$SeedPostfix-pub-ifup-sx1
@@ -725,7 +732,7 @@ then
 		sudo lxc-start  -n $j
 		sleep 5
 
-		if [ $MajorRelease -ge 7 ]
+		if [ $MajorRelease -ge 7 ] && [ $Release -ge 7 ]
 		then 
 			sudo lxc-attach -n $j -- hostnamectl set-hostname $j
 			sudo lxc-stop   -n $j
