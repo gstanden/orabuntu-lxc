@@ -101,7 +101,7 @@ fi
 if [ -z $2 ]
 then
 	SPOKEIP='lan.ip.this.host'
- 	SPOKEIP=192.168.1.242
+ 	SPOKEIP=192.168.1.116
 else
 	SPOKEIP=$2
 fi
@@ -109,7 +109,7 @@ fi
 if [ -z $3 ]
 then
 	HUBIP='lan.ip.hub.host'
- 	HUBIP=192.168.1.241
+ 	HUBIP=192.168.1.128
 else
 	HUBIP=$3
 fi
@@ -132,10 +132,10 @@ fi
 
 if [ -z $6 ]
 then
-        Product=no-product
  	Product=workspaces
  	Product=oracle-db
 	Product=oracle-gi-18c
+        Product=no-product
 else
 	Product=$6
 fi
@@ -163,22 +163,20 @@ function GetOwner {
 }
 Owner=$(GetOwner)
 
-### new ###
-
 if [ ! -d /opt/olxc ]
 then
         sudo mkdir -p  /opt/olxc
         sudo chmod 777 /opt/olxc
 fi
 
-if [ ! -d /opt/olxc/"$DistDir"/installs/logs ]
+if [ ! -d /opt/olxc/installs/logs ]
 then
-        sudo mkdir -p /opt/olxc/"$DistDir"/installs/logs
+        sudo mkdir -p /opt/olxc/installs/logs
 fi
 
-if [ -f /opt/olxc/"$DistDir"/installs/logs/$USER.log ]
+if [ -f /opt/olxc/installs/logs/$USER.log ]
 then
-        sudo mv /opt/olxc/"$DistDir"/installs/logs/$USER.log /opt/olxc/"$DistDir"/installs/logs/$USER.log.$LOGEXT
+        sudo mv /opt/olxc/installs/logs/$USER.log /opt/olxc/installs/logs/$USER.log.$LOGEXT
 fi
 
 if [ ! -d /var/log/sudo-io ]
@@ -188,7 +186,7 @@ fi
 
 if [ ! -f /etc/sudoers.d/orabuntu-lxc ]
 then
-        sudo sh -c "echo 'Defaults      logfile=\"/opt/olxc/$DistDir/installs/logs/$USER.log\"'                         >> /etc/sudoers.d/orabuntu-lxc"
+        sudo sh -c "echo 'Defaults      logfile=\"/opt/olxc/installs/logs/$USER.log\"'                          >> /etc/sudoers.d/orabuntu-lxc"
         sudo sh -c "echo 'Defaults      log_input,log_output'                                                           >> /etc/sudoers.d/orabuntu-lxc"
         sudo sh -c "echo 'Defaults      iolog_dir=/var/log/sudo-io/%{user}'                                             >> /etc/sudoers.d/orabuntu-lxc"
         sudo chmod 0440 /etc/sudoers.d/orabuntu-lxc
