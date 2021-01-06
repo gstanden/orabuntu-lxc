@@ -2837,9 +2837,9 @@ then
 
 	if [ $GRE = 'Y' ]
 	then
-        #       sudo sed -i "/route add -net/s/#/ /"                            /etc/network/openvswitch/crt_ovs_sw1.sh
-        #       sudo sed -i "/REMOTE_GRE_ENDPOINT/s/#/ /"                       /etc/network/openvswitch/crt_ovs_sw1.sh
-        #       sudo sed -i "s/REMOTE_GRE_ENDPOINT/$MultiHostVar5/g"            /etc/network/openvswitch/crt_ovs_sw1.sh
+                sudo sed -i "/route add -net/s/#/ /"                            /etc/network/openvswitch/crt_ovs_sw1.sh
+                sudo sed -i "/REMOTE_GRE_ENDPOINT/s/#/ /"                       /etc/network/openvswitch/crt_ovs_sw1.sh
+                sudo sed -i "s/REMOTE_GRE_ENDPOINT/$MultiHostVar5/g"            /etc/network/openvswitch/crt_ovs_sw1.sh
 
                 sudo ovs-vsctl add-port sw1 gre$Sw1Index -- set interface gre$Sw1Index type=gre options:remote_ip=$MultiHostVar5
 
@@ -2969,7 +2969,7 @@ then
 
                 fi
 
-                sudo getent hosts $HOSTNAME.$Domain2 > /dev/null 2>&1
+                sudo nslookup $HOSTNAME.$Domain2 > /dev/null 2>&1
                 if [ $? -eq 1 ]
                 then
                         echo ''
