@@ -331,47 +331,57 @@ echo ''
 let CloneIndex=10
 let CopyCompleted=0
 
+### new ###
+
 while [ $CopyCompleted -lt $NumCon ]
 do
-	# GLS 20160707 updated to use lxc-copy instead of lxc-clone for Ubuntu 16.04
-	# GLS 20160707 continues to use lxc-clone for Ubuntu 15.04 and 15.10
+	# GLS 20210107 updated to use getent instead of nslookup for indexing check for Fedora 31+
+        # GLS 20160707 updated to use lxc-copy instead of lxc-clone for Ubuntu 16.04
+        # GLS 20160707 continues to use lxc-clone for Ubuntu 15.04 and 15.10
 
-	RedHatVersion=$(GetRedHatVersion)
+        RedHatVersion=$(GetRedHatVersion)
 
-	function CheckDNSLookup {
-		nslookup $ContainerPrefix$CloneIndex $NameServer | grep -v '#' | grep Address | grep '10\.207\.39' | wc -l
-	}
-	DNSLookup=$(CheckDNSLookup)
-
-	if [ $Release -ge 7 ] || [ $Release -eq 6 ]
+	if [ $LinuxFlavor = 'Fedora' ] && [ $Release -eq 8 ]
 	then
-		while [ $DNSLookup -eq 1 ]
-		do
-			CloneIndex=$((CloneIndex+1))
-			DNSLookup=$(CheckDNSLookup)
-		done
-		if [ $DNSLookup -eq 0 ]
-		then
-			echo ''
-			echo "=============================================="
-			echo "Clone $SeedContainerName to $CP$CloneIndex    "
-			echo "=============================================="
-			echo ''
-
-			echo "Clone Container Name = $ContainerPrefix$CloneIndex"
-
-      			sudo lxc-copy -n $SeedContainerName -N $ContainerPrefix$CloneIndex
-
-			if [ $MajorRelease -ge 7 ]
-			then
-                        	sudo sed -i "s/$SeedContainerName/$ContainerPrefix$CloneIndex/g"        /var/lib/lxc/$ContainerPrefix$CloneIndex/rootfs/etc/hostname
-                        fi
-			sudo sed -i "s/$SeedContainerName/$ContainerPrefix$CloneIndex/g"        /var/lib/lxc/$ContainerPrefix$CloneIndex/rootfs/etc/sysconfig/network-scripts/ifcfg-eth0
-			sudo sed -i "s/HostName/$ContainerPrefix$CloneIndex/g"        		/var/lib/lxc/$ContainerPrefix$CloneIndex/rootfs/etc/sysconfig/network-scripts/ifcfg-eth0
-                        sudo sed -i "s/$SeedContainerName/$ContainerPrefix$CloneIndex/g"        /var/lib/lxc/$ContainerPrefix$CloneIndex/rootfs/etc/sysconfig/network
-                        sudo sed -i "s/$SeedContainerName/$ContainerPrefix$CloneIndex/g"        /var/lib/lxc/$ContainerPrefix$CloneIndex/rootfs/etc/hosts
-		fi
+		function CheckDNSLookup {
+			timeout 5 getent hosts $ContainerPrefix$CloneIndex
+		}
+		DNSLookup=$(CheckDNSLookup)
+		DNSLookup=`echo $?`
+	else
+		function CheckDNSLookup {
+			timeout 5 nslookup $ContainerPrefix$CloneIndex
+		}
+		DNSLookup=$(CheckDNSLookup)
+		DNSLookup=`echo $?`
 	fi
+
+        while [ $DNSLookup -eq 0 ]
+        do
+                CloneIndex=$((CloneIndex+1))
+                DNSLookup=$(CheckDNSLookup)
+                DNSLookup=`echo $?`
+        done
+
+        echo ''
+        echo "=============================================="
+        echo "Clone $SeedContainerName to $CP$CloneIndex    "
+        echo "=============================================="
+        echo ''
+
+	echo "Clone Container Name = $ContainerPrefix$CloneIndex"
+
+      	sudo lxc-copy -n $SeedContainerName -N $ContainerPrefix$CloneIndex
+
+	if [ $MajorRelease -ge 7 ]
+	then
+               	sudo sed -i "s/$SeedContainerName/$ContainerPrefix$CloneIndex/g"        /var/lib/lxc/$ContainerPrefix$CloneIndex/rootfs/etc/hostname
+	fi
+
+	sudo sed -i "s/$SeedContainerName/$ContainerPrefix$CloneIndex/g"        	/var/lib/lxc/$ContainerPrefix$CloneIndex/rootfs/etc/sysconfig/network-scripts/ifcfg-eth0
+	sudo sed -i "s/HostName/$ContainerPrefix$CloneIndex/g"        			/var/lib/lxc/$ContainerPrefix$CloneIndex/rootfs/etc/sysconfig/network-scripts/ifcfg-eth0
+	sudo sed -i "s/$SeedContainerName/$ContainerPrefix$CloneIndex/g"        	/var/lib/lxc/$ContainerPrefix$CloneIndex/rootfs/etc/sysconfig/network
+	sudo sed -i "s/$SeedContainerName/$ContainerPrefix$CloneIndex/g"        	/var/lib/lxc/$ContainerPrefix$CloneIndex/rootfs/etc/hosts
 
 	sudo sed -i "s/$SeedContainerName/$ContainerPrefix$CloneIndex/g" /var/lib/lxc/$ContainerPrefix$CloneIndex/config
 	sudo sed -i "s/\.10/\.$CloneIndex/g" /var/lib/lxc/$ContainerPrefix$CloneIndex/config

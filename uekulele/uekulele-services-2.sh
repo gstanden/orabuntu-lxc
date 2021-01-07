@@ -220,6 +220,8 @@ then
 	Release=0
 fi
 
+### GLS 20210107 ###
+
 if   [ $MultiHostVar3 = 'X' ] && [ $GREValue = 'Y' ]
 then
         SeedIndex=10
@@ -230,37 +232,56 @@ then
         }
         NameServerShortName=$(GetNameServerShortName)
 
-        function CheckDNSLookup {
-        	sudo nslookup oel$OracleRelease$SeedPostfix $NameServer | grep '10\.207\.29' | wc -l
-	}
-        DNSLookup=$(CheckDNSLookup)
+	if [ $LinuxFlavor = 'Fedora' ] && [ $Release -eq 8 ]
+	then
+		function CheckDNSLookup {
+			timeout 5 getent hosts oel$OracleRelease$SeedPostfix
+		}
+		DNSLookup=$(CheckDNSLookup)
+		DNSLookup=`echo $?`
+	else
+		function CheckDNSLookup {
+			timeout 5 nslookup oel$OracleRelease$SeedPostfix $NameServer
+		}
+		DNSLookup=$(CheckDNSLookup)
+		DNSLookup=`echo $?`
+	fi
 
-        if [ $UbuntuMajorVersion -ge 16 ] || [ $Release -ge 6 ]
-        then
-                while [ $DNSLookup -eq 1 ]
-                do
-                        SeedIndex=$((SeedIndex+1))
-                        SeedPostfix=c$SeedIndex
-                        DNSLookup=$(CheckDNSLookup)
-                done
+        while [ $DNSLookup -eq 0 ]
+        do
+                SeedIndex=$((SeedIndex+1))
                 SeedPostfix=c$SeedIndex
-        fi
+                NSLookup=$(CheckDNSLookup)
+                DNSLookup=`echo $?`
+        done
+        SeedPostfix=c$SeedIndex
 
 elif [ $MultiHostVar3 -eq 1 ] && [ $GREValue = 'N' ]
 then
         SeedIndex=10
         SeedPostfix=c$SeedIndex
 
-        function CheckHighestSeedIndexHit {
-               	sudo nslookup oel$OracleRelease$SeedPostfix $NameServer | grep '10\.207\.29' | wc -l
-        }
-        HighestSeedIndexHit=$(CheckHighestSeedIndexHit)
+	if [ $LinuxFlavor = 'Fedora' ] && [ $Release -eq 8 ]
+	then
+		function CheckHighestSeedIndexHit {
+			timeout 5 getent hosts oel$OracleRelease$SeedPostfix
+		}
+		HighestSeedIndexHit=$(CheckHighestSeedIndexHit)
+		HighestSeedIndexHit=`echo $?`
+	else
+		function CheckHighestSeedIndexHit {
+			timeout 5 nslookup oel$OracleRelease$SeedPostfix
+		}
+		HighestSeedIndexHit=$(CheckHighestSeedIndexHit)
+		HighestSeedIndexHit=`echo $?`
+	fi
 
-        while [ $HighestSeedIndexHit -eq 1 ]
+        while [ $HighestSeedIndexHit -eq 0 ]
         do
-               	SeedIndex=$((SeedIndex+1))
-               	SeedPostfix=c$SeedIndex
-               	HighestSeedIndexHit=$(CheckHighestSeedIndexHit)
+                SeedIndex=$((SeedIndex+1))
+                SeedPostfix=c$SeedIndex
+                HighestSeedIndexHit=$(CheckHighestSeedIndexHit)
+                HighestSeedIndexHit=`echo $?`
         done
         SeedPostfix=c$SeedIndex
 fi

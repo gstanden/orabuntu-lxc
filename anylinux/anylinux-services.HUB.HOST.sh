@@ -45,6 +45,27 @@ echo "Script: anylinux-services.HUB.HOST.sh         "
 echo "=============================================="
 echo ''
 
+sleep 5
+
+clear
+
+echo ''
+echo "=============================================="
+echo "Establish sudo privileges...                  "
+echo "=============================================="
+echo ''
+
+sudo -S date
+
+echo ''
+echo "=============================================="
+echo "Privileges established.                       "
+echo "=============================================="
+
+sleep 5
+
+clear
+
 if [ -e /sys/hypervisor/uuid ]
 then
         function CheckAWS {

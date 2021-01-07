@@ -4447,12 +4447,14 @@ then
 	then
 		sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /etc/NetworkManager/dnsmasq.d/local
 		sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /etc/network/openvswitch/crt_ovs_sw1.sh
+		sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /etc/dhcp/dhclient.conf
 	fi
 		
 	if [ -n $Domain2 ] && [ $MultiHostVar2 = 'Y' ]
 	then
 		sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /etc/NetworkManager/dnsmasq.d/local
 		sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /etc/network/openvswitch/crt_ovs_sw1.sh
+		sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /etc/dhcp/dhclient.conf
 	fi
 
 	if [ $MultiHostVar2 = 'N' ]
@@ -4485,16 +4487,13 @@ then
 			sudo sed -i "/nsa/s/nsa/$NameServer/g" /var/lib/lxc/nsa/rootfs/etc/hostname
 			sudo sed -i "/nsa/s/nsa/$NameServer/g" /var/lib/lxc/nsa/rootfs/etc/hosts
                         sudo sed -i "/nsa/s/nsa/$NameServer/g" /var/lib/lxc/nsa/rootfs/root/crontab.txt
-                        sudo sed -i "/nsa/s/nsa/$NameServer/g" /var/lib/lxc/nsa/rootfs/root/ns_backup_update.lst
-                        sudo sed -i "/nsa/s/nsa/$NameServer/g" /var/lib/lxc/nsa/rootfs/root/ns_backup_update.sh
-                        sudo sed -i "/nsa/s/nsa/$NameServer/g" /var/lib/lxc/nsa/rootfs/root/ns_backup.start.sh
-                        sudo sed -i "/nsa/s/nsa/$NameServer/g" /var/lib/lxc/nsa/rootfs/root/dns-sync.sh
 
                         function GetNameServerShortName {
                                 echo $NameServer | cut -f1 -d'-'
                         }
                         NameServerShortName=$(GetNameServerShortName)
 
+                        sudo sed -i "/nsa/s/nsa/$NameServerShortName/g" /var/lib/lxc/nsa/rootfs/root/ns_backup_update.lst
                         sudo sed -i "/nsa/s/nsa/$NameServerShortName/g" /var/lib/lxc/nsa/rootfs/root/ns_backup_update.sh
                         sudo sed -i "/nsa/s/nsa/$NameServerShortName/g" /var/lib/lxc/nsa/rootfs/root/ns_backup.start.sh
                         sudo sed -i "/nsa/s/nsa/$NameServerShortName/g" /var/lib/lxc/nsa/rootfs/root/dns-sync.sh
@@ -5387,9 +5386,23 @@ then
         sudo sed -i "s/Pass=ubuntu/Pass=$password/"     /var/lib/lxc/"$NameServer"-base/rootfs/root/ns_backup_update.sh
 
 	sudo useradd -m -p $(openssl passwd -1 ${PASSWORD}) -s /bin/bash ${USERNAME}
-	sudo mkdir -p  /home/${USERNAME}/Downloads /home/${USERNAME}/Manage-Orabuntu/backup-lxc-container/$NameServer/updates
-	sudo chown -R ${USERNAME}:${USERNAME} /home/${USERNAME}/Downloads /home/${USERNAME}/Manage-Orabuntu
+	sudo mkdir -p  /home/${USERNAME}/Downloads 
+
+        function CutOffBase {
+                echo $NameServer | cut -f1 -d'-'
+        }
+        OffBase=$(CutOffBase)
+
+	sudo mkdir -p /home/${USERNAME}/Manage-Orabuntu/backup-lxc-container/$NameServer/updates
+	sudo mkdir -p /home/${USERNAME}/Manage-Orabuntu/backup-lxc-container/$OffBase/updates
+
+        echo "sudo mkdir -p /home/${USERNAME}/Manage-Orabuntu/backup-lxc-container/$OffBase/updates"
+        echo "sudo mkdir -p /home/${USERNAME}/Manage-Orabuntu/backup-lxc-container/$NameServer/updates"
+
+	sudo chown -R ${USERNAME}:${USERNAME} /home/${USERNAME}/Downloads 
+	sudo chown -R ${USERNAME}:${USERNAME} /home/${USERNAME}/Manage-Orabuntu
 	sudo chmod -R 777 /home/${USERNAME}/Manage-Orabuntu
+
 	sudo sed -i "/lxc\.mount\.entry/s/#/ /" /var/lib/lxc/$NameServer/config
 	sudo sed -i "/Manage\-Orabuntu/s/afns1\-base/afns1/" /var/lib/lxc/$NameServer/config
 
@@ -5397,20 +5410,6 @@ then
 	sleep 5
         sudo lxc-start -n $NameServer
 
-#       echo ''
-#       echo "=============================================="
-#       echo "Debug of new file transfer mechanism ...      "
-#       echo "=============================================="
-#       echo ''
-
-#       sudo lxc-attach -n $NameServer -- sudo touch /root/backup-lxc-container/afns1/updates/testfile
-#       sudo ls -l /home/amide/Manage-Orabuntu/backup-lxc-container/afns1/updates
-#       sudo lxc-attach -n $NameServer -- ls -l /root/backup-lxc-container/afns1/updates
-
-#       echo "sleeping for 30 seconds ..."
-
-#       sleep 30
-	
 	echo ''
 	echo "=============================================="
         echo "Create amide user RSA key...                  "

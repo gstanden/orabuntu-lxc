@@ -45,6 +45,27 @@ echo "Script: anylinux-services.GRE.HOST.sh         "
 echo "=============================================="
 echo ''
 
+sleep 5
+
+clear
+
+echo ''
+echo "=============================================="
+echo "Establish sudo privileges...                  "
+echo "=============================================="
+echo ''
+
+sudo date
+
+echo ''
+echo "=============================================="
+echo "Privileges established.                       "
+echo "=============================================="
+
+sleep 5
+
+clear
+
 if [ -e /sys/hypervisor/uuid ]
 then
         function CheckAWS {
@@ -101,7 +122,7 @@ fi
 if [ -z $2 ]
 then
 	SPOKEIP='lan.ip.this.host'
- 	SPOKEIP=192.168.1.20
+ 	SPOKEIP=192.168.1.95
 else
 	SPOKEIP=$2
 fi
@@ -109,7 +130,7 @@ fi
 if [ -z $3 ]
 then
 	HUBIP='lan.ip.hub.host'
- 	HUBIP=192.168.1.33
+ 	HUBIP=192.168.1.246
 else
 	HUBIP=$3
 fi
@@ -293,20 +314,59 @@ then
         echo "=============================================="
         echo ''
 
+	sleep 5
+
+	clear
+
         DocBook2XInstalled=0
         m=1
         while [ $DocBook2XInstalled -eq 0 ] && [ $m -le 5 ]
         do
                 if [ $LinuxFlavor != 'Fedora' ]
                 then
+        		echo ''
+        		echo "=============================================="
+        		echo "Install Required Packages...                  "
+        		echo "=============================================="
+        		echo ''
+
                         sudo yum -y install wget
+        		
+			echo ''
+        		echo "=============================================="
+        		echo "Done: Install Required Packages.              "
+        		echo "=============================================="
+        		echo ''
+
+			sleep 5
+
+			clear
+
                         sudo mkdir -p /opt/olxc/"$DistDir"/uekulele/epel
                         sudo chown -R $Owner:$Group /opt/olxc
                         cd /opt/olxc/"$DistDir"/uekulele/epel
+
                         if   [ $Release -eq 7 ]
                         then
+				echo ''
+        			echo "=============================================="
+        			echo "Install epel...                               "
+        			echo "=============================================="
+        			echo ''
+
                                 wget --timeout=5 --tries=10 https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
                                 sudo rpm -ivh epel-release-latest-7.noarch.rpm
+				
+				echo ''
+        			echo "=============================================="
+        			echo "Done: Install epel.                           "
+        			echo "=============================================="
+        			echo ''
+
+				sleep 5
+
+				clear
+
                         elif [ $Release -eq 6 ]
                         then
 			#	GLS 20201217 EPEL seems unavailable for Linux 6
@@ -314,18 +374,71 @@ then
 			#	sudo rpm -ivh epel-release-latest-6.noarch.rpm
 			#	wget https://ftp.tu-chemnitz.de/pub/linux/dag/redhat/el6/en/x86_64/rpmforge/RPMS/docbook2x-0.8.8-1.el6.rf.x86_64.rpm -4
 			#	wget https://ftp.tu-chemnitz.de/pub/linux/dag/redhat/el6/en/i386/rpmforge/RPMS/sshpass-1.05-1.el6.rf.x86_64.rpm -4
+				
+				echo ''
+        			echo "=============================================="
+        			echo "Install docbook2x and sshpass ...             "
+        			echo "=============================================="
+        			echo ''
+
+				sudo yum -y install openjade texinfo perl-XML-SAX
 				sudo rpm -ivh "$DistDir"/rpmstage/docbook2x-0.8.8-1.el6.rf.x86_64.rpm
 				sudo rpm -ivh "$DistDir"/rpmstage/sshpass-1.05-1.el6.rf.x86_64.rpm
+				
+				echo ''
+        			echo "=============================================="
+        			echo "Done: Install docbook2x and sshpass.          "
+        			echo "=============================================="
+        			echo ''
+
+				sleep 5
+
+				clear
+
 			elif [ $Release -eq 8 ]
 			then
+        			echo ''
+        			echo "=============================================="
+        			echo "Install Required Packages...                  "
+        			echo "=============================================="
+        			echo ''
+
 				sudo yum -y install oracle-epel-release-el8
 				sudo yum -y install yum-utils
 				sudo yum-config-manager --enable ol8_codeready_builder
 				sudo yum-config-manager --enable ol8_addons
 				sudo yum -y install docbook2X
+        			
+				echo ''
+        			echo "=============================================="
+        			echo "Done: Install Required Packages.              "
+        			echo "=============================================="
+        			echo ''
+
+				sleep 5
+
+				clear
                         fi
+
+			echo ''
+        		echo "=============================================="
+        		echo "Check REPO provides for lxc...                "
+        		echo "=============================================="
+        		echo ''
+
                         sudo yum provides lxc | sed '/^\s*$/d' | grep Repo | sort -u
-                        sudo yum -y install docbook2X
+
+			echo ''
+        		echo "=============================================="
+        		echo "Done: Check REPO provides for lxc.            "
+        		echo "=============================================="
+        		echo ''
+
+			sleep 5
+
+			clear
+
+                        sudo yum -y install docbook2X > /dev/null 2>&1
                 fi
 
                 function CheckDocBook2XInstalled {
@@ -340,8 +453,11 @@ then
                         echo "Done: Configure epel for $LinuxFlavor Linux.  "
                         echo "=============================================="
                         echo ''
+
                         sleep 5
+
                         clear
+
                 elif [ $DocBook2XInstalled -eq 0 ]
                 then
                         echo ''
@@ -349,7 +465,9 @@ then
                         echo 'epel failure ... retrying epel configuration. '
                         echo "=============================================="
                         echo ''
+
                         sleep 5
+
                         clear
                 fi
                 m=$((m+1))
