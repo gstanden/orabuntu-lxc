@@ -519,7 +519,7 @@ do
 	fi
 	
 	ssh-keygen -R $j
-       	sshpass -p root ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no root@$j "uname -a; cat /etc/oracle-release"
+       	sshpass -p root ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no root@$j "uname -a; cat /etc/redhat-release"
 
         echo ''
         echo "=============================================="

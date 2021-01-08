@@ -110,6 +110,46 @@ function GetMultiHostVar10 {
 MultiHostVar10=$(GetMultiHostVar10)
 GREValue=$MultiHostVar10
 
+function GetMultiHostVar11 {
+        echo $MultiHost | cut -f11 -d':'
+}
+MultiHostVar11=$(GetMultiHostVar11)
+
+function GetMultiHostVar12 {
+        echo $MultiHost | cut -f12 -d':'
+}
+MultiHostVar12=$(GetMultiHostVar12)
+LXDValue=$MultiHostVar12
+
+function GetMultiHostVar13 {
+        echo $MultiHost | cut -f13 -d':'
+}
+MultiHostVar13=$(GetMultiHostVar13)
+
+function GetMultiHostVar14 {
+        echo $MultiHost | cut -f14 -d':'
+}
+MultiHostVar14=$(GetMultiHostVar14)
+PreSeed=$MultiHostVar14
+
+function GetMultiHostVar15 {
+        echo $MultiHost | cut -f15 -d':'
+}
+MultiHostVar15=$(GetMultiHostVar15)
+LXDCluster=$MultiHostVar15
+
+function GetMultiHostVar16 {
+        echo $MultiHost | cut -f16 -d':'
+}
+MultiHostVar16=$(GetMultiHostVar16)
+StorageDriver=$MultiHostVar16
+
+function GetMultiHostVar17 {
+        echo $MultiHost | cut -f17 -d':'
+}
+MultiHostVar17=$(GetMultiHostVar17)
+StoragePoolName=$MultiHostVar17
+
 if [ -f /etc/lsb-release ]
 then
         function GetUbuntuVersion {
@@ -380,10 +420,11 @@ do
 		fi
 	fi
 
-	sudo sed -i "s/$SeedContainerName/$ContainerPrefix$CloneIndex/g" /var/lib/lxc/$ContainerPrefix$CloneIndex/config
-	sudo sed -i "s/\.10/\.$CloneIndex/g" /var/lib/lxc/$ContainerPrefix$CloneIndex/config
-	sudo sed -i 's/sx1/sw1/g' /var/lib/lxc/$ContainerPrefix$CloneIndex/config
-	sudo sed -i "s/mtu = 1500/mtu = $MultiHostVar7/g" /var/lib/lxc/$ContainerPrefix$CloneIndex/config
+	sudo sed -i "s/$SeedContainerName/$ContainerPrefix$CloneIndex/g" 		/var/lib/lxc/$ContainerPrefix$CloneIndex/config
+	sudo sed -i "s/\.10/\.$CloneIndex/g" 						/var/lib/lxc/$ContainerPrefix$CloneIndex/config
+ 	sudo sed -i 's/sx1/sw1/g' 							/var/lib/lxc/$ContainerPrefix$CloneIndex/config
+#	sudo sed -i 's/sx1a/sw1a/g' 							/var/lib/lxc/$ContainerPrefix$CloneIndex/config
+	sudo sed -i "s/mtu = 1500/mtu = $MultiHostVar7/g" 				/var/lib/lxc/$ContainerPrefix$CloneIndex/config
 #	sudo sed -i "s/lxc\.mount\.entry = \/dev\/lxc_luns/#lxc\.mount\.entry = \/dev\/lxc_luns/g" /var/lib/lxc/$ContainerPrefix$CloneIndex/config
 #	sudo sed -i "/domain-name-servers/s/10.207.29.2/10.207.39.2/g" /var/lib/lxc/$ContainerPrefix$CloneIndex/rootfs/etc/dhcp/dhclient.conf
 
@@ -528,6 +569,27 @@ then
 	echo "=============================================="
 	echo ''
 fi
+
+sleep 5
+
+clear
+
+echo ''
+echo "=============================================="
+echo "Install LXD ...                               "
+echo "=============================================="
+echo ''
+
+sleep 5
+
+sudo chmod 775  /opt/olxc/"$DistDir"/orabuntu/archives/lxd_install_orabuntu.sh
+		/opt/olxc/"$DistDir"/orabuntu/archives/lxd_install_orabuntu.sh $PreSeed $LXDCluster $MultiHostVar2 $MultiHostVar10
+
+echo ''
+echo "=============================================="
+echo "Done: Install LXD.                            "
+echo "=============================================="
+echo ''
 
 sleep 5
 

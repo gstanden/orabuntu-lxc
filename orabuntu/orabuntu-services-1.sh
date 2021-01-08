@@ -124,6 +124,46 @@ function GetMultiHostVar10 {
 MultiHostVar10=$(GetMultiHostVar10)
 GRE=$MultiHostVar10
 
+function GetMultiHostVar11 {
+        echo $MultiHost | cut -f11 -d':'
+}
+MultiHostVar11=$(GetMultiHostVar11)
+
+function GetMultiHostVar12 {
+        echo $MultiHost | cut -f12 -d':'
+}
+MultiHostVar12=$(GetMultiHostVar12)
+LXDValue=$MultiHostVar12
+
+function GetMultiHostVar13 {
+        echo $MultiHost | cut -f13 -d':'
+}
+MultiHostVar13=$(GetMultiHostVar13)
+
+function GetMultiHostVar14 {
+        echo $MultiHost | cut -f14 -d':'
+}
+MultiHostVar14=$(GetMultiHostVar14)
+PreSeed=$MultiHostVar14
+
+function GetMultiHostVar15 {
+        echo $MultiHost | cut -f15 -d':'
+}
+MultiHostVar15=$(GetMultiHostVar15)
+LXDCluster=$MultiHostVar15
+
+function GetMultiHostVar16 {
+        echo $MultiHost | cut -f16 -d':'
+}
+MultiHostVar16=$(GetMultiHostVar16)
+StorageDriver=$MultiHostVar16
+
+function GetMultiHostVar17 {
+        echo $MultiHost | cut -f17 -d':'
+}
+MultiHostVar17=$(GetMultiHostVar17)
+StoragePoolName=$MultiHostVar17
+
 function CheckNetworkManagerInstalled {
 	sudo dpkg -l | grep -v  network-manager- | grep network-manager | wc -l
 }
@@ -1295,6 +1335,72 @@ clear
 
 echo ''
 echo "=============================================="
+echo "Install OvsVethCleanup.service                "
+echo "=============================================="
+echo ''
+
+sudo sh -c "echo '[Unit]'                                                               >  /etc/systemd/system/OvsVethCleanup.service"
+sudo sh -c "echo 'Description=OvsVethCleanup job'                                       >> /etc/systemd/system/OvsVethCleanup.service"
+sudo sh -c "echo ''                                                                     >> /etc/systemd/system/OvsVethCleanup.service"
+sudo sh -c "echo '[Service]'                                                            >> /etc/systemd/system/OvsVethCleanup.service"
+sudo sh -c "echo 'Type=oneshot'                                                         >> /etc/systemd/system/OvsVethCleanup.service"
+sudo sh -c "echo 'User=root'                                                            >> /etc/systemd/system/OvsVethCleanup.service"
+sudo sh -c "echo 'ExecStart=/usr/bin/bash /etc/network/openvswitch/OvsVethCleanup.sh'   >> /etc/systemd/system/OvsVethCleanup.service"
+
+sudo cat /etc/systemd/system/OvsVethCleanup.service
+
+echo ''
+echo "=============================================="
+echo "Done: Install OvsVethCleanup.service          "
+echo "=============================================="
+echo ''
+
+sleep 5
+
+clear
+
+echo ''
+echo "=============================================="
+echo "Install OvsVethCleanup.timer                  "
+echo "=============================================="
+echo ''
+
+sudo sh -c "echo '[Unit]'                                                               >  /etc/systemd/system/OvsVethCleanup.timer"
+sudo sh -c "echo 'Description=OvsVethCleanup'                                           >> /etc/systemd/system/OvsVethCleanup.timer"
+sudo sh -c "echo ''                                                                     >> /etc/systemd/system/OvsVethCleanup.timer"
+sudo sh -c "echo '[Timer]'                                                              >> /etc/systemd/system/OvsVethCleanup.timer"
+sudo sh -c "echo 'OnUnitActiveSec=60s'                                                  >> /etc/systemd/system/OvsVethCleanup.timer"
+sudo sh -c "echo 'OnBootSec=60s'                                                        >> /etc/systemd/system/OvsVethCleanup.timer"
+sudo sh -c "echo ''                                                                     >> /etc/systemd/system/OvsVethCleanup.timer"
+sudo sh -c "echo '[Install]'                                                            >> /etc/systemd/system/OvsVethCleanup.timer"
+sudo sh -c "echo 'WantedBy=timers.target'                                               >> /etc/systemd/system/OvsVethCleanup.timer"
+
+sudo cat /etc/systemd/system/OvsVethCleanup.timer
+
+echo ''
+
+sudo systemctl daemon-reload
+sudo systemctl enable OvsVethCleanup.timer
+sudo systemctl start  OvsVethCleanup.timer
+
+echo ''
+
+sudo systemctl list-timers --all
+
+sleep 5
+
+echo ''
+echo "=============================================="
+echo "Done: Install OvsVethCleanup.timer                  "
+echo "=============================================="
+echo ''
+
+sleep 5
+
+clear
+
+echo ''
+echo "=============================================="
 echo "Creating /etc/sysctl.d/60-olxc.conf file ...  "
 echo "=============================================="
 echo ''
@@ -1978,8 +2084,50 @@ sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw7.sh
 sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw8.sh
 sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw9.sh
 
-sudo sed -i "s/MULTIHOSTVAR7/$MultiHostVar7/g"	/etc/network/openvswitch/crt_ovs_sw1.sh
-sudo sed -i "s/MULTIHOSTVAR7/$MultiHostVar7/g"	/etc/network/openvswitch/crt_ovs_sx1.sh
+echo '==================================='
+echo 'LXDCluster = '$LXDCluster
+echo 'PreSeed    = '$PreSeed
+echo '==================================='
+
+# sleep 20
+
+if [ $LXDCluster = 'Y' ]
+then
+        sudo apt-get -y install expect
+        sudo sed -i "s/HOSTNAME/$HOSTNAME/g"    /etc/network/openvswitch/lxd-init-node1.sh
+#       sudo cat                                /etc/network/openvswitch/lxd-init-node1.sh
+#       sleep 20
+
+        if   [ $PreSeed = 'Y' ]
+        then
+                function GetShortHostName {
+                        hostname -s
+                }
+                ShortHostName=$(GetShortHostName)
+
+                if   [ $GRE = 'N' ]
+                then
+                        sudo sed -i "s/SWITCH_IP/$Sw1Index/g"                                                   /etc/network/openvswitch/preseed.sw1a.olxc.001.lxd.cluster
+                        sudo sed -i "s/HOSTNAME/$ShortHostName/g"                                               /etc/network/openvswitch/preseed.sw1a.olxc.001.lxd.cluster
+                        sudo sed -i "s/STORAGE-DRIVER/$StorageDriver/g"                                         /etc/network/openvswitch/preseed.sw1a.olxc.001.lxd.cluster
+                        sudo sed -i "s/POOL/$StoragePoolName/g"                                                 /etc/network/openvswitch/preseed.sw1a.olxc.001.lxd.cluster
+
+                elif [ $GRE = 'Y' ]
+                then
+                        sshpass -p $MultiHostVar8 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S --prompt='' <<< "$MultiHostVar8" lxc info | sed -n '/BEGIN.*-/,/END.*-/p'" > /tmp/cert.txt
+
+                        sudo sed -i "s/SWITCH_IP/$Sw1Index/g"                                                   /etc/network/openvswitch/preseed.sw1a.olxc.002.lxd.cluster
+                        sudo sed -i "s/HOSTNAME/$ShortHostName/g"                                               /etc/network/openvswitch/preseed.sw1a.olxc.002.lxd.cluster
+                        sudo sed -i "s/STORAGE-DRIVER/$StorageDriver/g"                                         /etc/network/openvswitch/preseed.sw1a.olxc.002.lxd.cluster
+                        sudo sed -i "s/POOL/$StoragePoolName/g"                                                 /etc/network/openvswitch/preseed.sw1a.olxc.002.lxd.cluster
+                        sudo sed -i -e '/-----BEGIN/,/-----END/!b' -e '/-----END/!d;r /tmp/cert.txt' -e 'd'     /etc/network/openvswitch/preseed.sw1a.olxc.002.lxd.cluster
+                        sudo rm -f /tmp/cert.txt
+                fi
+        fi
+fi
+
+sudo sed -i "s/MULTIHOSTVAR7/$MultiHostVar7/g"  /etc/network/openvswitch/crt_ovs_sw1.sh
+sudo sed -i "s/MULTIHOSTVAR7/$MultiHostVar7/g"  /etc/network/openvswitch/crt_ovs_sx1.sh
 
 if   [ $UbuntuMajorVersion -ge 16 ]
 then
@@ -2411,6 +2559,10 @@ fi
 sleep 5
 
 clear
+
+# echo "NameServerExists = "$NameServerExists
+# echo "MultiHostVar2    = "$MultiHostVar2
+# sleep 30
 
 if [ $NameServerExists -eq 0 ] && [ $MultiHostVar2 = 'Y' ]
 then

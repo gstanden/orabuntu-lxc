@@ -49,23 +49,6 @@ sleep 5
 
 clear
 
-echo ''
-echo "=============================================="
-echo "Establish sudo privileges...                  "
-echo "=============================================="
-echo ''
-
-sudo date
-
-echo ''
-echo "=============================================="
-echo "Privileges established.                       "
-echo "=============================================="
-
-sleep 5
-
-clear
-
 if [ -e /sys/hypervisor/uuid ]
 then
         function CheckAWS {
@@ -86,9 +69,66 @@ fi
 
 trap "exit" INT TERM; trap "kill 0" EXIT; sudo -v || exit $?; sleep 1; while true; do sleep 60; sudo -nv; done 2>/dev/null &
 
-GRE=Y 
-MTU=1420
-LOGEXT=`date +"%Y-%m-%d.%R:%S"`
+
+
+# LXC Settings
+
+            GRE=Y 
+            MTU=1420
+         LOGEXT=`date +"%Y-%m-%d.%R:%S"`
+
+# Kubernetes Settings
+
+            K8S=Y
+
+# LXD Cluster Settings
+
+StoragePoolName=olxc-002
+  StorageDriver=zfs
+        PreSeed=Y
+            LXD=S
+     LXDCluster=Y
+
+if [ $LXDCluster = 'Y' ]
+then
+        function CheckZpoolExist {
+                sudo zpool list $StoragePoolName | grep ONLINE | wc -l
+        }
+        ZpoolExist=$(CheckZpoolExist)
+
+	echo ''
+	echo "=============================================="
+	echo "Verify ZFS $StoragePoolName Exists...         "
+	echo "=============================================="
+	echo ''
+
+        if [ $ZpoolExist -eq 1 ]
+        then
+                echo "Storage Pool ZFS $StoragePoolName exists."
+        else
+                echo "Storage Pool ZFS $StoragePoolName does not exist."
+                echo "Storage Pool ZFS $StoragePoolName must be created before running Orabuntu-LXC in LXD Cluster Mode."
+                echo "Orabuntu-LXC Exiting."
+
+		echo ''
+		echo "=============================================="
+		echo "Done: Verify ZFS $StoragePoolName Exists.     "
+		echo "=============================================="
+		echo ''
+		
+		exit
+        fi
+
+	echo ''
+	echo "=============================================="
+	echo "Done: Verify ZFS $StoragePoolName Exists.     "
+	echo "=============================================="
+	echo ''
+
+	sleep 5
+
+	clear
+fi
 
 if [ -z $1 ]
 then	
@@ -122,7 +162,7 @@ fi
 if [ -z $2 ]
 then
 	SPOKEIP='lan.ip.this.host'
- 	SPOKEIP=192.168.1.95
+ 	SPOKEIP=192.168.1.10
 else
 	SPOKEIP=$2
 fi
@@ -130,7 +170,7 @@ fi
 if [ -z $3 ]
 then
 	HUBIP='lan.ip.hub.host'
- 	HUBIP=192.168.1.246
+ 	HUBIP=192.168.1.5
 else
 	HUBIP=$3
 fi
@@ -575,7 +615,7 @@ then
                 	MultiHost="$Operation:Y:X:X:$HUBIP:$SPOKEIP:1420:$HubUserAct:$HubSudoPwd:$GRE:$Product"
                 fi
         else
-                MultiHost="$Operation:Y:X:X:$HUBIP:$SPOKEIP:$MTU:$HubUserAct:$HubSudoPwd:$GRE:$Product"
+		MultiHost="$Operation:Y:X:X:$HUBIP:$SPOKEIP:$MTU:$HubUserAct:$HubSudoPwd:$GRE:$Product:$LXD:$K8S:$PreSeed:$LXDCluster:$StorageDriver:$StoragePoolName"
         fi
 
 	sleep 5

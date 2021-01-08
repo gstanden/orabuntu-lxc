@@ -45,27 +45,6 @@ echo "Script: anylinux-services.HUB.HOST.sh         "
 echo "=============================================="
 echo ''
 
-sleep 5
-
-clear
-
-echo ''
-echo "=============================================="
-echo "Establish sudo privileges...                  "
-echo "=============================================="
-echo ''
-
-sudo -S date
-
-echo ''
-echo "=============================================="
-echo "Privileges established.                       "
-echo "=============================================="
-
-sleep 5
-
-clear
-
 if [ -e /sys/hypervisor/uuid ]
 then
         function CheckAWS {
@@ -86,9 +65,41 @@ fi
 
 trap "exit" INT TERM; trap "kill 0" EXIT; sudo -v || exit $?; sleep 1; while true; do sleep 60; sudo -nv; done 2>/dev/null &
 
-GRE=N 
-MTU=1500
-LOGEXT=`date +"%Y-%m-%d.%R:%S"`
+# LXC Settings
+
+            GRE=N 
+            MTU=1500
+         LOGEXT=`date +"%Y-%m-%d.%R:%S"`
+
+# Kubernetes Settings
+
+            K8S=Y
+
+# LXD Cluster Settings
+
+StoragePoolName=olxc-001
+  StorageDriver=zfs
+        PreSeed=Y
+            LXD=S
+     LXDCluster=Y
+
+if [ $LXDCluster = 'Y' ]
+then
+	function CheckZpoolExist {
+		sudo zpool list $StoragePoolName | grep ONLINE | wc -l
+	}
+	ZpoolExist=$(CheckZpoolExist)
+
+	if [ $ZpoolExist -eq 1 ]
+	then
+		echo "ZFS $StoragePoolName exists."
+	else
+		echo "ZFS $StoragePoolName does not exist."
+		echo "ZFS $StoragePoolName must be created before running Orabuntu-LXC in LXD Cluster Mode."
+		echo "Orabuntu-LXC Exiting."
+		exit
+	fi
+fi
 
 if [ -z $1 ]
 then	
@@ -190,7 +201,7 @@ then
 		MultiHost="$Operation:N:1:X:X:X:$AwsMtu:X:X:$GRE:$Product"
 	fi
 else
-	MultiHost="$Operation:N:1:X:X:X:$MTU:X:X:$GRE:$Product"
+	MultiHost="$Operation:N:1:X:X:X:$MTU:X:X:$GRE:$Product:$LXD:$K8S:$PreSeed:$LXDCluster:$StorageDriver:$StoragePoolName"
 fi
 
 ./anylinux-services.sh $MultiHost 
