@@ -45,6 +45,115 @@ echo "Script: anylinux-services.HUB.HOST.sh         "
 echo "=============================================="
 echo ''
 
+sleep 5
+
+clear
+
+GetLinuxFlavors(){
+if   [[ -e /etc/oracle-release ]]
+then
+        LinuxFlavors=$(cat /etc/oracle-release | cut -f1 -d' ')
+elif [[ -e /etc/redhat-release ]]
+then
+        LinuxFlavors=$(cat /etc/redhat-release | cut -f1 -d' ')
+elif [[ -e /usr/bin/lsb_release ]]
+then
+        LinuxFlavors=$(lsb_release -d | awk -F ':' '{print $2}' | cut -f1 -d' ')
+elif [[ -e /etc/issue ]]
+then
+        LinuxFlavors=$(cat /etc/issue | cut -f1 -d' ')
+else
+        LinuxFlavors=$(cat /proc/version | cut -f1 -d' ')
+fi
+}
+GetLinuxFlavors
+
+function TrimLinuxFlavors {
+echo $LinuxFlavors | sed 's/^[ \t]//;s/[ \t]$//' | sed 's/\!//'
+}
+LinuxFlavor=$(TrimLinuxFlavors)
+
+if   [ $LinuxFlavor = 'Oracle' ]
+then
+        function GetOracleDistroRelease {
+                sudo cat /etc/oracle-release | cut -f5 -d' ' | cut -f1 -d'.'
+        }
+        OracleDistroRelease=$(GetOracleDistroRelease)
+	if   [ $OracleDistroRelease -eq 7 ] || [ $OracleDistroRelease -eq 6 ]
+	then
+		CutIndex=7
+
+	elif [ $OracleDistroRelease -eq 8 ]
+	then
+		CutIndex=6
+	fi
+        function GetRedHatVersion {
+                sudo cat /etc/redhat-release | cut -f"$CutIndex" -d' ' | cut -f1 -d'.'
+        }
+        RedHatVersion=$(GetRedHatVersion)
+        Release=$OracleDistroRelease
+        LF=$LinuxFlavor
+        RL=$Release
+	SubDirName=uekulele
+	UbuntuMajorVersion=0
+elif [ $LinuxFlavor = 'Red' ] || [ $LinuxFlavor = 'CentOS' ]
+then
+	if   [ $LinuxFlavor = 'Red' ]
+        then
+                function GetRedHatVersion {
+                        sudo cat /etc/redhat-release | rev | cut -f2 -d' ' | cut -f2 -d'.'
+                }
+        elif [ $LinuxFlavor = 'CentOS' ]
+        then
+                function GetRedHatVersion {
+                        cat /etc/redhat-release | sed 's/ Linux//' | cut -f1 -d'.' | rev | cut -f1 -d' '
+                }
+        fi
+	RedHatVersion=$(GetRedHatVersion)
+        RHV=$RedHatVersion
+        Release=$RedHatVersion
+        LF=$LinuxFlavor
+        RL=$Release
+	SubDirName=uekulele
+	UbuntuMajorVersion=0
+elif [ $LinuxFlavor = 'Fedora' ]
+then
+        CutIndex=3
+        function GetRedHatVersion {
+                sudo cat /etc/redhat-release | cut -f"$CutIndex" -d' ' | cut -f1 -d'.'
+        }
+        RedHatVersion=$(GetRedHatVersion)
+	if   [ $RedHatVersion -ge 28 ]
+	then
+		Release=8
+        elif [ $RedHatVersion -ge 19 ] && [ $RedHatVersion -le 27 ]
+        then
+                Release=7
+        elif [ $RedHatVersion -ge 12 ] && [ $RedHatVersion -le 18 ]
+        then
+                Release=6
+        fi
+        LF=$LinuxFlavor
+        RL=$Release
+	RHV=$RedHatVersion
+	SubDirName=uekulele
+	UbuntuMajorVersion=0
+elif [ $LinuxFlavor = 'Ubuntu' ] || [ $LinuxFlavor = 'Pop_OS' ]
+then
+        function GetUbuntuVersion {
+                cat /etc/lsb-release | grep DISTRIB_RELEASE | cut -f2 -d'='
+        }
+        UbuntuVersion=$(GetUbuntuVersion)
+        LF=$LinuxFlavor
+        RL=$UbuntuVersion
+        function GetUbuntuMajorVersion {
+                cat /etc/lsb-release | grep DISTRIB_RELEASE | cut -f2 -d'=' | cut -f1 -d'.'
+        }
+        UbuntuMajorVersion=$(GetUbuntuMajorVersion)
+	SubDirName=orabuntu
+	Release=0
+fi
+
 if [ -e /sys/hypervisor/uuid ]
 then
         function CheckAWS {
@@ -81,7 +190,13 @@ StoragePoolName=olxc-001
   StorageDriver=zfs
         PreSeed=Y
             LXD=S
-     LXDCluster=Y
+
+if [ $LinuxFlavor = 'Ubuntu' ] && [ $UbuntuMajorRelease -eq 20 ]
+then
+	LXDCluster=Y
+else
+	LXDCluster=N
+fi
 
 if [ $LXDCluster = 'Y' ]
 then

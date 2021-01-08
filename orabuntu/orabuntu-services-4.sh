@@ -574,26 +574,29 @@ sleep 5
 
 clear
 
-echo ''
-echo "=============================================="
-echo "Install LXD ...                               "
-echo "=============================================="
-echo ''
+if [ $LXDCluster = 'Y' ]
+then
+	echo ''
+	echo "=============================================="
+	echo "Install LXD ...                               "
+	echo "=============================================="
+	echo ''
 
-sleep 5
+	sleep 5
 
-sudo chmod 775  /opt/olxc/"$DistDir"/orabuntu/archives/lxd_install_orabuntu.sh
-		/opt/olxc/"$DistDir"/orabuntu/archives/lxd_install_orabuntu.sh $PreSeed $LXDCluster $MultiHostVar2 $MultiHostVar10
+	sudo chmod 775  /opt/olxc/"$DistDir"/orabuntu/archives/lxd_install_orabuntu.sh
+			/opt/olxc/"$DistDir"/orabuntu/archives/lxd_install_orabuntu.sh $PreSeed $LXDCluster $MultiHostVar2 $MultiHostVar10
 
-echo ''
-echo "=============================================="
-echo "Done: Install LXD.                            "
-echo "=============================================="
-echo ''
+	echo ''
+	echo "=============================================="
+	echo "Done: Install LXD.                            "
+	echo "=============================================="
+	echo ''
 
-sleep 5
+	sleep 5
 
-clear
+	clear
+fi
 
 echo ''
 echo "=============================================="
