@@ -172,7 +172,24 @@ then
 	AwsMtu=$(GetAwsMtu)
 fi
 
+
+echo ''
+echo "=============================================="
+echo "Establish sudo...                             "
+echo "=============================================="
+echo ''
+
 trap "exit" INT TERM; trap "kill 0" EXIT; sudo -v || exit $?; sleep 1; while true; do sleep 60; sudo -nv; done 2>/dev/null &
+
+echo ''
+echo "=============================================="
+echo "Done: Establish sudo.                         "
+echo "=============================================="
+echo ''
+
+sleep 5
+
+clear
 
 # LXC Settings
 

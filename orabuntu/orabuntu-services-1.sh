@@ -1066,6 +1066,7 @@ then
 		echo ''
 
 		dig +short us.images.linuxcontainers.org
+		echo ''
 
 		while [ $ContainerCreated -eq 0 ] && [ $m -le 3 ]
 		do
@@ -1084,11 +1085,13 @@ then
 			for i in rootfs.tar.xz meta.tar.xz
 			do
 				rm -f $DistDir/lxcimage/nsa/$i
+				echo ''
 				wget -4 -q --show-progress https://us.images.linuxcontainers.org/images/ubuntu/xenial/amd64/default/"$BuildDate"/$i -P "$DistDir"/lxcimage/nsa
 				diff <(shasum -a 256 "$DistDir"/lxcimage/nsa/$i | cut -f1,8 -d'/' | sed 's/  */ /g' | sed 's/\///' | sed 's/  */ /g') <(grep $i "$DistDir"/lxcimage/nsa/SHA256SUMS)
 			done
 			if [ $? -eq 0 ]
 			then
+				echo ''
 				sudo lxc-create -t local -n nsa -- -m $DistDir/lxcimage/nsa/meta.tar.xz -f $DistDir/lxcimage/nsa/rootfs.tar.xz
 			else
 				m=$((m+1))
@@ -1125,15 +1128,15 @@ then
 		ContainerCreated=$(ConfirmContainerCreated)
 	done
 	
-	echo ''
-	echo "=============================================="
-	echo "Trying Method 3...                            "
-	echo "=============================================="
-	echo ''
-	
 	q=1
 	while [ $ContainerCreated -eq 0 ] && [ $q -le 3 ]
 	do
+		echo ''
+		echo "=============================================="
+		echo "Trying Method 3...                            "
+		echo "=============================================="
+		echo ''
+
 		sudo lxc-create -n nsa -t ubuntu -- --release xenial --arch amd64
 		sleep 5
 		q=$((q+1))
@@ -1226,23 +1229,23 @@ then
 
 	clear
 
-	echo ''
-	echo "=============================================="
-	echo "Create DNS Replication Landing Zone ...       "
-	echo "=============================================="
-	echo ''
+#	echo ''
+#	echo "=============================================="
+#	echo "Create DNS Replication Landing Zone ...       "
+#	echo "=============================================="
+#	echo ''
 
 #	sudo lxc-attach -n nsa -- sudo mkdir -p /root/backup-lxc-container/$NameServerBase/updates
 
-	echo ''
-	echo "=============================================="
-	echo "Done: Create DNS Replication Landing Zone.    "
-	echo "=============================================="
-	echo ''
+#	echo ''
+#	echo "=============================================="
+#	echo "Done: Create DNS Replication Landing Zone.    "
+#	echo "=============================================="
+#	echo ''
 
-	sleep 5
+#	sleep 5
 
-	clear
+#	clear
 
 	echo ''
 	echo "=============================================="
@@ -1404,7 +1407,7 @@ clear
 
 echo ''
 echo "=============================================="
-echo "Creating /etc/sysctl.d/60-olxc.conf file ...  "
+echo "Create /etc/sysctl.d/60-olxc.conf file ...    "
 echo "=============================================="
 echo ''
 echo "=============================================="
@@ -1474,8 +1477,13 @@ sudo sh -c "echo 'kernel.panic_on_oops = 1'                  >> /etc/sysctl.d/60
 
 echo ''
 echo "=============================================="
-echo "Created /etc/sysctl.d/60-olxc.conf file ...   "
+echo "Done: Create /etc/sysctl.d/60-olxc.conf file. "
 echo "=============================================="
+
+sleep 5
+
+clear
+
 echo ''
 echo "=============================================="
 echo "Display /etc/sysctl.d/60-olxc.conf            "
@@ -1486,7 +1494,7 @@ sudo sysctl -p /etc/sysctl.d/60-olxc.conf
 
 echo ''
 echo "=============================================="
-echo "Displayed /etc/sysctl.d/60-olxc.conf file.    "
+echo "Done: Display /etc/sysctl.d/60-olxc.conf file."
 echo "=============================================="
 
 sleep 5
@@ -2087,16 +2095,26 @@ sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw7.sh
 sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw8.sh
 sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw9.sh
 
-echo '==================================='
-echo 'LXDCluster = '$LXDCluster
-echo 'PreSeed    = '$PreSeed
-echo '==================================='
-
-# sleep 20
-
 if [ $LXDCluster = 'Y' ]
 then
+        echo ''
+        echo "=============================================="
+        echo "Install packages...                           "
+        echo "=============================================="
+        echo ''
+
         sudo apt-get -y install expect dos2unix
+        
+	echo ''
+        echo "=============================================="
+        echo "Done: Install packages.                       "
+        echo "=============================================="
+        echo ''
+
+	sleep 5
+
+	clear
+
         sudo sed -i "s/HOSTNAME/$HOSTNAME/g"    /etc/network/openvswitch/lxd-init-node1.sh
 #       sudo cat                                /etc/network/openvswitch/lxd-init-node1.sh
 #       sleep 20
@@ -2159,6 +2177,10 @@ then
 			echo "Done: Display LXD Preseed.                    "
 			echo "=============================================="
 			echo ''
+
+			sleep 5
+
+			clear
                 fi
         fi
 fi
@@ -2208,6 +2230,10 @@ then
                 	sudo sh -c "echo ''							>> /etc/systemd/system/$k.service"
                 	sudo sh -c "echo '[Install]'						>> /etc/systemd/system/$k.service"
                 	sudo sh -c "echo 'WantedBy=multi-user.target'				>> /etc/systemd/system/$k.service"
+
+			sleep 5
+
+			clear
 		
 			echo ''
 			echo "=============================================="
@@ -2223,7 +2249,7 @@ then
 
 			echo ''
 			echo "=============================================="
-			echo "Done:  OpenvSwitch $k started.                "
+			echo "Done: OpenvSwitch $k started.                "
 			echo "=============================================="
 
 			sleep 5
@@ -2492,6 +2518,10 @@ then
 	echo "=============================================="
 	echo ''
 
+	sleep 5
+
+	clear
+
         if [ -n $NameServer ]
         then
                 sudo service sw1 restart
@@ -2615,7 +2645,7 @@ then
 
 	# GLS 20180411 Create the tar.gz of the source nameserver dynamically so that GRE hosts pick up all post-install nameserver configuration changes.
 
-	sshpass -p $MultiHostVar9 ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" echo '(Do NOT enter passwords...Wait...)'; echo ''; sudo -S <<< "$MultiHostVar9" lxc-stop -n $NameServerBase -k; sudo -S <<< "$MultiHostVar9" tar -P -czf ~/Manage-Orabuntu/"$NameServerBase".export."$HOSTNAME".tar.gz -T ~/Manage-Orabuntu/nameserver.lst --checkpoint=10000 --totals; sleep 2; sudo -S <<< "$MultiHostVar9" lxc-start -n $NameServerBase"
+	sshpass -p $MultiHostVar9 ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S -p' '  <<< "$MultiHostVar9" echo ''; sudo -S <<< "$MultiHostVar9" lxc-stop -n $NameServerBase -k; sudo -S <<< "$MultiHostVar9" tar -P -czf ~/Manage-Orabuntu/"$NameServerBase".export."$HOSTNAME".tar.gz -T ~/Manage-Orabuntu/nameserver.lst --checkpoint=10000 --totals; sleep 2; sudo -S <<< "$MultiHostVar9" lxc-start -n $NameServerBase"
 
 #	sshpass -p $MultiHostVar9 ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" echo '(Do NOT enter passwords...Wait...)'; echo ''; sudo -S <<< "$MultiHostVar9" lxc-stop -n $NameServerBase -k; sudo -S <<< "$MultiHostVar9" cat /home/orabuntu/.ssh/authorized_keys | cut -f3 -d' ' | cut -f2 -d'@' >> /var/lib/lxc/afns1/delta0/root/gre_hosts.txt; sudo -S <<< "$MultiHostVar9" cat /var/lib/lxc/afns1/delta0/root/gre_hosts.txt | sort -u > /var/lib/lxc/afns1/delta0/root/gre_hosts.tmp; sudo -S <<< "$MultiHostVar9" mv /var/lib/lxc/afns1/delta0/root/gre_hosts.tmp /var/lib/lxc/afns1/delta0/root/gre_hosts.txt; sudo -S <<< "$MultiHostVar9" tar -P -czf ~/Manage-Orabuntu/"$NameServerBase".export."$HOSTNAME".tar.gz -T ~/Manage-Orabuntu/nameserver.lst --checkpoint=10000 --totals; sleep 2; sudo -S <<< "$MultiHostVar9" lxc-start -n $NameServerBase"
 
@@ -2681,6 +2711,10 @@ echo "=============================================="
 echo "Checking and Configuring MultiHost Settings..."
 echo "=============================================="
 echo ''
+
+sleep 5
+
+clear
 
 if [ $MultiHostVar2 = 'N' ]
 then
@@ -2781,9 +2815,6 @@ then
 	sudo mkdir -p /home/${USERNAME}/Manage-Orabuntu/backup-lxc-container/$NameServer/updates
 	sudo mkdir -p /home/${USERNAME}/Manage-Orabuntu/backup-lxc-container/$OffBase/updates
 
-	echo "sudo mkdir -p /home/${USERNAME}/Manage-Orabuntu/backup-lxc-container/$OffBase/updates"
-	echo "sudo mkdir -p /home/${USERNAME}/Manage-Orabuntu/backup-lxc-container/$NameServer/updates"a
-
 	sudo chown -R ${USERNAME}:${USERNAME} /home/${USERNAME}/Downloads 
 	sudo chown -R ${USERNAME}:${USERNAME} /home/${USERNAME}/Manage-Orabuntu
 	sudo chmod -R 777 /home/${USERNAME}/Manage-Orabuntu
@@ -2794,6 +2825,17 @@ then
 	sudo lxc-stop -n $NameServer
 	sleep 5
 	sudo lxc-start -n $NameServer
+	clear
+
+	echo ''
+	echo "=============================================="
+	echo "Done: Configure jobs in $NameServer.          "
+	echo "=============================================="
+	echo ''
+
+	sleep 5
+
+	clear
 
         echo ''
         echo "=============================================="
@@ -2989,7 +3031,7 @@ then
 	echo "sudo mkdir -p /home/${USERNAME}/Manage-Orabuntu/backup-lxc-container/$NameServer/updates"a
 
 	sudo chown -R ${USERNAME}:${USERNAME} /home/${USERNAME}/Downloads 
-	sudo shown -R ${USERNAME}:${USERNAME} /home/${USERNAME}/Manage-Orabuntu
+	sudo chown -R ${USERNAME}:${USERNAME} /home/${USERNAME}/Manage-Orabuntu
 	sudo chmod -R 744 /home/${USERNAME}/Manage-Orabuntu
 	sudo chmod -R 744 /home/${USERNAME}/Downloads
 	sudo runuser -l amide -c "ssh-keygen -f /home/amide/.ssh/id_rsa -t rsa -N ''"
@@ -3100,7 +3142,7 @@ then
 		sudo ifconfig sw1 mtu $MultiHostVar7
 		sudo ifconfig sx1 mtu $MultiHostVar7
 
-                sudo getent hosts $HOSTNAME.$Domain1 > /dev/null 2>&1
+                sudo nslookup $HOSTNAME.$Domain1 > /dev/null 2>&1
                 if [ $? -eq 1 ]
                 then
                         echo ''
@@ -3437,7 +3479,6 @@ echo ''
 echo "=============================================="
 echo "Allow NTP to run in LXC Containers...         "
 echo "=============================================="
-echo ''
 
 if [ ! -f /usr/share/lxc/config/common.conf.d/01-sys-time.conf ]
 then
@@ -3451,7 +3492,6 @@ then
 	echo ''
 fi
 
-echo ''
 echo "=============================================="
 echo "Done: Allow NTP to run in LXC Containers.     "
 echo "=============================================="

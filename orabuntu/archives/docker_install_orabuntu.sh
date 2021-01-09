@@ -12,12 +12,6 @@ function GetUbuntuMajorVersion {
 }
 UbuntuMajorVersion=$(GetUbuntuMajorVersion)
 
-echo ''
-echo "=============================================="
-echo "Install Docker...                             "
-echo "=============================================="
-echo ''
-
 if   [ $UbuntuVersion = '16.04' ]
 then
 #	apt-get -o Acquire::ForceIPv4=true update
@@ -64,6 +58,18 @@ then
 
 	echo ''
 	echo "=============================================="
+	echo "Microk8s Snap Info ...                        "
+	echo "=============================================="
+	echo ''
+
+	sudo snap info microk8s
+
+	sleep 5
+
+	clear
+
+	echo ''
+	echo "=============================================="
 	echo "Installing Snap Docker ...                    "
 	echo "=============================================="
 	echo ''
@@ -82,18 +88,6 @@ then
 	echo ''
 
 	sudo snap info docker
-
-	sleep 5
-
-	clear
-
-	echo ''
-	echo "=============================================="
-	echo "Microk8s Snap Info ...                        "
-	echo "=============================================="
-	echo ''
-
-	sudo snap info microk8s
 
 	sleep 5
 

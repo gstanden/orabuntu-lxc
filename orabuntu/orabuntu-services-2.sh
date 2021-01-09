@@ -40,9 +40,6 @@ echo "                                              "
 echo "Script creates the Oracle Linux container.    "
 echo "=============================================="
 echo ''
-echo "=============================================="
-echo "This script is re-runnable                    "
-echo "=============================================="
 
 sleep 5
 
@@ -312,8 +309,6 @@ then
 
 		dig +short us.images.linuxcontainers.org
 
-		echo ''
-
 		if [ -d ~/Downloads/orabuntu-lxc-master/lxcimage/oracle"$MajorRelease" ]
 		then
 			sudo rm -f ~/Downloads/orabuntu-lxc-master/lxcimage/oracle"$MajorRelease"/*
@@ -331,18 +326,19 @@ then
 		for i in rootfs.tar.xz meta.tar.xz
 		do
 			rm -f $DistDir/lxcimage/oracle"$MajorRelease"/$i
+			echo ''
 			wget -4 -q --show-progress https://us.images.linuxcontainers.org/images/oracle/"$MajorRelease"/amd64/default/"$BuildDate"/$i -P "$DistDir"/lxcimage/oracle"$MajorRelease"
 			diff <(shasum -a 256 "$DistDir"/lxcimage/oracle"$MajorRelease"/$i | cut -f1,8 -d'/' | sed 's/  */ /g' | sed 's/\///' | sed 's/  */ /g') <(grep $i "$DistDir"/lxcimage/oracle"$MajorRelease"/SHA256SUMS)
 		done
 		if [ $? -eq 0 ]
 		then
+			echo ''
 			sudo lxc-create -t local -n oel$OracleRelease$SeedPostfix -- -m $DistDir/lxcimage/oracle"$MajorRelease"/meta.tar.xz -f $DistDir/lxcimage/oracle"$MajorRelease"/rootfs.tar.xz
 	
 			if [ $(SoftwareVersion $LXCVersion) -ge $(SoftwareVersion "2.1.0") ]
 			then
   				sudo lxc-update-config -c /var/lib/lxc/oel$OracleRelease$SeedPostfix/config
 			fi
-			sudo lxc-ls -f
 		fi
 
 		ContainerCreated=$(ConfirmContainerCreated)
@@ -352,8 +348,6 @@ then
 fi
 
 sleep 5
-
-clear
 
 n=1
 if [ $UbuntuMajorVersion -ge 20 ] # Because yum is no longer available in Ubuntu 20
@@ -535,7 +529,7 @@ then
 
         if [ $(SoftwareVersion $LXCVersion) -ge $(SoftwareVersion "2.1.0") ]
         then
-                sudo lxc-update-config -c /var/lib/lxc/nsa/config
+                sudo lxc-update-config -c 				/var/lib/lxc/oel$OracleRelease$SeedPostfix/config
         else
                 sudo sed -i 's/lxc.net.0/lxc.network/g'                 /var/lib/lxc/oel$OracleRelease$SeedPostfix/config
                 sudo sed -i 's/lxc.net.1/lxc.network/g'                 /var/lib/lxc/oel$OracleRelease$SeedPostfix/config

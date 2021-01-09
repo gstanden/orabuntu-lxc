@@ -1372,7 +1372,6 @@ then
 			echo "=============================================="
 			echo "Snapshot Nameserver $NameServer at HUB...     "
 			echo "=============================================="
-			echo ''
 
 			if [ $Release -ne 6 ] || [ $UbuntuMajorVersion -ge 16 ]
 			then

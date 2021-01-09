@@ -50,9 +50,6 @@ echo "This script installs required packages into   "
 echo "the Oracle Linux container.                   "
 echo "=============================================="
 echo ''
-echo "=============================================="
-echo "This script is re-runnable                    "
-echo "=============================================="
 
 if [ -e /sys/hypervisor/uuid ]
 then
@@ -432,7 +429,7 @@ clear
 
 echo ''
 echo "=============================================="
-echo "Testing connectivity to $SeedContainerName... "
+echo "Test connectivity to $SeedContainerName...    "
 echo "=============================================="
 echo ''
 echo "=============================================="
@@ -441,9 +438,32 @@ echo "=============================================="
 echo ''
 
 sudo lxc-attach -n $SeedContainerName -- uname -a
+
+echo ''
+echo "=============================================="
+echo "Done: Test connectivity to $SeedContainerName."
+echo "=============================================="
+echo ''
+
+sleep 5
+
+clear
+
+echo ''
+echo "=============================================="
+echo "Configure $SeedContainerName...               "
+echo "=============================================="
+echo ''
+
 sudo lxc-attach -n $SeedContainerName -- usermod --password `perl -e "print crypt('root','root');"` root
 sudo lxc-attach -n $SeedContainerName -- yum -y install openssh-server
 sudo lxc-attach -n $SeedContainerName -- service sshd restart
+
+echo ''
+echo "=============================================="
+echo "Done: Configure $SeedContainerName.           "
+echo "=============================================="
+echo ''
 
 sleep 5
 

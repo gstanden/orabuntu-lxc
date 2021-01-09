@@ -19,9 +19,13 @@ UbuntuMajorVersion=$(GetUbuntuMajorVersion)
 
 echo ''
 echo "=============================================="
-echo "Install LXD...                                "
+echo "Configure LXD...                              "
 echo "=============================================="
 echo ''
+
+sleep 5
+
+clear
 
 if   [ $UbuntuMajorVersion -ge 16 ]
 then
@@ -31,14 +35,28 @@ then
 	echo "=============================================="
 	echo ''
 
-	sleep 5
-
 	sudo snap install lxd
 	sudo snap refresh lxd
 #	sudo snap refresh lxd --edge
 
+	echo ''
+	echo "=============================================="
+	echo "Done: Install LXD Snap.                       "
+	echo "=============================================="
+	echo ''
+
+	sleep 5
+
+	clear
+
 	if   [ $PreSeed = 'Y' ] && [ $UbuntuMajorVersion -ge 20 ]
 	then
+		echo ''
+		echo "=============================================="
+		echo "Run LXD Init (takes awhile...)                "
+		echo "=============================================="
+		echo ''
+
 		m=1
 		n=1
 
@@ -95,6 +113,16 @@ then
 			fi
 		done
 
+		echo ''
+		echo "=============================================="
+		echo "Done: Run LXD Init.                           "
+		echo "=============================================="
+		echo ''
+
+		sleep 5
+
+		clear
+
 	elif [ $PreSeed = 'E' ]
 	then
 		m=1
@@ -111,13 +139,33 @@ then
 				m=0
 			fi
 		done
+
+		echo ''
+		echo "=============================================="
+		echo "Done: Run LXD Init.                           "
+		echo "=============================================="
+		echo ''
+
+		sleep 5
+
+		clear
 	else
 		lxd init --auto
+		
+		echo ''
+		echo "=============================================="
+		echo "Done: Run LXD Init.                           "
+		echo "=============================================="
+		echo ''
+
+		sleep 5
+
+		clear
 	fi
 
 	echo ''
 	echo "=============================================="
-	echo "Done: Install LXD Snap ...                       "
+	echo "Done: Configure LXD                           "
 	echo "=============================================="
 	echo ''
 

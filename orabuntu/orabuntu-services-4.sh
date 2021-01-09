@@ -182,7 +182,6 @@ echo "Script:  orabuntu-services-4.sh NumCon        "
 echo "=============================================="
 echo ''
 echo "=============================================="
-echo "This script is re-runnable.                   "
 echo "This script clones additional containers.     "
 echo "=============================================="
 echo ''
@@ -191,6 +190,11 @@ echo "NumCon is the number of containers            "
 echo "NumCon (small integer)                        "
 echo "NumCon defaults to value '2'                  "
 echo "=============================================="
+echo ''
+
+sleep 5
+
+clear
 
 if [ -z $3 ]
 then
@@ -222,6 +226,10 @@ echo "Update config if LXC v2.0 or lower...          "
 echo "=============================================="
 echo ''
 
+sleep 5
+
+clear
+
 # Case 1 Creating Oracle Seed Container in 2.0- LXC enviro.
 
 function CheckOracleSeedConfigFormat {
@@ -244,8 +252,6 @@ then
        sudo lxc-update-config -c /var/lib/lxc/$SeedContainerName/config
 fi
 
-sudo lxc-ls -f
-
 echo ''
 echo "=============================================="
 echo "Done: Update config if LXC v2.0 or lower.      "
@@ -258,28 +264,20 @@ clear
 
 echo ''
 echo "=============================================="
-echo "Number of LXC Container RAC Nodes = $NumCon   "
-echo "=============================================="
-echo ''
-echo "=============================================="
-echo "If wrong number of desired containers, then   "
-echo "<ctrl>+c and restart script to set            "
-echo "Sleeping 15 seconds...                        "
+echo "Number of LXC Container Nodes = $NumCon       "
 echo "=============================================="
 echo ''
 echo "=============================================="
 echo "This script creates container clones          "
 echo "=============================================="
 
-sleep 10
+sleep 5
 
 clear
 
 echo ''
 echo "=============================================="
 echo "Stopping $SeedContainerName seed container...  "
-echo "(OEL 5 shutdown can take awhile...patience)   "
-echo "(OEL 6 and OEL 7 are relatively fast shutdown)"
 echo "=============================================="
 echo ''
 
@@ -372,7 +370,7 @@ do
 		sshpass -p $MultiHostVar9 ssh -M -S /tmp/orabuntu -qt -o CheckHostIP=no -o StrictHostKeyChecking=no -o ControlPersist=60s $MultiHostVar8@$MultiHostVar5 exit
 
         	function CheckDNSLookup {
-			ssh -S /tmp/orabuntu $MultiHostVar5 "sudo -S <<< "$MultiHostVar9" lxc-attach -n $NameServerShortName -- nslookup -timeout=5 $ContainerPrefix$CloneIndex"	
+			ssh -S /tmp/orabuntu $MultiHostVar5 "sudo -S -p' ' <<< "$MultiHostVar9" lxc-attach -n $NameServerShortName -- nslookup -timeout=5 $ContainerPrefix$CloneIndex"	
         	}
         	DNSLookup=$(CheckDNSLookup)
 		DNSHit=$PIPESTATUS

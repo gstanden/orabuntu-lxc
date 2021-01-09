@@ -226,7 +226,7 @@ if [ $MultiHostVar1 = 'new' ]
 then	
 	echo ''
 	echo "=============================================="
-	echo "Install Docker...                             "
+	echo "Install K8S and/or Docker...                  "
 	echo "=============================================="
 	echo ''
 
@@ -240,7 +240,7 @@ then
 
 	echo ''
 	echo "=============================================="
-	echo "Done: Install Docker.                         "
+	echo "Done: Install K8S and/or Docker.              "
 	echo "=============================================="
 	echo ''
 
@@ -865,6 +865,8 @@ then
                 echo "=============================================="
                 echo ''
 
+		sleep 5
+
 		function CutOffBase {
 			echo $NameServer | cut -f1 -d'-'
 		}
@@ -880,7 +882,15 @@ then
 
 		sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ubuntu@10.207.39.2 "sudo -S <<< "ubuntu" echo $HOSTNAME > ~/new_gre_host.txt"
 
+		echo ''
+                echo "=============================================="
+                echo "Done: Configure replica nameserver $NameServer"
+                echo "=============================================="
+                echo ''
+
                 sleep 5
+
+		clear
         
                 if   [ $SystemdResolvedInstalled -ge 1 ]
                 then
@@ -901,6 +911,8 @@ then
                         echo '' 
         
                         sleep 5 
+
+			clear
        		fi
  
                 if [ $LxcNetRunning -ge 1 ] 
@@ -922,6 +934,8 @@ then
 			echo ''
 
 			sleep 5
+
+			clear
 		fi
                 
                 echo ''
