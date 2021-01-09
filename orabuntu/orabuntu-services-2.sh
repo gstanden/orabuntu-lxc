@@ -295,58 +295,61 @@ sleep 5
 
 clear
 
-m=1
-while [ $ContainerCreated -eq 0 ] && [ $m -le 3 ]
-do
-	echo ''
-	echo "=============================================="
-	echo "   Create the LXC Oracle Linux container      "
-	echo "                                              "
-	echo "      Note: Depends on download speed         "
-	echo "                                              "
-	echo "                 Method 1                     "
-	echo "=============================================="
-	echo ''
-
-	dig +short us.images.linuxcontainers.org
-
-	echo ''
-
-	if [ -d ~/Downloads/orabuntu-lxc-master/lxcimage/oracle"$MajorRelease" ]
-	then
-		sudo rm -f ~/Downloads/orabuntu-lxc-master/lxcimage/oracle"$MajorRelease"/*
-	fi
-
-	mkdir -p "$DistDir"/lxcimage/oracle"$MajorRelease"
-	cd       "$DistDir"/lxcimage/oracle"$MajorRelease"
-	sudo rm -f index.html
-	wget -4 -q https://us.images.linuxcontainers.org/images/oracle/"$MajorRelease"/amd64/default/ -P "$DistDir"/lxcimage/oracle"$MajorRelease"
-	function GetBuildDate {
-		grep folder.gif index.html | tail -1 | awk -F "\"" '{print $8}' | sed 's/\///g' | sed 's/\.//g'
-	}
-	BuildDate=$(GetBuildDate)
-	wget -4 -q https://us.images.linuxcontainers.org/images/oracle/"$MajorRelease"/amd64/default/"$BuildDate"/SHA256SUMS -P "$DistDir"/lxcimage/oracle"$MajorRelease"
-	for i in rootfs.tar.xz meta.tar.xz
+m=1; n=1; p=1
+if [ $UbuntuMajorVersion -gt 16 ]
+then
+	while [ $ContainerCreated -eq 0 ] && [ $m -le 3 ]
 	do
-		rm -f $DistDir/lxcimage/oracle"$MajorRelease"/$i
-		wget -4 -q --show-progress https://us.images.linuxcontainers.org/images/oracle/"$MajorRelease"/amd64/default/"$BuildDate"/$i -P "$DistDir"/lxcimage/oracle"$MajorRelease"
-		diff <(shasum -a 256 "$DistDir"/lxcimage/oracle"$MajorRelease"/$i | cut -f1,8 -d'/' | sed 's/  */ /g' | sed 's/\///' | sed 's/  */ /g') <(grep $i "$DistDir"/lxcimage/oracle"$MajorRelease"/SHA256SUMS)
-	done
-	if [ $? -eq 0 ]
-	then
-		sudo lxc-create -t local -n oel$OracleRelease$SeedPostfix -- -m $DistDir/lxcimage/oracle"$MajorRelease"/meta.tar.xz -f $DistDir/lxcimage/oracle"$MajorRelease"/rootfs.tar.xz
+		echo ''
+		echo "=============================================="
+		echo "   Create the LXC Oracle Linux container      "
+		echo "                                              "
+		echo "      Note: Depends on download speed         "
+		echo "                                              "
+		echo "                 Method 1                     "
+		echo "=============================================="
+		echo ''
 
-		if [ $(SoftwareVersion $LXCVersion) -ge $(SoftwareVersion "2.1.0") ]
+		dig +short us.images.linuxcontainers.org
+
+		echo ''
+
+		if [ -d ~/Downloads/orabuntu-lxc-master/lxcimage/oracle"$MajorRelease" ]
 		then
-  			sudo lxc-update-config -c /var/lib/lxc/oel$OracleRelease$SeedPostfix/config
+			sudo rm -f ~/Downloads/orabuntu-lxc-master/lxcimage/oracle"$MajorRelease"/*
 		fi
-		sudo lxc-ls -f
-	fi
 
-	ContainerCreated=$(ConfirmContainerCreated)
-	rm -f index.html
-	m=$((m+1))
-done
+		mkdir -p "$DistDir"/lxcimage/oracle"$MajorRelease"
+		cd       "$DistDir"/lxcimage/oracle"$MajorRelease"
+		sudo rm -f index.html
+		wget -4 -q https://us.images.linuxcontainers.org/images/oracle/"$MajorRelease"/amd64/default/ -P "$DistDir"/lxcimage/oracle"$MajorRelease"
+		function GetBuildDate {
+			grep folder.gif index.html | tail -1 | awk -F "\"" '{print $8}' | sed 's/\///g' | sed 's/\.//g'
+		}
+		BuildDate=$(GetBuildDate)
+		wget -4 -q https://us.images.linuxcontainers.org/images/oracle/"$MajorRelease"/amd64/default/"$BuildDate"/SHA256SUMS -P "$DistDir"/lxcimage/oracle"$MajorRelease"
+		for i in rootfs.tar.xz meta.tar.xz
+		do
+			rm -f $DistDir/lxcimage/oracle"$MajorRelease"/$i
+			wget -4 -q --show-progress https://us.images.linuxcontainers.org/images/oracle/"$MajorRelease"/amd64/default/"$BuildDate"/$i -P "$DistDir"/lxcimage/oracle"$MajorRelease"
+			diff <(shasum -a 256 "$DistDir"/lxcimage/oracle"$MajorRelease"/$i | cut -f1,8 -d'/' | sed 's/  */ /g' | sed 's/\///' | sed 's/  */ /g') <(grep $i "$DistDir"/lxcimage/oracle"$MajorRelease"/SHA256SUMS)
+		done
+		if [ $? -eq 0 ]
+		then
+			sudo lxc-create -t local -n oel$OracleRelease$SeedPostfix -- -m $DistDir/lxcimage/oracle"$MajorRelease"/meta.tar.xz -f $DistDir/lxcimage/oracle"$MajorRelease"/rootfs.tar.xz
+	
+			if [ $(SoftwareVersion $LXCVersion) -ge $(SoftwareVersion "2.1.0") ]
+			then
+  				sudo lxc-update-config -c /var/lib/lxc/oel$OracleRelease$SeedPostfix/config
+			fi
+			sudo lxc-ls -f
+		fi
+
+		ContainerCreated=$(ConfirmContainerCreated)
+		rm -f index.html
+		m=$((m+1))
+	done
+fi
 
 sleep 5
 
@@ -392,6 +395,7 @@ then
                 ContainerCreated=$(ConfirmContainerCreated)
         done
 else
+	n=1
 	while [ $ContainerCreated -eq 0 ] && [ $n -le 5 ]
 	do
 		echo ''
@@ -400,7 +404,7 @@ else
 		echo "                                              "
 		echo "      Note: Depends on download speed         "
 		echo "                                              "
-		echo "                 Method 2                     "
+		echo "                 Method 3                     "
 		echo "=============================================="
 		echo ''
 
@@ -527,7 +531,20 @@ then
 
 	sudo sed -i 's/sw1/sx1/g' 						/etc/network/if-up.d/openvswitch/oel$OracleRelease$SeedPostfix-pub-ifup-sx1
 	sudo sed -i 's/tag=10/tag=11/g' 					/etc/network/if-up.d/openvswitch/oel$OracleRelease$SeedPostfix-pub-ifup-sx1
-	sudo sed -i 's/sw1/sx1/g' 						/etc/network/if-down.d/openvswitch/oel$OracleRelease$SeedPostfix-pub-ifdown-sx1
+	sudo sed -i 's/sw1/sx1/g' 						/etc/network/if-down.d/openvswitch/oel$OracleRelease$SeedPostfix-pub-ifdown-sx1 
+
+        if [ $(SoftwareVersion $LXCVersion) -ge $(SoftwareVersion "2.1.0") ]
+        then
+                sudo lxc-update-config -c /var/lib/lxc/nsa/config
+        else
+                sudo sed -i 's/lxc.net.0/lxc.network/g'                 /var/lib/lxc/oel$OracleRelease$SeedPostfix/config
+                sudo sed -i 's/lxc.net.1/lxc.network/g'                 /var/lib/lxc/oel$OracleRelease$SeedPostfix/config
+		sudo sed -i "/lxc\.network\.link/s/virbr0/sx1a/g"   	/var/lib/lxc/oel$OracleRelease$SeedPostfix/config
+		sudo sed -i "/lxc\.network\.link/s/lxcbr0/sx1a/g"   	/var/lib/lxc/oel$OracleRelease$SeedPostfix/config
+                sudo sed -i 's/lxc.uts.name/lxc.utsname/g'              /var/lib/lxc/oel$OracleRelease$SeedPostfix/config
+                sudo sed -i 's/lxc.apparmor.profile/lxc.aa_profile/g'   /var/lib/lxc/oel$OracleRelease$SeedPostfix/config
+        fi
+
 
 	echo ''
 	echo "=============================================="

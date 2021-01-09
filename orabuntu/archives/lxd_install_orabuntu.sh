@@ -23,19 +23,7 @@ echo "Install LXD...                                "
 echo "=============================================="
 echo ''
 
-if   [ $UbuntuVersion = '16.04' ]
-then
-	echo 'Install LXD Snap ...'
-
-elif [ $UbuntuVersion = '16.10' ]
-then
-	echo 'Install LXD Snap ...'
-
-elif [ $UbuntuMajorVersion -eq 17 ]
-then
-	echo 'Install LXD Snap ...'
-
-elif [ $UbuntuMajorVersion -ge 18 ]
+if   [ $UbuntuMajorVersion -ge 16 ]
 then
 	echo ''
 	echo "=============================================="
@@ -46,9 +34,10 @@ then
 	sleep 5
 
 	sudo snap install lxd
-	sudo snap refresh lxd --edge
+	sudo snap refresh lxd
+#	sudo snap refresh lxd --edge
 
-	if   [ $PreSeed = 'Y' ]
+	if   [ $PreSeed = 'Y' ] && [ $UbuntuMajorVersion -ge 20 ]
 	then
 		m=1
 		n=1
@@ -92,7 +81,7 @@ then
 
 						n=$((n+1))
 					else
-						lxd init
+						sudo lxd init
 						
 						if [ $? -ne 0 ]
 						then

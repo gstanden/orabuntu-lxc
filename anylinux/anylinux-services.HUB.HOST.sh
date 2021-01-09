@@ -191,7 +191,7 @@ StoragePoolName=olxc-001
         PreSeed=Y
             LXD=S
 
-if [ $LinuxFlavor = 'Ubuntu' ] && [ $UbuntuMajorRelease -eq 20 ]
+if [ $LinuxFlavor = 'Ubuntu' ] && [ $UbuntuMajorVersion -ge 20 ]
 then
 	LXDCluster=Y
 else
@@ -302,7 +302,7 @@ do
 	AptProcessRunning=$(CheckAptProcessRunning)
 done
 
-if [ $AWS -eq 1 ]
+if   [ $AWS -eq 1 ]
 then
 	if   [ $AwsMtu -ge 9000 ]
 	then
@@ -315,6 +315,10 @@ then
 	then
 		MultiHost="$Operation:N:1:X:X:X:$AwsMtu:X:X:$GRE:$Product"
 	fi
+
+elif [ $UbuntuMajorVersion -ge 16 ]
+then
+	MultiHost="$Operation:N:1:X:X:X:$MTU:X:X:$GRE:$Product:$LXD:$K8S:$PreSeed:$LXDCluster:$StorageDriver:$StoragePoolName"
 else
 	MultiHost="$Operation:N:1:X:X:X:$MTU:X:X:$GRE:$Product:$LXD:$K8S:$PreSeed:$LXDCluster:$StorageDriver:$StoragePoolName"
 fi

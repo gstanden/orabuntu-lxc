@@ -193,7 +193,7 @@ StoragePoolName=olxc-002
         PreSeed=Y
             LXD=S
 
-if [ $LinuxFlavor = 'Ubuntu' ] && [ $UbuntuMajorRelease -eq 20 ]
+if [ $LinuxFlavor = 'Ubuntu' ] && [ $UbuntuMajorVersion -ge 20 ]
 then
         LXDCluster=Y
 else
@@ -273,7 +273,7 @@ fi
 if [ -z $2 ]
 then
 	SPOKEIP='lan.ip.this.host'
- 	SPOKEIP=192.168.1.10
+ 	SPOKEIP=192.168.1.144
 else
 	SPOKEIP=$2
 fi
@@ -281,7 +281,7 @@ fi
 if [ -z $3 ]
 then
 	HUBIP='lan.ip.hub.host'
- 	HUBIP=192.168.1.5
+ 	HUBIP=192.168.1.143
 else
 	HUBIP=$3
 fi
@@ -711,7 +711,7 @@ then
 
 	cd "$DistDir"/anylinux
 
-        if [ $AWS -eq 1 ]
+        if   [ $AWS -eq 1 ]
         then
                 if   [ $AwsMtu -ge 9000 ]
                 then
@@ -725,7 +725,11 @@ then
 		then
                 	MultiHost="$Operation:Y:X:X:$HUBIP:$SPOKEIP:1420:$HubUserAct:$HubSudoPwd:$GRE:$Product"
                 fi
-        else
+
+	elif [ $UbuntuMajorVersion -ge 16 ]
+	then
+		MultiHost="$Operation:Y:X:X:$HUBIP:$SPOKEIP:$MTU:$HubUserAct:$HubSudoPwd:$GRE:$Product:$LXD:$K8S:$PreSeed:$LXDCluster:$StorageDriver:$StoragePoolName"
+	else
 		MultiHost="$Operation:Y:X:X:$HUBIP:$SPOKEIP:$MTU:$HubUserAct:$HubSudoPwd:$GRE:$Product:$LXD:$K8S:$PreSeed:$LXDCluster:$StorageDriver:$StoragePoolName"
         fi
 

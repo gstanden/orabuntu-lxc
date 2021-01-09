@@ -273,7 +273,7 @@ then
 	echo ''
 	sudo systemctl start  systemd-resolved
 	echo ''
-	sudo systemd-resolve --status
+	sudo systemctl status systemd-resolved | head -50
 	echo ''
 
 	echo ''
@@ -1048,6 +1048,7 @@ function ConfirmContainerCreated {
 }
 ContainerCreated=$(ConfirmContainerCreated)
 
+m=1; n=1; p=1
 if [ $NameServerExists -eq 0 ] && [ $MultiHostVar2 = 'N' ]
 then
 	echo ''
@@ -1055,44 +1056,46 @@ then
 	echo "Create LXC DNS DHCP container...              "
 	echo "=============================================="
 	echo ''
-	echo "=============================================="
-	echo "Trying Method 1...                            "
-	echo "=============================================="
-	echo ''
 
-	dig +short us.images.linuxcontainers.org
+	if [ $UbuntuMajorVersion -gt 16 ]
+	then
 
-	m=1
-	n=1
-	p=1
-	while [ $ContainerCreated -eq 0 ] && [ $m -le 3 ]
-	do
-		sudo rm -f ~/Downloads/orabuntu-lxc-master/lxcimage/nsa/*
-		sudo rm -f index.html
-		mkdir -p $DistDir/lxcimage/nsa
-		DistDir="/home/ubuntu/Downloads/orabuntu-lxc-master"
-		rm -f index.html
-		wget -4 -q https://us.images.linuxcontainers.org/images/ubuntu/xenial/amd64/default/
-		function GetBuildDate {
-       			grep folder.gif index.html | tail -1 | awk -F "\"" '{print $8}' | sed 's/\///g' | sed 's/\.//g'
-		}
-		BuildDate=$(GetBuildDate)
-		wget -4 -q https://us.images.linuxcontainers.org/images/ubuntu/xenial/amd64/default/"$BuildDate"/SHA256SUMS    -P "$DistDir"/lxcimage/nsa
+		echo "=============================================="
+		echo "Trying Method 1...                            "
+		echo "=============================================="
+		echo ''
 
-		for i in rootfs.tar.xz meta.tar.xz
+		dig +short us.images.linuxcontainers.org
+
+		while [ $ContainerCreated -eq 0 ] && [ $m -le 3 ]
 		do
-			rm -f $DistDir/lxcimage/nsa/$i
-			wget -4 -q --show-progress https://us.images.linuxcontainers.org/images/ubuntu/xenial/amd64/default/"$BuildDate"/$i -P "$DistDir"/lxcimage/nsa
-			diff <(shasum -a 256 "$DistDir"/lxcimage/nsa/$i | cut -f1,8 -d'/' | sed 's/  */ /g' | sed 's/\///' | sed 's/  */ /g') <(grep $i "$DistDir"/lxcimage/nsa/SHA256SUMS)
+			sudo rm -f ~/Downloads/orabuntu-lxc-master/lxcimage/nsa/*
+			sudo rm -f index.html
+			mkdir -p $DistDir/lxcimage/nsa
+			DistDir="/home/ubuntu/Downloads/orabuntu-lxc-master"
+			rm -f index.html
+			wget -4 -q https://us.images.linuxcontainers.org/images/ubuntu/xenial/amd64/default/
+			function GetBuildDate {
+       				grep folder.gif index.html | tail -1 | awk -F "\"" '{print $8}' | sed 's/\///g' | sed 's/\.//g'
+			}
+			BuildDate=$(GetBuildDate)
+			wget -4 -q https://us.images.linuxcontainers.org/images/ubuntu/xenial/amd64/default/"$BuildDate"/SHA256SUMS    -P "$DistDir"/lxcimage/nsa
+
+			for i in rootfs.tar.xz meta.tar.xz
+			do
+				rm -f $DistDir/lxcimage/nsa/$i
+				wget -4 -q --show-progress https://us.images.linuxcontainers.org/images/ubuntu/xenial/amd64/default/"$BuildDate"/$i -P "$DistDir"/lxcimage/nsa
+				diff <(shasum -a 256 "$DistDir"/lxcimage/nsa/$i | cut -f1,8 -d'/' | sed 's/  */ /g' | sed 's/\///' | sed 's/  */ /g') <(grep $i "$DistDir"/lxcimage/nsa/SHA256SUMS)
+			done
+			if [ $? -eq 0 ]
+			then
+				sudo lxc-create -t local -n nsa -- -m $DistDir/lxcimage/nsa/meta.tar.xz -f $DistDir/lxcimage/nsa/rootfs.tar.xz
+			else
+				m=$((m+1))
+			fi
+		ContainerCreated=$(ConfirmContainerCreated)
 		done
-		if [ $? -eq 0 ]
-		then
-			sudo lxc-create -t local -n nsa -- -m $DistDir/lxcimage/nsa/meta.tar.xz -f $DistDir/lxcimage/nsa/rootfs.tar.xz
-		else
-			m=$((m+1))
-		fi
-	ContainerCreated=$(ConfirmContainerCreated)
-	done
+	fi
 	
 	while [ $ContainerCreated -eq 0 ] && [ $p -le 3 ]
 	do
@@ -1141,10 +1144,10 @@ then
 	then
 		sudo lxc-update-config -c /var/lib/lxc/nsa/config
 	else
-                sudo sed -i 's/lxc.net.0/lxc.network/g'         	/var/lib/lxc/$NameServer/config
-                sudo sed -i 's/lxc.net.1/lxc.network/g'         	/var/lib/lxc/$NameServer/config
-                sudo sed -i 's/lxc.uts.name/lxc.utsname/g'      	/var/lib/lxc/$NameServer/config
-		sudo sed -i 's/lxc.apparmor.profile/lxc.aa_profile/g'	/var/lib/lxc/$NameServer/config
+                sudo sed -i 's/lxc.net.0/lxc.network/g'         	/var/lib/lxc/nsa/config
+                sudo sed -i 's/lxc.net.1/lxc.network/g'         	/var/lib/lxc/nsa/config
+                sudo sed -i 's/lxc.uts.name/lxc.utsname/g'      	/var/lib/lxc/nsa/config
+		sudo sed -i 's/lxc.apparmor.profile/lxc.aa_profile/g'	/var/lib/lxc/nsa/config
 	fi
 
 	echo ''
@@ -2093,7 +2096,7 @@ echo '==================================='
 
 if [ $LXDCluster = 'Y' ]
 then
-        sudo apt-get -y install expect
+        sudo apt-get -y install expect dos2unix
         sudo sed -i "s/HOSTNAME/$HOSTNAME/g"    /etc/network/openvswitch/lxd-init-node1.sh
 #       sudo cat                                /etc/network/openvswitch/lxd-init-node1.sh
 #       sleep 20
@@ -2115,13 +2118,47 @@ then
                 elif [ $GRE = 'Y' ]
                 then
                         sshpass -p $MultiHostVar8 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S --prompt='' <<< "$MultiHostVar8" lxc info | sed -n '/BEGIN.*-/,/END.*-/p'" > /tmp/cert.txt
+			rm /tmp/cert.txt
+                        sshpass -p $MultiHostVar8 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S --prompt='' <<< "$MultiHostVar8" lxc info | sed -n '/BEGIN.*-/,/END.*-/p'" > /tmp/cert.txt
+		
+			echo ''
+			echo "=============================================="
+			echo "Display /tmp/cert.txt ...                     "
+			echo "=============================================="
+			echo ''
+
+			cat /tmp/cert.txt
+
+			echo ''
+			echo "=============================================="
+			echo "Done: Display /tmp/cert.txt.                  "
+			echo "=============================================="
+			echo ''
+
+			sleep 5
+
+			clear
 
                         sudo sed -i "s/SWITCH_IP/$Sw1Index/g"                                                   /etc/network/openvswitch/preseed.sw1a.olxc.002.lxd.cluster
                         sudo sed -i "s/HOSTNAME/$ShortHostName/g"                                               /etc/network/openvswitch/preseed.sw1a.olxc.002.lxd.cluster
                         sudo sed -i "s/STORAGE-DRIVER/$StorageDriver/g"                                         /etc/network/openvswitch/preseed.sw1a.olxc.002.lxd.cluster
                         sudo sed -i "s/POOL/$StoragePoolName/g"                                                 /etc/network/openvswitch/preseed.sw1a.olxc.002.lxd.cluster
                         sudo sed -i -e '/-----BEGIN/,/-----END/!b' -e '/-----END/!d;r /tmp/cert.txt' -e 'd'     /etc/network/openvswitch/preseed.sw1a.olxc.002.lxd.cluster
-                        sudo rm -f /tmp/cert.txt
+			sudo dos2unix										/etc/network/openvswitch/preseed.sw1a.olxc.002.lxd.cluster
+		
+			echo ''
+			echo "=============================================="
+			echo "Display LXD Preseed...                        "
+			echo "=============================================="
+			echo ''
+
+			sudo cat /etc/network/openvswitch/preseed.sw1a.olxc.002.lxd.cluster
+		
+			echo ''
+			echo "=============================================="
+			echo "Done: Display LXD Preseed.                    "
+			echo "=============================================="
+			echo ''
                 fi
         fi
 fi
