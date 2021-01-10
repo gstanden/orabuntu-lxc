@@ -49,6 +49,24 @@ sleep 5
 
 clear
 
+echo ''
+echo "=============================================="
+echo "Establish sudo privileges...                  "
+echo "=============================================="
+echo ''
+
+trap "exit" INT TERM; trap "kill 0" EXIT; sudo -v || exit $?; sleep 1; while true; do sleep 60; sudo -nv; done 2>/dev/null &
+
+echo ''
+echo "=============================================="
+echo "Done: Establish sudo privileges.              "
+echo "=============================================="
+echo ''
+
+sleep 5
+
+clear
+
 GetLinuxFlavors(){
 if   [[ -e /etc/oracle-release ]]
 then
@@ -172,10 +190,6 @@ then
         AwsMtu=$(GetAwsMtu)
 fi
 
-trap "exit" INT TERM; trap "kill 0" EXIT; sudo -v || exit $?; sleep 1; while true; do sleep 60; sudo -nv; done 2>/dev/null &
-
-
-
 # LXC Settings
 
             GRE=Y 
@@ -273,7 +287,7 @@ fi
 if [ -z $2 ]
 then
 	SPOKEIP='lan.ip.this.host'
- 	SPOKEIP=192.168.1.144
+ 	SPOKEIP=192.168.1.116
 else
 	SPOKEIP=$2
 fi
@@ -281,7 +295,7 @@ fi
 if [ -z $3 ]
 then
 	HUBIP='lan.ip.hub.host'
- 	HUBIP=192.168.1.143
+ 	HUBIP=192.168.1.128
 else
 	HUBIP=$3
 fi
