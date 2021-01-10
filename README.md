@@ -2,8 +2,9 @@
 
 Update:  May 14, 2019  Visit the new Orabuntu-LXC Documentation Site:
 
-Update:  January 10, 2021 Orabuntu-LXC v7.0.0-beta AMIDE coming soon!
 https://sites.google.com/a/orabuntu-lxc.com/documentation/
+
+Update:  January 10, 2021 Orabuntu-LXC v7.0.0-beta AMIDE coming soon!
 
 Orabuntu-LXC v6.0-beta AMIDE Edition stands for "Amazon Mult-I-host Docker Enterprise" Edition.  
 
