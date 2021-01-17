@@ -1206,25 +1206,74 @@ then
 
 	echo ''
 	echo "=============================================="
-	echo "Start LXC and libvirt (give it a minute)...   "
+	echo "Start LXC and libvirt...                      "
 	echo "=============================================="
 	echo ''
 
         if [ $Release -eq 8 ] && [ $LinuxFlavor = 'Red' ]
         then
+		echo "=============================================="
+		echo "Install required packages...                  "
+		echo "=============================================="
+		echo ''
+
                 sudo dnf -y install lxc lxc-* libcap-devel libcgroup wget
-		sudo systemctl start lxc
+		
+		echo ''
+		echo "=============================================="
+		echo "Done: Install required packages.              "
+		echo "=============================================="
+		echo ''
+
+		sleep 5
+
+		clear
+
+		echo ''
+		echo "=============================================="
+		echo "Enable and Start LXC...                       "
+		echo "=============================================="
+		echo ''
+
 		sudo systemctl enable lxc
+		sudo systemctl start  lxc
+
+		echo ''
+		echo "=============================================="
+		echo "Done: Enable and Start LXC.                   "
+		echo "=============================================="
+		echo ''
         fi
 
         if [ $Release -eq 8 ] && [ $LinuxFlavor = 'Oracle' ]
         then
+		echo "=============================================="
+		echo "Install required packages...                  "
+		echo "=============================================="
+		echo ''
+
 		sudo yum -y install libcgroup rsync wget libcap-devel
                 sudo dnf -y install lxc lxc-* 
+		
+		echo ''
+		echo "=============================================="
+		echo "Done: Install required packages.              "
+		echo "=============================================="
+		echo ''
+
+		sleep 5
+
+		clear
         fi
 
 	if [ $Release -ge 7 ] 
 	then
+		echo ''
+		echo "=============================================="
+		echo "Enable and Start LXC and Libvirt...           "
+		echo "=============================================="
+		echo ''
+
 		sudo systemctl daemon-reload
 		sudo systemctl enable lxc
 		echo ''
@@ -1240,9 +1289,25 @@ then
 		
 		sudo cp -p /etc/lxc/default.conf /etc/lxc/default.conf.bak
 
+		echo ''
+		echo "=============================================="
+		echo "Done: Enable and Start LXC and Libvirt.       "
+		echo "=============================================="
+		echo ''
+
+		sleep 5
+
+		clear
+
 	elif [ $Release -eq 6 ]
 	then
-#		sudo service lxc start
+		echo ''
+		echo "=============================================="
+		echo "Enable and Start LXC and Libvirt...           "
+		echo "=============================================="
+		echo ''
+
+ 		sudo service lxc start
 		echo ''
 		sudo chkconfig --list | grep lxc
 		echo ''
@@ -1252,6 +1317,16 @@ then
 		sudo service libvirtd start
 		echo ''
 		sudo service libvirtd status
+
+		echo ''
+		echo "=============================================="
+		echo "Done: Enable and Start LXC and Libvirt.       "
+		echo "=============================================="
+		echo ''
+
+		sleep 5
+
+		clear
 	fi
 
 	echo ''
@@ -3103,7 +3178,7 @@ then
 		then
 			echo ''
 			echo "=============================================="
-			echo "Build OpenvSwitch RPMs...                     "
+			echo "Build & Install OpenvSwitch RPMs...           "
 			echo "=============================================="
 			echo ''
 
@@ -3481,12 +3556,20 @@ then
 					
 					echo ''
 					echo "==============================================" 
-					echo "Done: Install OpenvSwitch RPM's.              "
+					echo "Done: Build & Install OpenvSwitch RPM's.      "
 					echo "==============================================" 
 					echo ''
 
 				elif [ $(SoftwareVersion $OvsVersion) -eq $(SoftwareVersion "2.12.1") ]
 				then
+					echo ''
+					echo "=============================================="
+					echo "Untar source code...                          "
+					echo "=============================================="
+					echo ''
+
+					sleep 5
+
 					cd /opt/olxc/"$DistDir"/uekulele/openvswitch/rpmbuild/SOURCES
 					tar -zxvf openvswitch-"$OvsVersion".tar.gz
 					cp -p openvswitch-"$OvsVersion"/rhel/*.spec /opt/olxc/"$DistDir"/uekulele/openvswitch/.
@@ -3510,10 +3593,38 @@ then
 
 					sudo yum -y install selinux-policy-devel unbound-devel
 					sudo yum -y install rpm-build yum-utils tar wget
+			
+					echo ''
+					echo "==============================================" 
+					echo "Done: Install Packages.                       "
+					echo "==============================================" 
+					echo ''
+
+					sleep 5
+
+					clear
+ 
+					echo ''
+					echo "==============================================" 
+					echo "Configure python environment...               "
+					echo "==============================================" 
+					echo ''
+
 					sudo alternatives --set python /usr/bin/python3
 					python3 -m venv py36env
 					source py36env/bin/activate
-			
+					python --version
+
+					echo ''
+					echo "==============================================" 
+					echo "Configure python environment...               "
+					echo "==============================================" 
+					echo ''
+
+					sleep 5
+
+					clear
+
 					echo ''
 					echo "==============================================" 
 					echo "Python3 pip ops (if needed)...                "
@@ -3642,6 +3753,23 @@ then
 					sleep 5
 
 					rpmbuild --define "_topdir /opt/olxc/"$DistDir"/uekulele/openvswitch/rpmbuild" -ba --without check openvswitch.spec
+					
+					echo ''
+					echo "=============================================="
+					echo "Done: Build OpenvSwitch RPMs                  "
+					echo "=============================================="
+					echo ''
+
+					sleep 5
+					
+					clear
+					
+					echo ''
+					echo "==============================================" 
+					echo "Install OpenvSwitch RPM's...                  "
+					echo "==============================================" 
+					echo ''
+
 					cd /opt/olxc/"$DistDir"/uekulele/openvswitch/rpmbuild/RPMS/x86_64/
 					sudo rpm -ivh *.rpm
 					sudo rpm -ivh openvswitch-"$OvsVersion"-1.x86_64.rpm
@@ -3649,8 +3777,18 @@ then
 					sudo rpm -ivh openvswitch-debug*
 	
 					echo ''
+					echo "==============================================" 
+					echo "Done: Install OpenvSwitch RPM's.              "
+					echo "==============================================" 
+					echo ''
+
+					sleep 5
+
+					clear
+
+					echo ''
 					echo "=============================================="
-					echo "Done: Build OpenvSwitch RPMs                  "
+					echo "Done: Build & Instlal OpenvSwitch RPMs.       "
 					echo "=============================================="
 				fi
 			fi
@@ -3938,98 +4076,96 @@ then
 	m=1; n=1; p=1
 	while [ $ContainerCreated -eq 0 ] && [ $m -le 3 ] && [ $Release -ge 7 ]
 	do
-		echo "=============================================="
-		echo "Trying Method 1 (give it a minute...)         "
-		echo "=============================================="
-		echo ''
+	        echo "=============================================="
+                echo "Trying Method 1 ...                           "
+                echo "=============================================="
+                echo ''
 
-		dig +short us.images.linuxcontainers.org
-		echo ''
+                dig +short us.images.linuxcontainers.org
 
-		if [ ! -d /opt/olxc/"$DistDir"/lxcimage/nsa ]
-		then
-			sudo mkdir -p /opt/olxc/"$DistDir"/lxcimage/nsa
-		else
-			echo "Directory already exists: /opt/olxc/"$DistDir"/lxcimage/nsa"
-			echo ''	
-		fi
+                if [ ! -d /opt/olxc/"$DistDir"/lxcimage/nsa ]
+                then
+                        sudo mkdir -p /opt/olxc/"$DistDir"/lxcimage/nsa
+                else
+                        echo "Directory already exists: /opt/olxc/"$DistDir"/lxcimage/nsa"
+                        echo ''
+                fi
 
-		sudo rm -f /opt/olxc/"$DistDir"/lxcimage/nsa/*
-		cd         /opt/olxc/"$DistDir"/lxcimage/nsa
-		
-		wget -4 -q https://us.images.linuxcontainers.org/images/ubuntu/xenial/amd64/default/ -P /opt/olxc/"$DistDir"/lxcimage/nsa
+                sudo rm -f                /opt/olxc/"$DistDir"/lxcimage/nsa/*
+                cd                        /opt/olxc/"$DistDir"/lxcimage/nsa
+                sudo chown $Owner:$Group  /opt/olxc/"$DistDir"/lxcimage/nsa
 
-		function GetBuildDate {
-       			grep folder.gif index.html | tail -1 | awk -F "\"" '{print $8}' | sed 's/\///g' | sed 's/\.//g'
-		}
-		BuildDate=$(GetBuildDate)
+                wget -4 -q https://us.images.linuxcontainers.org/images/ubuntu/focal/amd64/default/ -P /opt/olxc/"$DistDir"/lxcimage/nsa
 
-		wget -4 --no-verbose --progress=bar https://us.images.linuxcontainers.org/images/ubuntu/xenial/amd64/default/"$BuildDate"/SHA256SUMS -P /opt/olxc/"$DistDir"/lxcimage/nsa
+                function GetBuildDate {
+                        grep folder.gif index.html | tail -1 | awk -F "\"" '{print $8}' | sed 's/\///g' | sed 's/\.//g'
+                }
+                BuildDate=$(GetBuildDate)
 
-		for i in rootfs.tar.xz meta.tar.xz
-		do
-			if [ -f /opt/olxc/"$DistDir"/lxcimage/nsa/$i ]
-			then
-				rm -f /opt/olxc/"$DistDir"/lxcimage/nsa/$i
-			fi
+                wget -4 -q https://us.images.linuxcontainers.org/images/ubuntu/focal/amd64/default/"$BuildDate"/SHA256SUMS -P /opt/olxc/"$DistDir"/lxcimage/nsa
 
-			echo ''
-			echo "Downloading $i ..."
-			echo ''
+                for i in rootfs.tar.xz meta.tar.xz
+                do
+                        if [ -f /opt/olxc/"$DistDir"/lxcimage/nsa/$i ]
+                        then
+                                rm -f /opt/olxc/"$DistDir"/lxcimage/nsa/$i
+                        fi
 
-			wget -4 --no-verbose --progress=bar https://us.images.linuxcontainers.org/images/ubuntu/xenial/amd64/default/"$BuildDate"/$i -P /opt/olxc/"$DistDir"/lxcimage/nsa
-			diff <(shasum -a 256 /opt/olxc/"$DistDir"/lxcimage/nsa/$i | cut -f1,11 -d'/' | sed 's/  */ /g' | sed 's/\///' | sed 's/  */ /g') <(grep $i /opt/olxc/"$DistDir"/lxcimage/nsa/SHA256SUMS)
-		done
-		if [ $? -eq 0 ]
-		then
-			echo ''
-			sudo lxc-create -t local -n nsa -- -m /opt/olxc/"$DistDir"/lxcimage/nsa/meta.tar.xz -f /opt/olxc/"$DistDir"/lxcimage/nsa/rootfs.tar.xz
-		else
-			m=$((m+1))
-		fi
+                        echo ''
+                        echo "Downloading $i ..."
+                        echo ''
 
-	ContainerCreated=$(ConfirmContainerCreated)
+                        wget -4 -q --show-progress https://us.images.linuxcontainers.org/images/ubuntu/focal/amd64/default/"$BuildDate"/$i -P /opt/olxc/"$DistDir"/lxcimage/nsa
+                        diff <(shasum -a 256 /opt/olxc/"$DistDir"/lxcimage/nsa/$i | cut -f1,11 -d'/' | sed 's/  */ /g' | sed 's/\///' | sed 's/  */ /g') <(grep $i /opt/olxc/"$DistDir"/lxcimage/nsa/SHA256SUMS)
+                done
+                if [ $? -eq 0 ]
+                then
+                        echo ''
+                        sudo lxc-create -t local -n nsa -- -m /opt/olxc/"$DistDir"/lxcimage/nsa/meta.tar.xz -f /opt/olxc/"$DistDir"/lxcimage/nsa/rootfs.tar.xz
+                else
+                        m=$((m+1))
+                fi
 
+        	ContainerCreated=$(ConfirmContainerCreated)
 	done
 	
-	while [ $ContainerCreated -eq 0 ] && [ $p -le 3 ]
+	while [ $ContainerCreated -eq 0 ] && [ $n -le 3 ]
 	do
 		echo "=============================================="
 		echo "Trying Method 2...                            "
 		echo "=============================================="
 		echo ''
 	
-		sudo lxc-create -t download -n nsa -- --dist ubuntu --release xenial --arch amd64 --keyserver hkp://keyserver.ubuntu.com:80
+		sudo lxc-create -t download -n nsa -- --dist ubuntu --release focal --arch amd64 --keyserver hkp://keyserver.ubuntu.com:80
 		if [ $? -ne 0 ]
 		then
 			sudo lxc-stop -n nsa -k
 			sudo lxc-destroy -n nsa
 			sudo rm -rf /var/lib/lxc/nsa
-			sudo lxc-create -t download -n nsa -- --dist ubuntu --release xenial --arch amd64 --keyserver hkp://p80.pool.sks-keyservers.net:80
+			sudo lxc-create -t download -n nsa -- --dist ubuntu --release focal --arch amd64 --keyserver hkp://p80.pool.sks-keyservers.net:80
 			if [ $? -ne 0 ]
 			then
 				sudo lxc-stop -n nsa -k
 				sudo lxc-destroy -n nsa
 				sudo rm -rf /var/lib/lxc/nsa
-                                sudo lxc-create -t download -n nsa -- --dist ubuntu --release xenial --arch amd64 --no-validate
+                                sudo lxc-create -t download -n nsa -- --dist ubuntu --release focal --arch amd64 --no-validate
 			fi
 		fi
 
-		p=$((p+1))
+		n=$((n+1))
 		ContainerCreated=$(ConfirmContainerCreated)
 	done
 	
-	q=1
-	while [ $ContainerCreated -eq 0 ] && [ $q -le 3 ]
+	while [ $ContainerCreated -eq 0 ] && [ $p -le 3 ]
 	do
 		echo "=============================================="
 		echo "Trying Method 3...                            "
 		echo "=============================================="
 		echo ''
 
-		sudo lxc-create -n nsa -t ubuntu -- --release xenial --arch amd64
+		sudo lxc-create -n nsa -t ubuntu -- --release focal --arch amd64
 		sleep 5
-		q=$((q+1))
+		p=$((p+1))
 		ContainerCreated=$(ConfirmContainerCreated)
 	done
 
@@ -4527,12 +4663,13 @@ then
 			# GLS 20151221 Settable Domain feature added
 			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/var/lib/bind/fwd.orabuntu-lxc.com
 			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/var/lib/bind/rev.orabuntu-lxc.com
+			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/etc/systemd/resolved.conf
 			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/etc/resolv.conf > /dev/null 2>&1
 			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /etc/NetworkManager/dnsmasq.d/local
 			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /etc/network/openvswitch/crt_ovs_sw1.sh
 			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/etc/bind/named.conf.local
 			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/etc/dhcp/dhcpd.conf
-			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/etc/network/interfaces
+		#	sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/etc/network/interfaces
 			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/root/ns_backup_update.lst
 			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/root/dns-thaw.sh
 			sudo mv /var/lib/lxc/$NameServer/rootfs/var/lib/bind/fwd.orabuntu-lxc.com /var/lib/lxc/$NameServer/rootfs/var/lib/bind/fwd.$Domain1
@@ -4549,12 +4686,13 @@ then
 			# GLS 20151221 Settable Domain feature added
 			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /var/lib/lxc/$NameServer/rootfs/var/lib/bind/fwd.consultingcommandos.us
 			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /var/lib/lxc/$NameServer/rootfs/var/lib/bind/rev.consultingcommandos.us
+			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /var/lib/lxc/$NameServer/rootfs/etc/systemd/resolved.conf
 			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /var/lib/lxc/$NameServer/rootfs/etc/resolv.conf > /dev/null 2>&1
 			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /etc/NetworkManager/dnsmasq.d/local
 			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /etc/network/openvswitch/crt_ovs_sw1.sh
 			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /var/lib/lxc/$NameServer/rootfs/etc/bind/named.conf.local
 			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /var/lib/lxc/$NameServer/rootfs/etc/dhcp/dhcpd.conf
-			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /var/lib/lxc/$NameServer/rootfs/etc/network/interfaces
+		#	sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /var/lib/lxc/$NameServer/rootfs/etc/network/interfaces
 			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /var/lib/lxc/$NameServer/rootfs/root/ns_backup_update.lst
 			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /var/lib/lxc/$NameServer/rootfs/root/dns-thaw.sh
 			sudo mv /var/lib/lxc/$NameServer/rootfs/var/lib/bind/fwd.consultingcommandos.us /var/lib/lxc/$NameServer/rootfs/var/lib/bind/fwd.$Domain2
@@ -4830,6 +4968,7 @@ echo ''
 sudo ifconfig sw1
 sudo ifconfig sx1
 
+echo ''
 echo "=============================================="
 echo "Networks are up.                              "
 echo "=============================================="
@@ -4852,7 +4991,7 @@ then
 	}
 	KeySecret=$(GetKeySecret)
 	echo $KeySecret
-	sudo sed -i "/secret/c\key rndc-key { algorithm hmac-md5; $KeySecret }" /var/lib/lxc/$NameServer/rootfs/etc/dhcp/dhcpd.conf
+	sudo sed -i "/secret/c\key rndc-key { algorithm hmac-sha256; $KeySecret }" /var/lib/lxc/$NameServer/rootfs/etc/dhcp/dhcpd.conf
 	echo 'The following keys should match (for dynamic DNS updates by DHCP):'
 	echo ''
 	sudo cat /var/lib/lxc/$NameServer/rootfs/etc/dhcp/dhcpd.conf | grep secret | cut -f7 -d' ' | cut -f1 -d';'
@@ -5371,6 +5510,9 @@ then
 	echo "=============================================="
         echo "Configure jobs in $NameServer...              "
 	echo "=============================================="
+	echo ''
+
+	sleep 5
 
         genpasswd() { 
                 local l=$1 
@@ -5396,9 +5538,6 @@ then
 	sudo mkdir -p /home/${USERNAME}/Manage-Orabuntu/backup-lxc-container/$NameServer/updates
 	sudo mkdir -p /home/${USERNAME}/Manage-Orabuntu/backup-lxc-container/$OffBase/updates
 
-        echo "sudo mkdir -p /home/${USERNAME}/Manage-Orabuntu/backup-lxc-container/$OffBase/updates"
-        echo "sudo mkdir -p /home/${USERNAME}/Manage-Orabuntu/backup-lxc-container/$NameServer/updates"
-
 	sudo chown -R ${USERNAME}:${USERNAME} /home/${USERNAME}/Downloads 
 	sudo chown -R ${USERNAME}:${USERNAME} /home/${USERNAME}/Manage-Orabuntu
 	sudo chmod -R 777 /home/${USERNAME}/Manage-Orabuntu
@@ -5406,9 +5545,23 @@ then
 	sudo sed -i "/lxc\.mount\.entry/s/#/ /" /var/lib/lxc/$NameServer/config
 	sudo sed -i "/Manage\-Orabuntu/s/afns1\-base/afns1/" /var/lib/lxc/$NameServer/config
 
+	sudo cat /var/lib/lxc/"$OffBase"-base/rootfs/root/ns_backup_update.sh
+
         sudo lxc-stop -n  $NameServer
 	sleep 5
         sudo lxc-start -n $NameServer
+
+	clear
+
+	echo ''
+	echo "=============================================="
+        echo "Done: Configure jobs in $NameServer.          "
+	echo "=============================================="
+	echo ''
+
+	sleep 5
+
+	clear
 
 	echo ''
 	echo "=============================================="
@@ -6236,11 +6389,9 @@ then
         sudo touch /usr/share/lxc/config/common.conf.d/01-sys-time.conf
         sudo sh -c "echo 'lxc.cap.drop ='                                              > /usr/share/lxc/config/common.conf.d/01-sys-time.conf"
         sudo sh -c "echo 'lxc.cap.drop = mac_admin mac_override sys_module sys_rawio' >> /usr/share/lxc/config/common.conf.d/01-sys-time.conf"
-        echo ''
         sudo ls -l /usr/share/lxc/config/common.conf.d/01-sys-time.conf
         echo ''
         cat /usr/share/lxc/config/common.conf.d/01-sys-time.conf
-        echo ''
 fi
 
 echo ''

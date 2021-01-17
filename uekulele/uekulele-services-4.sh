@@ -565,6 +565,36 @@ sleep 5
 
 clear
 
+# if [ $LXDCluster = 'Y' ]
+# then
+#       echo ''
+#       echo "=============================================="
+#       echo "Install LXD ...                               "
+#       echo "=============================================="
+#       echo ''
+
+#       sleep 5
+
+#       sudo chmod 775  /opt/olxc/"$DistDir"/orabuntu/archives/lxd_install_uekulele.sh
+#                       /opt/olxc/"$DistDir"/orabuntu/archives/lxd_install_uekulele.sh $PreSeed $LXDCluster $MultiHostVar2 $MultiHostVar10
+
+#       echo ''
+#       echo "=============================================="
+#       echo "Done: Install LXD.                            "
+#       echo "=============================================="
+#       echo ''
+
+#       sleep 5
+
+#       clear
+# fi
+
+echo ''
+echo "=============================================="
+echo "Start Seed Container $SeedContainerName...    "
+echo "=============================================="
+echo ''
+
 echo ''
 echo "=============================================="
 echo "Start Seed Container $SeedContainerName...    "

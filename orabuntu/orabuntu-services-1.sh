@@ -1109,8 +1109,7 @@ then
                         m=$((m+1))
                 fi
 
-        ContainerCreated=$(ConfirmContainerCreated)
-
+        	ContainerCreated=$(ConfirmContainerCreated)
         done
 
 	while [ $ContainerCreated -eq 0 ] && [ $p -le 3 ]

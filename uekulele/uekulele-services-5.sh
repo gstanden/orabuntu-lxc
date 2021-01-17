@@ -541,7 +541,7 @@ then
 	echo ''
 
         sudo touch /etc/orabuntu-lxc-release
-        sudo sh -c "echo 'Orabuntu-LXC v6.13.21-beta AMIDE' > /etc/orabuntu-lxc-release"
+        sudo sh -c "echo 'Orabuntu-LXC v6.13.22-beta AMIDE' > /etc/orabuntu-lxc-release"
 	sudo ls -l /etc/orabuntu-lxc-release
 	echo ''
 	sudo cat /etc/orabuntu-lxc-release
@@ -1078,7 +1078,6 @@ then
 			sudo getenforce
 			if [ -f /etc/sysconfig/selinux ]
 			then
-				echo ''
 				echo "=============================================="
 				echo "Set SELINUX to Permissive mode.               "
 				echo "=============================================="

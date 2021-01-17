@@ -49,6 +49,16 @@ echo "This script creates oracle container.         "
 echo "=============================================="
 echo ''
 
+function GetGroup {
+        id | cut -f2 -d' ' | cut -f2 -d'(' | cut -f1 -d')'
+}
+Group=$(GetGroup)
+
+function GetOwner {
+        id | cut -f1 -d' ' | cut -f2 -d'(' | cut -f1 -d')'
+}
+Owner=$(GetOwner)
+
 function GetShortHost {
         uname -n | cut -f1 -d'.'
 }
@@ -391,21 +401,20 @@ do
 	echo ''
 
 	dig +short us.images.linuxcontainers.org
-
 	echo ''
 
 	if [ -d /opt/olxc/"$DistDir"/lxcimage/oracle"$MajorRelease" ]
-	then
-		sudo rm -f /opt/olxc/"$DistDir"/lxcimage/oracle"$MajorRelease"/*
-	fi
+        then
+                echo "Directory already exists: /opt/olxc/"$DistDir"/lxcimage/oracle$MajorRelease"
+                sudo rm -f      /opt/olxc/"$DistDir"/lxcimage/oracle"$MajorRelease"/*
+        else
+                sudo mkdir -p   /opt/olxc/"$DistDir"/lxcimage/oracle"$MajorRelease"
+                echo "Directory created: /opt/olxc/"$DistDir"/lxcimage/oracle$MajorRelease"
+        fi
 
-	if [ ! -d /opt/olxc/"$DistDir"/lxcimage/oracle"$MajorRelease" ]
-	then
-		mkdir -p /opt/olxc/"$DistDir"/lxcimage/oracle"$MajorRelease"
-	fi
-
-	cd /opt/olxc/"$DistDir"/lxcimage/oracle"$MajorRelease"
-	sudo rm -f *
+        sudo rm -f                      /opt/olxc/"$DistDir"/lxcimage/oracle"$MajorRelease"/*
+        sudo chown -R $Owner:$Group     /opt/olxc/"$DistDir"/lxcimage/oracle"$MajorRelease"
+        cd				/opt/olxc/"$DistDir"/lxcimage/oracle"$MajorRelease"
 
 	wget -4 -q https://us.images.linuxcontainers.org/images/oracle/"$MajorRelease"/amd64/default/ -P /opt/olxc/"$DistDir"/lxcimage/oracle"$MajorRelease"
 	
@@ -588,74 +597,130 @@ sleep 5
 
 clear
 
+### new ###
+
 if [ $MajorRelease -ge 6 ]
 then
-	echo ''
-	echo "=============================================="
-	echo "LXC config updates...                         "
-	echo "=============================================="
-	echo ''
+        echo ''
+        echo "=============================================="
+        echo "LXC config updates...                         "
+        echo "=============================================="
+        echo ''
 
-	function GetNewMacAddress {
-        	echo -n 00:16:3e; dd bs=1 count=3 if=/dev/random 2>/dev/null | hexdump -v -e '/1 ":%02x"'
+        function GetNewMacAddress {
+                echo -n 00:16:3e; dd bs=1 count=3 if=/dev/random 2>/dev/null | hexdump -v -e '/1 ":%02x"'
         }
         NewMacAddress=$(GetNewMacAddress)
 
-	sudo cp -p /etc/network/if-up.d/openvswitch/lxcora00-pub-ifup-sw1 	/etc/network/if-up.d/openvswitch/oel$OracleRelease$SeedPostfix-pub-ifup-sx1
-	sudo cp -p /etc/network/if-down.d/openvswitch/lxcora00-pub-ifdown-sw1 	/etc/network/if-down.d/openvswitch/oel$OracleRelease$SeedPostfix-pub-ifdown-sx1
+        sudo cp -p /etc/network/if-up.d/openvswitch/lxcora00-pub-ifup-sw1       /etc/network/if-up.d/openvswitch/oel$OracleRelease$SeedPostfix-pub-ifup-sx1
+        sudo cp -p /etc/network/if-down.d/openvswitch/lxcora00-pub-ifdown-sw1   /etc/network/if-down.d/openvswitch/oel$OracleRelease$SeedPostfix-pub-ifdown-sx1
 
-	sudo sh -c "echo 'lxc.net.0.mtu = $MultiHostVar7'											>> /var/lib/lxc/oel$OracleRelease$SeedPostfix/config"
-	sudo sh -c "echo 'lxc.net.0.script.up = /etc/network/if-up.d/openvswitch/ContainerName-pub-ifup-sx1' 					>> /var/lib/lxc/oel$OracleRelease$SeedPostfix/config"
-	sudo sh -c "echo 'lxc.net.0.script.down = /etc/network/if-down.d/openvswitch/ContainerName-pub-ifdown-sx1' 				>> /var/lib/lxc/oel$OracleRelease$SeedPostfix/config"
-	sudo sh -c "echo '# lxc.mount.entry = /dev/lxc_luns /var/lib/lxc/ContainerName/rootfs/dev/lxc_luns none defaults,bind,create=dir 0 0'	>> /var/lib/lxc/oel$OracleRelease$SeedPostfix/config"
-	sudo sh -c "echo '# lxc.mount.entry = shm dev/shm tmpfs size=3500m,nosuid,nodev,noexec,create=dir 0 0'					>> /var/lib/lxc/oel$OracleRelease$SeedPostfix/config"
-	sudo sed -i "s/ContainerName/oel$OracleRelease$SeedPostfix/g" 										   /var/lib/lxc/oel$OracleRelease$SeedPostfix/config
+        sudo sh -c "echo 'lxc.net.0.mtu = $MultiHostVar7'                                                                                       >> /var/lib/lxc/oel$OracleRelease$SeedPostfix/config"
+        sudo sh -c "echo '# lxc.net.0.script.up = /etc/network/if-up.d/openvswitch/ContainerName-pub-ifup-sx1'                                  >> /var/lib/lxc/oel$OracleRelease$SeedPostfix/config"
+        sudo sh -c "echo '# lxc.net.0.script.down = /etc/network/if-down.d/openvswitch/ContainerName-pub-ifdown-sx1'                            >> /var/lib/lxc/oel$OracleRelease$SeedPostfix/config"
+        sudo sh -c "echo '# lxc.mount.entry = /dev/lxc_luns /var/lib/lxc/ContainerName/rootfs/dev/lxc_luns none defaults,bind,create=dir 0 0'   >> /var/lib/lxc/oel$OracleRelease$SeedPostfix/config"
+        sudo sh -c "echo '# lxc.mount.entry = shm dev/shm tmpfs size=3500m,nosuid,nodev,noexec,create=dir 0 0'                                  >> /var/lib/lxc/oel$OracleRelease$SeedPostfix/config"
+        sudo sed -i "s/ContainerName/oel$OracleRelease$SeedPostfix/g"                                                                              /var/lib/lxc/oel$OracleRelease$SeedPostfix/config
+#       sudo sed -i 's/lxc\.net\.0\.link/\# lxc\.net\.0\.link/'                                                                                    /var/lib/lxc/oel$OracleRelease$SeedPostfix/config
+#       sudo sed -i 's/lxc\.net\.0\.link/\# lxc\.net\.0\.link/'                                                                                    /var/lib/lxc/oel$OracleRelease$SeedPostfix/config
+        sudo sed -i "/lxc\.net\.0\.link/s/virbr0/sx1a/g"                                                                                           /var/lib/lxc/oel$OracleRelease$SeedPostfix/config
+        sudo sed -i "/lxc\.net\.0\.link/s/lxcbr0/sx1a/g"                                                                                           /var/lib/lxc/oel$OracleRelease$SeedPostfix/config
+        sudo sed -i "s/\(hwaddr = \).*/\1$NewMacAddress/"                                                                                          /var/lib/lxc/oel$OracleRelease$SeedPostfix/config
 
-	if   [ $Release -ge 7 ]
-	then
-		sudo sed -i 's/lxc\.net\.0\.link/\# lxc\.net\.0\.link/' 									   /var/lib/lxc/oel$OracleRelease$SeedPostfix/config
+        sudo sed -i 's/sw1/sx1/g'                                               /etc/network/if-up.d/openvswitch/oel$OracleRelease$SeedPostfix-pub-ifup-sx1
+        sudo sed -i 's/tag=10/tag=11/g'                                         /etc/network/if-up.d/openvswitch/oel$OracleRelease$SeedPostfix-pub-ifup-sx1
+        sudo sed -i 's/sw1/sx1/g'                                               /etc/network/if-down.d/openvswitch/oel$OracleRelease$SeedPostfix-pub-ifdown-sx1
 
-	elif [ $Release -eq 6 ]
-	then
-		sudo sed -i 's/lxc\.network\.link/\# lxc\.network\.link/' 									   /var/lib/lxc/oel$OracleRelease$SeedPostfix/config
-	fi
-
-	sudo sed -i "s/\(hwaddr = \).*/\1$NewMacAddress/"               									   /var/lib/lxc/oel$OracleRelease$SeedPostfix/config
-
-	sudo sed -i 's/sw1/sx1/g' 						/etc/network/if-up.d/openvswitch/oel$OracleRelease$SeedPostfix-pub-ifup-sx1
-	sudo sed -i 's/tag=10/tag=11/g' 					/etc/network/if-up.d/openvswitch/oel$OracleRelease$SeedPostfix-pub-ifup-sx1
-	sudo sed -i 's/sw1/sx1/g' 						/etc/network/if-down.d/openvswitch/oel$OracleRelease$SeedPostfix-pub-ifdown-sx1
+        if [ $(SoftwareVersion $LXCVersion) -ge $(SoftwareVersion "2.1.0") ]
+        then
+                sudo lxc-update-config -c                               /var/lib/lxc/oel$OracleRelease$SeedPostfix/config
+        else
+                sudo sed -i 's/lxc.net.0/lxc.network/g'                 /var/lib/lxc/oel$OracleRelease$SeedPostfix/config
+                sudo sed -i 's/lxc.net.1/lxc.network/g'                 /var/lib/lxc/oel$OracleRelease$SeedPostfix/config
+                sudo sed -i "/lxc\.network\.link/s/virbr0/sx1a/g"       /var/lib/lxc/oel$OracleRelease$SeedPostfix/config
+                sudo sed -i "/lxc\.network\.link/s/lxcbr0/sx1a/g"       /var/lib/lxc/oel$OracleRelease$SeedPostfix/config
+                sudo sed -i 's/lxc.uts.name/lxc.utsname/g'              /var/lib/lxc/oel$OracleRelease$SeedPostfix/config
+                sudo sed -i 's/lxc.apparmor.profile/lxc.aa_profile/g'   /var/lib/lxc/oel$OracleRelease$SeedPostfix/config
+        fi
 
 	sudo cat /var/lib/lxc/oel$OracleRelease$SeedPostfix/config
 
-	sleep 5
-
-	echo ''
-	echo "=============================================="
-	echo "Done: LXC config updates.                     "
-	echo "=============================================="
+        echo ''
+        echo "=============================================="
+        echo "Done: LXC config updates.                     "
+        echo "=============================================="
 fi
+
+### new end ###
+
+# if [ $MajorRelease -ge 6 ]
+# then
+# 	echo ''
+# 	echo "=============================================="
+# 	echo "LXC config updates...                         "
+# 	echo "=============================================="
+# 	echo ''
+
+# 	function GetNewMacAddress {
+#        	echo -n 00:16:3e; dd bs=1 count=3 if=/dev/random 2>/dev/null | hexdump -v -e '/1 ":%02x"'
+#       }
+#       NewMacAddress=$(GetNewMacAddress)
+
+# 	sudo cp -p /etc/network/if-up.d/openvswitch/lxcora00-pub-ifup-sw1 	/etc/network/if-up.d/openvswitch/oel$OracleRelease$SeedPostfix-pub-ifup-sx1
+# 	sudo cp -p /etc/network/if-down.d/openvswitch/lxcora00-pub-ifdown-sw1 	/etc/network/if-down.d/openvswitch/oel$OracleRelease$SeedPostfix-pub-ifdown-sx1
+
+# 	sudo sh -c "echo 'lxc.net.0.mtu = $MultiHostVar7'											>> /var/lib/lxc/oel$OracleRelease$SeedPostfix/config"
+# 	sudo sh -c "echo 'lxc.net.0.script.up = /etc/network/if-up.d/openvswitch/ContainerName-pub-ifup-sx1' 					>> /var/lib/lxc/oel$OracleRelease$SeedPostfix/config"
+# 	sudo sh -c "echo 'lxc.net.0.script.down = /etc/network/if-down.d/openvswitch/ContainerName-pub-ifdown-sx1' 				>> /var/lib/lxc/oel$OracleRelease$SeedPostfix/config"
+# 	sudo sh -c "echo '# lxc.mount.entry = /dev/lxc_luns /var/lib/lxc/ContainerName/rootfs/dev/lxc_luns none defaults,bind,create=dir 0 0'	>> /var/lib/lxc/oel$OracleRelease$SeedPostfix/config"
+# 	sudo sh -c "echo '# lxc.mount.entry = shm dev/shm tmpfs size=3500m,nosuid,nodev,noexec,create=dir 0 0'					>> /var/lib/lxc/oel$OracleRelease$SeedPostfix/config"
+# 	sudo sed -i "s/ContainerName/oel$OracleRelease$SeedPostfix/g" 										   /var/lib/lxc/oel$OracleRelease$SeedPostfix/config
+
+# 	if   [ $Release -ge 7 ]
+# 	then
+# 		sudo sed -i 's/lxc\.net\.0\.link/\# lxc\.net\.0\.link/' 									   /var/lib/lxc/oel$OracleRelease$SeedPostfix/config
+# 
+# 	elif [ $Release -eq 6 ]
+# 	then
+# 		sudo sed -i 's/lxc\.network\.link/\# lxc\.network\.link/' 									   /var/lib/lxc/oel$OracleRelease$SeedPostfix/config
+# 	fi
+
+# 	sudo sed -i "s/\(hwaddr = \).*/\1$NewMacAddress/"               									   /var/lib/lxc/oel$OracleRelease$SeedPostfix/config
+
+# 	sudo sed -i 's/sw1/sx1/g' 						/etc/network/if-up.d/openvswitch/oel$OracleRelease$SeedPostfix-pub-ifup-sx1
+# 	sudo sed -i 's/tag=10/tag=11/g' 					/etc/network/if-up.d/openvswitch/oel$OracleRelease$SeedPostfix-pub-ifup-sx1
+# 	sudo sed -i 's/sw1/sx1/g' 						/etc/network/if-down.d/openvswitch/oel$OracleRelease$SeedPostfix-pub-ifdown-sx1
+
+# 	sudo cat /var/lib/lxc/oel$OracleRelease$SeedPostfix/config
+
+# 	sleep 5
+
+# 	echo ''
+# 	echo "=============================================="
+# 	echo "Done: LXC config updates.                     "
+# 	echo "=============================================="
+# fi
 
 sleep 5
 
 clear
 
-echo ''
-echo "=============================================="
-echo "Set NTP '-x' option in ntpd file...           "
-echo "=============================================="
-echo ''
+# echo ''
+# echo "=============================================="
+# echo "Set NTP '-x' option in ntpd file...           "
+# echo "=============================================="
+# echo ''
 
 # sudo sed -i -e '/OPTIONS/{ s/.*/OPTIONS="-g -x"/ }' /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/etc/sysconfig/ntpd
 
-echo ''
-echo "=============================================="
-echo "Done: Set NTP '-x' option in ntpd file.       "
-echo "=============================================="
+# echo ''
+# echo "=============================================="
+# echo "Done: Set NTP '-x' option in ntpd file.       "
+# echo "=============================================="
 
-sleep 5
+# sleep 5
 
-clear
+# clear
 
 echo ''
 echo "=============================================="
@@ -791,6 +856,7 @@ fi
 echo ''
 echo "==============================================" 
 echo "Public IP is up on oel$OracleRelease$SeedPostfix"
+echo "==============================================" 
 echo ''
 sudo lxc-ls -f
 echo ''

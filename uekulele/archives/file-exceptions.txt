@@ -18,6 +18,7 @@ rootfs/config.asm.flex.cluster
 /home/OWNER/Downloads/orabuntu-lxc-master/anylinux/dnf2yum
 /home/OWNER/Downloads/orabuntu-lxc-master/uekulele/archives/nameserver_copy.sh
 /home/OWNER/Downloads/orabuntu-lxc-master/uekulele/archives/docker_install_uekulele.sh
+/home/OWNER/Downloads/orabuntu-lxc-master/uekulele/archives/lxd_install_uekulele.sh
 /home/OWNER/Downloads/orabuntu-lxc-master/uekulele/uekulele-services-0.sh
 /home/OWNER/Downloads/orabuntu-lxc-master/uekulele/uekulele-services-1.sh
 /home/OWNER/Downloads/orabuntu-lxc-master/uekulele/uekulele-services-2.sh
