@@ -226,7 +226,7 @@ if [ $MultiHostVar1 = 'new' ]
 then	
 	echo ''
 	echo "=============================================="
-	echo "Install K8S and/or Docker...                  "
+	echo "Install Docker...                             "
 	echo "=============================================="
 	echo ''
 
@@ -240,7 +240,7 @@ then
 
 	echo ''
 	echo "=============================================="
-	echo "Done: Install K8S and/or Docker.              "
+	echo "Done: Install Docker.                         "
 	echo "=============================================="
 	echo ''
 
@@ -492,7 +492,7 @@ then
 	echo ''
 	
 	sudo touch /etc/orabuntu-lxc-release
-	sudo sh -c "echo 'Orabuntu-LXC v6.13.20-beta AMIDE' > /etc/orabuntu-lxc-release"
+	sudo sh -c "echo 'Orabuntu-LXC v6.13.21-beta AMIDE' > /etc/orabuntu-lxc-release"
 	sudo ls -l /etc/orabuntu-lxc-release
 	echo ''
 	sudo cat /etc/orabuntu-lxc-release

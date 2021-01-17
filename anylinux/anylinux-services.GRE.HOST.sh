@@ -51,7 +51,7 @@ clear
 
 echo ''
 echo "=============================================="
-echo "Establish sudo privileges...                  "
+echo "Establish sudo...                             "
 echo "=============================================="
 echo ''
 
@@ -60,7 +60,7 @@ sudo date
 
 echo ''
 echo "=============================================="
-echo "Done: Establish sudo privileges.              "
+echo "Done: Establish sudo.                         "
 echo "=============================================="
 echo ''
 
@@ -288,7 +288,7 @@ fi
 if [ -z $2 ]
 then
 	SPOKEIP='lan.ip.this.host'
- 	SPOKEIP=192.168.1.116
+ 	SPOKEIP=192.168.1.144
 else
 	SPOKEIP=$2
 fi
@@ -296,7 +296,7 @@ fi
 if [ -z $3 ]
 then
 	HUBIP='lan.ip.hub.host'
- 	HUBIP=192.168.1.128
+ 	HUBIP=192.168.1.143
 else
 	HUBIP=$3
 fi

@@ -1048,7 +1048,7 @@ function ConfirmContainerCreated {
 }
 ContainerCreated=$(ConfirmContainerCreated)
 
-m=1; n=1; p=1
+m=1; p=1; q=1
 if [ $NameServerExists -eq 0 ] && [ $MultiHostVar2 = 'N' ]
 then
 	echo ''
@@ -1057,49 +1057,62 @@ then
 	echo "=============================================="
 	echo ''
 
-	if [ $UbuntuMajorVersion -gt 16 ]
-	then
+	while [ $ContainerCreated -eq 0 ] && [ $m -le 3 ] && [ $UbuntuMajorVersion -gt 16 ]
+	do
+                echo "=============================================="
+                echo "Trying Method 1 ...                           "
+                echo "=============================================="
+                echo ''
 
-		echo "=============================================="
-		echo "Trying Method 1...                            "
-		echo "=============================================="
-		echo ''
+                dig +short us.images.linuxcontainers.org
 
-		dig +short us.images.linuxcontainers.org
-		echo ''
+                if [ ! -d /opt/olxc/"$DistDir"/lxcimage/nsa ]
+                then
+                        sudo mkdir -p /opt/olxc/"$DistDir"/lxcimage/nsa
+                else
+                        echo "Directory already exists: /opt/olxc/"$DistDir"/lxcimage/nsa"
+                        echo ''
+                fi
 
-		while [ $ContainerCreated -eq 0 ] && [ $m -le 3 ]
-		do
-			sudo rm -f ~/Downloads/orabuntu-lxc-master/lxcimage/nsa/*
-			sudo rm -f index.html
-			mkdir -p $DistDir/lxcimage/nsa
-			DistDir="/home/ubuntu/Downloads/orabuntu-lxc-master"
-			rm -f index.html
-			wget -4 -q https://us.images.linuxcontainers.org/images/ubuntu/xenial/amd64/default/
-			function GetBuildDate {
-       				grep folder.gif index.html | tail -1 | awk -F "\"" '{print $8}' | sed 's/\///g' | sed 's/\.//g'
-			}
-			BuildDate=$(GetBuildDate)
-			wget -4 -q https://us.images.linuxcontainers.org/images/ubuntu/xenial/amd64/default/"$BuildDate"/SHA256SUMS    -P "$DistDir"/lxcimage/nsa
+                sudo rm -f                /opt/olxc/"$DistDir"/lxcimage/nsa/*
+                cd                        /opt/olxc/"$DistDir"/lxcimage/nsa
+		sudo chown $Owner:$Group  /opt/olxc/"$DistDir"/lxcimage/nsa
 
-			for i in rootfs.tar.xz meta.tar.xz
-			do
-				rm -f $DistDir/lxcimage/nsa/$i
-				echo ''
-				wget -4 -q --show-progress https://us.images.linuxcontainers.org/images/ubuntu/xenial/amd64/default/"$BuildDate"/$i -P "$DistDir"/lxcimage/nsa
-				diff <(shasum -a 256 "$DistDir"/lxcimage/nsa/$i | cut -f1,8 -d'/' | sed 's/  */ /g' | sed 's/\///' | sed 's/  */ /g') <(grep $i "$DistDir"/lxcimage/nsa/SHA256SUMS)
-			done
-			if [ $? -eq 0 ]
-			then
-				echo ''
-				sudo lxc-create -t local -n nsa -- -m $DistDir/lxcimage/nsa/meta.tar.xz -f $DistDir/lxcimage/nsa/rootfs.tar.xz
-			else
-				m=$((m+1))
-			fi
-		ContainerCreated=$(ConfirmContainerCreated)
-		done
-	fi
-	
+                wget -4 -q https://us.images.linuxcontainers.org/images/ubuntu/focal/amd64/default/ -P /opt/olxc/"$DistDir"/lxcimage/nsa
+
+                function GetBuildDate {
+                        grep folder.gif index.html | tail -1 | awk -F "\"" '{print $8}' | sed 's/\///g' | sed 's/\.//g'
+                }
+                BuildDate=$(GetBuildDate)
+
+                wget -4 -q https://us.images.linuxcontainers.org/images/ubuntu/focal/amd64/default/"$BuildDate"/SHA256SUMS -P /opt/olxc/"$DistDir"/lxcimage/nsa
+
+                for i in rootfs.tar.xz meta.tar.xz
+                do
+                        if [ -f /opt/olxc/"$DistDir"/lxcimage/nsa/$i ]
+                        then
+                                rm -f /opt/olxc/"$DistDir"/lxcimage/nsa/$i
+                        fi
+
+                        echo ''
+                        echo "Downloading $i ..."
+                        echo ''
+
+                        wget -4 -q --show-progress https://us.images.linuxcontainers.org/images/ubuntu/focal/amd64/default/"$BuildDate"/$i -P /opt/olxc/"$DistDir"/lxcimage/nsa
+                        diff <(shasum -a 256 /opt/olxc/"$DistDir"/lxcimage/nsa/$i | cut -f1,11 -d'/' | sed 's/  */ /g' | sed 's/\///' | sed 's/  */ /g') <(grep $i /opt/olxc/"$DistDir"/lxcimage/nsa/SHA256SUMS)
+                done
+                if [ $? -eq 0 ]
+                then
+                        echo ''
+                        sudo lxc-create -t local -n nsa -- -m /opt/olxc/"$DistDir"/lxcimage/nsa/meta.tar.xz -f /opt/olxc/"$DistDir"/lxcimage/nsa/rootfs.tar.xz
+                else
+                        m=$((m+1))
+                fi
+
+        ContainerCreated=$(ConfirmContainerCreated)
+
+        done
+
 	while [ $ContainerCreated -eq 0 ] && [ $p -le 3 ]
 	do
 		echo ''
@@ -1108,19 +1121,19 @@ then
 		echo "=============================================="
 		echo ''
 	
-		sudo lxc-create -t download -n nsa -- --dist ubuntu --release xenial --arch amd64 --keyserver hkp://keyserver.ubuntu.com:80
+		sudo lxc-create -t download -n nsa -- --dist ubuntu --release focal --arch amd64 --keyserver hkp://keyserver.ubuntu.com:80
 		if [ $? -ne 0 ]
 		then
 			sudo lxc-stop -n nsa -k
 			sudo lxc-destroy -n nsa
 			sudo rm -rf /var/lib/lxc/nsa
-			sudo lxc-create -t download -n nsa -- --dist ubuntu --release xenial --arch amd64 --keyserver hkp://p80.pool.sks-keyservers.net:80
+			sudo lxc-create -t download -n nsa -- --dist ubuntu --release focal --arch amd64 --keyserver hkp://p80.pool.sks-keyservers.net:80
 			if [ $? -ne 0 ]
 			then
 				sudo lxc-stop -n nsa -k
 				sudo lxc-destroy -n nsa
 				sudo rm -rf /var/lib/lxc/nsa
-                                sudo lxc-create -t download -n nsa -- --dist ubuntu --release xenial --arch amd64 --no-validate
+                                sudo lxc-create -t download -n nsa -- --dist ubuntu --release focal --arch amd64 --no-validate
 			fi
 		fi
 
@@ -1137,7 +1150,7 @@ then
 		echo "=============================================="
 		echo ''
 
-		sudo lxc-create -n nsa -t ubuntu -- --release xenial --arch amd64
+		sudo lxc-create -n nsa -t ubuntu -- --release focal --arch amd64
 		sleep 5
 		q=$((q+1))
 		ContainerCreated=$(ConfirmContainerCreated)
@@ -1212,7 +1225,7 @@ then
 	echo ''
 
 	sudo lxc-attach -n nsa -- sudo apt-get -y update
-	sudo lxc-attach -n nsa -- sudo apt-get -y install bind9 isc-dhcp-server bind9utils dnsutils openssh-server man awscli sshpass
+	sudo lxc-attach -n nsa -- sudo apt-get -y -o Dpkg::Options::=--force-confdef install bind9 isc-dhcp-server bind9utils dnsutils openssh-server man awscli sshpass
 
 	sleep 2
 
@@ -1719,7 +1732,8 @@ then
 			# GLS 20151221 Settable Domain feature added
 			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/var/lib/bind/fwd.orabuntu-lxc.com
 			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/var/lib/bind/rev.orabuntu-lxc.com
-			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/etc/resolv.conf			> /dev/null 2>&1
+			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/etc/systemd/resolved.conf
+			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/etc/resolv.conf	> /dev/null 2>&1
 			
 			if [ $NetworkManagerInstalled -eq 1 ]
 			then
@@ -1732,11 +1746,11 @@ then
 			then
 				sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /etc/systemd/resolved.conf > /dev/null 2>&1
 			fi
-#			
-			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /run/systemd/resolve/stub-resolv.conf > /dev/null 2>&1
+ 			
+		#	sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /run/systemd/resolve/stub-resolv.conf > /dev/null 2>&1
 			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/etc/bind/named.conf.local
 			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/etc/dhcp/dhcpd.conf
-			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/etc/network/interfaces
+		#	sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/etc/network/interfaces
 			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/root/ns_backup_update.lst
 			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/root/dns-thaw.sh
 			sudo mv /var/lib/lxc/$NameServer/rootfs/var/lib/bind/fwd.orabuntu-lxc.com /var/lib/lxc/$NameServer/rootfs/var/lib/bind/fwd.$Domain1
@@ -1748,7 +1762,8 @@ then
 			# GLS 20151221 Settable Domain feature added
 			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /var/lib/lxc/$NameServer/rootfs/var/lib/bind/fwd.consultingcommandos.us
 			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /var/lib/lxc/$NameServer/rootfs/var/lib/bind/rev.consultingcommandos.us
-			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /var/lib/lxc/$NameServer/rootfs/etc/resolv.conf	> /dev/null 2>&1
+			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /var/lib/lxc/$NameServer/rootfs/etc/systemd/resolved.conf
+			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /var/lib/lxc/$NameServer/rootfs/etc/resolv.conf > /dev/null 2>&1
 			
 			if [ $NetworkManagerInstalled -eq 1 ]
 			then
@@ -1762,15 +1777,16 @@ then
 				sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /etc/systemd/resolved.conf > /dev/null 2>&1
 			fi
 
-#			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /run/systemd/resolve/stub-resolv.conf
+		#	sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /run/systemd/resolve/stub-resolv.conf
 			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /var/lib/lxc/$NameServer/rootfs/etc/bind/named.conf.local
 			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /var/lib/lxc/$NameServer/rootfs/etc/dhcp/dhcpd.conf
-			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /var/lib/lxc/$NameServer/rootfs/etc/network/interfaces
+		#	sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /var/lib/lxc/$NameServer/rootfs/etc/network/interfaces
 			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /var/lib/lxc/$NameServer/rootfs/root/ns_backup_update.lst
 			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /var/lib/lxc/$NameServer/rootfs/root/dns-thaw.sh
 			sudo mv /var/lib/lxc/$NameServer/rootfs/var/lib/bind/fwd.consultingcommandos.us /var/lib/lxc/$NameServer/rootfs/var/lib/bind/fwd.$Domain2
 			sudo mv /var/lib/lxc/$NameServer/rootfs/var/lib/bind/rev.consultingcommandos.us /var/lib/lxc/$NameServer/rootfs/var/lib/bind/rev.$Domain2
 		fi
+
 	elif [ $MultiHostVar2 = 'Y' ] && [ $SystemdResolvedInstalled -ge 1 ]
 	then
 			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" 		/etc/systemd/resolved.conf
@@ -2406,7 +2422,7 @@ then
 	}
 	KeySecret=$(GetKeySecret)
 	echo $KeySecret
-	sudo sed -i "/secret/c\key rndc-key { algorithm hmac-md5; $KeySecret }" /var/lib/lxc/$NameServer/rootfs/etc/dhcp/dhcpd.conf
+	sudo sed -i "/secret/c\key rndc-key { algorithm hmac-sha256; $KeySecret }" /var/lib/lxc/$NameServer/rootfs/etc/dhcp/dhcpd.conf
 	echo 'The following keys should match (for dynamic DNS updates by DHCP):'
 	echo ''
 	sudo cat /var/lib/lxc/$NameServer/rootfs/etc/dhcp/dhcpd.conf | grep secret | cut -f7 -d' ' | cut -f1 -d';'
@@ -2571,6 +2587,7 @@ then
                 fi
         fi
 
+	echo ''
 	echo "=============================================="
 	echo "Done: Start LXC DNS DHCP container.           "
 	echo "=============================================="
@@ -2637,7 +2654,6 @@ then
         echo "=============================================="
         echo "Replicate nameserver $NameServer...           "
         echo "=============================================="
-        echo ''
 
         sudo mkdir -p /home/$Owner/Manage-Orabuntu
         sudo chown $Owner:$Group /home/$Owner/Manage-Orabuntu

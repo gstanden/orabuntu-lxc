@@ -40,6 +40,9 @@ echo "                                              "
 echo "Script creates the Oracle Linux container.    "
 echo "=============================================="
 echo ''
+echo "=============================================="
+echo "This script is re-runnable                    "
+echo "=============================================="
 
 sleep 5
 
@@ -167,6 +170,16 @@ function GetMultiHostVar17 {
 MultiHostVar17=$(GetMultiHostVar17)
 StoragePoolName=$MultiHostVar17
 
+function GetGroup {
+        id | cut -f2 -d' ' | cut -f2 -d'(' | cut -f1 -d')'
+}
+Group=$(GetGroup)
+
+function GetOwner {
+        id | cut -f1 -d' ' | cut -f2 -d'(' | cut -f1 -d')'
+}
+Owner=$(GetOwner)
+
 function CheckSystemdResolvedInstalled {
 	sudo netstat -ulnp | grep 53 | sed 's/  */ /g' | rev | cut -f1 -d'/' | rev | sort -u | grep systemd- | wc -l
 }
@@ -292,74 +305,84 @@ sleep 5
 
 clear
 
+echo ''
+echo "=============================================="
+echo "    Create the LXC Oracle Linux Container     "
+echo "=============================================="
+echo ''
+
 m=1; n=1; p=1
-if [ $UbuntuMajorVersion -gt 16 ]
-then
-	while [ $ContainerCreated -eq 0 ] && [ $m -le 3 ]
-	do
+while [ $ContainerCreated -eq 0 ] && [ $m -le 3 ] && [ $UbuntuMajorVersion -gt 16 ]
+do
+        echo "=============================================="
+        echo "                 Method 1                     "
+        echo "=============================================="
+        echo ''
+
+        dig +short us.images.linuxcontainers.org
+	echo ''
+
+        if [ -d /opt/olxc/"$DistDir"/lxcimage/oracle"$MajorRelease" ]
+        then
+		echo "Directory already exists: /opt/olxc/"$DistDir"/lxcimage/oracle$MajorRelease"
+                sudo rm -f 	/opt/olxc/"$DistDir"/lxcimage/oracle"$MajorRelease"/*
+	else
+                sudo mkdir -p 	/opt/olxc/"$DistDir"/lxcimage/oracle"$MajorRelease"
+		echo "Directory created: /opt/olxc/"$DistDir"/lxcimage/oracle$MajorRelease"
+        fi
+
+        sudo rm -f 			/opt/olxc/"$DistDir"/lxcimage/oracle"$MajorRelease"/*
+	sudo chown -R $Owner:$Group  	/opt/olxc/"$DistDir"/lxcimage/oracle"$MajorRelease"
+        cd 				/opt/olxc/"$DistDir"/lxcimage/oracle"$MajorRelease"
+
+        wget -4 -q https://us.images.linuxcontainers.org/images/oracle/"$MajorRelease"/amd64/default/ -P /opt/olxc/"$DistDir"/lxcimage/oracle"$MajorRelease"
+
+        function GetBuildDate {
+                grep folder.gif index.html | tail -1 | awk -F "\"" '{print $8}' | sed 's/\///g' | sed 's/\.//g'
+        }
+        BuildDate=$(GetBuildDate)
+
+        wget -4 -q https://us.images.linuxcontainers.org/images/oracle/"$MajorRelease"/amd64/default/"$BuildDate"/SHA256SUMS -P /opt/olxc/"$DistDir"/lxcimage/oracle"$MajorRelease"
+
+        for i in rootfs.tar.xz meta.tar.xz
+        do
+                if [ -f /opt/olxc/$DistDir/lxcimage/oracle"$MajorRelease"/$i ]
+                then
+                        rm -f /opt/olxc/$DistDir/lxcimage/oracle"$MajorRelease"/$i
+                fi
+
+                echo ''
+                echo "Downloading $i ..."
+                echo ''
+
+                wget -4 -q --show-progress https://us.images.linuxcontainers.org/images/oracle/"$MajorRelease"/amd64/default/"$BuildDate"/$i -P /opt/olxc/"$DistDir"/lxcimage/oracle"$MajorRelease"
+                diff <(shasum -a 256 /opt/olxc/"$DistDir"/lxcimage/oracle"$MajorRelease"/$i | cut -f1,11 -d'/' | sed 's/  */ /g' | sed 's/\///' | sed 's/  */ /g') <(grep $i /opt/olxc/"$DistDir"/lxcimage/oracle"$MajorRelease"/SHA256SUMS)
+        done
+        if [ $? -eq 0 ]
+        then
 		echo ''
-		echo "=============================================="
-		echo "   Create the LXC Oracle Linux container      "
-		echo "                                              "
-		echo "      Note: Depends on download speed         "
-		echo "                                              "
-		echo "                 Method 1                     "
-		echo "=============================================="
-		echo ''
+                sudo lxc-create -t local -n oel$OracleRelease$SeedPostfix -- -m /opt/olxc/$DistDir/lxcimage/oracle"$MajorRelease"/meta.tar.xz -f /opt/olxc/$DistDir/lxcimage/oracle"$MajorRelease"/rootfs.tar.xz
 
-		dig +short us.images.linuxcontainers.org
+                if [ $(SoftwareVersion $LXCVersion) -ge $(SoftwareVersion "2.1.0") ]
+                then
+                        sudo lxc-update-config -c /var/lib/lxc/oel$OracleRelease$SeedPostfix/config
+                fi
+        fi
 
-		if [ -d ~/Downloads/orabuntu-lxc-master/lxcimage/oracle"$MajorRelease" ]
-		then
-			sudo rm -f ~/Downloads/orabuntu-lxc-master/lxcimage/oracle"$MajorRelease"/*
-		fi
-
-		mkdir -p "$DistDir"/lxcimage/oracle"$MajorRelease"
-		cd       "$DistDir"/lxcimage/oracle"$MajorRelease"
-		sudo rm -f index.html
-		wget -4 -q https://us.images.linuxcontainers.org/images/oracle/"$MajorRelease"/amd64/default/ -P "$DistDir"/lxcimage/oracle"$MajorRelease"
-		function GetBuildDate {
-			grep folder.gif index.html | tail -1 | awk -F "\"" '{print $8}' | sed 's/\///g' | sed 's/\.//g'
-		}
-		BuildDate=$(GetBuildDate)
-		wget -4 -q https://us.images.linuxcontainers.org/images/oracle/"$MajorRelease"/amd64/default/"$BuildDate"/SHA256SUMS -P "$DistDir"/lxcimage/oracle"$MajorRelease"
-		for i in rootfs.tar.xz meta.tar.xz
-		do
-			rm -f $DistDir/lxcimage/oracle"$MajorRelease"/$i
-			echo ''
-			wget -4 -q --show-progress https://us.images.linuxcontainers.org/images/oracle/"$MajorRelease"/amd64/default/"$BuildDate"/$i -P "$DistDir"/lxcimage/oracle"$MajorRelease"
-			diff <(shasum -a 256 "$DistDir"/lxcimage/oracle"$MajorRelease"/$i | cut -f1,8 -d'/' | sed 's/  */ /g' | sed 's/\///' | sed 's/  */ /g') <(grep $i "$DistDir"/lxcimage/oracle"$MajorRelease"/SHA256SUMS)
-		done
-		if [ $? -eq 0 ]
-		then
-			echo ''
-			sudo lxc-create -t local -n oel$OracleRelease$SeedPostfix -- -m $DistDir/lxcimage/oracle"$MajorRelease"/meta.tar.xz -f $DistDir/lxcimage/oracle"$MajorRelease"/rootfs.tar.xz
-	
-			if [ $(SoftwareVersion $LXCVersion) -ge $(SoftwareVersion "2.1.0") ]
-			then
-  				sudo lxc-update-config -c /var/lib/lxc/oel$OracleRelease$SeedPostfix/config
-			fi
-		fi
-
-		ContainerCreated=$(ConfirmContainerCreated)
-		rm -f index.html
-		m=$((m+1))
-	done
-fi
+        ContainerCreated=$(ConfirmContainerCreated)
+        rm -f index.html
+        m=$((m+1))
+done
 
 sleep 5
 
-n=1
+clear
+
 if [ $UbuntuMajorVersion -ge 20 ] # Because yum is no longer available in Ubuntu 20
 then
-	while [ $ContainerCreated -eq 0 ] && [ $n -le 5 ]
+	while [ $ContainerCreated -eq 0 ] && [ $n -le 3 ]
 	do
-		echo ''
 		echo "=============================================="
-		echo "   Create the LXC Oracle Linux container      "
-		echo "                                              "
-		echo "      Note: Depends on download speed         "
-		echo "                                              "
 		echo "                 Method 2                     "
 		echo "=============================================="
 		echo ''
@@ -389,15 +412,9 @@ then
                 ContainerCreated=$(ConfirmContainerCreated)
         done
 else
-	n=1
-	while [ $ContainerCreated -eq 0 ] && [ $n -le 5 ]
+	while [ $ContainerCreated -eq 0 ] && [ $p -le 3 ]
 	do
-		echo ''
 		echo "=============================================="
-		echo "   Create the LXC Oracle Linux container      "
-		echo "                                              "
-		echo "      Note: Depends on download speed         "
-		echo "                                              "
 		echo "                 Method 3                     "
 		echo "=============================================="
 		echo ''
@@ -429,7 +446,7 @@ else
 		fi
 
 		sleep 5
-		n=$((n+1))
+		p=$((p+1))
 		ContainerCreated=$(ConfirmContainerCreated)
 	done
 fi

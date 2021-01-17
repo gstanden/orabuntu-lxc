@@ -362,69 +362,57 @@ do
 
 	if [ $MultiHostVar3 = 'X' ] && [ $GREValue = 'Y' ]
 	then
-		function GetNameServerShortName {
-			echo $NameServer | cut -f1 -d'-'
-		}
-		NameServerShortName=$(GetNameServerShortName)
-
-		sshpass -p $MultiHostVar9 ssh -M -S /tmp/orabuntu -qt -o CheckHostIP=no -o StrictHostKeyChecking=no -o ControlPersist=60s $MultiHostVar8@$MultiHostVar5 exit
-
         	function CheckDNSLookup {
-			ssh -S /tmp/orabuntu $MultiHostVar5 "sudo -S -p' ' <<< "$MultiHostVar9" lxc-attach -n $NameServerShortName -- nslookup -timeout=5 $ContainerPrefix$CloneIndex"	
+                	timeout 5 nslookup $ContainerPrefix$CloneIndex
         	}
         	DNSLookup=$(CheckDNSLookup)
-		DNSHit=$PIPESTATUS
+		DNSLookup=`echo $?`
 	else
         	function CheckDNSLookup {
-                	sudo nslookup -timeout=1 $ContainerPrefix$CloneIndex | grep -v '#' | grep Address | grep '10\.207\.39'
+                	timeout 5 nslookup $ContainerPrefix$CloneIndex
         	}
         	DNSLookup=$(CheckDNSLookup)
-		DNSHit=$PIPESTATUS
+		DNSLookup=`echo $?`
 	fi
 		
-	if [ $UbuntuMajorVersion -ge 16 ]
-	then
-       		while [ $DNSHit -eq 0 ]
-       		do
-               		CloneIndex=$((CloneIndex+1))
-               		DNSLookup=$(CheckDNSLookup)
-			DNSHit=$PIPESTATUS
-			echo $ContainerPrefix$CloneIndex
-       		done
+	while [ $DNSLookup -eq 0 ]
+	do
+		CloneIndex=$((CloneIndex+1))
+		DNSLookup=$(CheckDNSLookup)
+		DNSLookup=`echo $?`
+	done
 		
-		if [ $DNSHit -eq 1 ]
-		then
-			echo ''
-			echo "=============================================="
-			echo "Clone $SeedContainerName to $CP$CloneIndex    "
-			echo "=============================================="
-			echo ''
+	echo ''
+	echo "=============================================="
+	echo "Clone $SeedContainerName to $CP$CloneIndex    "
+	echo "=============================================="
+	echo ''
 
-			echo "Clone Container Name = $ContainerPrefix$CloneIndex"
+	echo "Clone Container Name = $ContainerPrefix$CloneIndex"
 
-			sleep 5
+	sleep 5
 
-      			sudo lxc-copy -n $SeedContainerName -N $ContainerPrefix$CloneIndex
+      	sudo lxc-copy -n $SeedContainerName -N $ContainerPrefix$CloneIndex
 		
-			if [ $MajorRelease -eq 7 ]
-			then	
-				sudo sed -i "s/$SeedContainerName/$ContainerPrefix$CloneIndex/g"	/var/lib/lxc/$ContainerPrefix$CloneIndex/rootfs/etc/hostname
-			fi
-
-			sudo sed -i "s/$SeedContainerName/$ContainerPrefix$CloneIndex/g"		/var/lib/lxc/$ContainerPrefix$CloneIndex/rootfs/etc/sysconfig/network-scripts/ifcfg-eth0
-			sudo sed -i "s/HostName/$ContainerPrefix$CloneIndex/g"                  	/var/lib/lxc/$ContainerPrefix$CloneIndex/rootfs/etc/sysconfig/network-scripts/ifcfg-eth0
-			sudo sed -i "s/$SeedContainerName/$ContainerPrefix$CloneIndex/g"		/var/lib/lxc/$ContainerPrefix$CloneIndex/rootfs/etc/sysconfig/network
-			sudo sed -i "s/$SeedContainerName/$ContainerPrefix$CloneIndex/g"		/var/lib/lxc/$ContainerPrefix$CloneIndex/rootfs/etc/hosts
-		fi
+	if [ $MajorRelease -eq 6 ]
+	then	
+		sudo sed -i "s/$SeedContainerName/$ContainerPrefix$CloneIndex/g"	/var/lib/lxc/$ContainerPrefix$CloneIndex/rootfs/etc/hostname
 	fi
 
-	sudo sed -i "s/$SeedContainerName/$ContainerPrefix$CloneIndex/g" 		/var/lib/lxc/$ContainerPrefix$CloneIndex/config
-	sudo sed -i "s/\.10/\.$CloneIndex/g" 						/var/lib/lxc/$ContainerPrefix$CloneIndex/config
- 	sudo sed -i 's/sx1/sw1/g' 							/var/lib/lxc/$ContainerPrefix$CloneIndex/config
-#	sudo sed -i 's/sx1a/sw1a/g' 							/var/lib/lxc/$ContainerPrefix$CloneIndex/config
-	sudo sed -i "s/mtu = 1500/mtu = $MultiHostVar7/g" 				/var/lib/lxc/$ContainerPrefix$CloneIndex/config
-#	sudo sed -i "s/lxc\.mount\.entry = \/dev\/lxc_luns/#lxc\.mount\.entry = \/dev\/lxc_luns/g" /var/lib/lxc/$ContainerPrefix$CloneIndex/config
-#	sudo sed -i "/domain-name-servers/s/10.207.29.2/10.207.39.2/g" /var/lib/lxc/$ContainerPrefix$CloneIndex/rootfs/etc/dhcp/dhclient.conf
+	sudo sed -i "s/$SeedContainerName/$ContainerPrefix$CloneIndex/g"		/var/lib/lxc/$ContainerPrefix$CloneIndex/rootfs/etc/sysconfig/network-scripts/ifcfg-eth0
+	sudo sed -i "s/HostName/$ContainerPrefix$CloneIndex/g"                  	/var/lib/lxc/$ContainerPrefix$CloneIndex/rootfs/etc/sysconfig/network-scripts/ifcfg-eth0
+	sudo sed -i "s/$SeedContainerName/$ContainerPrefix$CloneIndex/g"		/var/lib/lxc/$ContainerPrefix$CloneIndex/rootfs/etc/sysconfig/network
+	sudo sed -i "s/$SeedContainerName/$ContainerPrefix$CloneIndex/g"		/var/lib/lxc/$ContainerPrefix$CloneIndex/rootfs/etc/hosts
+
+	sudo sed -i "s/$SeedContainerName/$ContainerPrefix$CloneIndex/g" 				/var/lib/lxc/$ContainerPrefix$CloneIndex/config
+	sudo sed -i "s/\.10/\.$CloneIndex/g" 								/var/lib/lxc/$ContainerPrefix$CloneIndex/config
+ 	sudo sed -i 's/sx1/sw1/g' 									/var/lib/lxc/$ContainerPrefix$CloneIndex/config
+#	sudo sed -i 's/sx1a/sw1a/g' 									/var/lib/lxc/$ContainerPrefix$CloneIndex/config
+	sudo sed -i "s/mtu = 1500/mtu = $MultiHostVar7/g" 						/var/lib/lxc/$ContainerPrefix$CloneIndex/config
+#	sudo sed -i "s/lxc\.mount\.entry = \/dev\/lxc_luns/#lxc\.mount\.entry = \/dev\/lxc_luns/g" 	/var/lib/lxc/$ContainerPrefix$CloneIndex/config
+#	sudo sed -i "/domain-name-servers/s/10.207.29.2/10.207.39.2/g" 					/var/lib/lxc/$ContainerPrefix$CloneIndex/rootfs/etc/dhcp/dhclient.conf
+	sudo rm  -f											/var/lib/lxc/$ContainerPrefix$CloneIndex/rootfs/etc/machine-id
+	sudo systemd-machine-id-setup								 --root=/var/lib/lxc/$ContainerPrefix$CloneIndex/rootfs
 
         echo ''
         echo "=============================================="
@@ -622,20 +610,30 @@ echo "=============================================="
 echo ''
 
 function GetClonedContainers {
-	sudo ls /var/lib/lxc | grep "ora$OracleRelease" | sort -V | sed 's/$/ /' | tr -d '\n' | sed 's/^[ \t]*//;s/[ \t]*$//'
+        sudo ls /var/lib/lxc | grep "ora$OracleRelease" | sort -V | sed 's/$/ /' | tr -d '\n' | sed 's/^[ \t]*//;s/[ \t]*$//'
 }
 ClonedContainers=$(GetClonedContainers)
 
 for j in $ClonedContainers
 do
-	if [ -e /var/lib/lxc/$j/rootfs/var/run/dhclient.pid ]
-	then
-		sudo rm -f /var/lib/lxc/$j/rootfs/var/run/dhclient.pid
-	fi
-	sudo lxc-start -n $j
-	sleep 10
-	sudo lxc-ls -f
-	echo ''
+        if [ -e /var/lib/lxc/$j/rootfs/var/run/dhclient.pid ]
+        then
+                sudo rm -f /var/lib/lxc/$j/rootfs/var/run/dhclient.pid
+        fi
+
+        sudo lxc-start  -n $j
+        sleep 5
+
+        if [ $MajorRelease -ge 7 ] && [ $UbuntuMajorVersion -ge 16 ]
+        then
+                sudo lxc-attach -n $j -- hostnamectl set-hostname $j
+                sudo lxc-stop   -n $j
+                sudo lxc-start  -n $j
+                sleep 5
+        fi
+
+        sudo lxc-ls -f
+        echo ''
 done
 
 echo "=============================================="

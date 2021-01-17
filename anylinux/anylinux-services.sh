@@ -1626,11 +1626,11 @@ echo "$DistDir/$SubDirName/COPYING"                                             
 echo "$DistDir/products/$Product/$Product"					>> "$DistDir"/"$SubDirName"/archives/"$SubDirName"-services.lst
 echo "$DistDir/products/$Product/$Product.net"					>> "$DistDir"/"$SubDirName"/archives/"$SubDirName"-services.lst
 echo "$DistDir/products/$Product/$Product.cnf"					>> "$DistDir"/"$SubDirName"/archives/"$SubDirName"-services.lst
-echo "$DistDir/lxcimage/SHA256SUMS"						>> "$DistDir"/"$SubDirName"/archives/"$SubDirName"-services.lst
-echo "$DistDir/lxcimage/oracle6/SHA256SUMS"					>> "$DistDir"/"$SubDirName"/archives/"$SubDirName"-services.lst
-echo "$DistDir/lxcimage/oracle7/SHA256SUMS"					>> "$DistDir"/"$SubDirName"/archives/"$SubDirName"-services.lst
-echo "$DistDir/lxcimage/oracle8/SHA256SUMS"					>> "$DistDir"/"$SubDirName"/archives/"$SubDirName"-services.lst
-echo "$DistDir/lxcimage/nsa/SHA256SUMS"						>> "$DistDir"/"$SubDirName"/archives/"$SubDirName"-services.lst
+# echo "$DistDir/lxcimage/SHA256SUMS"						>> "$DistDir"/"$SubDirName"/archives/"$SubDirName"-services.lst
+# echo "$DistDir/lxcimage/oracle6/SHA256SUMS"					>> "$DistDir"/"$SubDirName"/archives/"$SubDirName"-services.lst
+# echo "$DistDir/lxcimage/oracle7/SHA256SUMS"					>> "$DistDir"/"$SubDirName"/archives/"$SubDirName"-services.lst
+# echo "$DistDir/lxcimage/oracle8/SHA256SUMS"					>> "$DistDir"/"$SubDirName"/archives/"$SubDirName"-services.lst
+# echo "$DistDir/lxcimage/nsa/SHA256SUMS"					>> "$DistDir"/"$SubDirName"/archives/"$SubDirName"-services.lst
 
 cd "$DistDir"/"$SubDirName"/archives
 
