@@ -64,6 +64,40 @@ function GetMultiHostVar7 {
 }
 MultiHostVar7=$(GetMultiHostVar7)
 
+function GetMultiHostVar10 {
+        echo $MultiHost | cut -f10 -d':'
+}
+MultiHostVar10=$(GetMultiHostVar10)
+GREValue=$MultiHostVar10
+
+function GetMultiHostVar11 {
+        echo $MultiHost | cut -f11 -d':'
+}
+MultiHostVar11=$(GetMultiHostVar11)
+
+function GetMultiHostVar12 {
+        echo $MultiHost | cut -f12 -d':'
+}
+MultiHostVar12=$(GetMultiHostVar12)
+LXDValue=$MultiHostVar12
+
+function GetMultiHostVar13 {
+        echo $MultiHost | cut -f13 -d':'
+}
+MultiHostVar13=$(GetMultiHostVar13)
+
+function GetMultiHostVar14 {
+        echo $MultiHost | cut -f14 -d':'
+}
+MultiHostVar14=$(GetMultiHostVar14)
+PreSeed=$MultiHostVar14
+
+function GetMultiHostVar15 {
+        echo $MultiHost | cut -f15 -d':'
+}
+MultiHostVar15=$(GetMultiHostVar15)
+LXDCluster=$MultiHostVar15
+
 GetLinuxFlavors(){
 if   [[ -e /etc/oracle-release ]]
 then
@@ -565,29 +599,191 @@ sleep 5
 
 clear
 
-# if [ $LXDCluster = 'Y' ]
-# then
-#       echo ''
-#       echo "=============================================="
-#       echo "Install LXD ...                               "
-#       echo "=============================================="
-#       echo ''
+if [ $LXDCluster = 'Y' ] && [ $Release -eq 8 ] && [ $LinuxFlavor = 'Oracle' ]
+then
+	echo ''
+	echo "=============================================="
+	echo "Install and Configure LXD...                  "
+	echo "=============================================="
+	echo ''
 
-#       sleep 5
+	sleep 5
 
-#       sudo chmod 775  /opt/olxc/"$DistDir"/orabuntu/archives/lxd_install_uekulele.sh
-#                       /opt/olxc/"$DistDir"/orabuntu/archives/lxd_install_uekulele.sh $PreSeed $LXDCluster $MultiHostVar2 $MultiHostVar10
+	clear
 
-#       echo ''
-#       echo "=============================================="
-#       echo "Done: Install LXD.                            "
-#       echo "=============================================="
-#       echo ''
+        echo ''
+        echo "=============================================="
+        echo "Configure firewalld for LXD Cluster...        "
+        echo "=============================================="
+        echo ''
 
-#       sleep 5
+        sudo firewall-cmd --zone=public --add-service=https --add-service=dhcp --permanent
+        sudo firewall-cmd --zone=public --add-port=587/tcp --add-port=8443/tcp --permanent
+        sudo firewall-cmd --reload
+        sudo firewall-cmd --list-all
 
-#       clear
-# fi
+        echo ''
+        echo "=============================================="
+        echo "Done: Configure firewalld for LXD Cluster.    "
+        echo "=============================================="
+        echo ''
+
+        sleep 5
+
+        clear
+
+	echo ''
+	echo "=============================================="
+	echo "Configure btrfs Storage ...                   "
+	echo "=============================================="
+	echo ''
+
+	sudo parted --script /dev/sdb "mklabel gpt"
+	sudo parted --script /dev/sdb "mkpart primary 1 100%"
+	sudo parted /dev/sdb print
+	sudo fdisk -l /dev/sdb | grep sdb | grep -v Disk
+
+	echo ''
+	echo "=============================================="
+	echo "Done: Configure btrfs Storage.                "
+	echo "=============================================="
+	echo ''
+
+	sleep 5
+
+	clear
+
+	echo ''
+	echo "=============================================="
+	echo "Install EPEL ...                              "
+	echo "=============================================="
+	echo ''
+
+	sudo yum install epel-release
+
+	echo ''
+	echo "=============================================="
+	echo "Done: Install EPEL.                           "
+	echo "=============================================="
+	echo ''
+
+	sleep 5
+
+	clear
+
+	echo ''
+	echo "=============================================="
+	echo "Install and configure snapd...                "
+	echo "=============================================="
+	echo ''
+
+	sudo yum -y install snapd
+	echo ''
+	sudo systemctl enable --now snapd.socket
+	sudo ln -s /var/lib/snapd/snap /snap >/dev/null 2>&1
+	
+	echo ''
+	echo "=============================================="
+	echo "Done: Install and configure snapd.            "
+	echo "=============================================="
+	echo ''
+
+	sleep 5
+
+	clear
+
+	echo ''
+	echo "=============================================="
+	echo "Install LXD ...                               "
+	echo "=============================================="
+	echo ''
+
+	function CheckSnapInstalled {
+		sudo snap list lxd > /dev/null 2>&1
+	}
+	SnapInstalled=$(CheckSnapInstalled)
+	SnapInstalled=`echo $?`
+
+	while [ $SnapInstalled -ne 0 ]
+	do
+		sudo snap install lxd
+		SnapInstalled=$(CheckSnapInstalled)
+		SnapInstalled=`echo $?`
+		sleep 15
+		echo ''
+	done
+
+	sudo snap refresh lxd
+
+	echo ''
+	echo "=============================================="
+	echo "Done: Install LXD.                            "
+	echo "=============================================="
+	echo ''
+
+	sleep 5
+
+	clear
+
+	echo ''
+	echo "=============================================="
+	echo "Add current user to LXD group ...             "
+	echo "=============================================="
+	echo ''
+
+	sudo usermod -a -G lxd ubuntu
+	echo 'sudo usermod -a -G lxd ubuntu'
+
+	echo ''
+	echo "=============================================="
+	echo "Done: Add current user to LXD group.          "
+	echo "=============================================="
+	echo ''
+
+	sleep 5
+
+	clear
+
+	echo ''
+	echo "=============================================="
+	echo "Install LXD ...                               "
+	echo "=============================================="
+	echo ''
+
+	sleep 5
+
+	sudo chmod 775  	/opt/olxc/"$DistDir"/uekulele/archives/lxd_install_uekulele.sh
+	sudo su - ubuntu 	/opt/olxc/"$DistDir"/uekulele/archives/lxd_install_uekulele.sh $PreSeed $LXDCluster $GREValue $Release $MultiHost
+
+	echo ''
+	echo "=============================================="
+	echo "Done: Install LXD.                            "
+	echo "=============================================="
+	echo ''
+
+	sleep 5
+
+	clear
+
+	echo "=============================================="
+	echo "LXD Snap Info ...                             "
+	echo "=============================================="
+	echo ''
+
+	sleep 5
+
+	sudo snap info lxd
+
+	echo ''
+	echo "=============================================="
+	echo "Done: LXD Snap Info ...                       "
+	echo "=============================================="
+	echo ''
+
+	sleep 5
+
+	clear
+fi
 
 echo ''
 echo "=============================================="

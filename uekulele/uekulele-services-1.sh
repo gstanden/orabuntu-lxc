@@ -85,6 +85,9 @@ function GetOvsVersion {
 }
 OvsVersion=$(GetOvsVersion)
 
+# MultiHost for reference
+# MultiHost="$Operation:Y:X:X:$HUBIP:$SPOKEIP:$MTU:$HubUserAct:$HubSudoPwd:$GRE:$Product:$LXD:$K8S:$PreSeed:$LXDCluster:$StorageDriver:$StoragePoolName:$BtrfsLun"
+
 function GetMultiHostVar2 {
 	echo $MultiHost | cut -f2 -d':'
 }
@@ -130,6 +133,41 @@ function GetMultiHostVar10 {
 }
 MultiHostVar10=$(GetMultiHostVar10)
 GRE=$MultiHostVar10
+GREValue=$MultiHostVar10
+
+function GetMultiHostVar11 {
+        echo $MultiHost | cut -f11 -d':'
+}
+MultiHostVar11=$(GetMultiHostVar11)
+
+function GetMultiHostVar12 {
+        echo $MultiHost | cut -f12 -d':'
+}
+MultiHostVar12=$(GetMultiHostVar12)
+LXDValue=$MultiHostVar12
+
+function GetMultiHostVar13 {
+        echo $MultiHost | cut -f13 -d':'
+}
+MultiHostVar13=$(GetMultiHostVar13)
+
+function GetMultiHostVar14 {
+        echo $MultiHost | cut -f14 -d':'
+}
+MultiHostVar14=$(GetMultiHostVar14)
+PreSeed=$MultiHostVar14
+
+function GetMultiHostVar15 {
+        echo $MultiHost | cut -f15 -d':'
+}
+MultiHostVar15=$(GetMultiHostVar15)
+LXDCluster=$MultiHostVar15
+
+function GetMultiHostVar18 {
+        echo $MultiHost | cut -f18 -d':'
+}
+MultiHostVar18=$(GetMultiHostVar18)
+BtrfsLun=$MultiHostVar18
 
 function CheckSystemdResolvedInstalled {
         sudo netstat -ulnp | grep 53 | sed 's/  */ /g' | rev | cut -f1 -d'/' | rev | sort -u | grep systemd- | wc -l
@@ -4813,6 +4851,96 @@ sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw6.sh
 sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw7.sh
 sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw8.sh
 sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw9.sh
+
+if [ $LXDCluster = 'Y' ]
+then
+        echo ''
+        echo "=============================================="
+        echo "Install packages...                           "
+        echo "=============================================="
+        echo ''
+
+        sudo yum -y install dos2unix
+
+	echo ''
+        echo "=============================================="
+        echo "Done: Install packages.                       "
+        echo "=============================================="
+        echo ''
+
+	sleep 5
+
+	clear
+
+#	sudo sed -i "s/HOSTNAME/$HOSTNAME/g"    /etc/network/openvswitch/lxd-init-node1.sh
+
+        if   [ $PreSeed = 'Y' ]
+        then
+                function GetShortHostName {
+                        hostname -s
+                }
+                ShortHostName=$(GetShortHostName)
+
+                if   [ $GRE = 'N' ]
+                then
+                        sudo sed -i "s/SWITCH_IP/$Sw1Index/g"                                                   /etc/network/openvswitch/preseed.sw1a.oracle8.linux.001.lxd.cluster
+                        sudo sed -i "s/HOSTNAME/$ShortHostName/g"                                               /etc/network/openvswitch/preseed.sw1a.oracle8.linux.001.lxd.cluster
+                        sudo sed -i "s/BTRFSLUN/$BtrfsLun/g"                                               	/etc/network/openvswitch/preseed.sw1a.oracle8.linux.001.lxd.cluster
+		#	sudo sed -i "s/STORAGE-DRIVER/$StorageDriver/g"                                         /etc/network/openvswitch/preseed.sw1a.oracle8.linux.001.lxd.cluster
+		#	sudo sed -i "s/POOL/$StoragePoolName/g"                                                 /etc/network/openvswitch/preseed.sw1a.oracle8.linux.001.lxd.cluster
+
+                elif [ $GRE = 'Y' ]
+                then
+                        sshpass -p $MultiHostVar8 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S --prompt='' <<< "$MultiHostVar8" /var/lib/snapd/snap/bin/lxc info | sed -n '/BEGIN.*-/,/END.*-/p'" > /tmp/cert.txt
+			rm /tmp/cert.txt
+                        sshpass -p $MultiHostVar8 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S --prompt='' <<< "$MultiHostVar8" /var/lib/snapd/snap/bin/lxc info | sed -n '/BEGIN.*-/,/END.*-/p'" > /tmp/cert.txt
+
+			echo ''
+			echo "=============================================="
+			echo "Display /tmp/cert.txt ...                     "
+			echo "=============================================="
+			echo ''
+
+			cat /tmp/cert.txt
+
+			echo ''
+			echo "=============================================="
+			echo "Done: Display /tmp/cert.txt.                  "
+			echo "=============================================="
+			echo ''
+
+			sleep 5
+
+			clear
+
+                        sudo sed -i "s/SWITCH_IP/$Sw1Index/g"                                                   /etc/network/openvswitch/preseed.sw1a.oracle8.linux.002.lxd.cluster
+                        sudo sed -i "s/HOSTNAME/$ShortHostName/g"                                               /etc/network/openvswitch/preseed.sw1a.oracle8.linux.002.lxd.cluster
+                        sudo sed -i "s/BTRFSLUN/$BtrfsLun/g"                                               	/etc/network/openvswitch/preseed.sw1a.oracle8.linux.002.lxd.cluster
+		#	sudo sed -i "s/STORAGE-DRIVER/$StorageDriver/g"                                         /etc/network/openvswitch/preseed.sw1a.oracle8.linux.002.lxd.cluster
+		#	sudo sed -i "s/POOL/$StoragePoolName/g"                                                 /etc/network/openvswitch/preseed.sw1a.oracle8.linux.002.lxd.cluster
+                        sudo sed -i -e '/-----BEGIN/,/-----END/!b' -e '/-----END/!d;r /tmp/cert.txt' -e 'd'     /etc/network/openvswitch/preseed.sw1a.oracle8.linux.002.lxd.cluster
+			sudo dos2unix										/etc/network/openvswitch/preseed.sw1a.oracle8.linux.002.lxd.cluster
+
+			echo ''
+			echo "=============================================="
+			echo "Display LXD Preseed...                        "
+			echo "=============================================="
+			echo ''
+
+			sudo cat /etc/network/openvswitch/preseed.sw1a.oracle8.linux.002.lxd.cluster
+
+			echo ''
+			echo "=============================================="
+			echo "Done: Display LXD Preseed.                    "
+			echo "=============================================="
+			echo ''
+
+			sleep 5
+
+			clear
+                fi
+        fi
+fi
 
 sleep 5
 

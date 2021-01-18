@@ -205,17 +205,46 @@ fi
 
 StoragePoolName=olxc-001
   StorageDriver=zfs
+       BtrfsLun="\/dev\/sdb1"
         PreSeed=Y
             LXD=S
 
 if [ $LinuxFlavor = 'Ubuntu' ] && [ $UbuntuMajorVersion -ge 20 ]
 then
-	LXDCluster=Y
+	LXDCluster=N
+#	Uncomment next line for LXD Clustering (experimental feature of Orabuntu-LXC)
+#	LXDCluster=Y
 else
 	LXDCluster=N
 fi
 
-if [ $LXDCluster = 'Y' ]
+if [ $LinuxFlavor = 'Oracle' ] && [ $Release -eq 8 ]
+then
+	LXDCluster=N
+#	Uncomment next line for LXD Clustering (experimental feature of Orabuntu-LXC)
+#	LXDCluster=Y
+        echo ''
+        echo "=============================================="
+        echo "                WARNING !!                    "
+        echo "=============================================="
+        echo ''
+        echo "=============================================="
+        echo "LXD Cluster will RE-FORMAT $BtrfsLun as a     "
+        echo "BTRFS file system for LXD.                    "
+        echo "                                              "
+        echo "If you do NOT want to use /dev/sdb for this   "
+        echo "purpose, hit CTRL+c now to exit.              "
+        echo "=============================================="
+        echo ''
+
+        sleep 20
+
+	clear
+else
+	LXDCluster=N
+fi
+
+if [ $LXDCluster = 'Y' ] && [ $LinuxFlavor = 'Ubuntu' ]
 then
 	function CheckZpoolExist {
 		sudo zpool list $StoragePoolName | grep ONLINE | wc -l
@@ -333,11 +362,11 @@ then
 		MultiHost="$Operation:N:1:X:X:X:$AwsMtu:X:X:$GRE:$Product"
 	fi
 
-elif [ $UbuntuMajorVersion -ge 16 ]
+elif [ $UbuntuMajorVersion -ge 20 ]
 then
 	MultiHost="$Operation:N:1:X:X:X:$MTU:X:X:$GRE:$Product:$LXD:$K8S:$PreSeed:$LXDCluster:$StorageDriver:$StoragePoolName"
 else
-	MultiHost="$Operation:N:1:X:X:X:$MTU:X:X:$GRE:$Product:$LXD:$K8S:$PreSeed:$LXDCluster:$StorageDriver:$StoragePoolName"
+	MultiHost="$Operation:N:1:X:X:X:$MTU:X:X:$GRE:$Product:$LXD:$K8S:$PreSeed:$LXDCluster:$StorageDriver:$StoragePoolName:$BtrfsLun"
 fi
 
 ./anylinux-services.sh $MultiHost 

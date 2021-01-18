@@ -23,5 +23,7 @@
 /etc/network/openvswitch/olxc-scst-linux6.sh
 /etc/network/openvswitch/crt_ovs_sw1.sh
 /etc/network/openvswitch/crt_ovs_sx1.sh
+/etc/network/openvswitch/preseed.sw1a.oracle8.linux.001.lxd.cluster
+/etc/network/openvswitch/preseed.sw1a.oracle8.linux.002.lxd.cluster
 /etc/GNU3
 /etc/COPYING

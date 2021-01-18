@@ -205,17 +205,47 @@ fi
 
 StoragePoolName=olxc-002
   StorageDriver=zfs
+       BtrfsLun="\/dev\/sdb1"
         PreSeed=Y
             LXD=S
 
 if [ $LinuxFlavor = 'Ubuntu' ] && [ $UbuntuMajorVersion -ge 20 ]
 then
-        LXDCluster=Y
+        LXDCluster=N
+#       Uncomment next line for LXD Clustering (experimental feature of Orabuntu-LXC)
+#       LXDCluster=Y
 else
         LXDCluster=N
 fi
 
-if [ $LXDCluster = 'Y' ]
+if [ $LinuxFlavor = 'Oracle' ] && [ $Release -eq 8 ]
+then
+        LXDCluster=N
+#       Uncomment next line for LXD Clustering (experimental feature of Orabuntu-LXC)
+#       LXDCluster=Y
+	
+	echo ''
+	echo "=============================================="
+        echo "                WARNING !!                    "
+	echo "=============================================="
+	echo ''
+	echo "=============================================="
+        echo "LXD Cluster will RE-FORMAT $BtrfsLun as a     "
+	echo "BTRFS file system for LXD.                    "
+	echo "                                              "
+        echo "If you do NOT want to use $BtrfsLun for this  "
+	echo "purpose, hit CTRL+c now to exit.              "
+	echo "=============================================="
+	echo ''
+
+        sleep 20
+
+	clear
+else
+        LXDCluster=N
+fi
+
+if [ $LXDCluster = 'Y' ] && [ $LinuxFlavor = 'Ubuntu' ] && [ $UbuntuMajorVersion -ge 20 ]
 then
         function CheckZpoolExist {
                 sudo zpool list $StoragePoolName | grep ONLINE | wc -l
@@ -745,7 +775,7 @@ then
 	then
 		MultiHost="$Operation:Y:X:X:$HUBIP:$SPOKEIP:$MTU:$HubUserAct:$HubSudoPwd:$GRE:$Product:$LXD:$K8S:$PreSeed:$LXDCluster:$StorageDriver:$StoragePoolName"
 	else
-		MultiHost="$Operation:Y:X:X:$HUBIP:$SPOKEIP:$MTU:$HubUserAct:$HubSudoPwd:$GRE:$Product:$LXD:$K8S:$PreSeed:$LXDCluster:$StorageDriver:$StoragePoolName"
+		MultiHost="$Operation:Y:X:X:$HUBIP:$SPOKEIP:$MTU:$HubUserAct:$HubSudoPwd:$GRE:$Product:$LXD:$K8S:$PreSeed:$LXDCluster:$StorageDriver:$StoragePoolName:$BtrfsLun"
         fi
 
 	sleep 5
