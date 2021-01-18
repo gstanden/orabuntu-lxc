@@ -218,7 +218,7 @@ else
 	LXDCluster=N
 fi
 
-if [ $LinuxFlavor = 'Oracle' ] && [ $Release -eq 8 ]
+if [ $LXDCluster = 'Y' ] && [ $LinuxFlavor = 'Oracle' ] && [ $Release -eq 8 ]
 then
 	LXDCluster=N
 #	Uncomment next line for LXD Clustering (experimental feature of Orabuntu-LXC)
@@ -244,7 +244,7 @@ else
 	LXDCluster=N
 fi
 
-if [ $LXDCluster = 'Y' ] && [ $LinuxFlavor = 'Ubuntu' ]
+if [ $LXDCluster = 'Y' ] && [ $LinuxFlavor = 'Ubuntu' ] && [ $UbuntuMajorRelease -ge 20 ]
 then
 	function CheckZpoolExist {
 		sudo zpool list $StoragePoolName | grep ONLINE | wc -l
