@@ -208,8 +208,9 @@ StoragePoolName=olxc-002
        BtrfsLun="\/dev\/sdb1"
         PreSeed=Y
             LXD=S
+     LXDCluster=N
 
-if [ $LinuxFlavor = 'Ubuntu' ] && [ $UbuntuMajorVersion -ge 20 ]
+if [ $LXDCluster = 'Y' ] && [ $LinuxFlavor = 'Ubuntu' ] && [ $UbuntuMajorVersion -ge 20 ]
 then
         LXDCluster=N
 #       Uncomment next line for LXD Clustering (experimental feature of Orabuntu-LXC)
@@ -218,7 +219,7 @@ else
         LXDCluster=N
 fi
 
-if [ $LinuxFlavor = 'Oracle' ] && [ $Release -eq 8 ]
+if [ $LXDCluster = 'Y' ] && [ $LinuxFlavor = 'Oracle' ] && [ $Release -eq 8 ]
 then
         LXDCluster=N
 #       Uncomment next line for LXD Clustering (experimental feature of Orabuntu-LXC)
