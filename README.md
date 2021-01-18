@@ -6,6 +6,8 @@ https://sites.google.com/a/orabuntu-lxc.com/documentation/
 
 Orabuntu-LXC v6.0-beta AMIDE Edition stands for "Amazon Mult-I-host Docker Enterprise" Edition.  
 
+Update:  January 18, 2021 v7.0.0-beta AMIDE coming soon with LXD Cluster Support
+
 Orabuntu-LXC v7.0-beta AMIDE Edition stands for "Amazon Mult-I-host LXD Docker Enterprise" Edition (GA soon)
 
 Orabuntu-LXC v7.0-beta AMIDE Edition preview of new LXD support features can be found in Master branch v6.13.22-beta AMIDE.
