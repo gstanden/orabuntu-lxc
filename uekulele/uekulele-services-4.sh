@@ -221,7 +221,6 @@ echo "This script clones additional containers.     "
 echo "=============================================="
 echo ''
 echo "=============================================="
-echo "NumCon is the number of RAC nodes             "
 echo "NumCon (small integer)                        "
 echo "NumCon defaults to value '2'                  "
 echo "=============================================="
