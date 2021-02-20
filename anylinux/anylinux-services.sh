@@ -328,6 +328,43 @@ then
 	FirewalldBackend=$(GetFirewalldBackend)
 fi
 
+if [ $FirewalldBackend = 1 ]
+then
+	if [ $LinuxFlavor = 'Fedora' ]
+	then
+
+		echo ''
+		echo "=============================================="
+		echo "Set firewalld rules for dhcp and dns...       "
+		echo "=============================================="
+		echo ''
+
+		sudo firewall-cmd --zone=FedoraServer --add-service=dhcp   --permanent
+		sudo firewall-cmd --zone=FedoraServer --add-service=dns    --permanent 
+		sudo firewall-cmd --zone=FedoraServer --add-masquerade     --permanent
+		sudo firewall-cmd --zone=FedoraServer --add-interface=sw1  --permanent
+		sudo firewall-cmd --zone=FedoraServer --add-interface=sw1a --permanent
+		sudo firewall-cmd --zone=FedoraServer --add-interface=sx1  --permanent
+		sudo firewall-cmd --zone=FedoraServer --add-interface=sx1a --permanent
+		sudo firewall-cmd --reload
+		sudo firewall-cmd --list-services
+		sudo firewall-cmd --get-active-zones
+		sudo firewall-cmd --get-default-zone
+
+		echo ''
+		echo "=============================================="
+		echo "Done: Set firewalld rules for dhcp and dns.   "
+		echo "=============================================="
+		echo ''
+	fi
+fi
+
+sleep 5
+
+clear
+
+: ' Commented Out Start ----------------------------------------------------------
+
 if [ $LinuxFlavor = 'Fedora' ] && [ $RedHatVersion -ge 31 ]
 then
 	echo ''
@@ -504,6 +541,8 @@ then
         fi
 fi
 
+' Commented Out End ---------------------------------------------------
+
 if [ $LinuxFlavor = 'CentOS' ] && [ $Release -ge 7 ]
 then
 	sleep 5
@@ -584,7 +623,8 @@ then
 	echo "15. 'LXC ERROR: Unable to fetch GPG key from keyserver' Simos https://discuss.linuxcontainers.org/t/lxc-error-unable-to-fetch-gpg-key-from-keyserver/5434/2"
 	echo "16. 'Apply patch when asked File to patch what should I do?' Kaz https://unix.stackexchange.com/questions/307487/apply-patch-when-asked-file-to-patch-what-should-i-do"
 	echo "17. 'Re: [ovs-discuss] Build OpenvSwitch on Oracle Linux 8' Gilbert Standen https://www.mail-archive.com/ovs-discuss@openvswitch.org/msg06322.html"
-	echo "18. 'DNS Not Resolving under Network [CentOS8] #957' lfiraza  https://github.com/docker/for-linux/issues/957"
+	echo "18. 'DNS Not Resolving under Network [CentOS8] #957' lfiraza https://github.com/docker/for-linux/issues/957"
+	echo "19. 'Firewalld CentOS 7 Masquerading' lzap https://serverfault.com/questions/623297/firewalld-centos-7-masquerading"
 	echo ''
 	echo "Acknowledgements"
 	echo ''
@@ -787,7 +827,7 @@ fi
 	MajorRelease=$8
 	if [ -z $8 ]
 	then
-		MajorRelease=7
+		MajorRelease=8
 	fi
 	# echo 'Oracle Container Release  = '$MajorRelease
 
