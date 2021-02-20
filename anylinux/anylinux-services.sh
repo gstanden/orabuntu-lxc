@@ -833,7 +833,7 @@ fi
 	# ------------------------------------------------------------
 	# GLS 20210220 MUST use Oracle Linux 8 Container with cgroupv2
 
-	if [ $LinuxFlavor = Fedora ] && [ $RedHatRelease -ge 31 ]
+	if [ $LinuxFlavor = Fedora ] && [ $RedHatVersion -ge 31 ]
 	then
 		MajorRelease=8
 	fi
