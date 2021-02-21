@@ -841,13 +841,21 @@ fi
 	# GLS 20210220 
 	# ------------------------------------------------------------
 
-	# echo 'Oracle Container Release  = '$MajorRelease
+	echo 'Oracle Container Release  = '$MajorRelease
 
 	PointRelease=$2
 	if [ -z $2 ]
 	then
-		PointRelease=3
+		if   [ $MajorRelease -eq 8 ]
+		then
+			PointRelease=3
+
+		elif [ $MajorRelease -eq 6 ] || [ $MajorRelease -eq 7 ]
+		then
+			PointRelease=9
+		fi
 	fi
+	
 	echo 'Oracle Container Version  = '$MajorRelease.$PointRelease
 
 	NumCon=$3
