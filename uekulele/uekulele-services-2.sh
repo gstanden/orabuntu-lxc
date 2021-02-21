@@ -261,7 +261,7 @@ then
         do
                 SeedIndex=$((SeedIndex+1))
                 SeedPostfix=c$SeedIndex
-                NSLookup=$(CheckDNSLookup)
+                DNSLookup=$(CheckDNSLookup)
                 DNSLookup=`echo $?`
         done
         SeedPostfix=c$SeedIndex

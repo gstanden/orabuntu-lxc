@@ -171,8 +171,8 @@ fi
 
 if   [ $Release -le 7 ] && [ $UEKVersion -ge 4 ]
 then
-	sudo docker run -d oraclelinux:7.3
-	sudo docker run -d -p 2200:22 raesene/alpine-nettools
+#	sudo docker run -d oraclelinux:7.3
+#	sudo docker run -d -p 2200:22 raesene/alpine-nettools
 	sudo docker ps -a
 
 	sleep 2
@@ -188,8 +188,8 @@ then
 
 elif [ $Release -eq 8 ]
 then
-	podman run -d oraclelinux:7.3
-	podman run -d raesene/alpine-nettools
+#	podman run -d oraclelinux:7.3
+#	podman run -d raesene/alpine-nettools
 	podman ps -a
 
 	sleep 2

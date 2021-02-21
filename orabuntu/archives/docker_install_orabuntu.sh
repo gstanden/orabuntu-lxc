@@ -117,7 +117,7 @@ echo ''
 
 docker create ubuntu:16:04
 # Install alpine-nettools
-sudo docker run -d -p 2200:22 raesene/alpine-nettools
+# sudo docker run -d -p 2200:22 raesene/alpine-nettools
 
 # Install ODOO ERP
 # sudo docker run -d -e POSTGRES_USER=odoo -e POSTGRES_PASSWORD=odoo --name db postgres:9.4

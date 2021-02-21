@@ -244,20 +244,19 @@ then
 	NameServerShortName=$(GetNameServerShortName)
 
 	function CheckDNSLookup {
-		sudo host -W1 oel$OracleRelease$SeedPostfix | grep '10\.207\.29' | wc -l
+		timeout 5 nslookup oel$OracleRelease$SeedPostfix $NameServer
 	}
 	DNSLookup=$(CheckDNSLookup)
+	DNSLookup=`echo $?`
 
-	if [ $UbuntuMajorVersion -ge 16 ] || [ $Release -ge 6 ]
-	then
-       		while [ $DNSLookup -eq 1 ]
-       		do
-               		SeedIndex=$((SeedIndex+1))
-			SeedPostfix=c$SeedIndex
-               		DNSLookup=$(CheckDNSLookup)
-       		done
+	while [ $DNSLookup -eq 0 ]
+       	do
+       		SeedIndex=$((SeedIndex+1))
 		SeedPostfix=c$SeedIndex
-	fi
+       		DNSLookup=$(CheckDNSLookup)
+		DNSLookup=`echo $?`
+       	done
+	SeedPostfix=c$SeedIndex
 
 elif [ $MultiHostVar3 = '1' ] && [ $GREValue = 'N' ]
 then
@@ -267,15 +266,17 @@ then
 	if [ $ContainerCreated -gt 0 ]
 	then
 		function CheckHighestSeedIndexHit {
-        		sudo host -W1 oel$OracleRelease$SeedPostfix | grep '10\.207\.29' | wc -l
+        		timeout 5 nslookup oel$OracleRelease$SeedPostfix
 		}
 		HighestSeedIndexHit=$(CheckHighestSeedIndexHit)
+		HighestSeedIndexHit=`echo $?`
 
-		while [ $HighestSeedIndexHit = 1 ]
+		while [ $HighestSeedIndexHit = 0 ]
 		do
         		SeedIndex=$((SeedIndex+1))
         		SeedPostfix=c$SeedIndex
         		HighestSeedIndexHit=$(CheckHighestSeedIndexHit)
+			HighestSeedIndexHit=`echo $?`
 		done
 		SeedPostfix=c$SeedIndex
 	else
