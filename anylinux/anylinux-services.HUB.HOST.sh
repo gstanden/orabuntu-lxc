@@ -215,7 +215,7 @@ StorageDriver=zfs               # Relevant only if LXDCluster=Y
 ### Oracle Linux LXD Storage (optional)
 
 BtrfsLun="\/dev\/sdXn"          # Relevant only if LXDCluster=Y (e.g. Set to /dev/sdb1)
-LXD=S                           # This value is currently unused.  Leave set to S.
+LXD=N                           # This value is currently unused.  Leave set to N.
 
 LXDCluster=N                    # Default value
 PreSeed=N                       # Default value

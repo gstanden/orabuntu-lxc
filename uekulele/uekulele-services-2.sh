@@ -806,7 +806,7 @@ sudo sed -i 's/tag=10/tag=11/' 				/etc/network/if-down.d/openvswitch/oel$Oracle
 if [ $ContainerUp != 'RUNNING' ] || [ $PublicIP != 17229108 ]
 then
 	function CheckContainersExist {
-		sudo ls /var/lib/lxc | grep -v $NameServer | grep oel$OracleRelease$SeedPostfix | sort -V | sed 's/$/ /' | tr -d '\n' | sed 's/^[ \t]*//;s/[ \t]*$//'
+		sudo ls /var/lib/lxc | grep -v $NameServer | grep oel$OracleRelease | sort -V | sed 's/$/ /' | tr -d '\n' | sed 's/^[ \t]*//;s/[ \t]*$//'
 	}
 	ContainersExist=$(CheckContainersExist)
 	sleep 5
@@ -835,7 +835,7 @@ then
 			if [ $i -eq 5 ]
 			then
 			sudo lxc-stop -n $j > /dev/null 2>&1
-			sudo /etc/network/openvswitch/veth_cleanups.sh oel$OracleRelease$SeedPostfix
+			sudo /etc/network/openvswitch/veth_cleanups.sh $j
 			echo ''
 			sudo lxc-start -n $j > /dev/null 2>&1
 			fi

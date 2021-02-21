@@ -830,10 +830,26 @@ do
 	sleep 5
         if [ $MajorRelease -ge 7 ] && [ $Release -ge 7 ]
         then
+                echo ''
+                echo "=============================================="
+                echo "Set Host and Machine-ID in Clone ...          "
+                echo "=============================================="
+                echo ''
+
                 sudo lxc-attach -n $j -- hostnamectl set-hostname $j
+                sudo lxc-attach -n $j -- rm -f /etc/machine-id
+                sudo lxc-attach -n $j -- systemd-machine-id-setup
                 sudo lxc-stop   -n $j
                 sudo lxc-start  -n $j
-		sleep 5
+                sudo lxc-attach -n $j -- hostnamectl
+
+                echo ''
+                echo "=============================================="
+                echo "Set Host and Machine-ID in Clone ...          "
+                echo "=============================================="
+                echo ''
+
+                sleep 10
         fi
 
         sudo lxc-ls -f

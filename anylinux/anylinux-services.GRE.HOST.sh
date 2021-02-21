@@ -215,7 +215,7 @@ StorageDriver=zfs               # Relevant only if LXDCluster=Y
 ### Oracle Linux LXD Storage (optional)
 
 BtrfsLun="\/dev\/sdXn"          # Relevant only if LXDCluster=Y (e.g. Set to /dev/sdb1)
-LXD=S                           # This value is currently unused.  Leave set to S.
+LXD=N                           # This value is currently unused.  Leave set to N.
 
 LXDCluster=N                    # Default value
 PreSeed=N                       # Default value
@@ -338,7 +338,7 @@ fi
 if [ -z $2 ]
 then
 	SPOKEIP='lan.ip.this.host'
- 	SPOKEIP=192.168.1.95
+ 	SPOKEIP=192.168.1.144
 else
 	SPOKEIP=$2
 fi
@@ -346,7 +346,7 @@ fi
 if [ -z $3 ]
 then
 	HUBIP='lan.ip.hub.host'
- 	HUBIP=192.168.1.246
+ 	HUBIP=192.168.1.143
 else
 	HUBIP=$3
 fi

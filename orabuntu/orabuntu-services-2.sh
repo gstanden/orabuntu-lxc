@@ -712,7 +712,7 @@ sudo sed -i 's/tag=10/tag=11/' 				/etc/network/if-down.d/openvswitch/oel$Oracle
 if [ $ContainerUp != 'RUNNING' ] || [ $PublicIP != 17229108 ]
 then
 	function CheckContainersExist {
-	sudo ls /var/lib/lxc | grep -v $NameServer | grep oel$OracleRelease$SeedPostfix | sort -V | sed 's/$/ /' | tr -d '\n' | sed 's/^[ \t]*//;s/[ \t]*$//'
+		sudo ls /var/lib/lxc | grep -v $NameServer | grep oel$OracleRelease | sort -V | sed 's/$/ /' | tr -d '\n' | sed 's/^[ \t]*//;s/[ \t]*$//'
 	}
 	ContainersExist=$(CheckContainersExist)
 	sleep 5
@@ -724,7 +724,7 @@ then
 		if [ $UbuntuMajorVersion -ge 16 ]
         	then
         		function CheckPublicIPIterative {
-				sudo lxc-info -n oel$OracleRelease$SeedPostfix -iH | cut -f1-3 -d'.' | sed 's/\.//g' | head -1	
+				sudo lxc-info -n $j -iH | cut -f1-3 -d'.' | sed 's/\.//g' | head -1	
         		}
         	fi
 		PublicIPIterative=$(CheckPublicIPIterative)
@@ -734,7 +734,7 @@ then
 
 		if [ $MajorRelease -eq 8 ]
 		then 
-			sudo lxc-attach -n $j -- hostnamectl set-hostname oel$OracleRelease$SeedPostfix
+			sudo lxc-attach -n $j -- hostnamectl set-hostname $j
 			sudo lxc-stop   -n $j
 			sudo lxc-start  -n $j
 		fi
@@ -749,7 +749,7 @@ then
 			if [ $i -eq 5 ]
 			then
 			sudo lxc-stop -n $j > /dev/null 2>&1
-			sudo /etc/network/openvswitch/veth_cleanups.sh oel$OracleRelease$SeedPostfix
+			sudo /etc/network/openvswitch/veth_cleanups.sh $j
 			echo ''
 			sudo lxc-start -n $j > /dev/null 2>&1
 			fi
