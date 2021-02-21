@@ -1195,6 +1195,14 @@ function GetMultiHostVar18 {
 MultiHostVar18=$(GetMultiHostVar18)
 BtrfsLun=$MultiHostVar18
 
+function GetMultiHostVar19 {
+        echo $MultiHost | cut -f19 -d':'
+}
+MultiHostVar19=$(GetMultiHostVar19)
+Docker=$MultiHostVar19
+
+	echo 'Docker			  = '$Docker
+
 if [ $LinuxFlavor = 'Oracle' ] && [ $LXDCluster = 'Y' ]
 then
 	echo 'BtrfsLun                  = '$BtrfsLun

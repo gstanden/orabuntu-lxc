@@ -201,6 +201,10 @@ fi
 
            K8S=N                # Change to Y with Ubuntu Linux only.
 
+################### Docker Settings ########################
+
+           Docker=N            
+
 ################ LXD Cluster Settings ######################
 
 ### Ubuntu Linux LXD Storage (optional)
@@ -224,8 +228,8 @@ then
 	echo "=============================================="
 	echo ''
 
-	LXDCluster=Y	# Set to Y for automated LXD Cluster creation (optional).
-	PreSeed=Y	# Set to Y for automated LXD Cluster creation (optional).
+	LXDCluster=N	# Set to Y for automated LXD Cluster creation (optional).
+	PreSeed=N	# Set to Y for automated LXD Cluster creation (optional).
 
 	echo 'LXDCluster = '$LXDCluster
 	echo 'PreSeed    = '$PreSeed
@@ -404,9 +408,9 @@ then
 
 elif [ $UbuntuMajorVersion -ge 20 ]
 then
-	MultiHost="$Operation:N:1:X:X:X:$MTU:X:X:$GRE:$Product:$LXD:$K8S:$PreSeed:$LXDCluster:$StorageDriver:$StoragePoolName:$BtrfsLun"
+	MultiHost="$Operation:N:1:X:X:X:$MTU:X:X:$GRE:$Product:$LXD:$K8S:$PreSeed:$LXDCluster:$StorageDriver:$StoragePoolName:$BtrfsLun:$Docker"
 else
-	MultiHost="$Operation:N:1:X:X:X:$MTU:X:X:$GRE:$Product:$LXD:$K8S:$PreSeed:$LXDCluster:$StorageDriver:$StoragePoolName:$BtrfsLun"
+	MultiHost="$Operation:N:1:X:X:X:$MTU:X:X:$GRE:$Product:$LXD:$K8S:$PreSeed:$LXDCluster:$StorageDriver:$StoragePoolName:$BtrfsLun:$Docker"
 fi
 
 ./anylinux-services.sh $MultiHost 

@@ -201,6 +201,10 @@ fi
 
            K8S=Y		# Change to Y with Ubuntu Linux only.
 
+################### Docker Settings ########################
+
+           Docker=N
+
 ################ LXD Cluster Settings ######################
 
 ### Ubuntu Linux LXD Storage (optional)
@@ -789,9 +793,9 @@ then
 
 	elif [ $UbuntuMajorVersion -ge 16 ]
 	then
-		MultiHost="$Operation:Y:X:X:$HUBIP:$SPOKEIP:$MTU:$HubUserAct:$HubSudoPwd:$GRE:$Product:$LXD:$K8S:$PreSeed:$LXDCluster:$StorageDriver:$StoragePoolName"
+		MultiHost="$Operation:Y:X:X:$HUBIP:$SPOKEIP:$MTU:$HubUserAct:$HubSudoPwd:$GRE:$Product:$LXD:$K8S:$PreSeed:$LXDCluster:$StorageDriver:$StoragePoolName:$BtrfsLun:$Docker"
 	else
-		MultiHost="$Operation:Y:X:X:$HUBIP:$SPOKEIP:$MTU:$HubUserAct:$HubSudoPwd:$GRE:$Product:$LXD:$K8S:$PreSeed:$LXDCluster:$StorageDriver:$StoragePoolName:$BtrfsLun"
+		MultiHost="$Operation:Y:X:X:$HUBIP:$SPOKEIP:$MTU:$HubUserAct:$HubSudoPwd:$GRE:$Product:$LXD:$K8S:$PreSeed:$LXDCluster:$StorageDriver:$StoragePoolName:$BtrfsLun:$Docker"
         fi
 
 	sleep 5

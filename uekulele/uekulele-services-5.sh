@@ -97,6 +97,12 @@ function GetMultiHostVar10 {
 MultiHostVar10=$(GetMultiHostVar10)
 GRE=$MultiHostVar10
 
+function GetMultiHostVar19 {
+        echo $MultiHost | cut -f19 -d':'
+}
+MultiHostVar19=$(GetMultiHostVar19)
+Docker=$MultiHostVar19
+
 function SoftwareVersion { echo "$@" | awk -F. '{ printf("%d%03d%03d%03d\n", $1,$2,$3,$4); }'; }
 
 function GetLXCVersion {
@@ -238,7 +244,7 @@ sleep 5
 
 clear
 
-if [ $MultiHostVar1 = 'new' ] && [ $LinuxFlavor != 'Fedora' ]
+if [ $MultiHostVar1 = 'new' ] && [ $LinuxFlavor != 'Fedora' ] && [ $Docker = 'Y' ]
 then
 	echo ''
 	echo "=============================================="
