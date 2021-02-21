@@ -734,7 +734,7 @@ then
 
 		if [ $MajorRelease -eq 8 ]
 		then 
-			sudo lxc-attach -n $j -- sudo hostnamectl set-hostname oel$OracleRelease$SeedPostfix
+			sudo lxc-attach -n $j -- hostnamectl set-hostname oel$OracleRelease$SeedPostfix
 			sudo lxc-stop   -n $j
 			sudo lxc-start  -n $j
 		fi

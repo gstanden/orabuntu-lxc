@@ -199,7 +199,7 @@ fi
 
 ################# Kubernetes Settings ######################
 
-           K8S=Y		# Change to Y with Ubuntu Linux only.
+           K8S=N		# Change to Y with Ubuntu Linux only.
 
 ################### Docker Settings ########################
 
