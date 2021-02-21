@@ -191,77 +191,116 @@ then
 	AwsMtu=$(GetAwsMtu)
 fi
 
-# LXC Settings
+################ MultiHost Settings ########################
 
             GRE=N 
             MTU=1500
          LOGEXT=`date +"%Y-%m-%d.%R:%S"`
 
-# Kubernetes Settings
+################# Kubernetes Settings ######################
 
-            K8S=Y
+           K8S=N                # Change to Y with Ubuntu Linux only.
 
-# LXD Cluster Settings
+################ LXD Cluster Settings ######################
 
-StoragePoolName=olxc-001
-  StorageDriver=zfs
-       BtrfsLun="\/dev\/sdb1"
-        PreSeed=Y
-            LXD=S
-     LXDCluster=N
+### Ubuntu Linux LXD Storage (optional)
 
-if [ $LXDCluster = 'Y' ] && [ $LinuxFlavor = 'Ubuntu' ] && [ $UbuntuMajorVersion -ge 20 ]
+StoragePoolName=olxc-001        # Relevant only if LXDCluster=Y
+StorageDriver=zfs               # Relevant only if LXDCluster=Y
+
+### Oracle Linux LXD Storage (optional)
+
+BtrfsLun="\/dev\/sdXn"          # Relevant only if LXDCluster=Y (e.g. Set to /dev/sdb1)
+LXD=S                           # This value is currently unused.  Leave set to S.
+
+LXDCluster=N                    # Default value
+PreSeed=N                       # Default value
+
+if   [ $LinuxFlavor = 'Ubuntu' ] && [ $UbuntuMajorVersion -ge 20 ]
 then
-	LXDCluster=N
-#	Uncomment next line for LXD Clustering (experimental feature of Orabuntu-LXC)
-#	LXDCluster=Y
-else
-	LXDCluster=N
-fi
+	echo ''
+	echo "=============================================="
+	echo "Display Optional LXD Cluster Values...        "
+	echo "=============================================="
+	echo ''
 
-if [ $LXDCluster = 'Y' ] && [ $LinuxFlavor = 'Oracle' ] && [ $Release -eq 8 ]
-then
-	LXDCluster=N
-#	Uncomment next line for LXD Clustering (experimental feature of Orabuntu-LXC)
-#	LXDCluster=Y
-        echo ''
-        echo "=============================================="
-        echo "                WARNING !!                    "
-        echo "=============================================="
-        echo ''
-        echo "=============================================="
-        echo "LXD Cluster will RE-FORMAT $BtrfsLun as a     "
-        echo "BTRFS file system for LXD.                    "
-        echo "                                              "
-        echo "If you do NOT want to use /dev/sdb for this   "
-        echo "purpose, hit CTRL+c now to exit.              "
-        echo "=============================================="
-        echo ''
+	LXDCluster=Y	# Set to Y for automated LXD Cluster creation (optional).
+	PreSeed=Y	# Set to Y for automated LXD Cluster creation (optional).
 
-        sleep 20
+	echo 'LXDCluster = '$LXDCluster
+	echo 'PreSeed    = '$PreSeed
+			
+	echo ''
+	echo "=============================================="
+	echo "Done: Display LXD Cluster Values.             "
+	echo "=============================================="
+	echo ''
+
+	sleep 5
 
 	clear
-else
-	LXDCluster=N
-fi
 
-if [ $LXDCluster = 'Y' ] && [ $LinuxFlavor = 'Ubuntu' ] && [ $UbuntuMajorRelease -ge 20 ]
-then
-	function CheckZpoolExist {
-		sudo zpool list $StoragePoolName | grep ONLINE | wc -l
-	}
-	ZpoolExist=$(CheckZpoolExist)
-
-	if [ $ZpoolExist -eq 1 ]
+	if [ $LXDCluster = 'Y' ]
 	then
-		echo "ZFS $StoragePoolName exists."
-	else
-		echo "ZFS $StoragePoolName does not exist."
-		echo "ZFS $StoragePoolName must be created before running Orabuntu-LXC in LXD Cluster Mode."
-		echo "Orabuntu-LXC Exiting."
-		exit
+		echo ''
+		echo "=============================================="
+		echo "Check ZFS Storage Pool Exists...              "
+		echo "=============================================="
+		echo ''
+
+		function CheckZpoolExist {
+			sudo zpool list $StoragePoolName | grep ONLINE | wc -l
+		}
+		ZpoolExist=$(CheckZpoolExist)
+
+		if [ $ZpoolExist -eq 1 ]
+		then
+			echo "ZFS $StoragePoolName exists."
+		else
+			echo "ZFS $StoragePoolName does not exist."
+			echo "ZFS $StoragePoolName must be created before running Orabuntu-LXC in LXD Cluster Mode."
+			echo "Orabuntu-LXC Exiting."
+			exit
+		fi
+	
+		echo ''
+		echo "=============================================="
+		echo "Done: Check ZFS Storage Pool Exists.          "
+		echo "=============================================="
+		echo ''
+
+		sleep 5
+
+		clear
 	fi
 fi
+
+if [ $LinuxFlavor = 'Oracle' ] && [ $Release -eq 8 ]
+then
+ 	LXDCluster=N
+ 	PreSeed=N
+
+ 	if [ $LXDCluster = 'Y' ]
+ 	then
+ 		echo ''
+ 		echo "=============================================="
+ 		echo "                WARNING !!                    "
+ 		echo "=============================================="
+ 		echo ''
+ 		echo "=============================================="
+ 		echo "LXD Cluster will RE-FORMAT $BtrfsLun as a     "
+ 		echo "BTRFS file system for LXD.                    "
+ 		echo "                                              "
+ 		echo "If you do NOT want to use /dev/sdXn for this  "
+ 		echo "purpose, hit CTRL+c now to exit.              "
+ 		echo "=============================================="
+ 		echo ''
+
+ 		sleep 20
+ 	fi
+fi
+
+################## LXD Cluster Settings END #########################
 
 if [ -z $1 ]
 then	
@@ -365,7 +404,7 @@ then
 
 elif [ $UbuntuMajorVersion -ge 20 ]
 then
-	MultiHost="$Operation:N:1:X:X:X:$MTU:X:X:$GRE:$Product:$LXD:$K8S:$PreSeed:$LXDCluster:$StorageDriver:$StoragePoolName"
+	MultiHost="$Operation:N:1:X:X:X:$MTU:X:X:$GRE:$Product:$LXD:$K8S:$PreSeed:$LXDCluster:$StorageDriver:$StoragePoolName:$BtrfsLun"
 else
 	MultiHost="$Operation:N:1:X:X:X:$MTU:X:X:$GRE:$Product:$LXD:$K8S:$PreSeed:$LXDCluster:$StorageDriver:$StoragePoolName:$BtrfsLun"
 fi

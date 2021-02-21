@@ -326,13 +326,14 @@ then
 		sudo grep 'nftables' /etc/firewalld/firewalld.conf | grep FirewallBackend | grep -vc '#'
 	}
 	FirewalldBackend=$(GetFirewalldBackend)
+else
+	FirewalldBackend=0
 fi
 
 if [ $FirewalldBackend = 1 ]
 then
 	if [ $LinuxFlavor = 'Fedora' ]
 	then
-
 		echo ''
 		echo "=============================================="
 		echo "Set firewalld rules for dhcp and dns...       "
@@ -356,12 +357,12 @@ then
 		echo "Done: Set firewalld rules for dhcp and dns.   "
 		echo "=============================================="
 		echo ''
+
+		sleep 5
+
+		clear
 	fi
 fi
-
-sleep 5
-
-clear
 
 : ' Commented Out Start ----------------------------------------------------------
 
@@ -1139,6 +1140,67 @@ function GetMultiHostVar11 {
 }
 MultiHostVar11=$(GetMultiHostVar11)
 Product=$MultiHostVar11
+
+function GetMultiHostVar12 {
+        echo $MultiHost | cut -f12 -d':'
+}
+MultiHostVar12=$(GetMultiHostVar12)
+LXDValue=$MultiHostVar12
+
+	echo 'LXDValue                  = '$LXDValue
+
+function GetMultiHostVar13 {
+        echo $MultiHost | cut -f13 -d':'
+}
+MultiHostVar13=$(GetMultiHostVar13)
+K8S=$MultiHostVar13
+
+	echo 'K8S                  	  = '$K8S
+
+function GetMultiHostVar14 {
+        echo $MultiHost | cut -f14 -d':'
+}
+MultiHostVar14=$(GetMultiHostVar14)
+PreSeed=$MultiHostVar14
+
+	echo 'LXD Cluster PreSeed       = '$PreSeed
+
+function GetMultiHostVar15 {
+        echo $MultiHost | cut -f15 -d':'
+}
+MultiHostVar15=$(GetMultiHostVar15)
+LXDCluster=$MultiHostVar15
+
+	echo 'LXD Cluster               = '$LXDCluster
+
+function GetMultiHostVar16 {
+        echo $MultiHost | cut -f16 -d':'
+}
+MultiHostVar16=$(GetMultiHostVar16)
+LXDStorageDriver=$MultiHostVar16
+
+	echo 'LXDStorageDriver          = '$LXDStorageDriver
+
+function GetMultiHostVar17 {
+        echo $MultiHost | cut -f17 -d':'
+}
+MultiHostVar17=$(GetMultiHostVar17)
+StoragePoolName=$MultiHostVar17
+
+	echo 'StoragePoolName           = '$StoragePoolName
+
+function GetMultiHostVar18 {
+        echo $MultiHost | cut -f18 -d':'
+}
+MultiHostVar18=$(GetMultiHostVar18)
+BtrfsLun=$MultiHostVar18
+
+if [ $LinuxFlavor = 'Oracle' ] && [ $LXDCluster = 'Y' ]
+then
+	echo 'BtrfsLun                  = '$BtrfsLun
+else
+	echo 'BtrfsLun		  = Unused'
+fi
 
 if   [ $MultiHostVar3 = 'X' ] && [ $GREValue = 'Y' ]
 then
