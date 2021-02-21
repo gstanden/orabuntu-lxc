@@ -1155,7 +1155,7 @@ function GetMultiHostVar13 {
 MultiHostVar13=$(GetMultiHostVar13)
 K8S=$MultiHostVar13
 
-	echo 'K8S                  	  = '$K8S
+#	echo 'K8S                  	  = '$K8S #Displayed below Docker setting for readability.
 
 function GetMultiHostVar14 {
         echo $MultiHost | cut -f14 -d':'
@@ -1179,7 +1179,12 @@ function GetMultiHostVar16 {
 MultiHostVar16=$(GetMultiHostVar16)
 LXDStorageDriver=$MultiHostVar16
 
+if [ $LXDCluster = 'Y' ]
+then
 	echo 'LXDStorageDriver          = '$LXDStorageDriver
+else
+	echo 'LXDStorageDriver          = Unused'
+fi
 
 function GetMultiHostVar17 {
         echo $MultiHost | cut -f17 -d':'
@@ -1187,7 +1192,12 @@ function GetMultiHostVar17 {
 MultiHostVar17=$(GetMultiHostVar17)
 StoragePoolName=$MultiHostVar17
 
+if [ $LXDCluster = 'Y' ]
+then
 	echo 'StoragePoolName           = '$StoragePoolName
+else
+	echo 'StoragePoolName           = Unused'
+fi
 
 function GetMultiHostVar18 {
         echo $MultiHost | cut -f18 -d':'
@@ -1202,6 +1212,8 @@ MultiHostVar19=$(GetMultiHostVar19)
 Docker=$MultiHostVar19
 
 	echo 'Docker			  = '$Docker
+	echo 'K8S                  	  = '$K8S
+
 
 if [ $LinuxFlavor = 'Oracle' ] && [ $LXDCluster = 'Y' ]
 then
