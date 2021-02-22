@@ -228,8 +228,8 @@ then
         echo "=============================================="
         echo ''
 
-        LXDCluster=Y    # Set to Y for automated LXD Cluster creation (optional).
-        PreSeed=Y       # Set to Y for automated LXD Cluster creation (optional).
+        LXDCluster=N    # Set to Y for automated LXD Cluster creation (optional).
+        PreSeed=N       # Set to Y for automated LXD Cluster creation (optional).
 
         echo 'LXDCluster = '$LXDCluster
         echo 'PreSeed    = '$PreSeed
