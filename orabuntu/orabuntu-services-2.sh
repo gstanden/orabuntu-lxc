@@ -557,51 +557,14 @@ then
                 sudo sed -i 's/lxc.apparmor.profile/lxc.aa_profile/g'   /var/lib/lxc/oel$OracleRelease$SeedPostfix/config
         fi
 
+	sleep 5
+
+	clear
 
 	echo ''
 	echo "=============================================="
 	echo "Done: LXC config updates.                     "
 	echo "=============================================="
-fi
-
-sleep 5
-
-clear
-
-echo ''
-echo "=============================================="
-echo "Ping test  yum.oracle.com...                  "
-echo "=============================================="
-echo ''
-
-ping -c 3 yum.oracle.com
-
-function CheckNetworkUp {
-	ping -c 3 yum.oracle.com | grep packet | cut -f3 -d',' | sed 's/ //g'
-}
-NetworkUp=$(CheckNetworkUp)
-
-n=1
-while [ "$NetworkUp" !=  "0%packetloss" ] && [ "$n" -le 5 ]
-do
-	NetworkUp=$(CheckNetworkUp)
-	n=$((n+1))
-done
-
-if [ "$NetworkUp" != '0%packetloss' ]
-then
-	echo ''
-	echo "=============================================="
-	echo "Ping yum.oracle.com not reliably pingable.    "
-	echo "Script exiting.                               "
-	echo "=============================================="
-	exit
-else
-	echo ''
-	echo "=============================================="
-	echo "Ping yum.oracle.com reliable.                 "
-	echo "=============================================="
-	echo ''
 fi
 
 sleep 5
@@ -715,6 +678,8 @@ then
 		sudo ls /var/lib/lxc | grep -v $NameServer | grep oel$OracleRelease | sort -V | sed 's/$/ /' | tr -d '\n' | sed 's/^[ \t]*//;s/[ \t]*$//'
 	}
 	ContainersExist=$(CheckContainersExist)
+
+	echo $j
 	sleep 5
 	for j in $ContainersExist
 	do
@@ -734,9 +699,12 @@ then
 
 		if [ $MajorRelease -eq 8 ]
 		then 
-			sudo lxc-attach -n $j -- hostnamectl set-hostname $j
+			sudo lxc-attach -n $j -- hostnamectl set-hostname oel$OracleRelease$SeedPostfix
 			sudo lxc-stop   -n $j
 			sudo lxc-start  -n $j
+			sleep 5
+			nslookup $j
+			sleep 5
 		fi
 
 		i=1
@@ -825,16 +793,6 @@ echo "=============================================="
 echo ''
 
 sudo lxc-attach -n oel$OracleRelease$SeedPostfix -- uname -a
-
-if [ $? -ne 0 ]
-then
-	echo ''
-	echo "=============================================="
-	echo "lxc-attach is failing...see if selinux is set."
-	echo "Script exiting.                               "
-	echo "=============================================="
-	exit
-fi
 
 echo ''
 echo "=============================================="

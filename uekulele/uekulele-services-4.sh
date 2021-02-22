@@ -841,7 +841,10 @@ do
                 sudo lxc-attach -n $j -- systemd-machine-id-setup
                 sudo lxc-stop   -n $j
                 sudo lxc-start  -n $j
+                sudo lxc-attach -n $j -- hostnamectl set-hostname $j
                 sudo lxc-attach -n $j -- hostnamectl
+                sudo lxc-stop   -n $j
+                sudo lxc-start  -n $j
 
                 echo ''
                 echo "=============================================="
@@ -852,9 +855,10 @@ do
                 sleep 10
         fi
 
+	nslookup $j
         sudo lxc-ls -f
         echo ''
-        sleep 5
+        sleep 10
 done
 
 echo "=============================================="

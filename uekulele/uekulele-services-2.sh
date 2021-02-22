@@ -823,6 +823,9 @@ then
 			sudo lxc-attach -n $j -- hostnamectl set-hostname $j
 			sudo lxc-stop   -n $j
 			sudo lxc-start  -n $j
+			sleep 5
+			nslookup $j
+			sleep 5
 		fi
 
 		i=1
