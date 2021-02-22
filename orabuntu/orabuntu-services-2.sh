@@ -696,15 +696,13 @@ then
 		echo "Starting container $j ..."
 		echo ''
 		sudo lxc-start  -n $j
+		sleep 10
 
 		if [ $MajorRelease -eq 8 ]
 		then 
 			sudo lxc-attach -n $j -- hostnamectl set-hostname oel$OracleRelease$SeedPostfix
 			sudo lxc-stop   -n $j
 			sudo lxc-start  -n $j
-			sleep 5
-			nslookup $j
-			sleep 5
 		fi
 
 		i=1

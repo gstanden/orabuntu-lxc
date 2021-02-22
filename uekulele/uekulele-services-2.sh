@@ -816,16 +816,13 @@ then
 		echo "Starting container $j ..."
 		echo ''
 		sudo lxc-start  -n $j
-		sleep 5
+		sleep 10
 
 		if [ $MajorRelease -ge 7 ] && [ $Release -ge 7 ]
 		then 
 			sudo lxc-attach -n $j -- hostnamectl set-hostname $j
 			sudo lxc-stop   -n $j
 			sudo lxc-start  -n $j
-			sleep 5
-			nslookup $j
-			sleep 5
 		fi
 
 		i=1
