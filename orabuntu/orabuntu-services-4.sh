@@ -622,7 +622,7 @@ do
         fi
 
         sudo lxc-start  -n $j
-        sleep 5
+        sleep 10
 
         if [ $MajorRelease -ge 7 ] && [ $UbuntuMajorVersion -ge 16 ]
         then
@@ -637,8 +637,6 @@ do
                 sudo lxc-attach -n $j -- systemd-machine-id-setup
                 sudo lxc-stop   -n $j
                 sudo lxc-start  -n $j
-                sudo lxc-attach -n $j -- hostnamectl set-hostname $j
-                sudo lxc-attach -n $j -- hostnamectl
 		
 		echo ''
 		echo "=============================================="
@@ -649,7 +647,6 @@ do
                 sleep 10
         fi
 
-	nslookup $j
         sudo lxc-ls -f
         echo ''
 	sleep 10
