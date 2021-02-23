@@ -1069,4 +1069,29 @@ cd "$DistDir"/installs/logs
 LOGEXT=`date +"%Y-%m-%d.%R:%S"`
 sudo cp -p $USER.log $USER.orabuntu-lxc.install.$LOGEXT
 sudo rm -f /etc/sudoers.d/orabuntu-lxc
+
+if [ $UbuntuMajorVersion -eq 16 ]
+then
+        echo ''
+        echo "=============================================="
+        echo "Remove /etc/apt/apt/conf.d/99olxc-ipv4        "
+        echo "=============================================="
+        echo ''
+	echo 'This file was installed by Orabuntu-LXC to force apt-get to use ipv4 during the install.'
+	echo 'This file is now being removed because Orabuntu-LXC install is complete.'
+        echo ''
+        
+	sudo rm -f /etc/apt/apt.conf.d/99olxc-ipv4
+
+        echo ''
+        echo "=============================================="
+        echo "Done: Remove /etc/apt/apt/conf.d/99olxc-ipv4  "
+        echo "=============================================="
+        echo ''
+
+        sleep 5
+
+        clear
+fi
+
 cd $DistDir/anylinux

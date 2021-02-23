@@ -191,6 +191,31 @@ then
 	AwsMtu=$(GetAwsMtu)
 fi
 
+if [ $UbuntuMajorVersion -eq 16 ]
+then
+        echo ''
+        echo "=============================================="
+        echo "Set apt-get to use ipv4 if Ubuntu 16.04...    "
+        echo "=============================================="
+        echo ''
+
+        sudo sh -c "echo 'Acquire::ForceIPv4 \"true\"\;' >> /etc/apt/apt.conf.d/99olxc-ipv4"
+
+        sudo ls -l /etc/apt/apt.conf.d/99olxc-ipv4
+        echo ''
+        sudo cat /etc/apt/apt.conf.d/99olxc-ipv4
+
+        echo ''
+        echo "=============================================="
+        echo "Done: Set apt-get to use ipv4 if Ubuntu 16.04 "
+        echo "=============================================="
+        echo ''
+
+        sleep 5
+
+        clear
+fi
+
 ################ MultiHost Settings ########################
 
             GRE=N 

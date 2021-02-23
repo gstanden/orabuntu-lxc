@@ -191,6 +191,33 @@ then
         AwsMtu=$(GetAwsMtu)
 fi
 
+if [ $UbuntuMajorVersion -eq 16 ]
+then
+        echo ''
+        echo "=============================================="
+        echo "Set apt-get to use ipv4 if Ubuntu 16.04...    "
+        echo "=============================================="
+        echo ''
+
+        sudo sh -c "echo 'Acquire::ForceIPv4 \"true\"\;' > /etc/apt/apt.conf.d/99olxc-ipv4"
+
+        sudo ls -l /etc/apt/apt.conf.d/99olxc-ipv4
+        echo ''
+	echo 'Contents of file:'
+	echo ''
+        sudo cat /etc/apt/apt.conf.d/99olxc-ipv4
+
+        echo ''
+        echo "=============================================="
+        echo "Done: Set apt-get to use ipv4 if Ubuntu 16.04 "
+        echo "=============================================="
+        echo ''
+
+        sleep 5
+
+        clear
+fi
+
 ################ MultiHost Settings ########################
 
             GRE=Y 
@@ -338,7 +365,7 @@ fi
 if [ -z $2 ]
 then
 	SPOKEIP='lan.ip.this.host'
- 	SPOKEIP=192.168.1.144
+ 	SPOKEIP=192.168.1.136
 else
 	SPOKEIP=$2
 fi
@@ -346,7 +373,7 @@ fi
 if [ -z $3 ]
 then
 	HUBIP='lan.ip.hub.host'
- 	HUBIP=192.168.1.143
+ 	HUBIP=192.168.1.121
 else
 	HUBIP=$3
 fi
