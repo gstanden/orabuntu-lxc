@@ -831,16 +831,27 @@ fi
 		MajorRelease=8
 	fi
 
-	# ------------------------------------------------------------
+	# -------------------------------------------------------------
 	# GLS 20210220 MUST use Oracle Linux 8 Container with cgroupv2
 
-	if [ $LinuxFlavor = Fedora ] && [ $RedHatVersion -ge 31 ]
+	if [ $LinuxFlavor = 'Fedora' ] && [ $RedHatVersion -ge 31 ]
 	then
 		MajorRelease=8
 	fi
 
 	# GLS 20210220 
-	# ------------------------------------------------------------
+	# -------------------------------------------------------------
+
+	# -------------------------------------------------------------
+	# GLS 20210220 MUST use Oracle Linux 7 (OL7) Container with OL6 
+
+	if [ $LinuxFlavor = 'Oracle' ] && [ $Release -eq 6 ] && [ $MajorRelease -eq 8 ]
+	then
+		MajorRelease=7
+	fi
+
+	# GLS 20210220 
+	# -------------------------------------------------------------
 
 	echo 'Oracle Container Release  = '$MajorRelease
 
