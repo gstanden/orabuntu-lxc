@@ -862,9 +862,19 @@ fi
 		then
 			PointRelease=3
 
-		elif [ $MajorRelease -eq 6 ] || [ $MajorRelease -eq 7 ]
+		elif [ $MajorRelease -eq 7 ] 
 		then
-			PointRelease=9
+
+			if [ $Release -eq 6 ]
+			then
+				PointRelease=3
+			else
+				PointRelease=9
+			fi
+	
+		elif [ $MajorRelease -eq 6 ]
+		then
+			PointRelease=3
 		fi
 	fi
 	
