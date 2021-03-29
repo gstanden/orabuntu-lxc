@@ -120,6 +120,7 @@ function GetMultiHostVar12 {
 }
 MultiHostVar12=$(GetMultiHostVar12)
 LXDValue=$MultiHostVar12
+LXD=$MultiHostVar12
 
 function GetMultiHostVar13 {
         echo $MultiHost | cut -f13 -d':'
@@ -272,156 +273,176 @@ sleep 5
 
 clear
 
-function SoftwareVersion { echo "$@" | awk -F. '{ printf("%d%03d%03d%03d\n", $1,$2,$3,$4); }'; }
+if   [ $LXD = 'N' ]
+then
+	function SoftwareVersion { echo "$@" | awk -F. '{ printf("%d%03d%03d%03d\n", $1,$2,$3,$4); }'; }
 
-function GetLXCVersion {
-	lxc-create --version
-}
-LXCVersion=$(GetLXCVersion)
+	function GetLXCVersion {
+		lxc-create --version
+	}
+	LXCVersion=$(GetLXCVersion)
 
-function CheckSystemdResolvedInstalled {
+	function CheckSystemdResolvedInstalled {
 	        sudo netstat -ulnp | grep 53 | sed 's/  */ /g' | rev | cut -f1 -d'/' | rev | sort -u | grep systemd- | wc -l
 	}
-SystemdResolvedInstalled=$(CheckSystemdResolvedInstalled)
+	SystemdResolvedInstalled=$(CheckSystemdResolvedInstalled)
 
-sleep 5
+	sleep 5
 
-clear
+	clear
 
-function CheckSearchDomain2 {
-        grep -c $Domain2 /etc/resolv.conf
-}
-SearchDomain2=$(CheckSearchDomain2)
-
-if [ $SearchDomain2 -eq 0 ] && [ $AWS -eq 0 ]
-then
-        sudo sed -i '/search/d' /etc/resolv.conf
-        sudo sh -c "echo 'search $Domain1 $Domain2 gns1.$Domain1' >> /etc/resolv.conf"
-fi
-
-echo ''
-echo "=============================================="
-echo "Initialize LXC Seed Container on OpenvSwitch.."
-echo "=============================================="
-
-cd /etc/network/if-up.d/openvswitch
-
-function GetSeedPostfix {
-        sudo lxc-ls -f | grep oel"$OracleRelease"c | cut -f1 -d' ' | cut -f2 -d'c' | sed 's/^/c/'
-}
-SeedPostfix=$(GetSeedPostfix)
-
-function CheckContainerUp {
-	sudo lxc-ls -f | grep oel$OracleRelease | sed 's/  */ /g' | egrep 'RUNNING|STOPPED'  | cut -f2 -d' '
-}
-ContainerUp=$(CheckContainerUp)
-
-function CheckPublicIP {
-	sudo lxc-info -n oel$OracleRelease$SeedPostfix -iH | cut -f1-3 -d'.' | sed 's/\.//g'
-}
-PublicIP=$(CheckPublicIP)
-
-function GetSeedContainerName {
-	sudo lxc-ls -f | grep oel$OracleRelease | cut -f1 -d' '	
-}
-SeedContainerName=$(GetSeedContainerName)
-
-echo ''
-echo "=============================================="
-echo "Starting LXC Seed Container for Oracle        "
-echo "=============================================="
-echo ''
-
-if [ $ContainerUp != 'RUNNING' ] || [ $PublicIP != 1020729 ]
-then
-	function CheckContainersExist {
-		sudo ls /var/lib/lxc | grep oel$OracleRelease | sort -V | sed 's/$/ /' | tr -d '\n' | sed 's/^[ \t]*//;s/[ \t]*$//'
+	function CheckSearchDomain2 {
+        	grep -c $Domain2 /etc/resolv.conf
 	}
-	ContainersExist=$(CheckContainersExist)
+	SearchDomain2=$(CheckSearchDomain2)
+
+	if [ $SearchDomain2 -eq 0 ] && [ $AWS -eq 0 ]
+	then
+        	sudo sed -i '/search/d' /etc/resolv.conf
+        	sudo sh -c "echo 'search $Domain1 $Domain2 gns1.$Domain1' >> /etc/resolv.conf"
+	fi
+
+	echo ''
+	echo "=============================================="
+	echo "Initialize LXC Seed Container on OpenvSwitch.."
+	echo "=============================================="
+
+	cd /etc/network/if-up.d/openvswitch
+
+	function GetSeedPostfix {
+        	sudo lxc-ls -f | grep oel"$OracleRelease"c | cut -f1 -d' ' | cut -f2 -d'c' | sed 's/^/c/'
+	}
+	SeedPostfix=$(GetSeedPostfix)
+
+	function CheckContainerUp {
+		sudo lxc-ls -f | grep oel$OracleRelease | sed 's/  */ /g' | egrep 'RUNNING|STOPPED'  | cut -f2 -d' '
+	}
+	ContainerUp=$(CheckContainerUp)
+
+	function CheckPublicIP {
+		sudo lxc-info -n oel$OracleRelease$SeedPostfix -iH | cut -f1-3 -d'.' | sed 's/\.//g'
+	}
+	PublicIP=$(CheckPublicIP)
 
 	function GetSeedContainerName {
 		sudo lxc-ls -f | grep oel$OracleRelease | cut -f1 -d' '	
 	}
 	SeedContainerName=$(GetSeedContainerName)
 
-	sleep 5
-
-        for j in $ContainersExist
-        do
-                echo "=============================================="
-                echo "Display LXC Seed Container Name...            "
-                echo "=============================================="
-                echo ''
-                echo $j
-                echo ''
-                echo "=============================================="
-                echo "Done: Display LXC Seed Container Name.        "
-                echo "=============================================="
-                echo ''
-
-                sleep 5
-
-                # GLS 20160707 updated to use lxc-copy instead of lxc-clone for Ubuntu 16.04
-                # GLS 20160707 continues to use lxc-clone for Ubuntu 15.04 and 15.10
-
-		UbuntuVersion=$(GetUbuntuVersion)
-
-                if [ $UbuntuMajorVersion -ge 16 ]
-                then
-                        function CheckPublicIPIterative {
-                                sudo lxc-info -n oel$OracleRelease$SeedPostfix -iH | cut -f1-3 -d'.' | sed 's/\.//g' | head -1
-                        }
-                fi
-		PublicIPIterative=$(CheckPublicIPIterative)
-		echo "Starting container $j ..."
-		echo ''
-                if [ $MultiHostVar2 = 'Y' ]
-                then
-                        sudo sed -i "s/MtuSetting/$MultiHostVar7/g" /var/lib/lxc/$j/config
-                fi
-		sudo lxc-start -n $j > /dev/null 2>&1
-		i=1
-		while [ "$PublicIPIterative" != 1020729 ] && [ "$i" -le 10 ]
-		do
-			echo "Waiting for $j Public IP to come up..."
-			echo ''
-			sleep 5
-			PublicIPIterative=$(CheckPublicIPIterative)
-			if [ $i -eq 5 ]
-			then
-				echo ''
-				sudo lxc-stop -n $j > /dev/null 2>&1
-				sudo /etc/network/openvswitch/veth_cleanups.sh $SeedContainerName
-				echo ''
-                                if [ $MultiHostVar2 = 'Y' ]
-                                then
-                                        ls -l /var/lib/lxc/$j/config
-                                        sudo sed -i "s/MtuSetting/$MultiHostVar7/g" /var/lib/lxc/$j/config
-                                fi
-				sudo lxc-start -n $j > /dev/null 2>&1
-			fi
-		sleep 1
-		i=$((i+1))
-		done
-	done
-	echo "=============================================="
-	echo "LXC Seed Container for Oracle started.        "
-	echo "=============================================="
 	echo ''
 	echo "=============================================="
-	echo "Waiting for final container initialization.   " 
+	echo "Starting LXC Seed Container for Oracle        "
 	echo "=============================================="
+	echo ''
+
+	if [ $ContainerUp != 'RUNNING' ] || [ $PublicIP != 1020729 ]
+	then
+		function CheckContainersExist {
+			sudo ls /var/lib/lxc | grep oel$OracleRelease | sort -V | sed 's/$/ /' | tr -d '\n' | sed 's/^[ \t]*//;s/[ \t]*$//'
+		}
+		ContainersExist=$(CheckContainersExist)
+
+		function GetSeedContainerName {
+			sudo lxc-ls -f | grep oel$OracleRelease | cut -f1 -d' '	
+		}
+		SeedContainerName=$(GetSeedContainerName)
+
+		sleep 5
+
+        	for j in $ContainersExist
+        	do
+                	echo "=============================================="
+                	echo "Display LXC Seed Container Name...            "
+                	echo "=============================================="
+                	echo ''
+                	echo $j
+                	echo ''
+                	echo "=============================================="
+                	echo "Done: Display LXC Seed Container Name.        "
+                	echo "=============================================="
+
+                	sleep 5
+
+                	# GLS 20160707 updated to use lxc-copy instead of lxc-clone for Ubuntu 16.04
+                	# GLS 20160707 continues to use lxc-clone for Ubuntu 15.04 and 15.10
+
+			UbuntuVersion=$(GetUbuntuVersion)
+
+                	if [ $UbuntuMajorVersion -ge 16 ]
+                	then
+                        	function CheckPublicIPIterative {
+                                	sudo lxc-info -n oel$OracleRelease$SeedPostfix -iH | cut -f1-3 -d'.' | sed 's/\.//g' | head -1
+                        	}
+                	fi
+			PublicIPIterative=$(CheckPublicIPIterative)
+			echo "Starting container $j ..."
+			echo ''
+                	if [ $MultiHostVar2 = 'Y' ]
+                	then
+                        	sudo sed -i "s/MtuSetting/$MultiHostVar7/g" /var/lib/lxc/$j/config
+                	fi
+			sudo lxc-start -n $j > /dev/null 2>&1
+			i=1
+			while [ "$PublicIPIterative" != 1020729 ] && [ "$i" -le 10 ]
+			do
+				echo "Waiting for $j Public IP to come up..."
+				echo ''
+				sleep 5
+				PublicIPIterative=$(CheckPublicIPIterative)
+				if [ $i -eq 5 ]
+				then
+					echo ''
+					sudo lxc-stop -n $j > /dev/null 2>&1
+					sudo /etc/network/openvswitch/veth_cleanups.sh $SeedContainerName
+					echo ''
+                                	if [ $MultiHostVar2 = 'Y' ]
+                                	then
+                                        	ls -l /var/lib/lxc/$j/config
+                                        	sudo sed -i "s/MtuSetting/$MultiHostVar7/g" /var/lib/lxc/$j/config
+                                	fi
+					sudo lxc-start -n $j > /dev/null 2>&1
+				fi
+			sleep 1
+			i=$((i+1))
+			done
+		done
+		echo "=============================================="
+		echo "LXC Seed Container for Oracle started.        "
+		echo "=============================================="
+		echo ''
+		echo "=============================================="
+		echo "Waiting for final container initialization.   " 
+		echo "=============================================="
+	fi
+
+elif [ $LXD = 'Y' ]
+then		
+	function GetSeedContainerName {
+		lxc list | grep oel$OracleRelease | cut -f2 -d' ' | sed 's/^[ \t]*//;s/[ \t]*$//'	
+	}
+	SeedContainerName=$(GetSeedContainerName)
 fi
 
 echo ''
 echo "==============================================" 
-echo "Public IP is up on $SeedContainerName         "
+echo "Show IP on $SeedContainerName...              "
+echo "==============================================" 
 echo ''
-sudo lxc-ls -f
+
+if   [ $LXD = 'N' ]
+then
+	sudo lxc-ls -f
+
+elif [ $LXD = 'Y' ]
+then
+	lxc list
+fi
+
 echo ''
-echo "=============================================="
-echo "Container Up.                                 "
-echo "=============================================="
+echo "==============================================" 
+echo "Done: Show IP on $SeedContainerName.          "
+echo "==============================================" 
+echo ''
 
 sleep 5
 
@@ -437,7 +458,14 @@ echo "Output of 'uname -a' in $SeedContainerName... "
 echo "=============================================="
 echo ''
 
-sudo lxc-attach -n $SeedContainerName -- uname -a
+if   [ $LXD = 'N' ]
+then
+	sudo lxc-attach -n $SeedContainerName -- uname -a
+
+elif [ $LXD = 'Y' ]
+then
+	lxc exec $SeedContainerName -- uname -a
+fi
 
 echo ''
 echo "=============================================="
@@ -455,9 +483,18 @@ echo "Configure $SeedContainerName...               "
 echo "=============================================="
 echo ''
 
-sudo lxc-attach -n $SeedContainerName -- usermod --password `perl -e "print crypt('root','root');"` root
-sudo lxc-attach -n $SeedContainerName -- yum -y install openssh-server
-sudo lxc-attach -n $SeedContainerName -- service sshd restart
+if   [ $LXD = 'N' ]
+then
+	sudo lxc-attach -n $SeedContainerName -- usermod --password `perl -e "print crypt('root','root');"` root
+	sudo lxc-attach -n $SeedContainerName -- yum -y install openssh-server net-tools
+	sudo lxc-attach -n $SeedContainerName -- service sshd restart
+
+elif [ $LXD = 'Y' ]
+then
+	lxc exec $SeedContainerName -- usermod --password `perl -e "print crypt('root','root');"` root
+	lxc exec $SeedContainerName -- yum -y install openssh-server net-tools
+	lxc exec $SeedContainerName -- service sshd restart
+fi
 
 echo ''
 echo "=============================================="

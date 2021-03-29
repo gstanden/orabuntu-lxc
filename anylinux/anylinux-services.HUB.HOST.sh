@@ -240,7 +240,7 @@ StorageDriver=zfs               # Relevant only if LXDCluster=Y
 ### Oracle Linux LXD Storage (optional)
 
 BtrfsLun="\/dev\/sdXn"          # Relevant only if LXDCluster=Y (e.g. Set to /dev/sdb1)
-LXD=N                           # This value is currently unused.  Leave set to N.
+LXD=N                           # This value is currently unused.  Leave set to N. Values are [Y|N]
 
 LXDCluster=N                    # Default value
 PreSeed=N                       # Default value
@@ -249,7 +249,7 @@ if   [ $LinuxFlavor = 'Ubuntu' ] && [ $UbuntuMajorVersion -ge 20 ]
 then
 	echo ''
 	echo "=============================================="
-	echo "Display Optional LXD Cluster Values...        "
+	echo "Show Optional LXD & LXD Cluster Values...     "
 	echo "=============================================="
 	echo ''
 
@@ -258,10 +258,11 @@ then
 
 	echo 'LXDCluster = '$LXDCluster
 	echo 'PreSeed    = '$PreSeed
-			
+	echo 'LXD        = '$LXD
+
 	echo ''
 	echo "=============================================="
-	echo "Done: Display LXD Cluster Values.             "
+	echo "Done: Show Optional LXD & LXD Cluster Values. "
 	echo "=============================================="
 	echo ''
 

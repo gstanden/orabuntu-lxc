@@ -1,4 +1,4 @@
-#!/bin/bash
+#/bin/bash
 
 #    Copyright 2015-2019 Gilbert Standen
 #    This file is part of Orabuntu-LXC.
@@ -119,7 +119,7 @@ function GetMultiHostVar12 {
         echo $MultiHost | cut -f12 -d':'
 }
 MultiHostVar12=$(GetMultiHostVar12)
-LXDValue=$MultiHostVar12
+LXD=$MultiHostVar12
 
 function GetMultiHostVar13 {
         echo $MultiHost | cut -f13 -d':'
@@ -203,70 +203,100 @@ else
 	NumCon=$3
 fi
 
-ContainerPrefix=ora$1$2c
-CP=$ContainerPrefix
+ContainerPrefixLXC=ora$1$2c
+CPC=ora$1$2c
 
-if   [ $UbuntuMajorVersion -eq 16 ]
+ContainerPrefixLXD=ora$1$2d
+CPD=ora$1$2d
+
+CP=$ContainerPrefixLXC
+
+if   [ $LXD = 'N' ]
+then
+	if   [ $UbuntuMajorVersion -eq 16 ]
+	then
+		function GetSeedContainerName {
+			sudo ls -l /var/lib/lxc | rev | cut -f1 -d' ' | rev | grep oel$OracleRelease | cut -f1 -d' '
+		}
+		SeedContainerName=$(GetSeedContainerName)
+	elif [ $UbuntuMajorVersion -gt 16 ]
+	then
+		function GetSeedContainerName {
+			sudo lxc-ls -f | grep oel$OracleRelease | cut -f1 -d' '
+		}
+		SeedContainerName=$(GetSeedContainerName)
+	fi
+
+elif [ $LXD = 'Y' ]
 then
 	function GetSeedContainerName {
-		sudo ls -l /var/lib/lxc | rev | cut -f1 -d' ' | rev | grep oel$OracleRelease | cut -f1 -d' '
-	}
-	SeedContainerName=$(GetSeedContainerName)
-elif [ $UbuntuMajorVersion -gt 16 ]
-then
-	function GetSeedContainerName {
-		sudo lxc-ls -f | grep oel$OracleRelease | cut -f1 -d' '
+		lxc list | grep oel$OracleRelease | cut -f2 -d' ' | sed 's/^[ \t]*//;s/[ \t]*$//'
 	}
 	SeedContainerName=$(GetSeedContainerName)
 fi
 
-echo ''
-echo "=============================================="
-echo "Update config if LXC v2.0 or lower...          "
-echo "=============================================="
-echo ''
-
-sleep 5
-
-clear
-
-# Case 1 Creating Oracle Seed Container in 2.0- LXC enviro.
-
-function CheckOracleSeedConfigFormat {
-        sudo egrep -c 'lxc.net.0|lxc.net.1|lxc.uts.name|lxc.apparmor.profile' /var/lib/lxc/$SeedContainerName/config
-}
-OracleSeedConfigFormat=$(CheckOracleSeedConfigFormat)
-
-if [ $(SoftwareVersion $LXCVersion) -lt $(SoftwareVersion 2.1.0) ] && [ $OracleSeedConfigFormat -gt 0 ]
+if [ $LXD = 'N' ]
 then
-        sudo sed -i 's/lxc.net.0/lxc.network/g'                 /var/lib/lxc/$SeedContainerName/config
-        sudo sed -i 's/lxc.net.1/lxc.network/g'                 /var/lib/lxc/$SeedContainerName/config
-        sudo sed -i 's/lxc.uts.name/lxc.utsname/g'              /var/lib/lxc/$SeedContainerName/config
-        sudo sed -i 's/lxc.apparmor.profile/lxc.aa_profile/g'   /var/lib/lxc/$SeedContainerName/config
+	echo ''
+	echo "=============================================="
+	echo "Update config if LXC v2.0 or lower...          "
+	echo "=============================================="
+	echo ''
+
+	sleep 5
+
+	clear
+
+	# Case 1 Creating Oracle Seed Container in 2.0- LXC enviro.
+
+	function CheckOracleSeedConfigFormat {
+        	sudo egrep -c 'lxc.net.0|lxc.net.1|lxc.uts.name|lxc.apparmor.profile' /var/lib/lxc/$SeedContainerName/config
+	}
+	OracleSeedConfigFormat=$(CheckOracleSeedConfigFormat)
+
+	if [ $(SoftwareVersion $LXCVersion) -lt $(SoftwareVersion 2.1.0) ] && [ $OracleSeedConfigFormat -gt 0 ]
+	then
+        	sudo sed -i 's/lxc.net.0/lxc.network/g'                 /var/lib/lxc/$SeedContainerName/config
+        	sudo sed -i 's/lxc.net.1/lxc.network/g'                 /var/lib/lxc/$SeedContainerName/config
+        	sudo sed -i 's/lxc.uts.name/lxc.utsname/g'              /var/lib/lxc/$SeedContainerName/config
+        	sudo sed -i 's/lxc.apparmor.profile/lxc.aa_profile/g'   /var/lib/lxc/$SeedContainerName/config
+	fi
+
+	# Case 2 importing nameserver from an 2.0- LXC enviro into a 2.1+ LXC enviro (typically this if-then will never be called).
+
+	if [ $(SoftwareVersion $LXCVersion) -ge $(SoftwareVersion 2.1.0) ] && [ $OracleSeedConfigFormat -eq 0 ]
+	then
+       		sudo lxc-update-config -c /var/lib/lxc/$SeedContainerName/config
+	fi
+
+	echo ''
+	echo "=============================================="
+	echo "Done: Update config if LXC v2.0 or lower.      "
+	echo "=============================================="
+	echo ''
+
+	sleep 5
+
+	clear
 fi
 
-# Case 2 importing nameserver from an 2.0- LXC enviro into a 2.1+ LXC enviro (typically this if-then will never be called).
-
-if [ $(SoftwareVersion $LXCVersion) -ge $(SoftwareVersion 2.1.0) ] && [ $OracleSeedConfigFormat -eq 0 ]
+if [ $LXD = 'N' ]
 then
-       sudo lxc-update-config -c /var/lib/lxc/$SeedContainerName/config
+	echo ''
+	echo "=============================================="
+	echo "Number of LXC Container Nodes = $NumCon       "
+	echo "=============================================="
+	echo ''
+
+elif [ $LXD = 'Y' ]
+then
+	echo ''
+	echo "=============================================="
+	echo "Number of LXD Container Nodes = $NumCon       "
+	echo "=============================================="
+	echo ''
 fi
 
-echo ''
-echo "=============================================="
-echo "Done: Update config if LXC v2.0 or lower.      "
-echo "=============================================="
-echo ''
-
-sleep 5
-
-clear
-
-echo ''
-echo "=============================================="
-echo "Number of LXC Container Nodes = $NumCon       "
-echo "=============================================="
-echo ''
 echo "=============================================="
 echo "This script creates container clones          "
 echo "=============================================="
@@ -281,11 +311,22 @@ echo "Stopping $SeedContainerName seed container...  "
 echo "=============================================="
 echo ''
 
-function CheckContainerUp {
-sudo lxc-ls -f | grep $SeedContainerName | sed 's/  */ /g' | egrep 'RUNNING|STOPPED'  | cut -f2 -d' '
-}
-ContainerUp=$(CheckContainerUp)
-sudo lxc-stop -n $SeedContainerName > /dev/null 2>&1
+if   [ $LXD = 'N' ]
+then
+	function CheckContainerUp {
+		sudo lxc-ls -f | grep $SeedContainerName | sed 's/  */ /g' | egrep 'RUNNING|STOPPED'  | cut -f2 -d' '
+	}
+	ContainerUp=$(CheckContainerUp)
+	sudo lxc-stop -n $SeedContainerName > /dev/null 2>&1
+
+elif [ $LXD = 'Y' ]
+then
+	function CheckContainerUp {
+		lxc list | grep oel83 | sed 's/  */ /g' | egrep 'RUNNING|STOPPED' | cut -f4 -d' ' | sed 's/^[ \t]*//;s/[ \t]*$//'
+	}
+	ContainerUp=$(CheckContainerUp)
+	lxc stop $SeedContainerName > /dev/null 2>&1
+fi
 
 while [ "$ContainerUp" = 'RUNNING' ]
 do
@@ -293,7 +334,14 @@ do
 	ContainerUp=$(CheckContainerUp)
 done
 
-sudo lxc-ls -f
+if   [ $LXD = 'N' ]
+then
+	sudo lxc-ls -f
+
+elif [ $LXD = 'Y' ]
+then
+	lxc list
+fi
 
 echo ''
 echo "=============================================="
@@ -306,7 +354,10 @@ clear
 
 if [ $MultiHostVar2 = 'Y' ]
 then
-        sudo sed -i "s/MtuSetting/$MultiHostVar7/g" /var/lib/lxc/$SeedContainerName/config
+	if   [ $LXD = 'N' ]
+	then
+        	sudo sed -i "s/MtuSetting/$MultiHostVar7/g" /var/lib/lxc/$SeedContainerName/config
+	fi
 fi
 
 echo ''
@@ -319,7 +370,10 @@ sleep 5
 
 clear
 
-sudo /opt/olxc"$DistDir"/products/$Product/$Product.net $MultiHostVar1
+if   [ $LXD = 'N' ]
+then
+	sudo /opt/olxc"$DistDir"/products/$Product/$Product.net $MultiHostVar1
+fi
 
 echo ''
 echo "=============================================="
@@ -331,20 +385,50 @@ sleep 5
 
 clear
 
-if [ -f /var/lib/lxc/$SeedContainerName/rootfs/root/lxc-services.sh ]
+if   [ $LXD = 'N' ]
 then
-	sudo sed -i 's/yum install/yum -y install/g' /var/lib/lxc/$SeedContainerName/rootfs/root/lxc-services.sh
+	if [ -f /var/lib/lxc/$SeedContainerName/rootfs/root/lxc-services.sh ]
+	then
+		sudo sed -i 's/yum install/yum -y install/g' /var/lib/lxc/$SeedContainerName/rootfs/root/lxc-services.sh
+	fi
 fi
 
 sleep 5
 
 clear
 
+if [ $LXD = 'Y' ]
+then
+	echo ''
+	echo "=============================================="
+	echo "Create olxc_sw1a LXD Profile ...              "
+	echo "=============================================="
+	echo ''
+
+	lxc profile create olxc_sw1a
+	cat /etc/network/openvswitch/olxc_sw1a | lxc profile edit olxc_sw1a
+	lxc profile device add olxc_sw1a root disk path=/ pool=local
+
+	echo ''
+	echo "=============================================="
+	echo "Done: Create olxc_sw1a LXD Profile.           "
+	echo "=============================================="
+	echo ''
+
+	sleep 5
+
+	clear
+fi
+
 echo ''
 echo "=============================================="
 echo "Clone $SeedContainerName to $NumCon containers"
 echo "=============================================="
 echo ''
+
+sleep 5
+
+clear
 
 let CloneIndex=10
 let CopyCompleted=0
@@ -362,17 +446,39 @@ do
 
 	if [ $MultiHostVar3 = 'X' ] && [ $GREValue = 'Y' ]
 	then
-        	function CheckDNSLookup {
-                	timeout 5 nslookup $ContainerPrefix$CloneIndex
-        	}
-        	DNSLookup=$(CheckDNSLookup)
-		DNSLookup=`echo $?`
+		if   [ $LXD = 'N' ]
+		then
+        		function CheckDNSLookup {
+                		timeout 5 nslookup $ContainerPrefixLXC$CloneIndex
+        		}
+        		DNSLookup=$(CheckDNSLookup)
+			DNSLookup=`echo $?`
+
+		elif [ $LXD = 'Y' ]
+		then	
+        		function CheckDNSLookup {
+                		timeout 5 nslookup $ContainerPrefixLXD$CloneIndex
+        		}
+        		DNSLookup=$(CheckDNSLookup)
+			DNSLookup=`echo $?`
+		fi
 	else
-        	function CheckDNSLookup {
-                	timeout 5 nslookup $ContainerPrefix$CloneIndex
-        	}
-        	DNSLookup=$(CheckDNSLookup)
-		DNSLookup=`echo $?`
+		if   [ $LXD = 'N' ]
+		then
+        		function CheckDNSLookup {
+                		timeout 5 nslookup $ContainerPrefixLXC$CloneIndex
+        		}
+        		DNSLookup=$(CheckDNSLookup)
+			DNSLookup=`echo $?`
+
+		elif [ $LXD = 'Y' ]
+		then
+        		function CheckDNSLookup {
+                		timeout 5 nslookup $ContainerPrefixLXD$CloneIndex
+        		}
+        		DNSLookup=$(CheckDNSLookup)
+			DNSLookup=`echo $?`
+		fi
 	fi
 		
 	while [ $DNSLookup -eq 0 ]
@@ -381,130 +487,286 @@ do
 		DNSLookup=$(CheckDNSLookup)
 		DNSLookup=`echo $?`
 	done
-		
-	echo ''
-	echo "=============================================="
-	echo "Clone $SeedContainerName to $CP$CloneIndex    "
-	echo "=============================================="
-	echo ''
 
-	echo "Clone Container Name = $ContainerPrefix$CloneIndex"
+	if   [ $LXD = 'N' ]
+	then	
+		echo ''
+		echo "=============================================="
+		echo "Clone $SeedContainerName to $CPC$CloneIndex   "
+		echo "=============================================="
+		echo ''
+
+		echo "Clone Container Name = $CPC$CloneIndex"
+
+		sleep 5
+
+	elif  [ $LXD = 'Y' ]
+	then
+		CI=$CloneIndex
+		echo ''
+		echo "=============================================="
+		echo "Clone $SeedContainerName to $CPD$CI...        "
+		echo "=============================================="
+		echo ''
+
+		lxc copy $SeedContainerName $ContainerPrefixLXD$CloneIndex
+		lxc list $ContainerPrefixLXD$CloneIndex
+
+		echo ''
+		echo "=============================================="
+		echo "Done: Clone $SeedContainerName to $CPD$CI     "
+		echo "=============================================="
+		echo ''
+
+		sleep 5
+
+		clear
+	fi
+
+	if   [ $LXD = 'N' ]
+	then
+      		sudo lxc-copy -n $SeedContainerName -N $ContainerPrefixLXC$CloneIndex
+
+		if [ $MajorRelease -eq 6 ]
+		then	
+			sudo sed -i "s/$SeedContainerName/$ContainerPrefixLXC$CloneIndex/g"	/var/lib/lxc/$ContainerPrefixLXC$CloneIndex/rootfs/etc/hostname
+		fi
+
+		sudo sed -i "s/$SeedContainerName/$ContainerPrefixLXC$CloneIndex/g"		/var/lib/lxc/$ContainerPrefixLXC$CloneIndex/rootfs/etc/sysconfig/network-scripts/ifcfg-eth0
+		sudo sed -i "s/HostName/$ContainerPrefixLXC$CloneIndex/g"                  	/var/lib/lxc/$ContainerPrefixLXC$CloneIndex/rootfs/etc/sysconfig/network-scripts/ifcfg-eth0
+		sudo sed -i "s/$SeedContainerName/$ContainerPrefixLXC$CloneIndex/g"		/var/lib/lxc/$ContainerPrefixLXC$CloneIndex/rootfs/etc/sysconfig/network
+		sudo sed -i "s/$SeedContainerName/$ContainerPrefixLXC$CloneIndex/g"		/var/lib/lxc/$ContainerPrefixLXC$CloneIndex/rootfs/etc/hosts
+
+		sudo sed -i "s/$SeedContainerName/$ContainerPrefixLXC$CloneIndex/g" 				/var/lib/lxc/$ContainerPrefixLXC$CloneIndex/config
+		sudo sed -i "s/\.10/\.$CloneIndex/g" 								/var/lib/lxc/$ContainerPrefixLXC$CloneIndex/config
+ 		sudo sed -i 's/sx1/sw1/g' 									/var/lib/lxc/$ContainerPrefixLXC$CloneIndex/config
+	#	sudo sed -i 's/sx1a/sw1a/g' 									/var/lib/lxc/$ContainerPrefixLXC$CloneIndex/config
+		sudo sed -i "s/mtu = 1500/mtu = $MultiHostVar7/g" 						/var/lib/lxc/$ContainerPrefixLXC$CloneIndex/config
+	#	sudo sed -i "s/lxc\.mount\.entry = \/dev\/lxc_luns/#lxc\.mount\.entry = \/dev\/lxc_luns/g" 	/var/lib/lxc/$ContainerPrefixLXC$CloneIndex/config
+	#	sudo sed -i "/domain-name-servers/s/10.207.29.2/10.207.39.2/g" 					/var/lib/lxc/$ContainerPrefixLXC$CloneIndex/rootfs/etc/dhcp/dhclient.conf
+	#	sudo rm  -f											/var/lib/lxc/$ContainerPrefixLXC$CloneIndex/rootfs/etc/machine-id
+	#	sudo systemd-machine-id-setup								 --root=/var/lib/lxc/$ContainerPrefixLXC$CloneIndex/rootfs
+
+		echo ''
+		echo "==============================================  "
+		echo "Done: Clone $SeedContainerName to $CP$CloneIndex"
+		echo "==============================================  "
+		echo ''
+
+		sleep 5
+
+		clear
+
+		echo ''
+		echo "=============================================="
+		echo "OpenvSwitch Networking for $Product ...       "
+		echo "=============================================="
+		echo ''
+
+        	sudo /opt/olxc"$DistDir"/products/$Product/$Product.cnf $ContainerPrefixLXC $CloneIndex $Product $MultiHostVar1
+
+		echo ''
+		echo "=============================================="
+		echo "Done: OpenvSwitch Networking for $Product.    "
+		echo "=============================================="
+		echo ''
+
+		sleep 5
+
+		clear
+
+		function GetHostName (){ echo $ContainerPrefixLXC$CloneIndex\1; }
+		HostName=$(GetHostName)
+
+		sudo sed -i "s/$HostName/$ContainerPrefixLXC$CloneIndex/" /var/lib/lxc/$ContainerPrefixLXC$CloneIndex/rootfs/etc/sysconfig/network
+
+		echo ''
+		echo "=============================================="
+		echo "Create $CP$CloneIndex Onboot Service...       "
+		echo "=============================================="
+
+		sudo sh -c "echo '#!/bin/bash'										>  /etc/network/openvswitch/strt_$ContainerPrefixLXC$CloneIndex.sh"
+		sudo sh -c "echo '#'											>> /etc/network/openvswitch/strt_$ContainerPrefixLXC$CloneIndex.sh"
+		sudo sh -c "echo '# Manage the Oracle LXC containers'							>> /etc/network/openvswitch/strt_$ContainerPrefixLXC$CloneIndex.sh"
+		sudo sh -c "echo '#'											>> /etc/network/openvswitch/strt_$ContainerPrefixLXC$CloneIndex.sh"
+		sudo sh -c "echo 'start() {'										>> /etc/network/openvswitch/strt_$ContainerPrefixLXC$CloneIndex.sh"
+		sudo sh -c "echo '  exec lxc-start -n $ContainerPrefixLXC$CloneIndex > /dev/null 2>&1'			>> /etc/network/openvswitch/strt_$ContainerPrefixLXC$CloneIndex.sh"
+		sudo sh -c "echo '}'											>> /etc/network/openvswitch/strt_$ContainerPrefixLXC$CloneIndex.sh"
+		sudo sh -c "echo ''											>> /etc/network/openvswitch/strt_$ContainerPrefixLXC$CloneIndex.sh"
+		sudo sh -c "echo 'stop() {'										>> /etc/network/openvswitch/strt_$ContainerPrefixLXC$CloneIndex.sh"
+		sudo sh -c "echo '  exec lxc-stop -n $ContainerPrefixLXC$CloneIndex > /dev/null 2>&1'			>> /etc/network/openvswitch/strt_$ContainerPrefixLXC$CloneIndex.sh"
+		sudo sh -c "echo '}'											>> /etc/network/openvswitch/strt_$ContainerPrefixLXC$CloneIndex.sh"
+		sudo sh -c "echo ''											>> /etc/network/openvswitch/strt_$ContainerPrefixLXC$CloneIndex.sh"
+		sudo sh -c "echo 'case \$1 in'										>> /etc/network/openvswitch/strt_$ContainerPrefixLXC$CloneIndex.sh"
+		sudo sh -c "echo '  start|stop) \"\$1\" ;;'								>> /etc/network/openvswitch/strt_$ContainerPrefixLXC$CloneIndex.sh"
+		sudo sh -c "echo 'esac'											>> /etc/network/openvswitch/strt_$ContainerPrefixLXC$CloneIndex.sh"
+
+		sudo chmod +x /etc/network/openvswitch/strt_$ContainerPrefixLXC$CloneIndex.sh
+	
+		sudo sh -c "echo '[Unit]'                                                        			>  /etc/systemd/system/$ContainerPrefixLXC$CloneIndex.service"
+		sudo sh -c "echo 'Description=$ContainerPrefixLXC$CloneIndex Service'                               	>> /etc/systemd/system/$ContainerPrefixLXC$CloneIndex.service"
+		sudo sh -c "echo 'Wants=network-online.target sw1.service $NameServer.service'          		>> /etc/systemd/system/$ContainerPrefixLXC$CloneIndex.service"
+		sudo sh -c "echo 'After=network-online.target sw1.service $NameServer.service'          		>> /etc/systemd/system/$ContainerPrefixLXC$CloneIndex.service"
+		sudo sh -c "echo ''                                                             			>> /etc/systemd/system/$ContainerPrefixLXC$CloneIndex.service"
+		sudo sh -c "echo '[Service]'                                                    			>> /etc/systemd/system/$ContainerPrefixLXC$CloneIndex.service"
+	
+		if [ $AWS -eq 1 ]
+		then
+			sudo sh -c "echo 'Type=idle'									>> /etc/systemd/system/$ContainerPrefixLXC$CloneIndex.service"
+		else
+			sudo sh -c "echo 'Type=idle'									>> /etc/systemd/system/$ContainerPrefixLXC$CloneIndex.service"
+		fi
+
+		sudo sh -c "echo 'User=root'                                                    			>> /etc/systemd/system/$ContainerPrefixLXC$CloneIndex.service"
+		sudo sh -c "echo 'RemainAfterExit=yes'                                          			>> /etc/systemd/system/$ContainerPrefixLXC$CloneIndex.service"
+		sudo sh -c "echo 'ExecStart=/etc/network/openvswitch/strt_$ContainerPrefixLXC$CloneIndex.sh start' 	>> /etc/systemd/system/$ContainerPrefixLXC$CloneIndex.service"
+		sudo sh -c "echo 'ExecStop=/etc/network/openvswitch/strt_$ContainerPrefixLXC$CloneIndex.sh stop'   	>> /etc/systemd/system/$ContainerPrefixLXC$CloneIndex.service"
+		sudo sh -c "echo ''                                                             			>> /etc/systemd/system/$ContainerPrefixLXC$CloneIndex.service"
+		sudo sh -c "echo '[Install]'                                                    			>> /etc/systemd/system/$ContainerPrefixLXC$CloneIndex.service"
+		sudo sh -c "echo 'WantedBy=multi-user.target'                                   			>> /etc/systemd/system/$ContainerPrefixLXC$CloneIndex.service"
+
+		sudo chmod 644 /etc/systemd/system/$ContainerPrefixLXC$CloneIndex.service
+	
+		echo ''
+		sudo cat /etc/systemd/system/$ContainerPrefixLXC$CloneIndex.service
+		echo ''
+		sudo systemctl enable $ContainerPrefixLXC$CloneIndex
+		
+		echo ''
+		echo "=============================================="
+		echo "Created $CP$CloneIndex Onboot Service.        "
+		echo "=============================================="
+		echo ''
+
+		if [ $(SoftwareVersion $LXCVersion) -ge $(SoftwareVersion "2.1.0") ]
+		then
+			sudo lxc-update-config -c /var/lib/lxc/$CP$CloneIndex/config
+		fi
+	
+	elif [ $LXD = 'Y' ]
+	then
+		echo ''
+		echo "=============================================="
+		echo "Configure $ContainerPrefixLXD$CI...           "
+		echo "=============================================="
+		echo ''
+		echo "=============================================="
+		echo "Assign Profile $ContainerPrefixLXD$CI...      "
+		echo "=============================================="
+		echo ''
+
+		lxc profile assign $ContainerPrefixLXD$CloneIndex olxc_sw1a
+		
+		echo ''
+		echo "=============================================="
+		echo "Done: Assign Profile $ContainerPrefixLXD$CI.  "
+		echo "=============================================="
+		echo ''
+		echo "=============================================="
+		echo "Set Machine-ID  $ContainerPrefixLXD$CI...     "
+		echo "=============================================="
+		echo ''
+
+	echo   "lxc file delete $ContainerPrefixLXD$CloneIndex/etc/machine-id"
+		lxc file delete $ContainerPrefixLXD$CloneIndex/etc/machine-id 
+
+		sleep 5
+
+		lxc start $ContainerPrefixLXD$CloneIndex
+
+		sleep 5
+
+		n=1
+		while [ $n -ne 0 ]
+		do
+                	lxc exec  $ContainerPrefixLXD$CloneIndex -- systemd-machine-id-setup > /dev/null 2>&1
+			n=`echo $?`
+			sleep 5
+		done
+
+		lxc stop  $ContainerPrefixLXD$CloneIndex
+		lxc start $ContainerPrefixLXD$CloneIndex
+		
+		echo ''
+		echo "=============================================="
+		echo "Done: Set Machine-ID $ContainerPrefixLXD$CI.  "
+		echo "=============================================="
+		echo ''
+		echo "=============================================="
+		echo "Set hostnamectl $ContainerPrefixLXD$CI...     "
+		echo "=============================================="
+		echo ''
+
+		n=1
+		while [ $n -ne 0 ]
+		do
+			lxc exec $ContainerPrefixLXD$CloneIndex -- hostnamectl set-hostname $ContainerPrefixLXD$CloneIndex > /dev/null 2>&1
+			n=`echo $?`
+			sleep 5
+		done
+	
+		lxc exec  $ContainerPrefixLXD$CloneIndex -- hostnamectl
+		
+		echo ''
+		echo "=============================================="
+		echo "Done: Set hostnamectl $ContainerPrefixLXD$CI. "
+		echo "=============================================="
+		echo ''
+
+		sleep 5
+
+		clear
+
+		echo ''
+		echo "=============================================="
+		echo "Restart $ContainerPrefixLXD$CI...             "
+		echo "=============================================="
+		echo ''
+
+		lxc stop  $ContainerPrefixLXD$CloneIndex
+		lxc start $ContainerPrefixLXD$CloneIndex
+		lxc list  $ContainerPrefixLXD$CloneIndex
+		
+		echo ''
+		echo "=============================================="
+		echo "Done: Restart $ContainerPrefixLXD$CI.         "
+		echo "=============================================="
+		echo ''
+
+		sleep 5
+
+		clear
+
+		echo ''
+		echo "=============================================="
+		echo "Done: Configure $ContainerPrefixLXD$CI        "
+		echo "=============================================="
+		echo ''
+
+		sleep 5
+
+		clear
+
+		echo ''
+		echo "=============================================="
+		echo "nslookup $ContainerPrefixLXD$CI...            "
+		echo "=============================================="
+		echo ''
+
+		nslookup $ContainerPrefixLXD$CloneIndex
+		
+		echo "=============================================="
+		echo "Done: nslookup $ContainerPrefixLXD$CI.        "
+		echo "=============================================="
+		echo ''
+	fi
+
+	CopyCompleted=$((CopyCompleted+1))
+	CloneIndex=$((CloneIndex+1))
 
 	sleep 5
 
-      	sudo lxc-copy -n $SeedContainerName -N $ContainerPrefix$CloneIndex
-		
-	if [ $MajorRelease -eq 6 ]
-	then	
-		sudo sed -i "s/$SeedContainerName/$ContainerPrefix$CloneIndex/g"	/var/lib/lxc/$ContainerPrefix$CloneIndex/rootfs/etc/hostname
-	fi
-
-	sudo sed -i "s/$SeedContainerName/$ContainerPrefix$CloneIndex/g"		/var/lib/lxc/$ContainerPrefix$CloneIndex/rootfs/etc/sysconfig/network-scripts/ifcfg-eth0
-	sudo sed -i "s/HostName/$ContainerPrefix$CloneIndex/g"                  	/var/lib/lxc/$ContainerPrefix$CloneIndex/rootfs/etc/sysconfig/network-scripts/ifcfg-eth0
-	sudo sed -i "s/$SeedContainerName/$ContainerPrefix$CloneIndex/g"		/var/lib/lxc/$ContainerPrefix$CloneIndex/rootfs/etc/sysconfig/network
-	sudo sed -i "s/$SeedContainerName/$ContainerPrefix$CloneIndex/g"		/var/lib/lxc/$ContainerPrefix$CloneIndex/rootfs/etc/hosts
-
-	sudo sed -i "s/$SeedContainerName/$ContainerPrefix$CloneIndex/g" 				/var/lib/lxc/$ContainerPrefix$CloneIndex/config
-	sudo sed -i "s/\.10/\.$CloneIndex/g" 								/var/lib/lxc/$ContainerPrefix$CloneIndex/config
- 	sudo sed -i 's/sx1/sw1/g' 									/var/lib/lxc/$ContainerPrefix$CloneIndex/config
-#	sudo sed -i 's/sx1a/sw1a/g' 									/var/lib/lxc/$ContainerPrefix$CloneIndex/config
-	sudo sed -i "s/mtu = 1500/mtu = $MultiHostVar7/g" 						/var/lib/lxc/$ContainerPrefix$CloneIndex/config
-#	sudo sed -i "s/lxc\.mount\.entry = \/dev\/lxc_luns/#lxc\.mount\.entry = \/dev\/lxc_luns/g" 	/var/lib/lxc/$ContainerPrefix$CloneIndex/config
-#	sudo sed -i "/domain-name-servers/s/10.207.29.2/10.207.39.2/g" 					/var/lib/lxc/$ContainerPrefix$CloneIndex/rootfs/etc/dhcp/dhclient.conf
-	sudo rm  -f											/var/lib/lxc/$ContainerPrefix$CloneIndex/rootfs/etc/machine-id
-	sudo systemd-machine-id-setup								 --root=/var/lib/lxc/$ContainerPrefix$CloneIndex/rootfs
-
-        echo ''
-        echo "=============================================="
-        echo "OpenvSwitch Networking for $Product ...       "
-        echo "=============================================="
-        echo ''
-
-        sudo /opt/olxc"$DistDir"/products/$Product/$Product.cnf $ContainerPrefix $CloneIndex $Product $MultiHostVar1
-
-        echo ''
-        echo "=============================================="
-        echo "Done: OpenvSwitch Networking for $Product.    "
-        echo "=============================================="
-        echo ''
-
-        sleep 5
-
-	function GetHostName (){ echo $ContainerPrefix$CloneIndex\1; }
-	HostName=$(GetHostName)
-
-	sudo sed -i "s/$HostName/$ContainerPrefix$CloneIndex/" /var/lib/lxc/$ContainerPrefix$CloneIndex/rootfs/etc/sysconfig/network
-
-	echo ''
-	echo "=============================================="
-	echo "Create $CP$CloneIndex Onboot Service...       "
-	echo "=============================================="
-
-	sudo sh -c "echo '#!/bin/bash'										>  /etc/network/openvswitch/strt_$ContainerPrefix$CloneIndex.sh"
-	sudo sh -c "echo '#'											>> /etc/network/openvswitch/strt_$ContainerPrefix$CloneIndex.sh"
-	sudo sh -c "echo '# Manage the Oracle LXC containers'							>> /etc/network/openvswitch/strt_$ContainerPrefix$CloneIndex.sh"
-	sudo sh -c "echo '#'											>> /etc/network/openvswitch/strt_$ContainerPrefix$CloneIndex.sh"
-	sudo sh -c "echo 'start() {'										>> /etc/network/openvswitch/strt_$ContainerPrefix$CloneIndex.sh"
-	sudo sh -c "echo '  exec lxc-start -n $ContainerPrefix$CloneIndex > /dev/null 2>&1'			>> /etc/network/openvswitch/strt_$ContainerPrefix$CloneIndex.sh"
-	sudo sh -c "echo '}'											>> /etc/network/openvswitch/strt_$ContainerPrefix$CloneIndex.sh"
-	sudo sh -c "echo ''											>> /etc/network/openvswitch/strt_$ContainerPrefix$CloneIndex.sh"
-	sudo sh -c "echo 'stop() {'										>> /etc/network/openvswitch/strt_$ContainerPrefix$CloneIndex.sh"
-	sudo sh -c "echo '  exec lxc-stop -n $ContainerPrefix$CloneIndex > /dev/null 2>&1'			>> /etc/network/openvswitch/strt_$ContainerPrefix$CloneIndex.sh"
-	sudo sh -c "echo '}'											>> /etc/network/openvswitch/strt_$ContainerPrefix$CloneIndex.sh"
-	sudo sh -c "echo ''											>> /etc/network/openvswitch/strt_$ContainerPrefix$CloneIndex.sh"
-	sudo sh -c "echo 'case \$1 in'										>> /etc/network/openvswitch/strt_$ContainerPrefix$CloneIndex.sh"
-	sudo sh -c "echo '  start|stop) \"\$1\" ;;'								>> /etc/network/openvswitch/strt_$ContainerPrefix$CloneIndex.sh"
-	sudo sh -c "echo 'esac'											>> /etc/network/openvswitch/strt_$ContainerPrefix$CloneIndex.sh"
-
-	sudo chmod +x /etc/network/openvswitch/strt_$ContainerPrefix$CloneIndex.sh
-	
-	sudo sh -c "echo '[Unit]'                                                        			>  /etc/systemd/system/$ContainerPrefix$CloneIndex.service"
-	sudo sh -c "echo 'Description=$ContainerPrefix$CloneIndex Service'                               	>> /etc/systemd/system/$ContainerPrefix$CloneIndex.service"
-	sudo sh -c "echo 'Wants=network-online.target sw1.service $NameServer.service'          		>> /etc/systemd/system/$ContainerPrefix$CloneIndex.service"
-	sudo sh -c "echo 'After=network-online.target sw1.service $NameServer.service'          		>> /etc/systemd/system/$ContainerPrefix$CloneIndex.service"
-	sudo sh -c "echo ''                                                             			>> /etc/systemd/system/$ContainerPrefix$CloneIndex.service"
-	sudo sh -c "echo '[Service]'                                                    			>> /etc/systemd/system/$ContainerPrefix$CloneIndex.service"
-	
-	if [ $AWS -eq 1 ]
-	then
-		sudo sh -c "echo 'Type=idle'									>> /etc/systemd/system/$ContainerPrefix$CloneIndex.service"
-	else
-		sudo sh -c "echo 'Type=idle'									>> /etc/systemd/system/$ContainerPrefix$CloneIndex.service"
-	fi
-
-	sudo sh -c "echo 'User=root'                                                    			>> /etc/systemd/system/$ContainerPrefix$CloneIndex.service"
-	sudo sh -c "echo 'RemainAfterExit=yes'                                          			>> /etc/systemd/system/$ContainerPrefix$CloneIndex.service"
-	sudo sh -c "echo 'ExecStart=/etc/network/openvswitch/strt_$ContainerPrefix$CloneIndex.sh start' 	>> /etc/systemd/system/$ContainerPrefix$CloneIndex.service"
-	sudo sh -c "echo 'ExecStop=/etc/network/openvswitch/strt_$ContainerPrefix$CloneIndex.sh stop'   	>> /etc/systemd/system/$ContainerPrefix$CloneIndex.service"
-	sudo sh -c "echo ''                                                             			>> /etc/systemd/system/$ContainerPrefix$CloneIndex.service"
-	sudo sh -c "echo '[Install]'                                                    			>> /etc/systemd/system/$ContainerPrefix$CloneIndex.service"
-	sudo sh -c "echo 'WantedBy=multi-user.target'                                   			>> /etc/systemd/system/$ContainerPrefix$CloneIndex.service"
-
-	sudo chmod 644 /etc/systemd/system/$ContainerPrefix$CloneIndex.service
-	
-	echo ''
-	sudo cat /etc/systemd/system/$ContainerPrefix$CloneIndex.service
-	echo ''
-	sudo systemctl enable $ContainerPrefix$CloneIndex
-	
-	echo ''
-	echo "=============================================="
-	echo "Created $CP$CloneIndex Onboot Service.        "
-	echo "=============================================="
-	echo ''
-
-	if [ $(SoftwareVersion $LXCVersion) -ge $(SoftwareVersion "2.1.0") ]
-	then
-		sudo lxc-update-config -c /var/lib/lxc/$CP$CloneIndex/config
-	fi
-
-CopyCompleted=$((CopyCompleted+1))
-CloneIndex=$((CloneIndex+1))
-
-sleep 5
-
-clear
-
+	clear
 done
 
 echo ''
@@ -516,145 +778,346 @@ sleep 5
 
 clear
 
-echo ''
-echo "=============================================="
-echo "Creating OpenvSwitch files ...                "
-echo "=============================================="
-
-sleep 5
-
-# sudo /etc/network/openvswitch/create-ovs-sw-files-v2.sh $ContainerPrefix $NumCon $NewHighestContainerIndex $HighestContainerIndex
-  sudo /etc/network/openvswitch/create-ovs-sw-files-v2.sh $ContainerPrefix $NumCon $CloneIndex
-
-echo ''
-echo "=============================================="
-echo "Creating OpenvSwitch files complete.          "
-echo "=============================================="
-
-sleep 5
-
-clear
-
-if [ $(SoftwareVersion $LXCVersion) -ge $(SoftwareVersion "2.1.0") ]
+if [ $LXD = 'N' ]
 then
 	echo ''
 	echo "=============================================="
-	echo "Update config for LXC 2.1.0+                  "
+	echo "Creating OpenvSwitch files ...                "
 	echo "=============================================="
-	echo ''
 
-	sudo lxc-update-config -c /var/lib/lxc/$SeedContainerName/config
+	sleep 5
+
+	# sudo /etc/network/openvswitch/create-ovs-sw-files-v2.sh $ContainerPrefixLXC $NumCon $NewHighestContainerIndex $HighestContainerIndex
+	  sudo /etc/network/openvswitch/create-ovs-sw-files-v2.sh $ContainerPrefixLXC $NumCon $CloneIndex
+
+	echo ''
+	echo "=============================================="
+	echo "Creating OpenvSwitch files complete.          "
+	echo "=============================================="
 
 	sleep 5
 
 	clear
+
+	if [ $(SoftwareVersion $LXCVersion) -ge $(SoftwareVersion "2.1.0") ]
+	then
+		echo ''
+		echo "=============================================="
+		echo "Update config for LXC 2.1.0+                  "
+		echo "=============================================="
+		echo ''
+
+		sudo lxc-update-config -c /var/lib/lxc/$SeedContainerName/config
+
+		sleep 5
+
+		clear
 	
-	echo ''
-	echo "=============================================="
-	echo "Done: Update config for LXC 2.1.0+            "
-	echo "=============================================="
-	echo ''
-fi
+		echo ''
+		echo "=============================================="
+		echo "Done: Update config for LXC 2.1.0+            "
+		echo "=============================================="
+		echo ''
+	fi
 
 sleep 5
 
 clear
 
-if [ $LXDCluster = 'Y' ]
+fi
+
+### new ###
+
+: '
+if [ $LXD = 'Y' ]
+then
+
+        echo ''
+        echo "=============================================="
+        echo "Install LXD ...                               "
+        echo "=============================================="
+        echo ''
+
+        sleep 5
+
+        sudo chmod 775  /opt/olxc/"$DistDir"/orabuntu/archives/lxd_install_orabuntu.sh
+                        /opt/olxc/"$DistDir"/orabuntu/archives/lxd_install_orabuntu.sh $PreSeed $LXDCluster $MultiHostVar2 $MultiHostVar10
+
+        echo ''
+        echo "=============================================="
+        echo "Done: Install LXD.                            "
+        echo "=============================================="
+        echo ''
+
+        sleep 5
+
+        clear
+
+        echo ''
+        echo "=============================================="
+        echo "Convert $SeedContainerName LXC-to-LXD ...     "
+        echo "=============================================="
+        echo ''
+
+        sleep 5
+
+        function GetShortHostName {
+                hostname -s
+        }
+        ShortHostName=$(GetShortHostName)
+
+        function AlreadyConverted {
+                lxc list $SeedContainerName | grep -c $SeedContainerName
+        }
+        Converted=$(AlreadyConverted)
+
+        if [ $Converted -eq 0 ]
+        then
+                function GetOldMacAddress {
+                        sudo cat /var/lib/lxc/$SeedContainerName/config | grep hwaddr | cut -f3 -d' '
+                }
+                OldMacAddress=$(GetOldMacAddress)
+
+		function GetNewMacAddress {
+			echo -n 00:16:3e; dd bs=1 count=3 if=/dev/random 2>/dev/null | hexdump -v -e '/1 ":%02x"'
+		}
+		NewMacAddress=$(GetNewMacAddress)
+
+	#	sudo sed -i 's/sx1a/lxdbr0/g'                           /var/lib/lxc/$SeedContainerName/config
+	#	sudo sed -i "s/\(hwaddr = \).*/\1$NewMacAddress/"       /var/lib/lxc/$SeedContainerName/config
+
+		sudo lxd.lxc-to-lxd --lxcpath /var/lib/lxc --containers $SeedContainerName --storage $ShortHostName-$StoragePoolName --debug
+	#	sudo lxd.lxc-to-lxd --lxcpath /var/lib/lxc --containers $SeedContainerName --debug
+
+	#	sudo sed -i 's/lxdbr0/sx1a/g'                           /var/lib/lxc/$SeedContainerName/config
+	#	sudo sed -i "s/\(hwaddr = \).*/\1$OldMacAddress/"       /var/lib/lxc/$SeedContainerName/config
+        fi
+
+        echo ''
+        echo "=============================================="
+        echo "Done: Convert $SeedContainerName LXC-to-LXD   "
+        echo "=============================================="
+        echo ''
+
+        function GetLXDName {
+                    echo $SeedContainerName | sed 's/c/d/' 
+        }
+        LXDName=$(GetLXDName)
+
+        lxc move $SeedContainerName $LXDName
+        
+	lxc file delete $LXDName/etc/machine-id 		> /dev/null 2>&1
+ 	lxc file delete $LXDName/var/lib/dbus/machine-id 	> /dev/null 2>&1
+
+        if [ $MultiHostVar2 = 'N' ]
+        then
+                sudo lxc-stop -n $NameServer
+        fi
+
+        lxc start $LXDName
+	
+	sleep 20
+
+        if   [ $MajorRelease -ge 7 ]
+        then
+                lxc exec  $LXDName -- hostnamectl set-hostname $LXDName
+                lxc exec  $LXDName -- sed -i "s/$SeedContainerName/$LXDName/g" /etc/hosts
+                lxc exec  $LXDName -- sed -i "s/$SeedContainerName/$LXDName/g" /etc/sysconfig/network
+                lxc exec  $LXDName -- sed -i "s/$SeedContainerName/$LXDName/g" /etc/sysconfig/network-scripts/ifcfg-eth0
+
+                echo ''
+                echo "=============================================="
+                echo "Generate new LXD machine-id for container ... "
+                echo "=============================================="
+
+                echo ''
+
+                echo 'These values should differ ...'
+
+                echo ''
+
+                lxc exec  $LXDName -- systemd-machine-id-setup
+
+                echo "**********************************************"
+                lxc exec  $LXDName -- cat /etc/machine-id
+                sudo cat /var/lib/lxc/$SeedContainerName/rootfs/etc/machine-id
+                echo "**********************************************"
+
+                echo ''
+                echo "=============================================="
+                echo "Done: Generate LXD machine-id for container.  "
+                echo "=============================================="
+
+                sleep 5
+
+                clear
+
+
+        elif [ $MajorRelease -eq 6 ]
+        then
+                lxc exec $LXDName -- sed -i "s/$SeedContainerName/$LXDName/g" /etc/hosts
+                lxc exec $LXDName -- sed -i "s/$SeedContainerName/$LXDName/g" /etc/sysconfig/network
+                lxc exec $LXDName -- sed -i "s/$SeedContainerName/$LXDName/g" /etc/sysconfig/network-scripts/ifcfg-eth0
+        fi
+
+        lxc stop $LXDName
+
+        sleep 5
+
+        lxc start $LXDName
+
+	clear
+
+        echo ''
+        echo "=============================================="
+        echo "Display LXD uname -a ...                      "
+        echo "=============================================="
+        echo ''
+
+        lxc exec $LXDName -- uname -a
+
+        echo ''
+        echo "=============================================="
+        echo "Done: Display LXD uname -a                    "
+        echo "=============================================="
+        echo ''
+fi
+
+sleep 5
+
+clear
+'
+
+if   [ $LXD = 'N' ]
 then
 	echo ''
 	echo "=============================================="
-	echo "Install LXD ...                               "
+	echo "Start Seed Container $SeedContainerName...    "
 	echo "=============================================="
 	echo ''
 
+	sudo lxc-start -n $SeedContainerName > /dev/null 2>&1
 	sleep 5
-
-	sudo chmod 775  /opt/olxc/"$DistDir"/orabuntu/archives/lxd_install_orabuntu.sh
-			/opt/olxc/"$DistDir"/orabuntu/archives/lxd_install_orabuntu.sh $PreSeed $LXDCluster $MultiHostVar2 $MultiHostVar10
+	sudo lxc-ls -f
 
 	echo ''
 	echo "=============================================="
-	echo "Done: Install LXD.                            "
+	echo "Start Seed Container $SeedContainerName...    "
 	echo "=============================================="
-	echo ''
-
-	sleep 5
-
-	clear
 fi
-
-echo ''
-echo "=============================================="
-echo "Start Seed Container $SeedContainerName...    "
-echo "=============================================="
-echo ''
-
-sudo lxc-start -n $SeedContainerName > /dev/null 2>&1
-sleep 5
-sudo lxc-ls -f
-
-echo ''
-echo "=============================================="
-echo "Start Seed Container $SeedContainerName...    "
-echo "=============================================="
 
 sleep 5
 
 clear
 
-echo ''
-echo "=============================================="
-echo "Start Clone Containers...                     "
-echo "=============================================="
-echo ''
+if   [ $LXD = 'N' ]
+then
+	echo ''
+	echo "=============================================="
+	echo "Configure LXC Containers...                   "
+	echo "=============================================="
+	echo ''
 
-function GetClonedContainers {
-        sudo ls /var/lib/lxc | grep "ora$OracleRelease" | sort -V | sed 's/$/ /' | tr -d '\n' | sed 's/^[ \t]*//;s/[ \t]*$//'
-}
-ClonedContainers=$(GetClonedContainers)
+elif [ $LXD = 'Y' ]
+then
+	echo ''
+	echo "=============================================="
+	echo "Configure LXD Containers...                   "
+	echo "=============================================="
+	echo ''
+fi
 
-for j in $ClonedContainers
-do
-        if [ -e /var/lib/lxc/$j/rootfs/var/run/dhclient.pid ]
-        then
-                sudo rm -f /var/lib/lxc/$j/rootfs/var/run/dhclient.pid
-        fi
+sleep 5
 
-        sudo lxc-start  -n $j
-        sleep 10
+clear
 
-        if [ $MajorRelease -ge 7 ] && [ $UbuntuMajorVersion -ge 16 ]
-        then
-		echo ''
-		echo "=============================================="
-		echo "Set Host and Machine-ID in Clone ...          "
-		echo "=============================================="
-		echo ''
+if [ $LXD = 'N' ]
+then
+	function GetClonedContainers {
+        	sudo ls /var/lib/lxc | grep "ora$OracleRelease" | sort -V | sed 's/$/ /' | tr -d '\n' | sed 's/^[ \t]*//;s/[ \t]*$//'
+	}
+	ClonedContainers=$(GetClonedContainers)
 
-                sudo lxc-attach -n $j -- hostnamectl set-hostname $j
-                sudo lxc-attach -n $j -- rm -f /etc/machine-id
-                sudo lxc-attach -n $j -- systemd-machine-id-setup
-                sudo lxc-stop   -n $j
-                sudo lxc-start  -n $j
+	sleep 5
+
+	for j in $ClonedContainers
+	do
+        	if [ -e /var/lib/lxc/$j/rootfs/var/run/dhclient.pid ]
+        	then
+                	sudo rm -f /var/lib/lxc/$j/rootfs/var/run/dhclient.pid
+        	fi
+
+		sudo lxc-start  -n $j > /dev/null 2>&1
 		
+		sleep 5
+
+		clear
+
 		echo ''
 		echo "=============================================="
-		echo "Set Host and Machine-ID in Clone ...          "
+		echo "Set Host and Machine-ID in Clone $j ...       "
 		echo "=============================================="
 		echo ''
 
-                sleep 10
-        fi
+		sudo lxc-attach -n $j -- rm -f /etc/machine-id
+		sudo lxc-attach -n $j -- systemd-machine-id-setup
+		sudo lxc-stop   -n $j
+		sleep 5
+		sudo lxc-start  -n $j
 
-        sudo lxc-ls -f
-        echo ''
-	sleep 10
-done
+		echo ''
+		echo "=============================================="
+		echo "Done: Set Host and Machine-ID in Clone $j.    "
+		echo "=============================================="
 
-echo "=============================================="
-echo "Done: Start Clone Containers...               "
-echo "=============================================="
+		sleep 15
+
+		if [ $MajorRelease -ge 7 ] && [ $UbuntuMajorVersion -ge 16 ]
+		then
+			echo ''
+			echo "=============================================="
+			echo "Run hostnamectl in clone $j ...               "
+			echo "=============================================="
+			echo ''
+
+			sudo lxc-attach -n $j -- hostnamectl set-hostname $j
+			sudo lxc-attach -n $j -- hostnamectl
+			sudo lxc-stop   -n $j
+
+			echo ''
+			echo "=============================================="
+			echo "Done: Run hostnamectl in clone $j.            "
+			echo "=============================================="
+			echo ''
+
+			sleep 5
+
+			clear
+		fi
+	
+	#	sudo lxc-info -n $j
+       		echo ''
+	done
+
+	echo ''
+	echo "=============================================="
+	echo "Done: Configure LXC Containers.               "
+	echo "=============================================="
+	echo ''
+
+elif  [ $LXD = 'Y' ]
+then
+	echo ''
+	echo "=============================================="
+	echo "Done: Configure LXD Containers.               "
+	echo "=============================================="
+	echo ''
+fi
+
+if [ $MultiHostVar2 = 'N' ]
+then
+	sudo lxc-start -n $NameServer
+fi
 
 sleep 5
 

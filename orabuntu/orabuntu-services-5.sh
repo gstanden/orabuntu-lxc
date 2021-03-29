@@ -1,4 +1,4 @@
-#!/bin/bash
+!/bin/bash
 
 #    Copyright 2015-2019 Gilbert Standen
 #    This file is part of Orabuntu-LXC.
@@ -142,6 +142,7 @@ function GetMultiHostVar12 {
 }
 MultiHostVar12=$(GetMultiHostVar12)
 LXDValue=$MultiHostVar12
+LXD=$MultiHostVar12
 
 function GetMultiHostVar13 {
         echo $MultiHost | cut -f13 -d':'
@@ -221,14 +222,6 @@ echo "=============================================="
 echo "Script: orabuntu-services-5.sh                "
 echo "=============================================="
 echo ''
-echo "=============================================="
-echo "This script is re-runnable.                   "
-echo "=============================================="
-echo ''
-echo "=============================================="
-echo "This script starts LXC clones                 "
-echo "This script installs Docker                   "
-echo "=============================================="
 
 sleep 5
 
@@ -261,157 +254,255 @@ then
 	clear
 fi
 
-# if [ $MultiHostVar1 = 'new' ] || [ $MultiHostVar1 = 'reinstall' ]
-# then
-# 	echo ''
-# 	echo "=============================================="
-# 	echo "Create additional OpenvSwitch networks...     "
-# 	echo "=============================================="
-# 	echo ''
-
-# 	sleep 5
-
-# 	clear
-
-# 	SwitchList='sw2 sw3 sw4 sw5 sw6 sw7 sw8 sw9'
-# 	for k in $SwitchList
-# 	do
-# 		echo ''
-# 		echo "=============================================="
-# 		echo "Create systemd OpenvSwitch $k service...      "
-# 		echo "=============================================="
-#
-#		if [ ! -f /etc/systemd/system/$k.service ]
-#		then
-#			sudo sh -c "echo '[Unit]'						 > /etc/systemd/system/$k.service"
-#			sudo sh -c "echo 'Description=$k Service'				>> /etc/systemd/system/$k.service"
-#			sudo sh -c "echo 'After=network-online.target'				>> /etc/systemd/system/$k.service"
-#			sudo sh -c "echo ''							>> /etc/systemd/system/$k.service"
-#			sudo sh -c "echo '[Service]'						>> /etc/systemd/system/$k.service"
-#
-#			if [ $AWS -eq 1 ]
-#			then
-#				sudo sh -c "echo 'Type=idle'					>> /etc/systemd/system/$k.service"
-#			else
-#				sudo sh -c "echo 'Type=oneshot'					>> /etc/systemd/system/$k.service"
-#			fi
-#
-#			sudo sh -c "echo 'User=root'						>> /etc/systemd/system/$k.service"
-#			sudo sh -c "echo 'RemainAfterExit=yes'					>> /etc/systemd/system/$k.service"
-#			sudo sh -c "echo 'ExecStart=/etc/network/openvswitch/crt_ovs_$k.sh' 	>> /etc/systemd/system/$k.service"
-#			sudo sh -c "echo ''							>> /etc/systemd/system/$k.service"
-#			sudo sh -c "echo '[Install]'						>> /etc/systemd/system/$k.service"
-#			sudo sh -c "echo 'WantedBy=multi-user.target'				>> /etc/systemd/system/$k.service"
-#		fi
-#	
-#		echo ''
-#		echo "=============================================="
-#		echo "Start OpenvSwitch $k ...                      "
-#		echo "=============================================="
-#		echo ''
-#
-#		sudo chmod 644 /etc/systemd/system/$k.service
-#		sudo systemctl enable $k.service
-#		sudo service $k stop
-#		sudo service $k start
-#		sudo service $k status
-#
-#		echo ''
-#		echo "=============================================="
-#		echo "OpenvSwitch $k is up.                         "
-#		echo "=============================================="
-#	
-#		sleep 3
-#
-#		clear
-#	done
-#
-#	echo ''
-#	echo "=============================================="
-#	echo "Openvswitch networks installed & configured.  "
-#	echo "=============================================="
-#	echo ''
-#fi
-
 sleep 5
 
 clear
 
-echo ''
-echo "=============================================="
-echo "Starting LXC cloned containers for Oracle...  "
-echo "=============================================="
-echo ''
+if [ $LXD = 'N' ]
+then
+	echo ''
+	echo "=============================================="
+	echo "Starting LXC containers for Oracle...     "
+	echo "=============================================="
+	echo ''
 
-function GetSeedPostfix {
-        sudo lxc-ls -f | grep ora"$OracleRelease"c | cut -f1 -d' ' | cut -f2 -d'c' | sed 's/^/c/'
-}
-SeedPostfix=$(GetSeedPostfix)
+	sleep 5
 
-function CheckClonedContainersExist {
-	sudo ls /var/lib/lxc | grep "ora$OracleRelease" | sort -V | sed 's/$/ /' | tr -d '\n' | sed 's/^[ \t]*//;s/[ \t]*$//'
-}
-ClonedContainersExist=$(CheckClonedContainersExist)
+	clear
 
-# sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service lxc-net restart > /dev/null 2>&1"
-# sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service systemd-resolved restart > /dev/null 2>&1"
-# sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service dnsmasq restart > /dev/null 2>&1"
+	function GetSeedPostfix {
+        	sudo lxc-ls -f | grep ora"$OracleRelease"c | cut -f1 -d' ' | cut -f2 -d'c' | sed 's/^/c/'
+	}
+	SeedPostfix=$(GetSeedPostfix)
 
-sudo service systemd-resolved restart > /dev/null 2>&1
+	function CheckClonedContainersExist {
+		sudo ls /var/lib/lxc | grep "ora$OracleRelease" | sort -V | sed 's/$/ /' | tr -d '\n' | sed 's/^[ \t]*//;s/[ \t]*$//'
+	}
+	ClonedContainersExist=$(CheckClonedContainersExist)
 
-for j in $ClonedContainersExist
-do
-	# GLS 20160707 updated to use lxc-copy instead of lxc-clone for Ubuntu 16.04
-	# GLS 20160707 continues to use lxc-clone for Ubuntu 15.04 and 15.10
+	# sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service lxc-net restart > /dev/null 2>&1"
+	# sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service systemd-resolved restart > /dev/null 2>&1"
+	# sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service dnsmasq restart > /dev/null 2>&1"
 
-#	sudo /etc/network/openvswitch/veth_cleanups.sh $j > /dev/null 2>&1
+	sudo service systemd-resolved restart > /dev/null 2>&1
 
-	echo "Starting container $j ..."
+	for j in $ClonedContainersExist
+	do
+		# GLS 20160707 updated to use lxc-copy instead of lxc-clone for Ubuntu 16.04
+		# GLS 20160707 continues to use lxc-clone for Ubuntu 15.04 and 15.10
 
-	if [ $UbuntuMajorVersion -ge 16 ]
-	then
+#		sudo /etc/network/openvswitch/veth_cleanups.sh $j > /dev/null 2>&1
+
+#		Start commented-out section 
+: '		if [ $UbuntuMajorVersion -ge 20 ]
+		then
+			if [ $LXD = 'Y' ]
+			then
+				clear
+
+				echo ''
+				echo "=============================================="
+				echo "Convert $j LXC-to-LXD ...                     "
+				echo "=============================================="
+				echo ''
+
+				echo "Stopping LXC container $j ..." > /dev/null 2>&1
+
+				sudo lxc-stop -n $j > /dev/null 2>&1
+
+				sleep 5
+
+        			function GetShortHostName {
+                			hostname -s
+        			}
+        			ShortHostName=$(GetShortHostName)
+
+                        	function AlreadyConverted {
+                                	lxc list $j | grep -c $j
+                        	}
+                        	Converted=$(AlreadyConverted)
+
+                        	if [ $Converted -eq 0 ]
+                        	then
+					function GetOldMacAddress {
+				        	sudo cat /var/lib/lxc/$j/config | grep hwaddr | cut -f3 -d' '
+					}
+					OldMacAddress=$(GetOldMacAddress)
+
+					function GetNewMacAddress {
+				        	echo -n 00:16:3e; dd bs=1 count=3 if=/dev/random 2>/dev/null | hexdump -v -e '/1 ":%02x"'
+					}
+					NewMacAddress=$(GetNewMacAddress)
+
+				#	sudo sed -i 's/sw1a/lxdbr0/g' 				/var/lib/lxc/$j/config
+				#	sudo sed -i "s/\(hwaddr = \).*/\1$NewMacAddress/"       /var/lib/lxc/$j/config
+
+					sudo lxd.lxc-to-lxd --lxcpath /var/lib/lxc --containers $j --storage $ShortHostName-$StoragePoolName --debug
+				#	sudo lxd.lxc-to-lxd --lxcpath /var/lib/lxc --containers $j --debug
+
+				#	sudo sed -i 's/lxdbr0/sw1a/g' /var/lib/lxc/$j/config
+				#	sudo sed -i "s/\(hwaddr = \).*/\1$OldMacAddress/"       /var/lib/lxc/$j/config
+                        	fi
+
+				echo ''
+				echo "=============================================="
+				echo "Done: Convert $j LXC-to-LXD                   "
+				echo "=============================================="
+
+				sleep 5
+
+                        	function GetLXDName {
+                                	echo $j | sed 's/c/d/'
+                        	}
+                        	LXDName=$(GetLXDName)
+
+                        	lxc move $j $LXDName
+
+				sleep 5
+                        
+				lxc file delete $LXDName/etc/machine-id 		> /dev/null 2>&1
+                        	lxc file delete $LXDName/var/lib/dbus/machine-id 	> /dev/null 2>&1
+
+                        	lxc start $LXDName
+			
+				sleep 15
+
+                        	echo ''
+                        	echo "=============================================="
+                        	echo "Generate new LXD machine-id for container ... "
+                        	echo "=============================================="
+                        	echo ''
+
+                        	echo 'These values should differ ...'
+                        	echo ''
+                        	echo "=============================================="
+
+                        	lxc exec $LXDName -- systemd-machine-id-setup
+
+                        	sleep 5
+
+                        	lxc exec $LXDName -- cat /etc/machine-id
+                        	sudo cat /var/lib/lxc/$j/rootfs/etc/machine-id
+                        
+				echo "=============================================="
+
+                        	echo ''
+                        	echo "=============================================="
+                        	echo "Done: Generate LXD machine-id for container.  "
+                        	echo "=============================================="
+
+                        	lxc stop  $LXDName
+				sleep 2
+                        	lxc start $LXDName
+
+                        	sleep 30
+
+				if   [ $MajorRelease -ge 7 ]
+                        	then
+                                	lxc exec  $LXDName -- hostnamectl set-hostname $LXDName
+					lxc exec  $LXDName -- uname -a
+					lxc stop  $LXDName
+					sleep 2
+					lxc start $LXDName
+
+					sleep 15
+                                
+					lxc exec $LXDName -- sed -i "s/$j/$LXDName/g" /etc/hosts
+			 		lxc exec $LXDName -- sed -i "s/$j/$LXDName/g" /etc/sysconfig/network
+                                	lxc exec $LXDName -- sed -i "s/$j/$LXDName/g" /etc/sysconfig/network-scripts/ifcfg-eth0
+
+                        	elif [ $MajorRelease -eq 6 ]
+                        	then
+                                	lxc exec $LXDName
+                                	lxc exec $LXDName -- sed -i "s/$j/$LXDName/g" /etc/hosts
+			 		lxc exec $LXDName -- sed -i "s/$j/$LXDName/g" /etc/sysconfig/network
+                                	lxc exec $LXDName -- sed -i "s/$j/$LXDName/g" /etc/sysconfig/network-scripts/ifcfg-eth0
+                        	fi
+
+	  		sudo lxc-destroy -n $j
+	  		sudo systemctl disable $j
+
+                	fi
+        	fi
+'		# End commented-out section
+
+#		echo "Starting container $j ..."
+
+		sudo lxc-start -n $j > /dev/null 2>&1
+
 		function CheckPublicIPIterative {
 			sudo lxc-info -n $j -iH | cut -f1-3 -d'.' | sed 's/\.//g' | head -1
 		}
-	fi
-	PublicIPIterative=$(CheckPublicIPIterative)
-	echo $j | grep oel > /dev/null 2>&1
-	if [ $? -eq 0 ]
-	then
-		sudo bash -c "cat $Config|grep ipv4|cut -f2 -d'='|sed 's/^[ \t]*//;s/[ \t]*$//'|cut -f4 -d'.'|sed 's/^/\./'|xargs -I '{}' sed -i "/ipv4/s/\{}/\.1$OR/g" $Config"
-	fi
-	sudo lxc-start -n $j > /dev/null 2>&1
-	sleep 5
-	i=1
-	while [ "$PublicIPIterative" != 1020739 ] && [ "$i" -le 10 ]
-	do
-		echo "Waiting for $j Public IP to come up..."
-		sleep 10
 		PublicIPIterative=$(CheckPublicIPIterative)
-		if [ $i -eq 5 ]
-		then
-			sudo lxc-stop -n $j
-			sleep 2
-			echo ''
-			echo 'Attempting OpenvSwitch veth pair cleanup procedures...'
-			echo 'Messages Cannot file device are normal in this procedure.'
-			echo 'Orabuntu-LXC will re-attempt container startup after cleanup procedure.'
-			echo ''
-			sudo /etc/network/openvswitch/veth_cleanups.sh $j
-			echo ''
-			sudo service systemd-resolved restart > /dev/null 2>&1
-			sleep 2
-			sudo lxc-start -n $j
-			sleep 5
-			if [ $MajorRelease -eq 6 ] || [ $MajorRelease -eq 5 ]
+
+#		if   [ $LXD = 'N' ]
+#       	then
+#               	echo $j | grep oel > /dev/null 2>&1
+#
+#       	elif [ $LXD = 'Y' ]
+#       	then
+#               	echo $LXDName | grep oel > /dev/null 2>&1
+#       	fi
+#       	if [ $? -eq 0 ]
+#       	then
+#               	sudo bash -c "cat $Config|grep ipv4|cut -f2 -d'='|sed 's/^[ \t]*//;s/[ \t]*$//'|cut -f4 -d'.'|sed 's/^/\./'|xargs -I '{}' sed -i "/ipv4/s/\{}/\.1$OR/g" $Config"
+#       	fi
+
+		echo ''
+		echo "=============================================="
+		echo "LXC Container $j Started                      "
+		echo "=============================================="
+		echo ''
+
+		sudo lxc-ls -f | egrep "NAME|$j"
+
+		echo '' 
+		echo "=============================================="
+		echo ''
+
+		sleep 5
+
+		clear
+
+		i=1
+		while [ "$PublicIPIterative" != 1020739 ] && [ "$i" -le 10 ] && [ $LXD = 'N' ]
+		do
+        	#	echo ''
+        	#	echo "=============================================="
+        	#	echo "Waiting for $j Public IP to come up..."
+        	#	echo "=============================================="
+        	#	echo ''
+
+        	#	sleep 5
+
+		#	clear
+
+			PublicIPIterative=$(CheckPublicIPIterative)
+			if [ $i -eq 5 ]
 			then
-				sudo lxc-attach -n $j -- ntpd -x
+				sudo lxc-stop -n $j
+				sleep 2
+				echo ''
+				echo 'Attempting OpenvSwitch veth pair cleanup procedures...'
+				echo 'Messages Cannot file device are normal in this procedure.'
+				echo 'Orabuntu-LXC will re-attempt container startup after cleanup procedure.'
+				echo ''
+				sudo /etc/network/openvswitch/veth_cleanups.sh $j
+				echo ''
+				sudo service systemd-resolved restart > /dev/null 2>&1
+				sleep 2
+				sudo lxc-start -n $j
+				sleep 5
+				if [ $MajorRelease -eq 6 ] || [ $MajorRelease -eq 5 ]
+				then
+					sudo lxc-attach -n $j -- ntpd -x
+				fi
 			fi
-		fi
-	sleep 1
-	i=$((i+1))
+			sleep 1
+			i=$((i+1))
+		done
 	done
-done
+fi
 
 sleep 5
 
@@ -419,7 +510,7 @@ clear
 
 echo ''
 echo "=============================================="
-echo "LXC clone containers for Oracle started.      "
+echo "Done: Starting LXC containers for Oracle.     "
 echo "=============================================="
 echo ''
 
@@ -473,27 +564,32 @@ then
 	clear
 fi
 
-for j in $ClonedContainersExist
-do
-       	echo ''
-        echo "=============================================="
-	echo "SSH to local container $j...                  "
-       	echo "=============================================="
-       	echo ''
+if [ $LXD = 'N' ]
+then
+	for j in $ClonedContainersExist
+	do
+       		echo ''
+		echo "=============================================="
+		echo "SSH to local container $j...                  "
+       		echo "=============================================="
+       		echo ''
 
-	ssh-keygen -R $j
-       	sshpass -p root ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no root@$j "uname -a; cat /etc/oracle-release"
+		sudo lxc-start  -n $j > /dev/null 2>&1
+		sleep 10
+		ssh-keygen -R $j
+       		sshpass -p root ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no root@$j "uname -a; cat /etc/oracle-release"
 
-       	echo ''
-        echo "=============================================="
-	echo "Done: SSH to local container $j.              "
-       	echo "=============================================="
-       	echo ''
+       		echo ''
+		echo "=============================================="
+		echo "Done: SSH to local container $j.              "
+       		echo "=============================================="
+       		echo ''
 
-	sleep 5
+		sleep 5
 
-	clear
-done
+		clear
+	done
+fi
 
 if [ $MultiHostVar1 = 'new' ] || [ $MultiHostVar1 = 'reinstall' ]
 then
@@ -504,7 +600,7 @@ then
 	echo ''
 	
 	sudo touch /etc/orabuntu-lxc-release
-	sudo sh -c "echo 'Orabuntu-LXC v6.13.24-beta AMIDE' > /etc/orabuntu-lxc-release"
+	sudo sh -c "echo 'Orabuntu-LXC v7.0.0-beta AMIDE' > /etc/orabuntu-lxc-release"
 	sudo ls -l /etc/orabuntu-lxc-release
 	echo ''
 	sudo cat /etc/orabuntu-lxc-release
@@ -831,13 +927,9 @@ then
 		# GLS 20180411
 
                 sudo tar -P -czf ~/Manage-Orabuntu/$NameServer.tar.gz -T /opt/olxc/"$DistDir"/orabuntu/archives/nameserver.lst --checkpoint=10000 --totals
-                sudo lxc-start -n $NameServer > /dev/null 2>&1
 
-		echo ''
-                echo "=============================================="
-                echo "Configure replica nameserver $NameServer...   "
-                echo "=============================================="
-                echo ''
+		sudo lxc-start -n $NameServer > /dev/null 2>&1
+		sleep 15
 
 		function CutOffBase {
 			echo $NameServer | cut -f1 -d'-'
@@ -966,31 +1058,121 @@ then
 	echo "=============================================="
 	echo ''
 	echo "=============================================="
-	echo "LXC  Containers...                            "
+	echo "LXC Containers...                             "
 	echo "=============================================="
 	echo ''
 
 	sudo lxc-ls -f
 
-	echo ''
-	echo "=============================================="
-	echo "Docker Containers...                          "
-	echo "=============================================="
-	echo ''
+	if [ $LXD = 'Y' ]
+	then
+		function GetLXDContainerNames {
+			lxc list --columns n --format csv | grep -v oel | sed 's/$/ /g' | tr -d '\n' |  sed 's/[ \t]*$//'
+		}
+		LXDContainerNames=$(GetLXDContainerNames)
 
-	sudo docker ps -a
+		echo ''
+		echo "=============================================="
+		echo "LXD Containers...                             "
+		echo "=============================================="
+		echo ''
 
-	echo ''
-	echo "=============================================="
-	echo "To ssh to Docker raesene/alpine-nettools:     "
-	echo "                                              "
-	echo "     ssh username@localhost -p 2200           "
-	echo "                                              "
-	echo "The docker container can connect to anything  "
-	echo "on the OpenvSwitch network via any local LXC  "
-	echo "container but normally ssh to Docker not used."
-	echo "=============================================="
-	echo ''
+		lxc list
+
+	#	sudo lxc-attach -n $NameServer -- service bind9 stop
+	#	sudo lxc-attach -n $NameServer -- service bind9 start
+		
+		sleep 5
+
+		clear
+
+		for i in $LXDContainerNames
+		do
+	#		lxc exec  $i -- hostnamectl set-hostname $i
+	#		lxc stop  $i
+	#		lxc start $i 
+	#		sleep 15
+
+			echo ''
+			echo "=============================================="
+			echo "Test SSH to LXD Container $i ...              "
+			echo "=============================================="
+			echo ''
+
+			ssh-keygen -R $i
+			sleep 5
+       			sshpass -p root ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no root@$i "uname -a; cat /etc/oracle-release"
+
+			echo ''
+			echo "=============================================="
+			echo "Done: Test SSH to LXD Container $i.           "
+			echo "=============================================="
+			echo ''
+
+			sleep 5
+
+			clear
+
+			echo ''
+			echo "=============================================="
+			echo "Test nslookup LXD Container $i ...            "
+			echo "=============================================="
+			echo ''
+
+			nslookup $i
+
+			echo "=============================================="
+			echo "Done: Test nslookup LXD Container $i.         "
+			echo "=============================================="
+			echo ''
+
+			sleep 5
+
+			clear
+		done
+
+		sleep 5
+
+		clear
+
+		echo ''
+		echo "=============================================="
+		echo "List LXD Containers ...                       "
+		echo "=============================================="
+		echo ''
+
+		lxc list
+
+		echo ''
+		echo "=============================================="
+		echo "Done: List LXD Containers ...                 "
+		echo "=============================================="
+		echo ''
+	fi
+
+	if [ $Docker = 'Y' ]
+	then
+		echo ''
+		echo "=============================================="
+		echo "Docker Containers...                          "
+		echo "=============================================="
+		echo ''
+
+		sudo docker ps -a
+
+		echo ''
+	#	echo "=============================================="
+	#	echo "To ssh to Docker raesene/alpine-nettools:     "
+	#	echo "                                              "
+	#	echo "     ssh username@localhost -p 2200           "
+	#	echo "                                              "
+	#	echo "The docker container can connect to anything  "
+	#	echo "on the OpenvSwitch network via any local LXC  "
+	#	echo "container but normally ssh to Docker not used."
+	#	echo "=============================================="
+	#	echo ''
+	fi
+
 	echo "=============================================="
 	echo "Done: List Containers.                        "
 	echo "=============================================="

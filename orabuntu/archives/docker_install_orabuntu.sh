@@ -115,7 +115,7 @@ echo "Install User-Settable Docker Containers...    "
 echo "=============================================="
 echo ''
 
-docker create ubuntu:16:04
+# docker create ubuntu:16:04
 # Install alpine-nettools
 # sudo docker run -d -p 2200:22 raesene/alpine-nettools
 

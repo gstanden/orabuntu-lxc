@@ -1168,7 +1168,7 @@ function GetMultiHostVar12 {
 MultiHostVar12=$(GetMultiHostVar12)
 LXDValue=$MultiHostVar12
 
-	echo 'LXDValue                  = '$LXDValue
+	echo 'LXD                       = '$LXDValue
 
 function GetMultiHostVar13 {
         echo $MultiHost | cut -f13 -d':'

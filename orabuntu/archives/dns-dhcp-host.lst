@@ -7,7 +7,6 @@
 /etc/network/openvswitch/veth_cleanups.sh
 /etc/network/if-up.d/openvswitch/nsa-pub-ifup-sx1
 /etc/network/if-up.d/openvswitch/nsa-pub-ifup-sw1
-/etc/network/openvswitch/setup_gre_and_routes.sh
 /etc/network/openvswitch/ns_restore.sh
 /etc/network/openvswitch/crt_ovs_sw2.sh
 /etc/network/openvswitch/crt_ovs_sw3.sh
@@ -24,7 +23,10 @@
 /etc/network/openvswitch/lxd-init-node1.sh
 /etc/network/openvswitch/preseed.sw1a.olxc.002.lxd.cluster
 /etc/network/openvswitch/preseed.sw1a.olxc.001.lxd.cluster
-/etc/network/openvswitch/crt_ovs_sw1.sh
 /etc/network/openvswitch/crt_ovs_sx1.sh
+/etc/network/openvswitch/olxc_sx1a
+/etc/network/openvswitch/olxc_sw1a
+/etc/network/openvswitch/crt_ovs_sw1.sh
+/etc/network/openvswitch/setup_gre_and_routes.sh
 /etc/GNU3
 /etc/COPYING

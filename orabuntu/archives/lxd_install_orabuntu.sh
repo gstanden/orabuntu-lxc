@@ -24,8 +24,6 @@ echo "=============================================="
 
 sleep 5
 
-clear
-
 if   [ $UbuntuMajorVersion -ge 16 ]
 then
 	echo ''

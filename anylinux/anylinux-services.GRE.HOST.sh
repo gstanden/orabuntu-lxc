@@ -258,6 +258,7 @@ then
         LXDCluster=N    # Set to Y for automated LXD Cluster creation (optional).
         PreSeed=N       # Set to Y for automated LXD Cluster creation (optional).
 
+	echo 'LXD        = '$LXD
         echo 'LXDCluster = '$LXDCluster
         echo 'PreSeed    = '$PreSeed
 
@@ -365,7 +366,7 @@ fi
 if [ -z $2 ]
 then
 	SPOKEIP='lan.ip.this.host'
- 	SPOKEIP=192.168.1.136
+ 	SPOKEIP=192.168.1.144
 else
 	SPOKEIP=$2
 fi
@@ -373,7 +374,7 @@ fi
 if [ -z $3 ]
 then
 	HUBIP='lan.ip.hub.host'
- 	HUBIP=192.168.1.121
+ 	HUBIP=192.168.1.143
 else
 	HUBIP=$3
 fi

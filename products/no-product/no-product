@@ -114,6 +114,48 @@ function GetMultiHostVar10 {
 }
 MultiHostVar10=$(GetMultiHostVar10)
 GRE=$MultiHostVar10
+GREValue=$MultiHostVar10
+
+function GetMultiHostVar11 {
+        echo $MultiHost | cut -f11 -d':'
+}
+MultiHostVar11=$(GetMultiHostVar11)
+
+function GetMultiHostVar12 {
+        echo $MultiHost | cut -f12 -d':'
+}
+MultiHostVar12=$(GetMultiHostVar12)
+LXDValue=$MultiHostVar12
+LXD=$MultiHostVar12
+
+function GetMultiHostVar13 {
+        echo $MultiHost | cut -f13 -d':'
+}
+MultiHostVar13=$(GetMultiHostVar13)
+
+function GetMultiHostVar14 {
+        echo $MultiHost | cut -f14 -d':'
+}
+MultiHostVar14=$(GetMultiHostVar14)
+PreSeed=$MultiHostVar14
+
+function GetMultiHostVar15 {
+        echo $MultiHost | cut -f15 -d':'
+}
+MultiHostVar15=$(GetMultiHostVar15)
+LXDCluster=$MultiHostVar15
+
+function GetMultiHostVar16 {
+        echo $MultiHost | cut -f16 -d':'
+}
+MultiHostVar16=$(GetMultiHostVar16)
+StorageDriver=$MultiHostVar16
+
+function GetMultiHostVar17 {
+        echo $MultiHost | cut -f17 -d':'
+}
+MultiHostVar17=$(GetMultiHostVar17)
+StoragePoolName=$MultiHostVar17
 
 function CheckSystemdResolvedInstalled {
         sudo netstat -ulnp | grep 53 | sed 's/  */ /g' | rev | cut -f1 -d'/' | rev | sort -u | grep systemd- | wc -l
@@ -226,10 +268,20 @@ echo $MultiHost | cut -f1 -d':'
 }
 Operation=$(GetOperation)
 
-function GetSeedContainerName {
-        sudo lxc-ls -f | grep oel$OracleRelease | cut -f1 -d' '
-}
-SeedContainerName=$(GetSeedContainerName)
+if   [ $LXD = 'N' ]
+then
+	function GetSeedContainerName {
+        	sudo lxc-ls -f | grep oel$OracleRelease | cut -f1 -d' '
+	}
+	SeedContainerName=$(GetSeedContainerName)
+
+elif [ $LXD = 'Y' ]
+then
+	function GetSeedContainerName {
+        	lxc list | grep oel83 | cut -f2 -d' ' | sed 's/^[ \t]*//;s/[ \t]*$//'
+	}
+	SeedContainerName=$(GetSeedContainerName)
+fi
 
 function GetSeedPostfix {
         sudo lxc-ls -f | grep oel"$OracleRelease"c | cut -f1 -d' ' | cut -f2 -d'c' | sed 's/^/c/'
@@ -253,20 +305,23 @@ sleep 5
 
 clear
 
-echo ''
-echo "=============================================="
-echo "$SeedContainerName Install Custom Files...    "
-echo "=============================================="
-echo ''
+if   [ $LXD = 'N' ]
+then
+	echo ''
+	echo "=============================================="
+	echo "$SeedContainerName Install Custom Files...    "
+	echo "=============================================="
+	echo ''
 
-sudo lxc-attach -n $SeedContainerName -- usermod --password `perl -e "print crypt('root','root');"` root
-sudo tar -xvf /opt/olxc/"$DistDir"/"$SubDirName"/archives/product.tar -C /var/lib/lxc/$SeedContainerName --touch
+#	sudo lxc-attach -n $SeedContainerName -- usermod --password `perl -e "print crypt('root','root');"` root
+	sudo tar -xvf /opt/olxc/"$DistDir"/"$SubDirName"/archives/product.tar -C /var/lib/lxc/$SeedContainerName --touch
 
-echo ''
-echo "=============================================="
-echo "Done: $SeedContainerName Install Custom Files."
-echo "=============================================="
-echo ''
+	echo ''
+	echo "=============================================="
+	echo "Done: $SeedContainerName Install Custom Files."
+	echo "=============================================="
+	echo ''
+fi
 
 sleep 5
 

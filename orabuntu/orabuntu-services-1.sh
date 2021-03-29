@@ -134,6 +134,7 @@ function GetMultiHostVar12 {
 }
 MultiHostVar12=$(GetMultiHostVar12)
 LXDValue=$MultiHostVar12
+LXD=$MultiHostVar12
 
 function GetMultiHostVar13 {
         echo $MultiHost | cut -f13 -d':'
@@ -292,7 +293,6 @@ function CheckSystemdResolvedInstalled {
 SystemdResolvedInstalled=$(CheckSystemdResolvedInstalled)
 
 echo ''
-echo ''
 echo "=============================================="
 echo "Script:  orabuntu-services-1.sh               "
 echo "=============================================="
@@ -317,6 +317,11 @@ echo "=============================================="
 sleep 5 
 
 clear
+
+if [ $LXD = 'Y' ]
+then
+	sudo tar -vP --extract --file=/opt/olxc/"$DistDir"/orabuntu/archives/ubuntu-host.tar -C / etc/orabuntu-lxc-scripts/get-images.sh --touch
+fi
 
 if [ $RSA = 'Y' ]
 then
@@ -1194,7 +1199,6 @@ then
 	echo "Testing lxc-attach for ubuntu user...         "
 	echo "=============================================="
 	echo ''
-
 
 	sudo lxc-attach -n nsa -- uname -a
 	if [ $? -ne 0 ]
@@ -2131,8 +2135,6 @@ then
 	clear
 
         sudo sed -i "s/HOSTNAME/$HOSTNAME/g"    /etc/network/openvswitch/lxd-init-node1.sh
-#       sudo cat                                /etc/network/openvswitch/lxd-init-node1.sh
-#       sleep 20
 
         if   [ $PreSeed = 'Y' ]
         then
@@ -2443,7 +2445,6 @@ echo ''
 echo "=============================================="
 echo "Checking OpenvSwitch sw1...                   "
 echo "=============================================="
-echo ''
 
 sudo service sw1 stop
 sleep 2
@@ -2468,7 +2469,6 @@ echo ''
 echo "=============================================="
 echo "Checking OpenvSwitch sx1...                   "
 echo "=============================================="
-echo ''
 
 sudo service sx1 stop
 sleep 2
@@ -3087,7 +3087,7 @@ then
                 sudo sed -i "/REMOTE_GRE_ENDPOINT/s/#/ /"                       /etc/network/openvswitch/crt_ovs_sw1.sh
                 sudo sed -i "s/REMOTE_GRE_ENDPOINT/$MultiHostVar5/g"            /etc/network/openvswitch/crt_ovs_sw1.sh
 
-                sudo ovs-vsctl add-port sw1 gre$Sw1Index -- set interface gre$Sw1Index type=gre options:remote_ip=$MultiHostVar5
+                sudo ovs-vsctl add-port sw1 geneve$Sw1Index -- set interface geneve$Sw1Index type=geneve options:remote_ip=$MultiHostVar5 options:key=123
 
                 echo ''
                 echo "=============================================="

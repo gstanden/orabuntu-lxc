@@ -20,5 +20,6 @@
 /etc/orabuntu-lxc-scripts/stop_ora_containers.sh
 /etc/orabuntu-lxc-scripts/start_ora_containers.sh
 /etc/systemd/orabuntu-resolv.conf
+/etc/orabuntu-lxc-scripts/get-images.sh
 /etc/GNU3
 /etc/COPYING
