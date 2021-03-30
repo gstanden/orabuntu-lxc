@@ -79,7 +79,6 @@ then
 fi
 
 OR=$OracleRelease
-Config=/var/lib/lxc/$SeedContainerName/config
 
 function GetMultiHostVar1 {
 	echo $MultiHost | cut -f1 -d':'
@@ -192,10 +191,20 @@ function GetLXCVersion {
 }
 LXCVersion=$(GetLXCVersion)
 
-function GetSeedContainerName {
-        sudo lxc-ls -f | grep oel$OracleRelease | cut -f1 -d' '
-}
-SeedContainerName=$(GetSeedContainerName)
+if   [ $LXD = 'N' ]
+then
+	function GetSeedContainerName {
+        	sudo lxc-ls -f | grep oel$OracleRelease | cut -f1 -d' '
+	}
+	SeedContainerName=$(GetSeedContainerName)
+	Config=/var/lib/lxc/$SeedContainerName/config
+elif [ $LXD = 'Y' ]
+then
+	function GetSeedContainerName {
+        	lxc list | grep oel$OracleRelease | sort -d | cut -f2 -d' ' | sed 's/^[ \t]*//;s/[ \t]*$//' | tail -1
+	}
+	SeedContainerName=$(GetSeedContainerName)
+fi
 
 function CheckSystemdResolvedInstalled {
 	sudo netstat -ulnp | grep 53 | sed 's/  */ /g' | rev | cut -f1 -d'/' | rev | sort -u | grep systemd- | wc -l

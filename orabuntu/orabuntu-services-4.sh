@@ -230,7 +230,7 @@ then
 elif [ $LXD = 'Y' ]
 then
 	function GetSeedContainerName {
-		lxc list | grep oel$OracleRelease | cut -f2 -d' ' | sed 's/^[ \t]*//;s/[ \t]*$//'
+		lxc list | grep oel$OracleRelease | sort -d | cut -f2 -d' ' | sed 's/^[ \t]*//;s/[ \t]*$//' | tail -1
 	}
 	SeedContainerName=$(GetSeedContainerName)
 fi
@@ -322,7 +322,7 @@ then
 elif [ $LXD = 'Y' ]
 then
 	function CheckContainerUp {
-		lxc list | grep oel83 | sed 's/  */ /g' | egrep 'RUNNING|STOPPED' | cut -f4 -d' ' | sed 's/^[ \t]*//;s/[ \t]*$//'
+		lxc list | grep $SeedContainerName | sed 's/  */ /g' | egrep 'RUNNING|STOPPED' | cut -f4 -d' ' | sed 's/^[ \t]*//;s/[ \t]*$//'
 	}
 	ContainerUp=$(CheckContainerUp)
 	lxc stop $SeedContainerName > /dev/null 2>&1

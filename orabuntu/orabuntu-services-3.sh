@@ -418,7 +418,7 @@ then
 elif [ $LXD = 'Y' ]
 then		
 	function GetSeedContainerName {
-		lxc list | grep oel$OracleRelease | cut -f2 -d' ' | sed 's/^[ \t]*//;s/[ \t]*$//'	
+		lxc list | grep oel$OracleRelease | sort -d | cut -f2 -d' ' | sed 's/^[ \t]*//;s/[ \t]*$//' | tail -1
 	}
 	SeedContainerName=$(GetSeedContainerName)
 fi
