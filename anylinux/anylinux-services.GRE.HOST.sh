@@ -224,6 +224,10 @@ fi
             MTU=1420
          LOGEXT=`date +"%Y-%m-%d.%R:%S"`
 
+# TunType values [ geneve | gre | vxlan ]
+
+        TunType=gre
+
 ################# Kubernetes Settings ######################
 
            K8S=N		# Change to Y with Ubuntu Linux only.
@@ -242,7 +246,7 @@ StorageDriver=zfs               # Relevant only if LXDCluster=Y
 ### Oracle Linux LXD Storage (optional)
 
 BtrfsLun="\/dev\/sdXn"          # Relevant only if LXDCluster=Y (e.g. Set to /dev/sdb1)
-LXD=N                           # This value is currently unused.  Leave set to N.
+LXD=Y                           # This value is currently unused.  Leave set to N.
 
 LXDCluster=N                    # Default value
 PreSeed=N                       # Default value
@@ -255,8 +259,8 @@ then
         echo "=============================================="
         echo ''
 
-        LXDCluster=N    # Set to Y for automated LXD Cluster creation (optional).
-        PreSeed=N       # Set to Y for automated LXD Cluster creation (optional).
+        LXDCluster=Y    # Set to Y for automated LXD Cluster creation (optional).
+        PreSeed=Y       # Set to Y for automated LXD Cluster creation (optional).
 
 	echo 'LXD        = '$LXD
         echo 'LXDCluster = '$LXDCluster
@@ -821,9 +825,9 @@ then
 
 	elif [ $UbuntuMajorVersion -ge 16 ]
 	then
-		MultiHost="$Operation:Y:X:X:$HUBIP:$SPOKEIP:$MTU:$HubUserAct:$HubSudoPwd:$GRE:$Product:$LXD:$K8S:$PreSeed:$LXDCluster:$StorageDriver:$StoragePoolName:$BtrfsLun:$Docker"
+		MultiHost="$Operation:Y:X:X:$HUBIP:$SPOKEIP:$MTU:$HubUserAct:$HubSudoPwd:$GRE:$Product:$LXD:$K8S:$PreSeed:$LXDCluster:$StorageDriver:$StoragePoolName:$BtrfsLun:$Docker:$TunType"
 	else
-		MultiHost="$Operation:Y:X:X:$HUBIP:$SPOKEIP:$MTU:$HubUserAct:$HubSudoPwd:$GRE:$Product:$LXD:$K8S:$PreSeed:$LXDCluster:$StorageDriver:$StoragePoolName:$BtrfsLun:$Docker"
+		MultiHost="$Operation:Y:X:X:$HUBIP:$SPOKEIP:$MTU:$HubUserAct:$HubSudoPwd:$GRE:$Product:$LXD:$K8S:$PreSeed:$LXDCluster:$StorageDriver:$StoragePoolName:$BtrfsLun:$Docker:$TunType"
         fi
 
 	sleep 5

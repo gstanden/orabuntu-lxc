@@ -165,6 +165,14 @@ function GetMultiHostVar17 {
 MultiHostVar17=$(GetMultiHostVar17)
 StoragePoolName=$MultiHostVar17
 
+function GetMultiHostVar20 {
+        echo $MultiHost | cut -f20 -d':'
+}
+MultiHostVar20=$(GetMultiHostVar20)
+TunType=$MultiHostVar20
+echo "TunType = "$TunType
+sleep 10
+
 function CheckNetworkManagerInstalled {
 	sudo dpkg -l | grep -v  network-manager- | grep network-manager | wc -l
 }
@@ -3087,7 +3095,28 @@ then
                 sudo sed -i "/REMOTE_GRE_ENDPOINT/s/#/ /"                       /etc/network/openvswitch/crt_ovs_sw1.sh
                 sudo sed -i "s/REMOTE_GRE_ENDPOINT/$MultiHostVar5/g"            /etc/network/openvswitch/crt_ovs_sw1.sh
 
-                sudo ovs-vsctl add-port sw1 geneve$Sw1Index -- set interface geneve$Sw1Index type=geneve options:remote_ip=$MultiHostVar5 options:key=123
+		if   [ $TunType = 'geneve' ]
+		then
+                	sudo ovs-vsctl add-port sw1 geneve$Sw1Index -- set interface geneve$Sw1Index type=geneve options:remote_ip=$MultiHostVar5 options:key=flow
+
+			sudo sed -i '/type=gre/d'				/etc/network/openvswitch/crt_ovs_sw1.sh	
+			sudo sed -i '/type=vxlan/d'				/etc/network/openvswitch/crt_ovs_sw1.sh	
+		
+		elif [ $TunType = 'gre' ]
+		then
+			sudo ovs-vsctl add-port sw1 gre$Sw1Index    -- set interface gre$Sw1Index    type=gre    options:remote_ip=$MultiHostVar5
+
+			sudo sed -i '/type=geneve/d'				/etc/network/openvswitch/crt_ovs_sw1.sh	
+			sudo sed -i '/type=vxlan/d'				/etc/network/openvswitch/crt_ovs_sw1.sh	
+
+		elif [ $TunType = 'vxlan' ]
+		then
+                	sudo ovs-vsctl add-port sw1 vxlan$Sw1Index -- set interface vxlan$Sw1Index type=vxlan options:remote_ip=$MultiHostVar5 options:key=flow
+
+			sudo sed -i '/type=geneve/d'				/etc/network/openvswitch/crt_ovs_sw1.sh	
+			sudo sed -i '/type=gre/d'				/etc/network/openvswitch/crt_ovs_sw1.sh	
+
+		fi
 
                 echo ''
                 echo "=============================================="
@@ -3107,6 +3136,22 @@ then
 
                 sudo sed -i "s/MultiHostVar6/$MultiHostVar6/g"  /etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
                 sudo sed -i "s/MultiHostVar3/$Sw1Index/g"       /etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
+
+		if   [ $TunType = 'geneve' ]
+		then
+			sudo sed -i '/type=gre/d'		/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
+			sudo sed -i '/type=vxlan/d'		/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
+		
+		elif [ $TunType = 'gre' ]
+		then
+			sudo sed -i '/type=geneve/d'		/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
+			sudo sed -i '/type=vxlan/d'		/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
+
+		elif [ $TunType = 'vxlan' ]
+		then
+			sudo sed -i '/type=geneve/d'		/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
+			sudo sed -i '/type=gre/d'		/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
+		fi
 
                 sudo chmod 777 /etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
 

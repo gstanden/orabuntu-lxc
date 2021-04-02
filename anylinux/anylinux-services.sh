@@ -1232,6 +1232,12 @@ function GetMultiHostVar19 {
 MultiHostVar19=$(GetMultiHostVar19)
 Docker=$MultiHostVar19
 
+function GetMultiHostVar20 {
+        echo $MultiHost | cut -f20 -d':'
+}
+MultiHostVar20=$(GetMultiHostVar20)
+TunType=$MultiHostVar20
+
 	echo 'Docker			  = '$Docker
 	echo 'K8S                  	  = '$K8S
 
@@ -1346,6 +1352,14 @@ fi
 if [ $LinuxFlavor != 'Ubuntu' ] && [ $LinuxFlavor != 'Pop_OS' ]
 then
 	echo 'RPM libvirt installed     = '`rpm -qa | grep libvirt-[0123456] | grep -v client`
+fi
+
+if [ -z $TunType ]
+then
+	TunType=geneve
+	echo 'Tunnel Type		  = '$TunType
+else
+	echo 'Tunnel Type		  = '$MultiHostVar20
 fi
 
 echo ''

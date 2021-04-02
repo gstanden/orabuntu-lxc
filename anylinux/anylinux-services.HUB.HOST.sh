@@ -222,6 +222,10 @@ fi
             MTU=1500
          LOGEXT=`date +"%Y-%m-%d.%R:%S"`
 
+# TunType values [ geneve | gre | vxlan ]
+
+	TunType=geneve
+
 ################# Kubernetes Settings ######################
 
            K8S=N                # Change to Y with Ubuntu Linux only.
@@ -434,9 +438,9 @@ then
 
 elif [ $UbuntuMajorVersion -ge 20 ]
 then
-	MultiHost="$Operation:N:1:X:X:X:$MTU:X:X:$GRE:$Product:$LXD:$K8S:$PreSeed:$LXDCluster:$StorageDriver:$StoragePoolName:$BtrfsLun:$Docker"
+	MultiHost="$Operation:N:1:X:X:X:$MTU:X:X:$GRE:$Product:$LXD:$K8S:$PreSeed:$LXDCluster:$StorageDriver:$StoragePoolName:$BtrfsLun:$Docker:$TunType"
 else
-	MultiHost="$Operation:N:1:X:X:X:$MTU:X:X:$GRE:$Product:$LXD:$K8S:$PreSeed:$LXDCluster:$StorageDriver:$StoragePoolName:$BtrfsLun:$Docker"
+	MultiHost="$Operation:N:1:X:X:X:$MTU:X:X:$GRE:$Product:$LXD:$K8S:$PreSeed:$LXDCluster:$StorageDriver:$StoragePoolName:$BtrfsLun:$Docker:$TunType"
 fi
 
 ./anylinux-services.sh $MultiHost 
