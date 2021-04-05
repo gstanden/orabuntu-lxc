@@ -1,0 +1,9 @@
+The CONFIG file is used to configure the installation.
+Read the instructions at https://github.com/gstanden/orabuntu-lxc for installation information.
+
+When installing on a second host, a GRE host, as part of a multi-host deployment, be sure these variables are set in CONFIG to actual values:
+
+SPOKEIP='lan.ip.gre.host'               # IP address of HUB   Orabuntu-LXC host server. Example:  192.168.1.143
+HUBIP='lan.ip.hub.host'                 # IP address of SPOKE Orabuntu-LXC host server. Example:  192.168.1.144
+HubUserAct='username'                   # Linux user account used to install Orabuntu-LXC.  Example: ubuntu. Must have sudo all privilege which can be revoked after install.
+HubSudoPwd='password'			# Linux user account password

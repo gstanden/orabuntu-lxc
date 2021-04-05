@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#    Copyright 2015-2019 Gilbert Standen
+#    Copyright 2015-2021 Gilbert Standen
 #    This file is part of Orabuntu-LXC.
 
 #    Orabuntu-LXC is free software: you can redistribute it and/or modify
@@ -16,20 +16,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with Orabuntu-LXC. If not, see <http://www.gnu.org/licenses/>.
 
-#    v2.4 		GLS 20151224
-#    v2.8 		GLS 20151231
-#    v3.0 		GLS 20160710 Updates for Ubuntu 16.04
-#    v4.0 		GLS 20161025 DNS DHCP services moved into an LXC container
-#    v5.0 		GLS 20170909 Orabuntu-LXC Multi-Host
-#    v6.0-AMIDE-beta	GLS 20180106 Orabuntu-LXC AmazonS3 Multi-Host Docker Enterprise Edition (AMIDE)
-
-#    Note that this software builds a containerized DNS DHCP solution (bind9 / isc-dhcp-server).
-#    The nameserver should NOT be the name of an EXISTING nameserver but an arbitrary name because this software is CREATING a new LXC-containerized nameserver.
-#    The domain names can be arbitrary fictional names or they can be a domain that you actually own and operate.
-#    There are two domains and two networks because the "seed" LXC containers are on a separate network from the production LXC containers.
-#    If the domain is an actual domain, you will need to change the subnet using the subnets feature of Orabuntu-LXC
-#
-#!/bin/bash
+clear
 
 MajorRelease=$1
 PointRelease=$2
@@ -170,8 +157,6 @@ function GetMultiHostVar20 {
 }
 MultiHostVar20=$(GetMultiHostVar20)
 TunType=$MultiHostVar20
-echo "TunType = "$TunType
-sleep 10
 
 function CheckNetworkManagerInstalled {
 	sudo dpkg -l | grep -v  network-manager- | grep network-manager | wc -l
@@ -326,10 +311,10 @@ sleep 5
 
 clear
 
-if [ $LXD = 'Y' ]
-then
-	sudo tar -vP --extract --file=/opt/olxc/"$DistDir"/orabuntu/archives/ubuntu-host.tar -C / etc/orabuntu-lxc-scripts/get-images.sh --touch
-fi
+# if [ $LXD = 'Y' ]
+# then
+# 	sudo tar -vP --extract --file=/opt/olxc/"$DistDir"/orabuntu/archives/ubuntu-host.tar -C / etc/orabuntu-lxc-scripts/get-images.sh --touch
+# fi
 
 if [ $RSA = 'Y' ]
 then
@@ -3099,22 +3084,22 @@ then
 		then
                 	sudo ovs-vsctl add-port sw1 geneve$Sw1Index -- set interface geneve$Sw1Index type=geneve options:remote_ip=$MultiHostVar5 options:key=flow
 
-			sudo sed -i '/type=gre/d'				/etc/network/openvswitch/crt_ovs_sw1.sh	
-			sudo sed -i '/type=vxlan/d'				/etc/network/openvswitch/crt_ovs_sw1.sh	
+			sudo sed -i '/type=gre/d'   /etc/network/openvswitch/crt_ovs_sw1.sh	
+			sudo sed -i '/type=vxlan/d' /etc/network/openvswitch/crt_ovs_sw1.sh	
 		
 		elif [ $TunType = 'gre' ]
 		then
 			sudo ovs-vsctl add-port sw1 gre$Sw1Index    -- set interface gre$Sw1Index    type=gre    options:remote_ip=$MultiHostVar5
 
-			sudo sed -i '/type=geneve/d'				/etc/network/openvswitch/crt_ovs_sw1.sh	
-			sudo sed -i '/type=vxlan/d'				/etc/network/openvswitch/crt_ovs_sw1.sh	
+			sudo sed -i '/type=geneve/d' /etc/network/openvswitch/crt_ovs_sw1.sh	
+			sudo sed -i '/type=vxlan/d'  /etc/network/openvswitch/crt_ovs_sw1.sh	
 
 		elif [ $TunType = 'vxlan' ]
 		then
                 	sudo ovs-vsctl add-port sw1 vxlan$Sw1Index -- set interface vxlan$Sw1Index type=vxlan options:remote_ip=$MultiHostVar5 options:key=flow
 
-			sudo sed -i '/type=geneve/d'				/etc/network/openvswitch/crt_ovs_sw1.sh	
-			sudo sed -i '/type=gre/d'				/etc/network/openvswitch/crt_ovs_sw1.sh	
+			sudo sed -i '/type=geneve/d' /etc/network/openvswitch/crt_ovs_sw1.sh	
+			sudo sed -i '/type=gre/d'    /etc/network/openvswitch/crt_ovs_sw1.sh	
 
 		fi
 
@@ -3124,7 +3109,7 @@ then
                 echo "=============================================="
                 echo ''
 
-                sudo ovs-vsctl show | grep -A1 -B2 'type: gre' | grep -B4 "$MultiHostVar5" | sed 's/^[ \t]*//;s/[ \t]*$//'
+                sudo ovs-vsctl show | grep -A1 -B2 "type: $TunType" | grep -B4 "$MultiHostVar5" | sed 's/^[ \t]*//;s/[ \t]*$//'
 
                 echo ''
                 echo "=============================================="
@@ -3139,18 +3124,18 @@ then
 
 		if   [ $TunType = 'geneve' ]
 		then
-			sudo sed -i '/type=gre/d'		/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
-			sudo sed -i '/type=vxlan/d'		/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
+			sudo sed -i '/type=gre/d'    /etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
+			sudo sed -i '/type=vxlan/d'  /etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
 		
 		elif [ $TunType = 'gre' ]
 		then
-			sudo sed -i '/type=geneve/d'		/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
-			sudo sed -i '/type=vxlan/d'		/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
+			sudo sed -i '/type=geneve/d' /etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
+			sudo sed -i '/type=vxlan/d'  /etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
 
 		elif [ $TunType = 'vxlan' ]
 		then
-			sudo sed -i '/type=geneve/d'		/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
-			sudo sed -i '/type=gre/d'		/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
+			sudo sed -i '/type=geneve/d' /etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
+			sudo sed -i '/type=gre/d'    /etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
 		fi
 
                 sudo chmod 777 /etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh

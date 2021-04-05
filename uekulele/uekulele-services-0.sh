@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#    Copyright 2015-2019 Gilbert Standen
+#    Copyright 2015-2021 Gilbert Standen
 #    This file is part of Orabuntu-LXC.
 
 #    Orabuntu-LXC is free software: you can redistribute it and/or modify
@@ -15,21 +15,13 @@
 
 #    You should have received a copy of the GNU General Public License
 #    along with Orabuntu-LXC.  If not, see <http://www.gnu.org/licenses/>.
-
-#    v2.4 		GLS 20151224
-#    v2.8 		GLS 20151231
-#    v3.0 		GLS 20160710 Updates for Ubuntu 16.04
-#    v4.0 		GLS 20161025 DNS DHCP services moved into an LXC container
-#    v5.0 		GLS 20170909 Orabuntu-LXC Multi-Host
-#    v6.0-AMIDE-beta	GLS 20180106 Orabuntu-LXC AmazonS3 Multi-Host Docker Enterprise Edition (AMIDE)
-
-#    Note that this software builds a containerized DNS DHCP solution (bind9 / isc-dhcp-server).
-#    The nameserver should NOT be the name of an EXISTING nameserver but an arbitrary name because this software is CREATING a new LXC-containerized nameserver.
-#    The domain names can be arbitrary fictional names or they can be a domain that you actually own and operate.
-#    There are two domains and two networks because the "seed" LXC containers are on a separate network from the production LXC containers.
-#    If the domain is an actual domain, you will need to change the subnet using the subnets feature of Orabuntu-LXC
 #
-#    You can change the name of the username in this script from 'ubuntu' to whatever username is preferred.
+#    The name of the OrabuntuAccount username in this script can be changed from 'orabuntu' to whatever username is preferred.
+#    Use of this script is optional.  An existing user account with 'sudo all' and 'wheel' group can also be used (but CANNOT use 'root' account). 
+#    Note that the password is set same as the username.  If you want to use the genpassword utility for a secure password uncomment the line #PASSWORD=$password
+
+OrabuntuAccount=orabuntu
+OA=OrabuntuAccount
 
 genpasswd() {
         local l=$1
@@ -40,11 +32,11 @@ password=$(genpasswd)
 mkdir -p ../installs/logs
 echo $password > ../installs/logs/ubuntu-password.txt
 
-USERNAME=ubuntu
-PASSWORD=ubuntu
+USERNAME=$OA
+PASSWORD=$OA
 # PASSWORD=$password
 
-sudo groupadd -g 1000 ubuntu
-sudo useradd -g ubuntu -u 1000 -m -p $(openssl passwd -1 ${PASSWORD}) -s /bin/bash -G wheel ${USERNAME}
+sudo groupadd -g 1000 $OA
+sudo useradd -g $OA -u 1000 -m -p $(openssl passwd -1 ${PASSWORD}) -s /bin/bash -G wheel ${USERNAME}
 sudo mkdir -p  /home/${USERNAME}/Downloads /home/${USERNAME}/Manage-Orabuntu
 sudo chown ${USERNAME}:${USERNAME} /home/${USERNAME}/Downloads /home/${USERNAME}/Manage-Orabuntu

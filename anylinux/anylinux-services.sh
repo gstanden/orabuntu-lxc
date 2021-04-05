@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#    Copyright 2015-2019 Gilbert Standen
+#    Copyright 2015-2021 Gilbert Standen
 #    This file is part of Orabuntu-LXC.
 
 #    Orabuntu-LXC is free software: you can redistribute it and/or modify
@@ -22,98 +22,14 @@
 #    v4.0 		GLS 20161025 DNS DHCP services moved into an LXC container
 #    v5.0 		GLS 20170909 Orabuntu-LXC Multi-Host
 #    v6.0-AMIDE-beta	GLS 20180106 Orabuntu-LXC AmazonS3 Multi-Host Docker Enterprise Edition (AMIDE)
+#    v7.0-AMIDE-beta	GLS 20210428 Orabuntu-LXC AmazonS3 Multi-Host LXD Docker Enterprise Edition (AMIDE)
 
 #    Note that this software builds a containerized DNS DHCP solution (bind9 / isc-dhcp-server).
 #    The nameserver should NOT be the name of an EXISTING nameserver but an arbitrary name because this software is CREATING a new LXC-containerized nameserver.
 #    The domain names can be arbitrary fictional names or they can be a domain that you actually own and operate.
 #    There are two domains and two networks because the "seed" LXC containers are on a separate network from the production LXC containers.
 #    If the domain is an actual domain, you will need to change the subnet using the subnets feature of Orabuntu-LXC
-#
-#    Controlling script for Orabuntu-LXC
-
-#    Host OS Supported: Oracle Linux 7, RedHat 7, CentOS 7, Fedora 27, Ubuntu 16/17
-
-#    Usage:
-#    Passing parameters in from the command line is possible but is not described herein. The supported usage is to configure this file as described below.
-
-#    Create a non-root linux user account that has "SUDO ALL" full administrative privileges
-#    Unpack the distribution from github in the "~/Downloads" directory of th user with 'SUDO ALL' privilege.
-#    Configure this script and then run "./anylinux-services.sh"
-
-#    All of the following parameters are user-settable.
-#    
-#    U = User MUST set before running anylinux-services.sh
-#    D = User MAY  set before running anylinux-services.sh (DEFAULT VALUES ALREADY SET CAN BE USED)
-
-#    U	SudoPassword    
-#    D	GRE		[ N|Y ]
-#    D	MajorRelease	[ 7         | 6                   | 5                         | 4           ]
-#    D	PointRelease	[ {4,3,2,1} | {9,8,7,6,5,4,3,2,1} | {11,10,9,8,7,6,5,4,3,2,1} | {8,7,6,5,4} ]
-#    D	NumCon		[ 2 | Integer > 0 ]
-#    D	Domain1		[ urdomain1.com | some-domain1.{com|us|biz|org|info|...} ] (hyphen in domain is OK but NOT required)
-#    D	Domain2		[ urdomain2.com | some-domain2.{com|us|biz|org|info|...} ] (hyphen in domain is OK but NOT required)
-#    D	NameServer 	[ olive | nameserver ]
-#    D	OSMemRes	[ 1024  | Linux OS Memory Reservation (in Kb) ]
-#    D	MultiHost	[ new|reinstall|addclones|addrelease ]:[Y|N]:[1|X]:[$SudoPassword]:[Hub-IP|X]:[Spoke-IP|X]:[MTU]:[Hub-SudoPassword|X]:[Spoke-SudoPassword|X]:[Y|N]
-#
-#    LEGEND MultiHost:
-#			[new|reinstall|addclones|addrelease]	Installation mode of Orabuntu-LXC	
-#									new	   always used for first Orabuntu-LXC host (physical or VM).
-#									reinstall  always used for reinstalling Orabuntu-LXC on any host
-#									addclones  add additional containers of a release that ALREADY has an Orabuntu-LXC seed container of that version installed
-#									addrelease add container release (for example add Oracle Linux 5.9 containers to a deployment of Oracle Linux 7.3 containers)
-#			[N|Y]					multihost flag
-#									N always used to install first Orabuntu-LXC host (physical or VM). The first Orabuntu-LXC host is called a "Hub"
-#									Y always used to install added Orabuntu-LXC host (physical or VM). The added Orabuntu-LXC host is called a "spoke"
-#			[1|X]					IP address 4th triplet flag
-#									1 always used to install first Orabuntu-LXC host (physical or VM).
-#									X always used to install added Orabuntu-LXC host (physical or VM). Note that 'X' is a LITERAL value NOT a variable.
-#			[$SudoPassword]				sudo password of the 'ubuntu' linux account of this local host.  
-#									Note 'ubuntu' user for all Orabuntu-LXC hosts must have SUDO ALL privilege.  Tuning of SUDO privs is coming.
-#			[X:Hub-IP]				The LAN IP of the first Orabuntu-LXC host (physical or VM)
-#									Hub-IP always used to install added Orabuntu-LXC GRE phys host. Note that 'Hub-IP' is a LAN address e.g. 192.168.1.42
-#									X always used to install first Orabuntu-LXC VMs if running on Orabuntu-LXC physical host. Note 'X' is a LITERAL NOT a variable.
-#									X always used to install added Orabuntu-LXC VMs if running on Orabuntu-LXC physical host. Note 'X' is a LITERAL NOT a variable.
-#			[X:Spoke-IP]				The LAN IP of the added Orabuntu-LXC host (physical or VM)
-#								Spoke-IP always used to install added Orabuntu-LXC GRE phys host. Note that 'Hub-IP' is a LAN address e.g. 192.168.1.69
-#									X always used to install first Orabuntu-LXC VMs if running on Orabuntu-LXC physical host. Note 'X' is a LITERAL NOT a variable.
-#									X always used to install added Orabuntu-LXC VMs if running on Orabuntu-LXC physical host. Note 'X' is a LITERAL NOT a variable.
-#			[1500]					The MTU that will be used for the OpenvSwitch infrastructure deployment. Typical values are {1420, 1500, 8920, 9000}
-#									MTU use 1500 for first Orabuntu-LXC host (physical or VM) aka "hub" host
-#									MTU use 1420 for added Orabuntu-LXC host (physical)       aka "gre" host
-#									MTU use 1500 for added Orabuntu-LXC host (VM) if running on HUB   Orabuntu-LXC first physical host
-#									MTU use 1420 for added Orabuntu-LXC host (VM) if running on SPOKE Orabuntu-LXC added physical host
-#									MTU 8920/9000 not tested with this software but could be configured via manual edits to the files. Support on roadmap for MTU 9000.
-#			[X:Hub-SudoPassword]			sudo password of the 'ubuntu' linux account of the first Orabuntu-LXC host
-#									Hub-SudoPassword always used to install added Orabuntu-LXC phys host (GRE-connected host).
-#									X always used to install first Orabuntu-LXC host.
-#									X always used to install added Orabuntu-LXC VM host.
-#			[X:Spoke-SudoPassword]			sudo password of the 'ubuntu' linux account of the added Orabuntu-LXC host
-#									Spoke-SudoPassword always used to install added Orabuntu-LXC phys host (GRE-connected host).
-#									X always used to install first Orabuntu-LXC host.
-#									X always used to install added Orabuntu-LXC VM host.
-#			[N|Y]					GRE Flag
-#									N always used to install first Orabuntu-LXC host.
-#									N always used to install added Orabuntu-LXC host (VMs)
-#									Y always used to install added Orabuntu-LXC host (physical)(GRE-connected host)
-#
-#	MultiHost Note 1:  MultiHost default value:	MultiHost="new:N:1:$SudoPassword:X:X:1500:X:X:$GRE" (this value is uncommented in the default distribution of Orabuntu-LXC)
-			
-#	Subnets (See subnets section below for more information)
-#
-#    D	SeedNet1
-#    D	BaseNet1
-#    D	StorNet1
-#    D	StorNet2
-#    D	ExtrNet1
-#    D	ExtrNet2
-#    D	ExtrNet3
-#    D	ExtrNet4
-#    D	ExtrNet5
-#    D	ExtrNet6
-
-# Set these before running anylinux-services.sh
-# Leave GRE set to N for first Orabuntu-LXC host install
+#    See CONFIG file for user-settable configuration variables.
 
 sudo sed -i '$!N; /^\(.*\)\n\1$/!P; D'  /etc/resolv.conf
 
@@ -151,18 +67,32 @@ Owner=$(GetOwner)
 # pgroup1 begin
 # user-settable parameters group 1 begin
 # set the values for the subnet triplets (e.g. 172.29.108)
+# Orabuntu-LXC v7 please use the new variable configuration file ./anylinux/CONFIG referenced below.
 
-	SeedNet1='SeedNet1Fwd:172.29.108'	# UNCOMMENT LINE IF USING CUSTOM SUBNETS
-	BaseNet1='BaseNet1Fwd:10.209.53'	# UNCOMMENT LINE IF USING CUSTOM SUBNETS
-	StorNet1='StorNet1Fwd:10.210.107'	# UNCOMMENT LINE IF USING CUSTOM SUBNETS
-	StorNet2='StorNet2Fwd:10.211.107'	# UNCOMMENT LINE IF USING CUSTOM SUBNETS
+#	SeedNet1='SeedNet1Fwd:172.29.108'	# UNCOMMENT LINE IF USING CUSTOM SUBNETS
+#	BaseNet1='BaseNet1Fwd:10.209.53'	# UNCOMMENT LINE IF USING CUSTOM SUBNETS
+#	StorNet1='StorNet1Fwd:10.210.107'	# UNCOMMENT LINE IF USING CUSTOM SUBNETS
+#	StorNet2='StorNet2Fwd:10.211.107'	# UNCOMMENT LINE IF USING CUSTOM SUBNETS
 
-	ExtrNet1='172.200.11'			# UNCOMMENT LINE IF USING CUSTOM SUBNETS
-	ExtrNet2='172.201.11'			# UNCOMMENT LINE IF USING CUSTOM SUBNETS
-	ExtrNet3='192.168.19'			# UNCOMMENT LINE IF USING CUSTOM SUBNETS
-	ExtrNet4='192.168.20'			# UNCOMMENT LINE IF USING CUSTOM SUBNETS
-	ExtrNet5='192.168.21'			# UNCOMMENT LINE IF USING CUSTOM SUBNETS
-	ExtrNet6='192.168.22'			# UNCOMMENT LINE IF USING CUSTOM SUBNETS
+#	ExtrNet1='172.200.11'			# UNCOMMENT LINE IF USING CUSTOM SUBNETS
+#	ExtrNet2='172.201.11'			# UNCOMMENT LINE IF USING CUSTOM SUBNETS
+#	ExtrNet3='192.168.19'			# UNCOMMENT LINE IF USING CUSTOM SUBNETS
+#	ExtrNet4='192.168.20'			# UNCOMMENT LINE IF USING CUSTOM SUBNETS
+#	ExtrNet5='192.168.21'			# UNCOMMENT LINE IF USING CUSTOM SUBNETS
+#	ExtrNet6='192.168.22'			# UNCOMMENT LINE IF USING CUSTOM SUBNETS
+
+# Orabuntu-LXC v7 uses a centralized variable configuration file ./anylinux/CONFIG referenced below.
+
+SeedNet1=$(source /home/ubuntu/Downloads/orabuntu-lxc-master/anylinux/CONFIG; echo $SeedNet1)
+BaseNet1=$(source /home/ubuntu/Downloads/orabuntu-lxc-master/anylinux/CONFIG; echo $BaseNet1)
+StorNet1=$(source /home/ubuntu/Downloads/orabuntu-lxc-master/anylinux/CONFIG; echo $StorNet1)
+StorNet2=$(source /home/ubuntu/Downloads/orabuntu-lxc-master/anylinux/CONFIG; echo $StorNet2)
+ExtrNet1=$(source /home/ubuntu/Downloads/orabuntu-lxc-master/anylinux/CONFIG; echo $ExtrNet1)
+ExtrNet2=$(source /home/ubuntu/Downloads/orabuntu-lxc-master/anylinux/CONFIG; echo $ExtrNet2)
+ExtrNet3=$(source /home/ubuntu/Downloads/orabuntu-lxc-master/anylinux/CONFIG; echo $ExtrNet3)
+ExtrNet4=$(source /home/ubuntu/Downloads/orabuntu-lxc-master/anylinux/CONFIG; echo $ExtrNet4)
+ExtrNet5=$(source /home/ubuntu/Downloads/orabuntu-lxc-master/anylinux/CONFIG; echo $ExtrNet5)
+ExtrNet6=$(source /home/ubuntu/Downloads/orabuntu-lxc-master/anylinux/CONFIG; echo $ExtrNet6)
 
 # pgroup1 end
 # user-settable parameters group 1 end
@@ -209,10 +139,6 @@ do
         sleep 10
         AptProcessRunning=$(CheckAptProcessRunning)
 done
-
-sleep 5
-
-clear
 
 GetLinuxFlavors(){
 if   [[ -e /etc/oracle-release ]]
@@ -626,6 +552,7 @@ then
 	echo "17. 'Re: [ovs-discuss] Build OpenvSwitch on Oracle Linux 8' Gilbert Standen https://www.mail-archive.com/ovs-discuss@openvswitch.org/msg06322.html"
 	echo "18. 'DNS Not Resolving under Network [CentOS8] #957' lfiraza https://github.com/docker/for-linux/issues/957"
 	echo "19. 'Firewalld CentOS 7 Masquerading' lzap https://serverfault.com/questions/623297/firewalld-centos-7-masquerading"
+	echo "20. 'How do I read a variable from a file? (Ask Ubuntu)' Jesse Nickles https://askubuntu.com/questions/367136/how-do-i-read-a-variable-from-a-file"
 	echo ''
 	echo "Acknowledgements"
 	echo ''
@@ -828,7 +755,8 @@ fi
 	MajorRelease=$8
 	if [ -z $8 ]
 	then
-		MajorRelease=8
+	#	MajorRelease=8
+		MajorRelease=$(source /home/ubuntu/Downloads/orabuntu-lxc-master/anylinux/CONFIG; echo $MajorRelease)
 	fi
 
 	# -------------------------------------------------------------
@@ -850,12 +778,19 @@ fi
 		MajorRelease=7
 	fi
 
+	if [ $LinuxFlavor = 'Oracle' ] && [ $Release -eq 6 ] && [ $MajorRelease -eq 6 ]
+	then
+		MajorRelease=7
+	fi
+
 	# GLS 20210220 
 	# -------------------------------------------------------------
 
 	echo 'Oracle Container Release  = '$MajorRelease
 
 	PointRelease=$2
+	PointRelease=$(source /home/ubuntu/Downloads/orabuntu-lxc-master/anylinux/CONFIG; echo $PointRelease)
+	
 	if [ -z $2 ]
 	then
 		if   [ $MajorRelease -eq 8 ]
@@ -884,6 +819,7 @@ fi
 	if [ -z $3 ]
 	then
 		NumCon=4
+		NumCon=$(source /home/ubuntu/Downloads/orabuntu-lxc-master/anylinux/CONFIG; echo $NumCon)
 	fi
 	echo 'Oracle Container Count    = '$NumCon
 
@@ -891,6 +827,7 @@ fi
 	if [ -z $4 ]
 	then
 		Domain1=urdomain1.com
+		Domain1=$(source /home/ubuntu/Downloads/orabuntu-lxc-master/anylinux/CONFIG; echo $Domain1)
 	fi
 	echo 'Domain1                   = '$Domain1
 
@@ -898,6 +835,7 @@ fi
 	if [ -z $5 ]
 	then
 		Domain2=urdomain2.com
+		Domain2=$(source /home/ubuntu/Downloads/orabuntu-lxc-master/anylinux/CONFIG; echo $Domain2)
 	fi
 	echo 'Domain2                   = '$Domain2
 
@@ -905,6 +843,7 @@ fi
 	if [ -z $6 ]
 	then
 		NameServer=afns1
+		NameServer=$(source /home/ubuntu/Downloads/orabuntu-lxc-master/anylinux/CONFIG; echo $NameServer)
 	fi
 	echo 'NameServer                = '$NameServer
 
@@ -912,6 +851,7 @@ fi
 	if [ -z $7 ]
 	then
 		OSMemRes=1024
+		OSMemRes=$(source /home/ubuntu/Downloads/orabuntu-lxc-master/anylinux/CONFIG; echo $OSMemRes)
 	fi
 	echo 'OSMemRes                  = '$OSMemRes 
 

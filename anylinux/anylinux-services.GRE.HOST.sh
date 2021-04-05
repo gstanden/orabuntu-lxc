@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#    Copyright 2015-2019 Gilbert Standen
+#    Copyright 2015-2021 Gilbert Standen
 #    This file is part of Orabuntu-LXC.
 
 #    Orabuntu-LXC is free software: you can redistribute it and/or modify
@@ -16,26 +16,20 @@
 #    You should have received a copy of the GNU General Public License
 #    along with Orabuntu-LXC.  If not, see <http://www.gnu.org/licenses/>.
 
-#    v2.4 		GLS 20151224
-#    v2.8 		GLS 20151231
-#    v3.0 		GLS 20160710 Updates for Ubuntu 16.04
-#    v4.0 		GLS 20161025 DNS DHCP services moved into an LXC container
-#    v5.0 		GLS 20170909 Orabuntu-LXC Multi-Host
-#    v6.0-AMIDE-beta	GLS 20180106 Orabuntu-LXC AmazonS3 Multi-Host Docker Enterprise Edition (AMIDE)
+#    v2.4               GLS 20151224
+#    v2.8               GLS 20151231
+#    v3.0               GLS 20160710 Updates for Ubuntu 16.04
+#    v4.0               GLS 20161025 DNS DHCP services moved into an LXC container
+#    v5.0               GLS 20170909 Orabuntu-LXC Multi-Host
+#    v6.0-AMIDE-beta    GLS 20180106 Orabuntu-LXC AmazonS3 Multi-Host Docker Enterprise Edition (AMIDE)
+#    v7.0-AMIDE-beta    GLS 20210428 Orabuntu-LXC AmazonS3 Multi-Host LXD Docker Enterprise Edition (AMIDE)
 
 #    Note that this software builds a containerized DNS DHCP solution (bind9 / isc-dhcp-server).
 #    The nameserver should NOT be the name of an EXISTING nameserver but an arbitrary name because this software is CREATING a new LXC-containerized nameserver.
 #    The domain names can be arbitrary fictional names or they can be a domain that you actually own and operate.
 #    There are two domains and two networks because the "seed" LXC containers are on a separate network from the production LXC containers.
 #    If the domain is an actual domain, you will need to change the subnet using the subnets feature of Orabuntu-LXC
-#
-#    Controlling script for Orabuntu-LXC
-
-#    Host OS Supported: Oracle Linux 7, RedHat 7, CentOS 7, Fedora 27, Ubuntu 16/17
-
-#    Usage:
-#    Passing parameters in from the command line is possible but is not described herein. The supported usage is to configure this file as described below.
-#    Capital 'X' means 'not used' do not replace leave as is.
+#    See CONFIG file for user-settable configuration variables.
 
 clear
 
@@ -218,66 +212,62 @@ then
         clear
 fi
 
-################ MultiHost Settings ########################
+GRE=Y
+MTU=1420
+LOGEXT=`date +"%Y-%m-%d.%R:%S"`
 
-            GRE=Y 
-            MTU=1420
-         LOGEXT=`date +"%Y-%m-%d.%R:%S"`
+# TunType values [geneve|gre|vxlan]
 
-# TunType values [ geneve | gre | vxlan ]
+TunType=$(source /home/ubuntu/Downloads/orabuntu-lxc-master/anylinux/CONFIG; echo $TunType)
 
-        TunType=gre
+################# Kubernetes Install Flag  ######################
 
-################# Kubernetes Settings ######################
+K8S=$(source /home/ubuntu/Downloads/orabuntu-lxc-master/anylinux/CONFIG; echo $K8S)
 
-           K8S=N		# Change to Y with Ubuntu Linux only.
+################### Docker Install Flag  ########################
 
-################### Docker Settings ########################
-
-           Docker=N
+Docker=$(source /home/ubuntu/Downloads/orabuntu-lxc-master/anylinux/CONFIG; echo $Docker)
 
 ################ LXD Cluster Settings ######################
 
-### Ubuntu Linux LXD Storage (optional)
+LXD=$(source /home/ubuntu/Downloads/orabuntu-lxc-master/anylinux/CONFIG; echo $LXD)
+LXDCluster=$(source /home/ubuntu/Downloads/orabuntu-lxc-master/anylinux/CONFIG; echo $LXDCluster)
 
-StoragePoolName=olxc-002        # Relevant only if LXDCluster=Y
-StorageDriver=zfs               # Relevant only if LXDCluster=Y
-
-### Oracle Linux LXD Storage (optional)
-
-BtrfsLun="\/dev\/sdXn"          # Relevant only if LXDCluster=Y (e.g. Set to /dev/sdb1)
-LXD=Y                           # This value is currently unused.  Leave set to N.
-
-LXDCluster=N                    # Default value
-PreSeed=N                       # Default value
+if [ $LXDCluster = 'N' ]
+then
+        PreSeed=N
+fi
 
 if   [ $LinuxFlavor = 'Ubuntu' ] && [ $UbuntuMajorVersion -ge 20 ]
 then
-        echo ''
-        echo "=============================================="
-        echo "Display Optional LXD Cluster Values...        "
-        echo "=============================================="
-        echo ''
-
-        LXDCluster=Y    # Set to Y for automated LXD Cluster creation (optional).
-        PreSeed=Y       # Set to Y for automated LXD Cluster creation (optional).
-
-	echo 'LXD        = '$LXD
-        echo 'LXDCluster = '$LXDCluster
-        echo 'PreSeed    = '$PreSeed
-
-        echo ''
-        echo "=============================================="
-        echo "Done: Display LXD Cluster Values.             "
-        echo "=============================================="
-        echo ''
-
-        sleep 5
-
-        clear
-
         if [ $LXDCluster = 'Y' ]
         then
+		echo ''
+		echo "=============================================="
+		echo "Show Optional LXD & LXD Cluster Values...     "
+		echo "=============================================="
+		echo ''
+
+		LXD=Y
+                PreSeed=Y
+                BtrfsLun=Unused
+                StoragePoolName=olxc-002
+                StorageDriver=zfs
+
+                echo 'LXDCluster = '$LXDCluster
+                echo 'PreSeed    = '$PreSeed
+                echo 'LXD        = '$LXD
+
+		echo ''
+		echo "=============================================="
+		echo "Done: Show Optional LXD & LXD Cluster Values. "
+		echo "=============================================="
+		echo ''
+
+		sleep 5
+
+		clear
+
                 echo ''
                 echo "=============================================="
                 echo "Check ZFS Storage Pool Exists...              "
@@ -308,16 +298,24 @@ then
                 sleep 5
 
                 clear
+        else
+                PreSeed=Unused
+                BtrfsLun=Unused
+                StoragePoolName=Unused
+                StorageDriver=Unused
         fi
 fi
 
 if [ $LinuxFlavor = 'Oracle' ] && [ $Release -eq 8 ]
 then
-        LXDCluster=N
-        PreSeed=N
-
         if [ $LXDCluster = 'Y' ]
         then
+                LXD=Y
+                PreSeed=Y
+                BtrfsLun=$(source /home/ubuntu/Downloads/orabuntu-lxc-master/anylinux/CONFIG; echo $PreSeed)
+                StoragePoolName=Unused
+                StorageDriver=Unused
+
                 echo ''
                 echo "=============================================="
                 echo "                WARNING !!                    "
@@ -333,6 +331,11 @@ then
                 echo ''
 
                 sleep 20
+        else
+                PreSeed=Unused
+                BtrfsLun=Unused
+                StoragePoolName=Unused
+                StorageDriver=Unused
         fi
 fi
 
@@ -354,6 +357,10 @@ then
 	read -e -p "Install Type New or Reinstall [new/rei] " -i "new" OpType
 	echo "                                              "
 	echo "=============================================="
+
+	sleep 5
+
+	clear
 else
         OpType=$1
 fi
@@ -369,7 +376,7 @@ fi
 
 if [ -z $2 ]
 then
-	SPOKEIP='lan.ip.this.host'
+	SPOKEIP=$(source /home/ubuntu/Downloads/orabuntu-lxc-master/anylinux/CONFIG; echo $SPOKEIP)
  	SPOKEIP=192.168.1.144
 else
 	SPOKEIP=$2
@@ -377,7 +384,7 @@ fi
 
 if [ -z $3 ]
 then
-	HUBIP='lan.ip.hub.host'
+	HUBIP=$(source /home/ubuntu/Downloads/orabuntu-lxc-master/anylinux/CONFIG; echo $HUBIP)
  	HUBIP=192.168.1.143
 else
 	HUBIP=$3
@@ -385,35 +392,48 @@ fi
 
 if [ -z $4 ]
 then
-	HubUserAct=username
- 	HubUserAct=ubuntu
+	HubUserAct=$(source /home/ubuntu/Downloads/orabuntu-lxc-master/anylinux/CONFIG; echo $HubUserAct)
+	HubUserAct=ubuntu
 else
 	HubUserAct=$4
 fi
 
 if [ -z $5 ]
 then
-	HubSudoPwd=password
- 	HubSudoPwd=ubuntu
+	HubSudoPwd=$(source /home/ubuntu/Downloads/orabuntu-lxc-master/anylinux/CONFIG; echo $HubSudoPwd)
+	HubSudoPwd=ubuntu
 else
 	HubSudoPwd=$5
 fi
 
 if [ -z $6 ]
 then
- 	Product=workspaces
- 	Product=oracle-db
-	Product=oracle-gi-18c
-        Product=no-product
+	Product=$(source /home/ubuntu/Downloads/orabuntu-lxc-master/anylinux/CONFIG; echo $Product)
 else
 	Product=$6
 fi
 
-if [ $SPOKEIP = 'lan.ip.this.host' ] || [ $HUBIP = 'lan.ip.hub.host' ] || [ $HubUserAct = 'username' ] || [ $HubSudoPwd = 'password' ]
+if [ $SPOKEIP = 'lan.ip.gre.host' ] || [ $HUBIP = 'lan.ip.hub.host' ] || [ $HubUserAct = 'username' ] || [ $HubSudoPwd = 'password' ]
 then
-	echo 'You must edit this file first and set the SPOKEIIP, HUBIP, HubUserAct, and the HubSudoPwd'
-	echo 'After setting these in this file re-run the script'
+	echo ''
+	echo "=============================================="
+	echo "Update settings in config file required.      "
+	echo "=============================================="
+	echo ''
+	echo 'You must edit the "config" file first and set the following variables:'
+	echo ''
+	echo '		SPOKEIP'
+       	echo '		HUBIP'
+        echo '		HubUserAct'
+	echo '		HubSudoPwd'
+	echo ''
+	echo 'The config file is located in this current directory.'
+	echo ''
+	echo 'After setting these in this file re-run this anylinux-services.GRE.HOST.sh  script'
 	echo 'Also ... be SURE to verify these values carefully before running Orabuntu-LXC install !'
+	echo ''
+	echo "=============================================="
+	echo ''
 	exit
 fi
 
