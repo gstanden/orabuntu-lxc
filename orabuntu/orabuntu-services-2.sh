@@ -244,19 +244,19 @@ then
 	while [ $DNSLookup -eq 0 ]
        	do
        		SeedIndex=$((SeedIndex+1))
-		SeedPostfix=c$SeedIndex
        		DNSLookup=$(CheckDNSLookup)
+
+		if   [ $LXD = 'N' ]
+		then
+			SeedPostfix=c$SeedIndex
+		elif [ $LXD = 'Y' ]
+		then
+			SeedPostfix=d$SeedIndex
+		fi
+
 		DNSLookup=`echo $?`
        	done
 	
-	if   [ $LXD = 'N' ]
-	then
-		SeedPostfix=c$SeedIndex
-	elif [ $LXD = 'Y' ]
-	then
-		SeedPostfix=d$SeedIndex
-	fi
-
 elif [ $MultiHostVar3 = '1' ] && [ $GREValue = 'N' ]
 then
 	SeedIndex=10
@@ -735,7 +735,7 @@ then
         clear
 fi
 
-if [ $LXD = 'N' ]
+if   [ $LXD = 'N' ]
 then
 	if [ $(SoftwareVersion $LXCVersion) -ge $(SoftwareVersion "2.1.0") ]
 	then
@@ -862,19 +862,13 @@ then
 	echo "=============================================="
 	echo ''
 
-	# sudo sed -i -e '/OPTIONS/{ s/.*/OPTIONS="-g -x"/ }' /etc/sysconfig/ntpd
+#	sudo sed -i -e '/OPTIONS/{ s/.*/OPTIONS="-g -x"/ }' /etc/sysconfig/ntpd
 	sudo sed -i -e '/OPTIONS/{ s/.*/OPTIONS="-g -x"/ }' /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/etc/sysconfig/ntpd
 
-	sleep 5
-
-	clear
-	
 	echo ''
 	echo "=============================================="
 	echo "Done: Set NTP '-x' option in ntpd file.       "
 	echo "=============================================="
-
-	# fi
 
 	sleep 5
 
@@ -937,6 +931,11 @@ then
 	}
 	PublicIP=$(CheckPublicIP)
 
+        function CheckPublicIPIterative {
+                sudo lxc-info -n oel$OracleRelease$SeedPostfix -iH | cut -f1-3 -d'.' | sed 's/\.//g' | head -1
+        }
+        PublicIP=$(CheckPublicIPIterative)
+
 	# GLS 20151217 Veth Pair Cleanups Scripts Create
 
 	sudo chown root:root /etc/network/openvswitch/veth_cleanups.sh
@@ -964,28 +963,19 @@ then
 		}
 		ContainersExist=$(CheckContainersExist)
 
-		echo $j
 		sleep 5
+
 		for j in $ContainersExist
 		do
-        		# GLS 20160707 updated to use lxc-copy instead of lxc-clone for Ubuntu 16.04
-        		# GLS 20160707 continues to use lxc-clone for Ubuntu 15.04 and 15.10
-
-			if [ $UbuntuMajorVersion -ge 16 ]
-        		then
-        			function CheckPublicIPIterative {
-					sudo lxc-info -n $j -iH | cut -f1-3 -d'.' | sed 's/\.//g' | head -1	
-        			}
-        		fi
 			PublicIPIterative=$(CheckPublicIPIterative)
 			echo "Starting container $j ..."
 			echo ''
 			sudo lxc-start  -n $j
 			sleep 5
 
-			if [ $MajorRelease -eq 8 ]
+			if [ $MajorRelease -ge 7 ] && [ $Release -ge 7 ]
 			then 
-				sudo lxc-attach -n $j -- hostnamectl set-hostname oel$OracleRelease$SeedPostfix
+				sudo lxc-attach -n $j -- hostnamectl set-hostname $j
 				sudo lxc-stop   -n $j
 				sudo lxc-start  -n $j
 			fi

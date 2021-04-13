@@ -1,5 +1,5 @@
 #!/bin/bash
-
+#
 #    Copyright 2015-2021 Gilbert Standen
 #    This file is part of Orabuntu-LXC.
 
@@ -29,4 +29,4 @@
 #    The domain names can be arbitrary fictional names or they can be a domain that you actually own and operate.
 #    There are two domains and two networks because the "seed" LXC containers are on a separate network from the production LXC containers.
 #    If the domain is an actual domain, you will need to change the subnet using the subnets feature of Orabuntu-LXC
-#
+

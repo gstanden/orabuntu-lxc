@@ -212,10 +212,6 @@ then
         clear
 fi
 
-GRE=Y
-MTU=1420
-LOGEXT=`date +"%Y-%m-%d.%R:%S"`
-
 # TunType values [geneve|gre|vxlan]
 
 TunType=$(source /home/ubuntu/Downloads/orabuntu-lxc-master/anylinux/CONFIG; echo $TunType)
@@ -230,114 +226,141 @@ Docker=$(source /home/ubuntu/Downloads/orabuntu-lxc-master/anylinux/CONFIG; echo
 
 ################ LXD Cluster Settings ######################
 
+# These values are set hard-coded in this script because this is the HUB host install script.
+
+GRE=Y
+MTU=1420
+LOGEXT=`date +"%Y-%m-%d.%R:%S"`
+
+# TunType values [geneve|gre|vxlan]
+
+TunType=$(source /home/ubuntu/Downloads/orabuntu-lxc-master/anylinux/CONFIG; echo $TunType)
+
+################e Kubernetes Install Flag  ######################
+
+K8S=N
+
+################### Docker Install Flag  ########################
+
+Docker=$(source /home/ubuntu/Downloads/orabuntu-lxc-master/anylinux/CONFIG; echo $Docker)
+
+################ LXD Cluster Settings ######################
+
 LXD=$(source /home/ubuntu/Downloads/orabuntu-lxc-master/anylinux/CONFIG; echo $LXD)
 LXDCluster=$(source /home/ubuntu/Downloads/orabuntu-lxc-master/anylinux/CONFIG; echo $LXDCluster)
+StorageDriver=$(source /home/ubuntu/Downloads/orabuntu-lxc-master/anylinux/CONFIG; echo $StorageDriver)
 
 if [ $LXDCluster = 'N' ]
 then
         PreSeed=N
 fi
 
-if   [ $LinuxFlavor = 'Ubuntu' ] && [ $UbuntuMajorVersion -ge 20 ]
+if   [ $LinuxFlavor = 'Ubuntu' ] || [ $LinuxFlavor = 'Oracle' ]
 then
-        if [ $LXDCluster = 'Y' ]
+        if [ $UbuntuMajorVersion -ge 20 ] || [ $Release -ge 8 ]
         then
-		echo ''
-		echo "=============================================="
-		echo "Show Optional LXD & LXD Cluster Values...     "
-		echo "=============================================="
-		echo ''
-
-		LXD=Y
-                PreSeed=Y
-                BtrfsLun=Unused
-                StoragePoolName=olxc-002
-                StorageDriver=zfs
-
-                echo 'LXDCluster = '$LXDCluster
-                echo 'PreSeed    = '$PreSeed
-                echo 'LXD        = '$LXD
-
-		echo ''
-		echo "=============================================="
-		echo "Done: Show Optional LXD & LXD Cluster Values. "
-		echo "=============================================="
-		echo ''
-
-		sleep 5
-
-		clear
-
-                echo ''
-                echo "=============================================="
-                echo "Check ZFS Storage Pool Exists...              "
-                echo "=============================================="
-                echo ''
-
-                function CheckZpoolExist {
-                        sudo zpool list $StoragePoolName | grep ONLINE | wc -l
-                }
-                ZpoolExist=$(CheckZpoolExist)
-
-                if [ $ZpoolExist -eq 1 ]
+                if [ $LXDCluster = 'Y' ] && [ $StorageDriver = 'zfs' ]
                 then
-                        echo "ZFS $StoragePoolName exists."
+                        echo ''
+                        echo "=============================================="
+                        echo "Show Optional LXD & LXD Cluster Values...     "
+                        echo "=============================================="
+                        echo ''
+
+                        LXD=Y
+                        PreSeed=Y
+                        BtrfsLun=Unused
+                        StoragePoolName=olxc-002
+                        StorageDriver=zfs
+
+                        echo 'LXDCluster    = '$LXDCluster
+                        echo 'PreSeed       = '$PreSeed
+                        echo 'LXD           = '$LXD
+                        echo 'StorageDriver = '$StorageDriver
+                        echo 'StoragePool   = '$StoragePoolName
+                        echo 'BtrfsLun      = '$BtrfsLun
+
+                        echo ''
+                        echo "=============================================="
+                        echo "Done: Show Optional LXD & LXD Cluster Values. "
+                        echo "=============================================="
+                        echo ''
+
+                        sleep 5
+
+                        clear
+
+                        echo ''
+                        echo "=============================================="
+                        echo "Check ZFS Storage Pool Exists...              "
+                        echo "=============================================="
+                        echo ''
+
+                        function CheckZpoolExist {
+                                sudo zpool list $StoragePoolName | grep ONLINE | wc -l
+                        }
+                        ZpoolExist=$(CheckZpoolExist)
+
+                        if [ $ZpoolExist -eq 1 ]
+                        then
+                                echo "ZFS $StoragePoolName exists."
+                        else
+                                echo "ZFS $StoragePoolName does not exist."
+                                echo "ZFS $StoragePoolName must be created before running Orabuntu-LXC in LXD Cluster Mode."
+                                echo "Orabuntu-LXC Exiting."
+                                exit
+                        fi
+
+                        echo ''
+                        echo "=============================================="
+                        echo "Done: Check ZFS Storage Pool Exists.          "
+                        echo "=============================================="
+                        echo ''
+
+                        sleep 5
+
+                        clear
                 else
-                        echo "ZFS $StoragePoolName does not exist."
-                        echo "ZFS $StoragePoolName must be created before running Orabuntu-LXC in LXD Cluster Mode."
-                        echo "Orabuntu-LXC Exiting."
-                        exit
+                        PreSeed=Unused
+                        BtrfsLun=Unused
+                        StoragePoolName=Unused
+                        StorageDriver=Unused
                 fi
-
-                echo ''
-                echo "=============================================="
-                echo "Done: Check ZFS Storage Pool Exists.          "
-                echo "=============================================="
-                echo ''
-
-                sleep 5
-
-                clear
-        else
-                PreSeed=Unused
-                BtrfsLun=Unused
-                StoragePoolName=Unused
-                StorageDriver=Unused
         fi
 fi
 
-if [ $LinuxFlavor = 'Oracle' ] && [ $Release -eq 8 ]
-then
-        if [ $LXDCluster = 'Y' ]
-        then
-                LXD=Y
-                PreSeed=Y
-                BtrfsLun=$(source /home/ubuntu/Downloads/orabuntu-lxc-master/anylinux/CONFIG; echo $PreSeed)
-                StoragePoolName=Unused
-                StorageDriver=Unused
-
-                echo ''
-                echo "=============================================="
-                echo "                WARNING !!                    "
-                echo "=============================================="
-                echo ''
-                echo "=============================================="
-                echo "LXD Cluster will RE-FORMAT $BtrfsLun as a     "
-                echo "BTRFS file system for LXD.                    "
-                echo "                                              "
-                echo "If you do NOT want to use /dev/sdXn for this  "
-                echo "purpose, hit CTRL+c now to exit.              "
-                echo "=============================================="
-                echo ''
-
-                sleep 20
-        else
-                PreSeed=Unused
-                BtrfsLun=Unused
-                StoragePoolName=Unused
-                StorageDriver=Unused
-        fi
-fi
+# if [ $LinuxFlavor = 'Oracle' ] && [ $Release -eq 8 ]
+# then
+#       if [ $LXDCluster = 'Y' ]
+#       then
+#               LXD=Y
+#               PreSeed=Y
+#               BtrfsLun=$(source /home/ubuntu/Downloads/orabuntu-lxc-master/anylinux/CONFIG; echo $BtrfsLun)
+#               StoragePoolName=Unused
+#               StorageDriver=Unused
+#
+#               echo ''
+#               echo "=============================================="
+#               echo "                WARNING !!                    "
+#               echo "=============================================="
+#               echo ''
+#               echo "=============================================="
+#               echo "LXD Cluster will RE-FORMAT $BtrfsLun as a     "
+#               echo "BTRFS file system for LXD.                    "
+#               echo "                                              "
+#               echo "If you do NOT want to use $BtrfsLun for this  "
+#               echo "purpose, hit CTRL+c now to exit.              "
+#               echo "=============================================="
+#               echo ''
+#
+#               sleep 20
+#       else
+#               PreSeed=Unused
+#               BtrfsLun=Unused
+#               StoragePoolName=Unused
+#               StorageDriver=Unused
+#       fi
+#fi
 
 ################## LXD Cluster Settings END #########################
 
@@ -377,7 +400,6 @@ fi
 if [ -z $2 ]
 then
 	SPOKEIP=$(source /home/ubuntu/Downloads/orabuntu-lxc-master/anylinux/CONFIG; echo $SPOKEIP)
- 	SPOKEIP=192.168.1.144
 else
 	SPOKEIP=$2
 fi
@@ -385,7 +407,6 @@ fi
 if [ -z $3 ]
 then
 	HUBIP=$(source /home/ubuntu/Downloads/orabuntu-lxc-master/anylinux/CONFIG; echo $HUBIP)
- 	HUBIP=192.168.1.143
 else
 	HUBIP=$3
 fi
@@ -393,7 +414,6 @@ fi
 if [ -z $4 ]
 then
 	HubUserAct=$(source /home/ubuntu/Downloads/orabuntu-lxc-master/anylinux/CONFIG; echo $HubUserAct)
-	HubUserAct=ubuntu
 else
 	HubUserAct=$4
 fi
@@ -401,7 +421,6 @@ fi
 if [ -z $5 ]
 then
 	HubSudoPwd=$(source /home/ubuntu/Downloads/orabuntu-lxc-master/anylinux/CONFIG; echo $HubSudoPwd)
-	HubSudoPwd=ubuntu
 else
 	HubSudoPwd=$5
 fi

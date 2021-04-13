@@ -553,6 +553,9 @@ then
 	echo "18. 'DNS Not Resolving under Network [CentOS8] #957' lfiraza https://github.com/docker/for-linux/issues/957"
 	echo "19. 'Firewalld CentOS 7 Masquerading' lzap https://serverfault.com/questions/623297/firewalld-centos-7-masquerading"
 	echo "20. 'How do I read a variable from a file? (Ask Ubuntu)' Jesse Nickles https://askubuntu.com/questions/367136/how-do-i-read-a-variable-from-a-file"
+	echo "21. 'Run process under group on solaris (StackExchange)' meuh https://unix.stackexchange.com/questions/402996/run-process-under-group-on-solaris"
+	echo "22. 'Fedora 32: Error Could not resolve host' Humble https://www.humblec.com/fedora-32-error-could-not-resolve-host-while-building-docker-containers/"
+	echo "23. 'Bug 1454584 - firewall-cmd generates bad iptables rule for GRE' gorshkov https://bugzilla.redhat.com/show_bug.cgi?id=1454584"
 	echo ''
 	echo "Acknowledgements"
 	echo ''

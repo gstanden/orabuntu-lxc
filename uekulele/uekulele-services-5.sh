@@ -51,6 +51,16 @@ function GetMultiHostVar2 {
 }
 MultiHostVar2=$(GetMultiHostVar2)
 
+function GetMultiHostVar3 {
+	echo $MultiHost | cut -f3 -d':'
+}
+MultiHostVar3=$(GetMultiHostVar3)
+
+function GetMultiHostVar4 {
+	echo $MultiHost | cut -f4 -d':'
+}
+MultiHostVar4=$(GetMultiHostVar4)
+
 function GetMultiHostVar5 {
 	echo $MultiHost | cut -f5 -d':'
 }
@@ -81,12 +91,67 @@ function GetMultiHostVar10 {
 }
 MultiHostVar10=$(GetMultiHostVar10)
 GRE=$MultiHostVar10
+GREValue=$MultiHostVar10
+
+function GetMultiHostVar11 {
+        echo $MultiHost | cut -f11 -d':'
+}
+MultiHostVar11=$(GetMultiHostVar11)
+
+function GetMultiHostVar12 {
+        echo $MultiHost | cut -f12 -d':'
+}
+MultiHostVar12=$(GetMultiHostVar12)
+LXDValue=$MultiHostVar12
+LXD=$LXDValue
+
+function GetMultiHostVar13 {
+        echo $MultiHost | cut -f13 -d':'
+}
+MultiHostVar13=$(GetMultiHostVar13)
+K8S=$MultiHostVar13
+
+function GetMultiHostVar14 {
+        echo $MultiHost | cut -f14 -d':'
+}
+MultiHostVar14=$(GetMultiHostVar14)
+PreSeed=$MultiHostVar14
+
+function GetMultiHostVar15 {
+        echo $MultiHost | cut -f15 -d':'
+}
+MultiHostVar15=$(GetMultiHostVar15)
+LXDCluster=$MultiHostVar15
+
+function GetMultiHostVar16 {
+        echo $MultiHost | cut -f16 -d':'
+}
+MultiHostVar16=$(GetMultiHostVar16)
+LXDStorageDriver=$MultiHostVar16
+
+function GetMultiHostVar17 {
+        echo $MultiHost | cut -f17 -d':'
+}
+MultiHostVar17=$(GetMultiHostVar17)
+StoragePoolName=$MultiHostVar17
+
+function GetMultiHostVar18 {
+        echo $MultiHost | cut -f18 -d':'
+}
+MultiHostVar18=$(GetMultiHostVar18)
+BtrfsLun=$MultiHostVar18
 
 function GetMultiHostVar19 {
         echo $MultiHost | cut -f19 -d':'
 }
 MultiHostVar19=$(GetMultiHostVar19)
 Docker=$MultiHostVar19
+
+function GetMultiHostVar20 {
+        echo $MultiHost | cut -f20 -d':'
+}
+MultiHostVar20=$(GetMultiHostVar20)
+TunType=$MultiHostVar20
 
 function SoftwareVersion { echo "$@" | awk -F. '{ printf("%d%03d%03d%03d\n", $1,$2,$3,$4); }'; }
 
@@ -140,6 +205,7 @@ then
                 sudo cat /etc/oracle-release | cut -f5 -d' ' | cut -f1 -d'.'
         }
         OracleDistroRelease=$(GetOracleDistroRelease)
+
         if   [ $OracleDistroRelease -eq 7 ] || [ $OracleDistroRelease -eq 6 ]
         then
                 CutIndex=7
@@ -147,6 +213,7 @@ then
         then
                 CutIndex=6
         fi
+
         function GetRedHatVersion {
                 sudo cat /etc/redhat-release | cut -f"$CutIndex" -d' ' | cut -f1 -d'.'
         }
@@ -172,11 +239,13 @@ then
                         cat /etc/redhat-release | sed 's/ Linux//' | cut -f1 -d'.' | rev | cut -f1 -d' '
                 }
         fi
+
 	RedHatVersion=$(GetRedHatVersion)
 	RHV=$RedHatVersion
         Release=$RedHatVersion
         LF=$LinuxFlavor
         RL=$Release
+
 elif [ $LinuxFlavor = 'Fedora' ]
 then
         CutIndex=3
@@ -197,6 +266,7 @@ then
         fi
         LF=$LinuxFlavor
         RL=$Release
+
 elif [ $LinuxFlavor = 'Ubuntu' ]
 then
         function GetUbuntuVersion {
@@ -216,14 +286,6 @@ echo "=============================================="
 echo "Script: uekulele-services-5.sh                "
 echo "=============================================="
 echo ''
-echo "=============================================="
-echo "This script is re-runnable.                   "
-echo "=============================================="
-echo ''
-echo "=============================================="
-echo "This script starts lxc clones                 "
-echo "This script installs Docker                   "
-echo "=============================================="
 
 sleep 5
 
@@ -255,273 +317,172 @@ then
  	clear
 fi
 
-# if [ $MultiHostVar1 = 'new' ] || [ $MultiHostVar1 = 'reinstall' ]
-# then
-# 	echo ''
-# 	echo "=============================================="
-# 	echo "Create additional OpenvSwitch networks...     "
-# 	echo "=============================================="
-# 	echo ''
-# 
-# 	sleep 5
-# 
-# 	clear
-#
-# 	SwitchList='sw2 sw3 sw4 sw5 sw6 sw7 sw8 sw9'
-# 	for k in $SwitchList
-# 	do
-# 		if [ $Release -ge 7 ]
-# 		then
-# 			echo ''
-# 			echo "=============================================="
-# 			echo "Create systemd OpenvSwitch $k service...      "
-# 			echo "=============================================="
-# 
-# 			if [ ! -f /etc/systemd/system/$k.service ]
-# 			then
-# 				sudo sh -c "echo '[Unit]'						 > /etc/systemd/system/$k.service"
-# 			      	sudo sh -c "echo 'Description=$k Service'				>> /etc/systemd/system/$k.service"
-# 			      	sudo sh -c "echo 'After=network-online.target'				>> /etc/systemd/system/$k.service"
-# 			      	sudo sh -c "echo ''							>> /etc/systemd/system/$k.service"
-# 			      	sudo sh -c "echo '[Service]'						>> /etc/systemd/system/$k.service"
-# 			      	sudo sh -c "echo 'Type=oneshot'						>> /etc/systemd/system/$k.service"
-# 			      	sudo sh -c "echo 'User=root'						>> /etc/systemd/system/$k.service"
-# 			      	sudo sh -c "echo 'RemainAfterExit=yes'					>> /etc/systemd/system/$k.service"
-# 			      	sudo sh -c "echo 'ExecStart=/etc/network/openvswitch/crt_ovs_$k.sh' 	>> /etc/systemd/system/$k.service"
-# 			      	sudo sh -c "echo ''							>> /etc/systemd/system/$k.service"
-# 			      	sudo sh -c "echo '[Install]'						>> /etc/systemd/system/$k.service"
-# 			      	sudo sh -c "echo 'WantedBy=multi-user.target'				>> /etc/systemd/system/$k.service"
-# 			fi
-#	
-#			echo ''
-#			echo "=============================================="
-#			echo "Start OpenvSwitch $k ...                      "
-#			echo "=============================================="
-#			echo ''
-#
-#			sudo chmod 644 /etc/systemd/system/$k.service
-#			sudo systemctl enable $k.service
-#			sudo service $k stop
-#			sudo service $k start
-#			sudo service $k status
-#
-#			echo ''
-#			echo "=============================================="
-#			echo "OpenvSwitch $k is up.                         "
-#			echo "=============================================="
-#		
-#			sleep 3
-#
-#			clear
-#
-#		elif [ $Release -eq 6 ]
-#		then
-#			echo ''
-#			echo "=============================================="
-#			echo "Create OpenvSwitch $k service...              "
-#			echo "=============================================="
-#			echo ''
-#
-#			if [ ! -f /etc/init.d/ovs_$k ]
-#			then
-#				sudo cp -p /etc/network/openvswitch/switch-service-linux6.sh /etc/init.d/ovs_$k
-#				sudo sed -i "s/SWK/$k/g" /etc/init.d/ovs_$k
-#				sudo chmod 755 /etc/init.d/ovs_$k
-#				sudo chown $Owner:$Group /etc/init.d/ovs_$k
-#				sudo chkconfig --add ovs_$k
-#				sudo chkconfig ovs_$k on --level 345
-#				sudo chkconfig --list ovs_$k
-#			else
-#				sudo chkconfig --list ovs_$k
-#			fi
-#
-#		        echo ''
-#			echo "=============================================="
-#			echo "Start OpenvSwitch $k ...                      "
-#			echo "=============================================="
-#			echo ''
-#
-#			sudo chmod 755 /etc/network/openvswitch/crt_ovs_$k.sh
-#			sudo /etc/network/openvswitch/crt_ovs_$k.sh >/dev/null 2>&1
-#			sudo ifconfig $k | tail -50
-#
-#			echo "=============================================="
-#			echo "OpenvSwitch $k is up.                         "
-#			echo "=============================================="
-#			echo ''
-#
-#			sleep 3
-#
-#			clear
-#		fi
-#	done
-#
-#	echo ''
-#	echo "=============================================="
-#	echo "Openvswitch networks installed & configured.  "
-#	echo "=============================================="
-#	echo ''
-#
-#	sleep 5
-#
-#	clear
-#fi
-
 if [ $Release -ge 7 ]
 then
 	sudo systemctl daemon-reload
 fi
 
-# sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service lxc-net restart > /dev/null 2>&1"
-# sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service systemd-resolved restart > /dev/null 2>&1"
-# sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service dnsmasq restart > /dev/null 2>&1"
+if [ $LXD = 'N' ]
+then
+	echo ''
+	echo "=============================================="
+	echo "Starting LXC containers for Oracle...         "
+	echo "=============================================="
+	echo ''
 
-echo ''
-echo "=============================================="
-echo "Starting LXC cloned containers for Oracle...  "
-echo "=============================================="
-echo ''
+	sleep 5
 
-function GetSeedPostfix {
-	sudo lxc-ls -f | grep ora"$OracleRelease"c | cut -f1 -d' ' | cut -f2 -d'c' | sed 's/^/c/'
-}
-SeedPostfix=$(GetSeedPostfix)
+	clear
 
-function CheckClonedContainersExist {
-	sudo ls /var/lib/lxc | grep "ora$OracleRelease" | sort -V | sed 's/$/ /' | tr -d '\n' | sed 's/^[ \t]*//;s/[ \t]*$//'
-}
-ClonedContainersExist=$(CheckClonedContainersExist)
+	function GetSeedPostfix {
+		sudo lxc-ls -f | grep ora"$OracleRelease"c | cut -f1 -d' ' | cut -f2 -d'c' | sed 's/^/c/'
+	}
+	SeedPostfix=$(GetSeedPostfix)
 
-k=1
-for j in $ClonedContainersExist
-do
-	# GLS 20160707 updated to use lxc-copy instead of lxc-clone for Ubuntu 16.04
-	# GLS 20160707 continues to use lxc-clone for Ubuntu 15.04 and 15.10
+	function CheckClonedContainersExist {
+		sudo ls /var/lib/lxc | grep "ora$OracleRelease" | sort -V | sed 's/$/ /' | tr -d '\n' | sed 's/^[ \t]*//;s/[ \t]*$//'
+	}
+	ClonedContainersExist=$(CheckClonedContainersExist)
 
-#	sudo /etc/network/openvswitch/veth_cleanups.sh $j > /dev/null 2>&1
+	for j in $ClonedContainersExist
+	do
+		# GLS 20160707 updated to use lxc-copy instead of lxc-clone for Ubuntu 16.04
+		# GLS 20160707 continues to use lxc-clone for Ubuntu 15.04 and 15.10
 
-	echo "Starting container $j ..."
+	#	sudo /etc/network/openvswitch/veth_cleanups.sh $j > /dev/null 2>&1
+
+	#	echo "Starting container $j ..."
+
+		sudo lxc-start -n $J > /dev/null 2>&1
 	
-	if [ $Release -ge 6 ]
-	then
 		function CheckPublicIPIterative {
 			sudo lxc-info -n $j -iH | cut -f1-3 -d'.' | sed 's/\.//g' | head -1
 		}
-	fi
-	PublicIPIterative=$(CheckPublicIPIterative)
-	echo $j | grep oel > /dev/null 2>&1
-	if [ $? -eq 0 ]
-	then
-		sudo bash -c "cat $Config|grep ipv4|cut -f2 -d'='|sed 's/^[ \t]*//;s/[ \t]*$//'|cut -f4 -d'.'|sed 's/^/\./'|xargs -I '{}' sed -i "/ipv4/s/\{}/\.1$OR/g" $Config"
-	fi
-	sudo lxc-start -n $j > /dev/null 2>&1
-	sleep 5
-	i=1
-	while [ "$PublicIPIterative" != 1020739 ] && [ "$i" -le 10 ]
-	do
-		echo "Waiting for $j Public IP to come up..."
-		sleep 10
 		PublicIPIterative=$(CheckPublicIPIterative)
-		SeedPostfix=$(GetSeedPostfix)
-		if [ $i -eq 5 ]
-		then
-                        sudo lxc-stop -n $j -k > /dev/null 2>&1
-			sleep 2
-                        echo ''
-                        echo 'Attempting OpenvSwitch veth pair cleanup procedures...'
-                        echo "Messages 'Cannot find device...' are normal in this procedure."
-                        echo 'Orabuntu-LXC will re-attempt container startup after cleanup procedure.'
-                        echo ''
-			sudo /etc/network/openvswitch/veth_cleanups.sh $j
-			echo ''
 
-			sudo systemctl daemon-reload
+		echo ''
+		echo "=============================================="
+		echo "LXC Container $j Started                      "
+		echo "=============================================="
+		echo ''
 
-			if [ $LinuxFlavor != 'Fedora' ] && [ $LinuxFlavor != 'CentOS' ] && [ $LinuxFlavor != 'Red' ]
-			then
-				sudo service lxc-net restart > /dev/null 2>&1
-			else
-				sudo sed -i '/cache-size=150/s/cache-size=150/cache-size=0/g' /etc/dnsmasq.conf
-				sudo service dnsmasq restart > /dev/null 2>&1
-			fi
+		sudo lxc-ls -f | egrep "NAME|$j"
 
-			sleep 2
-			sudo lxc-start -n $j
-			sleep 2
-			if [ $MajorRelease -eq 6 ] || [ $MajorRelease -eq 5 ]
-			then
-				sudo lxc-attach -n $j -- ntpd -x
-			fi
-		fi
-	sleep 1
-	i=$((i+1))
-	echo "Container $j has been started ..."
-	done
-done
+		echo ''
+		echo "=============================================="
+		echo ''
 
-sleep 5
+		sleep 5
 
-clear
-
-echo ''
-echo "=============================================="
-echo "LXC clone containers for Oracle started.      "
-echo "=============================================="
-echo ''
-
-sleep 5
-
-clear
-
-if   [ $SystemdResolvedInstalled -ge 1 ] && [ $LinuxFlavor != 'Fedora' ]
-then
-        echo ''
-        echo "=============================================="
-        echo "Restart systemd-resolved...                   "
-        echo "=============================================="
-        echo ''
-
-        sudo service systemd-resolved restart
-        sleep 2
-        systemd-resolve --status | head -6 | tail -5
-
-        echo ''
-        echo "=============================================="
-        echo "Done: Restart systemd-resolved.               "
-        echo "=============================================="
-        echo ''
-
-        sleep 5
-
-        clear
-fi
-
-for j in $ClonedContainersExist
-do
-	echo ''
-        echo "=============================================="
-        echo "SSH to local container $j...                  "
-        echo "=============================================="
-        echo ''
-
-	if [ $LinuxFlavor = 'CentOS' ] && [ $Release -eq 6 ]
-	then
-		sudo cp -p /etc/resolv.conf.olxc /etc/resolv.conf
-	fi
+		clear
 	
-	ssh-keygen -R $j
-       	sshpass -p root ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no root@$j "uname -a; cat /etc/redhat-release"
+		i=1
+		while [ "$PublicIPIterative" != 1020739 ] && [ "$i" -le 10 ]
+		do
+			PublicIPIterative=$(CheckPublicIPIterative)
 
-        echo ''
-        echo "=============================================="
-        echo "Done: SSH to local container $j.              "
-        echo "=============================================="
-        echo ''
+			if [ $i -eq 5 ]
+			then
+                        	sudo lxc-stop -n $j -k > /dev/null 2>&1
+				sleep 2
+                        	echo ''
+                        	echo 'Attempting OpenvSwitch veth pair cleanup procedures...'
+                        	echo "Messages 'Cannot find device...' are normal in this procedure."
+                        	echo 'Orabuntu-LXC will re-attempt container startup after cleanup procedure.'
+                        	echo ''
+				sudo /etc/network/openvswitch/veth_cleanups.sh $j
+				echo ''
 
-        sleep 5
+				sudo systemctl daemon-reload
+
+				if [ $LinuxFlavor != 'Fedora' ] && [ $LinuxFlavor != 'CentOS' ] && [ $LinuxFlavor != 'Red' ]
+				then
+					sudo service lxc-net restart > /dev/null 2>&1
+				else
+					sudo sed -i '/cache-size=150/s/cache-size=150/cache-size=0/g' /etc/dnsmasq.conf
+					sudo service dnsmasq restart > /dev/null 2>&1
+				fi
+
+				sleep 2
+				sudo lxc-start -n $j
+				sleep 2
+
+				if [ $MajorRelease -eq 6 ] || [ $MajorRelease -eq 5 ]
+				then
+					sudo lxc-attach -n $j -- ntpd -x
+				fi
+			fi
+
+			sleep 1
+			i=$((i+1))
+			echo "Container $j has been started ..."
+		done
+	done
+
+	sleep 5
 
 	clear
-done
+
+	echo ''
+	echo "=============================================="
+	echo "LXC clone containers for Oracle started.      "
+	echo "=============================================="
+	echo ''
+
+	sleep 5
+
+	clear
+
+	if   [ $SystemdResolvedInstalled -ge 1 ] && [ $LinuxFlavor != 'Fedora' ]
+	then
+        	echo ''
+        	echo "=============================================="
+        	echo "Restart systemd-resolved...                   "
+        	echo "=============================================="
+        	echo ''
+
+        	sudo service systemd-resolved restart
+        	sleep 2
+        	systemd-resolve --status | head -6 | tail -5
+
+        	echo ''
+        	echo "=============================================="
+        	echo "Done: Restart systemd-resolved.               "
+        	echo "=============================================="
+        	echo ''
+
+        	sleep 5
+
+        	clear
+	fi
+
+	for j in $ClonedContainersExist
+	do
+		echo ''
+        	echo "=============================================="
+        	echo "SSH to local container $j...                  "
+        	echo "=============================================="
+        	echo ''
+
+		if [ $LinuxFlavor = 'CentOS' ] && [ $Release -eq 6 ]
+		then
+			sudo cp -p /etc/resolv.conf.olxc /etc/resolv.conf
+		fi
+	
+		ssh-keygen -R $j
+       		sshpass -p root ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no root@$j "uname -a; cat /etc/redhat-release"
+
+        	echo ''
+        	echo "=============================================="
+        	echo "Done: SSH to local container $j.              "
+        	echo "=============================================="
+        	echo ''
+
+        	sleep 5
+
+		clear
+	done
+fi
 
 if [ $MultiHostVar1 = 'new' ] || [ $MultiHostVar1 = 'reinstall' ]
 then
@@ -1163,6 +1124,84 @@ then
 
         sudo lxc-ls -f
 
+	if [ $LXD = 'Y' ]
+	then
+                function GetLXDContainerNames {
+                        echo "/var/lib/snapd/snap/bin/lxc list --columns n --format csv | grep -v oel | sed 's/$/ /g' | tr -d '\n' |  sed 's/[ \t]*$//'" | sg lxd
+                }
+                LXDContainerNames=$(GetLXDContainerNames)
+
+                echo ''
+                echo "=============================================="
+                echo "LXD Containers...                             "
+                echo "=============================================="
+                echo ''
+
+                echo "/var/lib/snapd/snap/bin/lxc list" | sg lxd
+
+                sleep 5
+
+                clear
+
+                for i in $LXDContainerNames
+                do
+                        echo ''
+                        echo "=============================================="
+                        echo "Test SSH to LXD Container $i ...              "
+                        echo "=============================================="
+                        echo ''
+
+                        ssh-keygen -R $i
+                        sleep 5
+                        sshpass -p root ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no root@$i "uname -a; cat /etc/oracle-release"
+
+                        echo ''
+                        echo "=============================================="
+                        echo "Done: Test SSH to LXD Container $i.           "
+                        echo "=============================================="
+                        echo ''
+
+                        sleep 5
+
+                        clear
+
+                        echo ''
+                        echo "=============================================="
+                        echo "Test nslookup LXD Container $i ...            "
+                        echo "=============================================="
+                        echo ''
+
+                        nslookup $i
+
+                        echo "=============================================="
+                        echo "Done: Test nslookup LXD Container $i.         "
+                        echo "=============================================="
+                        echo ''
+
+                        sleep 5
+
+                        clear
+                done
+
+                sleep 5
+
+                clear
+
+                echo ''
+                echo "=============================================="
+                echo "List LXD Containers ...                       "
+                echo "=============================================="
+                echo ''
+
+                echo "/var/lib/snapd/snap/bin/lxc list" | sg lxd
+
+                echo ''
+                echo "=============================================="
+                echo "Done: List LXD Containers ...                 "
+                echo "=============================================="
+                echo ''
+        fi
+
 	if [ $Release -ge 6 ] && [ $Release -le 8 ]
 	then
 		if   [ $Release -le 7 ]
@@ -1192,12 +1231,6 @@ then
 			echo "Done: List Application (docker) Containers.   "
         		echo "=============================================="
 			echo ''
-        		echo "=============================================="
-        		echo "To ssh to Docker raesene/alpine-nettools:     "
-        		echo "                                              "
-        		echo "     ssh username@localhost -p 2200           "
-        		echo "                                              "
-        		echo "=============================================="
 
 		elif [ $Release -ge 8 ] && [ $LinuxFlavor != 'Fedora' ]
 		then

@@ -59,7 +59,7 @@ then
 		sleep 120
 		if   [ $LXDCluster = 'N' ]
 		then
-			cat /etc/network/openvswitch/preseed.sw1a.oracle8.linux.001.lxd | lxd init --preseed
+			cat /etc/network/openvswitch/preseed.sw1a.olxc.001.lxd | lxd init --preseed
 			if [ $? -ne 0 ]
 			then
 				m=1
@@ -71,7 +71,7 @@ then
 		then
 			if   [ $GRE = 'N' ]
 			then
-				cat /etc/network/openvswitch/preseed.sw1a.oracle8.linux.001.lxd.cluster | lxd init --preseed
+				cat /etc/network/openvswitch/preseed.sw1a.olxc.001.lxd.cluster | lxd init --preseed
 				if [ $? -ne 0 ]
 				then
 					m=1
@@ -83,7 +83,7 @@ then
 			then
 				if [ $n -le 5 ]
 				then
-					cat   /etc/network/openvswitch/preseed.sw1a.oracle8.linux.002.lxd.cluster | sudo /snap/bin/lxd init --preseed
+					cat /etc/network/openvswitch/preseed.sw1a.olxc.002.lxd.cluster | lxd init --preseed
 					if [ $? -ne 0 ]
 					then
 						m=1
@@ -106,6 +106,8 @@ then
 			fi
 		fi
 	done
+
+	echo "/var/lib/snapd/snap/bin/lxc cluster list" | sg lxd
 
 	echo ''
 	echo "=============================================="

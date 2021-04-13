@@ -133,6 +133,24 @@ function GetMultiHostVar17 {
 MultiHostVar17=$(GetMultiHostVar17)
 StoragePoolName=$MultiHostVar17
 
+function GetMultiHostVar18 {
+        echo $MultiHost | cut -f18 -d':'
+}
+MultiHostVar18=$(GetMultiHostVar18)
+BtrfsLun=$MultiHostVar18
+
+function GetMultiHostVar19 {
+        echo $MultiHost | cut -f19 -d':'
+}
+MultiHostVar19=$(GetMultiHostVar19)
+Docker=$MultiHostVar19
+
+function GetMultiHostVar20 {
+        echo $MultiHost | cut -f20 -d':'
+}
+MultiHostVar20=$(GetMultiHostVar20)
+TunType=$MultiHostVar20
+
 GetLinuxFlavors(){
 if   [[ -e /etc/oracle-release ]]
 then

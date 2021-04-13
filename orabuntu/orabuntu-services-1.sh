@@ -115,6 +115,7 @@ function GetMultiHostVar11 {
         echo $MultiHost | cut -f11 -d':'
 }
 MultiHostVar11=$(GetMultiHostVar11)
+Product=$MultiHostVar11
 
 function GetMultiHostVar12 {
         echo $MultiHost | cut -f12 -d':'
@@ -127,6 +128,7 @@ function GetMultiHostVar13 {
         echo $MultiHost | cut -f13 -d':'
 }
 MultiHostVar13=$(GetMultiHostVar13)
+K8S=$MultiHostVar13
 
 function GetMultiHostVar14 {
         echo $MultiHost | cut -f14 -d':'
@@ -151,6 +153,18 @@ function GetMultiHostVar17 {
 }
 MultiHostVar17=$(GetMultiHostVar17)
 StoragePoolName=$MultiHostVar17
+
+function GetMultiHostVar18 {
+        echo $MultiHost | cut -f18 -d':'
+}
+MultiHostVar18=$(GetMultiHostVar18)
+BtrfsLun=$MultiHostVar18
+
+function GetMultiHostVar19 {
+        echo $MultiHost | cut -f19 -d':'
+}
+MultiHostVar19=$(GetMultiHostVar19)
+Docker=$MultiHostVar19
 
 function GetMultiHostVar20 {
         echo $MultiHost | cut -f20 -d':'
@@ -3156,8 +3170,10 @@ then
                 then
                 	sshpass -p $MultiHostVar9 scp -p /etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh $MultiHostVar8@$MultiHostVar5:~/.
                 fi
+
                 sshpass -p $MultiHostVar9 ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" ls -l ~/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh"
-                if [ $? -eq 0 ]
+                
+		if [ $? -eq 0 ]
                 then
                 	sshpass -p $MultiHostVar9 ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" ~/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh"
                 fi

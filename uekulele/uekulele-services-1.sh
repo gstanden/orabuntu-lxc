@@ -75,6 +75,11 @@ OvsVersion=$(GetOvsVersion)
 # MultiHost for reference
 # MultiHost="$Operation:Y:X:X:$HUBIP:$SPOKEIP:$MTU:$HubUserAct:$HubSudoPwd:$GRE:$Product:$LXD:$K8S:$PreSeed:$LXDCluster:$StorageDriver:$StoragePoolName:$BtrfsLun"
 
+function GetMultiHostVar1 {
+	echo $MultiHost | cut -f1 -d':'
+}
+MultiHostVar1=$(GetMultiHostVar1)
+
 function GetMultiHostVar2 {
 	echo $MultiHost | cut -f2 -d':'
 }
@@ -132,11 +137,13 @@ function GetMultiHostVar12 {
 }
 MultiHostVar12=$(GetMultiHostVar12)
 LXDValue=$MultiHostVar12
+LXD=$LXDValue
 
 function GetMultiHostVar13 {
         echo $MultiHost | cut -f13 -d':'
 }
 MultiHostVar13=$(GetMultiHostVar13)
+K8S=$MultiHostVar13
 
 function GetMultiHostVar14 {
         echo $MultiHost | cut -f14 -d':'
@@ -150,11 +157,35 @@ function GetMultiHostVar15 {
 MultiHostVar15=$(GetMultiHostVar15)
 LXDCluster=$MultiHostVar15
 
+function GetMultiHostVar16 {
+        echo $MultiHost | cut -f16 -d':'
+}
+MultiHostVar16=$(GetMultiHostVar16)
+LXDStorageDriver=$MultiHostVar16
+
+function GetMultiHostVar17 {
+        echo $MultiHost | cut -f17 -d':'
+}
+MultiHostVar17=$(GetMultiHostVar17)
+StoragePoolName=$MultiHostVar17
+
 function GetMultiHostVar18 {
         echo $MultiHost | cut -f18 -d':'
 }
 MultiHostVar18=$(GetMultiHostVar18)
 BtrfsLun=$MultiHostVar18
+
+function GetMultiHostVar19 {
+        echo $MultiHost | cut -f19 -d':'
+}
+MultiHostVar19=$(GetMultiHostVar19)
+Docker=$MultiHostVar19
+
+function GetMultiHostVar20 {
+        echo $MultiHost | cut -f20 -d':'
+}
+MultiHostVar20=$(GetMultiHostVar20)
+TunType=$MultiHostVar20
 
 function CheckSystemdResolvedInstalled {
         sudo netstat -ulnp | grep 53 | sed 's/  */ /g' | rev | cut -f1 -d'/' | rev | sort -u | grep systemd- | wc -l
@@ -3814,7 +3845,7 @@ then
 
 					echo ''
 					echo "=============================================="
-					echo "Done: Build & Instlal OpenvSwitch RPMs.       "
+					echo "Done: Build & Install OpenvSwitch RPMs.       "
 					echo "=============================================="
 				fi
 			fi
@@ -4840,7 +4871,7 @@ sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw7.sh
 sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw8.sh
 sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw9.sh
 
-if [ $LXDCluster = 'Y' ]
+if [ $LXDCluster = 'Y' ] && [ $LXDStorageDriver = 'btrfs' ]
 then
         echo ''
         echo "=============================================="
@@ -4874,7 +4905,7 @@ then
                         sudo sed -i "s/SWITCH_IP/$Sw1Index/g"                                                   /etc/network/openvswitch/preseed.sw1a.oracle8.linux.001.lxd.cluster
                         sudo sed -i "s/HOSTNAME/$ShortHostName/g"                                               /etc/network/openvswitch/preseed.sw1a.oracle8.linux.001.lxd.cluster
                         sudo sed -i "s/BTRFSLUN/$BtrfsLun/g"                                               	/etc/network/openvswitch/preseed.sw1a.oracle8.linux.001.lxd.cluster
-		#	sudo sed -i "s/STORAGE-DRIVER/$StorageDriver/g"                                         /etc/network/openvswitch/preseed.sw1a.oracle8.linux.001.lxd.cluster
+		#	sudo sed -i "s/STORAGE-DRIVER/$LXDStorageDriver/g"                                      /etc/network/openvswitch/preseed.sw1a.oracle8.linux.001.lxd.cluster
 		#	sudo sed -i "s/POOL/$StoragePoolName/g"                                                 /etc/network/openvswitch/preseed.sw1a.oracle8.linux.001.lxd.cluster
 
                 elif [ $GRE = 'Y' ]
@@ -4904,7 +4935,7 @@ then
                         sudo sed -i "s/SWITCH_IP/$Sw1Index/g"                                                   /etc/network/openvswitch/preseed.sw1a.oracle8.linux.002.lxd.cluster
                         sudo sed -i "s/HOSTNAME/$ShortHostName/g"                                               /etc/network/openvswitch/preseed.sw1a.oracle8.linux.002.lxd.cluster
                         sudo sed -i "s/BTRFSLUN/$BtrfsLun/g"                                               	/etc/network/openvswitch/preseed.sw1a.oracle8.linux.002.lxd.cluster
-		#	sudo sed -i "s/STORAGE-DRIVER/$StorageDriver/g"                                         /etc/network/openvswitch/preseed.sw1a.oracle8.linux.002.lxd.cluster
+		#	sudo sed -i "s/STORAGE-DRIVER/$LXDStorageDriver/g"                                      /etc/network/openvswitch/preseed.sw1a.oracle8.linux.002.lxd.cluster
 		#	sudo sed -i "s/POOL/$StoragePoolName/g"                                                 /etc/network/openvswitch/preseed.sw1a.oracle8.linux.002.lxd.cluster
                         sudo sed -i -e '/-----BEGIN/,/-----END/!b' -e '/-----END/!d;r /tmp/cert.txt' -e 'd'     /etc/network/openvswitch/preseed.sw1a.oracle8.linux.002.lxd.cluster
 			sudo dos2unix										/etc/network/openvswitch/preseed.sw1a.oracle8.linux.002.lxd.cluster
@@ -4926,6 +4957,94 @@ then
 			sleep 5
 
 			clear
+                fi
+        fi
+fi
+
+if [ $LXDCluster = 'Y' ] && [ $LXDStorageDriver = 'zfs' ]
+then
+        echo ''
+        echo "=============================================="
+        echo "Install packages...                           "
+        echo "=============================================="
+        echo ''
+
+        sudo yum -y install expect dos2unix
+
+        echo ''
+        echo "=============================================="
+        echo "Done: Install packages.                       "
+        echo "=============================================="
+        echo ''
+
+        sleep 5
+
+        clear
+
+        sudo sed -i "s/HOSTNAME/$HOSTNAME/g"    /etc/network/openvswitch/lxd-init-node1.sh
+
+        if   [ $PreSeed = 'Y' ]
+        then
+                function GetShortHostName {
+                        hostname -s
+                }
+                ShortHostName=$(GetShortHostName)
+
+                if   [ $GRE = 'N' ]
+                then
+                        sudo sed -i "s/SWITCH_IP/$Sw1Index/g"                                                   /etc/network/openvswitch/preseed.sw1a.olxc.001.lxd.cluster
+                        sudo sed -i "s/HOSTNAME/$ShortHostName/g"                                               /etc/network/openvswitch/preseed.sw1a.olxc.001.lxd.cluster
+                        sudo sed -i "s/STORAGE-DRIVER/$LXDStorageDriver/g"                                      /etc/network/openvswitch/preseed.sw1a.olxc.001.lxd.cluster
+                        sudo sed -i "s/POOL/$StoragePoolName/g"                                                 /etc/network/openvswitch/preseed.sw1a.olxc.001.lxd.cluster
+
+                elif [ $GRE = 'Y' ]
+                then
+                        sshpass -p $MultiHostVar8 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S --prompt='' <<< "$MultiHostVar8" /var/lib/snapd/snap/bin/lxc info | sed -n '/BEGIN.*-/,/END.*-/p'" > /tmp/cert.txt
+                        rm /tmp/cert.txt
+                        sshpass -p $MultiHostVar8 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S --prompt='' <<< "$MultiHostVar8" /var/lib/snapd/snap/bin/lxc info | sed -n '/BEGIN.*-/,/END.*-/p'" > /tmp/cert.txt
+
+                        echo ''
+                        echo "=============================================="
+                        echo "Display /tmp/cert.txt ...                     "
+                        echo "=============================================="
+                        echo ''
+
+                        cat /tmp/cert.txt
+
+                        echo ''
+                        echo "=============================================="
+                        echo "Done: Display /tmp/cert.txt.                  "
+                        echo "=============================================="
+                        echo ''
+
+                        sleep 5
+
+                        clear
+
+                        sudo sed -i "s/SWITCH_IP/$Sw1Index/g"                                                   /etc/network/openvswitch/preseed.sw1a.olxc.002.lxd.cluster
+                        sudo sed -i "s/HOSTNAME/$ShortHostName/g"                                               /etc/network/openvswitch/preseed.sw1a.olxc.002.lxd.cluster
+                        sudo sed -i "s/STORAGE-DRIVER/$StorageDriver/g"                                         /etc/network/openvswitch/preseed.sw1a.olxc.002.lxd.cluster
+                        sudo sed -i "s/POOL/$StoragePoolName/g"                                                 /etc/network/openvswitch/preseed.sw1a.olxc.002.lxd.cluster
+                        sudo sed -i -e '/-----BEGIN/,/-----END/!b' -e '/-----END/!d;r /tmp/cert.txt' -e 'd'     /etc/network/openvswitch/preseed.sw1a.olxc.002.lxd.cluster
+                        sudo dos2unix                                                                           /etc/network/openvswitch/preseed.sw1a.olxc.002.lxd.cluster
+
+                        echo ''
+                        echo "=============================================="
+                        echo "Display LXD Preseed...                        "
+                        echo "=============================================="
+                        echo ''
+
+                        sudo cat /etc/network/openvswitch/preseed.sw1a.olxc.002.lxd.cluster
+
+                        echo ''
+                        echo "=============================================="
+                        echo "Done: Display LXD Preseed.                    "
+                        echo "=============================================="
+                        echo ''
+
+                        sleep 5
+
+                        clear
                 fi
         fi
 fi
@@ -5661,7 +5780,7 @@ then
 	sudo sed -i "/lxc\.mount\.entry/s/#/ /" /var/lib/lxc/$NameServer/config
 	sudo sed -i "/Manage\-Orabuntu/s/afns1\-base/afns1/" /var/lib/lxc/$NameServer/config
 
-	sudo cat /var/lib/lxc/"$OffBase"-base/rootfs/root/ns_backup_update.sh
+#	sudo cat /var/lib/lxc/"$OffBase"-base/rootfs/root/ns_backup_update.sh
 
         sudo lxc-stop -n  $NameServer
 	sleep 5
@@ -5917,7 +6036,31 @@ then
 		sudo sed -i "/REMOTE_GRE_ENDPOINT/s/#/ /"			/etc/network/openvswitch/crt_ovs_sw1.sh	
 		sudo sed -i "s/REMOTE_GRE_ENDPOINT/$MultiHostVar5/g"		/etc/network/openvswitch/crt_ovs_sw1.sh
 
-		sudo ovs-vsctl add-port sw1 gre$Sw1Index -- set interface gre$Sw1Index type=gre options:remote_ip=$MultiHostVar5
+		if   [ $TunType = 'geneve' ]
+                then
+                        sudo ovs-vsctl add-port sw1 geneve$Sw1Index -- set interface geneve$Sw1Index type=geneve options:remote_ip=$MultiHostVar5 options:key=flow
+
+                        sudo sed -i '/type=gre/d'   /etc/network/openvswitch/crt_ovs_sw1.sh
+                        sudo sed -i '/type=vxlan/d' /etc/network/openvswitch/crt_ovs_sw1.sh
+			sudo firewall-cmd --permanent --zone=public --add-port=6081/udp
+
+                elif [ $TunType = 'gre' ]
+                then
+                        sudo ovs-vsctl add-port sw1 gre$Sw1Index    -- set interface gre$Sw1Index    type=gre    options:remote_ip=$MultiHostVar5
+
+                        sudo sed -i '/type=geneve/d' /etc/network/openvswitch/crt_ovs_sw1.sh
+                        sudo sed -i '/type=vxlan/d'  /etc/network/openvswitch/crt_ovs_sw1.sh
+			sudo firewall-cmd --add-protocol=gre
+
+                elif [ $TunType = 'vxlan' ]
+                then
+                        sudo ovs-vsctl add-port sw1 vxlan$Sw1Index -- set interface vxlan$Sw1Index type=vxlan options:remote_ip=$MultiHostVar5 options:key=flow
+
+                        sudo sed -i '/type=geneve/d' /etc/network/openvswitch/crt_ovs_sw1.sh
+                        sudo sed -i '/type=gre/d'    /etc/network/openvswitch/crt_ovs_sw1.sh
+			sudo firewall-cmd --permanent --zone=public --add-port=4789/udp
+
+                fi
 
                 echo ''
                 echo "=============================================="
@@ -5937,6 +6080,28 @@ then
 
  		sudo sed -i "s/MultiHostVar6/$MultiHostVar6/g" 	/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
  		sudo sed -i "s/MultiHostVar3/$Sw1Index/g" 	/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
+
+                if   [ $TunType = 'geneve' ]
+                then
+                        sudo sed -i '/type=gre/d'               /etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
+                        sudo sed -i '/type=vxlan/d'             /etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
+			sudo sed -i '/add-protocol=gre/d'	/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh	
+			sudo sed -i '/add-port=4789/d'	        /etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh	
+
+                elif [ $TunType = 'gre' ]
+                then
+                        sudo sed -i '/type=geneve/d'            /etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
+                        sudo sed -i '/type=vxlan/d'             /etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
+			sudo sed -i '/add-port=4789/d'	        /etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh	
+			sudo sed -i '/add-port=6081/d'	        /etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh	
+
+                elif [ $TunType = 'vxlan' ]
+                then
+                        sudo sed -i '/type=geneve/d'            /etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
+                        sudo sed -i '/type=gre/d'               /etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
+			sudo sed -i '/add-protocol=gre/d'	/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh	
+			sudo sed -i '/add-port=6081/d'	        /etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh	
+                fi
 
 		sudo chmod 777 /etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
 
