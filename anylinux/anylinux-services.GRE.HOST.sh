@@ -62,6 +62,11 @@ sleep 5
 
 clear
 
+function GetDistDir {
+        pwd | rev | cut -f2-20 -d'/' | rev
+}
+DistDir=$(GetDistDir)
+
 GetLinuxFlavors(){
 if   [[ -e /etc/oracle-release ]]
 then
@@ -214,15 +219,15 @@ fi
 
 # TunType values [geneve|gre|vxlan]
 
-TunType=$(source /home/ubuntu/Downloads/orabuntu-lxc-master/anylinux/CONFIG; echo $TunType)
+TunType=$(source "$DistDir"/anylinux/CONFIG; echo $TunType)
 
 ################# Kubernetes Install Flag  ######################
 
-K8S=$(source /home/ubuntu/Downloads/orabuntu-lxc-master/anylinux/CONFIG; echo $K8S)
+K8S=$(source "$DistDir"/anylinux/CONFIG; echo $K8S)
 
 ################### Docker Install Flag  ########################
 
-Docker=$(source /home/ubuntu/Downloads/orabuntu-lxc-master/anylinux/CONFIG; echo $Docker)
+Docker=$(source "$DistDir"/anylinux/CONFIG; echo $Docker)
 
 ################ LXD Cluster Settings ######################
 
@@ -234,7 +239,7 @@ LOGEXT=`date +"%Y-%m-%d.%R:%S"`
 
 # TunType values [geneve|gre|vxlan]
 
-TunType=$(source /home/ubuntu/Downloads/orabuntu-lxc-master/anylinux/CONFIG; echo $TunType)
+TunType=$(source "$DistDir"/anylinux/CONFIG; echo $TunType)
 
 ################e Kubernetes Install Flag  ######################
 
@@ -242,13 +247,13 @@ K8S=N
 
 ################### Docker Install Flag  ########################
 
-Docker=$(source /home/ubuntu/Downloads/orabuntu-lxc-master/anylinux/CONFIG; echo $Docker)
+Docker=$(source "$DistDir"/anylinux/CONFIG; echo $Docker)
 
 ################ LXD Cluster Settings ######################
 
-LXD=$(source /home/ubuntu/Downloads/orabuntu-lxc-master/anylinux/CONFIG; echo $LXD)
-LXDCluster=$(source /home/ubuntu/Downloads/orabuntu-lxc-master/anylinux/CONFIG; echo $LXDCluster)
-StorageDriver=$(source /home/ubuntu/Downloads/orabuntu-lxc-master/anylinux/CONFIG; echo $StorageDriver)
+LXD=$(source "$DistDir"/anylinux/CONFIG; echo $LXD)
+LXDCluster=$(source "$DistDir"/anylinux/CONFIG; echo $LXDCluster)
+StorageDriver=$(source "$DistDir"/anylinux/CONFIG; echo $StorageDriver)
 
 if [ $LXDCluster = 'N' ]
 then
@@ -335,7 +340,7 @@ fi
 #       then
 #               LXD=Y
 #               PreSeed=Y
-#               BtrfsLun=$(source /home/ubuntu/Downloads/orabuntu-lxc-master/anylinux/CONFIG; echo $BtrfsLun)
+#               BtrfsLun=$(source "$DistDir"/anylinux/CONFIG; echo $BtrfsLun)
 #               StoragePoolName=Unused
 #               StorageDriver=Unused
 #
@@ -399,35 +404,35 @@ fi
 
 if [ -z $2 ]
 then
-	SPOKEIP=$(source /home/ubuntu/Downloads/orabuntu-lxc-master/anylinux/CONFIG; echo $SPOKEIP)
+	SPOKEIP=$(source "$DistDir"/anylinux/CONFIG; echo $SPOKEIP)
 else
 	SPOKEIP=$2
 fi
 
 if [ -z $3 ]
 then
-	HUBIP=$(source /home/ubuntu/Downloads/orabuntu-lxc-master/anylinux/CONFIG; echo $HUBIP)
+	HUBIP=$(source "$DistDir"/anylinux/CONFIG; echo $HUBIP)
 else
 	HUBIP=$3
 fi
 
 if [ -z $4 ]
 then
-	HubUserAct=$(source /home/ubuntu/Downloads/orabuntu-lxc-master/anylinux/CONFIG; echo $HubUserAct)
+	HubUserAct=$(source "$DistDir"/anylinux/CONFIG; echo $HubUserAct)
 else
 	HubUserAct=$4
 fi
 
 if [ -z $5 ]
 then
-	HubSudoPwd=$(source /home/ubuntu/Downloads/orabuntu-lxc-master/anylinux/CONFIG; echo $HubSudoPwd)
+	HubSudoPwd=$(source "$DistDir"/anylinux/CONFIG; echo $HubSudoPwd)
 else
 	HubSudoPwd=$5
 fi
 
 if [ -z $6 ]
 then
-	Product=$(source /home/ubuntu/Downloads/orabuntu-lxc-master/anylinux/CONFIG; echo $Product)
+	Product=$(source "$DistDir"/anylinux/CONFIG; echo $Product)
 else
 	Product=$6
 fi

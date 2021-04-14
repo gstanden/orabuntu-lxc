@@ -62,6 +62,11 @@ sleep 5
 
 clear
 
+function GetDistDir {
+        pwd | rev | cut -f2-20 -d'/' | rev
+}
+DistDir=$(GetDistDir)
+
 GetLinuxFlavors(){
 if   [[ -e /etc/oracle-release ]]
 then
@@ -220,7 +225,7 @@ LOGEXT=`date +"%Y-%m-%d.%R:%S"`
 
 # TunType values [geneve|gre|vxlan]
 
-TunType=$(source /home/ubuntu/Downloads/orabuntu-lxc-master/anylinux/CONFIG; echo $TunType)
+TunType=$(source "$DistDir"/anylinux/CONFIG; echo $TunType)
 
 ################e Kubernetes Install Flag  ######################
 
@@ -228,13 +233,13 @@ K8S=N
 
 ################### Docker Install Flag  ########################
 
-Docker=$(source /home/ubuntu/Downloads/orabuntu-lxc-master/anylinux/CONFIG; echo $Docker)
+Docker=$(source "$DistDir"/anylinux/CONFIG; echo $Docker)
 
 ################ LXD Cluster Settings ######################
 
-LXD=$(source /home/ubuntu/Downloads/orabuntu-lxc-master/anylinux/CONFIG; echo $LXD)
-LXDCluster=$(source /home/ubuntu/Downloads/orabuntu-lxc-master/anylinux/CONFIG; echo $LXDCluster)
-StorageDriver=$(source /home/ubuntu/Downloads/orabuntu-lxc-master/anylinux/CONFIG; echo $StorageDriver)
+LXD=$(source "$DistDir"/anylinux/CONFIG; echo $LXD)
+LXDCluster=$(source "$DistDir"/anylinux/CONFIG; echo $LXDCluster)
+StorageDriver=$(source "$DistDir"/anylinux/CONFIG; echo $StorageDriver)
 
 if [ $LXDCluster = 'N' ]
 then
@@ -321,7 +326,7 @@ fi
 # 	then
 # 		LXD=Y
 #        	PreSeed=Y
-#       	BtrfsLun=$(source /home/ubuntu/Downloads/orabuntu-lxc-master/anylinux/CONFIG; echo $BtrfsLun)
+#       	BtrfsLun=$(source "$DistDir"/anylinux/CONFIG; echo $BtrfsLun)
 # 		StoragePoolName=Unused
 # 		StorageDriver=Unused
 
