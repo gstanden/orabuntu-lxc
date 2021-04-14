@@ -83,16 +83,16 @@ Owner=$(GetOwner)
 
 # Orabuntu-LXC v7 uses a centralized variable configuration file ./anylinux/CONFIG referenced below.
 
-SeedNet1=$(source /home/ubuntu/Downloads/orabuntu-lxc-master/anylinux/CONFIG; echo $SeedNet1)
-BaseNet1=$(source /home/ubuntu/Downloads/orabuntu-lxc-master/anylinux/CONFIG; echo $BaseNet1)
-StorNet1=$(source /home/ubuntu/Downloads/orabuntu-lxc-master/anylinux/CONFIG; echo $StorNet1)
-StorNet2=$(source /home/ubuntu/Downloads/orabuntu-lxc-master/anylinux/CONFIG; echo $StorNet2)
-ExtrNet1=$(source /home/ubuntu/Downloads/orabuntu-lxc-master/anylinux/CONFIG; echo $ExtrNet1)
-ExtrNet2=$(source /home/ubuntu/Downloads/orabuntu-lxc-master/anylinux/CONFIG; echo $ExtrNet2)
-ExtrNet3=$(source /home/ubuntu/Downloads/orabuntu-lxc-master/anylinux/CONFIG; echo $ExtrNet3)
-ExtrNet4=$(source /home/ubuntu/Downloads/orabuntu-lxc-master/anylinux/CONFIG; echo $ExtrNet4)
-ExtrNet5=$(source /home/ubuntu/Downloads/orabuntu-lxc-master/anylinux/CONFIG; echo $ExtrNet5)
-ExtrNet6=$(source /home/ubuntu/Downloads/orabuntu-lxc-master/anylinux/CONFIG; echo $ExtrNet6)
+SeedNet1=$(source "$DistDir"/anylinux/CONFIG; echo $SeedNet1)
+BaseNet1=$(source "$DistDir"/anylinux/CONFIG; echo $BaseNet1)
+StorNet1=$(source "$DistDir"/anylinux/CONFIG; echo $StorNet1)
+StorNet2=$(source "$DistDir"/anylinux/CONFIG; echo $StorNet2)
+ExtrNet1=$(source "$DistDir"/anylinux/CONFIG; echo $ExtrNet1)
+ExtrNet2=$(source "$DistDir"/anylinux/CONFIG; echo $ExtrNet2)
+ExtrNet3=$(source "$DistDir"/anylinux/CONFIG; echo $ExtrNet3)
+ExtrNet4=$(source "$DistDir"/anylinux/CONFIG; echo $ExtrNet4)
+ExtrNet5=$(source "$DistDir"/anylinux/CONFIG; echo $ExtrNet5)
+ExtrNet6=$(source "$DistDir"/anylinux/CONFIG; echo $ExtrNet6)
 
 # pgroup1 end
 # user-settable parameters group 1 end
@@ -759,7 +759,7 @@ fi
 	if [ -z $8 ]
 	then
 	#	MajorRelease=8
-		MajorRelease=$(source /home/ubuntu/Downloads/orabuntu-lxc-master/anylinux/CONFIG; echo $MajorRelease)
+		MajorRelease=$(source "$DistDir"/anylinux/CONFIG; echo $MajorRelease)
 	fi
 
 	# -------------------------------------------------------------
@@ -792,7 +792,7 @@ fi
 	echo 'Oracle Container Release  = '$MajorRelease
 
 	PointRelease=$2
-	PointRelease=$(source /home/ubuntu/Downloads/orabuntu-lxc-master/anylinux/CONFIG; echo $PointRelease)
+	PointRelease=$(source "$DistDir"/anylinux/CONFIG; echo $PointRelease)
 	
 	if [ -z $2 ]
 	then
@@ -822,7 +822,7 @@ fi
 	if [ -z $3 ]
 	then
 		NumCon=4
-		NumCon=$(source /home/ubuntu/Downloads/orabuntu-lxc-master/anylinux/CONFIG; echo $NumCon)
+		NumCon=$(source "$DistDir"/anylinux/CONFIG; echo $NumCon)
 	fi
 	echo 'Oracle Container Count    = '$NumCon
 
@@ -830,7 +830,7 @@ fi
 	if [ -z $4 ]
 	then
 		Domain1=urdomain1.com
-		Domain1=$(source /home/ubuntu/Downloads/orabuntu-lxc-master/anylinux/CONFIG; echo $Domain1)
+		Domain1=$(source "$DistDir"/anylinux/CONFIG; echo $Domain1)
 	fi
 	echo 'Domain1                   = '$Domain1
 
@@ -838,7 +838,7 @@ fi
 	if [ -z $5 ]
 	then
 		Domain2=urdomain2.com
-		Domain2=$(source /home/ubuntu/Downloads/orabuntu-lxc-master/anylinux/CONFIG; echo $Domain2)
+		Domain2=$(source "$DistDir"/anylinux/CONFIG; echo $Domain2)
 	fi
 	echo 'Domain2                   = '$Domain2
 
@@ -846,7 +846,7 @@ fi
 	if [ -z $6 ]
 	then
 		NameServer=afns1
-		NameServer=$(source /home/ubuntu/Downloads/orabuntu-lxc-master/anylinux/CONFIG; echo $NameServer)
+		NameServer=$(source "$DistDir"/anylinux/CONFIG; echo $NameServer)
 	fi
 	echo 'NameServer                = '$NameServer
 
@@ -854,7 +854,7 @@ fi
 	if [ -z $7 ]
 	then
 		OSMemRes=1024
-		OSMemRes=$(source /home/ubuntu/Downloads/orabuntu-lxc-master/anylinux/CONFIG; echo $OSMemRes)
+		OSMemRes=$(source "$DistDir"/anylinux/CONFIG; echo $OSMemRes)
 	fi
 	echo 'OSMemRes                  = '$OSMemRes 
 
