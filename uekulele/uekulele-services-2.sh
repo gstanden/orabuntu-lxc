@@ -781,7 +781,7 @@ then
 		echo ''
 	done
 
-#	sudo snap refresh lxd
+	sudo snap refresh lxd
 
 	echo ''
 	echo "=============================================="

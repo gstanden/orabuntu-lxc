@@ -6038,27 +6038,33 @@ then
 
 		if   [ $TunType = 'geneve' ]
                 then
-                        sudo ovs-vsctl add-port sw1 geneve$Sw1Index -- set interface geneve$Sw1Index type=geneve options:remote_ip=$MultiHostVar5 options:key=flow
+                        sudo ovs-vsctl add-port sw1 geneve$Sw1Index tag=10 -- set interface geneve$Sw1Index type=geneve options:remote_ip=$MultiHostVar5 options:key=flow
 
                         sudo sed -i '/type=gre/d'   /etc/network/openvswitch/crt_ovs_sw1.sh
                         sudo sed -i '/type=vxlan/d' /etc/network/openvswitch/crt_ovs_sw1.sh
 			sudo firewall-cmd --permanent --zone=public --add-port=6081/udp
+			sudo firewall-cmd --permanent --zone=public --add-interface=genev_sys_6081
+			sudo firewall-cmd --reload
 
                 elif [ $TunType = 'gre' ]
                 then
-                        sudo ovs-vsctl add-port sw1 gre$Sw1Index    -- set interface gre$Sw1Index    type=gre    options:remote_ip=$MultiHostVar5
+                        sudo ovs-vsctl add-port sw1 gre$Sw1Index tag=10 -- set interface gre$Sw1Index type=gre options:remote_ip=$MultiHostVar5
 
                         sudo sed -i '/type=geneve/d' /etc/network/openvswitch/crt_ovs_sw1.sh
                         sudo sed -i '/type=vxlan/d'  /etc/network/openvswitch/crt_ovs_sw1.sh
-			sudo firewall-cmd --add-protocol=gre
+			sudo firewall-cmd --permanent --zone=public --add-protocol=gre
+			sudo firewall-cmd --permanent --zone=public --add-interface=gre_sys
+			sudo firewall-cmd --reload
 
                 elif [ $TunType = 'vxlan' ]
                 then
-                        sudo ovs-vsctl add-port sw1 vxlan$Sw1Index -- set interface vxlan$Sw1Index type=vxlan options:remote_ip=$MultiHostVar5 options:key=flow
+                        sudo ovs-vsctl add-port sw1 vxlan$Sw1Index tag=10 -- set interface vxlan$Sw1Index type=vxlan options:remote_ip=$MultiHostVar5 options:key=flow
 
                         sudo sed -i '/type=geneve/d' /etc/network/openvswitch/crt_ovs_sw1.sh
                         sudo sed -i '/type=gre/d'    /etc/network/openvswitch/crt_ovs_sw1.sh
 			sudo firewall-cmd --permanent --zone=public --add-port=4789/udp
+			sudo firewall-cmd --permanent --zone=public --add-interface=vxlan_sys_4789
+			sudo firewall-cmd --reload
 
                 fi
 
@@ -6084,23 +6090,29 @@ then
                 if   [ $TunType = 'geneve' ]
                 then
                         sudo sed -i '/type=gre/d'               /etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
-                        sudo sed -i '/type=vxlan/d'             /etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
 			sudo sed -i '/add-protocol=gre/d'	/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh	
+			sudo sed -i '/gre_sys/d'	        /etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh	
+                        sudo sed -i '/type=vxlan/d'             /etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
 			sudo sed -i '/add-port=4789/d'	        /etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh	
+			sudo sed -i '/vxlan_sys_4789/d'	        /etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh	
 
                 elif [ $TunType = 'gre' ]
                 then
-                        sudo sed -i '/type=geneve/d'            /etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
                         sudo sed -i '/type=vxlan/d'             /etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
 			sudo sed -i '/add-port=4789/d'	        /etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh	
+			sudo sed -i '/vxlan_sys_4789/d'	        /etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh	
+                        sudo sed -i '/type=geneve/d'            /etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
 			sudo sed -i '/add-port=6081/d'	        /etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh	
+			sudo sed -i '/genev_sys_6081/d'	        /etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh	
 
                 elif [ $TunType = 'vxlan' ]
                 then
-                        sudo sed -i '/type=geneve/d'            /etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
                         sudo sed -i '/type=gre/d'               /etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
 			sudo sed -i '/add-protocol=gre/d'	/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh	
+			sudo sed -i '/gre_sys/d'	        /etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh	
+                        sudo sed -i '/type=geneve/d'            /etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
 			sudo sed -i '/add-port=6081/d'	        /etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh	
+			sudo sed -i '/genev_sys_6081/d'	        /etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh	
                 fi
 
 		sudo chmod 777 /etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
