@@ -6038,7 +6038,7 @@ then
 
 		if   [ $TunType = 'geneve' ]
                 then
-                        sudo ovs-vsctl add-port sw1 geneve$Sw1Index tag=10 -- set interface geneve$Sw1Index type=geneve options:remote_ip=$MultiHostVar5 options:key=flow
+                        sudo ovs-vsctl add-port sw1 geneve$Sw1Index trunks=10,11 -- set interface geneve$Sw1Index type=geneve options:remote_ip=$MultiHostVar5 options:key=flow
 
                         sudo sed -i '/type=gre/d'   /etc/network/openvswitch/crt_ovs_sw1.sh
                         sudo sed -i '/type=vxlan/d' /etc/network/openvswitch/crt_ovs_sw1.sh
@@ -6048,7 +6048,7 @@ then
 
                 elif [ $TunType = 'gre' ]
                 then
-                        sudo ovs-vsctl add-port sw1 gre$Sw1Index tag=10 -- set interface gre$Sw1Index type=gre options:remote_ip=$MultiHostVar5
+                        sudo ovs-vsctl add-port sw1 gre$Sw1Index trunks=10,11 -- set interface gre$Sw1Index type=gre options:remote_ip=$MultiHostVar5
 
                         sudo sed -i '/type=geneve/d' /etc/network/openvswitch/crt_ovs_sw1.sh
                         sudo sed -i '/type=vxlan/d'  /etc/network/openvswitch/crt_ovs_sw1.sh
@@ -6058,7 +6058,7 @@ then
 
                 elif [ $TunType = 'vxlan' ]
                 then
-                        sudo ovs-vsctl add-port sw1 vxlan$Sw1Index tag=10 -- set interface vxlan$Sw1Index type=vxlan options:remote_ip=$MultiHostVar5 options:key=flow
+                        sudo ovs-vsctl add-port sw1 vxlan$Sw1Index trunks=10,11 -- set interface vxlan$Sw1Index type=vxlan options:remote_ip=$MultiHostVar5 options:key=flow
 
                         sudo sed -i '/type=geneve/d' /etc/network/openvswitch/crt_ovs_sw1.sh
                         sudo sed -i '/type=gre/d'    /etc/network/openvswitch/crt_ovs_sw1.sh
