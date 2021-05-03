@@ -523,6 +523,7 @@ clear
 
 let CloneIndex=10
 let CopyCompleted=0
+ping -c 3 $NameServer
 
 while [ $CopyCompleted -lt $NumCon ]
 do
@@ -804,7 +805,7 @@ do
                         sleep 5
                 done
 
-                echo "/var/lib/snapd/snap/bin/lxc stop  $ContainerPrefixLXD$CloneIndex" | sg lxd
+                echo "/var/lib/snapd/snap/bin/lxc stop  $ContainerPrefixLXD$CloneIndex" --force | sg lxd
                 echo "/var/lib/snapd/snap/bin/lxc start $ContainerPrefixLXD$CloneIndex" | sg lxd
 
                 echo ''

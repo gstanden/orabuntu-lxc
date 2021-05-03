@@ -1420,7 +1420,7 @@ sleep 5
 
 echo ''
 echo "=============================================="
-echo "Done: Install OvsVethCleanup.timer                  "
+echo "Done: Install OvsVethCleanup.timer            "
 echo "=============================================="
 echo ''
 

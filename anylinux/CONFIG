@@ -119,9 +119,9 @@ Docker=N				# [Y|N]	 						Docker install from Canonical Snap.
 K8S=N					# [Y|N]							Kubernetes install K8S snap from Canonical Snap. Ubuntu Linux 20.04 only for now.
 BtrfsLun="\/dev\/sdb1"			#							LUN partition for LXD cluster where "X={b,c,d...z}. Auto-system-set to "unused" for some Linux distros, see below.
 StorageDriver=zfs			# [btrfs|zfs]						Storage for LXD Cluster and LXD containers.
-GRE=N					# [Y|N]
+GRE=Y					# [Y|N]
 Product=no-product			# [no-product|workspaces|oracle-db|oracle-gi-18c]	Product to be configured in the seed container. Use products subdirectory to see how to configure new products and add them.
-TunType=geneve				# [geneve|gre|vxlan]					Tunnel type for GRE-interconnected Orabuntu-LXC hosts.
+TunType=gre				# [geneve|gre|vxlan]					Tunnel type for GRE-interconnected Orabuntu-LXC hosts.
 SeedNet1='SeedNet1Fwd:172.29.108'	#							Container network for seed container. Any ipv4 address triplet.
 BaseNet1='BaseNet1Fwd:10.209.53'	#							Container network for cloned copies of the seed container. Any ipv4 address triplet.
 StorNet1='StorNet1Fwd:10.210.107'	#							Storage network 1. Any ipv4 address triplet.

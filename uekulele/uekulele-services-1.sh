@@ -4412,6 +4412,73 @@ sleep 5
 
 clear
 
+echo "=============================================="
+echo "Install OvsVethCleanup.service                "
+echo "=============================================="
+echo ''
+
+sudo sh -c "echo '[Unit]'                                                               >  /etc/systemd/system/OvsVethCleanup.service"
+sudo sh -c "echo 'Description=OvsVethCleanup job'                                       >> /etc/systemd/system/OvsVethCleanup.service"
+sudo sh -c "echo ''                                                                     >> /etc/systemd/system/OvsVethCleanup.service"
+sudo sh -c "echo '[Service]'                                                            >> /etc/systemd/system/OvsVethCleanup.service"
+sudo sh -c "echo 'Type=oneshot'                                                         >> /etc/systemd/system/OvsVethCleanup.service"
+sudo sh -c "echo 'User=root'                                                            >> /etc/systemd/system/OvsVethCleanup.service"
+sudo sh -c "echo 'ExecStart=/usr/bin/bash /etc/network/openvswitch/OvsVethCleanup.sh'   >> /etc/systemd/system/OvsVethCleanup.service"
+sudo sh -c "echo ''                                                                     >> /etc/systemd/system/OvsVethCleanup.service"
+sudo sh -c "echo '[Install]'								>> /etc/systemd/system/OvsVethCleanup.service"
+sudo sh -c "echo 'WantedBy=multi-user.target'						>> /etc/systemd/system/OvsVethCleanup.service"
+
+sudo cat /etc/systemd/system/OvsVethCleanup.service
+
+echo ''
+echo "=============================================="
+echo "Done: Install OvsVethCleanup.service          "
+echo "=============================================="
+echo ''
+
+sleep 5
+
+clear
+
+echo ''
+echo "=============================================="
+echo "Install OvsVethCleanup.timer                  "
+echo "=============================================="
+echo ''
+
+sudo sh -c "echo '[Unit]'                                                               >  /etc/systemd/system/OvsVethCleanup.timer"
+sudo sh -c "echo 'Description=OvsVethCleanup'                                           >> /etc/systemd/system/OvsVethCleanup.timer"
+sudo sh -c "echo ''                                                                     >> /etc/systemd/system/OvsVethCleanup.timer"
+sudo sh -c "echo '[Timer]'                                                              >> /etc/systemd/system/OvsVethCleanup.timer"
+sudo sh -c "echo 'OnUnitActiveSec=60s'                                                  >> /etc/systemd/system/OvsVethCleanup.timer"
+sudo sh -c "echo 'OnBootSec=60s'                                                        >> /etc/systemd/system/OvsVethCleanup.timer"
+sudo sh -c "echo ''                                                                     >> /etc/systemd/system/OvsVethCleanup.timer"
+sudo sh -c "echo '[Install]'                                                            >> /etc/systemd/system/OvsVethCleanup.timer"
+sudo sh -c "echo 'WantedBy=timers.target'                                               >> /etc/systemd/system/OvsVethCleanup.timer"
+
+sudo cat /etc/systemd/system/OvsVethCleanup.timer
+
+echo ''
+
+sudo systemctl daemon-reload
+sudo systemctl enable OvsVethCleanup.timer
+sudo systemctl start  OvsVethCleanup.timer
+
+echo ''
+
+sudo systemctl list-timers --all
+
+sleep 5
+
+echo ''
+echo "=============================================="
+echo "Done: Install OvsVethCleanup.timer            "
+echo "=============================================="
+
+sleep 5
+
+clear
+
 echo ''
 echo "=============================================="
 echo "Creating /etc/sysctl.d/60-olxc.conf file ..."
@@ -4870,6 +4937,12 @@ sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw6.sh
 sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw7.sh
 sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw8.sh
 sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw9.sh
+
+if [ $GRE = 'Y' ]
+then
+	sudo sed -i "s/mtu_request=1500/mtu_request=$MultiHostVar7/g" /etc/network/openvswitch/crt_ovs_sw1.sh
+	sudo sed -i "s/mtu_request=1500/mtu_request=$MultiHostVar7/g" /etc/network/openvswitch/crt_ovs_sx1.sh
+fi
 
 if [ $LXDCluster = 'Y' ] && [ $LXDStorageDriver = 'btrfs' ]
 then

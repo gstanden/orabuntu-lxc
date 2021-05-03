@@ -414,6 +414,12 @@ then
 
 elif [ $LXD = 'Y' ]
 then
+	if [ $GRE = 'Y' ] && [ $LXDCluster = 'Y' ]
+	then
+		sudo sed -i "s/mtu_request=1500/mtu_request=$MultiHostVar7/g" /etc/network/openvswitch/crt_ovs_sw1.sh
+		sudo sed -i "s/mtu_request=1500/mtu_request=$MultiHostVar7/g" /etc/network/openvswitch/crt_ovs_sx1.sh
+	fi
+
         function GetSeedContainerName {
 		echo "/var/lib/snapd/snap/bin/lxc list | grep oel$OracleRelease | sort -d | cut -f2 -d' ' | sed 's/^[ \t]*//;s/[ \t]*$//' | tail -1" | sg lxd
         }

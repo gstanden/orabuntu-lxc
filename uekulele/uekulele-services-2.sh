@@ -682,11 +682,13 @@ then
         echo "=============================================="
         echo ''
 
-        sudo firewall-cmd --zone=public --add-service=https --add-service=dhcp --add-service=ssh --permanent
-        sudo firewall-cmd --zone=public --add-port=587/tcp --add-port=8443/tcp --permanent
-	sudo firewall-cmd --zone=public --add-interface=sw1 --permanent
-	sudo firewall-cmd --zone=public --add-interface=sx1 --permanent
-	sudo firewall-cmd --zone=public --add-masquerade --permanent
+        sudo firewall-cmd --zone=public --permanent --add-service=https --add-service=dns --add-service=dhcp --add-service=ssh
+        sudo firewall-cmd --zone=public --permanent --add-port=587/tcp --add-port=8443/tcp
+	sudo firewall-cmd --zone=public --permanent --add-interface=sw1
+	sudo firewall-cmd --zone=public --permanent --add-interface=sx1
+	sudo firewall-cmd --zone=public --permanent --add-interface=sw1a
+	sudo firewall-cmd --zone=public --permanent --add-interface=sx1a
+	sudo firewall-cmd --zone=public --permanent --add-masquerade
         sudo firewall-cmd --reload
         sudo firewall-cmd --list-all
 
@@ -898,6 +900,24 @@ then
 
 	sleep 5
 
+	clear
+
+        echo ''
+        echo "=============================================="
+        echo "Configure firewalld for lxdbr0...             "
+        echo "=============================================="
+        echo ''
+
+	sudo firewall-cmd --zone=public --permanent --add-interface=lxdbr0
+        
+	echo ''
+        echo "=============================================="
+        echo "Done: Configure firewalld for lxdbr0.         "
+        echo "=============================================="
+        echo ''
+
+	sleep 5
+	
 	clear
 
         echo ''

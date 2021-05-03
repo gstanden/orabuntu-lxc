@@ -91,6 +91,7 @@ function GetMultiHostVar10 {
 }
 MultiHostVar10=$(GetMultiHostVar10)
 GREValue=$MultiHostVar10
+GRE=$GREValue
 
 function GetMultiHostVar11 {
         echo $MultiHost | cut -f11 -d':'
@@ -416,7 +417,13 @@ then
 	fi
 
 elif [ $LXD = 'Y' ]
-then		
+then
+        if [ $GRE = 'Y' ] && [ $LXDCluster = 'Y' ]
+        then
+                sudo sed -i "s/mtu_request=1500/mtu_request=$MultiHostVar7/g" /etc/network/openvswitch/crt_ovs_sw1.sh
+                sudo sed -i "s/mtu_request=1500/mtu_request=$MultiHostVar7/g" /etc/network/openvswitch/crt_ovs_sx1.sh
+        fi
+	
 	function GetSeedContainerName {
 		lxc list | grep oel$OracleRelease | sort -d | cut -f2 -d' ' | sed 's/^[ \t]*//;s/[ \t]*$//' | tail -1
 	}

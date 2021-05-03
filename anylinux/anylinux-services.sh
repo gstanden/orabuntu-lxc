@@ -713,10 +713,13 @@ then
 	if [ $LinuxFlavor = 'Oracle' ] && [ $Release -eq 8 ]
 	then
 		sudo yum -y install tar
-		sudo sed -i "s/FirewallBackend=nftables/FirewallBackend=iptables/g" /etc/firewalld/firewalld.conf
-		sudo systemctl restart firewalld.service
-		sleep 5
-	#	sudo firewall-cmd --zone=public --add-masquerade 
+		sudo firewall-cmd --zone=public --permanent --add-port=1024-65000/udp
+		sudo firewall-cmd --zone=public --permanent --add-port=1024-65000/tcp
+		sudo firewall-cmd --zone=public --permanent --add-masquerade 
+
+	#	sudo sed -i "s/FirewallBackend=nftables/FirewallBackend=iptables/g" /etc/firewalld/firewalld.conf
+	#	sudo systemctl restart firewalld.service
+	#	sleep 5
 	#	sudo firewall-cmd --runtime-to-permanent
 	#	sudo service firewalld stop
 	#	sudo service firewalld start
