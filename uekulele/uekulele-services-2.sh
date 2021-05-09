@@ -24,6 +24,8 @@ OracleVersion=$1.$2
 Domain1=$3
 Domain2=$4
 NameServer=$5
+echo "NameServer = "$NameServer
+sleep 5
 MultiHost=$6
 DistDir=$7
 OR=$OracleRelease
@@ -416,33 +418,6 @@ sleep 5
 
 clear
 
-if [ $MultiHostVar2 = 'N' ]
-then
-        echo ''
-        echo "=============================================="
-        echo "Snapshot DNS DHCP Pre-install ...             "
-        echo "=============================================="
-        echo ''
-
-        sudo lxc-stop -n $NameServer
-        sudo echo 'hub nameserver pre-install snapshot' >       /home/$Owner/snap-comment
-        sudo chown -R $Owner:$Group                             /home/$Owner/snap-comment
-        sudo lxc-snapshot -n $NameServer -c                     /home/$Owner/snap-comment
-        sudo rm -f                                              /home/$Owner/snap-comment
-        sudo lxc-snapshot -n $NameServer -L -C
-        sudo lxc-start    -n $NameServer
-fi
-
-echo ''
-echo "=============================================="
-echo "Done: Snapshot DNS DHCP Pre-install ...       "
-echo "=============================================="
-echo ''
-
-sleep 5
-
-clear
-
 if [ $LinuxFlavor = 'Fedora' ]
 then
 	echo ''
@@ -681,16 +656,21 @@ then
         echo "Configure firewalld for LXD Cluster...        "
         echo "=============================================="
         echo ''
-
-        sudo firewall-cmd --zone=public --permanent --add-service=https --add-service=dns --add-service=dhcp --add-service=ssh
+        sudo firewall-cmd --zone=public --permanent --add-service=https
+        sudo firewall-cmd --zone=public --permanent --add-service=dns 
+        sudo firewall-cmd --zone=public --permanent --add-service=dhcp
+        sudo firewall-cmd --zone=public --permanent --add-service=ssh
         sudo firewall-cmd --zone=public --permanent --add-port=587/tcp --add-port=8443/tcp
-	sudo firewall-cmd --zone=public --permanent --add-interface=sw1
-	sudo firewall-cmd --zone=public --permanent --add-interface=sx1
-	sudo firewall-cmd --zone=public --permanent --add-interface=sw1a
-	sudo firewall-cmd --zone=public --permanent --add-interface=sx1a
-	sudo firewall-cmd --zone=public --permanent --add-masquerade
-        sudo firewall-cmd --reload
-        sudo firewall-cmd --list-all
+ 	sudo firewall-cmd --zone=public --permanent --add-interface=sw1
+ 	sudo firewall-cmd --zone=public --permanent --add-interface=sx1
+ 	sudo firewall-cmd --zone=public --permanent --add-interface=sw1a
+ 	sudo firewall-cmd --zone=public --permanent --add-interface=sx1a
+ 	sudo firewall-cmd --zone=public --permanent --add-masquerade
+#       sudo firewall-cmd --reload
+#       sudo firewall-cmd --list-all
+	sleep 5
+	sudo lxc-attach -n $NameServer -- nslookup yum.oracle.com
+	sleep 5
 
         echo ''
         echo "=============================================="
