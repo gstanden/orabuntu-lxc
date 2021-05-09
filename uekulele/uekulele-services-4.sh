@@ -523,7 +523,6 @@ clear
 
 let CloneIndex=10
 let CopyCompleted=0
-ping -c 3 $NameServer
 
 while [ $CopyCompleted -lt $NumCon ]
 do

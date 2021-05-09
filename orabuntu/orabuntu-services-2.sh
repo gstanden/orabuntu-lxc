@@ -52,6 +52,8 @@ else
 	AWS=0
 fi
 
+echo 'Got to here ...'
+
 function SoftwareVersion { echo "$@" | awk -F. '{ printf("%d%03d%03d%03d\n", $1,$2,$3,$4); }'; }
 
 function GetUbuntuVersion {
@@ -188,6 +190,8 @@ then
         UbuntuMajorVersion=$(GetUbuntuMajorVersion)
 fi
 
+echo 'Got to here ...'
+
 if [ $SystemdResolvedInstalled -ge 1 ]
 then
 	echo ''
@@ -213,10 +217,14 @@ then
 	clear
 fi
 
+echo 'Got to here ...'
+
 function ConfirmContainerCreated {
 	sudo lxc-ls -f | grep oel$OracleRelease$SeedPostfix | wc -l
 }
 ContainerCreated=$(ConfirmContainerCreated)
+
+echo 'Got to here ...'
 
 if   [ $MultiHostVar3 = 'X' ] && [ $GREValue = 'Y' ]
 then
@@ -241,21 +249,21 @@ then
 	DNSLookup=$(CheckDNSLookup)
 	DNSLookup=`echo $?`
 
-	while [ $DNSLookup -eq 0 ]
-       	do
-       		SeedIndex=$((SeedIndex+1))
-       		DNSLookup=$(CheckDNSLookup)
+        while [ $DNSLookup -eq 0 ]
+        do
+                SeedIndex=$((SeedIndex+1))
 
-		if   [ $LXD = 'N' ]
-		then
-			SeedPostfix=c$SeedIndex
-		elif [ $LXD = 'Y' ]
-		then
-			SeedPostfix=d$SeedIndex
-		fi
+                if   [ $LXD = 'N' ]
+                then
+                        SeedPostfix=c$SeedIndex
+                elif [ $LXD = 'Y' ]
+                then
+                        SeedPostfix=d$SeedIndex
+                fi
 
-		DNSLookup=`echo $?`
-       	done
+                DNSLookup=$(CheckDNSLookup)
+                DNSLookup=`echo $?`
+        done
 	
 elif [ $MultiHostVar3 = '1' ] && [ $GREValue = 'N' ]
 then

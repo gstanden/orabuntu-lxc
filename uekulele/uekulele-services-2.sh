@@ -24,8 +24,6 @@ OracleVersion=$1.$2
 Domain1=$3
 Domain2=$4
 NameServer=$5
-echo "NameServer = "$NameServer
-sleep 5
 MultiHost=$6
 DistDir=$7
 OR=$OracleRelease
@@ -659,18 +657,13 @@ then
         sudo firewall-cmd --zone=public --permanent --add-service=https
         sudo firewall-cmd --zone=public --permanent --add-service=dns 
         sudo firewall-cmd --zone=public --permanent --add-service=dhcp
-        sudo firewall-cmd --zone=public --permanent --add-service=ssh
+#	sudo firewall-cmd --zone=public --permanent --add-service=ssh
         sudo firewall-cmd --zone=public --permanent --add-port=587/tcp --add-port=8443/tcp
  	sudo firewall-cmd --zone=public --permanent --add-interface=sw1
  	sudo firewall-cmd --zone=public --permanent --add-interface=sx1
  	sudo firewall-cmd --zone=public --permanent --add-interface=sw1a
  	sudo firewall-cmd --zone=public --permanent --add-interface=sx1a
- 	sudo firewall-cmd --zone=public --permanent --add-masquerade
-#       sudo firewall-cmd --reload
-#       sudo firewall-cmd --list-all
-	sleep 5
-	sudo lxc-attach -n $NameServer -- nslookup yum.oracle.com
-	sleep 5
+#	sudo firewall-cmd --zone=public --permanent --add-masquerade
 
         echo ''
         echo "=============================================="
@@ -852,7 +845,7 @@ then
         echo ''
 
         sudo systemctl reload snap.lxd.daemon > /dev/null 2>&1
-        sudo systemctl status snap.lxd.daemon
+        sudo systemctl status snap.lxd.daemon | tail -100
 
         echo ''
         echo "=============================================="
@@ -915,7 +908,13 @@ then
         DATE=$(GetDateFormat)
         DATE_START=$DATE
 
-        echo "nohup /var/lib/snapd/snap/bin/lxc image copy images:oracle/$MajorRelease local: --alias=oracle/$MajorRelease < /dev/null > /dev/null 2>&1 &" | sg lxd
+	ImageDownload=1
+	while [ $ImageDownload -ne 0 ]
+	do 
+        	echo "nohup /var/lib/snapd/snap/bin/lxc image copy images:oracle/$MajorRelease local: --alias=oracle/$MajorRelease < /dev/null > /dev/null 2>&1 &" | sg lxd
+		ImageDownload=`echo $?`
+		echo $ImageDownload
+	done
 
         function GetImageDownloadStatus {
                 echo "/var/lib/snapd/snap/bin/lxc image list | grep -c oracle/$MajorRelease" | sg lxd
