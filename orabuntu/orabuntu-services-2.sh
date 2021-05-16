@@ -567,7 +567,7 @@ then
         echo "=============================================="
         echo ''
 	
-	echo 'Downloading LXD image ... (can take two or three minuutes...status will update every 10 seconds.)'
+	echo 'Downloading LXD image ... (can take two or three minuutes...status will update every 20 seconds.)'
         echo ''
 
 	function GetDateFormat {
@@ -606,7 +606,7 @@ then
                 	sudo find /var/snap/lxd/common/lxd/images -type f -newermt "$DATE_START" -size +0c | sudo xargs ls -l | grep rootfs
 	 	fi
 
-		sleep 10
+		sleep 20
 
                 ImageDownloadStatus=$(GetImageDownloadStatus)
 		DATE=$(GetDateFormat)
@@ -635,9 +635,13 @@ then
         echo "=============================================="
         echo ''
 
-	lxc profile create olxc_sx1a
-	cat /etc/network/openvswitch/olxc_sx1a | lxc profile edit olxc_sx1a
-	lxc profile device add olxc_sx1a root disk path=/ pool=local
+	if [ $MultiHostVar2 = 'N' ]
+	then
+		lxc profile create olxc_sx1a
+		cat /etc/network/openvswitch/olxc_sx1a | lxc profile edit olxc_sx1a
+		lxc profile device add olxc_sx1a root disk path=/ pool=local
+	fi
+
 	lxc profile show olxc_sx1a
 #	lxc config device add oel$OracleRelease$SeedPostfix eth0 nic nictype=bridged parent=sw1a name=eth0
 
@@ -998,7 +1002,6 @@ then
 				echo "=============================================="
 				echo "Verify nslookup $j ...                        "
 				echo "=============================================="
-				echo ''
 
 				NsLookup=1
 				while [ $NsLookup -ne 0 ]
@@ -1013,7 +1016,6 @@ then
 
 				nslookup $j
 				
-				echo ''
 				echo "=============================================="
 				echo "Done: Verify nslookup $j                      "
 				echo "=============================================="

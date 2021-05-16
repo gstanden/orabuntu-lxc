@@ -1767,7 +1767,7 @@ then
 		#	sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /run/systemd/resolve/stub-resolv.conf > /dev/null 2>&1
 			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/etc/bind/named.conf.local
 			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/etc/dhcp/dhcpd.conf
-			sudo sed -i "/##R/s/##R//g"                                     /var/lib/lxc/$NameServer/rootfs/etc/dhcp/dhcpd.conf
+		#	sudo sed -i "/##R/s/##R//g"                                     /var/lib/lxc/$NameServer/rootfs/etc/dhcp/dhcpd.conf
 		#	sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/etc/network/interfaces
 			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/root/ns_backup_update.lst
 			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/root/dns-thaw.sh
@@ -2683,7 +2683,6 @@ then
 #	sudo lxc-attach -n $NameServer -- cat /etc/dhcp/dhcpd.conf | grep 'hardware ethernet' | sed 's/^[ \t]*//' | cut -f3 -d' '
 #	sudo lxc-attach -n $NameServer -- service isc-dhcp-server status
 
-	echo ''
 	echo "=============================================="	
 	echo "sed $NameServer:/etc/netplan/10-lxc.yaml      "
 	echo "=============================================="
