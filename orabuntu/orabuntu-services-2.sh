@@ -52,8 +52,6 @@ else
 	AWS=0
 fi
 
-echo 'Got to here ...'
-
 function SoftwareVersion { echo "$@" | awk -F. '{ printf("%d%03d%03d%03d\n", $1,$2,$3,$4); }'; }
 
 function GetUbuntuVersion {
@@ -190,8 +188,6 @@ then
         UbuntuMajorVersion=$(GetUbuntuMajorVersion)
 fi
 
-echo 'Got to here ...'
-
 if [ $SystemdResolvedInstalled -ge 1 ]
 then
 	echo ''
@@ -217,14 +213,10 @@ then
 	clear
 fi
 
-echo 'Got to here ...'
-
 function ConfirmContainerCreated {
 	sudo lxc-ls -f | grep oel$OracleRelease$SeedPostfix | wc -l
 }
 ContainerCreated=$(ConfirmContainerCreated)
-
-echo 'Got to here ...'
 
 if   [ $MultiHostVar3 = 'X' ] && [ $GREValue = 'Y' ]
 then
@@ -981,11 +973,51 @@ then
 			sudo lxc-start  -n $j
 			sleep 5
 
-			if [ $MajorRelease -ge 7 ] && [ $Release -ge 7 ]
-			then 
-				sudo lxc-attach -n $j -- hostnamectl set-hostname $j
-				sudo lxc-stop   -n $j
-				sudo lxc-start  -n $j
+			if [ $MajorRelease -ge 7 ]
+			then
+				echo "=============================================="
+				echo "Run hostnamectl set-hostname $j               "
+				echo "=============================================="
+				echo ''
+
+			        HostNameCtl=1
+                                while [ $HostNameCtl -ne 0 ]
+                                do
+                                        sudo lxc-attach -n $j -- hostnamectl set-hostname $j > /dev/null 2>&1
+                                        HostNameCtl=`echo $?`
+					sleep 5
+                                done
+                                
+				sudo lxc-attach -n $j -- hostnamectl
+				
+				echo ''
+				echo "=============================================="
+				echo "Done: Run hostnamectl set-hostname $j         "
+				echo "=============================================="
+				echo ''
+				echo "=============================================="
+				echo "Verify nslookup $j ...                        "
+				echo "=============================================="
+				echo ''
+
+				NsLookup=1
+				while [ $NsLookup -ne 0 ]
+				do
+                                	echo ''
+                                	sudo lxc-stop   -n $j
+                                	sudo lxc-start  -n $j
+                                	sleep 10
+                                	nslookup $j > /dev/null 2>&1
+					NsLookup=`echo $?`
+				done
+
+				nslookup $j
+				
+				echo ''
+				echo "=============================================="
+				echo "Done: Verify nslookup $j                      "
+				echo "=============================================="
+				echo ''
 			fi
 
 			i=1

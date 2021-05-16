@@ -4295,7 +4295,7 @@ then
 	echo ''
 
 	sudo lxc-attach -n nsa -- sudo apt-get -y update
-	sudo lxc-attach -n nsa -- sudo apt-get -y install bind9 isc-dhcp-server bind9utils dnsutils openssh-server man awscli sshpass tcpdump nmap
+	sudo lxc-attach -n nsa -- sudo apt-get -y install bind9 isc-dhcp-server bind9utils dnsutils openssh-server man awscli sshpass tcpdump nmap net-tools
 
 	sleep 2
 
@@ -4679,8 +4679,15 @@ then
 		echo ''
 	
 		sudo tar -xvf /opt/olxc/"$DistDir"/uekulele/archives/dns-dhcp-cont.tar -C / --touch
-		sudo sed -i 's/ubuntu\.common\.conf/common\.conf/' /var/lib/lxc/nsa/config
-#		sudo sed -i '/nameserver/d' /etc/resolv.conf
+		sudo sed -i 's/ubuntu\.common\.conf/common\.conf/' 	/var/lib/lxc/nsa/config
+
+		function GetNameServerShortName {
+			echo $NameServer | cut -f1 -d'-'
+		}
+		NameServerShortName=$(GetNameServerShortName)
+
+		sudo sed -i "s/NAMESERVER/$NameServerShortName/"	/var/lib/lxc/nsa/rootfs/etc/dhcp/dhcpd.conf
+	#	sudo sed -i '/nameserver/d' /etc/resolv.conf
 
 		echo ''
 		echo "=============================================="
@@ -4748,10 +4755,10 @@ then
 			sudo sed -i "/nsa/s/nsa/$NameServer/g" /var/lib/lxc/nsa/rootfs/etc/hosts
                         sudo sed -i "/nsa/s/nsa/$NameServer/g" /var/lib/lxc/nsa/rootfs/root/crontab.txt
 
-                        function GetNameServerShortName {
-                                echo $NameServer | cut -f1 -d'-'
-                        }
-                        NameServerShortName=$(GetNameServerShortName)
+                       # function GetNameServerShortName {
+                       #         echo $NameServer | cut -f1 -d'-'
+                       # }
+                       # NameServerShortName=$(GetNameServerShortName)
 
                         sudo sed -i "/nsa/s/nsa/$NameServerShortName/g" /var/lib/lxc/nsa/rootfs/root/ns_backup_update.lst
                         sudo sed -i "/nsa/s/nsa/$NameServerShortName/g" /var/lib/lxc/nsa/rootfs/root/ns_backup_update.sh
@@ -4792,6 +4799,7 @@ then
 			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /etc/NetworkManager/dnsmasq.d/local
 			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /etc/network/openvswitch/crt_ovs_sw1.sh
 			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/etc/bind/named.conf.local
+			sudo sed -i "/##R/s/##R//g"                             	/var/lib/lxc/$NameServer/rootfs/etc/dhcp/dhcpd.conf
 			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/etc/dhcp/dhcpd.conf
 		#	sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/etc/network/interfaces
 			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/root/ns_backup_update.lst
@@ -5663,6 +5671,36 @@ then
 	echo "Done: Start LXC DNS DHCP container.           "
 	echo "=============================================="
 fi
+
+sleep 5
+
+clear
+
+echo ''
+echo "=============================================="
+echo "Block eth0 DHCP in $NameServer...             "
+echo "=============================================="
+echo ''
+
+function GetNameServerEth0MacAddress {
+        sudo lxc-attach -n $NameServer -- ifconfig eth0 | grep ether | sed 's/^[ \t]*//' | cut -f2 -d' '
+}
+NameServerEth0MacAddress=$(GetNameServerEth0MacAddress)
+echo "NSEMA = "$NameServerEth0MacAddress
+
+sudo lxc-attach -n $NameServer -- cat /etc/dhcp/dhcpd.conf | grep 'hardware ethernet' | sed 's/^[ \t]*//' | cut -f3 -d' '
+sudo lxc-attach -n $NameServer -- sed -i "/hardware ethernet 00:16:3e:ce:de:25/s/00:16:3e:ce:de:25/$NameServerEth0MacAddress/" /etc/dhcp/dhcpd.conf
+sudo lxc-attach -n $NameServer -- service isc-dhcp-server stop
+sudo lxc-attach -n $NameServer -- service isc-dhcp-server start
+sleep 5
+sudo lxc-attach -n $NameServer -- cat /etc/dhcp/dhcpd.conf | grep 'hardware ethernet' | sed 's/^[ \t]*//' | cut -f3 -d' '
+sudo lxc-attach -n $NameServer -- service isc-dhcp-server status
+
+echo ''
+echo "=============================================="
+echo "Done: Block eth0 DHCP in $NameServer.         "
+echo "=============================================="
+echo ''
 
 sleep 5
 

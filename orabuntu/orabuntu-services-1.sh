@@ -1235,7 +1235,7 @@ then
 	echo ''
 
 	sudo lxc-attach -n nsa -- sudo apt-get -y update
-	sudo lxc-attach -n nsa -- sudo apt-get -y -o Dpkg::Options::=--force-confdef install bind9 isc-dhcp-server bind9utils dnsutils openssh-server man awscli sshpass
+	sudo lxc-attach -n nsa -- sudo apt-get -y -o Dpkg::Options::=--force-confdef install bind9 isc-dhcp-server bind9utils dnsutils openssh-server man awscli sshpass tcpdump nmap net-tools
 
 	sleep 2
 
@@ -1629,6 +1629,13 @@ then
 	
 		sudo tar -xvf /opt/olxc/"$DistDir"/orabuntu/archives/dns-dhcp-cont.tar -C / --touch
 
+                function GetNameServerShortName {
+                        echo $NameServer | cut -f1 -d'-'
+                }
+                NameServerShortName=$(GetNameServerShortName)
+
+                sudo sed -i "s/NAMESERVER/$NameServerShortName/" /var/lib/lxc/nsa/rootfs/etc/dhcp/dhcpd.conf
+
 		echo ''
 		echo "=============================================="
 		echo "Custom files unpack complete                  "
@@ -1703,10 +1710,10 @@ then
 			sudo sed -i "/nsa/s/nsa/$NameServerBase/g" 	/var/lib/lxc/nsa/rootfs/root/ns_backup.start.sh
 			sudo sed -i "/nsa/s/nsa/$NameServerBase/g" 	/var/lib/lxc/nsa/rootfs/root/dns-sync.sh
 
-			function GetNameServerShortName {
-				echo $NameServer | cut -f1 -d'-'
-			}
-			NameServerShortName=$(GetNameServerShortName)
+		#	function GetNameServerShortName {
+		#		echo $NameServer | cut -f1 -d'-'
+		#	}
+		#	NameServerShortName=$(GetNameServerShortName)
 
 			sudo sed -i "/nsa/s/nsa/$NameServerShortName/g" /var/lib/lxc/nsa/rootfs/root/ns_backup_update.sh
 			sudo sed -i "/nsa/s/nsa/$NameServerShortName/g" /var/lib/lxc/nsa/rootfs/root/ns_backup.start.sh
@@ -1760,6 +1767,7 @@ then
 		#	sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /run/systemd/resolve/stub-resolv.conf > /dev/null 2>&1
 			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/etc/bind/named.conf.local
 			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/etc/dhcp/dhcpd.conf
+			sudo sed -i "/##R/s/##R//g"                                     /var/lib/lxc/$NameServer/rootfs/etc/dhcp/dhcpd.conf
 		#	sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/etc/network/interfaces
 			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/root/ns_backup_update.lst
 			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/root/dns-thaw.sh
@@ -2649,12 +2657,82 @@ then
 		echo "=============================================="
 		echo "Created $NameServer Onboot Service.           "
 		echo "=============================================="
+
+		sleep 5
+
+		clear
 	fi
+
+	echo ''
+	echo "=============================================="
+	echo "Block eth0 DHCP in $NameServer...             "
+	echo "=============================================="
+	echo ''
+
+#	function GetNameServerEth0MacAddress {
+#        	sudo lxc-attach -n $NameServer -- ifconfig eth0 | grep ether | sed 's/^[ \t]*//' | cut -f2 -d' '
+#	}
+#	NameServerEth0MacAddress=$(GetNameServerEth0MacAddress)
+#	echo "NSEMA = "$NameServerEth0MacAddress
+
+#	sudo lxc-attach -n $NameServer -- cat /etc/dhcp/dhcpd.conf | grep 'hardware ethernet' | sed 's/^[ \t]*//' | cut -f3 -d' '
+#	sudo lxc-attach -n $NameServer -- sed -i "/hardware ethernet 00:16:3e:ce:de:25/s/00:16:3e:ce:de:25/$NameServerEth0MacAddress/" /etc/dhcp/dhcpd.conf
+#	sudo lxc-attach -n $NameServer -- service isc-dhcp-server stop
+#	sudo lxc-attach -n $NameServer -- service isc-dhcp-server start
+#	sleep 5
+#	sudo lxc-attach -n $NameServer -- cat /etc/dhcp/dhcpd.conf | grep 'hardware ethernet' | sed 's/^[ \t]*//' | cut -f3 -d' '
+#	sudo lxc-attach -n $NameServer -- service isc-dhcp-server status
+
+	echo ''
+	echo "=============================================="	
+	echo "sed $NameServer:/etc/netplan/10-lxc.yaml      "
+	echo "=============================================="
+	echo ''
+
+	sudo lxc-attach -n $NameServer -- sed -i "/dhcp4: true/s/true/false/" /etc/netplan/10-lxc.yaml
+	sudo lxc-attach -n $NameServer -- cat /etc/netplan/10-lxc.yaml
+	
+	echo ''
+	echo "=============================================="	
+	echo "Done: sed $NameServer:/etc/netplan/10-lxc.yaml"
+	echo "=============================================="
+	echo ''
+	echo "=============================================="	
+	echo "Show isc-dhcp-server status ...               "
+	echo "=============================================="
+	echo ''
+
+	sudo lxc-attach -n $NameServer -- service isc-dhcp-server restart
+	sudo lxc-attach -n $NameServer -- service isc-dhcp-server status
+	
+	echo ''
+	echo "=============================================="	
+	echo "Done: Show isc-dhcp-server status.            "
+	echo "=============================================="
+	echo ''
+	echo "=============================================="	
+	echo "Restart $NameServer...                        "
+	echo "=============================================="
+	echo ''
+
+	sudo lxc-stop   -n $NameServer
+	sudo lxc-start  -n $NameServer
+	sudo lxc-ls -f
+
+	echo ''
+	echo "=============================================="	
+	echo "Done: Restart $NameServer.                    "
+	echo "=============================================="
+	echo ''
+	echo "=============================================="	
+	echo "Done: Block eth0 DHCP in $NameServer.         "
+	echo "=============================================="
+	echo ''
+
+	sleep 5
+
+	clear
 fi
-
-sleep 5
-
-clear
 
 # echo "NameServerExists = "$NameServerExists
 # echo "MultiHostVar2    = "$MultiHostVar2

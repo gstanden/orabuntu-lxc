@@ -879,10 +879,10 @@ do
                 echo "Done: nslookup $ContainerPrefixLXD$CI.        "
                 echo "=============================================="
                 echo ''
+        
+		CopyCompleted=$((CopyCompleted+1))
+        	CloneIndex=$((CloneIndex+1))
         fi
-
-        CopyCompleted=$((CopyCompleted+1))
-        CloneIndex=$((CloneIndex+1))
 
         sleep 5
 
@@ -997,7 +997,8 @@ then
                 	sudo rm -f /var/lib/lxc/$j/rootfs/var/run/dhclient.pid
         	fi
 
-        	sudo lxc-start  -n $j /dev/null 2>&1
+        #	sudo lxc-start  -n $j > /dev/null 2>&1
+        	sudo lxc-start  -n $j 
 
 		sleep 5
 
