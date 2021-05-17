@@ -17,7 +17,7 @@
 /var/lib/lxc/nsa/rootfs/etc/netplan/02-netcfg.yaml
 /var/lib/lxc/nsa/rootfs/root/ns_backup_update.lst
 /var/lib/lxc/nsa/rootfs/etc/systemd/resolved.conf
-/var/lib/lxc/nsa/rootfs/etc/dhcp/dhcpd.conf
 /var/lib/lxc/nsa/config
+/var/lib/lxc/nsa/rootfs/etc/dhcp/dhcpd.conf
 /var/GNU3
 /var/COPYING

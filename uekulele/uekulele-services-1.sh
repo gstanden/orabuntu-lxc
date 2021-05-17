@@ -4799,7 +4799,7 @@ then
 			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /etc/NetworkManager/dnsmasq.d/local
 			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /etc/network/openvswitch/crt_ovs_sw1.sh
 			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/etc/bind/named.conf.local
-			sudo sed -i "/##R/s/##R//g"                             	/var/lib/lxc/$NameServer/rootfs/etc/dhcp/dhcpd.conf
+		#	sudo sed -i "/##R/s/##R//g"                             	/var/lib/lxc/$NameServer/rootfs/etc/dhcp/dhcpd.conf
 			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/etc/dhcp/dhcpd.conf
 		#	sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/etc/network/interfaces
 			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/root/ns_backup_update.lst
@@ -5670,44 +5670,66 @@ then
 	echo "=============================================="
 	echo "Done: Start LXC DNS DHCP container.           "
 	echo "=============================================="
+
+	sleep 5
+
+	clear
+
+	echo ''
+	echo "=============================================="
+	echo "Block eth0 DHCP in $NameServer...             "
+	echo "=============================================="
+	echo ''
+
+	echo "=============================================="
+	echo "sed $NameServer:/etc/netplan/10-lxc.yaml      "
+	echo "=============================================="
+	echo ''
+
+	sudo lxc-attach -n $NameServer -- sed -i "/dhcp4: true/s/true/false/" /etc/netplan/10-lxc.yaml
+	sudo lxc-attach -n $NameServer -- cat /etc/netplan/10-lxc.yaml
+
+	echo ''
+	echo "=============================================="
+	echo "Done: sed $NameServer:/etc/netplan/10-lxc.yaml"
+	echo "=============================================="
+	echo ''
+	echo "=============================================="
+	echo "Show isc-dhcp-server status ...               "
+	echo "=============================================="
+	echo ''
+
+	sudo lxc-attach -n $NameServer -- service isc-dhcp-server restart
+	sudo lxc-attach -n $NameServer -- service isc-dhcp-server status
+
+	echo ''
+	echo "=============================================="
+	echo "Done: Show isc-dhcp-server status.            "
+	echo "=============================================="
+	echo ''
+	echo "=============================================="
+	echo "Restart $NameServer...                        "
+	echo "=============================================="
+	echo ''
+
+	sudo lxc-stop   -n $NameServer
+	sudo lxc-start  -n $NameServer
+	sudo lxc-ls -f
+
+	echo ''
+	echo "=============================================="
+	echo "Done: Restart $NameServer.                    "
+	echo "=============================================="
+
+	echo "=============================================="
+	echo "Done: Block eth0 DHCP in $NameServer.         "
+	echo "=============================================="
+	echo ''
+
+	sleep 5
+
+	clear
 fi
-
-sleep 5
-
-clear
-
-echo ''
-echo "=============================================="
-echo "Block eth0 DHCP in $NameServer...             "
-echo "=============================================="
-echo ''
-
-function GetNameServerEth0MacAddress {
-        sudo lxc-attach -n $NameServer -- ifconfig eth0 | grep ether | sed 's/^[ \t]*//' | cut -f2 -d' '
-}
-NameServerEth0MacAddress=$(GetNameServerEth0MacAddress)
-echo "NSEMA = "$NameServerEth0MacAddress
-
-sudo lxc-attach -n $NameServer -- cat /etc/dhcp/dhcpd.conf | grep 'hardware ethernet' | sed 's/^[ \t]*//' | cut -f3 -d' '
-sudo lxc-attach -n $NameServer -- sed -i "/hardware ethernet 00:16:3e:ce:de:25/s/00:16:3e:ce:de:25/$NameServerEth0MacAddress/" /etc/dhcp/dhcpd.conf
-sudo lxc-attach -n $NameServer -- service isc-dhcp-server stop
-sudo lxc-attach -n $NameServer -- service isc-dhcp-server start
-sleep 5
-sudo lxc-attach -n $NameServer -- cat /etc/dhcp/dhcpd.conf | grep 'hardware ethernet' | sed 's/^[ \t]*//' | cut -f3 -d' '
-sudo lxc-attach -n $NameServer -- service isc-dhcp-server status
-
-echo ''
-echo "=============================================="
-echo "Done: Block eth0 DHCP in $NameServer.         "
-echo "=============================================="
-echo ''
-
-sleep 5
-
-clear
-
-# if [ $NameServerExists -eq 0 ] && [ $MultiHostVar2 = 'Y' ] && [ $GRE = 'Y' ]
-# GLS 20180202 Allow VMs to get a copy of the NameServer container(s).
 
 if [ $NameServerExists -eq 0 ] && [ $MultiHostVar2 = 'Y' ]
 then
