@@ -8,7 +8,6 @@
 /var/lib/lxc/nsa/rootfs/root/crontab.txt
 /var/lib/lxc/nsa/rootfs/etc/rc.local
 /var/lib/lxc/nsa/rootfs/etc/systemd/system/dns-thaw.service
-/var/lib/lxc/nsa/rootfs/root/ns_backup.start.sh
 /var/lib/lxc/nsa/rootfs/root/dns-sync.sh
 /var/lib/lxc/nsa/rootfs/root/dns-thaw.sh
 /var/lib/lxc/nsa/rootfs/etc/systemd/system/dns-sync.service
@@ -19,5 +18,6 @@
 /var/lib/lxc/nsa/rootfs/etc/systemd/resolved.conf
 /var/lib/lxc/nsa/config
 /var/lib/lxc/nsa/rootfs/etc/dhcp/dhcpd.conf
+/var/lib/lxc/nsa/rootfs/root/ns_backup.start.sh
 /var/GNU3
 /var/COPYING

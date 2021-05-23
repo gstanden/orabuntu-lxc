@@ -11,8 +11,8 @@ Domain1=urdomain1.com			#							Domain name of the clone containers network.
 Domain2=urdomain2.com			#							Domain name of the seed  containers network.
 NameServer=afns1			#							Name of the nameserver.
 OSMemRes=1024				#							Amount of reserved memory.  Often used with Oracle Enteprise software installations.
-LXD=N					# [Y|N]							Create LXD containers flag. Currently used only with Ubuntu Linux 20.04 but other distros coming soon.
-LXDCluster=N				# [Y|N]							Create LXD Cluster automatically flag.  Currently used only with Ubuntu Linux 20.04 but other distros coming soon.
+LXD=Y					# [Y|N]							Create LXD containers flag. Currently used only with Ubuntu Linux 20.04 but other distros coming soon.
+LXDCluster=Y				# [Y|N]							Create LXD Cluster automatically flag.  Currently used only with Ubuntu Linux 20.04 but other distros coming soon.
 Docker=N				# [Y|N]	 						Docker install from Canonical Snap.
 K8S=N					# [Y|N]							Kubernetes install K8S snap from Canonical Snap. Ubuntu Linux 20.04 only for now.
 BtrfsLun="\/dev\/sdb1"			#							LUN partition for LXD cluster where "X={b,c,d...z}. Auto-system-set to "unused" for some Linux distros, see below.
