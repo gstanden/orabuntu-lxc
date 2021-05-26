@@ -4,8 +4,8 @@
 
 # User-settable variables
 
-MajorRelease=8				# [8|7|6]						Reset automatically to specific values for some Linux distros.  See anylinux-services.sh search "pgroup1"
-PointRelease=3				# [9|3]	 						Reset automatically to specific values for some Linux distros.  See anylinux-services.sh search "pgroup1"
+MajorRelease=7				# [8|7|6]						Reset automatically to specific values for some Linux distros.  See anylinux-services.sh search "pgroup1"
+PointRelease=9				# [9|3]	 						Reset automatically to specific values for some Linux distros.  See anylinux-services.sh search "pgroup1"
 NumCon=4				#							Number of clones of the seed container.
 Domain1=urdomain1.com			#							Domain name of the clone containers network.
 Domain2=urdomain2.com			#							Domain name of the seed  containers network.

@@ -781,81 +781,87 @@ do
                 echo "=============================================="
                 echo "Done: Assign Profile $ContainerPrefixLXD$CI.  "
                 echo "=============================================="
-                echo ''
-                echo "=============================================="
-                echo "Set Machine-ID  $ContainerPrefixLXD$CI...     "
-                echo "=============================================="
-                echo ''
 
-        	echo "/var/lib/snapd/snap/bin/lxc file delete $ContainerPrefixLXD$CloneIndex/etc/machine-id"
-                echo "/var/lib/snapd/snap/bin/lxc file delete $ContainerPrefixLXD$CloneIndex/etc/machine-id" | sg lxd
+		if [ $MajorRelease -ge 8 ]
+		then
+                	echo ''
+                	echo "=============================================="
+                	echo "Set Machine-ID  $ContainerPrefixLXD$CI...     "
+                	echo "=============================================="
+                	echo ''
 
-                sleep 5
+        		echo "/var/lib/snapd/snap/bin/lxc file delete $ContainerPrefixLXD$CloneIndex/etc/machine-id"
+                	echo "/var/lib/snapd/snap/bin/lxc file delete $ContainerPrefixLXD$CloneIndex/etc/machine-id" | sg lxd
 
-                echo "/var/lib/snapd/snap/bin/lxc start $ContainerPrefixLXD$CloneIndex" | sg lxd
+                	sleep 5
 
-                sleep 5
+                	echo "/var/lib/snapd/snap/bin/lxc start $ContainerPrefixLXD$CloneIndex" | sg lxd
 
-                n=1
-                while [ $n -ne 0 ]
-                do
-                        echo "/var/lib/snapd/snap/bin/lxc exec  $ContainerPrefixLXD$CloneIndex -- systemd-machine-id-setup > /dev/null 2>&1" | sg lxd
-                        n=`echo $?`
-                        sleep 5
-                done
+                	sleep 5
 
-                echo "/var/lib/snapd/snap/bin/lxc stop  $ContainerPrefixLXD$CloneIndex" --force | sg lxd
-                echo "/var/lib/snapd/snap/bin/lxc start $ContainerPrefixLXD$CloneIndex" | sg lxd
+                	n=1
+                	while [ $n -ne 0 ]
+                	do
+                        	echo "/var/lib/snapd/snap/bin/lxc exec  $ContainerPrefixLXD$CloneIndex -- systemd-machine-id-setup > /dev/null 2>&1" | sg lxd
+                        	n=`echo $?`
+                        	sleep 5
+                	done
 
-                echo ''
-                echo "=============================================="
-                echo "Done: Set Machine-ID $ContainerPrefixLXD$CI.  "
-                echo "=============================================="
-                echo ''
-                echo "=============================================="
-                echo "Set hostnamectl $ContainerPrefixLXD$CI...     "
-                echo "=============================================="
-                echo ''
+                	echo "/var/lib/snapd/snap/bin/lxc stop  $ContainerPrefixLXD$CloneIndex" --force | sg lxd
+                	echo "/var/lib/snapd/snap/bin/lxc start $ContainerPrefixLXD$CloneIndex" | sg lxd
 
-                n=1
-                while [ $n -ne 0 ]
-                do
-                        echo "/var/lib/snapd/snap/bin/lxc exec $ContainerPrefixLXD$CloneIndex -- hostnamectl set-hostname $ContainerPrefixLXD$CloneIndex > /dev/null 2>&1" | sg lxd
-                        n=`echo $?`
-                        sleep 5
-                done
+                	echo ''
+                	echo "=============================================="
+                	echo "Done: Set Machine-ID $ContainerPrefixLXD$CI.  "
+                	echo "=============================================="
+                	echo ''
+                	echo "=============================================="
+                	echo "Set hostnamectl $ContainerPrefixLXD$CI...     "
+                	echo "=============================================="
+                	echo ''
 
-                echo "/var/lib/snapd/snap/bin/lxc exec $ContainerPrefixLXD$CloneIndex -- hostnamectl" | sg lxd
+                	n=1
+                	while [ $n -ne 0 ]
+                	do
+                        	echo "/var/lib/snapd/snap/bin/lxc exec $ContainerPrefixLXD$CloneIndex -- hostnamectl set-hostname $ContainerPrefixLXD$CloneIndex > /dev/null 2>&1" | sg lxd
+                        	n=`echo $?`
+                        	sleep 5
+                	done
 
-                echo ''
-                echo "=============================================="
-                echo "Done: Set hostnamectl $ContainerPrefixLXD$CI. "
-                echo "=============================================="
-                echo ''
+                	echo "/var/lib/snapd/snap/bin/lxc exec $ContainerPrefixLXD$CloneIndex -- hostnamectl" | sg lxd
 
-                sleep 5
+                	echo ''
+                	echo "=============================================="
+                	echo "Done: Set hostnamectl $ContainerPrefixLXD$CI. "
+                	echo "=============================================="
+                	echo ''
 
-                clear
+                	sleep 5
+                	
+			clear
 
-                echo ''
-                echo "=============================================="
-                echo "Restart $ContainerPrefixLXD$CI...             "
-                echo "=============================================="
-                echo ''
+                	echo ''
+                	echo "=============================================="
+                	echo "Restart $ContainerPrefixLXD$CI...             "
+                	echo "=============================================="
+                	echo ''
 
-                echo "/var/lib/snapd/snap/bin/lxc stop  $ContainerPrefixLXD$CloneIndex" | sg lxd
-                echo "/var/lib/snapd/snap/bin/lxc start $ContainerPrefixLXD$CloneIndex" | sg lxd
-                echo "/var/lib/snapd/snap/bin/lxc list  $ContainerPrefixLXD$CloneIndex" | sg lxd
+                	echo "/var/lib/snapd/snap/bin/lxc stop  $ContainerPrefixLXD$CloneIndex" | sg lxd
+                	echo "/var/lib/snapd/snap/bin/lxc start $ContainerPrefixLXD$CloneIndex" | sg lxd
+                	echo "/var/lib/snapd/snap/bin/lxc list  $ContainerPrefixLXD$CloneIndex" | sg lxd
 
-                echo ''
-                echo "=============================================="
-                echo "Done: Restart $ContainerPrefixLXD$CI.         "
-                echo "=============================================="
-                echo ''
+                	echo ''
+                	echo "=============================================="
+                	echo "Done: Restart $ContainerPrefixLXD$CI.         "
+                	echo "=============================================="
+                	echo ''
 
-                sleep 5
+                	sleep 5
 
-                clear
+                	clear
+		else
+                	echo "/var/lib/snapd/snap/bin/lxc start $ContainerPrefixLXD$CloneIndex" | sg lxd
+		fi
 
                 echo ''
                 echo "=============================================="
@@ -863,7 +869,7 @@ do
                 echo "=============================================="
                 echo ''
 
-                sleep 5
+                sleep 10
 
                 clear
 

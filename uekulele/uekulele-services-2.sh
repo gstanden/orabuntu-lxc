@@ -1013,13 +1013,21 @@ then
         echo "=============================================="
         echo ''
 
-        echo "/var/lib/snapd/snap/bin/lxc exec  oel$OracleRelease$SeedPostfix -- hostnamectl set-hostname oel$OracleRelease$SeedPostfix" | sg lxd
-        echo "/var/lib/snapd/snap/bin/lxc exec  oel$OracleRelease$SeedPostfix -- usermod --password `perl -e "print crypt('root','root');"` root" | sg lxd
+	if [ $MajorRelease -ge 8 ]
+	then
+        	echo "/var/lib/snapd/snap/bin/lxc exec oel$OracleRelease$SeedPostfix -- hostnamectl set-hostname oel$OracleRelease$SeedPostfix" | sg lxd
+	fi
+        
+	echo "/var/lib/snapd/snap/bin/lxc exec  oel$OracleRelease$SeedPostfix -- usermod --password `perl -e "print crypt('root','root');"` root" | sg lxd
         echo "/var/lib/snapd/snap/bin/lxc exec  oel$OracleRelease$SeedPostfix -- yum -y install openssh-server net-tools" | sg lxd
         echo "/var/lib/snapd/snap/bin/lxc exec  oel$OracleRelease$SeedPostfix -- service sshd restart" | sg lxd
         echo "/var/lib/snapd/snap/bin/lxc exec  oel$OracleRelease$SeedPostfix -- hostnamectl" | sg lxd
-        echo "/var/lib/snapd/snap/bin/lxc stop  oel$OracleRelease$SeedPostfix" | sg lxd
-        echo "/var/lib/snapd/snap/bin/lxc start oel$OracleRelease$SeedPostfix" | sg lxd
+
+	if [ $MajorRelease -ge 8 ]
+	then
+        	echo "/var/lib/snapd/snap/bin/lxc stop  oel$OracleRelease$SeedPostfix" | sg lxd
+        	echo "/var/lib/snapd/snap/bin/lxc start oel$OracleRelease$SeedPostfix" | sg lxd
+	fi
 
         echo '' 
         echo "=============================================="
@@ -1103,32 +1111,32 @@ then
 
 	cd /opt/olxc/"$DistDir"/uekulele/archives
 
-	if [ $MajorRelease -ge 8 ]
+	if [ $MajorRelease -ge 7 ]
 	then
 		sudo tar -vP --extract --file=lxc-oracle-files.tar --directory /var/lib/lxc/oel$OracleRelease$SeedPostfix rootfs/etc/ntp.conf
 		sudo tar -vP --extract --file=lxc-oracle-files.tar --directory /var/lib/lxc/oel$OracleRelease$SeedPostfix rootfs/etc/sysconfig/ntpd
 	fi
 
-	if [ $MajorRelease -eq 7 ] || [ $MajorRelease -eq 6 ]
-	then
-		sudo tar -xvf /opt/olxc/"$DistDir"/"$SubDirName"/archives/lxc-oracle-files.tar -C /var/lib/lxc/oel$OracleRelease$SeedPostfix --touch
-		sudo chown root:root /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/etc/dhcp/dhclient.conf
-		sudo chmod 644 /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/etc/dhcp/dhclient.conf
-		sudo sed -i "s/HOSTNAME=ContainerName/HOSTNAME=oel$OracleRelease$SeedPostfix/g" /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/etc/sysconfig/network
-		# sudo rm /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/etc/ntp.conf
-
-		if [ -n $Domain1 ]
-		then
-        		sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/etc/NetworkManager/dnsmasq.d/local
-			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/etc/dhcp/dhclient.conf
-		fi
-
-		if [ -n $Domain2 ]
-		then
-        		sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/etc/NetworkManager/dnsmasq.d/local
-			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/etc/dhcp/dhclient.conf
-		fi
-	fi
+ 	if [ $MajorRelease -eq 7 ] || [ $MajorRelease -eq 6 ]
+ 	then
+ 		sudo tar -xvf /opt/olxc/"$DistDir"/"$SubDirName"/archives/lxc-oracle-files.tar -C /var/lib/lxc/oel$OracleRelease$SeedPostfix --touch
+ 		sudo chown root:root /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/etc/dhcp/dhclient.conf
+ 		sudo chmod 644 /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/etc/dhcp/dhclient.conf
+ 		sudo sed -i "s/HOSTNAME=ContainerName/HOSTNAME=oel$OracleRelease$SeedPostfix/g" /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/etc/sysconfig/network
+ 		# sudo rm /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/etc/ntp.conf
+ 
+ 		if [ -n $Domain1 ]
+ 		then
+         		sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/etc/NetworkManager/dnsmasq.d/local
+ 			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/etc/dhcp/dhclient.conf
+ 		fi
+ 
+ 		if [ -n $Domain2 ]
+ 		then
+         		sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/etc/NetworkManager/dnsmasq.d/local
+ 			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /var/lib/lxc/oel$OracleRelease$SeedPostfix/rootfs/etc/dhcp/dhclient.conf
+ 		fi
+ 	fi
 
 	echo ''
 	echo "=============================================="
