@@ -260,7 +260,7 @@ then
 	}
 else
 	function CheckNetworkUp {
-		ping -c 3 yum.oracle.com > /dev/null 2>&1
+		ping -c 3 yum.oracle.com -4 > /dev/null 2>&1
 		echo $?
 	}
 fi
@@ -308,7 +308,7 @@ then
 		then
 			ping -c 3 yum.oracle.com -4
 		else
-			ping -c 3 yum.oracle.com
+			ping -c 3 yum.oracle.com -4
 		fi
 
 		echo ''
@@ -332,7 +332,7 @@ else
 	then
 		ping -c 3 yum.oracle.com -4
 	else
-		ping -c 3 yum.oracle.com
+		ping -c 3 yum.oracle.com -4
 	fi
 fi
 

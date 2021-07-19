@@ -1016,7 +1016,14 @@ then
 	if [ $MajorRelease -ge 8 ]
 	then
         	echo "/var/lib/snapd/snap/bin/lxc exec oel$OracleRelease$SeedPostfix -- hostnamectl set-hostname oel$OracleRelease$SeedPostfix" | sg lxd
-        	echo "/var/lib/snapd/snap/bin/lxc config set oel$OracleRelease$SeedPostfix security.privileged true" | sg lxd
+
+		# GLS 2021-07-19 Workaround for Oracle 8 using privileged container option.
+		# GLS 2021-07-19 See https://discuss.linuxcontainers.org/t/centos8-containers-unable-to-automatically-get-ipv4-addresses-after-update/11273/22 for more information.
+
+		if [ $Release -eq 8 ] && [ $LinuxFlavor = 'Oracle' ]
+		then
+        		echo "/var/lib/snapd/snap/bin/lxc config set oel$OracleRelease$SeedPostfix security.privileged true" | sg lxd
+		fi
 	fi
         
 	echo "/var/lib/snapd/snap/bin/lxc stop   oel$OracleRelease$SeedPostfix" | sg lxd
