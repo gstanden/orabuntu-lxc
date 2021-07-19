@@ -5700,7 +5700,7 @@ then
 	echo ''
 
 	sudo lxc-attach -n $NameServer -- service isc-dhcp-server restart
-	sudo lxc-attach -n $NameServer -- service isc-dhcp-server status
+	sudo lxc-attach -n $NameServer -- service isc-dhcp-server status | head -10
 
 	echo ''
 	echo "=============================================="

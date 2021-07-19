@@ -596,6 +596,7 @@ do
                 echo ''
 
                 echo "/var/lib/snapd/snap/bin/lxc copy $SeedContainerName $ContainerPrefixLXD$CloneIndex" | sg lxd
+                echo "/var/lib/snapd/snap/bin/lxc config set $ContainerPrefixLXD$CloneIndex security.privileged true" | sg lxd
                 echo "/var/lib/snapd/snap/bin/lxc list $ContainerPrefixLXD$CloneIndex" | sg lxd
 
                 echo ''

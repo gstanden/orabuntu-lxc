@@ -1016,12 +1016,24 @@ then
 	if [ $MajorRelease -ge 8 ]
 	then
         	echo "/var/lib/snapd/snap/bin/lxc exec oel$OracleRelease$SeedPostfix -- hostnamectl set-hostname oel$OracleRelease$SeedPostfix" | sg lxd
+        	echo "/var/lib/snapd/snap/bin/lxc config set oel$OracleRelease$SeedPostfix security.privileged true" | sg lxd
 	fi
         
-	echo "/var/lib/snapd/snap/bin/lxc exec  oel$OracleRelease$SeedPostfix -- usermod --password `perl -e "print crypt('root','root');"` root" | sg lxd
-        echo "/var/lib/snapd/snap/bin/lxc exec  oel$OracleRelease$SeedPostfix -- yum -y install openssh-server net-tools" | sg lxd
-        echo "/var/lib/snapd/snap/bin/lxc exec  oel$OracleRelease$SeedPostfix -- service sshd restart" | sg lxd
-        echo "/var/lib/snapd/snap/bin/lxc exec  oel$OracleRelease$SeedPostfix -- hostnamectl" | sg lxd
+	echo "/var/lib/snapd/snap/bin/lxc stop   oel$OracleRelease$SeedPostfix" | sg lxd
+	sleep 5
+	echo "/var/lib/snapd/snap/bin/lxc start  oel$OracleRelease$SeedPostfix" | sg lxd
+	sleep 20
+
+	nslookup oel$OracleRelease$SeedPostfix
+	if [ $? -ne 0 ]
+	then
+		sleep 20
+	fi
+	
+	echo "/var/lib/snapd/snap/bin/lxc exec   oel$OracleRelease$SeedPostfix -- usermod --password `perl -e "print crypt('root','root');"` root" | sg lxd
+        echo "/var/lib/snapd/snap/bin/lxc exec   oel$OracleRelease$SeedPostfix -- yum -y install openssh-server net-tools" | sg lxd
+        echo "/var/lib/snapd/snap/bin/lxc exec   oel$OracleRelease$SeedPostfix -- service sshd restart" | sg lxd
+        echo "/var/lib/snapd/snap/bin/lxc exec   oel$OracleRelease$SeedPostfix -- hostnamectl" | sg lxd
 
 	if [ $MajorRelease -ge 8 ]
 	then
