@@ -1,0 +1,2 @@
+# The files in this directors are for creating the required zfs pool storage on the various Linux distrbutions.
+# Currently there are one-script-does-it-all for Oracle Linux 7 and Oracle Linux 8.
