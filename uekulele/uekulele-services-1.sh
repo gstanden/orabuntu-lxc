@@ -5158,7 +5158,7 @@ do
 			if [ $k = 'sx1' ]
 			then
                 		sudo sh -c "echo 'Wants=network-online.target'			>> /etc/systemd/system/$k.service"
-                		sudo sh -c "echo 'After=network-online.target sw1.service'	>> /etc/systemd/system/$k.service"
+                		sudo sh -c "echo 'After=network-online.target'			>> /etc/systemd/system/$k.service"
 			fi
 
                	 	sudo sh -c "echo ''							>> /etc/systemd/system/$k.service"
@@ -5611,8 +5611,8 @@ then
 
 			sudo sh -c "echo '[Unit]'             	         				 > /etc/systemd/system/$NameServer.service"
 			sudo sh -c "echo 'Description=$NameServer Service'  				>> /etc/systemd/system/$NameServer.service"
-			sudo sh -c "echo 'Wants=network-online.target sw1.service sx1.service'		>> /etc/systemd/system/$NameServer.service"
-			sudo sh -c "echo 'After=network-online.target sw1.service sx1.service'		>> /etc/systemd/system/$NameServer.service"
+			sudo sh -c "echo 'Wants=network-online.target sx1.service'			>> /etc/systemd/system/$NameServer.service"
+			sudo sh -c "echo 'After=network-online.target sx1.service'			>> /etc/systemd/system/$NameServer.service"
 			sudo sh -c "echo ''                                 				>> /etc/systemd/system/$NameServer.service"
 			sudo sh -c "echo '[Service]'                        				>> /etc/systemd/system/$NameServer.service"
 			sudo sh -c "echo 'Type=oneshot'                     				>> /etc/systemd/system/$NameServer.service"
@@ -6175,9 +6175,13 @@ then
 
                         sudo sed -i '/type=gre/d'   /etc/network/openvswitch/crt_ovs_sw1.sh
                         sudo sed -i '/type=vxlan/d' /etc/network/openvswitch/crt_ovs_sw1.sh
-			sudo firewall-cmd --permanent --zone=public --add-port=6081/udp
-			sudo firewall-cmd --permanent --zone=public --add-interface=genev_sys_6081
-			sudo firewall-cmd --reload
+
+			if [ $LinuxFlavor = 'Oracle' ] && [ $Release -ge 8 ]
+			then
+				sudo firewall-cmd --permanent --zone=public --add-port=6081/udp
+				sudo firewall-cmd --permanent --zone=public --add-interface=genev_sys_6081
+				sudo firewall-cmd --reload
+			fi
 
                 elif [ $TunType = 'gre' ]
                 then
@@ -6185,9 +6189,13 @@ then
 
                         sudo sed -i '/type=geneve/d' /etc/network/openvswitch/crt_ovs_sw1.sh
                         sudo sed -i '/type=vxlan/d'  /etc/network/openvswitch/crt_ovs_sw1.sh
-			sudo firewall-cmd --permanent --zone=public --add-protocol=gre
-			sudo firewall-cmd --permanent --zone=public --add-interface=gre_sys
-			sudo firewall-cmd --reload
+
+			if [ $LinuxFlavor = 'Oracle' ] && [ $Release -ge 8 ]
+			then
+				sudo firewall-cmd --permanent --zone=public --add-protocol=gre
+				sudo firewall-cmd --permanent --zone=public --add-interface=gre_sys
+				sudo firewall-cmd --reload
+			fi
 
                 elif [ $TunType = 'vxlan' ]
                 then
@@ -6195,10 +6203,13 @@ then
 
                         sudo sed -i '/type=geneve/d' /etc/network/openvswitch/crt_ovs_sw1.sh
                         sudo sed -i '/type=gre/d'    /etc/network/openvswitch/crt_ovs_sw1.sh
-			sudo firewall-cmd --permanent --zone=public --add-port=4789/udp
-			sudo firewall-cmd --permanent --zone=public --add-interface=vxlan_sys_4789
-			sudo firewall-cmd --reload
 
+			if [ $LinuxFlavor = 'Oracle' ] && [ $Release -ge 8 ]
+			then
+				sudo firewall-cmd --permanent --zone=public --add-port=4789/udp
+				sudo firewall-cmd --permanent --zone=public --add-interface=vxlan_sys_4789
+				sudo firewall-cmd --reload
+			fi
                 fi
 
                 echo ''

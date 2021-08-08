@@ -801,7 +801,7 @@ fi
 	then
 		if   [ $MajorRelease -eq 8 ]
 		then
-			PointRelease=4
+			PointRelease=3
 
 		elif [ $MajorRelease -eq 7 ] 
 		then
