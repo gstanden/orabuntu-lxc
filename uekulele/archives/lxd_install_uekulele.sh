@@ -45,7 +45,7 @@ sleep 5
 
 clear
 
-if   [ $PreSeed = 'Y' ] && [ $Release -ge 8 ]
+if   [ $PreSeed = 'Y' ] && [ $Release -ge 7 ]
 then
 	echo ''
 	echo "=============================================="

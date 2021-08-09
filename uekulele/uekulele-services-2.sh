@@ -637,7 +637,7 @@ then
 	done
 fi
 
-if [ $LXDCluster = 'Y' ] && [ $Release -eq 8 ] && [ $LinuxFlavor = 'Oracle' ]
+if [ $LXDCluster = 'Y' ] && [ $Release -ge 7 ] && [ $LinuxFlavor = 'Oracle' ]
 then
 	echo ''
 	echo "=============================================="
@@ -649,31 +649,34 @@ then
 
 	clear
 
-        echo ''
-        echo "=============================================="
-        echo "Configure firewalld for LXD Cluster...        "
-        echo "=============================================="
-        echo ''
-        sudo firewall-cmd --zone=public --permanent --add-service=https
-        sudo firewall-cmd --zone=public --permanent --add-service=dns 
-        sudo firewall-cmd --zone=public --permanent --add-service=dhcp
-#	sudo firewall-cmd --zone=public --permanent --add-service=ssh
-        sudo firewall-cmd --zone=public --permanent --add-port=587/tcp --add-port=8443/tcp
- 	sudo firewall-cmd --zone=public --permanent --add-interface=sw1
- 	sudo firewall-cmd --zone=public --permanent --add-interface=sx1
- 	sudo firewall-cmd --zone=public --permanent --add-interface=sw1a
- 	sudo firewall-cmd --zone=public --permanent --add-interface=sx1a
-#	sudo firewall-cmd --zone=public --permanent --add-masquerade
+	if [ $Release -ge 8 ]
+	then
+        	echo ''
+        	echo "=============================================="
+        	echo "Configure firewalld for LXD Cluster...        "
+        	echo "=============================================="
+        	echo ''
+        	sudo firewall-cmd --zone=public --permanent --add-service=https
+        	sudo firewall-cmd --zone=public --permanent --add-service=dns 
+        	sudo firewall-cmd --zone=public --permanent --add-service=dhcp
+#		sudo firewall-cmd --zone=public --permanent --add-service=ssh
+        	sudo firewall-cmd --zone=public --permanent --add-port=587/tcp --add-port=8443/tcp
+ 		sudo firewall-cmd --zone=public --permanent --add-interface=sw1
+ 		sudo firewall-cmd --zone=public --permanent --add-interface=sx1
+ 		sudo firewall-cmd --zone=public --permanent --add-interface=sw1a
+ 		sudo firewall-cmd --zone=public --permanent --add-interface=sx1a
+#		sudo firewall-cmd --zone=public --permanent --add-masquerade
 
-        echo ''
-        echo "=============================================="
-        echo "Done: Configure firewalld for LXD Cluster.    "
-        echo "=============================================="
-        echo ''
+        	echo ''
+        	echo "=============================================="
+        	echo "Done: Configure firewalld for LXD Cluster.    "
+        	echo "=============================================="
+        	echo ''
 
-        sleep 5
+        	sleep 5
 
-        clear
+        	clear
+	fi
 
 #	echo ''
 #	echo "=============================================="
@@ -875,23 +878,26 @@ then
 
 	clear
 
-        echo ''
-        echo "=============================================="
-        echo "Configure firewalld for lxdbr0...             "
-        echo "=============================================="
-        echo ''
+	if [ $Release -ge 8 ]
+	then
+        	echo ''
+        	echo "=============================================="
+        	echo "Configure firewalld for lxdbr0...             "
+        	echo "=============================================="
+        	echo ''
 
-	sudo firewall-cmd --zone=public --permanent --add-interface=lxdbr0
+		sudo firewall-cmd --zone=public --permanent --add-interface=lxdbr0
         
-	echo ''
-        echo "=============================================="
-        echo "Done: Configure firewalld for lxdbr0.         "
-        echo "=============================================="
-        echo ''
+		echo ''
+        	echo "=============================================="
+        	echo "Done: Configure firewalld for lxdbr0.         "
+        	echo "=============================================="
+        	echo ''
 
-	sleep 5
+		sleep 5
 	
-	clear
+		clear
+	fi
 
         echo ''
         echo "=============================================="
@@ -1020,7 +1026,7 @@ then
 		# GLS 2021-07-19 Workaround for Oracle 8 using privileged container option.
 		# GLS 2021-07-19 See https://discuss.linuxcontainers.org/t/centos8-containers-unable-to-automatically-get-ipv4-addresses-after-update/11273/22 for more information.
 
-		if [ $Release -eq 8 ] && [ $LinuxFlavor = 'Oracle' ]
+		if [ $MajorRelease -eq 8 ] && [ $LinuxFlavor = 'Oracle' ]
 		then
         		echo "/var/lib/snapd/snap/bin/lxc config set oel$OracleRelease$SeedPostfix security.privileged true" | sg lxd
 		fi

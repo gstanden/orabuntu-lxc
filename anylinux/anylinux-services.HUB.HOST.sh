@@ -248,7 +248,7 @@ fi
 
 if   [ $LinuxFlavor = 'Ubuntu' ] || [ $LinuxFlavor = 'Oracle' ]
 then
-	if [ $UbuntuMajorVersion -ge 20 ] || [ $Release -ge 8 ]
+	if [ $UbuntuMajorVersion -ge 20 ] || [ $Release -ge 7 ]
 	then
 		if [ $LXDCluster = 'Y' ] && [ $StorageDriver = 'zfs' ]
 		then
