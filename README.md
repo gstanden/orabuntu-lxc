@@ -126,7 +126,7 @@ Run the HUB HOST script (as a **NON-root** "administrative" user with "SUDO ALL"
 ./anylinux-services.HUB.HOST.sh new
 ```
 
-**Note**: After the script finishes, if you have set LXD=Y and LXDCluster=Y then **you will need to log out/log back in again to host server** to have access to commands like "lxc list" "lxc cluster list" etc.**
+**Note**: After the script finishes, if you have set LXD=Y and LXDCluster=Y then **you will need to log out/log back in again to host server to have access to commands like "lxc list" "lxc cluster list" etc.**
 
 Otherwise, that's it. It runs fully-automated and delivers LXC single network spanned across multiple hosts, **or now alternatively an LXD cluster**, container infrastructure. There are optional switches in the CONFIG file to deploy Docker and (for Ubuntu Linux only K8S).  Currently, the LXD cluster features of Orabuntu-LXC only supports ZFS storage pools.  
 
