@@ -136,7 +136,7 @@ including support for any two separate user-selectable IP subnet ranges, and 2 u
 
 With the replicated and constantly updated LXC containerized DNS/DHCP solution, GRE-connected hosts (such as developer laptops) can be disconnected from the network and still have full DNS/DHCP lookup services for any containers stored locally on the developer laptop.  Plus, containers that are added by the developer after detachment from the Orabuntu-LXC network will be added to the local copy of the LXC containerized DNS/DHCP.
 
-#  More Detailed: Install Orabuntu-LXC v6.0-beta AMIDE 
+#  More Detailed: Install Orabuntu-LXC v6.13.25.x-beta AMIDE 
 
 An administrative non-root user account is required (such as the install account). The non-root user needs to have "sudo ALL" privilege.
 
@@ -203,16 +203,13 @@ Note that although the software is unpacked at /home/username/Downloads, nothing
 The install is customized and configured in the file:
 
 ```
-anylinux-services.sh
+anylinux/CONFIG
 ```
-
-Search for {pgroup1, pgroup2, pgroup3} to see the configurable settings. When first trying out Orabuntu-LXC, the simplest approach is probably to just build a VM of one of a supported vanilla Linux distro (Oracle Linux, Ubuntu, CentOS, Fedora, or Red Hat) and then just download and run as described above "./anylinux-services.HUB.HOST.sh new" and then after install study the setup to see how the configurations in "anylinux-services.sh" affect the deployment.
-
 To add additional physical hosts you use
 ```
 ./anylinux-services.GRE.HOST.sh new
 ```
-This script requires configuring these parameters in the "anylinux-services.GRE.HOST.sh" script.  
+This script requires configuring these parameters in the "anylinux/CONFIG" script.  
 
     * SPOKEIP
     * HUBIP
