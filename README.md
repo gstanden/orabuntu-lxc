@@ -113,7 +113,7 @@ Download the latest Orabuntu-LXC v6.0x AMIDE release to /home/username/Downloads
 ./anylinux-services.HUB.HOST.sh
 ```
 
-That's it. It runs fully-automated and delivers a complete next-generation LXC and Docker SDN container infrastructure.
+That's it. It runs fully-automated and delivers LXC single network spanned across multiple hosts, or now alternatively an LXD cluster, container infrastructure. There are optional switches in the CONFIG file to deploy Docker and (for Ubuntu Linux only K8S).  Currently, the LXD cluster features of Orabuntu-LXC only supports ZFS storage pools.  
 
 If, on the other hand, it is desired to customize Orabuntu-LXC, it is highly-flexible and configurable using the parameters in the file: 
 
