@@ -86,7 +86,7 @@ zfsutils/oracle/zpool_oracle8_uek.sh
 ```
 The scripts can be edited to use other than (/dev/sdb + /dev/sdc) for example (/dev/sdg + /dev/sdk).  Other than pre-creating the olxc-001 on the HUB host and the olxc-002 on the GRE host, the Orabuntu-LXC main scripts, anylinux-services.HUB.HOST.sh, and the anylinux-services.GRE.HOST.sh are still totally automated, and the scripts are a "one-button push" fully-automated way to create the containers and networks just the same as the way they work for LXC deployments.
 
-If LXC containers are preferred, then set these two parameters as shown below.
+If LXC containers are preferred, then set these two parameters as shown below. As of August 10, 2020 these two parameters are set as a pair, not separately, that is, only setting both to "N" or both to "Y" has been tested. In principle, the "LXD" variable just switches on creating LXD containers instead of LXC containers, and the "LXDCluster" switches on automated creation of and LXD cluster.  In the case of HUB HOST the LXDCluster switch creates a "single-node" LXD cluster, and the case of GRE HOST a "two-node" LXD cluster.
 ```
 LXD=N
 LXDCluster=N
