@@ -40,10 +40,11 @@ Orabuntu-LXC BUILDS EVERYTHING itself for the currently supported distros:
 * Optionally stores LXC-containerized DNS/DHCP updates at Amazon S3 for replication
 * Automatically detects filesystem types which support lxc-snapshot overlayfs for LXC-containerized DNS/DHCP
 * Updates the LXC-containerized DNS/DHCP container replicas with the latest zone and lease updates every x minutes.
-* Builds the LXC containers
-* Configures all OpenvSwitch switches and LXC containers as systemd services
-* Configures gold copy LXC containers (on a separate network) according to your specifications
-* Creates clones of the gold copy LXC containers
+* Optionally created the LXD multi-node cluster
+* Builds the LXC or LXD containers
+* Configures all OpenvSwitch switches and LXC or LXD containers as systemd services
+* Configures gold copy LXC or LXD containers (on a separate network) according to your specifications
+* Creates clones of the gold copy LXC or LXD containers
 * Builds SCST Linux SAN from source code as RPM or DKMS-enabled DEB packages
 * Creates the target, group, and LUNs according to your specifications
 * Creates the multipath.conf file and configures multipath
