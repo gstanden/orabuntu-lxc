@@ -68,7 +68,7 @@ sudo apt-get -y upgrade
 On Redhat-family Linuxes this is:
 
 ```
-sudo yum -y update
+sudo yum -y update (or the "dnf" equivalent for Linux 8 and higher)
 ```
 
 Step 2
