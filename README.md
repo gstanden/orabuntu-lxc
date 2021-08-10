@@ -107,7 +107,7 @@ Also in the /anylinux/CONFIG file select whether Oracle Linux 8.4 or Oracle Linu
 MajorRelease=8
 PointRelease=4
 ```
-Download the latest Orabuntu-LXC v6.0x AMIDE release to /home/username/Downloads and unzip it, then navigate to the "anylinux" directory and run it (as a NON-root "administrative" user with "SUDO ALL" privilege or "wheel" privilege) the following script:
+Download the latest Orabuntu-LXC v6.0x AMIDE release to /home/username/Downloads and unzip it, then navigate to the "anylinux" directory and run it (as a **NON-root** "administrative" user with "SUDO ALL" privilege or "wheel" privilege) the following script:
 
 ```
 ./anylinux-services.HUB.HOST.sh
