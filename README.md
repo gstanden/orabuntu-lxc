@@ -22,7 +22,7 @@ Orabuntu-LXC BUILDS EVERYTHING itself for the currently supported distros:
 * Oracle Linux 6.x, 7.x, 8.x
 * Ubuntu 16.04+ (16.04 and all higher versions)
 * CentOS 6.x, 7.x, 8.x
-* Fedora 22-33 (tested on 22 and 33)
+* Fedora 22-33+ (tested on 22 and 33)
 * RedHat 6.x, 7.x, 8.x
 * Pop_OS 17.10+ (System76)
 
