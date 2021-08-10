@@ -12,7 +12,7 @@ Add support for fully-automated "one-button" deployment of LXD clusters on Openv
 
 Orabuntu-LXC v7.0.0-alpha AMIDE Edition will be released soon.  The 6.13.25.x-beta AMIDE point releases preview the main new features:
 
-* Fully automated 2-node LXD clusters on VLANs on OpenvSwitch networks on Oracle Linux 7 and 8, and Ubuntu 20.04.
+* Fully-automated deployment of 2-node LXD clusters on VLANs on OpenvSwitch networks on Oracle Linux 7 and 8, and Ubuntu 20.04.
 * User-selectable tunnel-type for multi-host deployments { GRE | geneve | vxlan }.
 * New /anylinux/CONFIG file which centralizes all configuration parameters.
 * Adds support for nftables ("firewall-cmd") for LXD clusters and LXC multi-host "spanned" networks.
