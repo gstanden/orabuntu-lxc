@@ -3,6 +3,12 @@
 Orabuntu-LXC v7.0.0-alpha AMIDE Edition introduces support for fully-automated 2-node LXD cluster creation. Generalization to N-node is coming soon.
 (**AMIDE** still stands for "**A**mazon **M**ult-**I**-host LX**D D**ocker **E**nterprise **E**dition" but LXD has been added to the acronym).
 
+Please note that I haven't done any work with the "Amazon Cloud" part of the project, and currently only support LXC networks spanned across Ubuntu 16.04 EC2 containers.  Nothing has been done yet implementing the LXD Cluster features across Amazon EC2 instances.  Support for Orabuntu-LXC deployed LXD clusters on Amazon EC2 is on the roadmap, but not the immediate roadmap. 
+
+The immediate roadmap will:
+
+Add support for fully-automated "one-button" deployment of LXD clusters on OpenvSwitch for CentOS 7 and 8, and Fedora 27 through 33+.
+
 Orabuntu-LXC v7.0.0-alpha AMIDE Edition will be released soon.  This 6.13.25.7-beta AMIDE release previews the new features:
 
 * Fully automated 2-node LXD clusters on OpenvSwitch networks on Oracle Linux 7 and 8, and Ubuntu 20.04.
