@@ -171,15 +171,9 @@ For RedHat-family Linuxes the following script can be used to create the require
 ```
 The first Orabuntu-LXC install is always the "HUB" host install. 
 
-Install the Orabuntu-LXC HUB host as shown below (if installing an Orabuntu-LXC release).
+Install the Orabuntu-LXC HUB host as shown below (if installing an Orabuntu-LXC release). 
 ```
-cd /home/username/Downloads/orabuntu-lxc-6.03-beta/anylinux
-./anylinux-services.HUB.HOST.sh new
-```
-
-Install the Orabuntu-LXC HUB host as shown below (if installing from the DEV branch).
-```
-cd /home/username/Downloads/orabuntu-lxc-master/anylinux
+cd /home/username/Downloads/orabuntu-lxc-6.13.25.x-beta/anylinux
 ./anylinux-services.HUB.HOST.sh new
 ```
 That's all. This one command will do the following:
