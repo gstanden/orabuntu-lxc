@@ -131,7 +131,6 @@ If, on the other hand, it is desired to further customize Orabuntu-LXC, it is hi
 ```
 /anylinux/CONFIG
 ```
-
 including support for any two separate user-selectable IP subnet ranges, and 2 user-selectable domain names, and much more. One network, for example the "seed" network can also be used as an out-of-band maintenance network, and the other network used for production containers.
 
 With the replicated and constantly updated LXC containerized DNS/DHCP solution, GRE-connected hosts (such as developer laptops) can be disconnected from the network and still have full DNS/DHCP lookup services for any containers stored locally on the developer laptop.  Plus, containers that are added by the developer after detachment from the Orabuntu-LXC network will be added to the local copy of the LXC containerized DNS/DHCP.
@@ -216,6 +215,8 @@ If you used the scripts to create an "orabuntu" user then HubUserAct=orabuntu an
 Note that the subnet ranges chosen in the "anylinux-services.HUB.HOST.sh" install must be used unchanged when running the script "anylinux-services.GRE.HOST.sh" so that the multi-host networking works correctly.
 
 To put VM's on the Orabuntu-LXC OpenvSwitch network, on either a HUB physical host, or, on a GRE physical host, see the guide in the Orabuntu-LXC wiki which gives an example (VirtualBox) of putting a VM on the LXC OpenvSwitch network.
+
+**Note**: These VM scripts have not been updated for LXD features yet.
 
 To install Orabuntu-LXC in a VM running on the LXC OpenvSwitch network on the HUB host use the following script.  In this case, Orabuntu-LXC is already installed on the phyiscal host, a VM has been put on the LXC OpenvSwitch networks, and now Orabuntu-LXC is installed in the VM.  This results in containers that are running in the VM on the LXC OpenvSwitch network, as well as the existing LXC containers which are running on the Orabuntu-LXC physical host.  All of these containers, VM's and physical hosts can talk to each other by default.
 
