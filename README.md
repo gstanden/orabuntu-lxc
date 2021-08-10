@@ -125,10 +125,10 @@ Run the HUB HOST script (as a **NON-root** "administrative" user with "SUDO ALL"
 
 That's it. It runs fully-automated and delivers LXC single network spanned across multiple hosts, or now alternatively an LXD cluster, container infrastructure. There are optional switches in the CONFIG file to deploy Docker and (for Ubuntu Linux only K8S).  Currently, the LXD cluster features of Orabuntu-LXC only supports ZFS storage pools.  
 
-If, on the other hand, it is desired to customize Orabuntu-LXC, it is highly-flexible and configurable using the parameters in the file: 
+If, on the other hand, it is desired to further customize Orabuntu-LXC, it is highly-flexible and configurable using the parameters in the file: 
 
 ```
-anylinux-services.sh
+/anylinux/CONFIG
 ```
 
 including support for any two separate user-selectable IP subnet ranges, and 2 domain names, and much more. One network, for example the "seed" network can also be used as an out-of-band maintenance network, and the other network used for production containers.
