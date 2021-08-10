@@ -10,7 +10,7 @@ The immediate roadmap will:
 
 Add support for fully-automated "one-button" deployment of LXD clusters on OpenvSwitch for CentOS 7 and 8, and Fedora 27 through 33+.
 
-Orabuntu-LXC v7.0.0-alpha AMIDE Edition will be released soon.  This 6.13.25.x-beta AMIDE point release preview the main new features:
+Orabuntu-LXC v7.0.0-alpha AMIDE Edition will be released soon.  The 6.13.25.x-beta AMIDE point releases preview the main new features of v7.0.0-alpha:
 
 * Fully automated 2-node LXD clusters on OpenvSwitch networks on Oracle Linux 7 and 8, and Ubuntu 20.04.
 * User-selectable tunnel-type for multi-host deployments { GRE | geneve | vxlan }.
