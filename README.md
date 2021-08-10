@@ -74,6 +74,21 @@ sudo yum -y install unzip wget openssh-server net-tools bind-utils
 
 Step 3
 
+Edit the /anylinux/CONFIG file to select either LXC or LXD.  For example, to select LXD clusters, set the following parameters in the CONFIG file as shown below.
+```
+LXD=Y
+LXDCluster=Y
+```
+If LXC containers are preferred, then set these two parameters as shown below.
+```
+LXD=N
+LXDCluster=N
+```
+Also in the /anylinux/CONFIG file select whether Oracle Linux 8.4 or Oracle Linux 7.9 containers as shown below.
+```
+MajorRelease=8
+PointRelease=4
+```
 Download the latest Orabuntu-LXC v6.0x AMIDE release to /home/username/Downloads and unzip it, then navigate to the "anylinux" directory and run it (as a NON-root "administrative" user with "SUDO ALL" privilege or "wheel" privilege) the following script:
 
 ```
