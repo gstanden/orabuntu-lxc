@@ -1,6 +1,6 @@
 # What is Orabuntu-LXC 6.13.25.7-beta AMIDE
 
-Orabuntu-LXC v7.0.0-alpha AMIDE Edition introduces support for fully-automated 2-node LXD cluster creation. Generalization to N-node is coming soon.
+Orabuntu-LXC v7.0.0-alpha AMIDE Edition (to be released soon) introduces support for fully-automated 2-node LXD cluster creation. Generalization to N-node to be released soon.  These released in the 6.13.25.x-beta series are v7.0.0-alpha "precursor releases" previewing v7.0.0-alpha new features.
 
 **AMIDE** still stands for "**A**mazon **M**ult-**I**-host LX**D D**ocker **E**nterprise **E**dition" but LXD has been added to the acronym.
 
