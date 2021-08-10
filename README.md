@@ -103,7 +103,7 @@ Other than pre-creating the olxc-001 on the HUB host and the olxc-002 on the GRE
 anylinux-services.HUB.HOST.sh
 anylinux-services.GRE.HOST.sh 
 ```
-are still totally automated as before, and the scripts are a "one-button push" fully-automated way to create the containers and networks just the same as the way they work for LXC deployments.
+are still totally automated as just as they have always been, and the scripts are a "one-button push" fully-automated way to create the containers and networks just the same as the way they work for LXC deployments.
 
 If LXC containers are preferred, then set these two parameters as shown below. As of August 10, 2020 these two parameters are set as a pair, not separately, that is, only setting both to "N" or both to "Y" has been tested. In principle, the "LXD" variable just switches on creation of LXD containers instead of LXC containers, and the "LXDCluster" switches on automated creation of an LXD cluster.  In the case of HUB HOST the LXDCluster switch creates a "single-node" LXD cluster, and the case of GRE HOST a "two-node" LXD cluster.
 ```
