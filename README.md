@@ -79,6 +79,13 @@ Edit the /anylinux/CONFIG file to select either LXC or LXD.  For example, to sel
 LXD=Y
 LXDCluster=Y
 ```
+Note that if LXD and LXDCluster are selected, it will be necessary to create the required ZFS storage pool olxc-001 (for HUB node) and optionally olxc-002 (for GRE node if creating multi-host LXD Cluster). To create this, add /dev/sdb and /dev/sdc storage, and then create the ZFS storage pool.  For Oracle Linux, scripts to fully automate the creation of the required olxc-001 zfs pool are located as shown below.
+```
+zfsutils/oracle/zpool_oracle7_uek.sh
+zfsutils/oracle/zpool_oracle8_uek.sh
+```
+The scripts can be edited to use other than (/dev/sdb + /dev/sdc) for example (/dev/sdg + /dev/sdk).  Other than pre-creating the olxc-001 on the HUB host and the olxc-002 on the GRE host, the Orabuntu-LXC main scripts, anylinux-services.HUB.HOST.sh, and the anylinux-services.GRE.HOST.sh are still totally automated, and the scripts are a "one-button push" fully-automated way to create the containers and networks just the same as the way they work for LXC deployments.
+
 If LXC containers are preferred, then set these two parameters as shown below.
 ```
 LXD=N
