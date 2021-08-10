@@ -96,7 +96,9 @@ Note that if LXD and LXDCluster are selected, it will be necessary to first crea
 zfsutils/oracle/zpool_oracle7_uek.sh
 zfsutils/oracle/zpool_oracle8_uek.sh
 ```
-The scripts can be edited to use other than (/dev/sdb + /dev/sdc) for example (/dev/sdg + /dev/sdk).  Other than pre-creating the olxc-001 on the HUB host and the olxc-002 on the GRE host, the Orabuntu-LXC main scripts
+The scripts can be edited to use other than (/dev/sdb + /dev/sdc) for example (/dev/sdg + /dev/sdk).  
+
+Other than pre-creating the olxc-001 on the HUB host and the olxc-002 on the GRE host, the Orabuntu-LXC main scripts
 ```
 anylinux-services.HUB.HOST.sh
 anylinux-services.GRE.HOST.sh 
