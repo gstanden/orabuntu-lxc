@@ -4,10 +4,6 @@ Orabuntu-LXC v7.0.0-alpha AMIDE Edition (to be released soon) introduces support
 
 **AMIDE** still stands for "**A**mazon **M**ult-**I**-host LX**D D**ocker **E**nterprise **E**dition" and in v7.0.0-alpha "LXD" has been added to AMIDE.
 
-The immediate roadmap will:
-
-Add support for fully-automated "one-button" deployment of LXD clusters on OpenvSwitch for CentOS 7 and 8, and Fedora 27 through 33+.
-
 Orabuntu-LXC v7.0.0-alpha AMIDE Edition will be released soon.  The 6.13.25.x-beta AMIDE point releases preview the main new features:
 
 * Fully-automated deployment of 2-node LXD clusters on VLANs on OpenvSwitch networks on Oracle Linux 7 and 8, and Ubuntu 20.04.
