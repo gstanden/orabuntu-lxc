@@ -4,8 +4,6 @@ Orabuntu-LXC v7.0.0-alpha AMIDE Edition (to be released soon) introduces support
 
 **AMIDE** still stands for "**A**mazon **M**ult-**I**-host LX**D D**ocker **E**nterprise **E**dition" and in v7.0.0-alpha "LXD" has been added to AMIDE.
 
-**Note**: I haven't done any work recently with the "Amazon Cloud" part of the project, and currently only support LXC networks spanned across Ubuntu 16.04 EC2 containers.  Nothing has been done yet implementing the LXD Cluster features across Amazon EC2 instances.  Support for Orabuntu-LXC deployed LXD clusters on Amazon EC2 is on the roadmap, but not the immediate roadmap. 
-
 The immediate roadmap will:
 
 Add support for fully-automated "one-button" deployment of LXD clusters on OpenvSwitch for CentOS 7 and 8, and Fedora 27 through 33+.
@@ -138,6 +136,8 @@ If, on the other hand, it is desired to further customize Orabuntu-LXC, it is hi
 including support for any two separate user-selectable IP subnet ranges, and 2 user-selectable domain names, and much more. One network, for example the "seed" network can also be used as an out-of-band maintenance network, and the other network used for production containers.
 
 With the replicated and constantly updated LXC containerized DNS/DHCP solution, GRE-connected hosts (such as developer laptops) can be disconnected from the network and still have full DNS/DHCP lookup services for any containers stored locally on the developer laptop.  Plus, containers that are added by the developer after detachment from the Orabuntu-LXC network will be added to the local copy of the LXC containerized DNS/DHCP.
+
+**Note**: I haven't done any work recently with the "Amazon Cloud" part of the project, and currently only support LXC networks spanned across Ubuntu 16.04 EC2 containers.  Nothing has been done yet implementing the LXD Cluster features across Amazon EC2 instances.  Support for Orabuntu-LXC deployed LXD clusters on Amazon EC2 is on the roadmap, but not the immediate roadmap. 
 
 #  More Detailed: Install Orabuntu-LXC v6.13.25.x-beta AMIDE 
 
