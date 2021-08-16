@@ -498,6 +498,7 @@ then
 	m=1; n=1; p=1
 	while [ $ContainerCreated -eq 0 ] && [ $m -le 3 ] && [ $Release -ge 7 ]
 	do
+		echo ''
 		echo "=============================================="
 		echo "                 Method 1                     "
 		echo "=============================================="

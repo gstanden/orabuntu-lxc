@@ -6435,6 +6435,20 @@ then
 	sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" 	/etc/systemd/resolved.conf
 
         sudo service systemd-resolved restart
+
+	if [ $LinuxFlavor = 'Fedora' ] && [ $RedHatVersion -ge 33 ]
+	then
+		sudo rm -f /etc/resolv.conf
+		sudo ln -s /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
+		sudo ls -l /etc/resolv.conf
+		sudo cat   /etc/resolv.conf
+		echo ''
+		sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" 	    /etc/dhcp/dhclient.conf
+		sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /etc/dhcp/dhclient.conf
+		sudo cat /etc/dhcp/dhclient.conf
+		echo ''	
+		sleep 5
+	fi
 	
         echo ''
         echo "=============================================="
