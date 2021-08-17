@@ -258,36 +258,54 @@ fi
 
 if [ $FirewalldBackend = 1 ]
 then
-	if [ $LinuxFlavor = 'Fedora' ]
+	if   [ $LinuxFlavor = 'Fedora' ]
 	then
-		echo ''
-		echo "=============================================="
-		echo "Set firewalld rules for dhcp and dns...       "
-		echo "=============================================="
-		echo ''
+		Zone=FedoraServer
 
-		sudo firewall-cmd --zone=FedoraServer --add-service=dhcp   --permanent
-		sudo firewall-cmd --zone=FedoraServer --add-service=dns    --permanent 
-		sudo firewall-cmd --zone=FedoraServer --add-masquerade     --permanent
-		sudo firewall-cmd --zone=FedoraServer --add-interface=sw1  --permanent
-		sudo firewall-cmd --zone=FedoraServer --add-interface=sw1a --permanent
-		sudo firewall-cmd --zone=FedoraServer --add-interface=sx1  --permanent
-		sudo firewall-cmd --zone=FedoraServer --add-interface=sx1a --permanent
-		sudo firewall-cmd --reload
-		sudo firewall-cmd --list-services
-		sudo firewall-cmd --get-active-zones
-		sudo firewall-cmd --get-default-zone
-
-		echo ''
-		echo "=============================================="
-		echo "Done: Set firewalld rules for dhcp and dns.   "
-		echo "=============================================="
-		echo ''
-
-		sleep 5
-
-		clear
+	elif [ $LinuxFlavor = 'Oracle' ]
+	then
+		Zone=public
 	fi
+
+	echo ''
+	echo "=============================================="
+	echo "Set firewalld rules for dhcp and dns...       "
+	echo "=============================================="
+	echo ''
+
+	sudo firewall-cmd --zone=$Zone --add-service=dhcp        		--permanent
+	sudo firewall-cmd --zone=$Zone --add-service=dns         		--permanent 
+	sudo firewall-cmd --zone=$Zone --add-service=https       		--permanent 
+	sudo firewall-cmd --zone=$Zone --add-port=587/tcp --add-port=8443/tcp	--permanent
+	sudo firewall-cmd --zone=$Zone --add-port=6081/udp			--permanent
+	sudo firewall-cmd --zone=$Zone --add-protocol=gre			--permanent
+	sudo firewall-cmd --zone=$Zone --add-interface=gre_sys			--permanent
+	sudo firewall-cmd --zone=$Zone --add-interface=genev_sys_6081		--permanent
+	sudo firewall-cmd --zone=$Zone --add-port=4789/udp 			--permanent
+	sudo firewall-cmd --zone=$Zone --add-interface=vxlan_sys_4789		--permanent
+	sudo firewall-cmd --zone=$Zone --add-interface=sw1       		--permanent
+	sudo firewall-cmd --zone=$Zone --add-interface=sw1a      		--permanent
+	sudo firewall-cmd --zone=$Zone --add-interface=sx1       		--permanent
+	sudo firewall-cmd --zone=$Zone --add-interface=sx1a      		--permanent
+	sudo firewall-cmd --zone=$Zone --add-interface=lxcbr0      		--permanent
+	sudo firewall-cmd --zone=$Zone --add-interface=lxdbr0      		--permanent
+ 	sudo firewall-cmd --zone=$Zone --add-port=1024-65000/udp 		--permanent
+ 	sudo firewall-cmd --zone=$Zone --add-port=1024-65000/tcp 		--permanent
+	sudo firewall-cmd --zone=$Zone --add-masquerade          		--permanent	
+	sudo firewall-cmd --reload
+	sudo firewall-cmd --list-services
+	sudo firewall-cmd --get-active-zones
+	sudo firewall-cmd --get-default-zone
+
+	echo ''
+	echo "=============================================="
+	echo "Done: Set firewalld rules for dhcp and dns.   "
+	echo "=============================================="
+	echo ''
+
+	sleep 5
+
+	clear
 fi
 
 : ' Commented Out Start ----------------------------------------------------------
@@ -710,12 +728,12 @@ then
 		sudo yum -y install unbound-devel-1.6.6-1* > /dev/null 2>&1
 	fi
 
-	if [ $LinuxFlavor = 'Oracle' ] && [ $Release -eq 8 ]
-	then
+	# if [ $LinuxFlavor = 'Oracle' ] && [ $Release -eq 8 ]
+	# then
 		sudo yum -y install tar
-		sudo firewall-cmd --zone=public --permanent --add-port=1024-65000/udp
-		sudo firewall-cmd --zone=public --permanent --add-port=1024-65000/tcp
-		sudo firewall-cmd --zone=public --permanent --add-masquerade 
+	#	sudo firewall-cmd --zone=public --permanent --add-port=1024-65000/udp
+	#	sudo firewall-cmd --zone=public --permanent --add-port=1024-65000/tcp
+	#	sudo firewall-cmd --zone=public --permanent --add-masquerade 
 
 	#	sudo sed -i "s/FirewallBackend=nftables/FirewallBackend=iptables/g" /etc/firewalld/firewalld.conf
 	#	sudo systemctl restart firewalld.service
@@ -723,7 +741,7 @@ then
 	#	sudo firewall-cmd --runtime-to-permanent
 	#	sudo service firewalld stop
 	#	sudo service firewalld start
-	fi
+	# fi
 	
 	sudo yum -y install libvirt
 
@@ -971,7 +989,7 @@ echo 'MultiHost                 = '$MultiHost
 
 		elif [ $RedHatVersion -ge 28 ]
 		then
-			LxcOvsVersion="4.0.5:2.14.0"  # Do NOT change 4.0.5 version of LXC here.  Must use 4.0.5 for now.
+			LxcOvsVersion="4.0.5:2.15.0"  # Do NOT change 4.0.5 version of LXC here.  Must use 4.0.5 for now.
 		fi
 	fi
 

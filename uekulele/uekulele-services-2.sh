@@ -638,404 +638,386 @@ then
 	done
 fi
 
-if [ $LXDCluster = 'Y' ] && [ $Release -ge 7 ] && [ $LinuxFlavor = 'Oracle' ]
+sudo test -f /etc/firewalld/firewalld.conf
+if [ $? -eq 0 ]
 then
-	echo ''
-	echo "=============================================="
-	echo "Install and Configure LXD...                  "
-	echo "=============================================="
-	echo ''
+        function GetFirewalldBackend {
+                sudo grep 'nftables' /etc/firewalld/firewalld.conf | grep FirewallBackend | grep -vc '#'
+        }
+        FirewalldBackend=$(GetFirewalldBackend)
+else
+        FirewalldBackend=0
+fi
 
-	sleep 5
-
-	clear
-
-	if [ $Release -ge 8 ]
+if [ $LXDCluster = 'Y' ] && [ $LXD = 'Y' ] && [ $Release -ge 7 ]
+then
+	if [ $LinuxFlavor = 'Oracle' ] || [ $LinuxFlavor = 'Fedora' ]
 	then
-        	echo ''
-        	echo "=============================================="
-        	echo "Configure firewalld for LXD Cluster...        "
-        	echo "=============================================="
-        	echo ''
-        	sudo firewall-cmd --zone=public --permanent --add-service=https
-        	sudo firewall-cmd --zone=public --permanent --add-service=dns 
-        	sudo firewall-cmd --zone=public --permanent --add-service=dhcp
-#		sudo firewall-cmd --zone=public --permanent --add-service=ssh
-        	sudo firewall-cmd --zone=public --permanent --add-port=587/tcp --add-port=8443/tcp
- 		sudo firewall-cmd --zone=public --permanent --add-interface=sw1
- 		sudo firewall-cmd --zone=public --permanent --add-interface=sx1
- 		sudo firewall-cmd --zone=public --permanent --add-interface=sw1a
- 		sudo firewall-cmd --zone=public --permanent --add-interface=sx1a
-#		sudo firewall-cmd --zone=public --permanent --add-masquerade
-
-        	echo ''
-        	echo "=============================================="
-        	echo "Done: Configure firewalld for LXD Cluster.    "
-        	echo "=============================================="
-        	echo ''
-
-        	sleep 5
-
-        	clear
-	fi
-
-#	echo ''
-#	echo "=============================================="
-#	echo "Configure btrfs Storage ...                   "
-#	echo "=============================================="
-#	echo ''
-
-#	sudo parted --script /dev/sdb "mklabel gpt"
-#	sudo parted --script /dev/sdb "mkpart primary 1 100%"
-#	sudo parted /dev/sdb print
-#	sudo fdisk -l /dev/sdb | grep sdb | grep -v Disk
-
-#	echo ''
-#	echo "=============================================="
-#	echo "Done: Configure btrfs Storage.                "
-#	echo "=============================================="
-#	echo ''
-
-#	sleep 5
-
-#	clear
-
-	echo ''
-	echo "=============================================="
-	echo "Install EPEL ...                              "
-	echo "=============================================="
-	echo ''
-
-	sudo yum install epel-release
-
-	echo ''
-	echo "=============================================="
-	echo "Done: Install EPEL.                           "
-	echo "=============================================="
-	echo ''
-
-	sleep 5
-
-	clear
-
-	echo ''
-	echo "=============================================="
-	echo "Install and configure snapd...                "
-	echo "=============================================="
-	echo ''
-
-	sudo yum -y install snapd
-	echo ''
-	sudo systemctl enable --now snapd.socket
-	sudo ln -s /var/lib/snapd/snap /snap >/dev/null 2>&1
-	
-	echo ''
-	echo "=============================================="
-	echo "Done: Install and configure snapd.            "
-	echo "=============================================="
-	echo ''
-
-	sleep 5
-
-	clear
-
-	echo ''
-	echo "=============================================="
-	echo "Install LXD ...                               "
-	echo "=============================================="
-	echo ''
-
-	function CheckSnapInstalled {
-		sudo snap list lxd > /dev/null 2>&1
-	}
-	SnapInstalled=$(CheckSnapInstalled)
-	SnapInstalled=`echo $?`
-
-	while [ $SnapInstalled -ne 0 ]
-	do
-		sudo snap install lxd
-		SnapInstalled=$(CheckSnapInstalled)
-		SnapInstalled=`echo $?`
-		sleep 15
 		echo ''
-	done
-
-	sudo snap refresh lxd
-
-	echo ''
-	echo "=============================================="
-	echo "Done: Install LXD.                            "
-	echo "=============================================="
-	echo ''
-
-	sleep 5
-
-	clear
-
-	echo ''
-	echo "=============================================="
-	echo "Add current user to LXD group ...             "
-	echo "=============================================="
-	echo ''
-
-	sudo usermod -a -G lxd $Owner
-	echo "sudo usermod -a -G lxd $Owner"
-
-	echo ''
-	echo "=============================================="
-	echo "Done: Add current user to LXD group.          "
-	echo "=============================================="
-	echo ''
-
-	sleep 5
-
-	clear
-
-	echo ''
-	echo "=============================================="
-	echo "Install LXD ...                               "
-	echo "=============================================="
-	echo ''
-
-	sleep 5
-
-	sudo chmod 775  	/opt/olxc/"$DistDir"/uekulele/archives/lxd_install_uekulele.sh
-	sudo su - ubuntu 	/opt/olxc/"$DistDir"/uekulele/archives/lxd_install_uekulele.sh $PreSeed $LXDCluster $GREValue $Release $MultiHost
-
-	echo ''
-	echo "=============================================="
-	echo "Done: Install LXD.                            "
-	echo "=============================================="
-	echo ''
-
-	sleep 5
-
-	clear
-
-	echo ''
-	echo "=============================================="
-	echo "LXD Snap Info ...                             "
-	echo "=============================================="
-	echo ''
-
-	sleep 5
-
-	sudo snap info lxd
-
-	echo ''
-	echo "=============================================="
-	echo "Done: LXD Snap Info ...                       "
-	echo "=============================================="
-	echo ''
-
-	sleep 5
-
-	clear
-
-        echo ''
-        echo "=============================================="
-        echo "Create LXD Oracle Seed Container ...          "
-        echo "=============================================="
-        echo ''
-
-        sleep 5
-
-        clear
-
-        echo ''
-        echo "=============================================="
-        echo "Reload snap.lxd.daemon ...                    "
-        echo "=============================================="
-        echo ''
-
-        sudo systemctl reload snap.lxd.daemon > /dev/null 2>&1
-        sudo systemctl status snap.lxd.daemon | tail -100
-
-        echo ''
-        echo "=============================================="
-        echo "Done: Reload snap.lxd.daemon.                 "
-        echo "=============================================="
-        echo ''
-
-        sleep 5
-
-        clear
-
-        echo ''
-        echo "=============================================="
-	echo "Add lxd group to $(whoami) ...                "
-        echo "=============================================="
-        echo ''
-
-	sudo usermod --append --groups lxd $(whoami)
-
-        echo ''
-        echo "=============================================="
-	echo "Done: Add lxd group to $(whoami).             "
-        echo "=============================================="
-        echo ''
-
-	sleep 5
-
-	clear
-
-	if [ $Release -ge 8 ]
-	then
-        	echo ''
-        	echo "=============================================="
-        	echo "Configure firewalld for lxdbr0...             "
-        	echo "=============================================="
-        	echo ''
-
-		sudo firewall-cmd --zone=public --permanent --add-interface=lxdbr0
-        
+		echo "=============================================="
+		echo "Install LXD...                                "
+		echo "=============================================="
 		echo ''
-        	echo "=============================================="
-        	echo "Done: Configure firewalld for lxdbr0.         "
-        	echo "=============================================="
-        	echo ''
 
 		sleep 5
+
+		clear
+
+	#	GLS 2021-08-17 Could be useful for Fedora 34 which uses BTRFS by default.
+	#	echo ''
+	#	echo "=============================================="
+	#	echo "Configure btrfs Storage ...                   "
+	#	echo "=============================================="
+	#	echo ''
+
+	#	sudo parted --script /dev/sdb "mklabel gpt"
+	#	sudo parted --script /dev/sdb "mkpart primary 1 100%"
+	#	sudo parted /dev/sdb print
+	#	sudo fdisk -l /dev/sdb | grep sdb | grep -v Disk
+
+	#	echo ''
+	#	echo "=============================================="
+	#	echo "Done: Configure btrfs Storage.                "
+	#	echo "=============================================="
+	#	echo ''
+
+	#	sleep 5
+
+	#	clear
+
+		echo ''
+		echo "=============================================="
+		echo "Install EPEL ...                              "
+		echo "=============================================="
+		echo ''
+
+		if   [ $LinuxFlavor = 'Oracle' ]
+		then
+			sudo yum install epel-release
+
+		elif [ $LinuxFlavor = 'Fedora' ] && [ $Release -ge 8 ]
+		then
+			echo 'EPEL not needed for Fedora LXD deployment.'
+		fi	
+
+		echo ''
+		echo "=============================================="
+		echo "Done: Install EPEL.                           "
+		echo "=============================================="
+		echo ''
+
+		sleep 5
+
+		clear
+
+		echo ''
+		echo "=============================================="
+		echo "Install and configure snapd...                "
+		echo "=============================================="
+		echo ''
+
+		sudo yum -y install snapd
+		echo ''
+		sudo systemctl enable --now snapd.socket
+		sudo ln -s /var/lib/snapd/snap /snap >/dev/null 2>&1
 	
+		echo ''
+		echo "=============================================="
+		echo "Done: Install and configure snapd.            "
+		echo "=============================================="
+		echo ''
+
+		sleep 5
+
+		clear
+
+		echo ''
+		echo "=============================================="
+		echo "Install LXD (takes awhile...patience...)      "
+		echo "=============================================="
+		echo ''
+		echo 'error: too early for operation... can be safely IGNORED.'
+		echo ''
+
+		function CheckSnapInstalled {
+			sudo snap list lxd > /dev/null 2>&1
+		}
+		SnapInstalled=$(CheckSnapInstalled)
+		SnapInstalled=`echo $?`
+
+		while [ $SnapInstalled -ne 0 ]
+		do
+			sudo snap install lxd
+			SnapInstalled=$(CheckSnapInstalled)
+			SnapInstalled=`echo $?`
+			sleep 15
+			echo ''
+		done
+
+		sudo snap refresh lxd
+
+		echo ''
+		echo "=============================================="
+		echo "Done: Install LXD.                            "
+		echo "=============================================="
+		echo ''
+
+		sleep 5
+
+		clear
+
+		echo ''
+		echo "=============================================="
+		echo "Add current user to LXD group ...             "
+		echo "=============================================="
+		echo ''
+
+		sudo usermod -a -G lxd $Owner
+		echo "sudo usermod -a -G lxd $Owner"
+
+		echo ''
+		echo "=============================================="
+		echo "Done: Add current user to LXD group.          "
+		echo "=============================================="
+		echo ''
+
+		sleep 5
+
+		clear
+
+		echo ''
+		echo "=============================================="
+		echo "Configure LXD Cluster...                      "
+		echo "=============================================="
+		echo ''
+
+		sleep 5
+
+		sudo chmod 775  	/opt/olxc/"$DistDir"/uekulele/archives/lxd_install_uekulele.sh
+		sudo su - ubuntu 	/opt/olxc/"$DistDir"/uekulele/archives/lxd_install_uekulele.sh $PreSeed $LXDCluster $GREValue $Release $MultiHost
+
+		echo ''
+		echo "=============================================="
+		echo "Done: Configure LXD Cluster.                  "
+		echo "=============================================="
+		echo ''
+
+		sleep 5
+
+		clear
+
+		echo ''
+		echo "=============================================="
+		echo "LXD Snap Info ...                             "
+		echo "=============================================="
+		echo ''
+
+		sleep 5
+
+		sudo snap info lxd
+
+		echo ''
+		echo "=============================================="
+		echo "Done: LXD Snap Info ...                       "
+		echo "=============================================="
+		echo ''
+
+		sleep 5
+
+		clear
+
+		echo ''
+		echo "=============================================="
+		echo "Create LXD Oracle Seed Container ...          "
+		echo "=============================================="
+		echo ''
+
+		sleep 5
+
+		clear
+
+		echo ''
+		echo "=============================================="
+		echo "Reload snap.lxd.daemon ...                    "
+		echo "=============================================="
+		echo ''
+
+		sudo systemctl reload snap.lxd.daemon > /dev/null 2>&1
+		sudo systemctl status snap.lxd.daemon | tail -100
+
+		echo ''
+		echo "=============================================="
+		echo "Done: Reload snap.lxd.daemon.                 "
+		echo "=============================================="
+		echo ''
+
+		sleep 5
+
+		clear
+
+		echo ''
+		echo "=============================================="
+		echo "Add lxd group to $(whoami) ...                "
+		echo "=============================================="
+		echo ''
+
+		echo "sudo usermod --append --groups lxd $(whoami)"
+		sudo usermod --append --groups lxd $(whoami)
+
+		echo ''
+		echo "=============================================="
+		echo "Done: Add lxd group to $(whoami).             "
+		echo "=============================================="
+		echo ''
+
+		sleep 5
+
 		clear
 	fi
 
-        echo ''
-        echo "=============================================="
-        echo "Download Image (wait...)                      "
-        echo "=============================================="
-        echo ''
+	echo ''
+	echo "=============================================="
+	echo "Download Image (wait...)                      "
+	echo "=============================================="
+	echo ''
 
-        echo 'Downloading LXD image ... (can take up to 2-3 minutes...status will update every 20 seconds.)'
-        echo ''
+	echo 'Downloading LXD image ... (can take up to 2-3 minutes...status will update every 20 seconds.)'
+	echo ''
 
-        function GetDateFormat {
-                date +"%m/%d/%Y %H:%M:%S"
-        }
-        DATE=$(GetDateFormat)
-        DATE_START=$DATE
+	function GetDateFormat {
+	        date +"%m/%d/%Y %H:%M:%S"
+	}
+	DATE=$(GetDateFormat)
+	DATE_START=$DATE
 
 	ImageDownload=1
 	while [ $ImageDownload -ne 0 ]
 	do 
-        	echo "nohup /var/lib/snapd/snap/bin/lxc image copy images:oracle/$MajorRelease local: --alias=oracle/$MajorRelease < /dev/null > /dev/null 2>&1 &" | sg lxd
+	       	echo "nohup /var/lib/snapd/snap/bin/lxc image copy images:oracle/$MajorRelease local: --alias=oracle/$MajorRelease < /dev/null > /dev/null 2>&1 &" | sg lxd 2>/dev/null 
 		ImageDownload=`echo $?`
-		echo $ImageDownload
+	#	echo $ImageDownload
 	done
 
-        function GetImageDownloadStatus {
-                echo "/var/lib/snapd/snap/bin/lxc image list | grep -c oracle/$MajorRelease" | sg lxd
-        }
-        ImageDownloadStatus=$(GetImageDownloadStatus)
+	function GetImageDownloadStatus {
+	        echo "/var/lib/snapd/snap/bin/lxc image list | grep -c oracle/$MajorRelease" | sg lxd 2>/dev/null
+	}
+	ImageDownloadStatus=$(GetImageDownloadStatus)
 
-        function GetStatusBit {
-                sudo find /var/snap/lxd/common/lxd/images -type f -newermt "$DATE_START" -size +0c | sudo xargs ls -l | grep rootfs | wc -l
-        }
-        StatusBit=$(GetStatusBit)
+	function GetStatusBit {
+	        sudo find /var/snap/lxd/common/lxd/images -type f -newermt "$DATE_START" -size +0c | sudo xargs ls -l | grep rootfs | wc -l
+	}
+	StatusBit=$(GetStatusBit)
 
-        n=0
-        while [ $ImageDownloadStatus -eq 0 ]
-        do
-                if   [ $StatusBit -eq 0 ]
-                then
-                        echo "Image Download is still queueing up at $DATE"
-                elif [ $StatusBit -eq 1 ]
-                then
-                        if [ $n -eq 0 ]
-                        then
-                                echo ''
-                                echo "Downloading..."
-                                echo ''
-                                n=$((n+1))
-                        fi
-                        sudo find /var/snap/lxd/common/lxd/images -type f -newermt "$DATE_START" -size +0c | sudo xargs ls -l | grep rootfs
-                fi
+	n=0 m=0
+	while [ $ImageDownloadStatus -eq 0 ]
+	do
+	        if   [ $StatusBit -eq 0 ] && [ $m -le 25 ]
+	        then
+	                echo "Image Download is still queueing up at $DATE"
+			m=$((m+1))
 
-                sleep 20
+	        elif [ $StatusBit -eq 1 ] && [ $m -le 25 ]
+	        then
+	                if [ $n -eq 0 ]
+	                then
+	                        echo ''
+	                        echo "Downloading..."
+	                        echo ''
+	                        n=$((n+1))
+	                fi
+	                sudo find /var/snap/lxd/common/lxd/images -type f -newermt "$DATE_START" -size +0c | sudo xargs ls -l | grep rootfs
+		elif [ $m -gt 25 ]
+		then
+			echo 'Image Download will be done at LXD Seed Container creation step.'
+			echo 'Exiting Image Download.'
+	        fi
 
-                ImageDownloadStatus=$(GetImageDownloadStatus)
-                DATE=$(GetDateFormat)
-                StatusBit=$(GetStatusBit)
-        done
+	        sleep 20
 
-        echo ''
-        echo 'List LXD Images'
-        echo ''
+	        ImageDownloadStatus=$(GetImageDownloadStatus)
+	        DATE=$(GetDateFormat)
+	        StatusBit=$(GetStatusBit)
+	done
 
-        echo "/var/lib/snapd/snap/bin/lxc image list" | sg lxd
+	echo ''
+	echo 'List LXD Images'
+	echo ''
 
-        echo ''
-        echo "=============================================="
-        echo "Done: Download Image (wait...)                "
-        echo "=============================================="
-        echo ''
+	echo "/var/lib/snapd/snap/bin/lxc image list" | sg lxd 2>/dev/null 
 
-        sleep 5
+	echo ''
+	echo "=============================================="
+	echo "Done: Download Image (wait...)                "
+	echo "=============================================="
+	echo ''
 
-        clear
+	sleep 5
 
-        echo ''
-        echo "=============================================="
-        echo "Create LXD Profile olxc_sx1a...               "
-        echo "=============================================="
-        echo ''
+	clear
 
-        echo "/var/lib/snapd/snap/bin/lxc profile create olxc_sx1a" | sg lxd
-        echo "cat /etc/network/openvswitch/olxc_sx1a | /var/lib/snapd/snap/bin/lxc profile edit olxc_sx1a" | sg lxd
-        echo "/var/lib/snapd/snap/bin/lxc profile device add olxc_sx1a root disk path=/ pool=local" | sg lxd
-        echo "/var/lib/snapd/snap/bin/lxc profile show olxc_sx1a" | sg lxd
-#       /var/lib/snapd/snap/bin/lxc config device add oel$OracleRelease$SeedPostfix eth0 nic nictype=bridged parent=sw1a name=eth0
+	echo ''
+	echo "=============================================="
+	echo "Create LXD Profile olxc_sx1a...               "
+	echo "=============================================="
+	echo ''
 
-        echo ''
-        echo "=============================================="
-        echo "Done: Create LXD Profile olxc_sx1a...         "
-        echo "=============================================="
-        echo ''
+	echo "/var/lib/snapd/snap/bin/lxc profile create olxc_sx1a" | sg lxd 2>/dev/null 
+	echo "cat /etc/network/openvswitch/olxc_sx1a | /var/lib/snapd/snap/bin/lxc profile edit olxc_sx1a" | sg lxd 2>/dev/null 
+	echo "/var/lib/snapd/snap/bin/lxc profile device add olxc_sx1a root disk path=/ pool=local" | sg lxd 2>/dev/null 
+	echo "/var/lib/snapd/snap/bin/lxc profile show olxc_sx1a" | sg lxd 2>/dev/null 
+        #     /var/lib/snapd/snap/bin/lxc config device add oel$OracleRelease$SeedPostfix eth0 nic nictype=bridged parent=sw1a name=eth0
+	sudo ls -l /etc/network/openvswitch/olxc_sx1a
 
-        sleep 5
+	echo ''
+	echo "=============================================="
+	echo "Done: Create LXD Profile olxc_sx1a...         "
+	echo "=============================================="
+	echo ''
 
-        clear
+	sleep 5
 
-        echo ''
-        echo "=============================================="
-        echo "Launch Oracle LXD Seed Container...           "
-        echo "=============================================="
-        echo ''
+	clear
 
-        echo "/var/lib/snapd/snap/bin/lxc launch -p olxc_sx1a images:oracle/$MajorRelease/amd64 oel$OracleRelease$SeedPostfix" | sg lxd
+	echo ''
+	echo "=============================================="
+	echo "Launch Oracle LXD Seed Container...           "
+	echo "=============================================="
+	echo ''
 
-        echo ''
-        echo "=============================================="
-        echo "Done: Launch Oracle LXD Seed Container.       "
-        echo "=============================================="
-        echo ''
+	echo "/var/lib/snapd/snap/bin/lxc launch -p olxc_sx1a images:oracle/$MajorRelease/amd64 oel$OracleRelease$SeedPostfix" | sg lxd 2>/dev/null 
 
-        sleep 15
+	echo ''
+	echo "=============================================="
+	echo "Done: Launch Oracle LXD Seed Container.       "
+	echo "=============================================="
+	echo ''
 
-        clear
+	sleep 15
 
-        echo ''
-        echo "=============================================="
-        echo "Run hostnamectl in Container...               "
-        echo "=============================================="
-        echo ''
+	clear
+
+	echo ''
+	echo "=============================================="
+	echo "Run hostnamectl in Container...               "
+	echo "=============================================="
+	echo ''
 
 	if [ $MajorRelease -ge 8 ]
 	then
-        	echo "/var/lib/snapd/snap/bin/lxc exec oel$OracleRelease$SeedPostfix -- hostnamectl set-hostname oel$OracleRelease$SeedPostfix" | sg lxd
+	       	echo "/var/lib/snapd/snap/bin/lxc exec oel$OracleRelease$SeedPostfix -- hostnamectl set-hostname oel$OracleRelease$SeedPostfix" | sg lxd 2>/dev/null 
 
 		# GLS 2021-07-19 Workaround for Oracle 8 using privileged container option.
 		# GLS 2021-07-19 See https://discuss.linuxcontainers.org/t/centos8-containers-unable-to-automatically-get-ipv4-addresses-after-update/11273/22 for more information.
 
 		if [ $MajorRelease -eq 8 ] && [ $LinuxFlavor = 'Oracle' ]
 		then
-        		echo "/var/lib/snapd/snap/bin/lxc config set oel$OracleRelease$SeedPostfix security.privileged true" | sg lxd
+       			echo "/var/lib/snapd/snap/bin/lxc config set oel$OracleRelease$SeedPostfix security.privileged true" | sg lxd 2>/dev/null 
 		fi
 	fi
         
-	echo "/var/lib/snapd/snap/bin/lxc stop   oel$OracleRelease$SeedPostfix" | sg lxd
+	echo "/var/lib/snapd/snap/bin/lxc stop   oel$OracleRelease$SeedPostfix" | sg lxd 2>/dev/null 
 	sleep 5
-	echo "/var/lib/snapd/snap/bin/lxc start  oel$OracleRelease$SeedPostfix" | sg lxd
+	echo "/var/lib/snapd/snap/bin/lxc start  oel$OracleRelease$SeedPostfix" | sg lxd 2>/dev/null 
 	sleep 20
 
 	nslookup oel$OracleRelease$SeedPostfix
@@ -1044,70 +1026,70 @@ then
 		sleep 20
 	fi
 	
-	echo "/var/lib/snapd/snap/bin/lxc exec   oel$OracleRelease$SeedPostfix -- usermod --password `perl -e "print crypt('root','root');"` root" | sg lxd
-        echo "/var/lib/snapd/snap/bin/lxc exec   oel$OracleRelease$SeedPostfix -- yum -y install openssh-server net-tools" | sg lxd
-        echo "/var/lib/snapd/snap/bin/lxc exec   oel$OracleRelease$SeedPostfix -- service sshd restart" | sg lxd
-        echo "/var/lib/snapd/snap/bin/lxc exec   oel$OracleRelease$SeedPostfix -- hostnamectl" | sg lxd
+	echo "/var/lib/snapd/snap/bin/lxc exec   oel$OracleRelease$SeedPostfix -- usermod --password `perl -e "print crypt('root','root');"` root" | sg lxd 2>/dev/null 
+	echo "/var/lib/snapd/snap/bin/lxc exec   oel$OracleRelease$SeedPostfix -- yum -y install openssh-server net-tools" | sg lxd 2>/dev/null 
+	echo "/var/lib/snapd/snap/bin/lxc exec   oel$OracleRelease$SeedPostfix -- service sshd restart" | sg lxd 2>/dev/null 
+	echo "/var/lib/snapd/snap/bin/lxc exec   oel$OracleRelease$SeedPostfix -- hostnamectl" | sg lxd 2>/dev/null 
 
 	if [ $MajorRelease -ge 8 ]
 	then
-        	echo "/var/lib/snapd/snap/bin/lxc stop  oel$OracleRelease$SeedPostfix" | sg lxd
-        	echo "/var/lib/snapd/snap/bin/lxc start oel$OracleRelease$SeedPostfix" | sg lxd
+	       	echo "/var/lib/snapd/snap/bin/lxc stop  oel$OracleRelease$SeedPostfix" | sg lxd 2>/dev/null 
+	       	echo "/var/lib/snapd/snap/bin/lxc start oel$OracleRelease$SeedPostfix" | sg lxd 2>/dev/null 
 	fi
 
-        echo '' 
-        echo "=============================================="
-        echo "Done: Run hostnamectl in Container.           "
-        echo "=============================================="
-        echo ''
+	echo '' 
+	echo "=============================================="
+	echo "Done: Run hostnamectl in Container.           "
+	echo "=============================================="
+	echo ''
 
-        sleep 5
+	sleep 5
 
-        clear
+	clear
 
-        echo ''
-        echo "=============================================="
-        echo "List LXD Containers...                        "
-        echo "=============================================="
-        echo ''
+	echo ''
+	echo "=============================================="
+	echo "List LXD Containers...                        "
+	echo "=============================================="
+	echo ''
 
-        echo "/var/lib/snapd/snap/bin/lxc list" | sg lxd
+	echo "/var/lib/snapd/snap/bin/lxc list" | sg lxd 2>/dev/null 
 
-        echo ''
-        echo "=============================================="
-        echo "Done: List LXD Containers.                    "
-        echo "=============================================="
-        echo ''
+	echo ''
+	echo "=============================================="
+	echo "Done: List LXD Containers.                    "
+	echo "=============================================="
+	echo ''
 
-        sleep 5
+	sleep 5
 
-        clear
+	clear
 
-        echo ''
-        echo "=============================================="
-        echo "nslookup oel$OracleRelease$SeedPostfix...     "
-        echo "=============================================="
-        echo ''
+	echo ''
+	echo "=============================================="
+	echo "nslookup oel$OracleRelease$SeedPostfix...     "
+	echo "=============================================="
+	echo ''
 
-        nslookup  oel$OracleRelease$SeedPostfix
+	nslookup  oel$OracleRelease$SeedPostfix
 
-        echo "=============================================="
-        echo "Done: nslookup oel$OracleRelease$SeedPostfix. "
-        echo "=============================================="
-        echo ''
+	echo "=============================================="
+	echo "Done: nslookup oel$OracleRelease$SeedPostfix. "
+	echo "=============================================="
+	echo ''
 
-        sleep 5
+	sleep 5
 
-        clear
-        echo ''
-        echo "=============================================="
-        echo "Done: Create LXD Oracle Seed Container.       "
-        echo "=============================================="
-        echo ''
+	clear
+	echo ''
+	echo "=============================================="
+	echo "Done: Create LXD Oracle Seed Container.       "
+	echo "=============================================="
+	echo ''
 
-        sleep 5
+	sleep 5
 
-        clear
+	clear
 fi
 
 if   [ $LXD = 'N' ]

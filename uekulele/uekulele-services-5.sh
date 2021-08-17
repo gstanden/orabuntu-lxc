@@ -266,7 +266,7 @@ then
         fi
         LF=$LinuxFlavor
         RL=$Release
-
+	export FEDORA_SUFFIX='> /dev/null 2>&1'
 elif [ $LinuxFlavor = 'Ubuntu' ]
 then
         function GetUbuntuVersion {
@@ -879,6 +879,7 @@ then
                 echo "/var/lib/lxc/$NameServer-base"    >> /opt/olxc/"$DistDir"/uekulele/archives/nameserver.lst
 		sudo tar -P -czf $HOME/Manage-Orabuntu/$NameServer.tar.gz -T /opt/olxc/"$DistDir"/uekulele/archives/nameserver.lst --checkpoint=10000 --totals
 		sudo lxc-start -n $NameServer > /dev/null 2>&1
+		sleep 15
 
                 echo ''
                 echo "=============================================="
@@ -1127,7 +1128,7 @@ then
 	if [ $LXD = 'Y' ]
 	then
                 function GetLXDContainerNames {
-                        echo "/var/lib/snapd/snap/bin/lxc list --columns n --format csv | grep -v oel | sed 's/$/ /g' | tr -d '\n' |  sed 's/[ \t]*$//'" | sg lxd
+                        echo "/var/lib/snapd/snap/bin/lxc list --columns n --format csv | grep -v oel | sed 's/$/ /g' | tr -d '\n' |  sed 's/[ \t]*$//'" | sg lxd 2>/dev/null 
                 }
                 LXDContainerNames=$(GetLXDContainerNames)
 
@@ -1137,7 +1138,7 @@ then
                 echo "=============================================="
                 echo ''
 
-                echo "/var/lib/snapd/snap/bin/lxc list" | sg lxd
+                echo "/var/lib/snapd/snap/bin/lxc list" | sg lxd 2>/dev/null 
 
                 sleep 5
 
@@ -1193,7 +1194,7 @@ then
                 echo "=============================================="
                 echo ''
 
-                echo "/var/lib/snapd/snap/bin/lxc list" | sg lxd
+                echo "/var/lib/snapd/snap/bin/lxc list" | sg lxd 2>/dev/null 
 
                 echo ''
                 echo "=============================================="
@@ -1301,6 +1302,26 @@ then
 	echo "     ./create-scst.sh                         "
 	echo "=============================================="
 	echo ''
+	echo "=============================================="
+	echo "IF you created LXD containers, THEN you need  "
+	echo "to LOGOUT and LOGIN again to run lxc commands "
+	echo "so that the newgrp lxd takes effect and is    "
+	echo "applied to profile.                           "
+	echo "=============================================="
+	echo ''
+
+	if [ $LinuxFlavor = 'Fedora' ] && [ $RedHatVersion -ge 33 ]
+	then
+		echo "==================================================================================="
+		echo "On $LinuxFlavor $RedHatVersion the WARNING:                                        "
+		echo "                                                                                   "
+		echo "WARNING: cgroup v2 is not fully supported yet, proceeding with partial confinement."
+		echo "                                                                                   "
+		echo "can be safely IGNORED. More information on this is here:                           "
+		echo "                                                                                   "
+		echo "https://discuss.linuxcontainers.org/t/lxd-cgroup-v2-support/10455                  "
+		echo "==================================================================================="
+	fi	
 	
 	sleep 5
 fi

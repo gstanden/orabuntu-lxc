@@ -1244,9 +1244,6 @@ then
 			sudo systemctl start  lxc-net
 			sudo service lxc-net stop
 			sudo service lxc-net start
-		#	sudo firewall-cmd --permanent --zone=trusted --add-interface=lxcbr0
-		#	sudo firewall-cmd --permanent --zone=trusted --add-masquerade
-			sudo firewall-cmd --reload
 		fi
 	fi
 
@@ -4412,6 +4409,7 @@ sleep 5
 
 clear
 
+echo ''
 echo "=============================================="
 echo "Install OvsVethCleanup.service                "
 echo "=============================================="
@@ -4991,9 +4989,9 @@ then
 
                 elif [ $GRE = 'Y' ]
                 then
-                        sshpass -p $MultiHostVar8 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S --prompt='' <<< "$MultiHostVar8" /var/lib/snapd/snap/bin/lxc info | sed -n '/BEGIN.*-/,/END.*-/p'" > /tmp/cert.txt
+                        sshpass -p $MultiHostVar8 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S --prompt='' <<< "$MultiHostVar8" /var/lib/snapd/snap/bin/lxc info 2>/dev/null | sed -n '/BEGIN.*-/,/END.*-/p'" | sed '/WARNING/d' > /tmp/cert.txt
 			rm /tmp/cert.txt
-                        sshpass -p $MultiHostVar8 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S --prompt='' <<< "$MultiHostVar8" /var/lib/snapd/snap/bin/lxc info | sed -n '/BEGIN.*-/,/END.*-/p'" > /tmp/cert.txt
+                        sshpass -p $MultiHostVar8 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S --prompt='' <<< "$MultiHostVar8" /var/lib/snapd/snap/bin/lxc info 2>/dev/null | sed -n '/BEGIN.*-/,/END.*-/p'" | sed '/WARNING/d' > /tmp/cert.txt
 
 			echo ''
 			echo "=============================================="
@@ -5019,6 +5017,7 @@ then
 		#	sudo sed -i "s/STORAGE-DRIVER/$LXDStorageDriver/g"                                      /etc/network/openvswitch/preseed.sw1a.oracle8.linux.002.lxd.cluster
 		#	sudo sed -i "s/POOL/$StoragePoolName/g"                                                 /etc/network/openvswitch/preseed.sw1a.oracle8.linux.002.lxd.cluster
                         sudo sed -i -e '/-----BEGIN/,/-----END/!b' -e '/-----END/!d;r /tmp/cert.txt' -e 'd'     /etc/network/openvswitch/preseed.sw1a.oracle8.linux.002.lxd.cluster
+			sudo sed -i '/WARNING/d'								/etc/network/openvswitch/preseed.sw1a.oracle8.linux.002.lxd.cluster
 			sudo dos2unix										/etc/network/openvswitch/preseed.sw1a.oracle8.linux.002.lxd.cluster
 
 			echo ''
@@ -6163,6 +6162,17 @@ then
 
 	clear
 
+	sudo test -f /etc/firewalld/firewalld.conf
+	if [ $? -eq 0 ]
+	then
+        	function GetFirewalldBackend {
+                	sudo grep 'nftables' /etc/firewalld/firewalld.conf | grep FirewallBackend | grep -vc '#'
+        	}
+        	FirewalldBackend=$(GetFirewalldBackend)
+	else
+        	FirewalldBackend=0
+	fi
+
 	if [ $GRE = 'Y' ]
 	then
 		sudo sed -i "/route add -net/s/#/ /"				/etc/network/openvswitch/crt_ovs_sw1.sh	
@@ -6176,11 +6186,18 @@ then
                         sudo sed -i '/type=gre/d'   /etc/network/openvswitch/crt_ovs_sw1.sh
                         sudo sed -i '/type=vxlan/d' /etc/network/openvswitch/crt_ovs_sw1.sh
 
-			if [ $LinuxFlavor = 'Oracle' ] && [ $Release -ge 8 ]
+			if [ $FirewalldBackend -eq 1 ] && [ $LinuxFlavor = 'Oracle' ]
 			then
-				sudo firewall-cmd --permanent --zone=public --add-port=6081/udp
-				sudo firewall-cmd --permanent --zone=public --add-interface=genev_sys_6081
-				sudo firewall-cmd --reload
+				sudo firewall-cmd --permanent --zone=public --add-port=6081/udp				2>/dev/null
+				sudo firewall-cmd --permanent --zone=public --add-interface=genev_sys_6081		2>/dev/null
+			#	sudo firewall-cmd --reload
+			fi
+			
+			if [ $FirewalldBackend -eq 1 ] && [ $LinuxFlavor = 'Fedora' ]
+			then
+				sudo firewall-cmd --permanent --zone=FedoraServer --add-port=6081/udp			2>/dev/null
+				sudo firewall-cmd --permanent --zone=FedoraServer --add-interface=genev_sys_6081	2>/dev/null
+			#	sudo firewall-cmd --reload
 			fi
 
                 elif [ $TunType = 'gre' ]
@@ -6190,11 +6207,18 @@ then
                         sudo sed -i '/type=geneve/d' /etc/network/openvswitch/crt_ovs_sw1.sh
                         sudo sed -i '/type=vxlan/d'  /etc/network/openvswitch/crt_ovs_sw1.sh
 
-			if [ $LinuxFlavor = 'Oracle' ] && [ $Release -ge 8 ]
+			if [ $FirewalldBackend -eq 1 ] && [ $LinuxFlavor = 'Oracle' ]
 			then
-				sudo firewall-cmd --permanent --zone=public --add-protocol=gre
-				sudo firewall-cmd --permanent --zone=public --add-interface=gre_sys
-				sudo firewall-cmd --reload
+				sudo firewall-cmd --permanent --zone=public --add-protocol=gre				2>/dev/null
+				sudo firewall-cmd --permanent --zone=public --add-interface=gre_sys			2>/dev/null
+			#	sudo firewall-cmd --reload
+			fi
+
+			if [ $FirewalldBackend -eq 1 ] && [ $LinuxFlavor = 'Fedora' ]
+			then
+				sudo firewall-cmd --permanent --zone=FedoraServer --add-protocol=gre			2>/dev/null
+				sudo firewall-cmd --permanent --zone=FedoraServer --add-interface=gre_sys		2>/dev/null
+			#	sudo firewall-cmd --reload
 			fi
 
                 elif [ $TunType = 'vxlan' ]
@@ -6204,11 +6228,18 @@ then
                         sudo sed -i '/type=geneve/d' /etc/network/openvswitch/crt_ovs_sw1.sh
                         sudo sed -i '/type=gre/d'    /etc/network/openvswitch/crt_ovs_sw1.sh
 
-			if [ $LinuxFlavor = 'Oracle' ] && [ $Release -ge 8 ]
+			if [ $FirewalldBackend -eq 1 ] && [ $LinuxFlavor = 'Oracle' ]
 			then
-				sudo firewall-cmd --permanent --zone=public --add-port=4789/udp
-				sudo firewall-cmd --permanent --zone=public --add-interface=vxlan_sys_4789
-				sudo firewall-cmd --reload
+				sudo firewall-cmd --permanent --zone=public --add-port=4789/udp				2>/dev/null
+				sudo firewall-cmd --permanent --zone=public --add-interface=vxlan_sys_4789		2>/dev/null
+			#	sudo firewall-cmd --reload
+			fi
+			
+			if [ $FirewalldBackend -eq 1 ] && [ $LinuxFlavor = 'Fedora' ]
+			then
+				sudo firewall-cmd --permanent --zone=FedoraServer --add-port=4789/udp			2>/dev/null
+				sudo firewall-cmd --permanent --zone=FedoraServer --add-interface=vxlan_sys_4789	2>/dev/null
+			#	sudo firewall-cmd --reload
 			fi
                 fi
 
@@ -6233,30 +6264,45 @@ then
 
                 if   [ $TunType = 'geneve' ]
                 then
-                        sudo sed -i '/type=gre/d'               /etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
-			sudo sed -i '/add-protocol=gre/d'	/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh	
-			sudo sed -i '/gre_sys/d'	        /etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh	
-                        sudo sed -i '/type=vxlan/d'             /etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
-			sudo sed -i '/add-port=4789/d'	        /etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh	
-			sudo sed -i '/vxlan_sys_4789/d'	        /etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh	
+                        sudo sed -i '/type=gre/d'               		/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
+			sudo sed -i '/add-protocol=gre/d'			/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh	
+			sudo sed -i '/gre_sys/d'	        		/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh	
+                        sudo sed -i '/type=vxlan/d'             		/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
+			sudo sed -i '/add-port=4789/d'	        		/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh	
+			sudo sed -i '/vxlan_sys_4789/d'	        		/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
+
+			if [ $LinuxFlavor = 'Fedora' ]
+			then
+				sudo sed -i 's/zone=public/zone=FedoraServer/g' /etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
+			fi	
 
                 elif [ $TunType = 'gre' ]
                 then
-                        sudo sed -i '/type=vxlan/d'             /etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
-			sudo sed -i '/add-port=4789/d'	        /etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh	
-			sudo sed -i '/vxlan_sys_4789/d'	        /etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh	
-                        sudo sed -i '/type=geneve/d'            /etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
-			sudo sed -i '/add-port=6081/d'	        /etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh	
-			sudo sed -i '/genev_sys_6081/d'	        /etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh	
+                        sudo sed -i '/type=vxlan/d'             		/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
+			sudo sed -i '/add-port=4789/d'	        		/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh	
+			sudo sed -i '/vxlan_sys_4789/d'	        		/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh	
+                        sudo sed -i '/type=geneve/d'            		/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
+			sudo sed -i '/add-port=6081/d'	        		/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh	
+			sudo sed -i '/genev_sys_6081/d'	        		/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh	
+
+			if [ $LinuxFlavor = 'Fedora' ]
+			then
+				sudo sed -i 's/zone=public/zone=FedoraServer/g' /etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
+			fi	
 
                 elif [ $TunType = 'vxlan' ]
                 then
-                        sudo sed -i '/type=gre/d'               /etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
-			sudo sed -i '/add-protocol=gre/d'	/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh	
-			sudo sed -i '/gre_sys/d'	        /etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh	
-                        sudo sed -i '/type=geneve/d'            /etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
-			sudo sed -i '/add-port=6081/d'	        /etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh	
-			sudo sed -i '/genev_sys_6081/d'	        /etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh	
+                        sudo sed -i '/type=gre/d'               		/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
+			sudo sed -i '/add-protocol=gre/d'			/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh	
+			sudo sed -i '/gre_sys/d'	        		/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh	
+                        sudo sed -i '/type=geneve/d'            		/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
+			sudo sed -i '/add-port=6081/d'	        		/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh	
+			sudo sed -i '/genev_sys_6081/d'	        		/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh	
+
+			if [ $LinuxFlavor = 'Fedora' ]
+			then
+				sudo sed -i 's/zone=public/zone=FedoraServer/g' /etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
+			fi	
                 fi
 
 		sudo chmod 777 /etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
@@ -6423,6 +6469,11 @@ then
 	fi
 fi
 
+function CheckSystemdResolvedInstalled {
+        sudo netstat -ulnp | grep 53 | sed 's/  */ /g' | rev | cut -f1 -d'/' | rev | sort -u | grep systemd- | wc -l
+}
+SystemdResolvedInstalled=$(CheckSystemdResolvedInstalled)
+
 if [ $SystemdResolvedInstalled -ge 1 ]
 then
         echo ''
@@ -6440,14 +6491,11 @@ then
 	then
 		sudo rm -f /etc/resolv.conf
 		sudo ln -s /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
-		sudo ls -l /etc/resolv.conf
-		sudo cat   /etc/resolv.conf
-		echo ''
+	#	sudo ls -l /etc/resolv.conf
+	#	sudo cat   /etc/resolv.conf
 		sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" 	    /etc/dhcp/dhclient.conf
 		sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /etc/dhcp/dhclient.conf
-		sudo cat /etc/dhcp/dhclient.conf
-		echo ''	
-		sleep 5
+	#	sudo cat /etc/dhcp/dhclient.conf
 	fi
 	
         echo ''

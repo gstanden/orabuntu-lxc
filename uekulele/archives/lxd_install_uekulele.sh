@@ -49,7 +49,7 @@ if   [ $PreSeed = 'Y' ] && [ $Release -ge 7 ]
 then
 	echo ''
 	echo "=============================================="
-	echo "Run LXD Init (takes awhile...)                "
+	echo "Run LXD Init (takes awhile...patience...)     "
 	echo "=============================================="
 	echo ''
 
@@ -107,7 +107,7 @@ then
 		fi
 	done
 
-	echo "/var/lib/snapd/snap/bin/lxc cluster list" | sg lxd
+	echo "/var/lib/snapd/snap/bin/lxc cluster list" | sg lxd 2>/dev/null 
 
 	echo ''
 	echo "=============================================="

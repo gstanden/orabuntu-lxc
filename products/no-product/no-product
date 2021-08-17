@@ -265,7 +265,7 @@ then
 elif [ $LXD = 'Y' ]
 then
 	function GetSeedContainerName {
-        	echo "/var/lib/snapd/snap/bin/lxc list | grep oel83 | cut -f2 -d' ' | sed 's/^[ \t]*//;s/[ \t]*$//'" | sg lxd
+        	echo "/var/lib/snapd/snap/bin/lxc list | grep oel83 | cut -f2 -d' ' | sed 's/^[ \t]*//;s/[ \t]*$//'" | sg lxd 2>/dev/null
 	}
 	SeedContainerName=$(GetSeedContainerName)
 fi
