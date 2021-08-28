@@ -2,11 +2,12 @@
 
 Orabuntu-LXC v7.0.0-alpha AC/DC Edition (to be released soon) is the successor to the Orabuntu-LXC v6.x.x-beta AMIDE Editions.
 
+Orabuntu-LXC Version 7 **AC/DC** Edition stands for "**A**MIDE LX**C**/LX**D C**lusters" and retains all the great features of AMIDE Edition 6 AMIDE, and not AC/DC Edition 7 adds LXD cluster support and much more!
+
 Orabuntu-LXC v7.0.0-alpha AC/DC Edition introduces support for fully-automated N-node LXD clusters creation. 
 
 The 6.13.25.x-beta series releases are v7.0.0-alpha "precursor releases" previewing v7.0.0-alpha new features.  These 6.13.25.x-beta series releases are gradually adding all the Orabuntu-LXC supported platforms to fully-supported for fully-automated push-button LXD N-Node Cluster creation.
 
-Orabuntu-LXC Version 7 **AC/DC** Edition stands for "**A**MIDE LX**C**/LX**D C**lusters" and retains all the great features of AMIDE Edition 6 AMIDE, and not AC/DC Edition 7 adds LXD cluster support and much more!
 
 Orabuntu-LXC v7.0.0-alpha AMIDE Edition will be released soon.  The 6.13.25.x-beta AMIDE point releases preview the main new features:
 
