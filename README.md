@@ -6,7 +6,7 @@ Some nomeclature:
 
 The version 6 software had codename "AMIDE" suffixed to each point release.  The version 7 software to be released will have codename "ELENA" suffixed to each point release. "Elena" was one of her most popular nicknames among her friends. 
 
-You may also notice that although the project is still called "Orabuntu-LXC" there is a new logo for the upcoming Orabuntu-LXC Version 7 major release.  The big feature in Version 7 is support for fully-automated deployment of LXD clusters on all of our supported distros (Oracle Linux, Fedora, CentOS, RedHat, and Ubuntu). There are a couple of other major features, which are (1) support for cgroupv2 and (s) support for nftables (for systems that have firewalld installed).
+You may also notice that although the project is still called "Orabuntu-LXC" there is a new logo "Orabuntu-LX**D**" now on my github for the upcoming Orabuntu-LXC Version 7 major release.  The project is NOT going to be renamed to Orabuntu-LXD because it is already many years well-known by Orabuntu-LXC, but in order to draw attention to the single biggest feature of the ELENA release, it was decided to have the logo say "Orabuntu-**LXD**. And that is the big feature in the ELENA release: support for fully-automated deployment of LXD clusters on all of our supported distros (Oracle Linux, Fedora, CentOS, RedHat, and Ubuntu). There are a couple of other major features, which are (1) support for cgroupv2 and (s) support for nftables (for systems that have firewalld installed).
 
 Orabuntu-LXC Version 6 AMIDE Edition stands for "**A**mazon **M**ult-**I**-host LX**D D**ocker **E**nterprise" Edition
 
