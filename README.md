@@ -2,11 +2,11 @@
 
 Orabuntu-LXC Version 7 "Елена" Edition is named after my beloved wife who passed away on March 4, 2020.  She strongly supported the Orabuntu-LXC project over many years.  This release of Orabuntu-LXC is named in her honor, for without her support, there would never have been an Orabuntu-LXC. The Russian cyrillic alphabet spelling of her name "Елена" is pronounced in English as "Yelena" and that is the name of this major release version 7 of Orabuntu-LXC.
 
-About Release Codenames:
+About Release Codename:
 
 The version 6 software had codename "AMIDE" suffixed to each point release.  The version 7 software to be released will have codename "ELENA" suffixed to each point release. "Elena" was one of her most popular nicknames among her friends. 
 
-About Release Logos:
+About Release Logo:
 
 You may also notice that although the project is still called "Orabuntu-LXC" there is a new logo "Orabuntu-**LXD**" now on this github for the upcoming Orabuntu-LXC ELENA release.  The project is NOT going to be renamed to Orabuntu-LXD because it is already many years well-known as Orabuntu-LXC, but in order to draw attention to the single biggest feature of the ELENA release, it was decided to have the logo say **Orabuntu-LXD**. And that is the big feature in the ELENA release: support for fully-automated deployment of LXD clusters on all supported distros (Oracle Linux, Fedora, CentOS, RedHat, and Ubuntu). And "fully-automated" means that Orabuntu-LXC ELENA starts with a fresh vanilla server, and with the launch of a single script, the "push of a single button," builds a complete container infrastructure.  More details below.
 
