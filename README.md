@@ -17,10 +17,9 @@ About Other Major New Features:
 
 The 6.13.25.x-beta AMIDE point releases preview the main new features of Orabuntu-LXC ELENA Edition.
 
-* Fully-automated deployment of 2-node LXD clusters on VLANs on OpenvSwitch networks on Oracle Linux 7 and 8, and Ubuntu 20.04.
+* Fully-automated deployment of 2-node LXD clusters on VLANs on OpenvSwitch networks on all Orabuntu-LXC AMIDE supported distros.
 * User-selectable tunnel-type for multi-host deployments {GRE|geneve|vxlan }.
 * New /anylinux/CONFIG file which centralizes all configuration parameters.
-* Adds support for nftables ("firewall-cmd") for LXD clusters and LXC multi-host "spanned" networks (e.g. on Oracle Linux 8).
 
 Orabuntu-LXC BUILDS EVERYTHING itself for the currently supported distros: 
 
@@ -30,7 +29,11 @@ Orabuntu-LXC BUILDS EVERYTHING itself for the currently supported distros:
 * Fedora 22-33+ (tested on 22 and 33)
 * RedHat 6.x, 7.x, 8.x
 
-**Note**:  Linux 6 while still "theoretically" supported, is effectively "de-supported" because the repos for the various Linux 6 "flavors" are no longer provided by the vendors of the specific distros.  If you can point Orabuntu-LXC to your own in-house yum repos for Linux 6, then Oracle Linux 6, CentOS 6, and RedHat 6 should still be supported for Orabuntu-LXC.  So in other words, Linux 6 is effectively no longer supported for most users who rely on vendor repos, as these repos have been shut down for Linux 6 by their respective vendors.
+About Linux 6 Support:
+
+Linux 6 is still "theoretically" supported by Orabuntu-LXC ELENA edtion but for LXC multi-host spans only (not for LXD clusters).  The word "theoretically" is used because some Linux 6 vendors have ceased providing security updates (desupport) and some may at any time shut down their package repos for their Linux 6 at any time.  Linux 6 distros that have been tested and are still working fine with Orabuntu-LXC include:
+
+* Oracle Linux 6.10 (LXC multi-host "spans" only)
 
 **Orabuntu-LXC installer does all of the following automatically**:
 
