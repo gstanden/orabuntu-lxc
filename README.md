@@ -1,4 +1,4 @@
-# What is Orabuntu-LXC Verion 7 DC/AC Edition ?
+# What is Orabuntu-LXC Version 7 DC/AC Edition ?
 
 Orabuntu-LXC Version 7 DC/AC Edition stands for "LX**D C**lusters/**A**MIDE LX**C**" Edition.
 
