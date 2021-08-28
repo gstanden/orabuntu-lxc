@@ -1,8 +1,8 @@
 # What is Orabuntu-LXC Verion 7 DC/AC Edition ?
 
-Orabuntu-LXC Version 7 DC/AC Edition (to be released soon) stands for "**L**XD **C**lusters/**A**MIDE LX**C**" Edition.
+Orabuntu-LXC Version 7 DC/AC Edition stands for "**L**XD **C**lusters/**A**MIDE LX**C**" Edition.
 
-**AMIDE** still stands for "**A**mazon **M**ult-**I**-host LX**D D**ocker **E**nterprise **E**dition" and in v7.0.0-alpha "LX**D**" has been added to AMI**D**E.
+Orabuntu-LXC Version 6 AMIDE Edition stands for "**A**mazon **M**ult-**I**-host LX**D D**ocker **E**nterprise **E**dition" and in v7.0.0-alpha "LX**D**" has been added to AMI**D**E.
 
 Orabuntu-LXC v7.0.0-alpha AMIDE Edition will be released soon.  The 6.13.25.x-beta AMIDE point releases preview the main new features:
 
