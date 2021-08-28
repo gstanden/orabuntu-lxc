@@ -1,10 +1,10 @@
 # What is Orabuntu-LXC Version 7 DC/AC Edition ?
 
-Orabuntu-LXC Version 7 DC/AC Edition stands for "LX**D C**lusters/**A**MIDE LX**C**" Edition.
+Orabuntu-LXC Version 7 DC/AC Edition stands for "LX**D C**lusters/**A**MIDE LX**C**" Edition to be released soon.
 
 Orabuntu-LXC Version 6 AMIDE Edition stands for "**A**mazon **M**ult-**I**-host LX**D D**ocker **E**nterprise" Edition
 
-Orabuntu-LXC v7.0.0-alpha AMIDE Edition will be released soon.  The 6.13.25.x-beta AMIDE point releases preview the main new features:
+The 6.13.25.x-beta AMIDE point releases preview the main new features of Orabuntu-LXC "DC/AC" Edition.
 
 * Fully-automated deployment of 2-node LXD clusters on VLANs on OpenvSwitch networks on Oracle Linux 7 and 8, and Ubuntu 20.04.
 * User-selectable tunnel-type for multi-host deployments {GRE|geneve|vxlan }.
