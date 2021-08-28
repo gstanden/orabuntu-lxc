@@ -6,7 +6,7 @@ Orabuntu-LXC Version 7 **AC/DC** Edition stands for "**A**MIDE LX**C**/LX**D C**
 
 All of the AMIDE Edition 6 features are still there, but AC/DC Edition 7 adds support for LXD Clusters.
 
-Orabuntu-LXC v7.0.0-alpha AC/DC Edition introduces support for fully-automated N-node LXD clusters creation, hence this is an "extension" of AMIDE to LXD Clusters.
+Orabuntu-LXC Edition 7 AC/DC introduces support for fully-automated N-node LXD clusters creation, and therefore Edition 7 "extends" AMIDE to LXD Clusters.
 
 The 6.13.25.x-beta series releases are v7.0.0-alpha "precursor releases" previewing v7.0.0-alpha new features.  These 6.13.25.x-beta series releases are gradually adding all the Orabuntu-LXC supported platforms (Oracle Linux, Fedora, CentOS, RedHat, Ubuntu) to fully-automated push-button LXD N-Node Cluster creation. Support for spans of LXC networks across multiple hosts and all of the AMIDE Edition features are retained.  Users of the software can choose to build multi-host LXC network spans, or can opt for LXD clusters across multi-hosts. These configurations are made in the new anylinux/CONFIG file.
 
