@@ -33,7 +33,7 @@ About Linux 6 Support:
 
 Linux 6 is still "theoretically" supported by Orabuntu-LXC ELENA edtion but for LXC multi-host spans only (not for LXD clusters).  The word "theoretically" is used because some Linux 6 vendors have ceased providing security updates (desupport) and some may at any time shut down their package repos for their Linux 6 at any time.  Linux 6 distros that have been tested and are still working fine with Orabuntu-LXC include:
 
-* Oracle Linux 6.10 (LXC multi-host "spans" only)
+* Oracle Linux 6.10
 
 **Orabuntu-LXC installer does all of the following automatically**:
 
