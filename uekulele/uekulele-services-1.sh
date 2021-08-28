@@ -73,7 +73,7 @@ function GetOvsVersion {
 OvsVersion=$(GetOvsVersion)
 
 # MultiHost for reference
-# MultiHost="$Operation:Y:X:X:$HUBIP:$SPOKEIP:$MTU:$HubUserAct:$HubSudoPwd:$GRE:$Product:$LXD:$K8S:$PreSeed:$LXDCluster:$StorageDriver:$StoragePoolName:$BtrfsLun"
+# MultiHost="$Operation:Y:X:X:$HUBIP:$SPOKEIP:$MTU:$HubUserAct:$HubSudoPwd:$GRE:$Product:$LXD:$K8S:$PreSeed:$LXDCluster:$LXDStorageDriver:$StoragePoolName:$BtrfsLun"
 
 function GetMultiHostVar1 {
 	echo $MultiHost | cut -f1 -d':'
@@ -1235,11 +1235,19 @@ then
 		
 		if [ $Release -eq 8 ]
 		then
-			sudo systemctl enable dnsmasq
-			sudo systemctl start  dnsmasq
-			sudo sed -i 's/#LXC/LXC/g'				/etc/sysconfig/lxc-net 
-			sudo sed -i 's/LXC_DHCP_CONFILE/#LXC_DHCP_CONFILE/g'	/etc/sysconfig/lxc-net
-			sudo sed -i 's/LXC_DOMAIN/#LXC_DOMAIN/g'		/etc/sysconfig/lxc-net
+			if [ $RedHatVersion -ne 29 ]
+			then
+				sudo systemctl enable dnsmasq
+				sudo systemctl start  dnsmasq
+			fi
+			
+			if [ -f /etc/sysconfig/lxc-net ]
+			then
+				sudo sed -i 's/#LXC/LXC/g'				/etc/sysconfig/lxc-net 
+				sudo sed -i 's/LXC_DHCP_CONFILE/#LXC_DHCP_CONFILE/g'	/etc/sysconfig/lxc-net
+				sudo sed -i 's/LXC_DOMAIN/#LXC_DOMAIN/g'		/etc/sysconfig/lxc-net
+			fi
+
 			sudo systemctl enable lxc-net
 			sudo systemctl start  lxc-net
 			sudo service lxc-net stop
@@ -1602,8 +1610,18 @@ then
 						sudo dnf -y install openjade texinfo perl-XML-SAX docbook2X libcap-devel libcgroup
 						sudo rpm -ivh "$DistDir"/rpmstage/bridge-utils-1.5-9.el7.x86_64.rpm
 					else
-						sudo rpm -ivh "$DistDir"/rpmstage/bridge-utils-1.5-9.el7.x86_64.rpm
+						sudo rpm -qa | grep bridge-utils
+						if [ $? -ne 0 ]
+						then
+							sudo rpm -ivh "$DistDir"/rpmstage/bridge-utils-1.5-9.el7.x86_64.rpm
+						fi
+						
 						sudo yum -y install libcap-devel
+					fi
+
+					if [ $LinuxFlavor = 'Fedora' ] && [ $Release -ge 8 ]
+					then
+						sudo dnf -y install libcgroup
 					fi
 				echo ''
 				echo "=============================================="
@@ -1873,7 +1891,7 @@ then
 
 			if [ $Release -eq 7 ]
 			then
-				if [ $LinuxFlavor = 'CentOS' ] || [ $LinuxFlavor = 'Oracle' ] || [ $LinuxFlavor = 'Red' ]
+				if [ $LinuxFlavor = 'CentOS' ] || [ $LinuxFlavor = 'Oracle' ] || [ $LinuxFlavor = 'Red' ] || [ $LinuxFlavor = 'Fedora' ]
 				then
 					echo ''
 					echo "=============================================="
@@ -1960,7 +1978,7 @@ then
 
 			clear
 
-			if [ $LinuxFlavor = 'CentOS' ] && [ $Release -eq 7 ]
+			if [ $LinuxFlavor = 'CentOS' ]
 			then
 				echo ''
 				echo "=============================================="
@@ -1994,7 +2012,11 @@ then
 				sleep 5
 
 				sudo yum -y erase lxc* lxc-libs*
-				
+
+				if [ $LinuxFlavor = 'Fedora' ]
+				then
+					sudo dnf -y remove lxc-doc
+				fi
 				echo ''
 				echo "=============================================="
 				echo "Done: Remove Previous Version LXC RPM's.      "
@@ -2123,7 +2145,7 @@ then
 		
 			if [ $Release -eq 7 ]
 			then
-				if [ $LinuxFlavor = 'CentOS' ] || [ $LinuxFlavor = 'Oracle' ] || [ $LinuxFlavor = 'Red' ]
+				if [ $LinuxFlavor = 'CentOS' ] || [ $LinuxFlavor = 'Oracle' ] || [ $LinuxFlavor = 'Red' ] || [ $LinuxFlavor = 'Fedora' ]
 				then
 					echo ''
 					echo "=============================================="
@@ -2556,7 +2578,12 @@ sudo yum -y install bind-utils
 if [ $Release -eq 8 ]
 then
 	sudo yum -y install crda
-	sudo rpm -ivh "$DistDir"/rpmstage/wireless-tools-29-13.el7.x86_64.rpm 
+	
+	sudo rpm -qa | grep wireless-tools
+	if [ $? -ne 0 ]
+	then
+		sudo rpm -ivh "$DistDir"/rpmstage/wireless-tools-29-13.el7.x86_64.rpm 
+	fi
 else
 	sudo yum -y install wireless-tools
 fi
@@ -2690,7 +2717,12 @@ sleep 5
 
 clear
 
-if [ $Release -eq 8 ] && [ $LinuxFlavor = 'Fedora' ]
+function GetOvsRepoVersion {
+	sudo yum list openvswitch 2>/dev/null | grep openvswitch | sed 's/  */ /g' | cut -f2 -d' ' | cut -f1 -d'-' | sort | tail -1
+}
+OvsRepoVersion=$(GetOvsRepoVersion)
+
+if [ $Release -eq 8 ] && [ $LinuxFlavor = 'Fedora' ] && [ $(SoftwareVersion $OvsVersion) -le $(SoftwareVersion $OvsRepoVersion) ]
 then
 	echo ''
 	echo "=============================================="
@@ -2698,9 +2730,13 @@ then
 	echo "=============================================="
 	echo ''
 
-		if   [ $LinuxFlavor = 'Fedora' ]
+		if   [ $LinuxFlavor = 'Fedora' ] && [ $RedHatVersion -ge 31 ]
 		then
 			sudo dnf -y install lxc lxc-* openvswitch openvswitch-devel openvswitch-ipsec openvswitch-test python3-openvswitch
+		
+	 	elif [ $LinuxFlavor = 'Fedora' ] && [ $RedHatVersion -eq 29 ]
+	 	then
+	 		sudo dnf -y install openvswitch openvswitch-devel openvswitch-test python3-openvswitch
 		fi
 
 	echo ''
@@ -3249,7 +3285,7 @@ then
 				sleep 5
 			fi
 
-			if [ $Release -eq 7 ] && [ $(SoftwareVersion $OvsVersion) -eq $(SoftwareVersion "2.12.1") ]
+			if [ $Release -eq 7 ] && [ $(SoftwareVersion $OvsVersion) -ge $(SoftwareVersion "2.12.1") ]
 			then
 				echo ''
 				echo "==============================================" 
@@ -3351,9 +3387,16 @@ then
 
 				sleep 5
 
-				sudo yum -y install python3
-				sudo yum -y install python3-sphinx
-				sudo yum -y install python-six
+				if [ $LinuxFlavor = 'Fedora' ] && [ $Release -eq 7 ]
+				then
+					sudo yum -y install python3
+					sudo yum -y install python3-sphinx
+					sudo yum -y install python-six
+				else
+					sudo yum -y install python3
+					sudo yum -y install python3-sphinx
+					sudo yum -y install python-six
+				fi
 
 				echo ''
 				echo "==============================================" 
@@ -3422,7 +3465,12 @@ then
 
 				sleep 5
 
-				sudo yum -y install selinux-policy-devel unbound-devel
+				if [ $LinuxFlavor = 'Fedora' ] && [ $Release -eq 7 ]
+				then
+					sudo dnf -y install selinux-policy-devel unbound-devel
+				else
+					sudo yum -y install selinux-policy-devel unbound-devel
+				fi
 				
 				echo ''
 				echo "==============================================" 
@@ -3487,7 +3535,12 @@ then
 
 				sleep 5
 
-				sudo yum -y install python-sphinx
+				if [ $LinuxFlavor = 'Fedora' ] && [ $Release -eq 7 ]
+				then
+					sudo dnf -y install python-sphinx
+				else
+					sudo yum -y install python-sphinx
+				fi
 
 				echo ''
 				echo "==============================================" 
@@ -3522,8 +3575,9 @@ then
 			
  			if [ $Release -eq 8 ]
  			then
-				if [ $(SoftwareVersion $OvsVersion) -eq $(SoftwareVersion "2.14.0") ]
+				if [ $(SoftwareVersion $OvsVersion) -gt $(SoftwareVersion "2.12.1") ]
 				then
+			#		if [ $(SoftwareVersion $OvsVersion) -eq $(SoftwareVersion "2.14.0") ]
 					cd /opt/olxc/"$DistDir"/uekulele/openvswitch
 			
 					echo ''
@@ -3535,6 +3589,7 @@ then
 					sudo yum -y install checkpolicy selinux-policy-devel unbound-devel
 					sudo yum -y install python3-sphinx
 					sudo yum -y install gcc-c++ groff libcap-ng-devel python3-devel unbound
+					sudo yum -y install network-scripts libreswan
 			
 					echo ''
 					echo "==============================================" 
@@ -3552,8 +3607,8 @@ then
 					echo "=============================================="
 					echo ''
 
-					wget https://www.openvswitch.org/releases/openvswitch-2.14.0.tar.gz
-					tar -xzvf openvswitch-2.14.0.tar.gz 
+					wget https://www.openvswitch.org/releases/openvswitch-$OvsVersion.tar.gz
+					tar -xzvf openvswitch-$OvsVersion.tar.gz 
 
 					echo ''
 					echo "=============================================="
@@ -3573,7 +3628,7 @@ then
 
 					sleep 5
 
-					cd openvswitch-2.14.0
+					cd openvswitch-$OvsVersion
 					./configure
 					make rpm-fedora
 
@@ -3593,19 +3648,14 @@ then
 					echo "==============================================" 
 					echo ''
 
-					sudo yum -y remove openvswitch-devel-*
-					sudo yum -y remove openvswitch-*
-					sudo yum -y install network-scripts libreswan
 					cd /opt/olxc/"$DistDir"/uekulele/openvswitch/openvswitch-"$OvsVersion"/rpm/rpmbuild/RPMS/noarch
-					sudo rpm -ivh python3-openvswitch-"$OvsVersion"*.el8.noarch.rpm
-					sudo rpm -ivh openvswitch-selinux-policy-"$OvsVersion"*.el8.noarch.rpm
-					sudo rpm -ivh /opt/olxc/"$DistDir"/uekulele/openvswitch/openvswitch-"$OvsVersion"/rpm/rpmbuild/RPMS/noarch/python3-openvswitch-"$OvsVersion".el8.noarch.rpm
-					sudo rpm -ivh /opt/olxc/"$DistDir"/uekulele/openvswitch/openvswitch-"$OvsVersion"/rpm/rpmbuild/RPMS/noarch/openvswitch-selinux-policy-"$OvsVersion".el8.noarch.rpm
+					
+					sudo rpm -ivh python3-openvswitch-"$OvsVersion"*.rpm
+
+					cd /opt/olxc/"$DistDir"/uekulele/openvswitch/openvswitch-"$OvsVersion"/rpm/rpmbuild/RPMS/x86_64
+					
 					sudo rpm -ivh /opt/olxc/"$DistDir"/uekulele/openvswitch/openvswitch-"$OvsVersion"/rpm/rpmbuild/RPMS/x86_64/openvswitch-* 
-					sudo rpm -ivh /opt/olxc/"$DistDir"/uekulele/openvswitch/openvswitch-"$OvsVersion"/rpm/rpmbuild/RPMS/x86_64/openvswitch-debuginfo*
-					sudo rpm -ivh /opt/olxc/"$DistDir"/uekulele/openvswitch/openvswitch-"$OvsVersion"/rpm/rpmbuild/RPMS/x86_64/openvswitch-debugsource*
-					sudo rpm -ivh /opt/olxc/"$DistDir"/uekulele/openvswitch/openvswitch-"$OvsVersion"/rpm/rpmbuild/RPMS/x86_64/openvswitch-devel*
-					sudo rpm -ivh /opt/olxc/"$DistDir"/uekulele/openvswitch/openvswitch-"$OvsVersion"/rpm/rpmbuild/RPMS/x86_64/openvswitch-ipsec*
+					
 					cd /opt/olxc/"$DistDir"/uekulele/openvswitch
 					
 					echo ''
@@ -4411,7 +4461,7 @@ clear
 
 echo ''
 echo "=============================================="
-echo "Install OvsVethCleanup.service                "
+echo "Create OvsVethCleanup.service                 "
 echo "=============================================="
 echo ''
 
@@ -4430,7 +4480,7 @@ sudo cat /etc/systemd/system/OvsVethCleanup.service
 
 echo ''
 echo "=============================================="
-echo "Done: Install OvsVethCleanup.service          "
+echo "Done: Create OvsVethCleanup.service           "
 echo "=============================================="
 echo ''
 
@@ -4712,14 +4762,14 @@ then
 	then
 		sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /etc/NetworkManager/dnsmasq.d/local
 		sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /etc/network/openvswitch/crt_ovs_sw1.sh
-		sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /etc/dhcp/dhclient.conf
+		sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /etc/dhcp/dhclient.conf.orabuntu
 	fi
 		
 	if [ -n $Domain2 ] && [ $MultiHostVar2 = 'Y' ]
 	then
 		sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /etc/NetworkManager/dnsmasq.d/local
 		sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /etc/network/openvswitch/crt_ovs_sw1.sh
-		sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /etc/dhcp/dhclient.conf
+		sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /etc/dhcp/dhclient.conf.orabuntu
 	fi
 
 	if [ $MultiHostVar2 = 'N' ]
@@ -4802,12 +4852,18 @@ then
 		#	sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/etc/network/interfaces
 			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/root/ns_backup_update.lst
 			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/root/dns-thaw.sh
+			
+			if [ $LinuxFlavor = 'Fedora' ] && [ $RedHatVersion -eq 29 ]
+			then
+				sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /etc/dhcp/dhclient.conf.orabuntu
+			fi
+			
 			sudo mv /var/lib/lxc/$NameServer/rootfs/var/lib/bind/fwd.orabuntu-lxc.com /var/lib/lxc/$NameServer/rootfs/var/lib/bind/fwd.$Domain1
 			sudo mv /var/lib/lxc/$NameServer/rootfs/var/lib/bind/rev.orabuntu-lxc.com /var/lib/lxc/$NameServer/rootfs/var/lib/bind/rev.$Domain1
 			
 			if [ $Release -eq 6 ]
 			then
-				sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /etc/dhcp/dhclient.conf
+				sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /etc/dhcp/dhclient.conf.orabuntu
 			fi
 		fi
 
@@ -4825,11 +4881,18 @@ then
 		#	sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /var/lib/lxc/$NameServer/rootfs/etc/network/interfaces
 			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /var/lib/lxc/$NameServer/rootfs/root/ns_backup_update.lst
 			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /var/lib/lxc/$NameServer/rootfs/root/dns-thaw.sh
+			
+			if [ $LinuxFlavor = 'Fedora' ] && [ $RedHatVersion -eq 29 ]
+			then
+				sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /etc/dhcp/dhclient.conf.orabuntu
+			fi
+			
 			sudo mv /var/lib/lxc/$NameServer/rootfs/var/lib/bind/fwd.consultingcommandos.us /var/lib/lxc/$NameServer/rootfs/var/lib/bind/fwd.$Domain2
 			sudo mv /var/lib/lxc/$NameServer/rootfs/var/lib/bind/rev.consultingcommandos.us /var/lib/lxc/$NameServer/rootfs/var/lib/bind/rev.$Domain2
+			
 			if [ $Release -eq 6 ]
 			then
-				sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /etc/dhcp/dhclient.conf
+				sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /etc/dhcp/dhclient.conf.orabuntu
 			fi
 		fi
 	fi
@@ -4989,9 +5052,9 @@ then
 
                 elif [ $GRE = 'Y' ]
                 then
-                        sshpass -p $MultiHostVar8 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S --prompt='' <<< "$MultiHostVar8" /var/lib/snapd/snap/bin/lxc info 2>/dev/null | sed -n '/BEGIN.*-/,/END.*-/p'" | sed '/WARNING/d' > /tmp/cert.txt
+                        sshpass -p $MultiHostVar8 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S --prompt='' <<< "$MultiHostVar8" /var/lib/snapd/snap/bin/lxc info 2>/dev/null | sed -n '/BEGIN.*-/,/END.*-/p'" > /tmp/cert.txt
 			rm /tmp/cert.txt
-                        sshpass -p $MultiHostVar8 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S --prompt='' <<< "$MultiHostVar8" /var/lib/snapd/snap/bin/lxc info 2>/dev/null | sed -n '/BEGIN.*-/,/END.*-/p'" | sed '/WARNING/d' > /tmp/cert.txt
+                        sshpass -p $MultiHostVar8 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S --prompt='' <<< "$MultiHostVar8" /var/lib/snapd/snap/bin/lxc info 2>/dev/null | sed -n '/BEGIN.*-/,/END.*-/p'" > /tmp/cert.txt
 
 			echo ''
 			echo "=============================================="
@@ -5103,9 +5166,10 @@ then
 
                         sudo sed -i "s/SWITCH_IP/$Sw1Index/g"                                                   /etc/network/openvswitch/preseed.sw1a.olxc.002.lxd.cluster
                         sudo sed -i "s/HOSTNAME/$ShortHostName/g"                                               /etc/network/openvswitch/preseed.sw1a.olxc.002.lxd.cluster
-                        sudo sed -i "s/STORAGE-DRIVER/$StorageDriver/g"                                         /etc/network/openvswitch/preseed.sw1a.olxc.002.lxd.cluster
+                        sudo sed -i "s/STORAGE-DRIVER/$LXDStorageDriver/g"                                      /etc/network/openvswitch/preseed.sw1a.olxc.002.lxd.cluster
                         sudo sed -i "s/POOL/$StoragePoolName/g"                                                 /etc/network/openvswitch/preseed.sw1a.olxc.002.lxd.cluster
                         sudo sed -i -e '/-----BEGIN/,/-----END/!b' -e '/-----END/!d;r /tmp/cert.txt' -e 'd'     /etc/network/openvswitch/preseed.sw1a.olxc.002.lxd.cluster
+			sudo sed -i '/WARNING/d'								/etc/network/openvswitch/preseed.sw1a.olxc.002.lxd.cluster
                         sudo dos2unix                                                                           /etc/network/openvswitch/preseed.sw1a.olxc.002.lxd.cluster
 
                         echo ''
@@ -5177,7 +5241,7 @@ do
 			echo "=============================================="
 			echo ''
 			echo "=============================================="
-			echo "Start OpenvSwitch $k ...                      "
+			echo "Start OpenvSwitch $k...(wait)...patience...   "
 			echo "=============================================="
 			echo ''
 		
@@ -5186,7 +5250,7 @@ do
        			sudo systemctl enable $k.service
 			sudo service $k start
 			sudo service $k status
-	
+
 			echo ''
 			echo "=============================================="
 			echo "Done: Start OpenvSwitch $k.                   "
@@ -5328,68 +5392,68 @@ sleep 5
 
 clear
 
-if [ $Release -ge 7 ]
-then
-	echo ''
-	echo "=============================================="
-	echo "Checking OpenvSwitch sw1 service...           "
-	echo "=============================================="
-	echo ''
+# if [ $Release -ge 7 ]
+# then
+# 	echo ''
+# 	echo "=============================================="
+# 	echo "Checking OpenvSwitch sw1 service...           "
+# 	echo "=============================================="
+# 	echo ''
 
-	sudo service sw1 stop
-	sleep 2
-	sudo systemctl start sw1
-	sleep 2
-	echo ''
-	sudo ifconfig sw1
-	echo ''
-	sudo service sw1 status
+# 	sudo service sw1 stop
+# 	sleep 2
+# 	sudo systemctl start sw1
+# 	sleep 2
+# 	echo ''
+# 	sudo ifconfig sw1
+# 	echo ''
+# 	sudo service sw1 status
 
-	echo ''
-	echo "=============================================="
-	echo "OpenvSwitch sw1 service is up.                "
-	echo "=============================================="
-	echo ''
+# 	echo ''
+# 	echo "=============================================="
+# 	echo "OpenvSwitch sw1 service is up.                "
+# 	echo "=============================================="
+# 	echo ''
 
-	sleep 5
+# 	sleep 5
 
-	clear
+# 	clear
 
-	echo ''
-	echo "=============================================="
-	echo "Checking OpenvSwitch service sx1...           "
-	echo "=============================================="
-	echo ''
+# 	echo ''
+# 	echo "=============================================="
+# 	echo "Checking OpenvSwitch service sx1...           "
+# 	echo "=============================================="
+# 	echo ''
 
-	sudo service sx1 stop
-	sleep 2
-	sudo systemctl start sx1
-	sleep 2
-	echo ''
-	sudo ifconfig sx1
-	echo ''
-	sudo service sx1 status
+# 	sudo service sx1 stop
+# 	sleep 2
+# 	sudo systemctl start sx1
+# 	sleep 2
+# 	echo ''
+# 	sudo ifconfig sx1
+# 	echo ''
+# 	sudo service sx1 status
 
-	echo ''
-	echo "=============================================="
-	echo "OpenvSwitch service sx1 is up.                "
-	echo "=============================================="
-	echo ''
+# 	echo ''
+# 	echo "=============================================="
+# 	echo "OpenvSwitch service sx1 is up.                "
+# 	echo "=============================================="
+# 	echo ''
 
-	sleep 5
+# 	sleep 5
 
-	clear
-fi
+# 	clear
+# fi
 
-echo ''
-echo "=============================================="
-echo "Both required networks are up.                "
-echo "=============================================="
-echo ''
+# echo ''
+# echo "=============================================="
+# echo "Both required networks are up.                "
+# echo "=============================================="
+# echo ''
 
-sleep 5
+# sleep 5
 
-clear
+# clear
 
 if [ $GRE = 'Y' ] || [ $MultiHostVar3 != 'X' ]
 then
@@ -5447,7 +5511,6 @@ then
 	then
 		if [ $Release -ge 7 ]
 		then
-			echo ''
 			echo "=============================================="
 			echo "Restart OpenvSwitches...                      "
 			echo "=============================================="
@@ -5699,7 +5762,7 @@ then
 	echo ''
 
 	sudo lxc-attach -n $NameServer -- service isc-dhcp-server restart
-	sudo lxc-attach -n $NameServer -- service isc-dhcp-server status | head -10
+	sudo lxc-attach -n $NameServer -- service isc-dhcp-server status 
 
 	echo ''
 	echo "=============================================="
@@ -6179,6 +6242,17 @@ then
 		sudo sed -i "/REMOTE_GRE_ENDPOINT/s/#/ /"			/etc/network/openvswitch/crt_ovs_sw1.sh	
 		sudo sed -i "s/REMOTE_GRE_ENDPOINT/$MultiHostVar5/g"		/etc/network/openvswitch/crt_ovs_sw1.sh
 
+		echo ''
+		echo "=============================================="
+		echo "Close firewall to unused tunnel types...      "
+		echo "=============================================="
+		echo ''
+	
+		if [ $LinuxFlavor = 'Red' ]
+		then
+			Zone=trusted
+		fi
+
 		if   [ $TunType = 'geneve' ]
                 then
                         sudo ovs-vsctl add-port sw1 geneve$Sw1Index trunks=10,11 -- set interface geneve$Sw1Index type=geneve options:remote_ip=$MultiHostVar5 options:key=flow
@@ -6186,19 +6260,11 @@ then
                         sudo sed -i '/type=gre/d'   /etc/network/openvswitch/crt_ovs_sw1.sh
                         sudo sed -i '/type=vxlan/d' /etc/network/openvswitch/crt_ovs_sw1.sh
 
-			if [ $FirewalldBackend -eq 1 ] && [ $LinuxFlavor = 'Oracle' ]
-			then
-				sudo firewall-cmd --permanent --zone=public --add-port=6081/udp				2>/dev/null
-				sudo firewall-cmd --permanent --zone=public --add-interface=genev_sys_6081		2>/dev/null
-			#	sudo firewall-cmd --reload
-			fi
-			
-			if [ $FirewalldBackend -eq 1 ] && [ $LinuxFlavor = 'Fedora' ]
-			then
-				sudo firewall-cmd --permanent --zone=FedoraServer --add-port=6081/udp			2>/dev/null
-				sudo firewall-cmd --permanent --zone=FedoraServer --add-interface=genev_sys_6081	2>/dev/null
-			#	sudo firewall-cmd --reload
-			fi
+			sudo firewall-cmd --zone=$Zone --permanent --remove-port=4789/udp
+			sudo firewall-cmd --zone=$Zone --permanent --remove-interface=vxlan_sys_4789
+			sudo firewall-cmd --zone=$Zone --permanent --remove-protocol=gre
+			sudo firewall-cmd --zone=$Zone --permanent --remove-interface=gre_sys
+			sudo firewall-cmd --reload
 
                 elif [ $TunType = 'gre' ]
                 then
@@ -6207,19 +6273,11 @@ then
                         sudo sed -i '/type=geneve/d' /etc/network/openvswitch/crt_ovs_sw1.sh
                         sudo sed -i '/type=vxlan/d'  /etc/network/openvswitch/crt_ovs_sw1.sh
 
-			if [ $FirewalldBackend -eq 1 ] && [ $LinuxFlavor = 'Oracle' ]
-			then
-				sudo firewall-cmd --permanent --zone=public --add-protocol=gre				2>/dev/null
-				sudo firewall-cmd --permanent --zone=public --add-interface=gre_sys			2>/dev/null
-			#	sudo firewall-cmd --reload
-			fi
-
-			if [ $FirewalldBackend -eq 1 ] && [ $LinuxFlavor = 'Fedora' ]
-			then
-				sudo firewall-cmd --permanent --zone=FedoraServer --add-protocol=gre			2>/dev/null
-				sudo firewall-cmd --permanent --zone=FedoraServer --add-interface=gre_sys		2>/dev/null
-			#	sudo firewall-cmd --reload
-			fi
+			sudo firewall-cmd --zone=$Zone --permanent --remove-port=6081/udp
+			sudo firewall-cmd --zone=$Zone --permanent --remove-interface=genev_sys_6081
+			sudo firewall-cmd --zone=$Zone --permanent --remove-port=4789/udp
+			sudo firewall-cmd --zone=$Zone --permanent --remove-interface=vxlan_sys_4789
+			sudo firewall-cmd --reload
 
                 elif [ $TunType = 'vxlan' ]
                 then
@@ -6228,21 +6286,23 @@ then
                         sudo sed -i '/type=geneve/d' /etc/network/openvswitch/crt_ovs_sw1.sh
                         sudo sed -i '/type=gre/d'    /etc/network/openvswitch/crt_ovs_sw1.sh
 
-			if [ $FirewalldBackend -eq 1 ] && [ $LinuxFlavor = 'Oracle' ]
-			then
-				sudo firewall-cmd --permanent --zone=public --add-port=4789/udp				2>/dev/null
-				sudo firewall-cmd --permanent --zone=public --add-interface=vxlan_sys_4789		2>/dev/null
-			#	sudo firewall-cmd --reload
-			fi
-			
-			if [ $FirewalldBackend -eq 1 ] && [ $LinuxFlavor = 'Fedora' ]
-			then
-				sudo firewall-cmd --permanent --zone=FedoraServer --add-port=4789/udp			2>/dev/null
-				sudo firewall-cmd --permanent --zone=FedoraServer --add-interface=vxlan_sys_4789	2>/dev/null
-			#	sudo firewall-cmd --reload
-			fi
+			sudo firewall-cmd --zone=$Zone --permanent --remove-protocol=gre
+			sudo firewall-cmd --zone=$Zone --permanent --remove-interface=gre_sys
+			sudo firewall-cmd --zone=$Zone --permanent --remove-port=4789/udp
+			sudo firewall-cmd --zone=$Zone --permanent --remove-interface=vxlan_sys_4789
+			sudo firewall-cmd --reload
                 fi
 
+		echo ''
+		echo "=============================================="
+		echo "Done: Close firewall to unused tunnel types.  "
+		echo "=============================================="
+		echo ''
+
+		sleep 5
+
+		clear
+	
                 echo ''
                 echo "=============================================="
                 echo "Show local GRE endpoint...                    "
@@ -6264,45 +6324,55 @@ then
 
                 if   [ $TunType = 'geneve' ]
                 then
-                        sudo sed -i '/type=gre/d'               		/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
-			sudo sed -i '/add-protocol=gre/d'			/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh	
-			sudo sed -i '/gre_sys/d'	        		/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh	
-                        sudo sed -i '/type=vxlan/d'             		/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
-			sudo sed -i '/add-port=4789/d'	        		/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh	
-			sudo sed -i '/vxlan_sys_4789/d'	        		/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
+			sudo sed -i '/type=gre/d'                               /etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
+			sudo sed -i '/type=vxlan/d'                             /etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
+			sudo sed -i '/port=6081/d'	        		/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh	
+			sudo sed -i '/interface=genev_sys_6081/d'		/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh	
 
 			if [ $LinuxFlavor = 'Fedora' ]
 			then
 				sudo sed -i 's/zone=public/zone=FedoraServer/g' /etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
+			fi	
+
+			if [ $LinuxFlavor = 'Red' ]
+			then
+				sudo sed -i 's/zone=public/zone=trusted/g' 	/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
 			fi	
 
                 elif [ $TunType = 'gre' ]
                 then
-                        sudo sed -i '/type=vxlan/d'             		/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
-			sudo sed -i '/add-port=4789/d'	        		/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh	
-			sudo sed -i '/vxlan_sys_4789/d'	        		/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh	
-                        sudo sed -i '/type=geneve/d'            		/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
-			sudo sed -i '/add-port=6081/d'	        		/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh	
-			sudo sed -i '/genev_sys_6081/d'	        		/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh	
+                        sudo sed -i '/type=geneve/d'            	/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
+			sudo sed -i '/type=vxlan/d'                             /etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
+			sudo sed -i '/protocol=gre/d'			/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh	
+			sudo sed -i '/interface=gre_sys/d'		/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh	
 
 			if [ $LinuxFlavor = 'Fedora' ]
 			then
 				sudo sed -i 's/zone=public/zone=FedoraServer/g' /etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
+			fi	
+
+			if [ $LinuxFlavor = 'Red' ]
+			then
+				sudo sed -i 's/zone=public/zone=trusted/g' 	/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
 			fi	
 
                 elif [ $TunType = 'vxlan' ]
                 then
-                        sudo sed -i '/type=gre/d'               		/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
-			sudo sed -i '/add-protocol=gre/d'			/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh	
-			sudo sed -i '/gre_sys/d'	        		/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh	
                         sudo sed -i '/type=geneve/d'            		/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
-			sudo sed -i '/add-port=6081/d'	        		/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh	
-			sudo sed -i '/genev_sys_6081/d'	        		/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh	
+                        sudo sed -i '/type=gre/d'               		/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
+			sudo sed -i '/port=4789/d'	        		/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh	
+			sudo sed -i '/interface=vxlan_sys_4789/d'	        		/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh	
 
 			if [ $LinuxFlavor = 'Fedora' ]
 			then
 				sudo sed -i 's/zone=public/zone=FedoraServer/g' /etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
 			fi	
+
+			if [ $LinuxFlavor = 'Red' ]
+			then
+				sudo sed -i 's/zone=public/zone=trusted/g' 	/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
+			fi	
+
                 fi
 
 		sudo chmod 777 /etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
@@ -6493,8 +6563,8 @@ then
 		sudo ln -s /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
 	#	sudo ls -l /etc/resolv.conf
 	#	sudo cat   /etc/resolv.conf
-		sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" 	    /etc/dhcp/dhclient.conf
-		sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /etc/dhcp/dhclient.conf
+		sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" 	    /etc/dhcp/dhclient.conf.orabuntu
+		sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /etc/dhcp/dhclient.conf.orabuntu
 	#	sudo cat /etc/dhcp/dhclient.conf
 	fi
 	
@@ -6538,7 +6608,7 @@ NetworkManagerRunning=$(CheckNetworkManagerRunning)
 
 # sleep 10
 
-if [ $SystemdResolvedInstalled -eq 0 ]
+if [ $SystemdResolvedInstalled -eq 0 ] && [ $RedHatVersion -ne 29 ]
 then
 	if [ $GRE = 'Y' ] || [ $MultiHostVar2 = 'N' ]
 	then

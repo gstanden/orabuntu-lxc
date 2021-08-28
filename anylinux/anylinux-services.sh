@@ -31,7 +31,12 @@
 #    If the domain is an actual domain, you will need to change the subnet using the subnets feature of Orabuntu-LXC
 #    See CONFIG file for user-settable configuration variables.
 
-sudo sed -i '$!N; /^\(.*\)\n\1$/!P; D'  /etc/resolv.conf
+MultiHost=$1
+
+function GetGREValue {
+	echo $MultiHost | cut -f10 -d':'
+}
+GREValue=$(GetGREValue)
 
 function GetDistDir {
 	pwd | rev | cut -f2-20 -d'/' | rev
@@ -47,6 +52,8 @@ function GetOwner {
 	id | cut -f1 -d' ' | cut -f2 -d'(' | cut -f1 -d')'
 }
 Owner=$(GetOwner)
+
+sudo sed -i '$!N; /^\(.*\)\n\1$/!P; D'  /etc/resolv.conf
 
 # GLS 20180112
 # User-settable subnets added
@@ -245,7 +252,69 @@ then
 	Release=0
 fi
 
-sudo test -f /etc/firewalld/firewalld.conf 
+# Check if firewalld.conf file exists.
+
+function GetFwd1 {
+	sudo find / -name firewalld.conf 2>/dev/null | wc -l
+}
+Fwd1=$(GetFwd1)
+
+# Get FirewallBackend [ iptables | nftables ]
+
+if [ $Fwd1 -gt 0 ]
+then
+	function GetFwdConfFilename {
+		sudo find / -name firewalld.conf 2>/dev/null
+	}
+	FwdConfFilename=$(GetFwdConfFilename)
+
+	function GetFwdBackend {
+		sudo grep FirewallBackend $FwdConfFilename | grep FirewallBackend | grep -v '#' | cut -f2 -d'='
+	}
+	FwdBackend=$(GetFwdBackend)
+fi
+
+# Check if firewalld package is installed.
+
+if [ $LinuxFlavor = 'Red' ] || [ $LinuxFlavor = 'CentOS' ] || [ $LinuxFlavor = 'Oracle' ] || [ $LinuxFlavor = 'Fedora' ]
+then
+	echo ''
+	echo "==============================================" 
+	echo "Install libvirt ...                           "
+	echo "=============================================="
+	echo ''
+
+	sudo yum -y install libvirt
+
+	echo ''
+	echo "==============================================" 
+	echo "Done: Install libvirt                         "
+	echo "=============================================="
+	echo ''
+
+	sleep 5
+
+	clear
+
+	function GetFwd2 {
+		sudo rpm -qa | grep -c firewalld
+	}
+
+elif [ $LinuxFlavor = 'Ubuntu' ]
+then
+	function GetFwd2 {
+		sudo dpkg -l | grep -c firewalld
+	}
+fi
+Fwd2=$(GetFwd2)
+
+# Check if firewalld service is running.
+
+function GetFwd3 {
+	sudo firewall-cmd --state 2>/dev/null | grep -i 'running'
+}
+Fwd3=$(GetFwd3)
+
 if [ $? -eq 0 ]
 then
 	function GetFirewalldBackend {
@@ -256,15 +325,19 @@ else
 	FirewalldBackend=0
 fi
 
-if [ $FirewalldBackend = 1 ]
+if [ $Fwd1 -ge 1 ] && [ $Fwd2 -ge 1 ] && [ $Fwd3 = 'running' ]
 then
 	if   [ $LinuxFlavor = 'Fedora' ]
 	then
 		Zone=FedoraServer
 
-	elif [ $LinuxFlavor = 'Oracle' ]
+	elif [ $LinuxFlavor = 'Oracle' ] || [ $LinuxFlavor = 'CentOS' ]
 	then
 		Zone=public
+
+	elif [ $LinuxFlavor = 'Red' ]
+	then
+		Zone=trusted
 	fi
 
 	echo ''
@@ -273,25 +346,31 @@ then
 	echo "=============================================="
 	echo ''
 
-	sudo firewall-cmd --zone=$Zone --add-service=dhcp        		--permanent
-	sudo firewall-cmd --zone=$Zone --add-service=dns         		--permanent 
-	sudo firewall-cmd --zone=$Zone --add-service=https       		--permanent 
-	sudo firewall-cmd --zone=$Zone --add-port=587/tcp --add-port=8443/tcp	--permanent
-	sudo firewall-cmd --zone=$Zone --add-port=6081/udp			--permanent
-	sudo firewall-cmd --zone=$Zone --add-protocol=gre			--permanent
-	sudo firewall-cmd --zone=$Zone --add-interface=gre_sys			--permanent
-	sudo firewall-cmd --zone=$Zone --add-interface=genev_sys_6081		--permanent
-	sudo firewall-cmd --zone=$Zone --add-port=4789/udp 			--permanent
-	sudo firewall-cmd --zone=$Zone --add-interface=vxlan_sys_4789		--permanent
-	sudo firewall-cmd --zone=$Zone --add-interface=sw1       		--permanent
-	sudo firewall-cmd --zone=$Zone --add-interface=sw1a      		--permanent
-	sudo firewall-cmd --zone=$Zone --add-interface=sx1       		--permanent
-	sudo firewall-cmd --zone=$Zone --add-interface=sx1a      		--permanent
-	sudo firewall-cmd --zone=$Zone --add-interface=lxcbr0      		--permanent
-	sudo firewall-cmd --zone=$Zone --add-interface=lxdbr0      		--permanent
- 	sudo firewall-cmd --zone=$Zone --add-port=1024-65000/udp 		--permanent
- 	sudo firewall-cmd --zone=$Zone --add-port=1024-65000/tcp 		--permanent
-	sudo firewall-cmd --zone=$Zone --add-masquerade          		--permanent	
+ 	sudo firewall-cmd --zone=$Zone --permanent --add-service=dhcp
+ 	sudo firewall-cmd --zone=$Zone --permanent --add-service=dns
+ 	sudo firewall-cmd --zone=$Zone --permanent --add-service=https 
+ 	sudo firewall-cmd --zone=$Zone --permanent --add-port=587/tcp
+ 	sudo firewall-cmd --zone=$Zone --permanent --add-port=443/tcp
+
+	sudo firewall-cmd --zone=$Zone --permanent --add-protocol=gre
+ 	sudo firewall-cmd --zone=$Zone --permanent --add-interface=gre_sys
+	sudo firewall-cmd --zone=$Zone --permanent --add-port=6081/udp
+	sudo firewall-cmd --zone=$Zone --permanent --add-interface=genev_sys_6081
+ 	sudo firewall-cmd --zone=$Zone --permanent --add-port=4789/udp
+ 	sudo firewall-cmd --zone=$Zone --permanent --add-interface=vxlan_sys_4789
+
+	sudo firewall-cmd --zone=$Zone --permanent --add-interface=sw1
+	sudo firewall-cmd --zone=$Zone --permanent --add-interface=sw1a
+	sudo firewall-cmd --zone=$Zone --permanent --add-interface=sx1
+	sudo firewall-cmd --zone=$Zone --permanent --add-interface=sx1a
+	sudo firewall-cmd --zone=$Zone --permanent --add-interface=lxcbr0
+	sudo firewall-cmd --zone=$Zone --permanent --add-interface=lxdbr0
+
+#	GLS 20210827 Opens up all ports.  Useful for debugging.  Not recommended for production.
+#	sudo firewall-cmd --zone=$Zone --permanent --add-port=1024-65000/udp
+#	sudo firewall-cmd --zone=$Zone --permanent --add-port=1024-65000/tcp
+
+	sudo firewall-cmd --zone=$Zone --permanent --add-masquerade
 	sudo firewall-cmd --reload
 	sudo firewall-cmd --list-services
 	sudo firewall-cmd --get-active-zones
@@ -487,32 +566,6 @@ then
 fi
 
 ' Commented Out End ---------------------------------------------------
-
-if [ $LinuxFlavor = 'CentOS' ] && [ $Release -ge 7 ]
-then
-	sleep 5
-
-	clear
-
-	echo ''
-	echo "==============================================" 
-	echo "Set firewalld on $LinuxFlavor $Release...     "
-	echo "=============================================="
-	echo ''
-
-	sudo firewall-cmd --zone=public  --add-masquerade --permanent
-	sudo firewall-cmd --reload
-	
-	echo ''
-	echo "==============================================" 
-	echo "Done: Set firewalld on $LinuxFlavor $Release. "
-	echo "=============================================="
-	echo ''
-
-	sleep 5
-
-	clear
-fi
 
 cp -p GNU3 "$DistDir"/"$SubDirName"/archives/.
 cp -p GNU3 "$DistDir"/"$SubDirName"/.
@@ -711,48 +764,11 @@ then
 	fi
 fi
 
-if [ $LinuxFlavor != 'Ubuntu' ] && [ $LinuxFlavor != 'Pop_OS' ]
+if [ $LinuxFlavor = 'Oracle' ] && [ $Release -eq 7 ]
 then
-	echo ''
-	echo "==============================================" 
-	echo "Install libvirt ...                           "
-	echo "=============================================="
-	echo ''
-
-	sleep 5
-
-	if [ $LinuxFlavor = 'Oracle' ] && [ $Release -eq 7 ]
-	then
-		sudo yum -y remove   unbound-libs-1.6.6-5* > /dev/null 2>&1
-		sudo yum -y install  unbound-libs-1.6.6-1* > /dev/null 2>&1
-		sudo yum -y install unbound-devel-1.6.6-1* > /dev/null 2>&1
-	fi
-
-	# if [ $LinuxFlavor = 'Oracle' ] && [ $Release -eq 8 ]
-	# then
-		sudo yum -y install tar
-	#	sudo firewall-cmd --zone=public --permanent --add-port=1024-65000/udp
-	#	sudo firewall-cmd --zone=public --permanent --add-port=1024-65000/tcp
-	#	sudo firewall-cmd --zone=public --permanent --add-masquerade 
-
-	#	sudo sed -i "s/FirewallBackend=nftables/FirewallBackend=iptables/g" /etc/firewalld/firewalld.conf
-	#	sudo systemctl restart firewalld.service
-	#	sleep 5
-	#	sudo firewall-cmd --runtime-to-permanent
-	#	sudo service firewalld stop
-	#	sudo service firewalld start
-	# fi
-	
-	sudo yum -y install libvirt
-
-	echo ''
-	echo "==============================================" 
-	echo "Done: Install libvirt ...                     "
-	echo "=============================================="
-
-	sleep 5
-
-	clear
+	sudo yum -y remove  unbound-libs-1.6.6-5*  > /dev/null 2>&1
+	sudo yum -y install unbound-libs-1.6.6-1*  > /dev/null 2>&1
+	sudo yum -y install unbound-devel-1.6.6-1* > /dev/null 2>&1
 fi
 
 echo ''
@@ -784,7 +800,9 @@ fi
 	fi
 
 	# -------------------------------------------------------------
-	# GLS 20210220 MUST use Oracle Linux 8 Container with cgroupv2
+	# GLS 20210220              MUST use Oracle Linux 8 Container with cgroupv2
+	# GLS 20210313 Reconfirmed: MUST use Oracle Linux 8 Container with cgroupv2
+	# GLS 20210818 Reference:   https://discuss.linuxcontainers.org/t/centos-7-containers-dont-get-an-ipv4-address/11287/5
 
 	if [ $LinuxFlavor = 'Fedora' ] && [ $RedHatVersion -ge 31 ]
 	then
@@ -882,7 +900,8 @@ fi
 # pgroup2 end
 # user-settable parameters group 2 end
 
-MultiHost=$1
+# MultiHost=$1
+
 if [ -z $1 ]
 then
 	# First Orabuntu-LXC host (physical or virtual):
@@ -983,13 +1002,19 @@ echo 'MultiHost                 = '$MultiHost
 
 	if [ -z $9 ] && [ $LinuxFlavor = 'Fedora' ]
 	then
-		if   [ $RedHatVersion -ge 19 ] && [ $RedHatVersion -le 27 ]
+		if     [ $RedHatVersion -ge 19 ] && [ $RedHatVersion -le 21 ]
 		then
 			LxcOvsVersion="2.0.9:2.5.4"   # Do NOT change 2.0.9 version of LXC here.  Must use 2.0.9 for now.
 
-		elif [ $RedHatVersion -ge 28 ]
+		elif   [ $RedHatVersion -ge 22 ] && [ $RedHatVersion -le 28 ]
 		then
-			LxcOvsVersion="4.0.5:2.15.0"  # Do NOT change 4.0.5 version of LXC here.  Must use 4.0.5 for now.
+			LxcOvsVersion="3.0.4:2.12.1"  # Do NOT change 3.0.4 version of LXC here.  Must use 3.0.4 for now.
+
+		elif [ $RedHatVersion -ge 29 ]
+		then
+		#	LxcOvsVersion="4.0.10:2.16.0" # GLS Most recent versions LXC/OVS as of 20210820
+		#	LxcOvsVersion="4.0.10:2.10.0" # GLS Default Fedora 29 openvswitch strongly recommended.  Latest LXC.
+			LxcOvsVersion="3.0.4:2.10.0"  # GLS Default Fedora 29 repo default versions (fastest install)
 		fi
 	fi
 
@@ -1006,11 +1031,6 @@ elif [ $LinuxFlavor = 'Ubuntu' ]
 then
 	echo 'LxcOvsVersion             = Latest Canonical Repository Version (via apt-get)'
 fi
-
-function GetGREValue {
-	echo $MultiHost | cut -f10 -d':'
-}
-GREValue=$(GetGREValue)
 
 echo 'GRE                       = '$GREValue
 
@@ -1315,7 +1335,7 @@ fi
 
 if [ $LinuxFlavor != 'Ubuntu' ] && [ $LinuxFlavor != 'Pop_OS' ]
 then
-	echo 'RPM libvirt installed     = '`rpm -qa | grep libvirt-[0123456] | grep -v client`
+	echo 'RPM libvirt installed     = '`rpm -qa | grep libvirt-[01234567] | grep -v client`
 fi
 
 if [ -z $TunType ]

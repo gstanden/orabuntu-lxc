@@ -149,7 +149,7 @@ function GetMultiHostVar16 {
         echo $MultiHost | cut -f16 -d':'
 }
 MultiHostVar16=$(GetMultiHostVar16)
-StorageDriver=$MultiHostVar16
+LXDStorageDriver=$MultiHostVar16
 
 function GetMultiHostVar17 {
         echo $MultiHost | cut -f17 -d':'

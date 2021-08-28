@@ -270,7 +270,6 @@ if [ "$NetworkUp" -ne 0 ]
 then
         echo ''
         echo "=============================================="
-        echo "Networking is not up or is hiccuping badly:   "
         echo "yum.oracle.com ping test must succeed.        "
         echo "=============================================="
 
@@ -320,12 +319,8 @@ then
         elif [ $MultiHostVar1 = 'new' ]
         then
                 echo "=============================================="
-                echo "Networking is not up or is hiccuping badly:   "
                 echo "yum.oracle.com ping test must succeed.        "
-                echo "Exiting script...                             "
-                echo "Address network issues/hiccups & rerun script."
                 echo "=============================================="
-                exit
         fi
 else
 	if [ $Release -gt 6 ] && [ $LinuxFlavor = 'Oracle' ]

@@ -150,6 +150,11 @@ function GetMultiHostVar20 {
 MultiHostVar20=$(GetMultiHostVar20)
 TunType=$MultiHostVar20
 
+function CheckCgroupType {
+        ls /sys/fs/cgroup | egrep 'memory|cpuset' | grep -cv '\.'
+}
+CgroupType=$(CheckCgroupType)
+
 GetLinuxFlavors(){
 if   [[ -e /etc/oracle-release ]]
 then
@@ -422,7 +427,7 @@ then
 	fi
 
         function GetSeedContainerName {
-		echo "/var/lib/snapd/snap/bin/lxc list | grep oel$OracleRelease | sort -d | cut -f2 -d' ' | sed 's/^[ \t]*//;s/[ \t]*$//' | tail -1" | sg lxd 2>/dev/null 
+		echo "/var/lib/snapd/snap/bin/lxc list | grep oel$OracleRelease | sort -d | cut -f2 -d' ' | sed 's/^[ \t]*//;s/[ \t]*$//' | tail -1" | sg lxd  
         }
         SeedContainerName=$(GetSeedContainerName)
 fi
@@ -439,7 +444,7 @@ then
 
 elif [ $LXD = 'Y' ]
 then
-        echo "/var/lib/snapd/snap/bin/lxc list" | sg lxd 2>/dev/null 
+        echo "/var/lib/snapd/snap/bin/lxc list" | sg lxd  
 fi
 
 echo ''
@@ -468,7 +473,7 @@ then
 
 elif [ $LXD = 'Y' ]
 then
-        echo "/var/lib/snapd/snap/bin/lxc exec $SeedContainerName -- uname -a" | sg lxd 2>/dev/null 
+        echo "/var/lib/snapd/snap/bin/lxc exec $SeedContainerName -- uname -a" | sg lxd  
 fi
 
 echo ''
@@ -483,7 +488,7 @@ clear
 
 echo ''
 echo "=============================================="
-echo "Configure $SeedContainerName... (this)        "
+echo "Configure $SeedContainerName...               "
 echo "=============================================="
 echo ''
 
@@ -495,10 +500,10 @@ then
 
 elif [ $LXD = 'Y' ]
 then
-#	echo "/var/lib/snapd/snap/bin/lxc exec $SeedContainerName -- usermod --password `perl -e "print crypt('root','root');"` root" | sg lxd 2>/dev/null 
-#	echo "/var/lib/snapd/snap/bin/lxc exec $SeedContainerName -- yum -y install openssh-server net-tools" | sg lxd 2>/dev/null 
-#	echo "/var/lib/snapd/snap/bin/lxc exec $SeedContainerName -- service sshd restart" | sg lxd 2>/dev/null 
-	echo "/var/lib/snapd/snap/bin/lxc exec $SeedContainerName -- rpm -qa | egrep 'openssh-server|net-tools'" | sg lxd 2>/dev/null 
+#	echo "/var/lib/snapd/snap/bin/lxc exec $SeedContainerName -- usermod --password `perl -e "print crypt('root','root');"` root" | sg lxd  
+#	echo "/var/lib/snapd/snap/bin/lxc exec $SeedContainerName -- yum -y install openssh-server net-tools" | sg lxd  
+#	echo "/var/lib/snapd/snap/bin/lxc exec $SeedContainerName -- service sshd restart" | sg lxd  
+	echo "/var/lib/snapd/snap/bin/lxc exec $SeedContainerName -- rpm -qa | egrep 'openssh-server|net-tools'" | sg lxd  
 fi
 
 echo ''

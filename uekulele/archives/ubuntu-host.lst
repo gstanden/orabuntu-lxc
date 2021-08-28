@@ -18,7 +18,7 @@
 /etc/systemd/resolved.conf
 /etc/resolv.dnsmasq
 /etc/dnsmasq.conf
-/etc/dhcp/dhclient.conf
 /etc/orabuntu-lxc-scripts/start_containers.sh
+/etc/dhcp/dhclient.conf.orabuntu
 /etc/GNU3
 /etc/COPYING

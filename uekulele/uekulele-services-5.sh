@@ -194,6 +194,11 @@ fi
 }
 GetLinuxFlavors
 
+function CheckCgroupType {
+        ls /sys/fs/cgroup | egrep 'memory|cpuset' | grep -cv '\.'
+}
+CgroupType=$(CheckCgroupType)
+
 function TrimLinuxFlavors {
 echo $LinuxFlavors | sed 's/^[ \t]//;s/[ \t]$//'
 }
@@ -493,7 +498,7 @@ then
 	echo ''
 
         sudo touch /etc/orabuntu-lxc-release
-        sudo sh -c "echo 'Orabuntu-LXC v7.0.0-beta AMIDE' > /etc/orabuntu-lxc-release"
+        sudo sh -c "echo 'Orabuntu-LXC v7.0.0-alpha AMIDE' > /etc/orabuntu-lxc-release"
 	sudo ls -l /etc/orabuntu-lxc-release
 	echo ''
 	sudo cat /etc/orabuntu-lxc-release
@@ -887,8 +892,8 @@ then
                 echo "=============================================="
                 echo ''
 
-                ssh-keygen -R 10.207.39.2
-                ssh-keygen -R $NameServer
+                ssh-keygen -R 10.207.39.2 2>/dev/null
+                ssh-keygen -R $NameServer 2>/dev/null
                 sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ubuntu@10.207.39.2 "sudo -S <<< "ubuntu" echo $HOSTNAME > ~/new_gre_host.txt"
 
                 echo ''
@@ -1128,7 +1133,7 @@ then
 	if [ $LXD = 'Y' ]
 	then
                 function GetLXDContainerNames {
-                        echo "/var/lib/snapd/snap/bin/lxc list --columns n --format csv | grep -v oel | sed 's/$/ /g' | tr -d '\n' |  sed 's/[ \t]*$//'" | sg lxd 2>/dev/null 
+                        echo "/var/lib/snapd/snap/bin/lxc list --columns n --format csv | grep -v oel | sed 's/$/ /g' | tr -d '\n' |  sed 's/[ \t]*$//'" | sg lxd  
                 }
                 LXDContainerNames=$(GetLXDContainerNames)
 
@@ -1138,7 +1143,7 @@ then
                 echo "=============================================="
                 echo ''
 
-                echo "/var/lib/snapd/snap/bin/lxc list" | sg lxd 2>/dev/null 
+                echo "/var/lib/snapd/snap/bin/lxc list" | sg lxd  
 
                 sleep 5
 
@@ -1194,7 +1199,7 @@ then
                 echo "=============================================="
                 echo ''
 
-                echo "/var/lib/snapd/snap/bin/lxc list" | sg lxd 2>/dev/null 
+                echo "/var/lib/snapd/snap/bin/lxc list" | sg lxd  
 
                 echo ''
                 echo "=============================================="
@@ -1308,10 +1313,10 @@ then
 	echo "so that the newgrp lxd takes effect and is    "
 	echo "applied to profile.                           "
 	echo "=============================================="
-	echo ''
 
 	if [ $LinuxFlavor = 'Fedora' ] && [ $RedHatVersion -ge 33 ]
 	then
+		echo ''
 		echo "==================================================================================="
 		echo "On $LinuxFlavor $RedHatVersion the WARNING:                                        "
 		echo "                                                                                   "

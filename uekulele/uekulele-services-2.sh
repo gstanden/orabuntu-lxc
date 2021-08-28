@@ -170,6 +170,11 @@ function GetMultiHostVar20 {
 MultiHostVar20=$(GetMultiHostVar20)
 TunType=$MultiHostVar20
 
+function CheckCgroupType {
+	ls /sys/fs/cgroup | egrep 'memory|cpuset' | grep -cv '\.'
+}
+CgroupType=$(CheckCgroupType)
+
 GetLinuxFlavors(){
 if   [[ -e /etc/oracle-release ]]
 then
@@ -304,7 +309,7 @@ then
 	if [ $LinuxFlavor = 'Fedora' ] && [ $Release -eq 8 ]
 	then
 		function CheckDNSLookup {
-			timeout 5 getent hosts oel$OracleRelease$SeedPostfix
+			timeout 5 nslookup oel$OracleRelease$SeedPostfix $NameServer
 		}
 		DNSLookup=$(CheckDNSLookup)
 		DNSLookup=`echo $?`
@@ -349,7 +354,7 @@ then
 		if [ $LinuxFlavor = 'Fedora' ] && [ $Release -eq 8 ]
 		then
 			function CheckHighestSeedIndexHit {
-				timeout 5 getent hosts oel$OracleRelease$SeedPostfix
+				timeout 5 nslookup oel$OracleRelease$SeedPostfix
 			}
 			HighestSeedIndexHit=$(CheckHighestSeedIndexHit)
 			HighestSeedIndexHit=`echo $?`
@@ -416,25 +421,25 @@ sleep 5
 
 clear
 
-if [ $LinuxFlavor = 'Fedora' ]
-then
-	echo ''
-	echo "=============================================="
-	echo "Install lxc-templates ($LinuxFlavor)...       "
-	echo "=============================================="
-	echo ''
+# if [ $LinuxFlavor = 'Fedora' ]
+# then
+# 	echo ''
+# 	echo "=============================================="
+# 	echo "Install lxc-templates ($LinuxFlavor)...       "
+# 	echo "=============================================="
+# 	echo ''
 
-	sudo yum -y install lxc-templates
+# 	sudo yum -y install lxc-templates
 
-	echo ''
-	echo "=============================================="
-	echo "Done: Install lxc-templates ($LinuxFlavor).   "
-	echo "=============================================="
+# 	echo ''
+# 	echo "=============================================="
+# 	echo "Done: Install lxc-templates ($LinuxFlavor).   "
+# 	echo "=============================================="
 
-	sleep 5
+# 	sleep 5
 
-	clear
-fi
+# 	clear
+# fi
 
 if [ $LinuxFlavor = 'CentOS' ]
 then
@@ -483,11 +488,22 @@ clear
 # }
 # ContainerCreated=$(ConfirmContainerCreated)
 
-echo ''
-echo "=============================================="
-echo "   Create the LXC Oracle Linux container      "
-echo "=============================================="
-echo ''
+if   [ $LXD = 'N' ]
+then
+	echo ''
+	echo "=============================================="
+	echo "   Create the LXC Oracle Linux container      "
+	echo "=============================================="
+	echo ''
+
+elif [ $LXD = 'Y' ]
+then
+	echo ''
+	echo "=============================================="
+	echo "   Create the LXD Oracle Linux container      "
+	echo "=============================================="
+	echo ''
+fi
 
 sleep 5
 
@@ -651,7 +667,7 @@ fi
 
 if [ $LXDCluster = 'Y' ] && [ $LXD = 'Y' ] && [ $Release -ge 7 ]
 then
-	if [ $LinuxFlavor = 'Oracle' ] || [ $LinuxFlavor = 'Fedora' ]
+	if [ $LinuxFlavor = 'Oracle' ] || [ $LinuxFlavor = 'Fedora' ] || [ $LinuxFlavor = 'CentOS' ] || [ $LinuxFlavor = 'Red' ]
 	then
 		echo ''
 		echo "=============================================="
@@ -685,30 +701,46 @@ then
 
 	#	clear
 
-		echo ''
-		echo "=============================================="
-		echo "Install EPEL ...                              "
-		echo "=============================================="
-		echo ''
-
 		if   [ $LinuxFlavor = 'Oracle' ]
 		then
+			echo ''
+			echo "=============================================="
+			echo "Install EPEL ...                              "
+			echo "=============================================="
+			echo ''
+
 			sudo yum install epel-release
+
+			echo ''
+			echo "=============================================="
+			echo "Done: Install EPEL.                           "
+			echo "=============================================="
+			echo ''
+
+			sleep 5
+
+			clear
 
 		elif [ $LinuxFlavor = 'Fedora' ] && [ $Release -ge 8 ]
 		then
+			echo ''
+			echo "=============================================="
+			echo "Install EPEL ...                              "
+			echo "=============================================="
+			echo ''
+
 			echo 'EPEL not needed for Fedora LXD deployment.'
+			
+			echo ''
+			echo "=============================================="
+			echo "Done: Install EPEL.                           "
+			echo "=============================================="
+			echo ''
+		
+			sleep 5
+
+			clear
 		fi	
-
-		echo ''
-		echo "=============================================="
-		echo "Done: Install EPEL.                           "
-		echo "=============================================="
-		echo ''
-
-		sleep 5
-
-		clear
 
 		echo ''
 		echo "=============================================="
@@ -716,7 +748,13 @@ then
 		echo "=============================================="
 		echo ''
 
-		sudo yum -y install snapd
+		if [ $LinuxFlavor = 'Fedora' ]
+		then
+			sudo dnf -y install snapd
+		else
+			sudo yum -y install snapd
+		fi
+
 		echo ''
 		sudo systemctl enable --now snapd.socket
 		sudo ln -s /var/lib/snapd/snap /snap >/dev/null 2>&1
@@ -877,114 +915,28 @@ then
 
 	echo ''
 	echo "=============================================="
-	echo "Download Image (wait...)                      "
-	echo "=============================================="
-	echo ''
-
-	echo 'Downloading LXD image ... (can take up to 2-3 minutes...status will update every 20 seconds.)'
-	echo ''
-
-	function GetDateFormat {
-	        date +"%m/%d/%Y %H:%M:%S"
-	}
-	DATE=$(GetDateFormat)
-	DATE_START=$DATE
-
-	ImageDownload=1
-	while [ $ImageDownload -ne 0 ]
-	do 
-	       	echo "nohup /var/lib/snapd/snap/bin/lxc image copy images:oracle/$MajorRelease local: --alias=oracle/$MajorRelease < /dev/null > /dev/null 2>&1 &" | sg lxd 2>/dev/null 
-		ImageDownload=`echo $?`
-	#	echo $ImageDownload
-	done
-
-	function GetImageDownloadStatus {
-	        echo "/var/lib/snapd/snap/bin/lxc image list | grep -c oracle/$MajorRelease" | sg lxd 2>/dev/null
-	}
-	ImageDownloadStatus=$(GetImageDownloadStatus)
-
-	function GetStatusBit {
-	        sudo find /var/snap/lxd/common/lxd/images -type f -newermt "$DATE_START" -size +0c | sudo xargs ls -l | grep rootfs | wc -l
-	}
-	StatusBit=$(GetStatusBit)
-
-	n=0 m=0
-	while [ $ImageDownloadStatus -eq 0 ]
-	do
-	        if   [ $StatusBit -eq 0 ] && [ $m -le 25 ]
-	        then
-	                echo "Image Download is still queueing up at $DATE"
-			m=$((m+1))
-
-	        elif [ $StatusBit -eq 1 ] && [ $m -le 25 ]
-	        then
-	                if [ $n -eq 0 ]
-	                then
-	                        echo ''
-	                        echo "Downloading..."
-	                        echo ''
-	                        n=$((n+1))
-	                fi
-	                sudo find /var/snap/lxd/common/lxd/images -type f -newermt "$DATE_START" -size +0c | sudo xargs ls -l | grep rootfs
-		elif [ $m -gt 25 ]
-		then
-			echo 'Image Download will be done at LXD Seed Container creation step.'
-			echo 'Exiting Image Download.'
-	        fi
-
-	        sleep 20
-
-	        ImageDownloadStatus=$(GetImageDownloadStatus)
-	        DATE=$(GetDateFormat)
-	        StatusBit=$(GetStatusBit)
-	done
-
-	echo ''
-	echo 'List LXD Images'
-	echo ''
-
-	echo "/var/lib/snapd/snap/bin/lxc image list" | sg lxd 2>/dev/null 
-
-	echo ''
-	echo "=============================================="
-	echo "Done: Download Image (wait...)                "
-	echo "=============================================="
-	echo ''
-
-	sleep 5
-
-	clear
-
-	echo ''
-	echo "=============================================="
-	echo "Create LXD Profile olxc_sx1a...               "
-	echo "=============================================="
-	echo ''
-
-	echo "/var/lib/snapd/snap/bin/lxc profile create olxc_sx1a" | sg lxd 2>/dev/null 
-	echo "cat /etc/network/openvswitch/olxc_sx1a | /var/lib/snapd/snap/bin/lxc profile edit olxc_sx1a" | sg lxd 2>/dev/null 
-	echo "/var/lib/snapd/snap/bin/lxc profile device add olxc_sx1a root disk path=/ pool=local" | sg lxd 2>/dev/null 
-	echo "/var/lib/snapd/snap/bin/lxc profile show olxc_sx1a" | sg lxd 2>/dev/null 
-        #     /var/lib/snapd/snap/bin/lxc config device add oel$OracleRelease$SeedPostfix eth0 nic nictype=bridged parent=sw1a name=eth0
-	sudo ls -l /etc/network/openvswitch/olxc_sx1a
-
-	echo ''
-	echo "=============================================="
-	echo "Done: Create LXD Profile olxc_sx1a...         "
-	echo "=============================================="
-	echo ''
-
-	sleep 5
-
-	clear
-
-	echo ''
-	echo "=============================================="
 	echo "Launch Oracle LXD Seed Container...           "
 	echo "=============================================="
 	echo ''
+	echo "=============================================="
+	echo "(takes a minute or two ... patience) ...      "
+	echo "=============================================="
+	echo ''
+        if [ $LinuxFlavor = 'Fedora' ] && [ $RedHatVersion -ge 33 ]
+        then
+                echo "==================================================================================="
+                echo "On $LinuxFlavor $RedHatVersion the WARNING:                                        "
+                echo "                                                                                   "
+                echo "WARNING: cgroup v2 is not fully supported yet, proceeding with partial confinement."
+                echo "                                                                                   "
+                echo "can be safely IGNORED. This is a snapd issue not an LXD issue. More info here:     "
+                echo "                                                                                   "
+                echo "     https://discuss.linuxcontainers.org/t/lxd-cgroup-v2-support/10455             "
+                echo "==================================================================================="
+        fi
 
-	echo "/var/lib/snapd/snap/bin/lxc launch -p olxc_sx1a images:oracle/$MajorRelease/amd64 oel$OracleRelease$SeedPostfix" | sg lxd 2>/dev/null 
+
+	echo "/var/lib/snapd/snap/bin/lxc launch -p olxc_sx1a images:oracle/$MajorRelease/amd64 oel$OracleRelease$SeedPostfix" | sg lxd
 
 	echo ''
 	echo "=============================================="
@@ -996,50 +948,49 @@ then
 
 	clear
 
-	echo ''
-	echo "=============================================="
-	echo "Run hostnamectl in Container...               "
-	echo "=============================================="
-	echo ''
-
 	if [ $MajorRelease -ge 8 ]
 	then
-	       	echo "/var/lib/snapd/snap/bin/lxc exec oel$OracleRelease$SeedPostfix -- hostnamectl set-hostname oel$OracleRelease$SeedPostfix" | sg lxd 2>/dev/null 
+		echo ''
+		echo "=============================================="
+		echo "Run hostnamectl in Container...               "
+		echo "=============================================="
+		echo ''
 
-		# GLS 2021-07-19 Workaround for Oracle 8 using privileged container option.
+	       	echo "/var/lib/snapd/snap/bin/lxc exec oel$OracleRelease$SeedPostfix -- hostnamectl set-hostname oel$OracleRelease$SeedPostfix" | sg lxd  
+
+		# GLS 2021-07-19 Workaround for Oracle 8 using privileged container option so that containers will get DHCP ip addresses successfully.
 		# GLS 2021-07-19 See https://discuss.linuxcontainers.org/t/centos8-containers-unable-to-automatically-get-ipv4-addresses-after-update/11273/22 for more information.
 
-		if [ $MajorRelease -eq 8 ] && [ $LinuxFlavor = 'Oracle' ]
+		if [ $MajorRelease -eq 8 ]
 		then
-       			echo "/var/lib/snapd/snap/bin/lxc config set oel$OracleRelease$SeedPostfix security.privileged true" | sg lxd 2>/dev/null 
+       			echo "/var/lib/snapd/snap/bin/lxc config set oel$OracleRelease$SeedPostfix security.privileged true" | sg lxd  
 		fi
 	fi
         
-	echo "/var/lib/snapd/snap/bin/lxc stop   oel$OracleRelease$SeedPostfix" | sg lxd 2>/dev/null 
+	echo "/var/lib/snapd/snap/bin/lxc stop   oel$OracleRelease$SeedPostfix" | sg lxd  
 	sleep 5
-	echo "/var/lib/snapd/snap/bin/lxc start  oel$OracleRelease$SeedPostfix" | sg lxd 2>/dev/null 
-	sleep 20
+	echo "/var/lib/snapd/snap/bin/lxc start  oel$OracleRelease$SeedPostfix" | sg lxd  
+	sleep 5
 
-	nslookup oel$OracleRelease$SeedPostfix
-	if [ $? -ne 0 ]
-	then
-		sleep 20
-	fi
-	
-	echo "/var/lib/snapd/snap/bin/lxc exec   oel$OracleRelease$SeedPostfix -- usermod --password `perl -e "print crypt('root','root');"` root" | sg lxd 2>/dev/null 
-	echo "/var/lib/snapd/snap/bin/lxc exec   oel$OracleRelease$SeedPostfix -- yum -y install openssh-server net-tools" | sg lxd 2>/dev/null 
-	echo "/var/lib/snapd/snap/bin/lxc exec   oel$OracleRelease$SeedPostfix -- service sshd restart" | sg lxd 2>/dev/null 
-	echo "/var/lib/snapd/snap/bin/lxc exec   oel$OracleRelease$SeedPostfix -- hostnamectl" | sg lxd 2>/dev/null 
-
-	if [ $MajorRelease -ge 8 ]
-	then
-	       	echo "/var/lib/snapd/snap/bin/lxc stop  oel$OracleRelease$SeedPostfix" | sg lxd 2>/dev/null 
-	       	echo "/var/lib/snapd/snap/bin/lxc start oel$OracleRelease$SeedPostfix" | sg lxd 2>/dev/null 
-	fi
-
-	echo '' 
+	echo ''
 	echo "=============================================="
-	echo "Done: Run hostnamectl in Container.           "
+	echo "Display Seed Container uname -a ...           "
+	echo "=============================================="
+	echo ''
+
+	Status=1
+	n=1
+        while [ $Status -ne 0 ] && [ $n -le 10 ]
+	do
+        	echo "/var/lib/snapd/snap/bin/lxc exec oel$OracleRelease$SeedPostfix -- uname -a" | sg lxd 
+		Status=`echo $?`
+                n=$((n+1))
+		sleep 5
+        done
+
+	echo ''
+	echo "=============================================="
+	echo "Done: Display Seed Container uname -a         "
 	echo "=============================================="
 	echo ''
 
@@ -1049,11 +1000,145 @@ then
 
 	echo ''
 	echo "=============================================="
+	echo "Set root password in Seed Container...        "
+	echo "=============================================="
+	echo ''
+
+	Status=1
+	n=1
+	while [ $Status -ne 0 ] && [ $n -le 10 ]
+	do
+		echo "/var/lib/snapd/snap/bin/lxc exec oel$OracleRelease$SeedPostfix -- usermod --password `perl -e "print crypt('root','root');"` root" | sg lxd 
+		Status=`echo $?`
+                n=$((n+1))
+	done
+	
+	sleep 5
+
+	clear
+
+	echo ''
+	echo "=============================================="
+	echo "Done: Set root password in Seed Container.    "
+	echo "=============================================="
+	echo ''
+
+	sleep 5
+
+	clear
+
+        echo ''
+        echo "=============================================="
+        echo "Install Packages in Seed Container...         "
+        echo "=============================================="
+        echo ''
+
+        Status=1
+        n=1
+        while [ $Status -ne 0 ] && [ $n -le 10 ]
+        do
+                echo "/var/lib/snapd/snap/bin/lxc exec oel$OracleRelease$SeedPostfix -- yum install -y openssh-server net-tools" | sg lxd 
+                Status=`echo $?`
+                n=$((n+1))
+		sleep 5
+        done
+
+	echo ''
+
+        Status=1
+        n=1
+        while [ $Status -ne 0 ] && [ $n -le 10 ]
+        do
+                echo "/var/lib/snapd/snap/bin/lxc exec oel$OracleRelease$SeedPostfix -- bash -c 'yes | yum install openssh-server net-tools'" | sg lxd 
+                Status=`echo $?`
+                n=$((n+1))
+		sleep 5
+        done
+
+	echo ''
+	echo "=============================================="
+	echo "Done: Install Packages in Seed Container.     "
+	echo "=============================================="
+	echo ''
+
+	sleep 5
+
+	clear
+
+	echo ''
+	echo "=============================================="
+	echo "Restart SSHD in Seed Container...             "
+	echo "=============================================="
+	echo ''
+
+	Status=1
+        n=1
+	while [ $Status -ne 0 ] && [ $n -le 10 ]
+	do
+		echo "/var/lib/snapd/snap/bin/lxc exec oel$OracleRelease$SeedPostfix -- service sshd restart" | sg lxd 
+		Status=`echo $?`
+                n=$((n+1))
+	done
+
+	echo ''
+	echo "=============================================="
+	echo "Done: Restart SSHD in Seed Container.         "
+	echo "=============================================="
+	echo ''
+
+	sleep 5
+
+	clear
+
+	if [ $MajorRelease -ge 8 ]
+	then
+		echo ''
+		echo "=============================================="
+		echo "Display hostnamectl in Seed Container...      "
+		echo "=============================================="
+		echo ''
+
+		echo "/var/lib/snapd/snap/bin/lxc exec oel$OracleRelease$SeedPostfix -- hostnamectl" | sg lxd 
+
+		echo ''
+		echo "=============================================="
+		echo "Done: Display hostnamectl in Seed Container..."
+		echo "=============================================="
+		echo ''
+
+		sleep 5
+
+		clear
+	fi
+
+	if [ $MajorRelease -ge 7 ]
+	then
+	       	echo "/var/lib/snapd/snap/bin/lxc stop  oel$OracleRelease$SeedPostfix" | sg lxd   
+	       	echo "/var/lib/snapd/snap/bin/lxc start oel$OracleRelease$SeedPostfix" | sg lxd   
+	fi
+
+	sleep 5
+	
+	if [ $MajorRelease -ge 8 ]
+	then
+		echo '' 
+		echo "=============================================="
+		echo "Done: Run hostnamectl in Container.           "
+		echo "=============================================="
+		echo ''
+
+		sleep 5
+
+		clear
+	fi
+
+	echo ''
+	echo "=============================================="
 	echo "List LXD Containers...                        "
 	echo "=============================================="
 	echo ''
 
-	echo "/var/lib/snapd/snap/bin/lxc list" | sg lxd 2>/dev/null 
+	echo "/var/lib/snapd/snap/bin/lxc list" | sg lxd  
 
 	echo ''
 	echo "=============================================="

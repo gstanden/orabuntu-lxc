@@ -239,18 +239,28 @@ Docker=$(source "$DistDir"/anylinux/CONFIG; echo $Docker)
 
 LXD=$(source "$DistDir"/anylinux/CONFIG; echo $LXD)
 LXDCluster=$(source "$DistDir"/anylinux/CONFIG; echo $LXDCluster)
-StorageDriver=$(source "$DistDir"/anylinux/CONFIG; echo $StorageDriver)
+LXDStorageDriver=$(source "$DistDir"/anylinux/CONFIG; echo $LXDStorageDriver)
+
+# GLS 20210818 Support for snapd starts with Fedora 24
+# GLS 20210818 Orabuntu-LXC supports LXD and LXD Clusters starting with Fedora 24
+# GLS 20210818 Reference: https://www.omgubuntu.co.uk/2017/04/use-snap-fedora
+
+if [ $LinuxFlavor = 'Fedora' ] && [ $RedHatVersion -le 28 ]
+then
+	LXD='N'
+	LXDCluster='N'
+fi
 
 if [ $LXDCluster = 'N' ]
 then
 	PreSeed=N
 fi
 
-if   [ $LinuxFlavor = 'Ubuntu' ] || [ $LinuxFlavor = 'Oracle' ] || [ $LinuxFlavor = 'Fedora' ]
+if   [ $LinuxFlavor = 'Ubuntu' ] || [ $LinuxFlavor = 'Oracle' ] || [ $LinuxFlavor = 'Fedora' ] || [ $LinuxFlavor = 'CentOS' ] || [ $LinuxFlavor = 'Red' ]
 then
 	if [ $UbuntuMajorVersion -ge 20 ] || [ $Release -ge 7 ]
 	then
-		if [ $LXDCluster = 'Y' ] && [ $StorageDriver = 'zfs' ]
+		if [ $LXDCluster = 'Y' ] && [ $LXDStorageDriver = 'zfs' ]
 		then
 			echo ''
 			echo "=============================================="
@@ -262,14 +272,14 @@ then
 			PreSeed=Y
        		 	BtrfsLun=Unused
 			StoragePoolName=olxc-001
-			StorageDriver=zfs
+			LXDStorageDriver=zfs
 
-			echo 'LXDCluster    = '$LXDCluster
-			echo 'PreSeed       = '$PreSeed
-			echo 'LXD           = '$LXD
-			echo 'StorageDriver = '$StorageDriver
-			echo 'StoragePool   = '$StoragePoolName
-			echo 'BtrfsLun      = '$BtrfsLun
+			echo 'LXDCluster       = '$LXDCluster
+			echo 'PreSeed          = '$PreSeed
+			echo 'LXD              = '$LXD
+			echo 'LXDStorageDriver = '$LXDStorageDriver
+			echo 'StoragePool      = '$StoragePoolName
+			echo 'BtrfsLun         = '$BtrfsLun
 
 			echo ''
 			echo "=============================================="
@@ -315,20 +325,20 @@ then
 			PreSeed=Unused
        		 	BtrfsLun=Unused
 			StoragePoolName=Unused
-			StorageDriver=Unused
+			LXDStorageDriver=Unused
 		fi
 	fi
 fi
 
 # if [ $LinuxFlavor = 'Oracle' ] && [ $Release -eq 8 ]
 # then
-# 	if [ $LXDCluster = 'Y' ] && [ $StorageDriver = 'btrfs' ]
+# 	if [ $LXDCluster = 'Y' ] && [ $LXDStorageDriver = 'btrfs' ]
 # 	then
 # 		LXD=Y
 #        	PreSeed=Y
 #       	BtrfsLun=$(source "$DistDir"/anylinux/CONFIG; echo $BtrfsLun)
 # 		StoragePoolName=Unused
-# 		StorageDriver=Unused
+# 		LXDStorageDriver=Unused
 
 #        	echo ''
 #       	echo "=============================================="
@@ -349,7 +359,7 @@ fi
 # 		PreSeed=Unused
 #        	BtrfsLun=Unused
 # 		StoragePoolName=Unused
-# 		StorageDriver=Unused
+# 		LXDStorageDriver=Unused
 # 	fi
 # fi
 
@@ -456,7 +466,7 @@ then
 	fi
 
 else
-	MultiHost="$Operation:N:1:X:X:X:$MTU:X:X:$GRE:$Product:$LXD:$K8S:$PreSeed:$LXDCluster:$StorageDriver:$StoragePoolName:$BtrfsLun:$Docker:$TunType"
+	MultiHost="$Operation:N:1:X:X:X:$MTU:X:X:$GRE:$Product:$LXD:$K8S:$PreSeed:$LXDCluster:$LXDStorageDriver:$StoragePoolName:$BtrfsLun:$Docker:$TunType"
 fi
 
 ./anylinux-services.sh $MultiHost 

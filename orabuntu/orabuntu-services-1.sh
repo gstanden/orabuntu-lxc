@@ -146,7 +146,7 @@ function GetMultiHostVar16 {
         echo $MultiHost | cut -f16 -d':'
 }
 MultiHostVar16=$(GetMultiHostVar16)
-StorageDriver=$MultiHostVar16
+LXDStorageDriver=$MultiHostVar16
 
 function GetMultiHostVar17 {
         echo $MultiHost | cut -f17 -d':'
@@ -2168,7 +2168,7 @@ then
                 then
                         sudo sed -i "s/SWITCH_IP/$Sw1Index/g"                                                   /etc/network/openvswitch/preseed.sw1a.olxc.001.lxd.cluster
                         sudo sed -i "s/HOSTNAME/$ShortHostName/g"                                               /etc/network/openvswitch/preseed.sw1a.olxc.001.lxd.cluster
-                        sudo sed -i "s/STORAGE-DRIVER/$StorageDriver/g"                                         /etc/network/openvswitch/preseed.sw1a.olxc.001.lxd.cluster
+                        sudo sed -i "s/STORAGE-DRIVER/$LXDStorageDriver/g"                                      /etc/network/openvswitch/preseed.sw1a.olxc.001.lxd.cluster
                         sudo sed -i "s/POOL/$StoragePoolName/g"                                                 /etc/network/openvswitch/preseed.sw1a.olxc.001.lxd.cluster
 
                 elif [ $GRE = 'Y' ]
@@ -2197,7 +2197,7 @@ then
 
                         sudo sed -i "s/SWITCH_IP/$Sw1Index/g"                                                   /etc/network/openvswitch/preseed.sw1a.olxc.002.lxd.cluster
                         sudo sed -i "s/HOSTNAME/$ShortHostName/g"                                               /etc/network/openvswitch/preseed.sw1a.olxc.002.lxd.cluster
-                        sudo sed -i "s/STORAGE-DRIVER/$StorageDriver/g"                                         /etc/network/openvswitch/preseed.sw1a.olxc.002.lxd.cluster
+                        sudo sed -i "s/STORAGE-DRIVER/$LXDStorageDriver/g"                                      /etc/network/openvswitch/preseed.sw1a.olxc.002.lxd.cluster
                         sudo sed -i "s/POOL/$StoragePoolName/g"                                                 /etc/network/openvswitch/preseed.sw1a.olxc.002.lxd.cluster
                         sudo sed -i -e '/-----BEGIN/,/-----END/!b' -e '/-----END/!d;r /tmp/cert.txt' -e 'd'     /etc/network/openvswitch/preseed.sw1a.olxc.002.lxd.cluster
 			sudo dos2unix										/etc/network/openvswitch/preseed.sw1a.olxc.002.lxd.cluster
