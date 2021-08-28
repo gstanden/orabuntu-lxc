@@ -1,4 +1,4 @@
-# Orabuntu-LXC Version 7 Елена (Yelena) Edition ?
+# Orabuntu-LXC Version 7 "Елена" (Yelena) Edition 
 
 Orabuntu-LXC Version 7 "Елена" Edition is named after my beloved wife who passed away on March 4, 2020.  She strongly supported the Orabuntu-LXC project over many years.  This release of Orabuntu-LXC is named in her honor, for without her support, there would never have been an Orabuntu-LXC. The Russian cyrillic alphabet spelling of her name "Елена" is pronounced in English as "Yelena" and that is the name of the major release version 7 of Orabuntu-LXC.
 
