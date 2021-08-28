@@ -8,11 +8,14 @@ The version 6 software had codename "AMIDE" suffixed to each point release.  The
 
 About New Release Logo:
 
-You may also notice that although the project is still called "Orabuntu-LXC" there is a new logo "Orabuntu-**LXD**" now on my github for the upcoming Orabuntu-LXC Version 7 major release.  The project is NOT going to be renamed to Orabuntu-LXD because it is already many years well-known by Orabuntu-LXC, but in order to draw attention to the single biggest feature of the ELENA release, it was decided to have the logo say "Orabuntu-**LXD**. And that is the big feature in the ELENA release: support for fully-automated deployment of LXD clusters on all of our supported distros (Oracle Linux, Fedora, CentOS, RedHat, and Ubuntu). There are a couple of other major features, which are (1) support for cgroupv2 and (s) support for nftables (for systems that have firewalld installed).
+You may also notice that although the project is still called "Orabuntu-LXC" there is a new logo "Orabuntu-**LXD**" now on my github for the upcoming Orabuntu-LXC ELENA release.  The project is NOT going to be renamed to Orabuntu-LXD because it is already many years well-known by Orabuntu-LXC, but in order to draw attention to the single biggest feature of the ELENA release, it was decided to have the logo say "Orabuntu-**LXD**. And that is the big feature in the ELENA release: support for fully-automated deployment of LXD clusters on all supported distros (Oracle Linux, Fedora, CentOS, RedHat, and Ubuntu). 
 
-Orabuntu-LXC Version 6 AMIDE Edition stands for "**A**mazon **M**ult-**I**-host LX**D D**ocker **E**nterprise" Edition
+About Other New Features:
 
-The 6.13.25.x-beta AMIDE point releases preview the main new features of Orabuntu-LXC "DC/AC" Edition.
+* Support for cgroupv2 
+* Support for nftables (via firewalld) 
+
+The 6.13.25.x-beta AMIDE point releases preview the main new features of Orabuntu-LXC ELENA Edition.
 
 * Fully-automated deployment of 2-node LXD clusters on VLANs on OpenvSwitch networks on Oracle Linux 7 and 8, and Ubuntu 20.04.
 * User-selectable tunnel-type for multi-host deployments {GRE|geneve|vxlan }.
