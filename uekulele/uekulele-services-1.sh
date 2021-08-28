@@ -6248,7 +6248,7 @@ then
 		echo "=============================================="
 		echo ''
 	
-		if [ $LinuxFlavor = 'Red' ]
+		if [ $LinuxFlavor = 'Red' ] || [ $LinuxFlavor = 'Fedora' ] || [ $LinuxFlavor = 'Oracle' ] || [ $LinuxFlavor = 'CentOS' ]
 		then
 			Zone=trusted
 		fi

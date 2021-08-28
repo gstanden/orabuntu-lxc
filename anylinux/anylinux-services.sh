@@ -327,13 +327,17 @@ fi
 
 if [ $Fwd1 -ge 1 ] && [ $Fwd2 -ge 1 ] && [ $Fwd3 = 'running' ]
 then
-	if   [ $LinuxFlavor = 'Fedora' ]
+	if   [ $LinuxFlavor = 'CentOS' ]
 	then
-		Zone=FedoraServer
+		Zone=trusted
 
-	elif [ $LinuxFlavor = 'Oracle' ] || [ $LinuxFlavor = 'CentOS' ]
+	elif [ $LinuxFlavor = 'Fedora' ]
 	then
-		Zone=public
+		Zone=trusted
+
+	elif [ $LinuxFlavor = 'Oracle' ]
+	then
+		Zone=trusted
 
 	elif [ $LinuxFlavor = 'Red' ]
 	then

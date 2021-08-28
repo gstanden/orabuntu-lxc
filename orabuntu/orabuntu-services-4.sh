@@ -403,29 +403,6 @@ sleep 5
 
 clear
 
-if [ $LXD = 'Y' ]
-then
-	echo ''
-	echo "=============================================="
-	echo "Create olxc_sw1a LXD Profile ...              "
-	echo "=============================================="
-	echo ''
-
-	lxc profile create olxc_sw1a
-	cat /etc/network/openvswitch/olxc_sw1a | lxc profile edit olxc_sw1a
-	lxc profile device add olxc_sw1a root disk path=/ pool=local
-
-	echo ''
-	echo "=============================================="
-	echo "Done: Create olxc_sw1a LXD Profile.           "
-	echo "=============================================="
-	echo ''
-
-	sleep 5
-
-	clear
-fi
-
 echo ''
 echo "=============================================="
 echo "Clone $SeedContainerName to $NumCon containers"
@@ -947,9 +924,19 @@ sleep 5
 
 clear
 
+if [ $LXD = 'Y' ]
+then
+        echo "/var/lib/snapd/snap/bin/lxc start $SeedContainerName" | sg lxd
+fi
+
+if [ $LXD = 'N' ]
+then
+        sudo lxc-start -n $SeedContainerName
+fi
+
 echo ''
 echo "=============================================="
-echo "Next script to run: orabuntu-services-5.sh    "
+echo "Next script to run: uekulele-services-5.sh    "
 echo "=============================================="
 
 sleep 5
