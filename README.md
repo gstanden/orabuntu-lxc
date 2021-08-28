@@ -2,7 +2,9 @@
 
 Orabuntu-LXC Version 7 "Елена" Edition is named after my beloved wife who passed away on March 4, 2020.  She strongly supported the Orabuntu-LXC project over many years.  This release of Orabuntu-LXC is named in her honor, for without her support, there would never have been an Orabuntu-LXC. The Russian cyrillic alphabet spelling of her name "Елена" is pronounced in English as "Yelena" and that is the name of the major release version 7 of Orabuntu-LXC.
 
-Some nomeclature; The version 6 software released have had the codename "AMIDE" suffixed to each point release.  The version 7 software to be released will be suffixed with the five-letter codename "ELENA" which was one of her most popular nicknames among her friends.  This will be in keeping with the five-letter codename suffix for each major version starting with AMIDE version 6.
+Some nomeclature:
+
+The version 6 software released have had the codename "AMIDE" suffixed to each point release.  The version 7 software to be released will be suffixed with the five-letter codename "ELENA" which was one of her most popular nicknames among her friends.  This will be in keeping with the five-letter codename suffix for each major version starting with AMIDE version 6.
 
 You may also notice that although the project is still called "Orabuntu-LXC" there is a new logo for the upcoming Orabuntu-LXC Version 7 major release.  The big feature in Version 7 is support for fully-automated deployment of LXD clusters on all of our supported distros (Oracle Linux, Fedora, CentOS, RedHat, and Ubuntu). There are a couple of other major features, which are (1) support for cgroupv2 and (s) support for nftables (for systems that have firewalld installed).
 
