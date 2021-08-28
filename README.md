@@ -8,7 +8,7 @@ The version 6 software had codename "AMIDE" suffixed to each point release.  The
 
 About New Release Logo:
 
-You may also notice that although the project is still called "Orabuntu-LXC" there is a new logo "Orabuntu-**LXD**" now on my github for the upcoming Orabuntu-LXC ELENA release.  The project is NOT going to be renamed to Orabuntu-LXD because it is already many years well-known as Orabuntu-LXC, but in order to draw attention to the single biggest feature of the ELENA release, it was decided to have the logo say **Orabuntu-LXD**. And that is the big feature in the ELENA release: support for fully-automated deployment of LXD clusters on all supported distros (Oracle Linux, Fedora, CentOS, RedHat, and Ubuntu). 
+You may also notice that although the project is still called "Orabuntu-LXC" there is a new logo "Orabuntu-**LXD**" now on my github for the upcoming Orabuntu-LXC ELENA release.  The project is NOT going to be renamed to Orabuntu-LXD because it is already many years well-known as Orabuntu-LXC, but in order to draw attention to the single biggest feature of the ELENA release, it was decided to have the logo say **Orabuntu-LXD**. And that is the big feature in the ELENA release: support for fully-automated deployment of LXD clusters on all supported distros (Oracle Linux, Fedora, CentOS, RedHat, and Ubuntu). And "fully-automated" means that Orabuntu-LXC ELENA starts with a fresh vanilla server, and with the launch of a single script, the "push of a single button" builds a complete container infrastructure.  More details below.
 
 About Other New Features:
 
