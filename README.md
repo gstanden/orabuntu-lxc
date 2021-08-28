@@ -1,6 +1,8 @@
 # What is Orabuntu-LXC Version 7 Елена (Yelena) Edition ?
 
-Orabuntu-LXC Version 7 DC/AC Edition stands for "LX**D C**lusters/**A**MIDE LX**C**" Edition to be released soon.
+Orabuntu-LXC Version 7 Елена Edition is named after my beloved wife who passed away on March 4, 2020.  She strongly supported the Orabuntu-LXC project.  This release of Orabuntu-LXC is named in her honor, for without her support, there would never have been an Orabuntu-LXC. The Russian cyrillic alphabet spelling of her name "Елена" is pronounced in English as "Yelena" and that is the name of the major release version 7 of Orabuntu-LXC.
+
+You may also notice that although the project is still called "Orabuntu-LXC" the logo now has "Orabuntu-LXD" and that is because the software now gives you the option to build N-node LXD Clusters across multiple hosts, or you can instead use the original LXC deployment mode which allows to span two LXC container networks across multiple hosts (so the LXC multi-host option is a network span across multiple hosts, but is not a true "cluster", whereas the LXD is true clusters.
 
 Orabuntu-LXC Version 6 AMIDE Edition stands for "**A**mazon **M**ult-**I**-host LX**D D**ocker **E**nterprise" Edition
 
