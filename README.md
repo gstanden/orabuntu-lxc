@@ -14,7 +14,8 @@ About Other Major New Features:
 
 * Support for cgroupv2 
 * Support for nftables (via firewalld) 
-* Support for ZFS Pools including a new directory "zfsutils" and full-automation ZFS Pool create scripts for each distro.  Just bring your LUNs.
+* Support for ZFS Pools including a new directory "zfsutil" and a subdirectory for each distro
+* Full-automation ZFS Pool create scripts for each distro.  Just bring your LUNs.
 * OvsVethCleanup.timer systemd service to remove orphaned system-generated veth ports off the OpenvSwitches every 5 minutes.
 
 The 6.13.25.x-beta AMIDE point releases preview the main new features of Orabuntu-LXC ELENA Edition.
