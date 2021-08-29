@@ -271,7 +271,7 @@ then
 			LXD=Y
 			PreSeed=Y
        		 	BtrfsLun=Unused
-			StoragePoolName=olxc-001
+			StoragePoolName=$(source "$DistDir"/anylinux/CONFIG; echo $LXDStoragePoolName)
 			LXDStorageDriver=zfs
 
 			echo 'LXDCluster       = '$LXDCluster

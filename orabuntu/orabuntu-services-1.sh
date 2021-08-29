@@ -2069,38 +2069,68 @@ then
 	sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service systemd-resolved restart > /dev/null 2>&1"
 	sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service lxc-net restart > /dev/null 2>&1"
         
-	Sx1Index=201
-        function CheckHighestSx1IndexHit {
-                sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" lxc-attach -n $NameServerShortName -- getent hosts $Sx1Net.$Sx1Index" | grep -c 'name ='
+        Sx1Index=201
+        function CheckDNSLookup {
+                sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" getent hosts $Sx1Net.$Sx1Index"
         }
-        HighestSx1IndexHit=$(CheckHighestSx1IndexHit)
+        DNSLookup=$(CheckDNSLookup)
+        DNSHit=$?
 
-        while [ $HighestSx1IndexHit = 1 ]
-        do
-                Sx1Index=$((Sx1Index+1))
-                HighestSx1IndexHit=$(CheckHighestSx1IndexHit)
-        done
+        if [ $UbuntuMajorVersion -ge 16 ]
+        then
+                while [ $DNSHit -eq 0 ]
+                do
+                        Sx1Index=$((Sx1Index+1))
+                        DNSLookup=$(CheckDNSLookup)
+                        DNSHit=$?
+                done
+        fi
+        
+	echo ''
+        echo "=============================================="
+        echo "Done: Get sx1 IP address.                     "
+        echo "=============================================="
+        echo ''
 
-        echo ''
-        echo "=============================================="
-        echo "Get sw1 IP address.                           "
-        echo "=============================================="
-        echo ''
+	sleep 5
+
+	clear
 
 	sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service systemd-resolved restart > /dev/null 2>&1"
 	sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service lxc-net restart > /dev/null 2>&1"
         
-        Sw1Index=201
-        function CheckHighestSw1IndexHit {
-                sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" lxc-attach -n $NameServerShortName -- getent hosts $Sw1Net.$Sw1Index" | grep -c 'name ='
-        }
-        HighestSw1IndexHit=$(CheckHighestSw1IndexHit)
+        echo ''
+        echo "=============================================="
+        echo "Get sw1 IP address...                         "
+        echo "=============================================="
+        echo ''
 
-        while [ $HighestSw1IndexHit = 1 ]
-        do
-                Sw1Index=$((Sw1Index+1))
-                HighestSw1IndexHit=$(CheckHighestSw1IndexHit)
-        done
+        Sw1Index=201
+        function CheckDNSLookup {
+                sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" getent hosts $Sw1Net.$Sw1Index"
+        }
+        DNSLookup=$(CheckDNSLookup)
+        DNSHit=$?
+
+        if [ $UbuntuMajorVersion -ge 16 ]
+        then
+                while [ $DNSHit -eq 0 ]
+                do
+                        Sw1Index=$((Sw1Index+1))
+                        DNSLookup=$(CheckDNSLookup)
+                        DNSHit=$?
+                done
+        fi
+        
+	echo ''
+        echo "=============================================="
+        echo "Done: Get sw1 IP address.                     "
+        echo "=============================================="
+        echo ''
+
+	sleep 5
+
+	clear
 
 elif [ $MultiHostVar3 = 'X' ] && [ $MultiHostVar2 = 'Y' ] && [ $GRE = 'N' ]
 then
