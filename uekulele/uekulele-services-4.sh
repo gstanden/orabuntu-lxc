@@ -151,6 +151,13 @@ function CheckCgroupType {
 }
 CgroupType=$(CheckCgroupType)
 
+if [ $CgroupType -eq 0 ]
+then
+        CGROUPV2_SUFFIX='2>/dev/null'
+else
+        CGROUPV2_SUFFIX=''
+fi
+
 GetLinuxFlavors(){
 if   [[ -e /etc/oracle-release ]]
 then
@@ -310,7 +317,7 @@ then
 elif [ $LXD = 'Y' ]
 then
         function GetSeedContainerName {
-                echo "/var/lib/snapd/snap/bin/lxc list | grep oel$OracleRelease | sort -d | cut -f2 -d' ' | sed 's/^[ \t]*//;s/[ \t]*$//' | tail -1" | sg lxd 
+                echo "/var/lib/snapd/snap/bin/lxc list | grep oel$OracleRelease | sort -d | cut -f2 -d' ' | sed 's/^[ \t]*//;s/[ \t]*$//' | tail -1" | sg lxd $CGROUPV2_SUFFIX
         }
         SeedContainerName=$(GetSeedContainerName)
 fi
@@ -419,10 +426,10 @@ then
 elif [ $LXD = 'Y' ]
 then
         function CheckContainerUp {
-                echo "/var/lib/snapd/snap/bin/lxc list | grep $SeedContainerName | sed 's/  */ /g' | egrep 'RUNNING|STOPPED' | cut -f4 -d' ' | sed 's/^[ \t]*//;s/[ \t]*$//'" | sg lxd  
+                echo "/var/lib/snapd/snap/bin/lxc list | grep $SeedContainerName | sed 's/  */ /g' | egrep 'RUNNING|STOPPED' | cut -f4 -d' ' | sed 's/^[ \t]*//;s/[ \t]*$//'" | sg lxd $CGROUPV2_SUFFIX 
         }
         ContainerUp=$(CheckContainerUp)
-        echo "/var/lib/snapd/snap/bin/lxc stop $SeedContainerName --force" | sg lxd  
+        echo "/var/lib/snapd/snap/bin/lxc stop $SeedContainerName --force" | sg lxd $CGROUPV2_SUFFIX 
 fi
 
 while [ "$ContainerUp" = 'RUNNING' ]
@@ -437,7 +444,7 @@ then
 
 elif [ $LXD = 'Y' ]
 then
-        echo "/var/lib/snapd/snap/bin/lxc list" | sg lxd  
+        echo "/var/lib/snapd/snap/bin/lxc list" | sg lxd $CGROUPV2_SUFFIX 
 fi
 
 echo ''
@@ -578,23 +585,23 @@ do
                 echo "=============================================="
                 echo ''
 
-                echo "/var/lib/snapd/snap/bin/lxc copy $SeedContainerName $ContainerPrefixLXD$CloneIndex" | sg lxd  
+                echo "/var/lib/snapd/snap/bin/lxc copy $SeedContainerName $ContainerPrefixLXD$CloneIndex" | sg lxd $CGROUPV2_SUFFIX 
 
 		# GLS 2021-07-19 Workaround for Oracle 8 using privileged container option.
                 # GLS 2021-07-19 See https://discuss.linuxcontainers.org/t/centos8-containers-unable-to-automatically-get-ipv4-addresses-after-update/11273/22 for more information.
 
                 if [ $Release -eq 8 ] && [ $LinuxFlavor = 'Oracle' ]
                 then
-                        echo "/var/lib/snapd/snap/bin/lxc config set oel$OracleRelease$SeedPostfix security.privileged true" | sg lxd  
+                        echo "/var/lib/snapd/snap/bin/lxc config set oel$OracleRelease$SeedPostfix security.privileged true" | sg lxd $CGROUPV2_SUFFIX 
                 fi
                 
 		if [ $Release -eq 8 ] && [ $LinuxFlavor = 'Fedora' ]
                 then
-                        echo "/var/lib/snapd/snap/bin/lxc config set oel$OracleRelease$SeedPostfix security.privileged true" | sg lxd  
+                        echo "/var/lib/snapd/snap/bin/lxc config set oel$OracleRelease$SeedPostfix security.privileged true" | sg lxd $CGROUPV2_SUFFIX 
                 fi
 
 
-                echo "/var/lib/snapd/snap/bin/lxc list $ContainerPrefixLXD$CloneIndex" | sg lxd  
+                echo "/var/lib/snapd/snap/bin/lxc list $ContainerPrefixLXD$CloneIndex" | sg lxd $CGROUPV2_SUFFIX 
 
                 echo ''
                 echo "=============================================="
@@ -773,7 +780,7 @@ do
                 echo "=============================================="
                 echo ''
 
-                echo "/var/lib/snapd/snap/bin/lxc profile assign $ContainerPrefixLXD$CloneIndex olxc_sw1a" | sg lxd  
+                echo "/var/lib/snapd/snap/bin/lxc profile assign $ContainerPrefixLXD$CloneIndex olxc_sw1a" | sg lxd $CGROUPV2_SUFFIX 
 
                 echo ''
                 echo "=============================================="
@@ -789,24 +796,24 @@ do
                 	echo ''
 
         		echo "/var/lib/snapd/snap/bin/lxc file delete $ContainerPrefixLXD$CloneIndex/etc/machine-id"
-                	echo "/var/lib/snapd/snap/bin/lxc file delete $ContainerPrefixLXD$CloneIndex/etc/machine-id" | sg lxd 
+                	echo "/var/lib/snapd/snap/bin/lxc file delete $ContainerPrefixLXD$CloneIndex/etc/machine-id" | sg lxd $CGROUPV2_SUFFIX
 
                 	sleep 5
 
-                	echo "/var/lib/snapd/snap/bin/lxc start $ContainerPrefixLXD$CloneIndex" | sg lxd  
+                	echo "/var/lib/snapd/snap/bin/lxc start $ContainerPrefixLXD$CloneIndex" | sg lxd $CGROUPV2_SUFFIX 
 
                 	sleep 5
 
                 	n=1
                 	while [ $n -ne 0 ]
                 	do
-                        	echo "/var/lib/snapd/snap/bin/lxc exec  $ContainerPrefixLXD$CloneIndex -- systemd-machine-id-setup > /dev/null 2>&1" | sg lxd  
+                        	echo "/var/lib/snapd/snap/bin/lxc exec  $ContainerPrefixLXD$CloneIndex -- systemd-machine-id-setup > /dev/null 2>&1" | sg lxd $CGROUPV2_SUFFIX 
                         	n=`echo $?`
                         	sleep 5
                 	done
 
-                	echo "/var/lib/snapd/snap/bin/lxc stop  $ContainerPrefixLXD$CloneIndex" --force | sg lxd  
-                	echo "/var/lib/snapd/snap/bin/lxc start $ContainerPrefixLXD$CloneIndex" | sg lxd  
+                	echo "/var/lib/snapd/snap/bin/lxc stop  $ContainerPrefixLXD$CloneIndex" --force | sg lxd $CGROUPV2_SUFFIX 
+                	echo "/var/lib/snapd/snap/bin/lxc start $ContainerPrefixLXD$CloneIndex" | sg lxd $CGROUPV2_SUFFIX 
 
                 	echo ''
                 	echo "=============================================="
@@ -821,12 +828,12 @@ do
                 	n=1
                 	while [ $n -ne 0 ]
                 	do
-                        	echo "/var/lib/snapd/snap/bin/lxc exec $ContainerPrefixLXD$CloneIndex -- hostnamectl set-hostname $ContainerPrefixLXD$CloneIndex > /dev/null 2>&1" | sg lxd  
+                        	echo "/var/lib/snapd/snap/bin/lxc exec $ContainerPrefixLXD$CloneIndex -- hostnamectl set-hostname $ContainerPrefixLXD$CloneIndex > /dev/null 2>&1" | sg lxd $CGROUPV2_SUFFIX 
                         	n=`echo $?`
                         	sleep 5
                 	done
 
-                	echo "/var/lib/snapd/snap/bin/lxc exec $ContainerPrefixLXD$CloneIndex -- hostnamectl" | sg lxd  
+                	echo "/var/lib/snapd/snap/bin/lxc exec $ContainerPrefixLXD$CloneIndex -- hostnamectl" | sg lxd $CGROUPV2_SUFFIX 
 
                 	echo ''
                 	echo "=============================================="
@@ -844,9 +851,9 @@ do
                 	echo "=============================================="
                 	echo ''
 
-                	echo "/var/lib/snapd/snap/bin/lxc stop  $ContainerPrefixLXD$CloneIndex" | sg lxd  
-                	echo "/var/lib/snapd/snap/bin/lxc start $ContainerPrefixLXD$CloneIndex" | sg lxd  
-                	echo "/var/lib/snapd/snap/bin/lxc list  $ContainerPrefixLXD$CloneIndex" | sg lxd  
+                	echo "/var/lib/snapd/snap/bin/lxc stop  $ContainerPrefixLXD$CloneIndex" | sg lxd $CGROUPV2_SUFFIX 
+                	echo "/var/lib/snapd/snap/bin/lxc start $ContainerPrefixLXD$CloneIndex" | sg lxd $CGROUPV2_SUFFIX 
+                	echo "/var/lib/snapd/snap/bin/lxc list  $ContainerPrefixLXD$CloneIndex" | sg lxd $CGROUPV2_SUFFIX 
 
                 	echo ''
                 	echo "=============================================="
@@ -858,7 +865,7 @@ do
 
                 	clear
 		else
-                	echo "/var/lib/snapd/snap/bin/lxc start $ContainerPrefixLXD$CloneIndex" | sg lxd  
+                	echo "/var/lib/snapd/snap/bin/lxc start $ContainerPrefixLXD$CloneIndex" | sg lxd $CGROUPV2_SUFFIX 
 		fi
 
                 echo ''
@@ -1079,7 +1086,7 @@ clear
 
 if [ $LXD = 'Y' ]
 then
-	echo "/var/lib/snapd/snap/bin/lxc start $SeedContainerName" | sg lxd 
+	echo "/var/lib/snapd/snap/bin/lxc start $SeedContainerName" | sg lxd $CGROUPV2_SUFFIX
 fi
 
 if [ $LXD = 'N' ]

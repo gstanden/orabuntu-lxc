@@ -2069,6 +2069,27 @@ then
 	sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service systemd-resolved restart > /dev/null 2>&1"
 	sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service lxc-net restart > /dev/null 2>&1"
         
+	Sx1Index=201
+        function CheckHighestSx1IndexHit {
+                sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" lxc-attach -n $NameServerShortName -- getent hosts $Sx1Net.$Sx1Index" | grep -c 'name ='
+        }
+        HighestSx1IndexHit=$(CheckHighestSx1IndexHit)
+
+        while [ $HighestSx1IndexHit = 1 ]
+        do
+                Sx1Index=$((Sx1Index+1))
+                HighestSx1IndexHit=$(CheckHighestSx1IndexHit)
+        done
+
+        echo ''
+        echo "=============================================="
+        echo "Get sw1 IP address.                           "
+        echo "=============================================="
+        echo ''
+
+	sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service systemd-resolved restart > /dev/null 2>&1"
+	sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service lxc-net restart > /dev/null 2>&1"
+       
         Sx1Index=201
         function CheckDNSLookup {
                 sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" getent hosts $Sx1Net.$Sx1Index"
@@ -2085,25 +2106,6 @@ then
                         DNSHit=$?
                 done
         fi
-        
-	echo ''
-        echo "=============================================="
-        echo "Done: Get sx1 IP address.                     "
-        echo "=============================================="
-        echo ''
-
-	sleep 5
-
-	clear
-
-	sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service systemd-resolved restart > /dev/null 2>&1"
-	sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service lxc-net restart > /dev/null 2>&1"
-        
-        echo ''
-        echo "=============================================="
-        echo "Get sw1 IP address...                         "
-        echo "=============================================="
-        echo ''
 
         Sw1Index=201
         function CheckDNSLookup {
@@ -2121,17 +2123,7 @@ then
                         DNSHit=$?
                 done
         fi
-        
-	echo ''
-        echo "=============================================="
-        echo "Done: Get sw1 IP address.                     "
-        echo "=============================================="
-        echo ''
-
-	sleep 5
-
-	clear
-
+	
 elif [ $MultiHostVar3 = 'X' ] && [ $MultiHostVar2 = 'Y' ] && [ $GRE = 'N' ]
 then
         function GetSx1Index {

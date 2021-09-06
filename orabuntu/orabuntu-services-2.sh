@@ -561,11 +561,105 @@ then
 
 	clear
  
+        echo ''
+        echo "=============================================="
+	echo "Download Image (wait...)                      "
+        echo "=============================================="
+        echo ''
+	
+	echo 'Downloading LXD image ... (can take two or three minuutes...status will update every 20 seconds.)'
+        echo ''
+
+	function GetDateFormat {
+		date +"%m/%d/%Y %H:%M:%S"
+	}
+	DATE=$(GetDateFormat)
+	DATE_START=$DATE
+
+	nohup lxc image copy images:oracle/$MajorRelease local: --alias=oracle/$MajorRelease < /dev/null > /dev/null 2>&1 &
+
+        function GetImageDownloadStatus {
+                lxc image list | grep -c oracle/$MajorRelease
+        }
+        ImageDownloadStatus=$(GetImageDownloadStatus)
+
+	function GetStatusBit {
+		sudo find /var/snap/lxd/common/lxd/images -type f -newermt "$DATE_START" -size +0c | sudo xargs ls -l | grep rootfs | wc -l
+	}
+	StatusBit=$(GetStatusBit)
+
+	n=0
+        while [ $ImageDownloadStatus -eq 0 ]
+        do
+		if   [ $StatusBit -eq 0 ]
+		then
+			echo "Image Download is still queueing up at $DATE"
+		elif [ $StatusBit -eq 1 ]
+		then
+			if [ $n -eq 0 ]
+			then
+				echo ''
+				echo "Downloading..."
+				echo ''
+				n=$((n+1))
+			fi
+                	sudo find /var/snap/lxd/common/lxd/images -type f -newermt "$DATE_START" -size +0c | sudo xargs ls -l | grep rootfs
+	 	fi
+
+		sleep 20
+
+                ImageDownloadStatus=$(GetImageDownloadStatus)
+		DATE=$(GetDateFormat)
+		StatusBit=$(GetStatusBit)
+        done
+
+	echo ''
+	echo 'List LXD Images'
+	echo ''
+
+	lxc image list
+	
 	echo ''
         echo "=============================================="
-	echo "Launch LXD Seed Container...(takes a minute)  "
+	echo "Done: Download Image (wait...)                "
         echo "=============================================="
+        echo ''
+
+	sleep 5
+
+	clear
+
 	echo ''
+        echo "=============================================="
+	echo "Create LXD Profile olxc_sx1a...               "
+        echo "=============================================="
+        echo ''
+
+	if [ $MultiHostVar2 = 'N' ]
+	then
+		lxc profile create olxc_sx1a
+		cat /etc/network/openvswitch/olxc_sx1a | lxc profile edit olxc_sx1a
+		lxc profile device add olxc_sx1a root disk path=/ pool=local
+	fi
+
+	lxc profile show olxc_sx1a
+#	lxc config device add oel$OracleRelease$SeedPostfix eth0 nic nictype=bridged parent=sw1a name=eth0
+
+	echo ''
+        echo "=============================================="
+	echo "Done: Create LXD Profile olxc_sx1a...         "
+        echo "=============================================="
+        echo ''
+
+	sleep 5
+
+	clear
+
+	echo ''
+        echo "=============================================="
+	echo "Launch Oracle LXD Seed Container...           "
+        echo "=============================================="
+        echo ''
 
         lxc launch -p olxc_sx1a images:oracle/$MajorRelease/amd64 oel$OracleRelease$SeedPostfix
 

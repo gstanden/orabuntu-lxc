@@ -199,6 +199,13 @@ function CheckCgroupType {
 }
 CgroupType=$(CheckCgroupType)
 
+if [ $CgroupType -eq 0 ]
+then
+        CGROUPV2_SUFFIX='2>/dev/null'
+else
+        CGROUPV2_SUFFIX=''
+fi
+
 function TrimLinuxFlavors {
 echo $LinuxFlavors | sed 's/^[ \t]//;s/[ \t]$//'
 }
@@ -498,7 +505,7 @@ then
 	echo ''
 
         sudo touch /etc/orabuntu-lxc-release
-        sudo sh -c "echo 'Orabuntu-LXC v7.0.0-alpha AMIDE' > /etc/orabuntu-lxc-release"
+        sudo sh -c "echo 'Orabuntu-LXC v7.0.0-beta AMIDE' > /etc/orabuntu-lxc-release"
 	sudo ls -l /etc/orabuntu-lxc-release
 	echo ''
 	sudo cat /etc/orabuntu-lxc-release
@@ -892,8 +899,8 @@ then
                 echo "=============================================="
                 echo ''
 
-                ssh-keygen -R 10.207.39.2 2>/dev/null
-                ssh-keygen -R $NameServer 2>/dev/null
+                ssh-keygen -R 10.207.39.2
+                ssh-keygen -R $NameServer
                 sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ubuntu@10.207.39.2 "sudo -S <<< "ubuntu" echo $HOSTNAME > ~/new_gre_host.txt"
 
                 echo ''
@@ -1133,7 +1140,7 @@ then
 	if [ $LXD = 'Y' ]
 	then
                 function GetLXDContainerNames {
-                        echo "/var/lib/snapd/snap/bin/lxc list --columns n --format csv | grep -v oel | sed 's/$/ /g' | tr -d '\n' |  sed 's/[ \t]*$//'" | sg lxd  
+                        echo "/var/lib/snapd/snap/bin/lxc list --columns n --format csv | grep -v oel | sed 's/$/ /g' | tr -d '\n' |  sed 's/[ \t]*$//'" | sg lxd $CGROUPV2_SUFFIX 
                 }
                 LXDContainerNames=$(GetLXDContainerNames)
 
@@ -1143,7 +1150,7 @@ then
                 echo "=============================================="
                 echo ''
 
-                echo "/var/lib/snapd/snap/bin/lxc list" | sg lxd  
+                echo "/var/lib/snapd/snap/bin/lxc list" | sg lxd $CGROUPV2_SUFFIX 
 
                 sleep 5
 
@@ -1199,7 +1206,7 @@ then
                 echo "=============================================="
                 echo ''
 
-                echo "/var/lib/snapd/snap/bin/lxc list" | sg lxd  
+                echo "/var/lib/snapd/snap/bin/lxc list" | sg lxd $CGROUPV2_SUFFIX 
 
                 echo ''
                 echo "=============================================="

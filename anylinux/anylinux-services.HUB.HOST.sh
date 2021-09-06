@@ -256,7 +256,7 @@ then
 	PreSeed=N
 fi
 
-if   [ $LinuxFlavor = 'Ubuntu' ] || [ $LinuxFlavor = 'Oracle' ] || [ $LinuxFlavor = 'Fedora' ] || [ $LinuxFlavor = 'CentOS' ] || [ $LinuxFlavor = 'Red' ]
+if   [ $LinuxFlavor = 'Ubuntu' ] || [ $LinuxFlavor = 'Oracle' ] || [ $LinuxFlavor = 'Fedora' ]
 then
 	if [ $UbuntuMajorVersion -ge 20 ] || [ $Release -ge 7 ]
 	then

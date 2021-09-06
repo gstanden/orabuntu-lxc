@@ -270,7 +270,7 @@ then
         PreSeed=N
 fi
 
-if   [ $LinuxFlavor = 'Ubuntu' ] || [ $LinuxFlavor = 'Oracle' ] || [ $LinuxFlavor = 'Fedora' ] || [ $LinuxFlavor = 'CentOS' ] || [ $LinuxFlavor = 'Red' ]
+if   [ $LinuxFlavor = 'Ubuntu' ] || [ $LinuxFlavor = 'Oracle' ] || [ $LinuxFlavor = 'Fedora' ]
 then
         if [ $UbuntuMajorVersion -ge 20 ] || [ $Release -ge 7 ]
         then
@@ -515,6 +515,99 @@ then
         sudo chmod 0440 /etc/sudoers.d/orabuntu-lxc
 fi
 
+GetLinuxFlavors(){
+if   [[ -e /etc/oracle-release ]]
+then
+        LinuxFlavors=$(cat /etc/oracle-release | cut -f1 -d' ')
+elif [[ -e /etc/redhat-release ]]
+then
+        LinuxFlavors=$(cat /etc/redhat-release | cut -f1 -d' ')
+elif [[ -e /usr/bin/lsb_release ]]
+then
+        LinuxFlavors=$(lsb_release -d | awk -F ':' '{print $2}' | cut -f1 -d' ')
+elif [[ -e /etc/issue ]]
+then
+        LinuxFlavors=$(cat /etc/issue | cut -f1 -d' ')
+else
+        LinuxFlavors=$(cat /proc/version | cut -f1 -d' ')
+fi
+}
+GetLinuxFlavors
+
+function TrimLinuxFlavors {
+echo $LinuxFlavors | sed 's/^[ \t]//;s/[ \t]$//'
+}
+LinuxFlavor=$(TrimLinuxFlavors)
+
+if   [ $LinuxFlavor = 'Oracle' ]
+then
+        CutIndex=7
+        function GetRedHatVersion {
+                sudo cat /etc/redhat-release | cut -f"$CutIndex" -d' ' | cut -f1 -d'.'
+        }
+        RedHatVersion=$(GetRedHatVersion)
+        function GetOracleDistroRelease {
+                sudo cat /etc/oracle-release | cut -f5 -d' ' | cut -f1 -d'.'
+        }
+        OracleDistroRelease=$(GetOracleDistroRelease)
+        Release=$OracleDistroRelease
+        LF=$LinuxFlavor
+        RL=$Release
+        SubDirName=uekulele
+elif [ $LinuxFlavor = 'Red' ] || [ $LinuxFlavor = 'CentOS' ]
+then
+        if   [ $LinuxFlavor = 'Red' ]
+        then
+                function GetRedHatVersion {
+                        sudo cat /etc/redhat-release | cut -f7 -d' ' | cut -f1 -d'.'
+                }
+        elif [ $LinuxFlavor = 'CentOS' ]
+        then
+                function GetRedHatVersion {
+                        cat /etc/redhat-release | sed 's/ Linux//' | cut -f1 -d'.' | rev | cut -f1 -d' '
+                }
+        fi
+        RedHatVersion=$(GetRedHatVersion)
+        RHV=$RedHatVersion
+        Release=$RedHatVersion
+        LF=$LinuxFlavor
+        RL=$Release
+        SubDirName=uekulele
+elif [ $LinuxFlavor = 'Fedora' ]
+then
+        CutIndex=3
+        function GetRedHatVersion {
+                sudo cat /etc/redhat-release | cut -f"$CutIndex" -d' ' | cut -f1 -d'.'
+        }
+        RedHatVersion=$(GetRedHatVersion)
+        if   [ $RedHatVersion -ge 28 ]
+        then
+                Release=8
+        elif [ $RedHatVersion -ge 19 ] && [ $RedHatVersion -le 27 ]
+        then
+                Release=7
+        elif [ $RedHatVersion -ge 12 ] && [ $RedHatVersion -le 18 ]
+        then
+                Release=6
+        fi
+        LF=$LinuxFlavor
+        RL=$Release
+        SubDirName=uekulele
+elif [ $LinuxFlavor = 'Ubuntu' ]
+then
+        function GetUbuntuVersion {
+                cat /etc/lsb-release | grep DISTRIB_RELEASE | cut -f2 -d'='
+        }
+        UbuntuVersion=$(GetUbuntuVersion)
+        LF=$LinuxFlavor
+        RL=$UbuntuVersion
+        function GetUbuntuMajorVersion {
+                cat /etc/lsb-release | grep DISTRIB_RELEASE | cut -f2 -d'=' | cut -f1 -d'.'
+        }
+        UbuntuMajorVersion=$(GetUbuntuMajorVersion)
+        SubDirName=orabuntu
+fi
+
 if [ $LinuxFlavor != 'Ubuntu' ] && [ $LinuxFlavor != 'Fedora' ]
 then
         echo ''
@@ -612,30 +705,10 @@ then
         			echo "=============================================="
         			echo ''
 
-				if [ $LinuxFlavor = 'Red' ]
-				then
-					echo 'sudo dnf -y  module enable 389-ds'
-					echo ''
-					sudo dnf -y  module enable 389-ds
-					echo ''
-					echo 'sudo subscription-manager repos --enable codeready-builder-for-rhel-8-x86_64-rpms'
-					echo ''
-					sudo subscription-manager repos --enable codeready-builder-for-rhel-8-x86_64-rpms
-					echo ''
-					sudo dnf -y install 389-ds-base
-					sudo dnf -y install 389-ds-base-legacy-tools
-					sudo dnf -y install docbook2X
-					sudo rpm -qa | grep docbook2X
-				fi
-
-				if [ $LinuxFlavor = 'Oracle' ]
-				then
-					sudo yum -y install oracle-epel-release-el8
-					sudo yum -y install yum-utils
-					sudo yum-config-manager --enable ol8_codeready_builder
-					sudo yum-config-manager --enable ol8_addons
-				fi
-
+				sudo yum -y install oracle-epel-release-el8
+				sudo yum -y install yum-utils
+				sudo yum-config-manager --enable ol8_codeready_builder
+				sudo yum-config-manager --enable ol8_addons
 				sudo yum -y install docbook2X
         			
 				echo ''

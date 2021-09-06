@@ -21,7 +21,7 @@
 #    Note that the password is set same as the username.  If you want to use the genpassword utility for a secure password uncomment the line #PASSWORD=$password
 
 OrabuntuAccount=orabuntu
-OA=OrabuntuAccount
+OA=$OrabuntuAccount
 
 genpasswd() {
         local l=$1
@@ -40,3 +40,5 @@ sudo groupadd -g 1000 $OA
 sudo useradd -g $OA -u 1000 -m -p $(openssl passwd -1 ${PASSWORD}) -s /bin/bash -G wheel ${USERNAME}
 sudo mkdir -p  /home/${USERNAME}/Downloads /home/${USERNAME}/Manage-Orabuntu
 sudo chown ${USERNAME}:${USERNAME} /home/${USERNAME}/Downloads /home/${USERNAME}/Manage-Orabuntu
+sudo sh -c "echo '${USERNAME} ALL=(ALL) ALL' > /etc/sudoers.d/${USERNAME}"
+

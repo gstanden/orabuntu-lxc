@@ -1,25 +1,15 @@
-# Orabuntu-LXC Version 7 "Елена" (Yelena) Edition 
+# What is Orabuntu-LXC 6.13.25.x-beta AMIDE ?
 
-Orabuntu-LXC Version 7 "Елена" Edition is named after my beloved wife who passed away on March 4, 2020.  She strongly supported the Orabuntu-LXC project over many years.  This release of Orabuntu-LXC is named in her honor, for without her support, there would never have been an Orabuntu-LXC. The Russian cyrillic alphabet spelling of her name "Елена" is pronounced in English as "Yelena" and that is the name of the major release version 7 of Orabuntu-LXC.
+Orabuntu-LXC v7.0.0-alpha AMIDE Edition (to be released soon) introduces support for fully-automated 2-node LXD cluster creation. Generalization to N-node to be released soon.  These releases in the 6.13.25.x-beta series are v7.0.0-alpha "precursor releases" previewing v7.0.0-alpha new features.
 
-About New Release Codename:
+**AMIDE** still stands for "**A**mazon **M**ult-**I**-host LX**D D**ocker **E**nterprise **E**dition" and in v7.0.0-alpha "LX**D**" has been added to AMI**D**E.
 
-The version 6 software had codename "AMIDE" suffixed to each point release.  The version 7 software to be released will have codename "ELENA" suffixed to each point release. "Elena" was one of her most popular nicknames among her friends. 
+Orabuntu-LXC v7.0.0-alpha AMIDE Edition will be released soon.  The 6.13.25.x-beta AMIDE point releases preview the main new features:
 
-About New Release Logo:
-
-You may also notice that although the project is still called "Orabuntu-LXC" there is a new logo "Orabuntu-**LXD**" now on this github for the upcoming Orabuntu-LXC ELENA release.  The project is NOT going to be renamed to Orabuntu-LXD because it is already many years well-known as Orabuntu-LXC, but in order to draw attention to the single biggest feature of the ELENA release, it was decided to have the logo say **Orabuntu-LXD**. And that is the big feature in the ELENA release: support for fully-automated deployment of LXD clusters on all supported distros (Oracle Linux, Fedora, CentOS, RedHat, and Ubuntu). And "fully-automated" means that Orabuntu-LXC ELENA starts with a fresh vanilla server, and with the launch of a single script, the "push of a single button," builds a complete container infrastructure.  More details below.
-
-About Other Major New Features:
-
-* Support for cgroupv2 
-* Support for nftables (via firewalld) 
-
-The 6.13.25.x-beta AMIDE point releases preview the main new features of Orabuntu-LXC ELENA Edition.
-
-* Fully-automated deployment of 2-node LXD clusters on VLANs on OpenvSwitch networks on all Orabuntu-LXC AMIDE supported distros.
+* Fully-automated deployment of 2-node LXD clusters on VLANs on OpenvSwitch networks on Oracle Linux 7 and 8, and Ubuntu 20.04.
 * User-selectable tunnel-type for multi-host deployments {GRE|geneve|vxlan }.
 * New /anylinux/CONFIG file which centralizes all configuration parameters.
+* Adds support for nftables ("firewall-cmd") for LXD clusters and LXC multi-host "spanned" networks (e.g. on Oracle Linux 8).
 
 Orabuntu-LXC BUILDS EVERYTHING itself for the currently supported distros: 
 
@@ -29,11 +19,7 @@ Orabuntu-LXC BUILDS EVERYTHING itself for the currently supported distros:
 * Fedora 22-33+ (tested on 22 and 33)
 * RedHat 6.x, 7.x, 8.x
 
-About Linux 6 Support:
-
-Linux 6 is still "theoretically" supported by Orabuntu-LXC ELENA edtion but for LXC multi-host spans only (not for LXD clusters).  The word "theoretically" is used because some Linux 6 vendors have ceased providing security updates (desupport) and some may at any time shut down their package repos for their Linux 6 at any time.  Linux 6 distros that have been tested and are still working fine with Orabuntu-LXC include:
-
-* Oracle Linux 6.10
+**Note**:  Linux 6 while still "theoretically" supported, is effectively "de-supported" because the repos for the various Linux 6 "flavors" are no longer provided by the vendors of the specific distros.  If you can point Orabuntu-LXC to your own in-house yum repos for Linux 6, then Oracle Linux 6, CentOS 6, and RedHat 6 should still be supported for Orabuntu-LXC.  So in other words, Linux 6 is effectively no longer supported for most users who rely on vendor repos, as these repos have been shut down for Linux 6 by their respective vendors.
 
 **Orabuntu-LXC installer does all of the following automatically**:
 
