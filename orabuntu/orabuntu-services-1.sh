@@ -2089,41 +2089,19 @@ then
 
 	sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service systemd-resolved restart > /dev/null 2>&1"
 	sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service lxc-net restart > /dev/null 2>&1"
-       
-        Sx1Index=201
-        function CheckDNSLookup {
-                sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" getent hosts $Sx1Net.$Sx1Index"
-        }
-        DNSLookup=$(CheckDNSLookup)
-        DNSHit=$?
-
-        if [ $UbuntuMajorVersion -ge 16 ]
-        then
-                while [ $DNSHit -eq 0 ]
-                do
-                        Sx1Index=$((Sx1Index+1))
-                        DNSLookup=$(CheckDNSLookup)
-                        DNSHit=$?
-                done
-        fi
-
+        
         Sw1Index=201
-        function CheckDNSLookup {
-                sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" getent hosts $Sw1Net.$Sw1Index"
+        function CheckHighestSw1IndexHit {
+                sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" lxc-attach -n $NameServerShortName -- getent hosts $Sw1Net.$Sw1Index" | grep -c 'name ='
         }
-        DNSLookup=$(CheckDNSLookup)
-        DNSHit=$?
+        HighestSw1IndexHit=$(CheckHighestSw1IndexHit)
 
-        if [ $UbuntuMajorVersion -ge 16 ]
-        then
-                while [ $DNSHit -eq 0 ]
-                do
-                        Sw1Index=$((Sw1Index+1))
-                        DNSLookup=$(CheckDNSLookup)
-                        DNSHit=$?
-                done
-        fi
-	
+        while [ $HighestSw1IndexHit = 1 ]
+        do
+                Sw1Index=$((Sw1Index+1))
+                HighestSw1IndexHit=$(CheckHighestSw1IndexHit)
+        done
+
 elif [ $MultiHostVar3 = 'X' ] && [ $MultiHostVar2 = 'Y' ] && [ $GRE = 'N' ]
 then
         function GetSx1Index {

@@ -849,8 +849,8 @@ then
 
 	if [ $Release -le 7 ]
 	then
-		sudo yum -y install debootstrap bash-completion-extras bridge-utils docbook2X lxc >/dev/null 2>&1
-		sudo yum -y install lxc libcap-devel libcgroup wget bridge-utils  >/dev/null 2>&1
+		sudo yum -y install debootstrap bash-completion-extras bridge-utils docbook2X lxc
+		sudo yum -y install lxc libcap-devel libcgroup wget bridge-utils 
 	fi
 
 	if   [ $Release -eq 6 ]
@@ -1175,7 +1175,7 @@ then
                         fi
 
                         sudo yum provides lxc | sed '/^\s*$/d' | grep Repo | sort -u
-                        sudo yum -y install docbook2X >/dev/null 2>&1
+                        sudo yum -y install docbook2X
 
 			function CheckDocBook2XInstalled {
 				rpm -qa | grep -ic docbook2X
@@ -1225,8 +1225,8 @@ then
 
 	if [ $Release -le 7 ]
 	then
-		sudo yum -y install debootstrap bash-completion-extras bridge-utils docbook2X lxc >/dev/null 2>&1
-		sudo yum -y install lxc libcap-devel libcgroup wget bridge-utils >/dev/null 2>&1
+		sudo yum -y install debootstrap bash-completion-extras bridge-utils docbook2X lxc
+		sudo yum -y install lxc libcap-devel libcgroup wget bridge-utils 
 	fi
 
 	if [ $LinuxFlavor = 'Fedora' ] && [ $Release -ge 7 ]
@@ -2718,7 +2718,7 @@ sleep 5
 clear
 
 function GetOvsRepoVersion {
-	sudo yum list all | grep openvswitch | sed 's/  */ /g' | cut -f2 -d' ' | cut -f1 -d'-' | sort | tail -1
+	sudo yum -q list openvswitch 2>/dev/null | grep openvswitch | sed 's/  */ /g' | cut -f2 -d' ' | cut -f1 -d'-' | sort | tail -1
 }
 OvsRepoVersion=$(GetOvsRepoVersion)
 
@@ -3069,7 +3069,7 @@ then
 			echo ''
 
 			cd /opt/olxc/"$DistDir"/uekulele/openvswitch
-			wget --timeout=5 --tries=10 --no-check-certificate http://openvswitch.org/releases/openvswitch-"$OvsVersion".tar.gz -4
+			wget --timeout=5 --tries=10 http://openvswitch.org/releases/openvswitch-"$OvsVersion".tar.gz -4
 
 			echo ''
 			echo "=============================================="
@@ -3130,7 +3130,7 @@ then
 
 			mkdir -p /opt/olxc/"$DistDir"/uekulele/openvswitch
 			cd /opt/olxc/"$DistDir"/uekulele/openvswitch
-			wget --timeout=5 --tries=10 --no-check-certificate http://openvswitch.org/releases/openvswitch-"$OvsVersion".tar.gz -4
+			wget --timeout=5 --tries=10 http://openvswitch.org/releases/openvswitch-"$OvsVersion".tar.gz -4
 			mkdir -p /opt/olxc/"$DistDir"/uekulele/openvswitch/rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
 			cp -p openvswitch-"$OvsVersion".tar.gz /opt/olxc/"$DistDir"/uekulele/openvswitch/rpmbuild/SOURCES/.
 
@@ -3607,7 +3607,7 @@ then
 					echo "=============================================="
 					echo ''
 
-					wget --no-check-certificate https://www.openvswitch.org/releases/openvswitch-$OvsVersion.tar.gz
+					wget https://www.openvswitch.org/releases/openvswitch-$OvsVersion.tar.gz
 					tar -xzvf openvswitch-$OvsVersion.tar.gz 
 
 					echo ''
@@ -4459,74 +4459,69 @@ sleep 5
 
 clear
 
-if [ $Release -le 6 ]
-then
-        sudo /etc/network/openvswitch/OvsVethCleanupCronjob.sh
-else
-        echo ''
-        echo "=============================================="
-        echo "Create OvsVethCleanup.service                 "
-        echo "=============================================="
-        echo ''
+echo ''
+echo "=============================================="
+echo "Create OvsVethCleanup.service                 "
+echo "=============================================="
+echo ''
 
-        sudo sh -c "echo '[Unit]'                                                               >  /etc/systemd/system/OvsVethCleanup.service"
-        sudo sh -c "echo 'Description=OvsVethCleanup job'                                       >> /etc/systemd/system/OvsVethCleanup.service"
-        sudo sh -c "echo ''                                                                     >> /etc/systemd/system/OvsVethCleanup.service"
-        sudo sh -c "echo '[Service]'                                                            >> /etc/systemd/system/OvsVethCleanup.service"
-        sudo sh -c "echo 'Type=oneshot'                                                         >> /etc/systemd/system/OvsVethCleanup.service"
-        sudo sh -c "echo 'User=root'                                                            >> /etc/systemd/system/OvsVethCleanup.service"
-        sudo sh -c "echo 'ExecStart=/usr/bin/bash /etc/network/openvswitch/OvsVethCleanup.sh'   >> /etc/systemd/system/OvsVethCleanup.service"
-        sudo sh -c "echo ''                                                                     >> /etc/systemd/system/OvsVethCleanup.service"
-        sudo sh -c "echo '[Install]'                                                            >> /etc/systemd/system/OvsVethCleanup.service"
-        sudo sh -c "echo 'WantedBy=multi-user.target'                                           >> /etc/systemd/system/OvsVethCleanup.service"
+sudo sh -c "echo '[Unit]'                                                               >  /etc/systemd/system/OvsVethCleanup.service"
+sudo sh -c "echo 'Description=OvsVethCleanup job'                                       >> /etc/systemd/system/OvsVethCleanup.service"
+sudo sh -c "echo ''                                                                     >> /etc/systemd/system/OvsVethCleanup.service"
+sudo sh -c "echo '[Service]'                                                            >> /etc/systemd/system/OvsVethCleanup.service"
+sudo sh -c "echo 'Type=oneshot'                                                         >> /etc/systemd/system/OvsVethCleanup.service"
+sudo sh -c "echo 'User=root'                                                            >> /etc/systemd/system/OvsVethCleanup.service"
+sudo sh -c "echo 'ExecStart=/usr/bin/bash /etc/network/openvswitch/OvsVethCleanup.sh'   >> /etc/systemd/system/OvsVethCleanup.service"
+sudo sh -c "echo ''                                                                     >> /etc/systemd/system/OvsVethCleanup.service"
+sudo sh -c "echo '[Install]'								>> /etc/systemd/system/OvsVethCleanup.service"
+sudo sh -c "echo 'WantedBy=multi-user.target'						>> /etc/systemd/system/OvsVethCleanup.service"
 
-        sudo cat /etc/systemd/system/OvsVethCleanup.service
+sudo cat /etc/systemd/system/OvsVethCleanup.service
 
-        echo ''
-        echo "=============================================="
-        echo "Done: Create OvsVethCleanup.service           "
-        echo "=============================================="
-        echo ''
+echo ''
+echo "=============================================="
+echo "Done: Create OvsVethCleanup.service           "
+echo "=============================================="
+echo ''
 
-        sleep 5
+sleep 5
 
-        clear
+clear
 
-        echo ''
-        echo "=============================================="
-        echo "Install OvsVethCleanup.timer                  "
-        echo "=============================================="
-        echo ''
+echo ''
+echo "=============================================="
+echo "Install OvsVethCleanup.timer                  "
+echo "=============================================="
+echo ''
 
-        sudo sh -c "echo '[Unit]'                                                               >  /etc/systemd/system/OvsVethCleanup.timer"
-        sudo sh -c "echo 'Description=OvsVethCleanup'                                           >> /etc/systemd/system/OvsVethCleanup.timer"
-        sudo sh -c "echo ''                                                                     >> /etc/systemd/system/OvsVethCleanup.timer"
-        sudo sh -c "echo '[Timer]'                                                              >> /etc/systemd/system/OvsVethCleanup.timer"
-        sudo sh -c "echo 'OnUnitActiveSec=60s'                                                  >> /etc/systemd/system/OvsVethCleanup.timer"
-        sudo sh -c "echo 'OnBootSec=60s'                                                        >> /etc/systemd/system/OvsVethCleanup.timer"
-        sudo sh -c "echo ''                                                                     >> /etc/systemd/system/OvsVethCleanup.timer"
-        sudo sh -c "echo '[Install]'                                                            >> /etc/systemd/system/OvsVethCleanup.timer"
-        sudo sh -c "echo 'WantedBy=timers.target'                                               >> /etc/systemd/system/OvsVethCleanup.timer"
+sudo sh -c "echo '[Unit]'                                                               >  /etc/systemd/system/OvsVethCleanup.timer"
+sudo sh -c "echo 'Description=OvsVethCleanup'                                           >> /etc/systemd/system/OvsVethCleanup.timer"
+sudo sh -c "echo ''                                                                     >> /etc/systemd/system/OvsVethCleanup.timer"
+sudo sh -c "echo '[Timer]'                                                              >> /etc/systemd/system/OvsVethCleanup.timer"
+sudo sh -c "echo 'OnUnitActiveSec=60s'                                                  >> /etc/systemd/system/OvsVethCleanup.timer"
+sudo sh -c "echo 'OnBootSec=60s'                                                        >> /etc/systemd/system/OvsVethCleanup.timer"
+sudo sh -c "echo ''                                                                     >> /etc/systemd/system/OvsVethCleanup.timer"
+sudo sh -c "echo '[Install]'                                                            >> /etc/systemd/system/OvsVethCleanup.timer"
+sudo sh -c "echo 'WantedBy=timers.target'                                               >> /etc/systemd/system/OvsVethCleanup.timer"
 
-        sudo cat /etc/systemd/system/OvsVethCleanup.timer
+sudo cat /etc/systemd/system/OvsVethCleanup.timer
 
-        echo ''
+echo ''
 
-        sudo systemctl daemon-reload
-        sudo systemctl enable OvsVethCleanup.timer
-        sudo systemctl start  OvsVethCleanup.timer
+sudo systemctl daemon-reload
+sudo systemctl enable OvsVethCleanup.timer
+sudo systemctl start  OvsVethCleanup.timer
 
-        echo ''
+echo ''
 
-        sudo systemctl list-timers --all
+sudo systemctl list-timers --all
 
-        sleep 5
+sleep 5
 
-        echo ''
-        echo "=============================================="
-        echo "Done: Install OvsVethCleanup.timer            "
-        echo "=============================================="
-fi
+echo ''
+echo "=============================================="
+echo "Done: Install OvsVethCleanup.timer            "
+echo "=============================================="
 
 sleep 5
 
@@ -4945,6 +4940,18 @@ then
        	 	HighestSx1IndexHit=$(CheckHighestSx1IndexHit)
 	done
 
+	echo "Sx1 Index = "$Sx1Index
+
+ 	echo ''
+ 	echo "=============================================="
+ 	echo "Done: Get sx1 IP address.                     "
+ 	echo "=============================================="
+ 	echo ''
+
+	sleep 5
+
+	clear
+
  	echo ''
  	echo "=============================================="
  	echo "Get sw1 IP address.                           "
@@ -4966,6 +4973,18 @@ then
        	 	Sw1Index=$((Sw1Index+1))
        	 	HighestSw1IndexHit=$(CheckHighestSw1IndexHit)
 	done
+ 	
+	echo "Sw1 Index = "$Sw1Index
+	
+	echo ''
+ 	echo "=============================================="
+ 	echo "Done: Get sw1 IP address.                     "
+ 	echo "=============================================="
+ 	echo ''
+
+	sleep 5
+
+	clear
 
 elif [ $MultiHostVar3 = 'X' ]  && [ $GRE = 'N' ] && [ $MultiHostVar2 = 'Y' ] && [ -f /etc/network/openvswitch/sx1.info ] && [ -f /etc/network/openvswitch/sw1.info ]
 then
@@ -5067,7 +5086,7 @@ then
 			echo "=============================================="
 			echo ''
 
-			cat /tmp/cert.txt
+			cat /tmp/cert.txt | grep -v WARNING
 
 			echo ''
 			echo "=============================================="
@@ -5157,7 +5176,7 @@ then
                         echo "=============================================="
                         echo ''
 
-                        cat /tmp/cert.txt
+                        cat /tmp/cert.txt | grep -v WARNING
 
                         echo ''
                         echo "=============================================="
@@ -5239,14 +5258,24 @@ do
                 	sudo sh -c "echo ''							>> /etc/systemd/system/$k.service"
                 	sudo sh -c "echo '[Install]'						>> /etc/systemd/system/$k.service"
                 	sudo sh -c "echo 'WantedBy=multi-user.target'				>> /etc/systemd/system/$k.service"
+
+			sleep 5
+
+			clear
 		
 			echo ''
 			echo "=============================================="
 			echo "Done: Create OpenvSwitch systemd $k service.  "
 			echo "=============================================="
 			echo ''
+
+			sleep 5
+
+			clear
+
+			echo ''
 			echo "=============================================="
-			echo "Start OpenvSwitch $k ...                      "
+			echo "Start OpenvSwitch $k...(wait)...              "
 			echo "=============================================="
 			echo ''
 		
@@ -5397,68 +5426,6 @@ sleep 5
 
 clear
 
-if [ $Release -ge 7 ]
-then
-	echo ''
-	echo "=============================================="
-	echo "Checking OpenvSwitch sw1 service...           "
-	echo "=============================================="
-	echo ''
-
-	sudo service sw1 stop
-	sleep 2
-	sudo systemctl start sw1
-	sleep 2
-	echo ''
-	sudo ifconfig sw1
-	echo ''
-	sudo service sw1 status
-
-	echo ''
-	echo "=============================================="
-	echo "OpenvSwitch sw1 service is up.                "
-	echo "=============================================="
-	echo ''
-
-	sleep 5
-
-	clear
-
-	echo ''
-	echo "=============================================="
-	echo "Checking OpenvSwitch service sx1...           "
-	echo "=============================================="
-	echo ''
-
-	sudo service sx1 stop
-	sleep 2
-	sudo systemctl start sx1
-	sleep 2
-	echo ''
-	sudo ifconfig sx1
-	echo ''
-	sudo service sx1 status
-
-	echo ''
-	echo "=============================================="
-	echo "OpenvSwitch service sx1 is up.                "
-	echo "=============================================="
-	echo ''
-
-	sleep 5
-
-	clear
-fi
-
-echo ''
-echo "=============================================="
-echo "Both required networks are up.                "
-echo "=============================================="
-echo ''
-
-sleep 5
-
-clear
 
 if [ $GRE = 'Y' ] || [ $MultiHostVar3 != 'X' ]
 then
@@ -5516,7 +5483,6 @@ then
 	then
 		if [ $Release -ge 7 ]
 		then
-			echo ''
 			echo "=============================================="
 			echo "Restart OpenvSwitches...                      "
 			echo "=============================================="
@@ -5683,9 +5649,11 @@ then
 			sudo sh -c "echo 'After=network-online.target sx1.service'			>> /etc/systemd/system/$NameServer.service"
 			sudo sh -c "echo ''                                 				>> /etc/systemd/system/$NameServer.service"
 			sudo sh -c "echo '[Service]'                        				>> /etc/systemd/system/$NameServer.service"
-			sudo sh -c "echo 'Type=oneshot'                     				>> /etc/systemd/system/$NameServer.service"
+			sudo sh -c "echo 'Type=simple'                     				>> /etc/systemd/system/$NameServer.service"
 			sudo sh -c "echo 'User=root'                        				>> /etc/systemd/system/$NameServer.service"
 			sudo sh -c "echo 'RemainAfterExit=yes'              				>> /etc/systemd/system/$NameServer.service"
+			sudo sh -c "echo 'Restart=always'	              				>> /etc/systemd/system/$NameServer.service"
+			sudo sh -c "echo 'RestartSec=5'  	            				>> /etc/systemd/system/$NameServer.service"
 			sudo sh -c "echo 'ExecStart=/etc/network/openvswitch/strt_$NameServer.sh start'	>> /etc/systemd/system/$NameServer.service"
 			sudo sh -c "echo 'ExecStop=/etc/network/openvswitch/strt_$NameServer.sh stop'	>> /etc/systemd/system/$NameServer.service"
 			sudo sh -c "echo ''                                 				>> /etc/systemd/system/$NameServer.service"
@@ -5768,7 +5736,7 @@ then
 	echo ''
 
 	sudo lxc-attach -n $NameServer -- service isc-dhcp-server restart
-	sudo lxc-attach -n $NameServer -- service isc-dhcp-server status
+	sudo lxc-attach -n $NameServer -- service isc-dhcp-server status 
 
 	echo ''
 	echo "=============================================="
@@ -6244,9 +6212,61 @@ then
 
 	if [ $GRE = 'Y' ]
 	then
+		if [ $Release -ge 7 ]
+		then
+			sudo sed -i "/nsa/s/nsa/$NameServer/g"			/etc/network/openvswitch/strt_nsa.sh
+			sudo cp -p /etc/network/openvswitch/strt_nsa.sh		/etc/network/openvswitch/strt_$NameServerBase.sh
+			sudo cp -p /etc/network/openvswitch/strt_nsa.sh		/etc/network/openvswitch/strt_$NameServer.sh
+
+			echo ''
+			echo "=============================================="
+			echo "Create $NameServer Onboot Service...          "
+			echo "=============================================="
+			echo ''
+
+			sudo sh -c "echo '[Unit]'             	         				 > /etc/systemd/system/$NameServer.service"
+			sudo sh -c "echo 'Description=$NameServer Service'  				>> /etc/systemd/system/$NameServer.service"
+			sudo sh -c "echo 'Wants=network-online.target sx1.service'			>> /etc/systemd/system/$NameServer.service"
+			sudo sh -c "echo 'After=network-online.target sx1.service'			>> /etc/systemd/system/$NameServer.service"
+			sudo sh -c "echo ''                                 				>> /etc/systemd/system/$NameServer.service"
+			sudo sh -c "echo '[Service]'                        				>> /etc/systemd/system/$NameServer.service"
+			sudo sh -c "echo 'Type=simple'                     				>> /etc/systemd/system/$NameServer.service"
+			sudo sh -c "echo 'User=root'                        				>> /etc/systemd/system/$NameServer.service"
+			sudo sh -c "echo 'RemainAfterExit=yes'              				>> /etc/systemd/system/$NameServer.service"
+			sudo sh -c "echo 'Restart=always'	              				>> /etc/systemd/system/$NameServer.service"
+			sudo sh -c "echo 'RestartSec=5'  	            				>> /etc/systemd/system/$NameServer.service"
+			sudo sh -c "echo 'ExecStart=/etc/network/openvswitch/strt_$NameServer.sh start'	>> /etc/systemd/system/$NameServer.service"
+			sudo sh -c "echo 'ExecStop=/etc/network/openvswitch/strt_$NameServer.sh stop'	>> /etc/systemd/system/$NameServer.service"
+			sudo sh -c "echo ''                                 				>> /etc/systemd/system/$NameServer.service"
+			sudo sh -c "echo '[Install]'                        				>> /etc/systemd/system/$NameServer.service"
+			sudo sh -c "echo 'WantedBy=multi-user.target'       				>> /etc/systemd/system/$NameServer.service"
+			sudo chmod 644 /etc/systemd/system/$NameServer.service
+
+			sudo sed -i "s/-base//g" /etc/network/openvswitch/strt_$NameServer.sh
+
+			sudo systemctl enable $NameServer
+			sudo systemctl disable $NameServer
+
+			echo ''
+			echo "=============================================="
+			echo "Done: Create $NameServer Onboot Service.      "
+			echo "=============================================="
+		fi
+
 		sudo sed -i "/route add -net/s/#/ /"				/etc/network/openvswitch/crt_ovs_sw1.sh	
 		sudo sed -i "/REMOTE_GRE_ENDPOINT/s/#/ /"			/etc/network/openvswitch/crt_ovs_sw1.sh	
 		sudo sed -i "s/REMOTE_GRE_ENDPOINT/$MultiHostVar5/g"		/etc/network/openvswitch/crt_ovs_sw1.sh
+
+		echo ''
+		echo "=============================================="
+		echo "Close firewall to unused tunnel types...      "
+		echo "=============================================="
+		echo ''
+	
+		if [ $LinuxFlavor = 'Red' ] || [ $LinuxFlavor = 'Fedora' ] || [ $LinuxFlavor = 'Oracle' ] || [ $LinuxFlavor = 'CentOS' ]
+		then
+			Zone=trusted
+		fi
 
 		if   [ $TunType = 'geneve' ]
                 then
@@ -6255,19 +6275,11 @@ then
                         sudo sed -i '/type=gre/d'   /etc/network/openvswitch/crt_ovs_sw1.sh
                         sudo sed -i '/type=vxlan/d' /etc/network/openvswitch/crt_ovs_sw1.sh
 
-			if [ $FirewalldBackend -eq 1 ] && [ $LinuxFlavor = 'Oracle' ]
-			then
-				sudo firewall-cmd --permanent --zone=public --add-port=6081/udp				2>/dev/null
-				sudo firewall-cmd --permanent --zone=public --add-interface=genev_sys_6081		2>/dev/null
-			#	sudo firewall-cmd --reload
-			fi
-			
-			if [ $FirewalldBackend -eq 1 ] && [ $LinuxFlavor = 'Fedora' ]
-			then
-				sudo firewall-cmd --permanent --zone=FedoraServer --add-port=6081/udp			2>/dev/null
-				sudo firewall-cmd --permanent --zone=FedoraServer --add-interface=genev_sys_6081	2>/dev/null
-			#	sudo firewall-cmd --reload
-			fi
+			sudo firewall-cmd --zone=$Zone --permanent --remove-port=4789/udp
+			sudo firewall-cmd --zone=$Zone --permanent --remove-interface=vxlan_sys_4789
+			sudo firewall-cmd --zone=$Zone --permanent --remove-protocol=gre
+			sudo firewall-cmd --zone=$Zone --permanent --remove-interface=gre_sys
+			sudo firewall-cmd --reload
 
                 elif [ $TunType = 'gre' ]
                 then
@@ -6276,19 +6288,11 @@ then
                         sudo sed -i '/type=geneve/d' /etc/network/openvswitch/crt_ovs_sw1.sh
                         sudo sed -i '/type=vxlan/d'  /etc/network/openvswitch/crt_ovs_sw1.sh
 
-			if [ $FirewalldBackend -eq 1 ] && [ $LinuxFlavor = 'Oracle' ]
-			then
-				sudo firewall-cmd --permanent --zone=public --add-protocol=gre				2>/dev/null
-				sudo firewall-cmd --permanent --zone=public --add-interface=gre_sys			2>/dev/null
-			#	sudo firewall-cmd --reload
-			fi
-
-			if [ $FirewalldBackend -eq 1 ] && [ $LinuxFlavor = 'Fedora' ]
-			then
-				sudo firewall-cmd --permanent --zone=FedoraServer --add-protocol=gre			2>/dev/null
-				sudo firewall-cmd --permanent --zone=FedoraServer --add-interface=gre_sys		2>/dev/null
-			#	sudo firewall-cmd --reload
-			fi
+			sudo firewall-cmd --zone=$Zone --permanent --remove-port=6081/udp
+			sudo firewall-cmd --zone=$Zone --permanent --remove-interface=genev_sys_6081
+			sudo firewall-cmd --zone=$Zone --permanent --remove-port=4789/udp
+			sudo firewall-cmd --zone=$Zone --permanent --remove-interface=vxlan_sys_4789
+			sudo firewall-cmd --reload
 
                 elif [ $TunType = 'vxlan' ]
                 then
@@ -6297,21 +6301,23 @@ then
                         sudo sed -i '/type=geneve/d' /etc/network/openvswitch/crt_ovs_sw1.sh
                         sudo sed -i '/type=gre/d'    /etc/network/openvswitch/crt_ovs_sw1.sh
 
-			if [ $FirewalldBackend -eq 1 ] && [ $LinuxFlavor = 'Oracle' ]
-			then
-				sudo firewall-cmd --permanent --zone=public --add-port=4789/udp				2>/dev/null
-				sudo firewall-cmd --permanent --zone=public --add-interface=vxlan_sys_4789		2>/dev/null
-			#	sudo firewall-cmd --reload
-			fi
-			
-			if [ $FirewalldBackend -eq 1 ] && [ $LinuxFlavor = 'Fedora' ]
-			then
-				sudo firewall-cmd --permanent --zone=FedoraServer --add-port=4789/udp			2>/dev/null
-				sudo firewall-cmd --permanent --zone=FedoraServer --add-interface=vxlan_sys_4789	2>/dev/null
-			#	sudo firewall-cmd --reload
-			fi
+			sudo firewall-cmd --zone=$Zone --permanent --remove-protocol=gre
+			sudo firewall-cmd --zone=$Zone --permanent --remove-interface=gre_sys
+			sudo firewall-cmd --zone=$Zone --permanent --remove-port=4789/udp
+			sudo firewall-cmd --zone=$Zone --permanent --remove-interface=vxlan_sys_4789
+			sudo firewall-cmd --reload
                 fi
 
+		echo ''
+		echo "=============================================="
+		echo "Done: Close firewall to unused tunnel types.  "
+		echo "=============================================="
+		echo ''
+
+		sleep 5
+
+		clear
+	
                 echo ''
                 echo "=============================================="
                 echo "Show local GRE endpoint...                    "
@@ -6333,45 +6339,24 @@ then
 
                 if   [ $TunType = 'geneve' ]
                 then
-                        sudo sed -i '/type=gre/d'               		/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
-			sudo sed -i '/add-protocol=gre/d'			/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh	
-			sudo sed -i '/gre_sys/d'	        		/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh	
-                        sudo sed -i '/type=vxlan/d'             		/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
-			sudo sed -i '/add-port=4789/d'	        		/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh	
-			sudo sed -i '/vxlan_sys_4789/d'	        		/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
-
-			if [ $LinuxFlavor = 'Fedora' ]
-			then
-				sudo sed -i 's/zone=public/zone=FedoraServer/g' /etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
-			fi	
+			sudo sed -i '/type=gre/d'			/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
+			sudo sed -i '/type=vxlan/d'			/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
+			sudo sed -i '/port=6081/d'        		/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh	
+			sudo sed -i '/interface=genev_sys_6081/d'	/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh	
 
                 elif [ $TunType = 'gre' ]
                 then
-                        sudo sed -i '/type=vxlan/d'             		/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
-			sudo sed -i '/add-port=4789/d'	        		/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh	
-			sudo sed -i '/vxlan_sys_4789/d'	        		/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh	
-                        sudo sed -i '/type=geneve/d'            		/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
-			sudo sed -i '/add-port=6081/d'	        		/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh	
-			sudo sed -i '/genev_sys_6081/d'	        		/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh	
-
-			if [ $LinuxFlavor = 'Fedora' ]
-			then
-				sudo sed -i 's/zone=public/zone=FedoraServer/g' /etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
-			fi	
+                        sudo sed -i '/type=geneve/d'			/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
+			sudo sed -i '/type=vxlan/d'			/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
+			sudo sed -i '/protocol=gre/d'			/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh	
+			sudo sed -i '/interface=gre_sys/d'		/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh	
 
                 elif [ $TunType = 'vxlan' ]
                 then
-                        sudo sed -i '/type=gre/d'               		/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
-			sudo sed -i '/add-protocol=gre/d'			/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh	
-			sudo sed -i '/gre_sys/d'	        		/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh	
-                        sudo sed -i '/type=geneve/d'            		/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
-			sudo sed -i '/add-port=6081/d'	        		/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh	
-			sudo sed -i '/genev_sys_6081/d'	        		/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh	
-
-			if [ $LinuxFlavor = 'Fedora' ]
-			then
-				sudo sed -i 's/zone=public/zone=FedoraServer/g' /etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
-			fi	
+                        sudo sed -i '/type=geneve/d'			/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
+                        sudo sed -i '/type=gre/d'			/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
+			sudo sed -i '/port=4789/d'			/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh	
+			sudo sed -i '/interface=vxlan_sys_4789/d'	/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh	
                 fi
 
 		sudo chmod 777 /etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
@@ -6975,11 +6960,6 @@ echo ''
 sleep 5
 
 clear
-
-if [ $LinuxFlavor = 'Oracle' ] && [ $Release -eq 6 ]
-then
-	sudo ifup ifcfg-eth0:0
-fi
 
 echo ''
 echo "=============================================="

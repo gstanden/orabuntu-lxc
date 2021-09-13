@@ -199,13 +199,6 @@ function CheckCgroupType {
 }
 CgroupType=$(CheckCgroupType)
 
-if [ $CgroupType -eq 0 ]
-then
-        CGROUPV2_SUFFIX='2>/dev/null'
-else
-        CGROUPV2_SUFFIX=''
-fi
-
 function TrimLinuxFlavors {
 echo $LinuxFlavors | sed 's/^[ \t]//;s/[ \t]$//'
 }
@@ -303,7 +296,7 @@ sleep 5
 
 clear
 
-if [ $MultiHostVar1 = 'new' ] && [ $LinuxFlavor != 'Fedora' ] && [ $Docker = 'Y' ]
+if [ $MultiHostVar1 = 'new' ] && [ $Docker = 'Y' ]
 then
 	echo ''
 	echo "=============================================="
@@ -316,7 +309,7 @@ then
   	if [ $Release -ge 6 ] && [ $Release -le 8 ]
   	then
   		sudo chmod 775 /opt/olxc/"$DistDir"/uekulele/archives/docker_install_uekulele.sh
-  		/opt/olxc/"$DistDir"/uekulele/archives/docker_install_uekulele.sh $LinuxFlavor $Release $DistDir
+  		/opt/olxc/"$DistDir"/uekulele/archives/docker_install_uekulele.sh $LinuxFlavor $Release $DistDir $Owner
   	fi
 	
   	echo ''
@@ -505,7 +498,7 @@ then
 	echo ''
 
         sudo touch /etc/orabuntu-lxc-release
-        sudo sh -c "echo 'Orabuntu-LXC v7.0.0-beta AMIDE' > /etc/orabuntu-lxc-release"
+        sudo sh -c "echo 'Orabuntu-LXC v7.0.0-alpha AMIDE' > /etc/orabuntu-lxc-release"
 	sudo ls -l /etc/orabuntu-lxc-release
 	echo ''
 	sudo cat /etc/orabuntu-lxc-release
@@ -899,8 +892,8 @@ then
                 echo "=============================================="
                 echo ''
 
-                ssh-keygen -R 10.207.39.2
-                ssh-keygen -R $NameServer
+                ssh-keygen -R 10.207.39.2 2>/dev/null
+                ssh-keygen -R $NameServer 2>/dev/null
                 sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ubuntu@10.207.39.2 "sudo -S <<< "ubuntu" echo $HOSTNAME > ~/new_gre_host.txt"
 
                 echo ''
@@ -1139,8 +1132,55 @@ then
 
 	if [ $LXD = 'Y' ]
 	then
+	        echo ''
+		echo "=============================================="
+		echo "Evaluate CGROUP_SUFFIX variable...            "
+		echo "=============================================="
+		echo ''
+
+		function GetCgroupv2Warning1 {
+		        echo "/var/lib/snapd/snap/bin/lxc cluster list" | sg lxd 2> >(grep -c 'WARNING: cgroup v2 is not fully supported yet, proceeding with partial confinement') >/dev/null
+		}
+		Cgroupv2Warning1=$(GetCgroupv2Warning1)
+
+		if [ $Cgroupv2Warning1 -eq 1 ]
+		then
+		        echo "=============================================="
+		        echo "On $LinuxFlavor $RedHatVersion the WARNING:   "
+		        echo "                                              "
+		        echo "WARNING: cgroup v2 is not fully supported yet "
+		        echo "proceeding with partial confinement.          "
+		        echo "                                              "
+		        echo "can be safely IGNORED.                        "
+		        echo "This is a snapd issue not an LXD issue.       "
+		        echo "                                              "
+		        echo "This specific warning has been suppressed     "
+		        echo "during this install of Orabuntu-LXC.          "
+		        echo "                                              "
+		        echo " More info here:                              "
+		        echo "                                              "
+		        echo "https://discuss.linuxcontainers.org/t/lxd-cgroup-v2-support/10455"
+		        echo "https://bugs.launchpad.net/ubuntu/+source/snapd/+bug/1850667"
+		        echo "                                              "
+		        echo "=============================================="
+
+		        CGROUP_SUFFIX='2>/dev/null'
+		else
+		        CGROUP_SUFFIX=''
+		fi
+
+		echo ''
+		echo "=============================================="
+		echo "Done: Evaluate CGROUP_SUFFIX variable.        "
+		echo "=============================================="
+		echo ''
+
+		sleep 10
+
+		clear
+
                 function GetLXDContainerNames {
-                        echo "/var/lib/snapd/snap/bin/lxc list --columns n --format csv | grep -v oel | sed 's/$/ /g' | tr -d '\n' |  sed 's/[ \t]*$//'" | sg lxd $CGROUPV2_SUFFIX 
+                        echo "/var/lib/snapd/snap/bin/lxc list --columns n --format csv | grep -v oel | sed 's/$/ /g' | tr -d '\n' |  sed 's/[ \t]*$//'" | sg lxd 2>/dev/null 
                 }
                 LXDContainerNames=$(GetLXDContainerNames)
 
@@ -1150,7 +1190,7 @@ then
                 echo "=============================================="
                 echo ''
 
-                echo "/var/lib/snapd/snap/bin/lxc list" | sg lxd $CGROUPV2_SUFFIX 
+		eval echo "'/var/lib/snapd/snap/bin/lxc list' | sg lxd $CGROUP_SUFFIX"
 
                 sleep 5
 
@@ -1206,7 +1246,7 @@ then
                 echo "=============================================="
                 echo ''
 
-                echo "/var/lib/snapd/snap/bin/lxc list" | sg lxd $CGROUPV2_SUFFIX 
+		eval echo "'/var/lib/snapd/snap/bin/lxc list' | sg lxd $CGROUP_SUFFIX"
 
                 echo ''
                 echo "=============================================="
@@ -1323,16 +1363,24 @@ then
 
 	if [ $LinuxFlavor = 'Fedora' ] && [ $RedHatVersion -ge 33 ]
 	then
-		echo ''
-		echo "==================================================================================="
-		echo "On $LinuxFlavor $RedHatVersion the WARNING:                                        "
-		echo "                                                                                   "
-		echo "WARNING: cgroup v2 is not fully supported yet, proceeding with partial confinement."
-		echo "                                                                                   "
-		echo "can be safely IGNORED. More information on this is here:                           "
-		echo "                                                                                   "
-		echo "https://discuss.linuxcontainers.org/t/lxd-cgroup-v2-support/10455                  "
-		echo "==================================================================================="
+	        echo "=============================================="
+	        echo "On $LinuxFlavor $RedHatVersion the WARNING:   "
+	        echo "                                              "
+	        echo "WARNING: cgroup v2 is not fully supported yet "
+	        echo "proceeding with partial confinement.          "
+	        echo "                                              "
+	        echo "can be safely IGNORED.                        "
+	        echo "This is a snapd issue not an LXD issue.       "
+	        echo "                                              "
+	        echo "This specific warning has been suppressed     "
+	        echo "during this install of Orabuntu-LXC.          "
+	        echo "                                              "
+	        echo " More info here:                              "
+	        echo "                                              "
+	        echo "https://discuss.linuxcontainers.org/t/lxd-cgroup-v2-support/10455"
+	        echo "https://bugs.launchpad.net/ubuntu/+source/snapd/+bug/1850667"
+	        echo "                                              "
+	        echo "=============================================="
 	fi	
 	
 	sleep 5

@@ -155,13 +155,6 @@ function CheckCgroupType {
 }
 CgroupType=$(CheckCgroupType)
 
-if [ $CgroupType -eq 0 ]
-then
-        CGROUPV2_SUFFIX='2>/dev/null'
-else
-        CGROUPV2_SUFFIX=''
-fi
-
 GetLinuxFlavors(){
 if   [[ -e /etc/oracle-release ]]
 then
@@ -427,6 +420,53 @@ then
 
 elif [ $LXD = 'Y' ]
 then
+	echo ''
+	echo "=============================================="
+	echo "Evaluate CGROUP_SUFFIX variable...            "
+	echo "=============================================="
+	echo ''
+
+	function GetCgroupv2Warning1 {
+	        echo "/var/lib/snapd/snap/bin/lxc cluster list" | sg lxd 2> >(grep -c 'WARNING: cgroup v2 is not fully supported yet, proceeding with partial confinement') >/dev/null
+	}
+	Cgroupv2Warning1=$(GetCgroupv2Warning1)
+
+	if [ $Cgroupv2Warning1 -eq 1 ]
+	then
+	        echo "=============================================="
+	        echo "On $LinuxFlavor $RedHatVersion the WARNING:   "
+	        echo "                                              "
+	        echo "WARNING: cgroup v2 is not fully supported yet "
+	        echo "proceeding with partial confinement.          "
+	        echo "                                              "
+	        echo "can be safely IGNORED.                        "
+	        echo "This is a snapd issue not an LXD issue.       "
+	        echo "                                              "
+	        echo "This specific warning has been suppressed     "
+	        echo "during this install of Orabuntu-LXC.          "
+	        echo "                                              "
+	        echo " More info here:                              "
+	        echo "                                              "
+	        echo "https://discuss.linuxcontainers.org/t/lxd-cgroup-v2-support/10455"
+	        echo "https://bugs.launchpad.net/ubuntu/+source/snapd/+bug/1850667"
+	        echo "                                              "
+	        echo "=============================================="
+
+	        CGROUP_SUFFIX='2>/dev/null'
+	else
+		CGROUP_SUFFIX=''
+	fi
+
+	echo ''
+	echo "=============================================="
+	echo "Done: Evaluate CGROUP_SUFFIX variable.        "
+	echo "=============================================="
+	echo ''
+
+	sleep 10
+
+	clear
+
 	if [ $GRE = 'Y' ] && [ $LXDCluster = 'Y' ]
 	then
 		sudo sed -i "s/mtu_request=1500/mtu_request=$MultiHostVar7/g" /etc/network/openvswitch/crt_ovs_sw1.sh
@@ -434,7 +474,7 @@ then
 	fi
 
         function GetSeedContainerName {
-		echo "/var/lib/snapd/snap/bin/lxc list | grep oel$OracleRelease | sort -d | cut -f2 -d' ' | sed 's/^[ \t]*//;s/[ \t]*$//' | tail -1" | sg lxd $CGROUPV2_SUFFIX 
+		eval echo "'/var/lib/snapd/snap/bin/lxc list -c n -f csv | grep oel$OracleRelease | sort -d | tail -1' | sg lxd $CGROUP_SUFFIX"
         }
         SeedContainerName=$(GetSeedContainerName)
 fi
@@ -451,7 +491,7 @@ then
 
 elif [ $LXD = 'Y' ]
 then
-        echo "/var/lib/snapd/snap/bin/lxc list" | sg lxd $CGROUPV2_SUFFIX 
+        eval echo "'/var/lib/snapd/snap/bin/lxc list' | sg lxd $CGROUP_SUFFIX"  
 fi
 
 echo ''
@@ -480,7 +520,7 @@ then
 
 elif [ $LXD = 'Y' ]
 then
-        echo "/var/lib/snapd/snap/bin/lxc exec $SeedContainerName -- uname -a" | sg lxd $CGROUPV2_SUFFIX 
+        eval echo "'/var/lib/snapd/snap/bin/lxc exec $SeedContainerName -- uname -a' | sg lxd $CGROUP_SUFFIX"  
 fi
 
 echo ''
@@ -495,7 +535,7 @@ clear
 
 echo ''
 echo "=============================================="
-echo "Configure $SeedContainerName... (this)        "
+echo "Configure $SeedContainerName...               "
 echo "=============================================="
 echo ''
 
@@ -507,10 +547,11 @@ then
 
 elif [ $LXD = 'Y' ]
 then
-#	echo "/var/lib/snapd/snap/bin/lxc exec $SeedContainerName -- usermod --password `perl -e "print crypt('root','root');"` root" | sg lxd $CGROUPV2_SUFFIX 
-#	echo "/var/lib/snapd/snap/bin/lxc exec $SeedContainerName -- yum -y install openssh-server net-tools" | sg lxd $CGROUPV2_SUFFIX 
-#	echo "/var/lib/snapd/snap/bin/lxc exec $SeedContainerName -- service sshd restart" | sg lxd $CGROUPV2_SUFFIX 
-	echo "/var/lib/snapd/snap/bin/lxc exec $SeedContainerName -- rpm -qa | egrep 'openssh-server|net-tools'" | sg lxd $CGROUPV2_SUFFIX 
+#	eval echo "'/var/lib/snapd/snap/bin/lxc exec $SeedContainerName -- usermod --password `perl -e "print crypt('root','root');"` root' | sg lxd $CGROUP_SUFFIX"  
+#	eval echo "'/var/lib/snapd/snap/bin/lxc exec $SeedContainerName -- yum -y install openssh-server net-tools' | sg lxd $CGROUP_SUFFIX"  
+#	eval echo "'/var/lib/snapd/snap/bin/lxc exec $SeedContainerName -- service sshd restart' | sg lxd $CGROUP_SUFFIX"  
+	eval echo "'/var/lib/snapd/snap/bin/lxc exec $SeedContainerName -- rpm -qa | grep openssh-server' | sg lxd $CGROUP_SUFFIX"  
+	eval echo "'/var/lib/snapd/snap/bin/lxc exec $SeedContainerName -- rpm -qa | grep net-tools'      | sg lxd $CGROUP_SUFFIX"  
 fi
 
 echo ''

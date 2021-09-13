@@ -175,13 +175,6 @@ function CheckCgroupType {
 }
 CgroupType=$(CheckCgroupType)
 
-if [ $CgroupType -eq 0 ]
-then
-	CGROUPV2_SUFFIX='2>/dev/null'
-else
-	CGROUPV2_SUFFIX=''
-fi
-
 GetLinuxFlavors(){
 if   [[ -e /etc/oracle-release ]]
 then
@@ -512,6 +505,10 @@ then
 	echo ''
 fi
 
+sleep 5
+
+clear
+
 if   [ $LXD = 'N' ]
 then
 	m=1; n=1; p=1
@@ -628,26 +625,6 @@ then
                               		sudo lxc-create -t download -n oel$OracleRelease$SeedPostfix -- --dist oracle --release $MajorRelease --arch amd64 --no-validate
                        		fi
                 	fi
-
-                elif [ $LinuxFlavor = 'Oracle' ] && [ $Release -eq 6 ]
-                then
-                        sudo lxc-create -n oel$OracleRelease$SeedPostfix -t oracle -- --release=$MajorRelease.latest
-                        if [ $? -ne 0 ]
-                        then
-                                sudo lxc-stop -n oel$OracleRelease$SeedPostfix -k
-                                sudo lxc-destroy -n oel$OracleRelease$SeedPostfix
-                                sudo rm -rf /var/lib/lxc/oel$OracleRelease$SeedPostfix
-                                sudo lxc-create -n oel$OracleRelease$SeedPostfix -t oracle -- --release=$MajorRelease.latest
-
-                                if [ $? -ne 0 ]
-                                then
-                                        sudo lxc-stop -n oel$OracleRelease$SeedPostfix -k
-                                        sudo lxc-destroy -n oel$OracleRelease$SeedPostfix
-                                        sudo rm -rf /var/lib/lxc/oel$OracleRelease$SeedPostfix
-                                        sudo lxc-create -n oel$OracleRelease$SeedPostfix -t oracle -- --release=$MajorRelease.latest
-                                fi
-                        fi
-
 		else
 			sudo lxc-create -n oel$OracleRelease$SeedPostfix -t oracle -- --release=$OracleVersion
 			
@@ -690,7 +667,7 @@ fi
 
 if [ $LXDCluster = 'Y' ] && [ $LXD = 'Y' ] && [ $Release -ge 7 ]
 then
-	if [ $LinuxFlavor = 'Oracle' ] || [ $LinuxFlavor = 'Fedora' ]
+	if [ $LinuxFlavor = 'Oracle' ] || [ $LinuxFlavor = 'Fedora' ] || [ $LinuxFlavor = 'CentOS' ] || [ $LinuxFlavor = 'Red' ]
 	then
 		echo ''
 		echo "=============================================="
@@ -724,30 +701,46 @@ then
 
 	#	clear
 
-		echo ''
-		echo "=============================================="
-		echo "Install EPEL ...                              "
-		echo "=============================================="
-		echo ''
-
 		if   [ $LinuxFlavor = 'Oracle' ]
 		then
+			echo ''
+			echo "=============================================="
+			echo "Install EPEL ...                              "
+			echo "=============================================="
+			echo ''
+
 			sudo yum install epel-release
+
+			echo ''
+			echo "=============================================="
+			echo "Done: Install EPEL.                           "
+			echo "=============================================="
+			echo ''
+
+			sleep 5
+
+			clear
 
 		elif [ $LinuxFlavor = 'Fedora' ] && [ $Release -ge 8 ]
 		then
+			echo ''
+			echo "=============================================="
+			echo "Install EPEL ...                              "
+			echo "=============================================="
+			echo ''
+
 			echo 'EPEL not needed for Fedora LXD deployment.'
+			
+			echo ''
+			echo "=============================================="
+			echo "Done: Install EPEL.                           "
+			echo "=============================================="
+			echo ''
+		
+			sleep 5
+
+			clear
 		fi	
-
-		echo ''
-		echo "=============================================="
-		echo "Done: Install EPEL.                           "
-		echo "=============================================="
-		echo ''
-
-		sleep 5
-
-		clear
 
 		echo ''
 		echo "=============================================="
@@ -853,6 +846,59 @@ then
 
 		echo ''
 		echo "=============================================="
+		echo "List LXD Cluster...                           "
+		echo "=============================================="
+		echo ''
+
+		function GetCgroupv2Warning1 {
+		        echo "/var/lib/snapd/snap/bin/lxc cluster list" | sg lxd 2> >(grep -c 'WARNING: cgroup v2 is not fully supported yet, proceeding with partial confinement') >/dev/null
+		}
+		Cgroupv2Warning1=$(GetCgroupv2Warning1)
+
+		if [ $Cgroupv2Warning1 -eq 1 ]
+		then
+			echo "=============================================="
+			echo "On $LinuxFlavor $RedHatVersion the WARNING:   "
+			echo "                                              "
+			echo "WARNING: cgroup v2 is not fully supported yet "
+			echo "proceeding with partial confinement.          "
+			echo "                                              "
+			echo "can be safely IGNORED.                        "
+			echo "This is a snapd issue NOT an LXD issue.       "
+			echo "                                              "
+			echo "This specific warning has been suppressed     "
+			echo "during this install of Orabuntu-LXC.          "
+			echo "                                              "
+			echo " More info here:                              "
+			echo "                                              "
+			echo "https://discuss.linuxcontainers.org/t/lxd-cgroup-v2-support/10455"
+			echo "https://bugs.launchpad.net/ubuntu/+source/snapd/+bug/1850667"
+			echo "                                              " 
+			echo "=============================================="
+
+		        CGROUP_SUFFIX='2>/dev/null'
+		else
+			CGROUP_SUFFIX=''
+		fi
+
+		eval echo "'/var/lib/snapd/snap/bin/lxc cluster list' | sg lxd $CGROUP_SUFFIX"
+
+		sleep 10
+
+		clear
+
+		echo ''
+		echo "=============================================="
+		echo "Done: List LXD Cluster.                       "
+		echo "=============================================="
+		echo ''
+
+		sleep 5
+
+		clear
+
+		echo ''
+		echo "=============================================="
 		echo "LXD Snap Info ...                             "
 		echo "=============================================="
 		echo ''
@@ -925,8 +971,31 @@ then
 	echo "Launch Oracle LXD Seed Container...           "
 	echo "=============================================="
 	echo ''
+	echo "=============================================="
+	echo "(takes a minute or two ... patience) ...      "
+	echo "=============================================="
+	echo ''
 
-	echo "/var/lib/snapd/snap/bin/lxc launch -p olxc_sx1a images:oracle/$MajorRelease/amd64 oel$OracleRelease$SeedPostfix" | sg lxd $CGROUPV2_SUFFIX 
+        LaunchCode=1
+        n=0
+        while [ $LaunchCode -ne 0 ] && [ $n -le 5 ]
+        do
+                eval echo "'/var/lib/snapd/snap/bin/lxc launch -p olxc_sx1a images:oracle/$MajorRelease/amd64 oel$OracleRelease$SeedPostfix' | sg lxd $CGROUP_SUFFIX"
+                LaunchCode=`echo $?`
+
+                if [ $LaunchCode -ne 0 ]
+                then
+                        echo 'Launch of LXD container encountered an unexpected issue.  Retrying launch ...'
+                        echo ''
+			if [ $n -ge 2 ]
+			then
+                		SeedIndex=$((SeedIndex+1))
+				SeedPostfix=c$SeedIndex
+			fi
+			sleep 5
+                fi
+		n=$((n+1))
+        done
 
 	echo ''
 	echo "=============================================="
@@ -946,20 +1015,20 @@ then
 		echo "=============================================="
 		echo ''
 
-	       	echo "/var/lib/snapd/snap/bin/lxc exec oel$OracleRelease$SeedPostfix -- hostnamectl set-hostname oel$OracleRelease$SeedPostfix" | sg lxd $CGROUPV2_SUFFIX 
+	       	eval echo "'/var/lib/snapd/snap/bin/lxc exec oel$OracleRelease$SeedPostfix -- hostnamectl set-hostname oel$OracleRelease$SeedPostfix' | sg lxd $CGROUP_SUFFIX"  
 
 		# GLS 2021-07-19 Workaround for Oracle 8 using privileged container option so that containers will get DHCP ip addresses successfully.
 		# GLS 2021-07-19 See https://discuss.linuxcontainers.org/t/centos8-containers-unable-to-automatically-get-ipv4-addresses-after-update/11273/22 for more information.
 
 		if [ $MajorRelease -eq 8 ]
 		then
-       			echo "/var/lib/snapd/snap/bin/lxc config set oel$OracleRelease$SeedPostfix security.privileged true" | sg lxd $CGROUPV2_SUFFIX 
+       			eval echo "'/var/lib/snapd/snap/bin/lxc config set oel$OracleRelease$SeedPostfix security.privileged true' | sg lxd $CGROUP_SUFFIX"  
 		fi
 	fi
         
-	echo "/var/lib/snapd/snap/bin/lxc stop   oel$OracleRelease$SeedPostfix" | sg lxd $CGROUPV2_SUFFIX 
+	eval echo "'/var/lib/snapd/snap/bin/lxc stop   oel$OracleRelease$SeedPostfix' | sg lxd $CGROUP_SUFFIX"  
 	sleep 5
-	echo "/var/lib/snapd/snap/bin/lxc start  oel$OracleRelease$SeedPostfix" | sg lxd $CGROUPV2_SUFFIX 
+	eval echo "'/var/lib/snapd/snap/bin/lxc start  oel$OracleRelease$SeedPostfix' | sg lxd $CGROUP_SUFFIX"  
 	sleep 5
 
 	echo ''
@@ -972,7 +1041,7 @@ then
 	n=1
         while [ $Status -ne 0 ] && [ $n -le 10 ]
 	do
-        	echo "/var/lib/snapd/snap/bin/lxc exec oel$OracleRelease$SeedPostfix -- uname -a" | sg lxd $CGROUPV2_SUFFIX
+        	eval echo "'/var/lib/snapd/snap/bin/lxc exec oel$OracleRelease$SeedPostfix -- uname -a' | sg lxd $CGROUP_SUFFIX" 
 		Status=`echo $?`
                 n=$((n+1))
 		sleep 5
@@ -998,7 +1067,7 @@ then
 	n=1
 	while [ $Status -ne 0 ] && [ $n -le 10 ]
 	do
-		echo "/var/lib/snapd/snap/bin/lxc exec oel$OracleRelease$SeedPostfix -- usermod --password `perl -e "print crypt('root','root');"` root" | sg lxd $CGROUPV2_SUFFIX
+		eval echo "'/var/lib/snapd/snap/bin/lxc exec oel$OracleRelease$SeedPostfix -- usermod --password `perl -e "print crypt('root','root');"` root' | sg lxd $CGROUP_SUFFIX" 
 		Status=`echo $?`
                 n=$((n+1))
 	done
@@ -1027,23 +1096,13 @@ then
         n=1
         while [ $Status -ne 0 ] && [ $n -le 10 ]
         do
-                echo "/var/lib/snapd/snap/bin/lxc exec oel$OracleRelease$SeedPostfix -- yum install -y openssh-server net-tools" | sg lxd $CGROUPV2_SUFFIX
+                eval echo "'/var/lib/snapd/snap/bin/lxc exec oel$OracleRelease$SeedPostfix -- yum install -y openssh-server net-tools' | sg lxd $CGROUP_SUFFIX" 
                 Status=`echo $?`
                 n=$((n+1))
 		sleep 5
         done
 
 	echo ''
-
-        Status=1
-        n=1
-        while [ $Status -ne 0 ] && [ $n -le 10 ]
-        do
-                echo "/var/lib/snapd/snap/bin/lxc exec oel$OracleRelease$SeedPostfix -- bash -c 'yes | yum install openssh-server net-tools'" | sg lxd $CGROUPV2_SUFFIX
-                Status=`echo $?`
-                n=$((n+1))
-		sleep 5
-        done
 
 	echo ''
 	echo "=============================================="
@@ -1065,7 +1124,7 @@ then
         n=1
 	while [ $Status -ne 0 ] && [ $n -le 10 ]
 	do
-		echo "/var/lib/snapd/snap/bin/lxc exec oel$OracleRelease$SeedPostfix -- service sshd restart" | sg lxd $CGROUPV2_SUFFIX
+		eval echo "'/var/lib/snapd/snap/bin/lxc exec oel$OracleRelease$SeedPostfix -- service sshd restart' | sg lxd $CGROUP_SUFFIX" 
 		Status=`echo $?`
                 n=$((n+1))
 	done
@@ -1088,7 +1147,7 @@ then
 		echo "=============================================="
 		echo ''
 
-		echo "/var/lib/snapd/snap/bin/lxc exec oel$OracleRelease$SeedPostfix -- hostnamectl" | sg lxd $CGROUPV2_SUFFIX
+		eval echo "'/var/lib/snapd/snap/bin/lxc exec oel$OracleRelease$SeedPostfix -- hostnamectl' | sg lxd $CGROUP_SUFFIX" 
 
 		echo ''
 		echo "=============================================="
@@ -1103,8 +1162,8 @@ then
 
 	if [ $MajorRelease -ge 7 ]
 	then
-	       	echo "/var/lib/snapd/snap/bin/lxc stop  oel$OracleRelease$SeedPostfix" | sg lxd $CGROUPV2_SUFFIX  
-	       	echo "/var/lib/snapd/snap/bin/lxc start oel$OracleRelease$SeedPostfix" | sg lxd $CGROUPV2_SUFFIX  
+	       	eval echo "'/var/lib/snapd/snap/bin/lxc stop  oel$OracleRelease$SeedPostfix' | sg lxd $CGROUP_SUFFIX"   
+	       	eval echo "'/var/lib/snapd/snap/bin/lxc start oel$OracleRelease$SeedPostfix' | sg lxd $CGROUP_SUFFIX"   
 	fi
 
 	sleep 5
@@ -1128,7 +1187,7 @@ then
 	echo "=============================================="
 	echo ''
 
-	echo "/var/lib/snapd/snap/bin/lxc list" | sg lxd $CGROUPV2_SUFFIX 
+	eval echo "'/var/lib/snapd/snap/bin/lxc list' | sg lxd $CGROUP_SUFFIX"  
 
 	echo ''
 	echo "=============================================="

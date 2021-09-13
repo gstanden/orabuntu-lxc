@@ -107,7 +107,7 @@ then
 		fi
 	done
 
-	echo "/var/lib/snapd/snap/bin/lxc cluster list" | sg lxd 2>/dev/null 
+	echo "/var/lib/snapd/snap/bin/lxc cluster list" | sg lxd
 
 	echo ''
 	echo "=============================================="

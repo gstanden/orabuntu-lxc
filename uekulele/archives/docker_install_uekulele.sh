@@ -19,6 +19,7 @@
 LinuxFlavor=$1
     Release=$2
     DistDir=$3
+      Owner=$4
 
 if [ $LinuxFlavor = 'Oracle' ]
 then
@@ -87,7 +88,6 @@ then
 	if   [ $Release -eq 6 ]
 	then
 		sudo yum -y install docker-io
-		sleep 2
 		sudo service docker start
 		sudo chkconfig docker on
 
@@ -116,16 +116,71 @@ then
  		sudo yum -y install docker-ce
  		sudo systemctl start docker
  		sudo systemctl enable docker
+
+	elif [ $Release -ge 8 ]
+        then
+		function CheckSnapdInstalled {
+        	        sudo snap version | egrep -c 'snap|snapd'
+        	}
+        	SnapdInstalled=$(CheckSnapdInstalled)
+	
+		if [ $SnapdInstalled -ge 1 ]
+		then
+                	sudo snap install docker
+                	sudo groupadd docker
+                	sudo usermod -a -G docker ubuntu
+                	sudo snap disable docker
+                	sudo snap enable docker
+                	docker run -d oraclelinux:7.3
+                	docker ps -a
+		fi
  	fi
 fi
 
 if [ $LinuxFlavor = 'Fedora' ]
 then
-	sudo dnf -y install dnf-plugins-core
-	sudo dnf -y config-manager --add-repo https://download.docker.com/linux/fedora/docker-ce.repo
-	sudo dnf -y install docker-ce
-	sudo systemctl start docker
-	sudo systemctl enable docker
+	function CheckSnapdInstalled {
+		sudo snap version | egrep -c 'snap|snapd'	
+	}
+	SnapdInstalled=$(CheckSnapdInstalled)
+
+	if [ $Release -ge 8 ] && [ $SnapdInstalled -ge 1 ]
+	then
+		sudo snap install docker
+		sleep 5
+		sudo docker run -d oraclelinux:7.3
+	else
+		sudo dnf -y install dnf-plugins-core
+		sudo dnf -y config-manager --add-repo https://download.docker.com/linux/fedora/docker-ce.repo
+		sudo dnf -y install docker-ce
+		sudo systemctl start docker
+		sudo systemctl enable docker
+	fi
+fi
+
+if [ $LinuxFlavor = 'Red' ]
+then
+	function CheckSnapdInstalled {
+		sudo snap version | egrep -c 'snap|snapd'	
+	}
+	SnapdInstalled=$(CheckSnapdInstalled)
+
+	if [ $Release -ge 8 ] && [ $SnapdInstalled -ge 1 ]
+	then
+		sudo snap install docker
+		sudo groupadd docker
+		sudo usermod -a -G docker ubuntu
+		sudo snap disable docker
+		sudo snap enable docker
+		docker run -d oraclelinux:7.3
+		docker ps -a
+	else
+		sudo dnf -y install dnf-plugins-core
+		sudo dnf -y config-manager --add-repo https://download.docker.com/linux/fedora/docker-ce.repo
+		sudo dnf -y install docker-ce
+		sudo systemctl start docker
+		sudo systemctl enable docker
+	fi
 fi
 
 # echo ''
@@ -188,6 +243,7 @@ then
 	echo "Done: Install OCI Tools.                      "
 	echo "=============================================="
 fi
+
 
 # Install ODOO ERP
 # sudo docker run -d -e POSTGRES_USER=odoo -e POSTGRES_PASSWORD=odoo --name db postgres:9.4
