@@ -19,7 +19,8 @@ Orabuntu-LXC BUILDS EVERYTHING itself for the currently supported distros:
 * Fedora 22-33+ (tested on 22 and 33)
 * RedHat 6.x, 7.x, 8.x
 
-**Note**:  Linux 6 while still "theoretically" supported, is effectively "de-supported" because the repos for the various Linux 6 "flavors" are no longer provided by the vendors of the specific distros.  If you can point Orabuntu-LXC to your own in-house yum repos for Linux 6, then Oracle Linux 6, CentOS 6, and RedHat 6 should still be supported for Orabuntu-LXC.  So in other words, Linux 6 is effectively no longer supported for most users who rely on vendor repos, as these repos have been shut down for Linux 6 by their respective vendors.
+**Note 1**: Support for Linux 6 is no longer guaranteed supported due to the vendors of the various Linux 6 flavors de-support of Linux 6.
+**Note 2**: Support for SCST deployer for Linux 6 is no longer guaranteed supported due to the vendors of the various Linux 6 flavors de-support of Linux 6.
 
 **Orabuntu-LXC installer does all of the following automatically**:
 
