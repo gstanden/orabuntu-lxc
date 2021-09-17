@@ -20,6 +20,7 @@ Orabuntu-LXC BUILDS EVERYTHING itself for the currently supported distros:
 * RedHat 6.x, 7.x, 8.x
 
 **Note 1**: Support for Linux 6 is no longer guaranteed supported due to vendor de-support of Linux 6.
+
 **Note 2**: Support for SCST deployer for Linux 6 is no longer guaranteed supported due to vendor de-support of Linux 6.
 
 **Orabuntu-LXC installer does all of the following automatically**:
