@@ -4,7 +4,7 @@ Orabuntu-LXC v7.0.0-alpha Елена Edition (to be released soon) introduces su
 
 Orabuntu-LXC v7.0.0-alpha Елена Edition will be released soon.  The 6.13.25.x-beta AMIDE point releases preview the main new features:
 
-* Fully-automated deployment of N-node LXD clusters on VLANs on OpenvSwitch networks on Oracle Linux, Fedora, RedHat, CentOS, and Ubuntu.
+* Fully-automated deployment of N-node LXD on OpenvSwitch VLAN networks on Oracle Linux, Fedora, RedHat, CentOS, and Ubuntu.
 * User-selectable tunnel-type for multi-host deployments {GRE|geneve|vxlan }.
 * New /anylinux/CONFIG file which centralizes all configuration parameters.
 * Adds support for nftables ("firewall-cmd") for LXD clusters and LXC multi-host "spanned" networks (e.g. on Oracle Linux 8).
