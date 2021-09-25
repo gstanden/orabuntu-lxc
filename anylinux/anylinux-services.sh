@@ -53,6 +53,12 @@ function GetOwner {
 }
 Owner=$(GetOwner)
 
+function GetMultiHostVar20 {
+        echo $MultiHost | cut -f20 -d':'
+}
+MultiHostVar20=$(GetMultiHostVar20)
+TunType=$MultiHostVar20
+
 sudo sed -i '$!N; /^\(.*\)\n\1$/!P; D'  /etc/resolv.conf
 
 # GLS 20180112
@@ -250,6 +256,7 @@ then
         UbuntuMajorVersion=$(GetUbuntuMajorVersion)
 	SubDirName=orabuntu
 	Release=0
+	RedHatVersion=0
 fi
 
 # Check if firewalld.conf file exists.
@@ -308,73 +315,115 @@ then
 fi
 Fwd2=$(GetFwd2)
 
+if [ $LinuxFlavor = 'Oracle' ] && [ $Release -eq 6 ]
+then
+	echo ''
+	echo "=============================================="
+	echo "Install Required Packages...                  "
+	echo "=============================================="
+	echo ''
+
+	sudo yum -y install xfsprogs xfsdump xfsprogs-devel xfsprogs-qa-devel tunctl
+
+	echo ''
+	echo "=============================================="
+	echo "Done: Install Required Packages.              "
+	echo "=============================================="
+	echo ''
+
+	sleep 5
+
+	clear
+fi
+
 # Check if firewalld service is running.
 
 function GetFwd3 {
-	sudo firewall-cmd --state 2>/dev/null | grep -i 'running'
+	sudo firewall-cmd --state 2>/dev/null | grep -ic 'running'
 }
 Fwd3=$(GetFwd3)
 
-if [ $? -eq 0 ]
+if [ -f /etc/firewalld/firewalld.conf ]
 then
-	function GetFirewalldBackend {
+	function GetFwd4 {
 		sudo grep 'nftables' /etc/firewalld/firewalld.conf | grep FirewallBackend | grep -vc '#'
 	}
-	FirewalldBackend=$(GetFirewalldBackend)
+	Fwd4=$(GetFwd4)
 else
-	FirewalldBackend=0
+	Fwd4=0
 fi
 
-if [ $Fwd1 -ge 1 ] && [ $Fwd2 -ge 1 ] && [ $Fwd3 = 'running' ]
+if [ $Fwd1 -ge 1 ] && [ $Fwd2 -ge 1 ] && [ $Fwd3 -ge 1 ]
 then
+	echo ''
+	echo "=============================================="
+	echo "Set firewalld rules ...                       "
+	echo "=============================================="
+	echo ''
+	
+  	sudo firewall-cmd --zone=$Zone --permanent --add-service=dns
+  	sudo firewall-cmd --zone=$Zone --permanent --add-service=dhcp
+ 	sudo firewall-cmd --zone=$Zone --permanent --add-service=https 
+	sudo firewall-cmd --zone=$Zone --permanent --add-masquerade
+	
+	if   [ $TunType = 'geneve' ]
+	then
+		sudo firewall-cmd --zone=$Zone --permanent --add-port=6081/udp
+		sudo firewall-cmd --zone=$Zone --permanent --add-interface=genev_sys_6081
+
+	elif [ $TunType = 'vxlan' ]
+	then
+ 		sudo firewall-cmd --zone=$Zone --permanent --add-port=4789/udp
+ 		sudo firewall-cmd --zone=$Zone --permanent --add-interface=vxlan_sys_4789
+
+	elif [ $TunType = 'gre' ]
+	then
+		sudo firewall-cmd --zone=$Zone --permanent --add-protocol=gre
+ 		sudo firewall-cmd --zone=$Zone --permanent --add-interface=gre_sys
+	fi
+
 	if   [ $LinuxFlavor = 'CentOS' ]
 	then
 		Zone=trusted
-
+	
 	elif [ $LinuxFlavor = 'Fedora' ]
 	then
-		Zone=trusted
-
+		if [ $RedHatVersion -eq 29 ]
+		then
+			Zone=FedoraServer
+			sudo firewall-cmd --permanent --zone=$Zone --set-target=ACCEPT
+		else
+			Zone=trusted
+		fi
+	
 	elif [ $LinuxFlavor = 'Oracle' ]
 	then
-		Zone=trusted
+		if [ $Release -eq 7 ]
+		then
+			Zone=public
+			sudo firewall-cmd --permanent --zone=$Zone --set-target=ACCEPT
+		else
+			Zone=trusted
+			sudo firewall-cmd --permanent --zone=$Zone --set-target=ACCEPT
+		fi
 
 	elif [ $LinuxFlavor = 'Red' ]
 	then
 		Zone=trusted
 	fi
 
-	echo ''
-	echo "=============================================="
-	echo "Set firewalld rules for dhcp and dns...       "
-	echo "=============================================="
-	echo ''
+	if [ $Fwd4 -ge 1 ]
+	then
+  		sudo firewall-cmd --zone=$Zone --permanent --add-port=443/tcp
+  		sudo firewall-cmd --zone=$Zone --permanent --add-port=587/tcp
+ 		sudo firewall-cmd --zone=$Zone --permanent --add-interface=sw1
+ 		sudo firewall-cmd --zone=$Zone --permanent --add-interface=sw1a
+ 		sudo firewall-cmd --zone=$Zone --permanent --add-interface=sx1
+ 		sudo firewall-cmd --zone=$Zone --permanent --add-interface=sx1a
+ 		sudo firewall-cmd --zone=$Zone --permanent --add-interface=lxcbr0
+ 		sudo firewall-cmd --zone=$Zone --permanent --add-interface=lxdbr0
+	fi
 
- 	sudo firewall-cmd --zone=$Zone --permanent --add-service=dhcp
- 	sudo firewall-cmd --zone=$Zone --permanent --add-service=dns
- 	sudo firewall-cmd --zone=$Zone --permanent --add-service=https 
- 	sudo firewall-cmd --zone=$Zone --permanent --add-port=587/tcp
- 	sudo firewall-cmd --zone=$Zone --permanent --add-port=443/tcp
-
-	sudo firewall-cmd --zone=$Zone --permanent --add-protocol=gre
- 	sudo firewall-cmd --zone=$Zone --permanent --add-interface=gre_sys
-	sudo firewall-cmd --zone=$Zone --permanent --add-port=6081/udp
-	sudo firewall-cmd --zone=$Zone --permanent --add-interface=genev_sys_6081
- 	sudo firewall-cmd --zone=$Zone --permanent --add-port=4789/udp
- 	sudo firewall-cmd --zone=$Zone --permanent --add-interface=vxlan_sys_4789
-
-	sudo firewall-cmd --zone=$Zone --permanent --add-interface=sw1
-	sudo firewall-cmd --zone=$Zone --permanent --add-interface=sw1a
-	sudo firewall-cmd --zone=$Zone --permanent --add-interface=sx1
-	sudo firewall-cmd --zone=$Zone --permanent --add-interface=sx1a
-	sudo firewall-cmd --zone=$Zone --permanent --add-interface=lxcbr0
-	sudo firewall-cmd --zone=$Zone --permanent --add-interface=lxdbr0
-
-#	GLS 20210827 Opens up all ports.  Useful for debugging.  Not recommended for production.
-#	sudo firewall-cmd --zone=$Zone --permanent --add-port=1024-65000/udp
-#	sudo firewall-cmd --zone=$Zone --permanent --add-port=1024-65000/tcp
-
-	sudo firewall-cmd --zone=$Zone --permanent --add-masquerade
 	sudo firewall-cmd --reload
 
 	echo ''
@@ -664,6 +713,7 @@ then
 	echo "21. 'Run process under group on solaris (StackExchange)' meuh https://unix.stackexchange.com/questions/402996/run-process-under-group-on-solaris"
 	echo "22. 'Fedora 32: Error Could not resolve host' Humble https://www.humblec.com/fedora-32-error-could-not-resolve-host-while-building-docker-containers/"
 	echo "23. 'Bug 1454584 - firewall-cmd generates bad iptables rule for GRE' gorshkov https://bugzilla.redhat.com/show_bug.cgi?id=1454584"
+	echo "23. 'nohup as background task does NOT return prompt' Devon https://stackoverflow.com/questions/23024850/nohup-as-background-task-does-not-return-prompt"
 	echo ''
 	echo "Acknowledgements"
 	echo ''
@@ -1051,7 +1101,7 @@ echo 'MultiHost                 = '$MultiHost
 		then
 		#	LxcOvsVersion="4.0.10:2.16.0" # GLS Most recent versions LXC/OVS as of 20210820
 		#	LxcOvsVersion="4.0.10:2.10.0" # GLS Default Fedora 29 openvswitch strongly recommended.  Latest LXC.
-			LxcOvsVersion="3.0.4:2.10.0"  # GLS Default Fedora 29 repo default versions (fastest install)
+		 	LxcOvsVersion="3.0.4:2.10.0"  # GLS Default Fedora 29 repo default versions (fastest install)
 		fi
 	fi
 

@@ -4459,69 +4459,76 @@ sleep 5
 
 clear
 
-echo ''
-echo "=============================================="
-echo "Create OvsVethCleanup.service                 "
-echo "=============================================="
-echo ''
+### new
 
-sudo sh -c "echo '[Unit]'                                                               >  /etc/systemd/system/OvsVethCleanup.service"
-sudo sh -c "echo 'Description=OvsVethCleanup job'                                       >> /etc/systemd/system/OvsVethCleanup.service"
-sudo sh -c "echo ''                                                                     >> /etc/systemd/system/OvsVethCleanup.service"
-sudo sh -c "echo '[Service]'                                                            >> /etc/systemd/system/OvsVethCleanup.service"
-sudo sh -c "echo 'Type=oneshot'                                                         >> /etc/systemd/system/OvsVethCleanup.service"
-sudo sh -c "echo 'User=root'                                                            >> /etc/systemd/system/OvsVethCleanup.service"
-sudo sh -c "echo 'ExecStart=/usr/bin/bash /etc/network/openvswitch/OvsVethCleanup.sh'   >> /etc/systemd/system/OvsVethCleanup.service"
-sudo sh -c "echo ''                                                                     >> /etc/systemd/system/OvsVethCleanup.service"
-sudo sh -c "echo '[Install]'								>> /etc/systemd/system/OvsVethCleanup.service"
-sudo sh -c "echo 'WantedBy=multi-user.target'						>> /etc/systemd/system/OvsVethCleanup.service"
+if [ $Release -le 6 ]
+then
+        sudo /etc/network/openvswitch/OvsVethCleanupCronjob.sh
+else
+        echo ''
+        echo "=============================================="
+        echo "Create OvsVethCleanup.service                 "
+        echo "=============================================="
+        echo ''
 
-sudo cat /etc/systemd/system/OvsVethCleanup.service
+        sudo sh -c "echo '[Unit]'                                                               >  /etc/systemd/system/OvsVethCleanup.service"
+        sudo sh -c "echo 'Description=OvsVethCleanup job'                                       >> /etc/systemd/system/OvsVethCleanup.service"
+        sudo sh -c "echo ''                                                                     >> /etc/systemd/system/OvsVethCleanup.service"
+        sudo sh -c "echo '[Service]'                                                            >> /etc/systemd/system/OvsVethCleanup.service"
+        sudo sh -c "echo 'Type=oneshot'                                                         >> /etc/systemd/system/OvsVethCleanup.service"
+        sudo sh -c "echo 'User=root'                                                            >> /etc/systemd/system/OvsVethCleanup.service"
+        sudo sh -c "echo 'ExecStart=/usr/bin/bash /etc/network/openvswitch/OvsVethCleanup.sh'   >> /etc/systemd/system/OvsVethCleanup.service"
+        sudo sh -c "echo ''                                                                     >> /etc/systemd/system/OvsVethCleanup.service"
+        sudo sh -c "echo '[Install]'                                                            >> /etc/systemd/system/OvsVethCleanup.service"
+        sudo sh -c "echo 'WantedBy=multi-user.target'                                           >> /etc/systemd/system/OvsVethCleanup.service"
 
-echo ''
-echo "=============================================="
-echo "Done: Create OvsVethCleanup.service           "
-echo "=============================================="
-echo ''
+        sudo cat /etc/systemd/system/OvsVethCleanup.service
 
-sleep 5
+        echo ''
+        echo "=============================================="
+        echo "Done: Create OvsVethCleanup.service           "
+        echo "=============================================="
+        echo ''
 
-clear
+        sleep 5
 
-echo ''
-echo "=============================================="
-echo "Install OvsVethCleanup.timer                  "
-echo "=============================================="
-echo ''
+        clear
 
-sudo sh -c "echo '[Unit]'                                                               >  /etc/systemd/system/OvsVethCleanup.timer"
-sudo sh -c "echo 'Description=OvsVethCleanup'                                           >> /etc/systemd/system/OvsVethCleanup.timer"
-sudo sh -c "echo ''                                                                     >> /etc/systemd/system/OvsVethCleanup.timer"
-sudo sh -c "echo '[Timer]'                                                              >> /etc/systemd/system/OvsVethCleanup.timer"
-sudo sh -c "echo 'OnUnitActiveSec=60s'                                                  >> /etc/systemd/system/OvsVethCleanup.timer"
-sudo sh -c "echo 'OnBootSec=60s'                                                        >> /etc/systemd/system/OvsVethCleanup.timer"
-sudo sh -c "echo ''                                                                     >> /etc/systemd/system/OvsVethCleanup.timer"
-sudo sh -c "echo '[Install]'                                                            >> /etc/systemd/system/OvsVethCleanup.timer"
-sudo sh -c "echo 'WantedBy=timers.target'                                               >> /etc/systemd/system/OvsVethCleanup.timer"
+        echo ''
+        echo "=============================================="
+        echo "Install OvsVethCleanup.timer                  "
+        echo "=============================================="
+        echo ''
 
-sudo cat /etc/systemd/system/OvsVethCleanup.timer
+        sudo sh -c "echo '[Unit]'                                                               >  /etc/systemd/system/OvsVethCleanup.timer"
+        sudo sh -c "echo 'Description=OvsVethCleanup'                                           >> /etc/systemd/system/OvsVethCleanup.timer"
+        sudo sh -c "echo ''                                                                     >> /etc/systemd/system/OvsVethCleanup.timer"
+        sudo sh -c "echo '[Timer]'                                                              >> /etc/systemd/system/OvsVethCleanup.timer"
+        sudo sh -c "echo 'OnUnitActiveSec=60s'                                                  >> /etc/systemd/system/OvsVethCleanup.timer"
+        sudo sh -c "echo 'OnBootSec=60s'                                                        >> /etc/systemd/system/OvsVethCleanup.timer"
+        sudo sh -c "echo ''                                                                     >> /etc/systemd/system/OvsVethCleanup.timer"
+        sudo sh -c "echo '[Install]'                                                            >> /etc/systemd/system/OvsVethCleanup.timer"
+        sudo sh -c "echo 'WantedBy=timers.target'                                               >> /etc/systemd/system/OvsVethCleanup.timer"
 
-echo ''
+        sudo cat /etc/systemd/system/OvsVethCleanup.timer
 
-sudo systemctl daemon-reload
-sudo systemctl enable OvsVethCleanup.timer
-sudo systemctl start  OvsVethCleanup.timer
+        echo ''
 
-echo ''
+        sudo systemctl daemon-reload
+        sudo systemctl enable OvsVethCleanup.timer
+        sudo systemctl start  OvsVethCleanup.timer
 
-sudo systemctl list-timers --all
+        echo ''
 
-sleep 5
+        sudo systemctl list-timers --all
 
-echo ''
-echo "=============================================="
-echo "Done: Install OvsVethCleanup.timer            "
-echo "=============================================="
+        sleep 5
+
+        echo ''
+        echo "=============================================="
+        echo "Done: Install OvsVethCleanup.timer            "
+        echo "=============================================="
+fi
 
 sleep 5
 
@@ -5250,9 +5257,11 @@ do
 
                	 	sudo sh -c "echo ''							>> /etc/systemd/system/$k.service"
                	 	sudo sh -c "echo '[Service]'						>> /etc/systemd/system/$k.service"
-                	sudo sh -c "echo 'Type=oneshot'						>> /etc/systemd/system/$k.service"
-                	sudo sh -c "echo 'User=root'						>> /etc/systemd/system/$k.service"
-                	sudo sh -c "echo 'RemainAfterExit=yes'					>> /etc/systemd/system/$k.service"
+                        sudo sh -c "echo 'Type=simple'                                          >> /etc/systemd/system/$k.service"
+                        sudo sh -c "echo 'User=root'                                            >> /etc/systemd/system/$k.service"
+                        sudo sh -c "echo 'RemainAfterExit=yes'                                  >> /etc/systemd/system/$k.service"
+                        sudo sh -c "echo 'Restart=on-failure'                                   >> /etc/systemd/system/$k.service"
+                        sudo sh -c "echo 'RestartSec=5'                                         >> /etc/systemd/system/$k.service"
                 	sudo sh -c "echo 'ExecStart=/etc/network/openvswitch/crt_ovs_$k.sh' 	>> /etc/systemd/system/$k.service"
 			sudo sh -c "echo 'ExecStop=/usr/bin/ovs-vsctl del-br $k'                >> /etc/systemd/system/$k.service"
                 	sudo sh -c "echo ''							>> /etc/systemd/system/$k.service"
@@ -5283,7 +5292,22 @@ do
 			sudo systemctl daemon-reload
        			sudo systemctl enable $k.service
 			sudo service $k start
+
 			sudo service $k status
+			echo ''
+
+			sudo ifconfig $k >/dev/null 2>&1
+			IfCon=`echo $?`
+			n=1
+			while [ $IfCon -ne 0 ] && [ $n -le 5 ]
+			do
+				sudo ifconfig $k >/dev/null 2>&1
+				IfCon=`echo $?`
+				n=$((n+1))
+				sleep 5
+			done
+
+			sudo ifconfig $k
 
 			echo ''
 			echo "=============================================="
@@ -5481,27 +5505,6 @@ then
 
 	if [ -n $NameServer ]
 	then
-		if [ $Release -ge 7 ]
-		then
-			echo "=============================================="
-			echo "Restart OpenvSwitches...                      "
-			echo "=============================================="
-			echo ''
-
- 			sudo service sw1 restart 
- 			sudo service sx1 restart
-			
-			echo ''
-			echo "=============================================="
-			echo "Done: Restart OpenvSwitches...                "
-			echo "=============================================="
-			echo ''
-
-			sleep 5
-
-			clear
-		fi
-
 	        function CheckFileSystemTypeXfs {
 			stat --file-system --format=%T /var/lib/lxc | grep -c xfs
        		}
@@ -6258,15 +6261,10 @@ then
 		sudo sed -i "s/REMOTE_GRE_ENDPOINT/$MultiHostVar5/g"		/etc/network/openvswitch/crt_ovs_sw1.sh
 
 		echo ''
-		echo "=============================================="
-		echo "Close firewall to unused tunnel types...      "
-		echo "=============================================="
-		echo ''
-	
-		if [ $LinuxFlavor = 'Red' ] || [ $LinuxFlavor = 'Fedora' ] || [ $LinuxFlavor = 'Oracle' ] || [ $LinuxFlavor = 'CentOS' ]
-		then
-			Zone=trusted
-		fi
+                echo "=============================================="
+		echo "Create tunnel/remove unused tunnel types...   "
+                echo "=============================================="
+                echo ''
 
 		if   [ $TunType = 'geneve' ]
                 then
@@ -6275,12 +6273,6 @@ then
                         sudo sed -i '/type=gre/d'   /etc/network/openvswitch/crt_ovs_sw1.sh
                         sudo sed -i '/type=vxlan/d' /etc/network/openvswitch/crt_ovs_sw1.sh
 
-			sudo firewall-cmd --zone=$Zone --permanent --remove-port=4789/udp
-			sudo firewall-cmd --zone=$Zone --permanent --remove-interface=vxlan_sys_4789
-			sudo firewall-cmd --zone=$Zone --permanent --remove-protocol=gre
-			sudo firewall-cmd --zone=$Zone --permanent --remove-interface=gre_sys
-			sudo firewall-cmd --reload
-
                 elif [ $TunType = 'gre' ]
                 then
                         sudo ovs-vsctl add-port sw1 gre$Sw1Index trunks=10,11 -- set interface gre$Sw1Index type=gre options:remote_ip=$MultiHostVar5
@@ -6288,29 +6280,17 @@ then
                         sudo sed -i '/type=geneve/d' /etc/network/openvswitch/crt_ovs_sw1.sh
                         sudo sed -i '/type=vxlan/d'  /etc/network/openvswitch/crt_ovs_sw1.sh
 
-			sudo firewall-cmd --zone=$Zone --permanent --remove-port=6081/udp
-			sudo firewall-cmd --zone=$Zone --permanent --remove-interface=genev_sys_6081
-			sudo firewall-cmd --zone=$Zone --permanent --remove-port=4789/udp
-			sudo firewall-cmd --zone=$Zone --permanent --remove-interface=vxlan_sys_4789
-			sudo firewall-cmd --reload
-
                 elif [ $TunType = 'vxlan' ]
                 then
                         sudo ovs-vsctl add-port sw1 vxlan$Sw1Index trunks=10,11 -- set interface vxlan$Sw1Index type=vxlan options:remote_ip=$MultiHostVar5 options:key=flow
 
                         sudo sed -i '/type=geneve/d' /etc/network/openvswitch/crt_ovs_sw1.sh
                         sudo sed -i '/type=gre/d'    /etc/network/openvswitch/crt_ovs_sw1.sh
-
-			sudo firewall-cmd --zone=$Zone --permanent --remove-protocol=gre
-			sudo firewall-cmd --zone=$Zone --permanent --remove-interface=gre_sys
-			sudo firewall-cmd --zone=$Zone --permanent --remove-port=4789/udp
-			sudo firewall-cmd --zone=$Zone --permanent --remove-interface=vxlan_sys_4789
-			sudo firewall-cmd --reload
                 fi
 
 		echo ''
 		echo "=============================================="
-		echo "Done: Close firewall to unused tunnel types.  "
+		echo "Done: Create tunnel/remove unused tunnel types"
 		echo "=============================================="
 		echo ''
 
@@ -6339,25 +6319,47 @@ then
 
                 if   [ $TunType = 'geneve' ]
                 then
-			sudo sed -i '/type=gre/d'			/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
-			sudo sed -i '/type=vxlan/d'			/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
-			sudo sed -i '/port=6081/d'        		/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh	
-			sudo sed -i '/interface=genev_sys_6081/d'	/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh	
+                        sudo sed -i '/type=gre/d'                                       /etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
+                        sudo sed -i '/type=vxlan/d'                                     /etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
+                       
+			sudo sed -i '/protocol=gre/d'                                   /etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
+                        sudo sed -i '/interface=gre_sys/d'                       	/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
+                        sudo sed -i '/port=4789/d'                       		/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
+                        sudo sed -i '/interface=vxlan_sys_4789/d'                       /etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
 
                 elif [ $TunType = 'gre' ]
                 then
-                        sudo sed -i '/type=geneve/d'			/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
-			sudo sed -i '/type=vxlan/d'			/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
-			sudo sed -i '/protocol=gre/d'			/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh	
-			sudo sed -i '/interface=gre_sys/d'		/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh	
+                        sudo sed -i '/type=geneve/d'                                    /etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
+                        sudo sed -i '/type=vxlan/d'                                     /etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
+
+                        sudo sed -i '/port=4789/d'					/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
+                        sudo sed -i '/interface=vxlan_sys_4789/d'                       /etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
+                        sudo sed -i '/port=6081/d'					/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
+                        sudo sed -i '/interface=genev_sys_6081/d'                       /etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
 
                 elif [ $TunType = 'vxlan' ]
                 then
-                        sudo sed -i '/type=geneve/d'			/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
-                        sudo sed -i '/type=gre/d'			/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
-			sudo sed -i '/port=4789/d'			/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh	
-			sudo sed -i '/interface=vxlan_sys_4789/d'	/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh	
+                        sudo sed -i '/type=geneve/d'                                    /etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
+                        sudo sed -i '/type=gre/d'                                       /etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
+
+                        sudo sed -i '/port=6081/d'					/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
+                        sudo sed -i '/interface=genev_sys_6081/d'                       /etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
+			sudo sed -i '/protocol=gre/d'                                   /etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
+                        sudo sed -i '/interface=gre_sys/d'                       	/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
                 fi
+                        
+		if [ $LinuxFlavor = 'Fedora' ] && [ $RedHatVersion -eq 29 ]
+                then
+			Zone=FedoraServer
+                	sudo sed -i "s/zone=trusted/zone=$Zone/g"       		/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
+                fi     
+
+		if [ $LinuxFlavor = 'Oracle' ] && [ $Release -eq 7 ]
+                then
+			Zone=public
+                	sudo sed -i "s/zone=trusted/zone=$Zone/g"       		/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
+                fi     
+
 
 		sudo chmod 777 /etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
 

@@ -709,7 +709,7 @@ then
 			echo "=============================================="
 			echo ''
 
-			sudo yum install epel-release
+			sudo yum -y install epel-release
 
 			echo ''
 			echo "=============================================="
@@ -777,21 +777,22 @@ then
 		echo 'error: too early for operation... can be safely IGNORED.'
 		echo ''
 
-		function CheckSnapInstalled {
+		function CheckLxdSnapInstalled {
 			sudo snap list lxd > /dev/null 2>&1
 		}
-		SnapInstalled=$(CheckSnapInstalled)
-		SnapInstalled=`echo $?`
+		LxdSnapInstalled=$(CheckLxdSnapInstalled)
+		LxdSnapInstalled=`echo $?`
 
-		while [ $SnapInstalled -ne 0 ]
+		while [ $LxdSnapInstalled -ne 0 ]
 		do
 			sudo snap install lxd
-			SnapInstalled=$(CheckSnapInstalled)
-			SnapInstalled=`echo $?`
+			LxdSnapInstalled=$(CheckLxdSnapInstalled)
+			LxdSnapInstalled=`echo $?`
 			sleep 15
 			echo ''
 		done
 
+		sudo snap install lxd
 		sudo snap refresh lxd
 
 		echo ''
@@ -803,6 +804,40 @@ then
 		sleep 5
 
 		clear
+
+		if [ $K8S = 'Y' ]
+		then
+			echo ''
+			echo "=============================================="
+			echo "Install K8S (takes awhile...patience...)      "
+			echo "=============================================="
+			echo ''
+
+			function CheckK8sSnapInstalled {
+				sudo snap list microk8s > /dev/null 2>&1
+			}
+			K8sSnapInstalled=$(CheckK8sSnapInstalled)
+			K8sSnapInstalled=`echo $?`
+
+			while [ $K8sSnapInstalled -ne 0 ]
+			do
+				sudo snap install microk8s --classic
+				K8sSnapInstalled=$(CheckK8sSnapInstalled)
+				K8sSnapInstalled=`echo $?`
+				sleep 15
+				echo ''
+			done
+
+			echo ''
+			echo "=============================================="
+			echo "Done: Install K8S.                            "
+			echo "=============================================="
+			echo ''
+
+			sleep 5
+
+			clear
+		fi
 
 		echo ''
 		echo "=============================================="
@@ -939,6 +974,24 @@ then
 		echo ''
 		echo "=============================================="
 		echo "Done: Reload snap.lxd.daemon.                 "
+		echo "=============================================="
+		echo ''
+
+		sleep 5
+
+		clear
+
+		echo ''
+		echo "=============================================="
+		echo "Restart OpenvSwitch sw1 ...                   "
+		echo "=============================================="
+		echo ''
+
+		sudo service sw1 restart	
+
+		echo ''
+		echo "=============================================="
+		echo "Done: Restart OpenvSwitch sw1.                "
 		echo "=============================================="
 		echo ''
 

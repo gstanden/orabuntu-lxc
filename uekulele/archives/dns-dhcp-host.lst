@@ -25,12 +25,13 @@
 /etc/network/openvswitch/crt_ovs_sw3.sh
 /etc/network/openvswitch/crt_ovs_sw2.sh
 /etc/network/openvswitch/OvsVethCleanup.sh
-/etc/network/openvswitch/crt_ovs_sx1.sh
 /etc/network/openvswitch/olxc_sx1a
 /etc/network/openvswitch/preseed.sw1a.olxc.001.lxd.cluster
 /etc/network/openvswitch/preseed.sw1a.olxc.002.lxd.cluster
-/etc/network/openvswitch/setup_gre_and_routes.sh
-/etc/network/openvswitch/crt_ovs_sw1.sh
 /etc/network/openvswitch/strt_nsa.sh
+/etc/network/openvswitch/OvsVethCleanupCronjob.sh
+/etc/network/openvswitch/crt_ovs_sx1.sh
+/etc/network/openvswitch/crt_ovs_sw1.sh
+/etc/network/openvswitch/setup_gre_and_routes.sh
 /etc/GNU3
 /etc/COPYING
