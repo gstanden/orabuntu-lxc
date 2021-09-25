@@ -1,12 +1,10 @@
 # What is Orabuntu-LXC 6.13.25.x-beta AMIDE ?
 
-Orabuntu-LXC v7.0.0-alpha AMIDE Edition (to be released soon) introduces support for fully-automated 2-node LXD cluster creation. Generalization to N-node to be released soon.  These releases in the 6.13.25.x-beta series are v7.0.0-alpha "precursor releases" previewing v7.0.0-alpha new features.
+Orabuntu-LXC v7.0.0-alpha ELENA Edition (to be released soon) introduces support for fully-automated N-node LXD cluster creation. hese releases in the 6.13.25.x-beta series are v7.0.0-alpha "precursor releases" previewing v7.0.0-alpha new features.
 
-**AMIDE** still stands for "**A**mazon **M**ult-**I**-host LX**D D**ocker **E**nterprise **E**dition" and in v7.0.0-alpha "LX**D**" has been added to AMI**D**E.
+Orabuntu-LXC v7.0.0-alpha ELENA Edition will be released soon.  The 6.13.25.x-beta AMIDE point releases preview the main new features:
 
-Orabuntu-LXC v7.0.0-alpha AMIDE Edition will be released soon.  The 6.13.25.x-beta AMIDE point releases preview the main new features:
-
-* Fully-automated deployment of 2-node LXD clusters on VLANs on OpenvSwitch networks on Oracle Linux 7 and 8, and Ubuntu 20.04.
+* Fully-automated deployment of N-node LXD clusters on VLANs on OpenvSwitch networks on Oracle Linux, Fedora, CentOS, RedHat and Ubuntu.
 * User-selectable tunnel-type for multi-host deployments {GRE|geneve|vxlan }.
 * New /anylinux/CONFIG file which centralizes all configuration parameters.
 * Adds support for nftables ("firewall-cmd") for LXD clusters and LXC multi-host "spanned" networks (e.g. on Oracle Linux 8).
@@ -16,11 +14,12 @@ Orabuntu-LXC BUILDS EVERYTHING itself for the currently supported distros:
 * Oracle Linux 6.x, 7.x, 8.x
 * Ubuntu 16.04+ (16.04 and all higher versions)
 * CentOS 6.x, 7.x, 8.x
-* Fedora 22-33+ (tested on 22 and 33)
+* Fedora 22-34+ (tested on 22 and 33)
 * RedHat 6.x, 7.x, 8.x
 
-**Note**:  Linux 6 while still "theoretically" supported, is effectively "de-supported" because the repos for the various Linux 6 "flavors" are no longer provided by the vendors of the specific distros.  If you can point Orabuntu-LXC to your own in-house yum repos for Linux 6, then Oracle Linux 6, CentOS 6, and RedHat 6 should still be supported for Orabuntu-LXC.  So in other words, Linux 6 is effectively no longer supported for most users who rely on vendor repos, as these repos have been shut down for Linux 6 by their respective vendors.
-
+**Note 1**:  Linux 6 support cannot be guaranteed due to de-support by vendors of distros
+**Note 2**:  SCST on Linux 6 cannot be guaranteed due to de-support by SCST 
+       
 **Orabuntu-LXC installer does all of the following automatically**:
 
 * Automatically detects your OS and branches to the appropriate build pathway
