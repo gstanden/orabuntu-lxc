@@ -37,6 +37,7 @@ function GetGREValue {
 	echo $MultiHost | cut -f10 -d':'
 }
 GREValue=$(GetGREValue)
+GRE=$GREValue
 
 function GetDistDir {
 	pwd | rev | cut -f2-20 -d'/' | rev
@@ -343,7 +344,7 @@ function GetFwd3 {
 }
 Fwd3=$(GetFwd3)
 
-if [ -f /etc/firewalld/firewalld.conf ]
+if sudo test -f /etc/firewalld/firewalld.conf
 then
 	function GetFwd4 {
 		sudo grep 'nftables' /etc/firewalld/firewalld.conf | grep FirewallBackend | grep -vc '#'
@@ -361,27 +362,6 @@ then
 	echo "=============================================="
 	echo ''
 	
-  	sudo firewall-cmd --zone=$Zone --permanent --add-service=dns
-  	sudo firewall-cmd --zone=$Zone --permanent --add-service=dhcp
- 	sudo firewall-cmd --zone=$Zone --permanent --add-service=https 
-	sudo firewall-cmd --zone=$Zone --permanent --add-masquerade
-	
-	if   [ $TunType = 'geneve' ]
-	then
-		sudo firewall-cmd --zone=$Zone --permanent --add-port=6081/udp
-		sudo firewall-cmd --zone=$Zone --permanent --add-interface=genev_sys_6081
-
-	elif [ $TunType = 'vxlan' ]
-	then
- 		sudo firewall-cmd --zone=$Zone --permanent --add-port=4789/udp
- 		sudo firewall-cmd --zone=$Zone --permanent --add-interface=vxlan_sys_4789
-
-	elif [ $TunType = 'gre' ]
-	then
-		sudo firewall-cmd --zone=$Zone --permanent --add-protocol=gre
- 		sudo firewall-cmd --zone=$Zone --permanent --add-interface=gre_sys
-	fi
-
 	if   [ $LinuxFlavor = 'CentOS' ]
 	then
 		Zone=trusted
@@ -411,11 +391,35 @@ then
 	then
 		Zone=trusted
 	fi
+	
+  	sudo firewall-cmd --zone=$Zone --permanent --add-service=dns
+  	sudo firewall-cmd --zone=$Zone --permanent --add-service=dhcp
+ 	sudo firewall-cmd --zone=$Zone --permanent --add-service=https 
+	sudo firewall-cmd --zone=$Zone --permanent --add-masquerade
+  	sudo firewall-cmd --zone=$Zone --permanent --add-port=443/tcp
+  	sudo firewall-cmd --zone=$Zone --permanent --add-port=587/tcp
+
+	if [ $GRE = 'Y' ]
+	then	
+		if   [ $TunType = 'geneve' ]
+		then
+			sudo firewall-cmd --zone=$Zone --permanent --add-port=6081/udp
+			sudo firewall-cmd --zone=$Zone --permanent --add-interface=genev_sys_6081
+	
+		elif [ $TunType = 'vxlan' ]
+		then
+ 			sudo firewall-cmd --zone=$Zone --permanent --add-port=4789/udp
+ 			sudo firewall-cmd --zone=$Zone --permanent --add-interface=vxlan_sys_4789
+
+		elif [ $TunType = 'gre' ]
+		then
+			sudo firewall-cmd --zone=$Zone --permanent --add-protocol=gre
+ 			sudo firewall-cmd --zone=$Zone --permanent --add-interface=gre_sys
+		fi
+	fi
 
 	if [ $Fwd4 -ge 1 ]
 	then
-  		sudo firewall-cmd --zone=$Zone --permanent --add-port=443/tcp
-  		sudo firewall-cmd --zone=$Zone --permanent --add-port=587/tcp
  		sudo firewall-cmd --zone=$Zone --permanent --add-interface=sw1
  		sudo firewall-cmd --zone=$Zone --permanent --add-interface=sw1a
  		sudo firewall-cmd --zone=$Zone --permanent --add-interface=sx1
