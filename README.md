@@ -2,7 +2,7 @@
 
 Orabuntu-LXC v7.0.0-alpha ELENA Edition (to be released soon) introduces support for fully-automated N-node LXD cluster creation. hese releases in the 6.13.25.x-beta series are v7.0.0-alpha "precursor releases" previewing v7.0.0-alpha new features.
 
-Orabuntu-LXC v7.0.0-alpha ELENA Edition will be released soon.  The 6.13.25.x-beta AMIDE point releases preview the main new features:
+The 6.13.25.x-beta AMIDE point releases preview the main new features of v7.0.0-alpha ELENA edition:
 
 * Fully-automated deployment of N-node LXD clusters on VLANs on OpenvSwitch networks on Oracle Linux, Fedora, CentOS, RedHat and Ubuntu.
 * User-selectable tunnel-type for multi-host deployments {GRE|geneve|vxlan }.
