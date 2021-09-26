@@ -1,6 +1,6 @@
 # What is Orabuntu-LXC 7.0.0-alpha ELENA ?
 
-Announcing Orabuntu-LXC v7.0.0-alpha ELENA (Enterprise LXD Edition New AMIDE) available now in MASTER branch only introducing support for fully-automated N-node LXD cluster creation.
+Announcing Orabuntu-LXC v7.0.0-alpha ELENA (Enterprise LXD Edition New AMIDE) available now (in MASTER branch only) introducing support for fully-automated N-node LXD cluster creation.
 
 New features of v7.0.0-alpha ELENA edition:
 
