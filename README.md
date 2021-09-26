@@ -131,7 +131,7 @@ anylinux-services.GRE.HOST.sh
 ```
 are still totally automated as just as they have always been, and the scripts are a "one-button push" fully-automated way to create the containers and networks just the same as the way they work for LXC deployments.
 
-If LXC containers are preferred, then set these two parameters as a pair to "Y" shown below. It's highly-recommended to set both of these parameters to "Y" because even if deploying a single LXD node, this create the single server and a "one-node LXD cluster" which makes in "cluster-ready" so that another node can be easily added alter if desired, since the clustering is already setup. In the case of HUB HOST the LXDCluster switch creates a "single-node" LXD cluster, and in the case of GRE HOST an "N-node" LXD cluster depending on how many GRE hosts have been added to the cluster.
+If LXC containers are preferred, then set these two parameters as a pair to "Y" shown below. It's highly-recommended to set both of these parameters to "Y" because even if deploying a single LXD node, this create the single server and a "one-node LXD cluster" which makes the single-node LXD "cluster-ready" so that another node can be easily added alter if desired, since the clustering is already setup. In the case of HUB HOST the LXDCluster switch creates a "single-node" LXD cluster, and in the case of GRE HOST an "N-node" LXD cluster depending on how many GRE hosts have been added to the cluster.
 ```
 LXD=N
 LXDCluster=N
