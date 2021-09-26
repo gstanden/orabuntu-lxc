@@ -168,7 +168,7 @@ With the replicated and constantly updated LXC containerized DNS/DHCP solution, 
 
 **Note**: I haven't done any work recently with the "Amazon Cloud" part of the project, and currently only support LXC networks spanned across Ubuntu 16.04 EC2 containers.  Nothing has been done yet implementing the LXD Cluster features across Amazon EC2 instances.  Support for Orabuntu-LXC deployed LXD clusters on Amazon EC2 is on the roadmap, but not the immediate roadmap. 
 
-#  More Detailed: Install Orabuntu-LXC v6.13.25.x-beta AMIDE 
+#  More Detailed: Install Orabuntu-LXC v7.0.0-alpha ELENA 
 
 An administrative non-root user account is required (such as the install account). The non-root user needs to have "sudo ALL" privilege.
 
