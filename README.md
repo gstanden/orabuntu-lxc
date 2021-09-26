@@ -1,6 +1,6 @@
 # What is Orabuntu-LXC 6.13.25.x-beta AMIDE ?
 
-Orabuntu-LXC v7.0.0-alpha ELENA Edition (to be released soon) introduces support for fully-automated N-node LXD cluster creation. hese releases in the 6.13.25.x-beta series are v7.0.0-alpha "precursor releases" previewing v7.0.0-alpha new features.
+Orabuntu-LXC v7.0.0-alpha ELENA (Enterprise LXD Edition New AMIDE) to be released soon, introduces support for fully-automated N-node LXD cluster creation. These releases in the 6.13.25.x-beta series are v7.0.0-alpha "precursor releases" previewing v7.0.0-alpha new features.
 
 The 6.13.25.x-beta AMIDE point releases preview the main new features of v7.0.0-alpha ELENA edition:
 
