@@ -100,7 +100,7 @@ If a non-root administrative user is not available on the host, create it with t
 
 Step 4
 
-Edit the **/anylinux/CONFIG** file to select either LXC or LXDFor example, to select LXD clusters, set the following parameters in the CONFIG file as shown below.
+Edit the **/anylinux/CONFIG** file to select either LXC or LXD. For example, to select LXD clusters, set the following parameters in the CONFIG file as shown below.
 ```
 LXD=Y
 LXDCluster=Y
