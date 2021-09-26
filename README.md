@@ -84,7 +84,13 @@ sudo yum -y install unzip wget openssh-server net-tools bind-utils
 
 Step 3
 
-Download the latest Orabuntu-LXC 7.0.0-alpha ELENA release (as of September 26, 2021 this is in MASTER branch only) to /home/username/Downloads and unzip it, then navigate to the "anylinux" directory.
+Download the latest Orabuntu-LXC 7.0.0-alpha ELENA release (as of September 26, 2021 this is in MASTER branch only) to 
+
+"/home/username/Downloads" 
+
+and unzip it, then navigate to the "anylinux" directory. 
+
+**Note** that you can download to any directory owned by the install user; the "Downloads" directory is just a recommended download destination.
 
 If a non-root administrative user is not available on the host, create it with the ./uekulele/uekulele-services-0.sh script as described below.
 
