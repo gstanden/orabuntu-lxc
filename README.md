@@ -17,7 +17,7 @@ Orabuntu-LXC BUILDS EVERYTHING itself for the currently supported distros:
 * Fedora 22-34+ (tested on 22, 24, 29, 33 and 34)
 * RedHat 6.x, 7.x, 8.x
 
-**Note 1**:  Linux 6 support cannot be guaranteed due to de-support by vendors of distros
+**Note 1**:  Linux 6 support cannot be guaranteed due to de-support of Linux 6 by Linux vendors
 
 **Note 2**:  SCST on Linux 6 cannot be guaranteed due to de-support by SCST 
        
