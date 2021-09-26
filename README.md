@@ -93,7 +93,7 @@ zfsutils/oracle/zpool_oracle8_uek.sh
 ```
 The scripts can be edited to use other than (/dev/sdb + /dev/sdc) for example (/dev/sdg + /dev/sdk).  
 
-For ZFS pools on Ubuntu 20.04 similar manual steps can be used to create the required olxc-001 or olxc-002 ZFS storage pool.
+There are scripts in distro subdirectories to create the required ZFS storage pools for all supported Orabuntu-LXC distro.
 
 Other than pre-creating the olxc-001 on the HUB host and the olxc-002 on the GRE host, the Orabuntu-LXC main scripts
 ```
