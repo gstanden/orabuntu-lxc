@@ -90,6 +90,8 @@ Download the latest Orabuntu-LXC 7.0.0-alpha ELENA release (as of September 26, 
 
 **Note 2:** the uekulele-services-0.sh script by default sets the linux install user password to the same as username ("ubuntu/ubuntu") but there is a random password generator in the uekulele-services-0.sh script so edit the script to use the random password generator for security if desired.
 
+Step 4
+
 Edit the **/anylinux/CONFIG** file to select either LXC or LXDFor example, to select LXD clusters, set the following parameters in the CONFIG file as shown below.
 ```
 LXD=Y
@@ -97,9 +99,15 @@ LXDCluster=Y
 ```
 If instead LXC containers (not LXD) multi-host span is desired, set both of these parameters to "N".
 
+Step 5
+
 Edit other install parameters in the **/anylinux/CONFIG** file as desired or required.
 
-Note that if LXD=Y and LXDCluster=Y are selected, it will be necessary to first create the required ZFS storage pool olxc-001 (for HUB node) and optionally olxc-002 (for GRE node if creating N-node LXD Cluster). To create this, add /dev/sdb and /dev/sdc storage, and then create the ZFS storage pool.  For Oracle Linux, scripts to fully automate the creation of the required olxc-001 zfs pool are located as shown below.
+Step 6
+
+Note that if LXD=Y and LXDCluster=Y are selected, it will be necessary to first create the required ZFS storage pool for the LXD cluster.  The naming convention olxc-001 (for HUB node) and optionally olxc-002 (for GRE node if creating N-node LXD Cluster) etc is suggested, but any naming arbitrary naming scheme can be used in the ./anylinux/CONFIG file for naming the ZFS storage pools. 
+
+To create the ZFS storage pools, add /dev/sdb and /dev/sdc storage, and then create the ZFS storage pool.  For Oracle Linux, scripts to fully automate the creation of the required olxc-001 zfs pool are located as shown below.
 ```
 zfsutils/oracle/zpool_oracle7_uek.sh
 zfsutils/oracle/zpool_oracle8_uek.sh
