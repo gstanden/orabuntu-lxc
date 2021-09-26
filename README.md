@@ -97,6 +97,8 @@ LXDCluster=Y
 ```
 If instead LXC containers (not LXD) multi-host span is desired, set both of these parameters to "N".
 
+Edit other install parameters in the **/anylinux/CONFIG** file as desired or required.
+
 Note that if LXD=Y and LXDCluster=Y are selected, it will be necessary to first create the required ZFS storage pool olxc-001 (for HUB node) and optionally olxc-002 (for GRE node if creating N-node LXD Cluster). To create this, add /dev/sdb and /dev/sdc storage, and then create the ZFS storage pool.  For Oracle Linux, scripts to fully automate the creation of the required olxc-001 zfs pool are located as shown below.
 ```
 zfsutils/oracle/zpool_oracle7_uek.sh
