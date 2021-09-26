@@ -84,7 +84,7 @@ sudo yum -y install unzip wget openssh-server net-tools bind-utils
 
 Step 3
 
-Download the latest Orabuntu-LXC 7.0.0-alpha ELENA release to /home/username/Downloads and unzip it, then navigate to the "anylinux" directory, and then edit the **/anylinux/CONFIG** file to select either LXC or LXD.  
+Download the latest Orabuntu-LXC 7.0.0-alpha ELENA (as of September 26, 2021 this is in MASTER branch only) release to /home/username/Downloads and unzip it, then navigate to the "anylinux" directory, and then edit the **/anylinux/CONFIG** file to select either LXC or LXD.  
 
 For example, to select LXD clusters, set the following parameters in the CONFIG file as shown below.
 ```
