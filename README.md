@@ -86,6 +86,8 @@ For example, to select LXD clusters, set the following parameters in the CONFIG 
 LXD=Y
 LXDCluster=Y
 ```
+If instead an LXC multi-host span is desired, set both of these parameters to "N".
+
 Note that if LXD and LXDCluster are selected, it will be necessary to first create the required ZFS storage pool olxc-001 (for HUB node) and optionally olxc-002 (for GRE node if creating multi-host LXD Cluster). To create this, add /dev/sdb and /dev/sdc storage, and then create the ZFS storage pool.  For Oracle Linux, scripts to fully automate the creation of the required olxc-001 zfs pool are located as shown below.
 ```
 zfsutils/oracle/zpool_oracle7_uek.sh
