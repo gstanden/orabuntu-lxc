@@ -1791,7 +1791,8 @@ then
 			echo "=============================================="
 			echo ''
 	
-			ping -c 5 linuxcontainers.org -4
+			ping -c 5 linuxcontainers.org -4 2>/dev/null
+			ping -c 5 linuxcontainers.org  2>/dev/null
 			echo ''
 			
 			echo ''
@@ -6348,7 +6349,7 @@ then
                         sudo sed -i '/interface=gre_sys/d'                       	/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
                 fi
                         
-		if [ $LinuxFlavor = 'Fedora' ] && [ $RedHatVersion -eq 29 ]
+		if [ $LinuxFlavor = 'Fedora' ] && [ $RedHatVersion -le 29 ]
                 then
 			Zone=FedoraServer
                 	sudo sed -i "s/zone=trusted/zone=$Zone/g"       		/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh

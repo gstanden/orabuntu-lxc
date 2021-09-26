@@ -368,7 +368,7 @@ then
 	
 	elif [ $LinuxFlavor = 'Fedora' ]
 	then
-		if [ $RedHatVersion -eq 29 ]
+		if [ $RedHatVersion -le 29 ]
 		then
 			Zone=FedoraServer
 			sudo firewall-cmd --permanent --zone=$Zone --set-target=ACCEPT
@@ -1594,30 +1594,32 @@ then
 
 		if   [ ! -z $HubFtype ]
 		then
-			echo ''
-			echo "=============================================="
-			echo "NS $NameServer full backup at HUB...          "
-			echo "=============================================="
-			echo ''
+		 	echo ''
+		 	echo "=============================================="
+		 	echo "NS $NameServer full backup at HUB...          "
+		 	echo "=============================================="
+		 	echo ''
+
+			echo 'Filesystem type does not support lxc snapshot.'
 
 		#	sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" lxc-stop -n $NameServer -k;echo '(Do NOT enter password...Wait...)'"
-			sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S -p' ' <<< "$MultiHostVar9" lxc-stop -n $NameServer -k"
-			sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" lxc-copy -n $NameServer -N $NameServer-$HOSTNAME" >/dev/null 2>&1
-			sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" lxc-start -n $NameServer; echo ''; sudo -S <<< "$MultiHostVar9" lxc-ls -f"
+		#	sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S -p' ' <<< "$MultiHostVar9" lxc-stop -n $NameServer -k"
+		#	sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" lxc-copy -n $NameServer -N $NameServer-$HOSTNAME" >/dev/null 2>&1
+		#	sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" lxc-start -n $NameServer; echo ''; sudo -S <<< "$MultiHostVar9" lxc-ls -f"
  			
-			echo ''
- 			echo "$NameServer-$HOSTNAME has been created on the Orabuntu-LXC HUB host at $MultiHostVar5"
- 			echo "$NameServer-$HOSTNAME can be restored to $NameServer if necessary using lxc-copy command."
+		#	echo ''
+ 		#	echo "$NameServer-$HOSTNAME has been created on the Orabuntu-LXC HUB host at $MultiHostVar5"
+ 		#	echo "$NameServer-$HOSTNAME can be restored to $NameServer if necessary using lxc-copy command."
 
-			echo ''
-			echo "=============================================="
-			echo "Done: NS $NameServer backup at HUB.           "
-			echo "=============================================="
-			echo ''
+		 	echo ''
+		 	echo "=============================================="
+		 	echo "Done: NS $NameServer backup at HUB.           "
+		 	echo "=============================================="
+		 	echo ''
 
-			sleep 5
+		 	sleep 5
 
-			clear
+		 	clear
 		elif [ -z $Ftype ]
 		then
 			echo ''
