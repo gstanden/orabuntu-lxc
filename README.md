@@ -82,13 +82,15 @@ Install manually the following packages (if on RedHat-family Linux):
 sudo yum -y install unzip wget openssh-server net-tools bind-utils
 ```
 
-Step 3
+Step 3a
 
 Download the latest Orabuntu-LXC 7.0.0-alpha ELENA release (as of September 26, 2021 this is in MASTER branch only) to 
 
 "/home/username/Downloads" 
 
 and unzip it, then navigate to the "anylinux" directory. **Note** that the software can be downloaded to any directory owned by the install user; the "Downloads" directory is just a recommended download destination.
+
+Step 3b
 
 If a non-root administrative user is not available on the host, create it with the "./uekulele/uekulele-services-0.sh" script as described below.
 
