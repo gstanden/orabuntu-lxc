@@ -113,7 +113,7 @@ Edit other install parameters in the **/anylinux/CONFIG** file as desired or req
 
 Step 6
 
-Note that if LXD=Y and LXDCluster=Y are selected, it will be necessary to first create the required ZFS storage pool for the LXD cluster.  The naming convention olxc-001 (for HUB node) and optionally olxc-00[2,3,4 ...] (for GRE node if creating N-node LXD Cluster) etc is suggested, but any arbitrary user-settable naming scheme can be used in the ./anylinux/CONFIG file for naming the ZFS storage pools. 
+**Note 1:** if LXD=Y and LXDCluster=Y are selected, it will be necessary to first create the required ZFS storage pool for the LXD cluster.  The naming convention olxc-001 (for HUB node) and optionally olxc-00[2,3,4 ...] (for GRE node if creating N-node LXD Cluster) etc is suggested, but any arbitrary user-settable naming scheme can be used in the ./anylinux/CONFIG file for naming the ZFS storage pools. 
 
 To create the ZFS storage pools, add /dev/sdb and /dev/sdc storage, and then create the ZFS storage pool.  For Oracle Linux, scripts to fully automate the creation of the required olxc-001 zfs pool are located as shown below.
 ```
