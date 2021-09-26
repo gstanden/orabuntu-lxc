@@ -124,7 +124,7 @@ The scripts can be edited to use other than (/dev/sdb + /dev/sdc) for example (/
 
 There are scripts in distro subdirectories to create the required ZFS storage pools for all supported Orabuntu-LXC distros (CentOS, Fedora, RedHat, Ubuntu and Oracle Linux).
 
-Other than pre-creating the olxc-001 on the HUB host and the olxc-002 on the GRE host, the Orabuntu-LXC main scripts
+Other than pre-creating the olxc-001 on the HUB host and the olxc-00[2,3,4,...] on the GRE host, the Orabuntu-LXC main scripts
 ```
 anylinux-services.HUB.HOST.sh
 anylinux-services.GRE.HOST.sh 
