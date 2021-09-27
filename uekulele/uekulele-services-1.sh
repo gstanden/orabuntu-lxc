@@ -6361,6 +6361,11 @@ then
                 	sudo sed -i "s/zone=trusted/zone=$Zone/g"       		/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
                 fi     
 
+		if [ $LinuxFlavor = 'CentOS' ] && [ $Release -eq 7 ]
+                then
+			Zone=public
+                	sudo sed -i "s/zone=trusted/zone=$Zone/g"       		/etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
+                fi     
 
 		sudo chmod 777 /etc/network/openvswitch/setup_gre_and_routes_"$HOSTNAME"_"$Sw1Index".sh
 

@@ -364,7 +364,14 @@ then
 	
 	if   [ $LinuxFlavor = 'CentOS' ]
 	then
-		Zone=trusted
+		if [ $Release -eq 7 ]
+		then
+			Zone=public
+			sudo firewall-cmd --permanent --zone=$Zone --set-target=ACCEPT
+		else
+			Zone=trusted
+			sudo firewall-cmd --permanent --zone=$Zone --set-target=ACCEPT
+		fi
 	
 	elif [ $LinuxFlavor = 'Fedora' ]
 	then
