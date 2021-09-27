@@ -42,11 +42,11 @@ echo "=============================================="
 echo ''
 
 sudo yum -y install yum-utils
-sudo dnf -y install epel-release
+sudo yum -y install epel-release
 sudo yum config-manager --enable epel
-sudo dnf install -y  http://download.zfsonlinux.org/epel/zfs-release.el8_4.noarch.rpm
+sudo dnf install http://download.zfsonlinux.org/epel/zfs-release$(rpm -E %dist)_`cat /etc/centos-release | rev | cut -f2,3 -d'.' | cut -f1 -d' ' | rev | cut -f2 -d'.'`.noarch.rpm
 rpm -qa | grep zfs
-sudo dnf install -y kernel-devel zfs
+sudo yum install -y kernel-devel zfs
 sudo modprobe zfs
 sudo systemctl list-unit-files | grep zfs
 
