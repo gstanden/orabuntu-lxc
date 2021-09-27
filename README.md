@@ -94,7 +94,10 @@ and unzip it, then navigate to the "anylinux" directory. **Note** that the softw
 
 Step 3b
 
-If a non-root administrative user is not available on the host, create it with the "./uekulele/uekulele-services-0.sh" script as described below.
+If a non-root administrative user is not available on the host, create it with the appropriate script:
+
+./uekulele/uekulele-services-0.sh (RedHat-family linuxes)
+./orabuntu/orabuntu-services-0.sh (Ubuntu-family linuxes)
 
 **Note 1:** The linux user account used to install Orabuntu-LXC must have "sudo ALL" privilege.  On Ubuntu Linux this is typically the "ubuntu" user.  For CentOS, Fedora, RedHat and Oracle Linux, use the "./uekulele/uekulele-services-0.sh" script.  The script by default creates the "orabuntu" user with all required sudo privileges and required directories, but the script can be edited to use any arbitrary user-settable username. I typically edit the file and create "ubuntu" user on the RedHat-family linuxes as my installer account because I develop Orabuntu-LXC on an Ubuntu physical host running CentOS, Fedora, RedHat and Oracle Linux VM's in VirtualBox, so using an "ubuntu" linux user throughout simplifies interoperability between the Ubuntu host and the VM guests, but you can create an install user with any username.  
 
