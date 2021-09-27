@@ -46,6 +46,8 @@ Orabuntu-LXC BUILDS EVERYTHING itself for the currently supported distros:
 * Present LUNs in 3 locations, including a container-friendly non-symlink location under /dev/containername
 * Present LUNs to containers directly, only the LUNs for that container, at full bare-metal storage performance.
 
+Note that all Orabuntu-LXC supported distros and releases were tested on freshly installed systems using LVM.  If you install on existing machines it is possible unforseen issues could arise.  Please open an issue at the Orabuntu-LXC github if you run into an issue on an existing machine.
+
 Orabuntu-LXC does all of this and much more with just these easy steps:
 
 Step 0
