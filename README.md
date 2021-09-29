@@ -138,8 +138,8 @@ The ipaddress subnets still need to be edited in "./anylinux/anylinux-services.s
 
 Other than pre-creating the olxc-001 on the HUB host and the olxc-00[2,3,4,...] on the GRE host, the Orabuntu-LXC main scripts
 ```
-anylinux-services.HUB.HOST.sh
-anylinux-services.GRE.HOST.sh 
+anylinux-services.HUB.HOST.sh new
+anylinux-services.GRE.HOST.sh new
 ```
 are still totally automated as just as they have always been, and the scripts are a "one-button push" fully-automated way to create the containers and networks just the same as the way they work for LXC deployments.
 
