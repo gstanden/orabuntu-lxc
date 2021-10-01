@@ -532,6 +532,42 @@ sleep 5
 
 clear
 
+echo ''
+echo "=============================================="
+echo "Restart OpenvSwitches...                      "
+echo "=============================================="
+echo ''
+
+SwitchList='sw1 sx1'
+for k in $SwitchList
+do
+	sudo ifconfig $k >/dev/null 2>&1
+	IfCon=`echo $?`
+	n=1
+	while [ $IfCon -ne 0 ] && [ $n -le 5 ]
+	do
+        	sudo ifconfig $k >/dev/null 2>&1
+        	IfCon=`echo $?`
+        	n=$((n+1))
+        	sleep 5
+	done
+
+	sudo ifconfig $k
+done
+
+echo ''
+sudo iptables -S | egrep 'sw1|sx1'
+
+echo ''
+echo "=============================================="
+echo "Done: Restart OpenvSwitches.                  "
+echo "=============================================="
+echo ''
+
+sleep 5
+
+clear
+
 if   [ $LXD = 'N' ]
 then
 	if [ -f /var/lib/lxc/$SeedContainerName/rootfs/root/lxc-services.sh ]

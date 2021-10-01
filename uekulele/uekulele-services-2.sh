@@ -1081,6 +1081,12 @@ then
         
 	eval echo "'/var/lib/snapd/snap/bin/lxc stop   oel$OracleRelease$SeedPostfix' | sg lxd $CGROUP_SUFFIX"  
 	sleep 5
+
+	sudo lxc-stop -n  $NameServer
+	sudo lxc-start -n $NameServer
+
+	ping -c 3 $NameServer
+
 	eval echo "'/var/lib/snapd/snap/bin/lxc start  oel$OracleRelease$SeedPostfix' | sg lxd $CGROUP_SUFFIX"  
 	sleep 5
 
