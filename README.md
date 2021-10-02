@@ -22,7 +22,7 @@ Orabuntu-LXC BUILDS EVERYTHING itself for the currently supported distros:
 
 **Note 2**:  SCST on Linux 6 cannot be guaranteed due to de-support of kernels older than 2.6 by SCST 
 
-**Note 3**:  LXD clustering NA for Linux 6 all distros nor for Ubuntu 16.04
+**Note 3**:  LXD options NA for Linux 6 all distros nor for Ubuntu 16.04
        
 **Orabuntu-LXC installer does all of the following automatically**:
 
