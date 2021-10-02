@@ -45,10 +45,10 @@ Orabuntu-LXC/D ELENA BUILDS EVERYTHING itself for the currently supported distro
 * Configures gold copy LXC or **LXD** containers (on a separate network) according to your specifications
 * Creates clones of the gold copy LXC or **LXD** containers
 * Builds SCST Linux SAN from source code as RPM or DKMS-enabled DEB packages
-* Creates the target, group, and LUNs according to your specifications
-* Creates the multipath.conf file and configures multipath
-* Present LUNs in 3 locations, including a container-friendly non-symlink location under /dev/lxc_luns
-* Present LUNs to containers directly, only the LUNs for that container, at full bare-metal storage performance.
+* Creates the SCST target, group, and LUNs according to your specifications
+* Creates the multipath.conf file and configures multipath to include the new SCST LUNs
+* Presents SCST LUNs in 3 locations, including a container-friendly non-symlink location under /dev/lxc_luns
+* Presents SCST LUNs to containers directly, only the LUNs for that container, at full bare-metal storage performance.
 
 **Note 1** CentOS 7 and RedHat 7 use Ubuntu Hirsute 21.04 for the LXC containerized replicated DNS/DHCP. See [discussion thread here](https://discuss.linuxcontainers.org/t/no-dhcp-request-on-centos7/12253)
 
