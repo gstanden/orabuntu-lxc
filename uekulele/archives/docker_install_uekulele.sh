@@ -16,9 +16,10 @@
 #    You should have received a copy of the GNU General Public License
 #    along with Orabuntu-LXC.  If not, see <http://www.gnu.org/licenses/>.
 
-LinuxFlavor=$1
-    Release=$2
-    DistDir=$3
+   LinuxFlavor=$1
+       Release=$2
+       DistDir=$3
+    LXDCluster=$4
 
 if [ $LinuxFlavor = 'Oracle' ]
 then
@@ -80,6 +81,35 @@ then
 			sleep 5
 		fi
 	fi
+fi
+
+if [ $LinuxFlavor = 'Red' ]
+then
+	if   [ $Release -eq 6 ]
+	then
+		sudo yum -y update
+		sudo yum install yum-utils device-mapper-persistent-data lvm2
+		sudo yum-config-manager --add-repo https://download.docker.com/linux/rhel/docker-ce.repo
+		sudo yum update
+		sudo yum install docker-ce
+		sudo systemctl enable docker
+		sudo systemctl status docker
+
+	elif [ $Release -ge 7 ]
+	then
+		if [ $LXDCluster = 'Y' ]
+		then
+			sudo snap install docker
+		else
+			sudo yum -y install snapd
+			sudo snap install docker
+		fi
+
+		sudo /var/lib/snapd/snap/bin/docker run -d hello-world
+		sudo /var/lib/snapd/snap/bin/docker ps -a
+	fi
+ 	
+	sudo docker run -d hello-world
 fi
 
 if [ $LinuxFlavor = 'CentOS' ]
@@ -165,9 +195,9 @@ else
 	UEKVersion=0
 fi
 
-if   [ $Release -le 7 ] && [ $UEKVersion -ge 4 ]
+if   [ $Release -le 7 ]
 then
-#	sudo docker run -d oraclelinux:7.3
+ 	sudo docker run -d hello-world
 #	sudo docker run -d -p 2200:22 raesene/alpine-nettools
 	sudo docker ps -a
 
@@ -182,9 +212,9 @@ then
 	echo "Done: Install Docker.                         "
 	echo "=============================================="
 
-elif [ $Release -eq 8 ]
+elif [ $Release -eq 8 ] && [ $LinuxFlavor = 'Oracle' ]
 then
-#	podman run -d oraclelinux:7.3
+ 	podman run -d hello-world
 #	podman run -d raesene/alpine-nettools
 	podman ps -a
 
@@ -198,6 +228,8 @@ then
 	echo "=============================================="
 	echo "Done: Install OCI Tools.                      "
 	echo "=============================================="
+else
+	sudo docker run -d hello-world
 fi
 
 
