@@ -168,7 +168,7 @@ Run the HUB HOST script (as a **NON-root** "administrative" user with "SUDO ALL"
 
 **Note**: After the script finishes, if you have set LXD=Y and LXDCluster=Y then **you will need to log out/log back in again to host server to have access to commands like "lxc list" "lxc cluster list" etc.**
 
-Otherwise, that's it. It runs fully-automated and delivers LXC networks spanned via OpenvSwitch SDN networks across multiple hosts, **or now alternatively an LXD cluster**, container infrastructure across multiple hosts via OpenvSwitch SDN networks. There are optional switches in the CONFIG file to deploy Docker snap and microk8s snap.  Currently, the LXD cluster features of Orabuntu-LXC only supports ZFS storage pools.  
+Otherwise, that's it. It runs fully-automated and delivers LXC networks spanned via OpenvSwitch SDN networks across multiple hosts, **or now alternatively an LXD cluster** container infrastructure across multiple hosts via OpenvSwitch SDN networks. There are optional switches in the CONFIG file to deploy Docker snap and microk8s snap.  Currently, the LXD cluster features of Orabuntu-LXC only supports ZFS storage pools.  
 
 If, on the other hand, it is desired to further customize Orabuntu-LXC, it is highly-flexible and configurable using the parameters in the file: 
 
