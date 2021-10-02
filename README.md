@@ -24,7 +24,7 @@ Orabuntu-LXC BUILDS EVERYTHING itself for the currently supported distros:
 
 **Note 3**:  LXD options NA for Linux 6 all distros, nor for Ubuntu 16.04.  These distros and versions are LXC options only.
        
-**Orabuntu-LXC installer does all of the following automatically**:
+**Orabuntu-LXC/D ELENA installer does all of the following automatically**:
 
 * Automatically detects your OS and branches to the appropriate build pathway
 * Deploys/Builds OpenvSwitch from source as RPM or DEB packages
