@@ -206,7 +206,7 @@ If using the optional SCST Linux SAN fully-automated deployer which is found in 
 lxc config device add ora84d10 asm disk source=/dev/lxc_luns path=/dev/lxc_luns
 ```
 
-**Note 1** that the LUNs are available in three places on the LXD host:
+**Note 1** that the SCST LUNs are available in three places on the LXD host:
 ```
 /dev/mapper
 /dev/asm
