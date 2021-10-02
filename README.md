@@ -40,9 +40,9 @@ Orabuntu-LXC BUILDS EVERYTHING itself for the currently supported distros:
 * Configures multi-host **using user-selectable tunnel-type of [ geneve | vxlan | GRE ]**
 * **Optionally automatically creates the LXD cluster**
 * Builds the LXC **or LXD containers**
-* Configures all OpenvSwitch switches and LXC or LXD containers as systemd services
-* Configures gold copy LXC or LXD containers (on a separate network) according to your specifications
-* Creates clones of the gold copy LXC or LXD containers
+* Configures all OpenvSwitch switches and LXC or **LXD** containers as systemd services
+* Configures gold copy LXC or **LXD** containers (on a separate network) according to your specifications
+* Creates clones of the gold copy LXC or **LXD** containers
 * Builds SCST Linux SAN from source code as RPM or DKMS-enabled DEB packages
 * Creates the target, group, and LUNs according to your specifications
 * Creates the multipath.conf file and configures multipath
