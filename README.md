@@ -19,7 +19,7 @@ Orabuntu-LXC/D ELENA BUILDS EVERYTHING itself for the currently supported distro
 * Fedora 22-35+ (tested on 22, 24, 29, 33 and 34)
 * RedHat 6.x, 7.x, 8.x
 
-**Note 1**:  Linux 6 support cannot be guaranteed due to de-support of Linux 6 by Linux vendors. Still supported but on a "best effort" basis only.
+**Note 1**:  Linux 6 being de-supported by Linux vendors. Orabuntu-LXC support is "best effort" basis only.
 
 **Note 2**:  Orabuntu-LXC SCST deployer support: de-support pending for kernels older than 2.6 (notified by SCST maintainers).
 
