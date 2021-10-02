@@ -402,7 +402,20 @@ then
 
 	elif [ $LinuxFlavor = 'Red' ]
 	then
-		Zone=trusted
+		if [ $Release -eq 7 ]
+		then
+			Zone=public
+			sudo firewall-cmd --permanent --zone=$Zone --set-target=ACCEPT
+ 			sudo firewall-cmd --zone=$Zone --permanent --add-interface=sw1
+ 			sudo firewall-cmd --zone=$Zone --permanent --add-interface=sw1a
+ 			sudo firewall-cmd --zone=$Zone --permanent --add-interface=sx1
+ 			sudo firewall-cmd --zone=$Zone --permanent --add-interface=sx1a
+ 			sudo firewall-cmd --zone=$Zone --permanent --add-interface=lxcbr0
+ 			sudo firewall-cmd --zone=$Zone --permanent --add-interface=lxdbr0
+		else
+			Zone=trusted
+			sudo firewall-cmd --permanent --zone=$Zone --set-target=ACCEPT
+		fi
 	fi
 	
   	sudo firewall-cmd --zone=$Zone --permanent --add-service=dns
