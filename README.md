@@ -194,7 +194,7 @@ Starting fed34d10
 
 Step 10
 
-If using the optional SCST Linux SAN fully-automated deployer which is found in /opt/olxc/home/scst-files AFTER Orabuntu-LXC deployment has finished, then use the following command to expose local host SCST Linux SAN LUNs to any given container as shown below.
+If using the optional SCST Linux SAN fully-automated deployer which is found in /opt/olxc/home/scst-files AFTER Orabuntu-LXC deployment has finished, then use the following command to expose local host SCST Linux SAN LUNs to any given container. An example command is shown below.
 
 ```
 lxc config device add ora84d10 asm disk source=/dev/lxc_luns path=/dev/lxc_luns
