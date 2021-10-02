@@ -50,7 +50,7 @@ Orabuntu-LXC/D ELENA BUILDS EVERYTHING itself for the currently supported distro
 * Present LUNs in 3 locations, including a container-friendly non-symlink location under /dev/lxc_luns
 * Present LUNs to containers directly, only the LUNs for that container, at full bare-metal storage performance.
 
-**Note 1** CentOS 7 and RedHat 7 use Ubuntu Hirsute 21.04 for the LXC containerized replicated DNS/DHCP. See [discussion thread here.](https://discuss.linuxcontainers.org/t/no-dhcp-request-on-centos7/12253/5)
+**Note 1** CentOS 7 and RedHat 7 use Ubuntu Hirsute 21.04 for the LXC containerized replicated DNS/DHCP. See [discussion thread here.](https://discuss.linuxcontainers.org/t/no-dhcp-request-on-centos7/12253)
 
 **Note 2** All Orabuntu-LXC supported distros and releases were tested on freshly installed systems using LVM.  If you install on existing machines it is possible unforseen issues could arise during the Orabuntu-LXC deployments.  Please open an issue at the Orabuntu-LXC github if you run into an issue on an existing machine.
 
