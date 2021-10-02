@@ -32,7 +32,7 @@ Orabuntu-LXC BUILDS EVERYTHING itself for the currently supported distros:
 * Configures VLANs on the OpenvSwitch Network
 * Connects the OpenvSwitch network physical host interfaces using nftables or iptables rules
 * Deploys/Builds LXC from source as RPM or DEB packages
-* Creates an LXC-containerized Ubuntu 20.04 DNS/DHCP container running bind9 and isc-dhcp-server
+* Creates an LXC-containerized Ubuntu Focal 20.04 DNS/DHCP container running bind9 and isc-dhcp-server (see Note 1 below)
 * Replicates the LXC-containerized DNS/DHCP container to all Orabuntu-LXC physical GRE-connected hosts
 * Optionally stores LXC-containerized DNS/DHCP updates at Amazon S3 for replication
 * Automatically detects filesystem types which support lxc-snapshot overlayfs for LXC-containerized DNS/DHCP
@@ -49,7 +49,9 @@ Orabuntu-LXC BUILDS EVERYTHING itself for the currently supported distros:
 * Present LUNs in 3 locations, including a container-friendly non-symlink location under /dev/containername
 * Present LUNs to containers directly, only the LUNs for that container, at full bare-metal storage performance.
 
-Note that all Orabuntu-LXC supported distros and releases were tested on freshly installed systems using LVM.  If you install on existing machines it is possible unforseen issues could arise during the Orabuntu-LXC deployments.  Please open an issue at the Orabuntu-LXC github if you run into an issue on an existing machine.
+**Note 1** CentOS 7 and RedHat 7 use Ubuntu Hirsute 21.04 for the LXC containerized DNS/DHCP.
+
+**Note 2** All Orabuntu-LXC supported distros and releases were tested on freshly installed systems using LVM.  If you install on existing machines it is possible unforseen issues could arise during the Orabuntu-LXC deployments.  Please open an issue at the Orabuntu-LXC github if you run into an issue on an existing machine.
 
 Orabuntu-LXC does all of this and much more with just these easy steps:
 
