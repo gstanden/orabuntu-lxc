@@ -31,23 +31,25 @@ then
 		echo "=============================================="
 		echo ''
 
-		sudo yum -y install yum-utils
 		sudo yum-config-manager --enable ol8_addons
-		sudo yum -y install podman skopeo buildah 
+		sudo dnf -y install yum-utils
+		sudo dnf -y install podman skopeo buildah 
+		podman run -d hello-world
+		podman ps -a
 
-	elif [ $Release -eq 7 ]
-	then
-		echo ''
-		echo "=============================================="
-		echo "Install docker-ce...                          "
-		echo "=============================================="
-		echo ''
+	elif [ $Release -eq 7 ] 
+	then 
+		if [ $LXDCluster = 'Y' ]
+		then
+			sudo snap install docker
+		else
+			sudo yum -y install snapd
+			sudo snap install docker
+		fi
 
-		sudo yum-config-manager --enable ol7_addons
-		sudo yum -y install docker-engine podman
-		sudo systemctl start docker
-		sudo systemctl enable docker
-
+		sudo /var/lib/snapd/snap/bin/docker run -d hello-world
+		sudo /var/lib/snapd/snap/bin/docker ps -a
+	
 	elif [ $Release -eq 6 ]
 	then
 		function CheckUEKVersion {
@@ -65,38 +67,34 @@ then
 
 			sudo yum-config-manager --enable public_ol6_addons
 			sudo yum -y install docker-engine
-			sleep 5
-			sudo sh -c "service docker start"
-			sleep 5
 			sudo service docker start
-			sleep 5
 			sudo chkconfig docker on
-			sleep 5
-			sudo sh -c "service docker status"
-			sleep 5
+			sudo docker run -d hello-world
+			sudo docker ps -a
 		else
 			echo "=============================================="
 			echo "Docker unsupported on UEK $UEKVersion kernels."
 			echo "=============================================="
-			sleep 5
 		fi
 	fi
 fi
 
 if [ $LinuxFlavor = 'Red' ]
 then
-	if   [ $Release -eq 6 ]
+	if   [ $Release -eq 8 ]
 	then
-		sudo yum -y update
-		sudo yum install yum-utils device-mapper-persistent-data lvm2
-		sudo yum-config-manager --add-repo https://download.docker.com/linux/rhel/docker-ce.repo
-		sudo yum update
-		sudo yum install docker-ce
-		sudo systemctl enable docker
-		sudo systemctl status docker
+		echo ''
+		echo "=============================================="
+		echo "Install OCI Tools (podman skopeo buildah) ... "
+		echo "=============================================="
+		echo ''
 
-	elif [ $Release -ge 7 ]
-	then
+		sudo dnf -y install podman skopeo buildah 
+		podman run -d hello-world
+		podman ps -a
+
+	elif [ $Release -eq 7 ] 
+	then 
 		if [ $LXDCluster = 'Y' ]
 		then
 			sudo snap install docker
@@ -107,47 +105,98 @@ then
 
 		sudo /var/lib/snapd/snap/bin/docker run -d hello-world
 		sudo /var/lib/snapd/snap/bin/docker ps -a
+	
+	elif [ $Release -eq 6 ]
+	then
+		sudo yum -y update
+		sudo yum -y  install yum-utils device-mapper-persistent-data lvm2
+		sudo yum-config-manager --add-repo https://download.docker.com/linux/rhel/docker-ce.repo
+		sudo yum -y update
+		sudo yum -y install docker-ce
+		sudo systemctl enable docker
+		sudo systemctl status docker
+		sudo docker run -d hello-world
+		sudo docker ps -a
 	fi
- 	
-	sudo docker run -d hello-world
 fi
 
 if [ $LinuxFlavor = 'CentOS' ]
 then
-	if   [ $Release -eq 6 ]
+	if   [ $Release -eq 8 ]
 	then
-		sudo yum -y install docker-io
-		sleep 2
-		sudo service docker start
-		sudo chkconfig docker on
+		echo ''
+		echo "=============================================="
+		echo "Install OCI Tools (podman skopeo buildah) ... "
+		echo "=============================================="
+		echo ''
 
-		function CheckDockerRunning {
-			ps -ef | grep -c 'docker \-d'
-		}
-		DockerRunning=$(CheckDockerRunning)
+		sudo dnf -y install podman skopeo buildah 
+		podman run -d hello-world
+		podman ps -a
 
-		d=1
-		while [ $DockerRunning -eq 0 ] && [ $d -le 5 ]
-		do
-			sleep 5
-			sudo service docker start
-			echo ''
-			DockerRunning=$(CheckDockerRunning)
-			ps -ef | grep docker
-			d=$((d+1))
-		done
+	elif [ $Release -eq 7 ] 
+	then 
+		if [ $LXDCluster = 'Y' ]
+		then
+			sudo snap install docker
+		else
+			sudo yum -y install snapd
+			sudo snap install docker
+		fi
 
- 	elif [ $Release -eq 7 ]
- 	then
- 		sudo yum install -y yum-utils device-mapper-persistent-data lvm2
- 		sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
- 		sudo yum-config-manager --enable docker-ce-edge
- 		sudo yum-config-manager --enable docker-ce-test
- 		sudo yum -y install docker-ce
- 		sudo systemctl start docker
- 		sudo systemctl enable docker
- 	fi
+		sudo /var/lib/snapd/snap/bin/docker run -d hello-world
+		sudo /var/lib/snapd/snap/bin/docker ps -a
+	
+	elif [ $Release -eq 6 ]
+	then
+		sudo yum -y update
+		sudo yum -y  install yum-utils device-mapper-persistent-data lvm2
+		sudo yum-config-manager --add-repo https://download.docker.com/linux/rhel/docker-ce.repo
+		sudo yum -y update
+		sudo yum -y install docker-ce
+		sudo systemctl enable docker
+		sudo systemctl status docker
+		sudo docker run -d hello-world
+		sudo docker ps -a
+	fi
 fi
+
+# if [ $LinuxFlavor = 'CentOS' ]
+# then
+# 	if   [ $Release -eq 6 ]
+# 	then
+# 		sudo yum -y install docker-io
+# 		sleep 2
+# 		sudo service docker start
+# 		sudo chkconfig docker on
+# 
+# 		function CheckDockerRunning {
+# 			ps -ef | grep -c 'docker \-d'
+# 		}
+# 		DockerRunning=$(CheckDockerRunning)
+# 
+# 		d=1
+# 		while [ $DockerRunning -eq 0 ] && [ $d -le 5 ]
+# 		do
+# 			sleep 5
+# 			sudo service docker start
+# 			echo ''
+# 			DockerRunning=$(CheckDockerRunning)
+# 			ps -ef | grep docker
+# 			d=$((d+1))
+# 		done
+# 
+# 	elif [ $Release -eq 7 ]
+# 	then
+# 		sudo yum install -y yum-utils device-mapper-persistent-data lvm2
+# 		sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+# 		sudo yum-config-manager --enable docker-ce-edge
+# 		sudo yum-config-manager --enable docker-ce-test
+# 		sudo yum -y install docker-ce
+# 		sudo systemctl start docker
+# 		sudo systemctl enable docker
+# 	fi
+# fi
 
 if [ $LinuxFlavor = 'Fedora' ]
 then
