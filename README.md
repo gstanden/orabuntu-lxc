@@ -140,7 +140,7 @@ There are scripts in distro subdirectories to create the required ZFS storage po
 
 Step 7
 
-The user-settable ip address subnets are set in the ./anylinux/CONFIG file.  Settings for SeedNet1 and BaseNet1 are required (default is 172.29.108 and 10.209.53) and they can be reset to arbitrary ipv4 subnets.  The StorNet# nets are optional but should have a value in them.  They are also set to defaults but can be set to any arbitrary value.  The StorNet# are used when dedicated storage networks are desired, for example for the SCST Linux SAN traffic. The ExtrNet# network are used when additional networks are needed, such as for Oracle Database RAC interconnect. The StorNet# and the ExtrNet# are only deployed if $Product is set to products other than the default product setting of "Product=no-product".
+The user-settable ip address subnets are set in the ./anylinux/CONFIG file.  Settings for SeedNet1 and BaseNet1 are required (default is 172.29.108 and 10.209.53) and they can be reset to arbitrary ipv4 subnets by editing the CONFIG file.  The StorNet# nets are optional but should have a value in them.  They are also set to defaults but can be set to any arbitrary value.  The StorNet# are used when dedicated storage networks are desired, for example for the SCST Linux SAN traffic. The ExtrNet# network are used when additional networks are needed, such as for Oracle Database RAC interconnect. The StorNet# and the ExtrNet# are only deployed if $Product is set to products other than the default product setting of "Product=no-product".
 
 Other than pre-creating the olxc-001 on the HUB host and the olxc-00[2,3,4,...] on the GRE host, the Orabuntu-LXC main scripts
 ```
