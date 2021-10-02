@@ -178,7 +178,7 @@ With the replicated and constantly updated LXC containerized DNS/DHCP solution, 
 
 Step 9
 
-To add other flavors of LXD container to the Orabuntu-LXC OpenvSwitch networks, simply choose the profile desired and then launch the container.  There are two user-settable networks created as previously mentioned.  The default networks for this example are 10.209.53.0/24 and 172.29.108.0/24 which have LXD profiles olxc_sw1a and olxc_sx1a respectively.  So for example to add a Fedora 34 LXD container with DHCP networking to the 172.29.108.0/24 network run the follwing command as shown below.
+To add other flavors of LXD container to the Orabuntu-LXC OpenvSwitch networks, after Orabuntu-LXC scripts have finished, and the system is configured, simply choose the profile desired and then launch the container.  There are two user-settable networks created as previously mentioned.  The default networks for this example are 10.209.53.0/24 and 172.29.108.0/24 (but these are user-settable and can be changed prior to running Orabuntu-LXC they are BaseNet and SeedNet, respectively) which have LXD profiles olxc_sw1a and olxc_sx1a respectively.  So for example to add a Fedora 34 LXD container with DHCP networking to the 172.29.108.0/24 network run the follwing command as shown below.
 
 ```
 [ubuntu@o83sv2 uekulele]$ lxc launch -p olxc_sx1a images:fedora/34 fed34d10
