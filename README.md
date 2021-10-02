@@ -125,7 +125,7 @@ Edit other install parameters in the **/anylinux/CONFIG** file as desired or req
 
 Step 6
 
-**Note 1:** if "LXD=Y" and "LXDCluster=Y" are selected, it will be necessary to first create the required ZFS storage pool for the LXD cluster.  The naming convention olxc-001 (for HUB node) and optionally olxc-00[2,3,4 ...] (for GRE node if creating N-node LXD Cluster) etc is suggested, but any arbitrary user-settable naming scheme can be used in the ./anylinux/CONFIG file for naming the ZFS storage pools.
+**Note 1:** if "LXD=Y" and "LXDCluster=Y" are selected, it will be necessary to first create the required ZFS storage pool for the LXD cluster.  The naming convention olxc-001 (for HUB node) and optionally olxc-00[2,3,4 ...N] (for GRE node if creating N-node LXD Cluster) etc is suggested, but any arbitrary user-settable naming scheme can be used in the ./anylinux/CONFIG file for naming the ZFS storage pools.
 
 **Note 2:** When clustering with v7.0.0-**alpha** ELENA it is strongly recommended to REBOOT each node after Orabuntu-LXC has completed before moving on to the next LXD cluster node or LXC multi-host node to be installed with Orabuntu-LXC. For example the first node for Fedora 34 needs a reboot to assign ip addresses to the clone containers.  These requirement to reboot the first cluster node before installing additional nodes will be REMOVED before the actual release of v7.0.0-alpha ELENA but for now when using this alpha in the master branch, reboot of first node before moving on to install LXD cluster nodes is strongly recommended to ensure the first node remains and/or is fully configured across reboots.
 
