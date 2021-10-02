@@ -32,7 +32,7 @@ Orabuntu-LXC/D ELENA BUILDS EVERYTHING itself for the currently supported distro
 * Builds the OpenvSwitch Network
 * Configures VLANs on the OpenvSwitch Network
 * Connects the OpenvSwitch network physical host interfaces using nftables or iptables rules
-* Builds/Deploys LXC as RPM or DEB packages and builds packages from source if necessary
+* Builds/Deploys LXC as RPM or DEB packages and builds LXC RPM or DEB packages from source if necessary
 * Creates an LXC-containerized replicated Ubuntu Focal 20.04 DNS/DHCP container running bind9 and isc-dhcp-server (see Note 1 below)
 * Replicates the LXC-containerized DNS/DHCP container to all Orabuntu-LXC physical GRE-connected hosts
 * Optionally stores LXC-containerized DNS/DHCP updates at Amazon S3 for replication
