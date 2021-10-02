@@ -206,7 +206,7 @@ lxc config device add ora84d10 asm disk source=/dev/lxc_luns path=/dev/lxc_luns
 /dev/asm
 /dev/lxc_luns
 ```
-and that the /dev/lxc_luns location is specially-designed so that the LUNs are "softlink-less" so that the multi-path LUNs are available by simply exposing /dev/lxc_luns to the container with no need to also expose an endpoint of a LUN soft link as would be necessary if say /dev/mapper was exposed to the container.  Also note the the names "lxc_luns" and "asm" are user-settable and can be changed by the user in the scripts prior to launching the "create-scst.sh" script.
+and that the /dev/lxc_luns location is specially-designed so that the LUNs are "non-softlinked" so that the multi-path LUNs are available by simply exposing /dev/lxc_luns to the container with no need to also expose an endpoint of a LUN soft link as would be necessary if say /dev/mapper was exposed to the container.  Also note the the names "lxc_luns" and "asm" are user-settable and can be changed by the user in the scripts prior to launching the "create-scst.sh" script.
 
 **Note 2** This is one of the reasons creating a "single-node" LXD cluster is strongly-recommended when only deploying Orabuntu-LXC on a single node.  The profiles using in the "-p" switch of the "lxc config device add" statement are part of the LXD init cluster config preseed script and are built in to the LXD deployment when selecting "LXD=Y" AND "LXDCluster = Y" setting BOTH to "Y".  By also setting "LXDCluster = Y" the system will get the olxc_sw1a and olxc_sx1a scripts built-in ready to use for any additional non-Oracle Linux containers added to the networks, and, the single-node is built "cluster-ready" as previously noted in an earlier section above.
 
