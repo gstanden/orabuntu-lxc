@@ -153,7 +153,7 @@ Also in the /anylinux/CONFIG file select whether Oracle Linux 8.4 or Oracle Linu
 MajorRelease=8
 PointRelease=4
 ```
-Step 4
+Step 8
 
 Run the HUB HOST script (as a **NON-root** "administrative" user with "SUDO ALL" privilege or "wheel" privilege) the following script:
 
@@ -175,6 +175,22 @@ including support for any two separate user-selectable IP subnet ranges, and 2 u
 With the replicated and constantly updated LXC containerized DNS/DHCP solution, GRE-connected hosts (such as developer laptops) can be disconnected from the network and still have full DNS/DHCP lookup services for any containers stored locally on the developer laptop.  Plus, containers that are added by the developer after detachment from the Orabuntu-LXC network will be added to the local copy of the LXC containerized DNS/DHCP.
 
 **Note**: I haven't done any work recently with the "Amazon Cloud" part of the project, and currently only support LXC networks spanned across Ubuntu 16.04 EC2 containers.  Nothing has been done yet implementing the LXD Cluster features across Amazon EC2 instances.  Support for Orabuntu-LXC deployed LXD clusters on Amazon EC2 is on the roadmap, but not the immediate roadmap. 
+
+Step 9
+
+To add other flavors of LXD container to the Orabuntu-LXC OpenvSwitch networks, simply choose the profile desired and then launch the container.  There are two user-settable networks created as previously mentioned.  The default networks for this example are 10.209.53.0/24 and 172.29.108.0/24 which have LXD profiles olxc_sw1a and olxc_sx1a respectively.  So for example to add a Fedora 34 LXD container with DHCP networking to the 172.29.108.0/24 network run the follwing command as shown below.
+
+```
+[ubuntu@o83sv2 uekulele]$ lxc launch -p olxc_sx1a images:fedora/34 fed34d10
+Creating fed34d10
+Starting fed34d10                           
+[ubuntu@o83sv2 uekulele]$ lxc list
++----------+---------+----------------------+------+-----------+-----------+----------+
+|   NAME   |  STATE  |         IPV4         | IPV6 |   TYPE    | SNAPSHOTS | LOCATION |
++----------+---------+----------------------+------+-----------+-----------+----------+
+| fed34d10 | RUNNING | 172.29.108.12 (eth0) |      | CONTAINER | 0         | o83sv1   |
++----------+---------+----------------------+------+-----------+-----------+----------+
+```
 
 #  More Detailed: Install Orabuntu-LXC v7.0.0-alpha ELENA 
 
