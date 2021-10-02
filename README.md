@@ -46,7 +46,7 @@ Orabuntu-LXC BUILDS EVERYTHING itself for the currently supported distros:
 * Builds SCST Linux SAN from source code as RPM or DKMS-enabled DEB packages
 * Creates the target, group, and LUNs according to your specifications
 * Creates the multipath.conf file and configures multipath
-* Present LUNs in 3 locations, including a container-friendly non-symlink location under /dev/containername
+* Present LUNs in 3 locations, including a container-friendly non-symlink location under /dev/lxc_luns
 * Present LUNs to containers directly, only the LUNs for that container, at full bare-metal storage performance.
 
 **Note 1** CentOS 7 and RedHat 7 use Ubuntu Hirsute 21.04 for the LXC containerized DNS/DHCP.
