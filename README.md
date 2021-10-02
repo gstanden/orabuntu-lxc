@@ -200,6 +200,14 @@ If using the optional SCST Linux SAN fully-automated deployer which is found in 
 lxc config device add ora84d10 asm disk source=/dev/lxc_luns path=/dev/lxc_luns
 ```
 
+**Note** that the LUNs are available in three places on the LXD host:
+
+/dev/mapper
+/dev/asm
+/dev/lxc_luns
+
+and that the /dev/lxc_luns location is specially-designed so that the LUNs are "softlink-less" so that the multi-path LUNs are available by simply exposing /dev/lxc_luns to the container with no need to also expose an endpoint of a LUN soft link as would be necessary if say /dev/mapper was exposed to the container.  Also note the the name "lxc_luns" is user-settable and can be changed by the user in the scripts.
+
 #  More Detailed: Install Orabuntu-LXC v7.0.0-alpha ELENA 
 
 An administrative non-root user account is required (such as the install account). The non-root user needs to have "sudo ALL" privilege.
