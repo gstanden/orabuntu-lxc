@@ -184,12 +184,20 @@ To add other flavors of LXD container to the Orabuntu-LXC DHCP OpenvSwitch netwo
 [ubuntu@o83sv2 uekulele]$ lxc launch -p olxc_sx1a images:fedora/34 fed34d10
 Creating fed34d10
 Starting fed34d10                           
-[ubuntu@o83sv2 uekulele]$ lxc list
+[ubuntu@o83sv2 uekulele]$ lxc listlxc config device add ora79d17 asm disk source=/dev/lxc_luns path=/dev/lxc_luns
 +----------+---------+----------------------+------+-----------+-----------+----------+
 |   NAME   |  STATE  |         IPV4         | IPV6 |   TYPE    | SNAPSHOTS | LOCATION |
 +----------+---------+----------------------+------+-----------+-----------+----------+
 | fed34d10 | RUNNING | 172.29.108.12 (eth0) |      | CONTAINER | 0         | o83sv1   |
 +----------+---------+----------------------+------+-----------+-----------+----------+
+```
+
+Step 10
+
+If using the optional SCST Linux SAN fully-automated deployer which is found in /opt/olxc/home/scst-files AFTER Orabuntu-LXC deployment has finished, then use the following command to expose local host SCST Linux SAN LUNs to any given container as shown below.
+
+```
+lxc config device add ora84d10 asm disk source=/dev/lxc_luns path=/dev/lxc_luns
 ```
 
 #  More Detailed: Install Orabuntu-LXC v7.0.0-alpha ELENA 
