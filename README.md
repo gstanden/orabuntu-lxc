@@ -10,7 +10,7 @@ New features of v7.0.0-alpha ELENA edition:
 * Adds support for nftables and firewalld for LXD clusters and LXC multi-host "spanned" networks.
 * Continues to offer option of LXC networks spanned across multiple hosts, as well as the new LXD cluster option
 
-Orabuntu-LXC BUILDS EVERYTHING itself for the currently supported distros: 
+Orabuntu-LXC/D ELENA BUILDS EVERYTHING itself for the currently supported distros: 
 
 * Oracle Linux 6.x, 7.x, 8.x
 * Ubuntu 16.04+ (16.04 and all higher versions)
