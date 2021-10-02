@@ -28,7 +28,7 @@ Orabuntu-LXC/D ELENA BUILDS EVERYTHING itself for the currently supported distro
 **Orabuntu-LXC/D ELENA installer does all of the following automatically**:
 
 * Automatically detects your OS and branches to the appropriate build pathway
-* Deploys/Builds OpenvSwitch from source as RPM or DEB packages
+* Builds/Deploys OpenvSwitch as RPM or DEB packages and builds RPM or DEB packages from source if necessary
 * Builds the OpenvSwitch Network
 * Configures VLANs on the OpenvSwitch Network
 * Connects the OpenvSwitch network physical host interfaces using nftables or iptables rules
