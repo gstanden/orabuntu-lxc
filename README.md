@@ -8,6 +8,7 @@ New features of v7.0.0-alpha ELENA edition:
 * User-selectable tunnel-type for multi-host deployments [ gre | geneve | vxlan ].
 * New /anylinux/CONFIG file which centralizes deployment configuration parameters.
 * Adds support for nftables and firewalld for LXD clusters and LXC multi-host "spanned" networks.
+* Continued to offer options of LXC networks spanned across multiple hosts, as well as the new LXD cluster option
 
 Orabuntu-LXC BUILDS EVERYTHING itself for the currently supported distros: 
 
