@@ -32,7 +32,7 @@ Orabuntu-LXC BUILDS EVERYTHING itself for the currently supported distros:
 * Configures VLANs on the OpenvSwitch Network
 * Connects the OpenvSwitch network physical host interfaces using nftables or iptables rules
 * Deploys/Builds LXC from source as RPM or DEB packages
-* Creates an LXC-containerized Ubuntu Focal 20.04 DNS/DHCP container running bind9 and isc-dhcp-server (see Note 1 below)
+* Creates an LXC-containerized replicated Ubuntu Focal 20.04 DNS/DHCP container running bind9 and isc-dhcp-server (see Note 1 below)
 * Replicates the LXC-containerized DNS/DHCP container to all Orabuntu-LXC physical GRE-connected hosts
 * Optionally stores LXC-containerized DNS/DHCP updates at Amazon S3 for replication
 * Automatically detects filesystem types which support lxc-snapshot overlayfs for LXC-containerized DNS/DHCP
