@@ -20,9 +20,9 @@ Orabuntu-LXC BUILDS EVERYTHING itself for the currently supported distros:
 
 **Note 1**:  Linux 6 support cannot be guaranteed due to de-support of Linux 6 by Linux vendors. Still supported on a "best effort" basis only.
 
-**Note 2**:  SCST on Linux 6 cannot be guaranteed due to de-support of kernels older than 2.6 by SCST 
+**Note 2**:  Orabuntu-LXC SCST deployer support: de-support pending for kernels older than 2.6 (notified by SCST maintainers).
 
-**Note 3**:  LXD options NA for Linux 6 all distros, nor for Ubuntu 16.04.  These distros and versions are LXC options only.
+**Note 3**:  LXD options NA for Linux 6 all distros, nor for Ubuntu 16.04.  These distros and versions are LXC multi-host span options only.
        
 **Orabuntu-LXC/D ELENA installer does all of the following automatically**:
 
