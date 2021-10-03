@@ -139,9 +139,13 @@ then
 		if [ $LXDCluster = 'Y' ]
 		then
 			sudo snap install docker
+			sudo docker run -d hello-world
+			sudo docker ps -a
 		else
 			sudo yum -y install snapd
 			sudo snap install docker
+			sudo docker run -d hello-world
+			sudo docker ps -a
 		fi
 
 		sudo /var/lib/snapd/snap/bin/docker run -d hello-world
@@ -161,129 +165,39 @@ then
 	fi
 fi
 
-# if [ $LinuxFlavor = 'CentOS' ]
-# then
-# 	if   [ $Release -eq 6 ]
-# 	then
-# 		sudo yum -y install docker-io
-# 		sleep 2
-# 		sudo service docker start
-# 		sudo chkconfig docker on
-# 
-# 		function CheckDockerRunning {
-# 			ps -ef | grep -c 'docker \-d'
-# 		}
-# 		DockerRunning=$(CheckDockerRunning)
-# 
-# 		d=1
-# 		while [ $DockerRunning -eq 0 ] && [ $d -le 5 ]
-# 		do
-# 			sleep 5
-# 			sudo service docker start
-# 			echo ''
-# 			DockerRunning=$(CheckDockerRunning)
-# 			ps -ef | grep docker
-# 			d=$((d+1))
-# 		done
-# 
-# 	elif [ $Release -eq 7 ]
-# 	then
-# 		sudo yum install -y yum-utils device-mapper-persistent-data lvm2
-# 		sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
-# 		sudo yum-config-manager --enable docker-ce-edge
-# 		sudo yum-config-manager --enable docker-ce-test
-# 		sudo yum -y install docker-ce
-# 		sudo systemctl start docker
-# 		sudo systemctl enable docker
-# 	fi
-# fi
-
 if [ $LinuxFlavor = 'Fedora' ]
 then
-	function CheckSnapdInstalled {
-		sudo snap version | egrep -c 'snap|snapd'	
-	}
-	SnapdInstalled=$(CheckSnapdInstalled)
-
-	if [ $Release -ge 8 ] && [ $SnapdInstalled -ge 1 ]
+	if   [ $Release -ge 8 ]
 	then
-		sudo snap install docker
-		sudo docker run -d oraclelinux:7.3
-	else
+		if [ $LXDCluster = 'Y' ]
+		then
+			sudo snap install docker
+		else
+			sudo dnf -y install snapd
+			sudo snap install docker
+		fi
+
+		sudo /var/lib/snapd/snap/bin/docker run -d hello-world
+		sudo /var/lib/snapd/snap/bin/docker ps -a
+
+	elif [ $Release -eq 7 ]
+	then
 		sudo dnf -y install dnf-plugins-core
 		sudo dnf -y config-manager --add-repo https://download.docker.com/linux/fedora/docker-ce.repo
 		sudo dnf -y install docker-ce
 		sudo systemctl start docker
 		sudo systemctl enable docker
+		sudo docker run -d hello-world
+		sudo docker ps -a
+	
+	elif [ $Release -eq 6 ]
+	then
+		sudo dnf -y install docker
+		sudo systemctl start docker
+		sudo systemctl enable docker
+		sudo service docker status
+		sudo docker run -d hello-world
+		sudo docker ps -a
 	fi
 fi
-
-# echo ''
-# echo "=============================================="
-# echo "Done: Configure required repository.          "
-# echo "=============================================="
-# echo ''
-# echo "=============================================="
-# echo "Done: Install docker-ce.                      "
-# echo "=============================================="
-# echo ''
-# echo "=============================================="
-# echo "Install User-Settable Docker Containers...    "
-# echo "=============================================="
-# echo ''
-
-# Install alpine-nettools
-
-if [ $LinuxFlavor = 'Oracle' ]
-then
-	function CheckUEKVersion {
-		sudo /opt/olxc/"$DistDir"/anylinux/vercomp | cut -f2 -d"'" | cut -f1 -d' ' | cut -f1 -d'.'
-	}
-	UEKVersion=$(CheckUEKVersion)
-else
-	UEKVersion=0
-fi
-
-if   [ $Release -le 7 ]
-then
- 	sudo docker run -d hello-world
-#	sudo docker run -d -p 2200:22 raesene/alpine-nettools
-	sudo docker ps -a
-
-	sleep 2
-
-	echo ''
-	echo "=============================================="
-	echo "Done: Install User-Settable Docker Containers."
-	echo "=============================================="
-	echo ''
-	echo "=============================================="
-	echo "Done: Install Docker.                         "
-	echo "=============================================="
-
-elif [ $Release -eq 8 ] && [ $LinuxFlavor = 'Oracle' ]
-then
- 	podman run -d hello-world
-#	podman run -d raesene/alpine-nettools
-	podman ps -a
-
-	sleep 2
-
-	echo ''
-	echo "=============================================="
-	echo "Done: Install User-Settable Podman Containers."
-	echo "=============================================="
-	echo ''
-	echo "=============================================="
-	echo "Done: Install OCI Tools.                      "
-	echo "=============================================="
-else
-	sudo docker run -d hello-world
-fi
-
-
-# Install ODOO ERP
-# sudo docker run -d -e POSTGRES_USER=odoo -e POSTGRES_PASSWORD=odoo --name db postgres:9.4
-# sudo docker run -d -p 8069:8069 --name odoo --link db:db -t odoo
-# sudo docker exec -ti <container_name> /bin/sh
 
