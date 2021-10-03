@@ -181,8 +181,8 @@ then
 
 		sudo groupadd docker
 		sudo usermod -aG docker $Owner
-		sudo /var/lib/snapd/snap/bin/docker run -d hello-world | sg docker
-		sudo /var/lib/snapd/snap/bin/docker ps -a | sg docker
+		sudo docker run -d hello-world
+		sudo docker ps -a
 
 	elif [ $RedHatVersion -le 29 ] && [ $RedHatVersion -ge 22 ]
 	then
