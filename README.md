@@ -58,6 +58,8 @@ Orabuntu-LXC does all of this and much more with just these easy steps:
 
 Step 0
 
+Be sure there is a working connection to the internet.  Orabuntu-LXC installs packages during the install.
+
 Create a physical host or VM host of CentOS, Fedora, Redhat, Ubuntu or Oracle Linux.  Use of LVM when building the host is strongly recommeded so that the optional Orabuntu-LXC fully-automated SCST Linux SAN deployer can be fully-leveraged after the LXC or LXD N-node hosts have been deployed.
 
 Step 1
