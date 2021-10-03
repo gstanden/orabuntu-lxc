@@ -6608,9 +6608,6 @@ then
         clear
 fi
 
-sudo cat /etc/systemd/resolved.conf
-sleep 60
-
 # GLS 20161118 This section for any tweaks to the unpacked files from archives.
 if [ $Release -ge 6 ]
 then
