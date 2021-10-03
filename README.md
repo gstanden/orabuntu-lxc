@@ -102,7 +102,7 @@ and unzip it, then navigate to the "anylinux" directory. **Note** that the softw
 
 Step 3b
 
-If a non-root administrative user is not available on the host, create it with the appropriate script:
+If a non-root user with "sudo ALL" privilege is not available on the host, create the user with the appropriate script:
 ```
 ./uekulele/uekulele-services-0.sh (RedHat-family linuxes)
 ./orabuntu/orabuntu-services-0.sh (Ubuntu-family linuxes)
