@@ -81,7 +81,7 @@ then
 
 			elif [ $GRE = 'Y' ]
 			then
-				if [ $n -le 5 ]
+				if [ $n -le 10 ]
 				then
 					cat /etc/network/openvswitch/preseed.sw1a.olxc.002.lxd.cluster | lxd init --preseed
 					if [ $? -ne 0 ]
