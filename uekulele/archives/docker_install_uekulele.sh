@@ -21,6 +21,7 @@
        DistDir=$3
     LXDCluster=$4
 	 Owner=$5
+ RedHatVersion=$6
 
 if [ $LinuxFlavor = 'Oracle' ]
 then
@@ -168,7 +169,7 @@ fi
 
 if [ $LinuxFlavor = 'Fedora' ]
 then
-	if   [ $Release -ge 8 ]
+	if   [ $RedHatVersion -ge 30 ]
 	then
 		if [ $LXDCluster = 'Y' ]
 		then
@@ -183,7 +184,7 @@ then
 		sudo /var/lib/snapd/snap/bin/docker run -d hello-world | sg docker
 		sudo /var/lib/snapd/snap/bin/docker ps -a | sg docker
 
-	elif [ $Release -eq 7 ]
+	elif [ $RedHatVersion -le 29 ] && [ $RedHatVersion -ge 22 ]
 	then
 		sudo dnf -y install dnf-plugins-core
 		sudo dnf -y config-manager --add-repo https://download.docker.com/linux/fedora/docker-ce.repo
@@ -193,7 +194,7 @@ then
 		sudo docker run -d hello-world
 		sudo docker ps -a
 	
-	elif [ $Release -eq 6 ]
+	elif [ $RedHatVersion -lt 22 ]
 	then
 		sudo dnf -y install docker
 		sudo systemctl start docker
