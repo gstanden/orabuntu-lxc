@@ -187,7 +187,18 @@ then
 	elif [ $RedHatVersion -le 29 ] && [ $RedHatVersion -ge 22 ]
 	then
 		sudo dnf -y install dnf-plugins-core
-		sudo dnf -y config-manager --add-repo https://download.docker.com/linux/fedora/docker-ce.repo
+
+		ping -c 5 download.docker.com
+		DockerCeRepo=1
+		n=1
+		while [ $DockerCeRepo -ne 0 ] && [ $n -le 5 ]
+		do
+		 	sudo dnf -y config-manager --add-repo https://download.docker.com/linux/fedora/docker-ce.repo
+			DockerCeRepo=`echo $?`
+			n=$((n+1))
+			sleep 5
+		done
+			
 		sudo dnf -y install docker-ce
 		sudo systemctl start docker
 		sudo systemctl enable docker
