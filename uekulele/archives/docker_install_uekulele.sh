@@ -20,6 +20,7 @@
        Release=$2
        DistDir=$3
     LXDCluster=$4
+	 Owner=$5
 
 if [ $LinuxFlavor = 'Oracle' ]
 then
@@ -177,8 +178,10 @@ then
 			sudo snap install docker
 		fi
 
-		sudo /var/lib/snapd/snap/bin/docker run -d hello-world
-		sudo /var/lib/snapd/snap/bin/docker ps -a
+		sudo groupadd docker
+		sudo usermod -aG docker $Owner
+		sudo /var/lib/snapd/snap/bin/docker run -d hello-world | sg docker
+		sudo /var/lib/snapd/snap/bin/docker ps -a | sg docker
 
 	elif [ $Release -eq 7 ]
 	then

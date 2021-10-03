@@ -309,7 +309,7 @@ then
   	if [ $Release -ge 6 ] && [ $Release -le 8 ]
   	then
   		sudo chmod 775 /opt/olxc/"$DistDir"/uekulele/archives/docker_install_uekulele.sh
-  		/opt/olxc/"$DistDir"/uekulele/archives/docker_install_uekulele.sh $LinuxFlavor $Release $DistDir
+  		/opt/olxc/"$DistDir"/uekulele/archives/docker_install_uekulele.sh $LinuxFlavor $Release $DistDir $LXDCluster $Owner
   	fi
 	
   	echo ''
