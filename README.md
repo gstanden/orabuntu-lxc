@@ -21,7 +21,7 @@ Orabuntu-LXC/D ELENA BUILDS EVERYTHING itself for the currently supported distro
 
 **Note 1**:  Linux 6 being de-supported by major Linux vendors. Orabuntu-LXC support is "best effort" basis only.
 
-**Note 2**:  Orabuntu-LXC SCST deployer support: de-support pending for kernels older than 2.6 (notified by SCST maintainers).
+**Note 2**:  Orabuntu-LXC SCST: de-support pending for kernels older than 2.6 (notified by SCST maintainers).
 
 **Note 3**:  LXD: NA Linux 6 all distros; NA Ubuntu 16.04; NA Fedora 22-28; these hosts currently LXC option only.
        
