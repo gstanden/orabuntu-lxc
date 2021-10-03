@@ -47,7 +47,7 @@ sudo rpm -Uvh https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch
 sudo yum-config-manager --enable ol7_developer_EPEL
 sudo yum repolist
 sudo yum -y install dkms
-sudo rpm -Uvh http://download.zfsonlinux.org/epel/zfs-release.el7_9.noarch.rpm
+sudo rpm -Uvh http://download.zfsonlinux.org/epel/zfs-release.el`cat /etc/oracle-release | cut -f5 -d' ' | sed 's/\./_/'`.noarch.rpm
 
 sleep 5
 
