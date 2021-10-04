@@ -3419,9 +3419,10 @@ then
 
 					sleep 5
 
-			                sudo yum -y remove   unbound-libs-1.6.6-5* > /dev/null 2>&1
-			                sudo yum -y install  unbound-libs-1.6.6-1* > /dev/null 2>&1
-			                sudo yum -y install unbound-devel-1.6.6-1* > /dev/null 2>&1
+			                sudo yum -y -q remove   unbound-libs-1.6.6-5* 
+			                sudo yum -y -q install  unbound-libs-1.6.6-1*  
+			                sudo yum -y -q install unbound-devel-1.6.6-1* 
+					sudo yum -y -q install libvirt
 					rpm -qa | egrep 'unbound-libs|unbound-devel'
 					
 					echo ''

@@ -395,6 +395,12 @@ then
 		then
 			Zone=public
 			sudo firewall-cmd --permanent --zone=$Zone --set-target=ACCEPT
+ 			sudo firewall-cmd --zone=$Zone --permanent --add-interface=sw1
+ 			sudo firewall-cmd --zone=$Zone --permanent --add-interface=sw1a
+ 			sudo firewall-cmd --zone=$Zone --permanent --add-interface=sx1
+ 			sudo firewall-cmd --zone=$Zone --permanent --add-interface=sx1a
+ 			sudo firewall-cmd --zone=$Zone --permanent --add-interface=lxcbr0
+ 			sudo firewall-cmd --zone=$Zone --permanent --add-interface=lxdbr0
 		else
 			Zone=trusted
 			sudo firewall-cmd --permanent --zone=$Zone --set-target=ACCEPT
@@ -879,13 +885,6 @@ then
 		echo "CentOS kernel version meets requirements.     "
 		echo "=============================================="
 	fi
-fi
-
-if [ $LinuxFlavor = 'Oracle' ] && [ $Release -eq 7 ]
-then
-	sudo yum -y remove  unbound-libs-1.6.6-5*  > /dev/null 2>&1
-	sudo yum -y install unbound-libs-1.6.6-1*  > /dev/null 2>&1
-	sudo yum -y install unbound-devel-1.6.6-1* > /dev/null 2>&1
 fi
 
 echo ''
