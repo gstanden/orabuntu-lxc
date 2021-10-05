@@ -108,6 +108,16 @@ ExtrNet4=$(source "$DistDir"/anylinux/CONFIG; echo $ExtrNet4)
 ExtrNet5=$(source "$DistDir"/anylinux/CONFIG; echo $ExtrNet5)
 ExtrNet6=$(source "$DistDir"/anylinux/CONFIG; echo $ExtrNet6)
 
+function GetSw1Net {
+	echo $BaseNet1 | cut -f2 -d':'
+}
+Sw1Net=$(GetSw1Net)
+	
+function GetSx1Net {
+	echo $SeedNet1 | cut -f2 -d':'
+}
+Sx1Net=$(GetSx1Net)
+
 # pgroup1 end
 # user-settable parameters group 1 end
 # Custom Subnets End
@@ -887,6 +897,31 @@ then
 	fi
 fi
 
+if [ $GRE = 'Y' ]
+then
+	echo ''
+	echo "=============================================="
+	echo "Check nslookup/getent ...                     "
+	echo "=============================================="
+	echo ''
+
+	if [ $LinuxFlavor = 'Oracle' ] && [ $Release -eq 7 ]
+	then
+		sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" nslookup $Sw1Net.1"
+		sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" nslookup $Sx1Net.1"
+	fi
+
+	echo ''
+	echo "=============================================="
+	echo "Check nslookup/getent ...                     "
+	echo "=============================================="
+	echo ''
+
+	sleep 5
+
+	clear
+fi
+
 echo ''
 echo "=============================================="
 echo "Display Installation Parameters ...           "
@@ -1366,15 +1401,16 @@ then
 	}
 	MultiHostVar9=$(GetMultiHostVar9)
 
-	function GetSw1Net {
-		echo $BaseNet1 | cut -f2 -d':'
-	}
-	Sw1Net=$(GetSw1Net)
+#	GLS 20211005 Moved up to pgroup1 area 
+#	function GetSw1Net {
+#		echo $BaseNet1 | cut -f2 -d':'
+#	}
+#	Sw1Net=$(GetSw1Net)
 	
-	function GetSx1Net {
-		echo $SeedNet1 | cut -f2 -d':'
-	}
-	Sx1Net=$(GetSx1Net)
+#	function GetSx1Net {
+#		echo $SeedNet1 | cut -f2 -d':'
+#	}
+#	Sx1Net=$(GetSx1Net)
 
 	ssh-keygen -R $MultiHostVar5 > /dev/null 2>&1
         sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service systemd-resolved restart > /dev/null 2>&1"
