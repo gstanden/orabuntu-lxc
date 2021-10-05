@@ -49,7 +49,18 @@ then
 			sudo snap install docker
 		fi
 
-		sudo /var/lib/snapd/snap/bin/docker run -d hello-world
+		n=1
+		HelloWorld=1
+		while [ $HelloWorld -ne 0 ] && [ $n -le 12 ]
+		do
+			sudo /var/lib/snapd/snap/bin/docker run -d hello-world
+			HelloWorld=`echo $?`
+			n=$((n+1))
+			echo "Retry Docker ..."
+			sleep 5
+		done
+
+		echo ''
 		sudo /var/lib/snapd/snap/bin/docker ps -a
 	
 	elif [ $Release -eq 6 ]
@@ -105,7 +116,18 @@ then
 			sudo snap install docker
 		fi
 
-		sudo /var/lib/snapd/snap/bin/docker run -d hello-world
+		n=1
+		HelloWorld=1
+		while [ $HelloWorld -ne 0 ] && [ $n -le 12 ]
+		do
+			sudo /var/lib/snapd/snap/bin/docker run -d hello-world 
+			HelloWorld=`echo $?`
+			n=$((n+1))
+			echo "Retry Docker ..."
+			sleep 5
+		done
+
+		echo ''
 		sudo /var/lib/snapd/snap/bin/docker ps -a
 	
 	elif [ $Release -eq 6 ]
@@ -141,16 +163,23 @@ then
 		if [ $LXDCluster = 'Y' ]
 		then
 			sudo snap install docker
-			sudo docker run -d hello-world
-			sudo docker ps -a
 		else
 			sudo yum -y install snapd
 			sudo snap install docker
-			sudo docker run -d hello-world
-			sudo docker ps -a
 		fi
 
-		sudo /var/lib/snapd/snap/bin/docker run -d hello-world
+		n=1
+		HelloWorld=1
+		while [ $HelloWorld -ne 0 ] && [ $n -le 12 ]
+		do
+			sudo /var/lib/snapd/snap/bin/docker run -d hello-world
+			HelloWorld=`echo $?`
+			n=$((n+1))
+			echo "Retry Docker ..."
+			sleep 5
+		done
+
+		echo ''
 		sudo /var/lib/snapd/snap/bin/docker ps -a
 	
 	elif [ $Release -eq 6 ]
