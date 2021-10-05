@@ -3419,9 +3419,9 @@ then
 
 					sleep 5
 
-			                sudo yum -y -q remove   unbound-libs-1.6.6-5* 
-			                sudo yum -y -q install  unbound-libs-1.6.6-1*  
-			                sudo yum -y -q install unbound-devel-1.6.6-1* 
+			                sudo yum -y -q remove   unbound-libs-1.6.6-5* 2>/dev/null
+			                sudo yum -y    install  unbound-libs-1.6.6-1*  
+			                sudo yum -y    install unbound-devel-1.6.6-1* 
 					sudo yum -y -q install libvirt
 					rpm -qa | egrep 'unbound-libs|unbound-devel'
 					
@@ -5691,8 +5691,16 @@ then
 			sudo sh -c "echo 'Type=simple'                     				>> /etc/systemd/system/$NameServer.service"
 			sudo sh -c "echo 'User=root'                        				>> /etc/systemd/system/$NameServer.service"
 			sudo sh -c "echo 'RemainAfterExit=yes'              				>> /etc/systemd/system/$NameServer.service"
-		 	sudo sh -c "echo '# Restart=always'	              				>> /etc/systemd/system/$NameServer.service"
-		 	sudo sh -c "echo '# RestartSec=5'  	            				>> /etc/systemd/system/$NameServer.service"
+
+			if [ $GRE = 'Y' ]
+			then
+		 		sudo sh -c "echo '# Restart=always'	              			>> /etc/systemd/system/$NameServer.service"
+		 		sudo sh -c "echo '# RestartSec=5'  	            			>> /etc/systemd/system/$NameServer.service"
+			else
+		 		sudo sh -c "echo 'Restart=always'	              			>> /etc/systemd/system/$NameServer.service"
+		 		sudo sh -c "echo 'RestartSec=5'  	            			>> /etc/systemd/system/$NameServer.service"
+			fi
+
 			sudo sh -c "echo 'ExecStart=/etc/network/openvswitch/strt_$NameServer.sh start'	>> /etc/systemd/system/$NameServer.service"
 			sudo sh -c "echo 'ExecStop=/etc/network/openvswitch/strt_$NameServer.sh stop'	>> /etc/systemd/system/$NameServer.service"
 			sudo sh -c "echo ''                                 				>> /etc/systemd/system/$NameServer.service"
