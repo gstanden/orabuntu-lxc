@@ -1388,7 +1388,7 @@ then
 
 	Sx1Index=201
 	function CheckDNSLookup {
-		sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" getent hosts $Sx1Net.$Sx1Index"
+		sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" nslookup $Sx1Net.$Sx1Index"
 	}
 	DNSLookup=$(CheckDNSLookup)
 	DNSHit=$?
@@ -1405,7 +1405,7 @@ then
  
 	Sw1Index=201
 	function CheckDNSLookup {
-		sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" getent hosts $Sw1Net.$Sw1Index"
+		sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" nslookup $Sw1Net.$Sw1Index"
 	}
 	DNSLookup=$(CheckDNSLookup)
 	DNSHit=$?
