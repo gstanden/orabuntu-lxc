@@ -61,7 +61,8 @@ then
 		done
 
 		echo ''
-		sudo /var/lib/snapd/snap/bin/docker ps -a
+		sudo ln -s /snap/bin/docker /usr/bin/docker
+		sudo docker ps -a
 	
 	elif [ $Release -eq 6 ]
 	then
@@ -120,7 +121,7 @@ then
 		HelloWorld=1
 		while [ $HelloWorld -ne 0 ] && [ $n -le 12 ]
 		do
-			sudo /var/lib/snapd/snap/bin/docker run -d hello-world 
+			sudo /var/lib/snapd/snap/bin/docker run -d hello-world
 			HelloWorld=`echo $?`
 			n=$((n+1))
 			echo "Retry Docker ..."
@@ -128,7 +129,8 @@ then
 		done
 
 		echo ''
-		sudo /var/lib/snapd/snap/bin/docker ps -a
+		sudo ln -s /snap/bin/docker /usr/bin/docker
+		sudo docker ps -a
 	
 	elif [ $Release -eq 6 ]
 	then
@@ -180,7 +182,8 @@ then
 		done
 
 		echo ''
-		sudo /var/lib/snapd/snap/bin/docker ps -a
+		sudo ln -s /snap/bin/docker /usr/bin/docker
+		sudo docker ps -a
 	
 	elif [ $Release -eq 6 ]
 	then
