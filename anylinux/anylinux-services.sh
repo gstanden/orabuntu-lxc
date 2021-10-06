@@ -897,31 +897,6 @@ then
 	fi
 fi
 
-if [ $GRE = 'Y' ]
-then
-	echo ''
-	echo "=============================================="
-	echo "Check nslookup/getent ...                     "
-	echo "=============================================="
-	echo ''
-
-	if [ $LinuxFlavor = 'Oracle' ] && [ $Release -eq 7 ]
-	then
-		sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" nslookup $Sw1Net.1"
-		sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" nslookup $Sx1Net.1"
-	fi
-
-	echo ''
-	echo "=============================================="
-	echo "Check nslookup/getent ...                     "
-	echo "=============================================="
-	echo ''
-
-	sleep 5
-
-	clear
-fi
-
 echo ''
 echo "=============================================="
 echo "Display Installation Parameters ...           "

@@ -622,15 +622,17 @@ then
 	}
 	ShortHost=$(GetShortHost)
 	
+	sudo lxc-stop -n $NameServer
+	
 	nslookup $HOSTNAME.$Domain1 $NameServer > /dev/null 2>&1
-	if [ $? -eq 1 ]
+	if [ $? -ne 0 ]
 	then
 	        echo ''
 	        echo "=============================================="
 	        echo "Create ADD DNS $ShortHost.$Domain1            "
 	        echo "=============================================="
 	        echo ''
-	
+
 	        ssh-keygen -R 10.207.39.2
 	        sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.39.2 "sudo -S <<< "ubuntu" mkdir -p ~/Downloads"
 	        sshpass -p ubuntu ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@10.207.39.2 "sudo -S <<< "ubuntu" chown ubuntu:ubuntu Downloads"
@@ -650,7 +652,7 @@ then
 	fi
 	
 	nslookup $HOSTNAME.$Domain2 $NameServer > /dev/null 2>&1
-	if [ $? -eq 1 ]
+	if [ $? -ne 0 ]
 	then
 	        echo ''
 	        echo "=============================================="

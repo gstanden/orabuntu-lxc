@@ -5691,18 +5691,8 @@ then
 			sudo sh -c "echo 'Type=simple'  	               				>> /etc/systemd/system/$NameServer.service"
 			sudo sh -c "echo 'User=root'           	        				>> /etc/systemd/system/$NameServer.service"
 			sudo sh -c "echo 'RemainAfterExit=yes' 	        				>> /etc/systemd/system/$NameServer.service"
-
-			if   [ $GRE = 'N' ]
-			then
-		 		sudo sh -c "echo 'Restart=always'	              			>> /etc/systemd/system/$NameServer.service"
-		 		sudo sh -c "echo 'RestartSec=5'  	            			>> /etc/systemd/system/$NameServer.service"
-			
-			elif [ $GRE = 'Y' ]
-			then
-		 		sudo sh -c "echo '# Restart=always'	              			>> /etc/systemd/system/$NameServer.service"
-		 		sudo sh -c "echo '# RestartSec=5'  	            			>> /etc/systemd/system/$NameServer.service"
-			fi
-
+		 	sudo sh -c "echo 'Restart=always'		              			>> /etc/systemd/system/$NameServer.service"
+		 	sudo sh -c "echo 'RestartSec=5'  	       		     			>> /etc/systemd/system/$NameServer.service"
 			sudo sh -c "echo 'ExecStart=/etc/network/openvswitch/strt_$NameServer.sh start'	>> /etc/systemd/system/$NameServer.service"
 			sudo sh -c "echo 'ExecStop=/etc/network/openvswitch/strt_$NameServer.sh stop'	>> /etc/systemd/system/$NameServer.service"
 			sudo sh -c "echo ''                                 				>> /etc/systemd/system/$NameServer.service"
@@ -5829,8 +5819,9 @@ then
         sudo chown $Owner:$Group /home/$Owner/Manage-Orabuntu
         sudo chmod 775 /opt/olxc/"$DistDir"/uekulele/archives/nameserver_copy.sh
         /opt/olxc/"$DistDir"/uekulele/archives/nameserver_copy.sh $MultiHostVar5 $MultiHostVar6 $MultiHostVar8 $MultiHostVar9 $NameServerBase $Release $LinuxFlavor
-
-        echo ''
+	sudo sed -i 's/Restart/# Restart/g' /etc/systemd/system/$NameServer.service
+        
+	echo ''
         echo "=============================================="
         echo "Done: Replicate nameserver $NameServer.       "
         echo "=============================================="

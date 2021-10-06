@@ -1153,11 +1153,6 @@ then
 	echo ''
 fi
 
-if [ $MultiHostVar2 = 'N' ]
-then
-        sudo lxc-start -n $NameServer > /dev/null 2>&1
-fi
-
 sleep 5
 
 clear
