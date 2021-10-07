@@ -157,7 +157,18 @@ then
 		echo ''
 
 		sudo dnf -y install podman skopeo buildah 
-		podman run -d hello-world
+		
+		n=1
+		HelloWorld=1
+		while [ $HelloWorld -ne 0 ] && [ $n -le 12 ]
+		do
+			sudo podman run -d hello-world >/dev/null 2>&1
+			HelloWorld=`echo $?`
+			n=$((n+1))
+			echo "Retry Docker ..."
+			sleep 5
+		done
+
 		podman ps -a
 
 	elif [ $Release -eq 7 ] 
@@ -194,7 +205,18 @@ then
 		sudo yum -y install docker-ce
 		sudo systemctl enable docker
 		sudo systemctl status docker
-		sudo docker run -d hello-world
+		
+		n=1
+		HelloWorld=1
+		while [ $HelloWorld -ne 0 ] && [ $n -le 12 ]
+		do
+			sudo docker run -d hello-world >/dev/null 2>&1
+			HelloWorld=`echo $?`
+			n=$((n+1))
+			echo "Retry Docker ..."
+			sleep 5
+		done
+
 		sudo docker ps -a
 	fi
 fi
@@ -213,7 +235,20 @@ then
 
 		sudo groupadd docker
 		sudo usermod -aG docker $Owner
-		sudo docker run -d hello-world
+		
+		n=1
+		HelloWorld=1
+		while [ $HelloWorld -ne 0 ] && [ $n -le 12 ]
+		do
+			sudo /var/lib/snapd/snap/bin/docker run -d hello-world >/dev/null 2>&1
+			HelloWorld=`echo $?`
+			n=$((n+1))
+			echo "Retry Docker ..."
+			sleep 5
+		done
+
+		echo ''
+		sudo ln -s /snap/bin/docker /usr/bin/docker
 		sudo docker ps -a
 
 	elif [ $RedHatVersion -le 29 ] && [ $RedHatVersion -ge 22 ]
@@ -221,8 +256,9 @@ then
 		sudo dnf -y install dnf-plugins-core
 
 		ping -c 5 download.docker.com
-		DockerCeRepo=1
+
 		n=1
+		DockerCeRepo=1
 		while [ $DockerCeRepo -ne 0 ] && [ $n -le 5 ]
 		do
 		 	sudo dnf -y config-manager --add-repo https://download.docker.com/linux/fedora/docker-ce.repo
@@ -234,7 +270,18 @@ then
 		sudo dnf -y install docker-ce
 		sudo systemctl start docker
 		sudo systemctl enable docker
-		sudo docker run -d hello-world
+		
+		n=1
+		HelloWorld=1
+		while [ $HelloWorld -ne 0 ] && [ $n -le 12 ]
+		do
+			sudo docker run -d hello-world >/dev/null 2>&1
+			HelloWorld=`echo $?`
+			n=$((n+1))
+			echo "Retry Docker ..."
+			sleep 5
+		done
+		
 		sudo docker ps -a
 	
 	elif [ $RedHatVersion -lt 22 ]
@@ -243,7 +290,18 @@ then
 		sudo systemctl start docker
 		sudo systemctl enable docker
 		sudo service docker status
-		sudo docker run -d hello-world
+		
+		n=1
+		HelloWorld=1
+		while [ $HelloWorld -ne 0 ] && [ $n -le 12 ]
+		do
+			sudo docker run -d hello-world >/dev/null 2>&1
+			HelloWorld=`echo $?`
+			n=$((n+1))
+			echo "Retry Docker ..."
+			sleep 5
+		done
+
 		sudo docker ps -a
 	fi
 fi
