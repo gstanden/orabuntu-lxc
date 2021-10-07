@@ -615,14 +615,15 @@ then
 	        sleep 5
 	
 	        clear
+	
+		sudo lxc-stop -n $NameServer >/dev/null 2>&1
+		sudo systemctl disable $NameServer.service >/dev/null 2>&1	
 	fi
 	
 	function GetShortHost {
 	        uname -n | cut -f1 -d'.'
 	}
 	ShortHost=$(GetShortHost)
-	
-	sudo lxc-stop -n $NameServer
 	
 	nslookup $HOSTNAME.$Domain1 $NameServer > /dev/null 2>&1
 	if [ $? -ne 0 ]
@@ -1210,7 +1211,18 @@ then
 
                         ssh-keygen -R $i
                         sleep 5
-                        sshpass -p root ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no root@$i "uname -a; cat /etc/oracle-release"
+
+			n=1
+			SshTest=1
+			while [ $SshTest -ne 0 ] && [ $n -le 5 ]
+			do
+                        	sshpass -p root ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no root@$i "uname -a; cat /etc/oracle-release" >/dev/null 2>&1
+				SshTest=`echo $?`
+				n=$((n+1))
+				sleep 5
+			done
+                        	
+			sshpass -p root ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no root@$i "uname -a; cat /etc/oracle-release"
 
                         echo ''
                         echo "=============================================="
@@ -1227,6 +1239,16 @@ then
                         echo "Test nslookup LXD Container $i ...            "
                         echo "=============================================="
                         echo ''
+
+			n=1
+			Nsl=1
+			while [ $Nsl -ne 0 ] && [ $n -le 5 ]
+			do
+                        	nslookup $i >/dev/null 2>&1
+				Nsl=`echo $?`
+				n=$((n+1))
+				sleep 5
+			done
 
                         nslookup $i
 
