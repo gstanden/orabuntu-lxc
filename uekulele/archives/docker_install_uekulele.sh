@@ -162,7 +162,7 @@ then
 		HelloWorld=1
 		while [ $HelloWorld -ne 0 ] && [ $n -le 12 ]
 		do
-			sudo podman run -d hello-world >/dev/null 2>&1
+			podman run -d hello-world >/dev/null 2>&1
 			HelloWorld=`echo $?`
 			n=$((n+1))
 			echo "Retry Docker ..."
