@@ -114,11 +114,10 @@ If a non-root user with "sudo ALL" privilege is not available on the host, creat
 
 Step 4
 
-Edit the **/anylinux/CONFIG** file to select either LXC or LXD. For example, to select LXD clusters, set the following parameters in the CONFIG file as shown below. It's highly-recommended to set all three of these parameters to "Y" as a set because even if deploying a single LXD node, this creates the single server as a "one-node LXD cluster" which makes the single-node LXD "cluster-ready" so that another node can be easily added later if desired, since the clustering is already setup. In the case of HUB HOST the "LXDCluster=Y" switch creates a "single-node" LXD cluster, and in the case of GRE HOST an "N-node" LXD cluster depending on how many GRE hosts have been added to the cluster.
+Edit the **/anylinux/CONFIG** file to select either LXC or LXD. For example, to select LXD clusters, set the following parameters in the CONFIG file as shown below. It's highly-recommended to set both of these parameters to "Y" as a set because even if deploying a single LXD node, this creates the single server as a "one-node LXD cluster" which makes the single-node LXD "cluster-ready" so that another node can be easily added later if desired, since the clustering is already setup. In the case of HUB HOST the "LXDCluster=Y" switch creates a "single-node" LXD cluster, and in the case of GRE HOST an "N-node" LXD cluster depending on how many GRE hosts have been added to the cluster.
 ```
 LXD=Y
 LXDCluster=Y
-LXDClusterPreSeed=Y
 ```
 If instead LXC containers (not LXD) multi-host span is desired, set all of these parameters to "N".
 
@@ -156,7 +155,6 @@ If LXC containers are preferred, then set these two parameters as a set to "N" s
 ```
 LXD=N
 LXDCluster=N
-LXDClusterPreSeed=N
 ```
 Also in the /anylinux/CONFIG file select whether Oracle Linux 8.4 or Oracle Linux 7.9 containers as shown below.
 ```
