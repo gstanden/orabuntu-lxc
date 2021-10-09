@@ -50,6 +50,19 @@
 #
 # RUN THIS:
 #
+# sudo subscription-manager remove --all
+# sudo subscription-manager unregister
+# sudo subscription-manager clean
+# sudo subscription-manager register --auto-attach --force
+# 
+# For convenience, instead of cutting and pasting the above commands, just run the script: 
+#
+# ./redhat-subscription-fixit-script.sh
+#
+# which is located in this directory. Note you will need your redhat subscription login/password for running that script.
+#
+# The expected output for these commands is shown below.
+#
 # [ubuntu@r79sv3 redhat]$ sudo subscription-manager remove --all
 #
 # 1 local certificate has been deleted.

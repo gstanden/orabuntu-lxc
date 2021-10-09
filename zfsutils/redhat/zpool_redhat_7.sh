@@ -37,7 +37,7 @@ clear
 PoolName=$1
 
 function CheckZpoolExists {
-	sudo zpool list | grep -c $PoolName
+	sudo zpool list 2>/dev/null | grep -c $PoolName
 }
 ZpoolExists=$(CheckZpoolExists)
 
@@ -307,7 +307,25 @@ then
 		echo 'Exiting script ...'
 		exit
 	fi
+	
+	echo ''
+	echo "=============================================="
+	echo "Done: Clone OpenZFS git repo.                 "
+	echo "=============================================="
+	echo ''
+
+	sleep 5
+
+	clear
 fi
+
+echo ''
+echo "=============================================="
+echo "Git Checkout Master...                        "
+echo "=============================================="
+echo ''
+
+sleep 5
 
 cd ./zfs
 
@@ -321,23 +339,25 @@ do
 	sleep 5
 done
 
+git checkout master
+
 if [ $Git2 -ne 0 ]
 then
 	echo 'git checkout ZFS failed ...'
 	echo 'Fix issue and retry zpool_redhat_7.sh'
 	echo 'Exiting script ...'
 	exit
-
-	echo ''
-	echo "=============================================="
-	echo "Done: Clone OpenZFS git repo.                 "
-	echo "=============================================="
-	echo ''
-
-	sleep 5
-
-	clear
 fi
+
+echo ''
+echo "=============================================="
+echo "Done: Git Checkout Master.                    "
+echo "=============================================="
+echo ''
+
+sleep 5
+
+clear
 
 function GetRpmCount {
 	ls -l *.rpm 2>/dev/null | grep -cv src
