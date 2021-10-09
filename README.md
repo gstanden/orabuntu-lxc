@@ -98,6 +98,12 @@ Download the latest Orabuntu-LXC 7.0.0-alpha ELENA release (as of September 26, 
 
 "/home/username/Downloads" 
 
+For example, for the MASTER branch the download command from the "/home/username/Downloads" directory is:
+
+```
+wget https://github.com/gstanden/orabuntu-lxc/archive/refs/heads/master.zip
+```
+
 and unzip it, then navigate to the "anylinux" directory. **Note** that the software can be downloaded to any directory owned by the install user; the "Downloads" directory is just a recommended download destination.
 
 Step 3b
