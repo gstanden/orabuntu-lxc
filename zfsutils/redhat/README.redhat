@@ -38,20 +38,49 @@
 # OR any other unspecified error not listed here, then that issue will need to be resolved before running the zpool_redhat_7.sh script.
 #
 # Orabuntu-LXC does not in general provide advice about registration issues for RedHat servers.
-# That being said, the command shown below often resolves registration issues and restores proper access to repos:
+#
+# ====================================== !!! WARNING IMPORTANT !!! ===========================================
+#
+#          IF this is a production machine or MISSION-CRITICAL system in any indirect way
+# THEN consult your in-house REDHAT subscriptions MANAGER FIRST before running any of the following commands!!
+#
+# ============================================================================================================
+#
+# That being said, these steps shown below often resolves registration issues and restores proper access to repos:
 #
 # RUN THIS:
 #
+# [ubuntu@r79sv3 redhat]$ sudo subscription-manager remove --all
+#
+# 1 local certificate has been deleted.
+# 1 subscription removed at the server.
+#
+# [ubuntu@r79sv3 redhat]$ sudo subscription-manager unregister
+#
+# Unregistering from: subscription.rhsm.redhat.com:443/subscription
+# System has been unregistered.
+#
+# [ubuntu@r79sv3 redhat]$ sudo subscription-manager clean
+#
+# All local data removed
+#
 # [ubuntu@r79sv3 redhat]$ sudo subscription-manager register --auto-attach --force
 #
-# THEN TRY REPO COMMAND AGAIN.
+# Registering to: subscription.rhsm.redhat.com:443/subscription
+# Username: xxxxxxxxxxxxxxxx 
+# Password: 
+# The system has been registered with ID: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+# The registered system name is: xxxxx
+# Installed Product Current Status:
+# Product Name: Red Hat Enterprise Linux Server
+# Status:       Subscribed
 #
-# If the above subscription-manager command does not set things right, additional information can be found here:
+# If the above subscription-manager commands do not set things right, additional information can be found here:
 #
 # https://access.redhat.com/discussions/4603661
 # https://access.redhat.com
 #
-# CHECK TO SEE WHAT SUBSCRIPTION LOOKS LIKE AFTER THE "--auto-attach --force" step:
+# CHECK TO SEE WHAT SUBSCRIPTION LOOKS LIKE AFTER THE ABOVE subscription-manager steps:
 #
 # If it is similar to as shown below,  then it is PROBABLY CORRECT (again here at Orabuntu-LXC we are not RedHat Subscription experts!).
 #
@@ -99,4 +128,110 @@
 # Starts:              12/20/2020
 # Ends:                12/20/2021
 # Entitlement Type:    Physical
-
+#
+# THEN TRY REPO COMMAND AGAIN.
+#
+# NOW MAKE SURE YOUR LUNS ARE CORRECT FOR THE ZFS POOL CREATION:
+# 
+# If you are using /dev/sdb and /dev/sdc then use fdisk to make sure the LUNS are "vanilla" with no partitions.  
+#
+# WARNING!!! these steps will destroy any data on /dev/sdb /dev/sdc (or whatever LUNs you are using with this script!!).
+#
+# [ubuntu@r79sv3 redhat]$ sudo fdisk /dev/sdb
+# WARNING: fdisk GPT support is currently new, and therefore in an experimental phase. Use at your own discretion.
+# Welcome to fdisk (util-linux 2.23.2).
+# 
+# Changes will remain in memory only, until you decide to write them.
+# Be careful before using the write command.
+# 
+# 
+# Command (m for help): p
+# 
+# Disk /dev/sdb: 26.8 GB, 26843545600 bytes, 52428800 sectors
+# Units = sectors of 1 * 512 = 512 bytes
+# Sector size (logical/physical): 512 bytes / 512 bytes
+# I/O size (minimum/optimal): 512 bytes / 512 bytes
+# Disk label type: gpt
+# Disk identifier: 9F73A68E-0075-4140-BC2A-7AAEA580A3D6
+# 
+# 
+#         Start          End    Size  Type            Name
+#  1         2048     52410367     25G  Solaris /usr &  zfs-ce0af99cdc502b08
+#  9     52410368     52426751      8M  Solaris reserve 
+# 
+# Command (m for help): d
+# Partition number (1,9, default 9): 1
+# Partition 1 is deleted
+# 
+# Command (m for help): d
+# Selected partition 9
+# Partition 9 is deleted
+# 
+# Command (m for help): w
+# The partition table has been altered!
+# 
+# Calling ioctl() to re-read partition table.
+# Syncing disks.
+# [ubuntu@r79sv3 redhat]$ sudo fdisk /dev/sdc
+# WARNING: fdisk GPT support is currently new, and therefore in an experimental phase. Use at your own discretion.
+# Welcome to fdisk (util-linux 2.23.2).
+# 
+# Changes will remain in memory only, until you decide to write them.
+# Be careful before using the write command.
+# 
+# 
+# Command (m for help): p
+# 
+# Disk /dev/sdc: 26.8 GB, 26843545600 bytes, 52428800 sectors
+# Units = sectors of 1 * 512 = 512 bytes
+# Sector size (logical/physical): 512 bytes / 512 bytes
+# I/O size (minimum/optimal): 512 bytes / 512 bytes
+# Disk label type: gpt
+# Disk identifier: 66C22DD4-9010-AF4B-A0C7-70588EAEE770
+# 
+# 
+#         Start          End    Size  Type            Name
+#  1         2048     52410367     25G  Solaris /usr &  zfs-63efd045f424b186
+#  9     52410368     52426751      8M  Solaris reserve 
+# 
+# Command (m for help): d
+# Partition number (1,9, default 9): 1
+# Partition 1 is deleted
+# 
+# Command (m for help): d
+# Selected partition 9
+# Partition 9 is deleted
+# 
+# Command (m for help): w
+# The partition table has been altered!
+# 
+# Calling ioctl() to re-read partition table.
+# Syncing disks.
+# [ubuntu@r79sv3 redhat]$ sudo fdisk -l /dev/sdb /dev/sdc
+# WARNING: fdisk GPT support is currently new, and therefore in an experimental phase. Use at your own discretion.
+# 
+# Disk /dev/sdb: 26.8 GB, 26843545600 bytes, 52428800 sectors
+# Units = sectors of 1 * 512 = 512 bytes
+# Sector size (logical/physical): 512 bytes / 512 bytes
+# I/O size (minimum/optimal): 512 bytes / 512 bytes
+# Disk label type: gpt
+# Disk identifier: 9F73A68E-0075-4140-BC2A-7AAEA580A3D6
+# 
+# 
+#         Start          End    Size  Type            Name
+# WARNING: fdisk GPT support is currently new, and therefore in an experimental phase. Use at your own discretion.
+# 
+# Disk /dev/sdc: 26.8 GB, 26843545600 bytes, 52428800 sectors
+# Units = sectors of 1 * 512 = 512 bytes
+# Sector size (logical/physical): 512 bytes / 512 bytes
+# I/O size (minimum/optimal): 512 bytes / 512 bytes
+# Disk label type: gpt
+# Disk identifier: 66C22DD4-9010-AF4B-A0C7-70588EAEE770
+# 
+# 
+#         Start          End    Size  Type            Name
+# END
+#
+# You can edit the script to use LUNS other than /dev/sdb /dev/sdc.  Be sure whatever LUNs you use are vanilla before running zpool_redhat_7.sh
+#
+# Orabuntu-LXC St. Louis, MO October 9, 2021.

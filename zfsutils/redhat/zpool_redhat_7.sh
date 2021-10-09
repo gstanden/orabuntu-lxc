@@ -34,6 +34,32 @@
 
 clear
 
+PoolName=$1
+
+function CheckZpoolExists {
+	sudo zpool list | grep -c $PoolName
+}
+ZpoolExists=$(CheckZpoolExists)
+
+if [ $ZpoolExists -ne 0 ]
+then
+	clear
+	echo ''
+	echo "=============================================="
+	echo "The zpool $PoolName already exists:           "
+	echo ''
+	sudo zpool list
+	echo ''
+	echo "Change zpool name or destroy existing zpool:  "
+	echo ''
+	echo "(sudo zpool destroy $PoolName)                "
+	echo ''
+	echo "Script is exiting ...                         "
+	echo "=============================================="
+	echo ''
+	exit
+fi
+
 echo ''
 echo "=============================================="
 echo "Configure ZFS Storage ...                     "
@@ -72,7 +98,25 @@ echo "Get EPEL latest ...                           "
 echo "=============================================="
 echo ''
 
-sudo rpm -ivh https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+function CheckEpelInstalled {
+	rpm -qa | grep -c epel-release
+}
+EpelInstalled=$(CheckEpelInstalled)
+
+if [ $EpelInstalled -eq 0 ]
+then
+	n=1
+	Epel1=1
+	while [ $Epel1 -ne 0 ] && [ $n -le 5 ]
+	do
+		sudo rpm -ivh https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+		Epel1=`echo $?`
+		n=$((n+1))
+		sleep 5
+	done
+else
+	sudo rpm -qa | grep epel-release
+fi
 
 echo ''
 echo "=============================================="
@@ -90,7 +134,15 @@ echo "EPEL install python-packaging & dkms ...      "
 echo "=============================================="
 echo ''
 
-sudo yum -y install --enablerepo=epel python-packaging dkms
+n=1
+Dkms1=1
+while [ $Dkms1 -ne 0 ] && [ $n -le 5 ]
+do
+	sudo yum -y install --enablerepo=epel python-packaging dkms
+	Dkms1=`echo $?`
+	n=$((n+1))
+	sleep 5
+done
 
 echo ''
 echo "=============================================="
@@ -134,7 +186,23 @@ echo "Install Group 1 packages ...                  "
 echo "=============================================="
 echo ''
 
-sudo yum -y install unzip wget openssh-server net-tools bind-utils
+n=1
+Grp1=1
+while [ $Grp1 -ne 0 ] && [ $n -le 5 ]
+do
+	sudo yum -y install unzip wget openssh-server net-tools bind-utils
+	Grp1=`echo $?`
+	n=$((n+1))
+	sleep 5
+done
+
+if [ $Grp1 -ne 0 ]
+then
+	echo 'Install Group 1 packages failed ...'
+	echo 'Fix issue and retry zpool_redhat_7.sh'
+	echo 'Exiting script ...'
+	exit
+fi
 
 echo ''
 echo "=============================================="
@@ -152,7 +220,23 @@ echo "Install Group 2 packages ...                  "
 echo "=============================================="
 echo ''
 
-sudo yum -y install gcc make autoconf automake libtool rpm-build libtirpc-devel libblkid-devel libuuid-devel libudev-devel openssl-devel 
+n=1
+Grp2=1
+while [ $Grp2 -ne 0 ] && [ $n -le 5 ]
+do
+	sudo yum -y install gcc make autoconf automake libtool rpm-build libtirpc-devel libblkid-devel libuuid-devel libudev-devel openssl-devel 
+	Grp2=`echo $?`
+	n=$((n+1))
+	sleep 5
+done
+
+if [ $Grp2 -ne 0 ]
+then
+	echo 'Install Group 2 packages failed ...'
+	echo 'Fix issue and retry zpool_redhat_7.sh'
+	echo 'Exiting script ...'
+	exit
+fi
 
 echo ''
 echo "=============================================="
@@ -170,11 +254,182 @@ echo "Install Group 3 packages ...                  "
 echo "=============================================="
 echo ''
 
-sudo yum -y install zlib-devel libaio-devel libattr-devel elfutils-libelf-devel kernel-devel-$(uname -r) python python2-devel python-setuptools python-cffi libffi-devel git ncompress
+n=1
+Grp3=1
+while [ $Grp3 -ne 0 ] && [ $n -le 5 ]
+do
+	sudo yum -y install zlib-devel libaio-devel libattr-devel elfutils-libelf-devel kernel-devel-$(uname -r) python python2-devel python-setuptools python-cffi libffi-devel git ncompress
+	Grp3=`echo $?`
+	n=$((n+1))
+	sleep 5
+done
+
+if [ $Grp3 -ne 0 ]
+then
+	echo 'Install Group 3 packages failed ...'
+	echo 'Fix issue and retry zpool_redhat_7.sh'
+	echo 'Exiting script ...'
+	exit
+fi
 
 echo ''
 echo "=============================================="
 echo "Done: Install Group 3 packages.               "
+echo "=============================================="
+echo ''
+
+sleep 5
+
+clear
+
+if [ ! -d zfs ]	
+then
+ 	echo ''
+	echo "=============================================="
+	echo "Clone OpenZFS git repo...                     "
+	echo "=============================================="
+	echo ''
+
+	n=1
+	Git1=1
+	while [ $Git1 -ne 0 ] && [ $n -le 5 ]
+	do
+		git clone https://github.com/openzfs/zfs
+		Git1=`echo $?`
+		n=$((n+1))
+		sleep 5
+	done
+
+	if [ $Git1 -ne 0 ]
+	then
+		echo 'git clone ZFS failed ...'
+		echo 'Fix issue and retry zpool_redhat_7.sh'
+		echo 'Exiting script ...'
+		exit
+	fi
+fi
+
+cd ./zfs
+
+n=1
+Git2=1
+while [ $Git2 -ne 0 ] && [ $n -le 5 ]
+do
+	git checkout master >/dev/null 2>&1
+	Git2=`echo $?`
+	n=$((n+1))
+	sleep 5
+done
+
+if [ $Git2 -ne 0 ]
+then
+	echo 'git checkout ZFS failed ...'
+	echo 'Fix issue and retry zpool_redhat_7.sh'
+	echo 'Exiting script ...'
+	exit
+
+	echo ''
+	echo "=============================================="
+	echo "Done: Clone OpenZFS git repo.                 "
+	echo "=============================================="
+	echo ''
+
+	sleep 5
+
+	clear
+fi
+
+function GetRpmCount {
+	ls -l *.rpm 2>/dev/null | grep -cv src
+}
+RpmCount=$(GetRpmCount)
+
+which zpool >/dev/null 2>&1
+ZpCmp=`echo $?`
+
+if [ $ZpCmp -ne 0 ] && [ $RpmCount -lt 15 ]
+then
+	echo ''
+	echo "=============================================="
+	echo "Run autogen and configure...                  "
+	echo "=============================================="
+	echo ''
+
+	sh autogen.sh
+	Stat1=`echo $?`
+	if [ $Stat1 -ne 0 ]
+	then
+		echo 'The autogen step failed.'
+		echo 'Address issue and retry zpool_redhat_7.sh'
+		exit
+	fi
+
+	./configure
+	Stat2=`echo $?`
+	if [ $Stat2 -ne 0 ]
+	then
+		echo 'The configure step failed.'
+		echo 'Address issue and retry zpool_redhat_7.sh'
+		exit
+	fi
+
+	echo ''
+	echo "=============================================="
+	echo "Done: Run autogen and configure.              "
+	echo "=============================================="
+	echo ''
+
+	sleep 5
+
+	clear
+
+	echo ''
+	echo "=============================================="
+	echo "make rpm (takes a minute or two...patience)   "
+	echo "=============================================="
+	echo ''
+
+	sleep 5
+
+	make rpm
+	Make1=`echo $?`
+	if [ $Make1 -ne 0 ]
+	then
+		echo 'The make rpm step failed'
+		echo 'Address issue and retry zpool_redhat_7.sh'
+		exit
+	fi
+
+	echo ''
+	echo "=============================================="
+	echo "Done: make rpm.                               "
+	echo "=============================================="
+	echo ''
+
+	sleep 5
+
+	clear
+fi
+
+echo ''
+echo "=============================================="
+echo "Install Group 4 packages ...                  "
+echo "=============================================="
+echo ''
+
+n=1
+Grp4=1
+while [ $Grp4 -ne 0 ] && [ $n -le 5 ]
+do
+	sudo yum -y install sysstat mdadm ksh fio
+	Grp4=`echo $?`
+	n=$((n+1))
+	sleep 5
+done
+
+echo ''
+echo "=============================================="
+echo "Done: Install Group 4 packages.               "
 echo "=============================================="
 echo ''
 
@@ -194,84 +449,7 @@ clear
 
 echo ''
 echo "=============================================="
-echo "Clone OpenZFS git repo...                     "
-echo "=============================================="
-echo ''
-
-git clone https://github.com/openzfs/zfs
-cd ./zfs
-git checkout master
-
-echo ''
-echo "=============================================="
-echo "Done: Clone OpenZFS git repo.                 "
-echo "=============================================="
-echo ''
-
-sleep 5
-
-clear
-
-echo ''
-echo "=============================================="
-echo "Run autogen and configure...                  "
-echo "=============================================="
-echo ''
-
-sh autogen.sh
-./configure
-
-echo ''
-echo "=============================================="
-echo "Done: Run autogen and configure.              "
-echo "=============================================="
-echo ''
-
-sleep 5
-
-clear
-
-echo ''
-echo "=============================================="
-echo "make rpm ...                                  "
-echo "=============================================="
-echo ''
-
-sleep 5
-
-make rpm
-
-echo ''
-echo "=============================================="
-echo "Done: make rpm.                               "
-echo "=============================================="
-echo ''
-
-sleep 5
-
-clear
-
-echo ''
-echo "=============================================="
-echo "Install additional packages ...               "
-echo "=============================================="
-echo ''
-
-sudo yum -y install sysstat mdadm ksh fio
-
-echo ''
-echo "=============================================="
-echo "Done: Install additional packages.            "
-echo "=============================================="
-echo ''
-
-sleep 5
-
-clear
-
-echo ''
-echo "=============================================="
-echo "Install OpenZFS packages...                   "
+echo "Install OpenZFS packages (takes awhile...)    "
 echo "=============================================="
 echo ''
 
@@ -330,7 +508,7 @@ echo "Create zpool...                               "
 echo "=============================================="
 echo ''
 
-sudo zpool create $1 mirror /dev/sdb /dev/sdc
+sudo zpool create $PoolName mirror /dev/sdb /dev/sdc
 sudo zpool list
 
 echo ''
