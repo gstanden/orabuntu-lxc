@@ -1253,14 +1253,47 @@ then
 
 	clear
 
+	if [ $GRE = 'N' ] && [ $MultiHostVar2 = 'N' ]
+	then
+		echo ''
+		echo "=============================================="
+		echo "Restart $NameServer...                        "
+		echo "=============================================="
+		echo ''
+
+		sudo lxc-stop  -n $NameServer
+		sudo lxc-start -n $NameServer
+		sudo lxc-info  -n $NameServer | head -3
+
+		echo ''
+		echo "=============================================="
+		echo "Done: Restart $NameServer.                    "
+		echo "=============================================="
+		echo ''
+
+		sleep 5
+
+		clear
+	fi
+	
 	echo ''
 	echo "=============================================="
 	echo "nslookup oel$OracleRelease$SeedPostfix...     "
 	echo "=============================================="
 	echo ''
 
-	nslookup  oel$OracleRelease$SeedPostfix
+	n=1
+	Nsp1=1
+	while [ $Nsp1 -ne 0 ] && [ $n -le 5 ]
+	do
+		nslookup oel$OracleRelease$SeedPostfix >/dev/null 2>&1
+		Nsp1=`echo $?`
+		n=$((n+1))
+		sleep 5
+	done
 
+	nslookup oel$OracleRelease$SeedPostfix
+	
 	echo "=============================================="
 	echo "Done: nslookup oel$OracleRelease$SeedPostfix. "
 	echo "=============================================="
