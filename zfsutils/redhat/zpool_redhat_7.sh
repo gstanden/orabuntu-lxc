@@ -219,6 +219,8 @@ echo "make rpm ...                                  "
 echo "=============================================="
 echo ''
 
+sleep 5
+
 make rpm
 
 echo ''
