@@ -349,6 +349,10 @@ then
 		CGROUP_SUFFIX=''
         fi
 
+	sleep 5
+
+	clear
+
         echo ''
         echo "=============================================="
         echo "Done: Evaluate CGROUP_SUFFIX variable.        "
@@ -556,11 +560,26 @@ do
 done
 
 echo ''
+echo "=============================================="
+echo "Done: Restart OpenvSwitches.                  "
+echo "=============================================="
+echo ''
+
+sleep 5
+
+clear
+
+echo ''
+echo "=============================================="
+echo "Check iptables rules ...                      "
+echo "=============================================="
+echo ''
+
 sudo iptables -S | egrep 'sw1|sx1'
 
 echo ''
 echo "=============================================="
-echo "Done: Restart OpenvSwitches.                  "
+echo "Done: Check iptables rules.                   "
 echo "=============================================="
 echo ''
 

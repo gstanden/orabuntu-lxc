@@ -1123,11 +1123,7 @@ then
 		clear
 	fi
 
-        echo ''
-        echo "=============================================="
-        echo "List Containers...                            "
-        echo "=============================================="
-        echo ''
+	echo ''
         echo "=============================================="
         echo "List LXC Containers...                        "
         echo "=============================================="
@@ -1174,13 +1170,17 @@ then
 		        CGROUP_SUFFIX=''
 		fi
 
+		sleep 5
+		
+		clear
+
 		echo ''
 		echo "=============================================="
 		echo "Done: Evaluate CGROUP_SUFFIX variable.        "
 		echo "=============================================="
 		echo ''
 
-		sleep 10
+		sleep 5
 
 		clear
 
@@ -1265,45 +1265,56 @@ then
                 sleep 5
 
                 clear
-
-                echo ''
-                echo "=============================================="
-                echo "List LXD Containers ...                       "
-                echo "=============================================="
-                echo ''
-
-		eval echo "'/var/lib/snapd/snap/bin/lxc list' | sg lxd $CGROUP_SUFFIX"
-
-                echo ''
-                echo "=============================================="
-                echo "Done: List LXD Containers ...                 "
-                echo "=============================================="
-                echo ''
         fi
 
 	if [ $Release -ge 6 ] && [ $Release -le 8 ]
 	then
 		if   [ $Release -le 7 ]
 		then
-        		echo ''
-        		echo "=============================================="
-			echo "List Application (docker) Containers...       "
-        		echo "=============================================="
-        		echo ''
+                        echo ''
+                        echo "=============================================="
+                        echo "List Application (docker) Containers...       "
+                        echo "=============================================="
+                        echo ''
 
-			function CheckDockerInstalled {
-				sudo rpm -qa | grep -c docker
-			}
-			DockerInstalled=$(CheckDockerInstalled)
+                        function CheckSnapdInstalled {
+                                sudo snap list | grep -c snapd
+                        }
+                        SnapdInstalled=$(CheckSnapdInstalled)
 
-			if [ $DockerInstalled -gt 0 ]
-			then
-        			sudo docker ps -a
-			else
-        			echo "=============================================="
-				echo "Docker not installed on this system.          "
-        			echo "=============================================="
-			fi
+                        if [ $SnapdInstalled -gt 0 ]
+                        then
+                                function CheckDockerInstalled {
+                                        sudo snap list | grep -c docker
+                                }
+                                DockerInstalled=$(CheckDockerInstalled)
+                                echo "=============================================="
+                                echo 'Docker snap info'
+                                echo "=============================================="
+                                echo ''
+                                sudo snap list docker
+                                echo ''
+                        else
+                                function CheckDockerInstalled {
+                                        sudo rpm -qa | grep -c docker
+                                }
+                                DockerInstalled=$(CheckDockerInstalled)
+                                echo "=============================================="
+                                echo 'Docker RPM info'
+                                echo "=============================================="
+                                echo ''
+                                sudo rpm -qa | grep docker
+                                echo ''
+                        fi
+
+                        if [ $DockerInstalled -gt 0 ]
+                        then
+                                sudo docker ps -a
+                        else
+                                echo "=============================================="
+                                echo "Docker not installed on this system.          "
+                                echo "=============================================="
+                        fi
 			
 			echo ''
         		echo "=============================================="

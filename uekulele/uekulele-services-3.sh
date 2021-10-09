@@ -457,6 +457,10 @@ then
 		CGROUP_SUFFIX=''
 	fi
 
+	sleep 5
+
+	clear
+
 	echo ''
 	echo "=============================================="
 	echo "Done: Evaluate CGROUP_SUFFIX variable.        "

@@ -56,11 +56,12 @@ then
 			sudo /var/lib/snapd/snap/bin/docker run -d hello-world
 			HelloWorld=`echo $?`
 			n=$((n+1))
-			echo "Retry Docker ..."
+			echo ''
+			echo "Retry Docker test pull in 5 seconds ..."
+			echo ''
 			sleep 5
 		done
 
-		echo ''
 		sudo ln -s /snap/bin/docker /usr/bin/docker
 		sudo docker ps -a
 	
@@ -124,7 +125,9 @@ then
 			sudo /var/lib/snapd/snap/bin/docker run -d hello-world
 			HelloWorld=`echo $?`
 			n=$((n+1))
-			echo "Retry Docker ..."
+			echo ''
+			echo "Retry Docker test pull in 5 seconds ..."
+			echo ''
 			sleep 5
 		done
 
@@ -165,7 +168,9 @@ then
 			podman run -d hello-world >/dev/null 2>&1
 			HelloWorld=`echo $?`
 			n=$((n+1))
-			echo "Retry Docker ..."
+			echo ''
+			echo "Retry Docker test pull in 5 seconds ..."
+			echo ''
 			sleep 5
 		done
 
@@ -188,7 +193,9 @@ then
 			sudo /var/lib/snapd/snap/bin/docker run -d hello-world
 			HelloWorld=`echo $?`
 			n=$((n+1))
-			echo "Retry Docker ..."
+			echo ''
+			echo "Retry Docker test pull in 5 seconds ..."
+			echo ''
 			sleep 5
 		done
 
@@ -213,7 +220,9 @@ then
 			sudo docker run -d hello-world >/dev/null 2>&1
 			HelloWorld=`echo $?`
 			n=$((n+1))
-			echo "Retry Docker ..."
+			echo ''
+			echo "Retry Docker test pull in 5 seconds ..."
+			echo ''
 			sleep 5
 		done
 
@@ -243,7 +252,9 @@ then
 			sudo /var/lib/snapd/snap/bin/docker run -d hello-world >/dev/null 2>&1
 			HelloWorld=`echo $?`
 			n=$((n+1))
-			echo "Retry Docker ..."
+			echo ''
+			echo "Retry Docker test pull in 5 seconds ..."
+			echo ''
 			sleep 5
 		done
 
@@ -278,7 +289,9 @@ then
 			sudo docker run -d hello-world >/dev/null 2>&1
 			HelloWorld=`echo $?`
 			n=$((n+1))
-			echo "Retry Docker ..."
+			echo ''
+			echo "Retry Docker test pull in 5 seconds ..."
+			echo ''
 			sleep 5
 		done
 		
@@ -298,7 +311,9 @@ then
 			sudo docker run -d hello-world >/dev/null 2>&1
 			HelloWorld=`echo $?`
 			n=$((n+1))
-			echo "Retry Docker ..."
+			echo ''
+			echo "Retry Docker test pull in 5 seconds ..."
+			echo ''
 			sleep 5
 		done
 

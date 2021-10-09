@@ -879,42 +879,62 @@ then
 
 		clear
 
+                echo ''
+                echo "=============================================="
+                echo "Evaluate CGROUP_SUFFIX variable...            "
+                echo "=============================================="
+                echo ''
+
+                function GetCgroupv2Warning1 {
+                        echo "/var/lib/snapd/snap/bin/lxc cluster list" | sg lxd 2> >(grep -c 'WARNING: cgroup v2 is not fully supported yet, proceeding with partial confinement') >/dev/null
+                }
+                Cgroupv2Warning1=$(GetCgroupv2Warning1)
+
+                if [ $Cgroupv2Warning1 -eq 1 ]
+                then
+                        echo "=============================================="
+                        echo "On $LinuxFlavor $RedHatVersion the WARNING:   "
+                        echo "                                              "
+                        echo "WARNING: cgroup v2 is not fully supported yet "
+                        echo "proceeding with partial confinement.          "
+                        echo "                                              "
+                        echo "can be safely IGNORED.                        "
+                        echo "This is a snapd issue not an LXD issue.       "
+                        echo "                                              "
+                        echo "This specific warning has been suppressed     "
+                        echo "during this install of Orabuntu-LXC.          "
+                        echo "                                              "
+                        echo " More info here:                              "
+                        echo "                                              "
+                        echo "https://discuss.linuxcontainers.org/t/lxd-cgroup-v2-support/10455"
+                        echo "https://bugs.launchpad.net/ubuntu/+source/snapd/+bug/1850667"
+                        echo "                                              "
+                        echo "=============================================="
+
+                        CGROUP_SUFFIX='2>/dev/null'
+                else
+                        CGROUP_SUFFIX=''
+                fi
+
+                sleep 5
+
+                clear
+
+                echo ''
+                echo "=============================================="
+                echo "Done: Evaluate CGROUP_SUFFIX variable.        "
+                echo "=============================================="
+                echo ''
+
+		sleep 5
+
+		clear
+
 		echo ''
 		echo "=============================================="
 		echo "List LXD Cluster...                           "
 		echo "=============================================="
 		echo ''
-
-		function GetCgroupv2Warning1 {
-		        echo "/var/lib/snapd/snap/bin/lxc cluster list" | sg lxd 2> >(grep -c 'WARNING: cgroup v2 is not fully supported yet, proceeding with partial confinement') >/dev/null
-		}
-		Cgroupv2Warning1=$(GetCgroupv2Warning1)
-
-		if [ $Cgroupv2Warning1 -eq 1 ]
-		then
-			echo "=============================================="
-			echo "On $LinuxFlavor $RedHatVersion the WARNING:   "
-			echo "                                              "
-			echo "WARNING: cgroup v2 is not fully supported yet "
-			echo "proceeding with partial confinement.          "
-			echo "                                              "
-			echo "can be safely IGNORED.                        "
-			echo "This is a snapd issue NOT an LXD issue.       "
-			echo "                                              "
-			echo "This specific warning has been suppressed     "
-			echo "during this install of Orabuntu-LXC.          "
-			echo "                                              "
-			echo " More info here:                              "
-			echo "                                              "
-			echo "https://discuss.linuxcontainers.org/t/lxd-cgroup-v2-support/10455"
-			echo "https://bugs.launchpad.net/ubuntu/+source/snapd/+bug/1850667"
-			echo "                                              " 
-			echo "=============================================="
-
-		        CGROUP_SUFFIX='2>/dev/null'
-		else
-			CGROUP_SUFFIX=''
-		fi
 
 		eval echo "'/var/lib/snapd/snap/bin/lxc cluster list' | sg lxd $CGROUP_SUFFIX"
 

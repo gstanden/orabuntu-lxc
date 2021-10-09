@@ -558,19 +558,36 @@ then
                         if   [ $Release -eq 7 ]
                         then
 				echo ''
-        			echo "=============================================="
-        			echo "Install epel...                               "
-        			echo "=============================================="
-        			echo ''
-
-                                wget --timeout=5 --tries=10 https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
-                                sudo rpm -ivh epel-release-latest-7.noarch.rpm
-				
+				echo "=============================================="
+				echo "Get EPEL latest ...                           "
+				echo "=============================================="
 				echo ''
-        			echo "=============================================="
-        			echo "Done: Install epel.                           "
-        			echo "=============================================="
-        			echo ''
+
+				function CheckEpelInstalled {
+				        rpm -qa | grep -c epel-release
+				}
+				EpelInstalled=$(CheckEpelInstalled)
+
+				if [ $EpelInstalled -eq 0 ]
+				then
+				        n=1
+				        Epel1=1
+				        while [ $Epel1 -ne 0 ] && [ $n -le 5 ]
+				        do
+				                sudo rpm -ivh https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+				                Epel1=`echo $?`
+				                n=$((n+1))
+				                sleep 5
+				        done
+				else
+				        sudo rpm -qa | grep epel-release
+				fi
+
+				echo ''
+				echo "=============================================="
+				echo "Done: Get EPEL latest.                        "
+				echo "=============================================="
+				echo ''
 
 				sleep 5
 

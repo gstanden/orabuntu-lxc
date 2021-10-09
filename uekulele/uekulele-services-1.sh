@@ -5476,7 +5476,7 @@ then
 	echo "=============================================="
 	echo ''
 
-	sudo iptables -S | egrep 'sw1|sx1'
+	sudo iptables -S | egrep 'sw1|sx1' 
 
 	echo ''
 	echo "=============================================="
