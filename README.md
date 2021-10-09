@@ -110,7 +110,13 @@ and then unzip it:
 unzip master.zip
 ```
 
-then navigate to the "anylinux" directory. **Note** that the software can be downloaded to any directory owned by the install user; the "Downloads" directory is just a recommended download destination.
+then navigate to the "anylinux" directory:
+
+```
+cd orabuntu-lxc-master/anylinux
+```
+
+**Note** that the software can be downloaded to any directory owned by the install user; the "Downloads" directory is just a recommended download destination.
 
 Step 3b
 
