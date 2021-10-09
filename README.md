@@ -104,7 +104,13 @@ For example, for the MASTER branch the download command from the "/home/username
 wget https://github.com/gstanden/orabuntu-lxc/archive/refs/heads/master.zip
 ```
 
-and unzip it, then navigate to the "anylinux" directory. **Note** that the software can be downloaded to any directory owned by the install user; the "Downloads" directory is just a recommended download destination.
+and then unzip it:
+
+```
+unzip master.zip
+```
+
+then navigate to the "anylinux" directory. **Note** that the software can be downloaded to any directory owned by the install user; the "Downloads" directory is just a recommended download destination.
 
 Step 3b
 
