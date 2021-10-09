@@ -1,0 +1,48 @@
+# Readme for Configuring ZFS on RedHat 7
+
+# Orabuntu-LXC provides expertise via this script for installing ZFS.
+# RedHat "subscription" issues for access to repos and to register a RedHat system can cause this script to fail.
+# The following information is provided to help with that but is not definitive.
+# For example, this repo in the zpool_redhat_7.sh script needs to succeed with expected output from command as shown below:
+#
+# CORRECT COMMAND RIGHT OUTPUT:
+
+# [ubuntu@r79sv3 ~]$ sudo subscription-manager repos --enable rhel-7-server-optional-rpms --enable rhel-7-server-extras-rpms
+# Repository 'rhel-7-server-optional-rpms' is enabled for this system.
+# Repository 'rhel-7-server-extras-rpms' is enabled for this system.
+#
+# If instead it fails with messages which might include the one shown below:
+#
+# CORRECT COMMAND WRONG OUTPUT:
+
+# [ubuntu@r79sv3 ~]$ sudo subscription-manager repos --enable rhel-7-server-optional-rpms --enable rhel-7-server-extras-rpms
+# Error: 'rhel-7-server-optional-rpms' does not match a valid repository ID. Use "subscription-manager repos --list" to see valid repositories.
+# Error: 'rhel-7-server-extras-rpms' does not match a valid repository ID. Use "subscription-manager repos --list" to see valid repositories.
+# 
+# OR: 
+#
+# [ubuntu@r79sv3 ~]$ sudo subscription-manager repos --enable rhel-7-server-optional-rpms --enable rhel-7-server-extras-rpms
+# Consumer profile "c813030a-0a20-44fd-b591-4cbf1c238280" has been deleted from the server. You can use command clean or unregister to remove local profile.
+#
+# OR:
+#
+# [ubuntu@r79sv3 ~]$  sudo subscription-manager repos --enable rhel-7-server-optional-rpms --enable rhel-7-server-extras-rpms
+# This system has no repositories available through subscriptions.
+#
+# OR any other unspecified error not listed here, then that issue will need to be resolved before running this script.
+#
+# Orabuntu-LXC does not in general provide advice about registration issues for RedHat servers.
+# That being said, the command shown below often resolves registration issues and restores proper access to repos:
+#
+# RUN THIS:
+#
+# sudo subscription-manager register --auto-attach --force
+#
+# THEN TRY REPO COMMAND AGAIN.
+#
+# If the above subscription-manager command does not set things right, additional information can be found here:
+#
+# https://access.redhat.com/discussions/4603661
+# https://access.redhat.com
+#
+# Orabuntu-LXC St. Louis, MO October 9, 2021.

@@ -37,7 +37,7 @@ clear
 echo ''
 echo "=============================================="
 echo "Configure ZFS Storage ...                     "
-echo "CentOS7 OpenZFS build/install rpm from source."
+echo "RedHat OpenZFS build/install rpm from source."
 echo "                                              "
 echo "(rpm build takes awhile ... patience)         " 
 echo "=============================================="
@@ -68,33 +68,106 @@ clear
 
 echo ''
 echo "=============================================="
-echo "Enable required repos ...                     "
+echo "EPEL install python-packaging & dkms ...      "
 echo "=============================================="
 echo ''
 
-sudo yum -y install --enablerepo=epel python-packaging dkms
-sudo subscription-manager repos --enable rhel-7-server-optional-rpms --enable rhel-7-server-extras-rpms
-sudo yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+sudo yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm --enablerepo=epel python-packaging dkms
 
 echo ''
 echo "=============================================="
-echo "Done: Enable required repos.                  "
+echo "Done: EPEL install python-packaging & dkms    "
 echo "=============================================="
 echo ''
 
 sleep 5
 
 clear
- 
+
 echo ''
 echo "=============================================="
-echo "Install packages ...                          "
+echo "Enable OPTIONAL and EXTRA repos...            "
+echo "=============================================="
+echo ''
+
+sudo subscription-manager repos --enable rhel-7-server-optional-rpms --enable rhel-7-server-extras-rpms
+OpEx1=`echo $?`
+if [ $OpEx1 -ne 0 ]
+then
+	echo 'There appears to be an issue with your RedHat subscription configuration.'
+	echo 'Read README.redhat in this directory and correct RedHat subscription issue, then rerun this script.'
+	echo 'Exiting this script ...'
+	exit
+fi
+
+echo ''
+echo "=============================================="
+echo "Enable OPTIONAL and EXTRA repos...            "
+echo "=============================================="
+echo ''
+
+sleep 5
+
+clear
+
+echo ''
+echo "=============================================="
+echo "Install Group 1 packages ...                  "
 echo "=============================================="
 echo ''
 
 sudo yum -y install unzip wget openssh-server net-tools bind-utils
-sudo yum -y install epel-release gcc make autoconf automake libtool rpm-build libtirpc-devel libblkid-devel libuuid-devel libudev-devel openssl-devel zlib-devel libaio-devel libattr-devel elfutils-libelf-devel kernel-devel-$(uname -r) python python2-devel python-setuptools python-cffi libffi-devel git ncompress
 
+echo ''
+echo "=============================================="
+echo "Done: Install Group 1 packages.               "
+echo "=============================================="
+echo ''
+
+sleep 5
+
+clear
+
+echo ''
+echo "=============================================="
+echo "Install Group 2 packages ...                  "
+echo "=============================================="
+echo ''
+
+sudo yum -y install gcc make autoconf automake libtool rpm-build libtirpc-devel libblkid-devel libuuid-devel libudev-devel openssl-devel 
+
+echo ''
+echo "=============================================="
+echo "Done: Install Group 2 packages.               "
+echo "=============================================="
+echo ''
+
+sleep 5
+
+clear
+
+echo ''
+echo "=============================================="
+echo "Install Group 3 packages ...                  "
+echo "=============================================="
+echo ''
+
+sudo yum -y install zlib-devel libaio-devel libattr-devel elfutils-libelf-devel kernel-devel-$(uname -r) python python2-devel python-setuptools python-cffi libffi-devel git ncompress
+
+echo ''
+echo "=============================================="
+echo "Done: Install Group 3 packages.               "
+echo "=============================================="
+echo ''
+
+sleep 5
+
+clear
+
+echo ''
+echo "=============================================="
+echo "Done: Install packages.                       "
+echo "=============================================="
 echo ''
 
 sleep 5
@@ -196,17 +269,34 @@ clear
 
 echo ''
 echo "=============================================="
-echo "Finish OpenZFS configuration...               "
+echo "Run modprobe zfs and lsmod...                 "
 echo "=============================================="
 echo ''
 
 sudo modprobe zfs
 sudo lsmod | grep zfs
+
+echo ''
+echo "=============================================="
+echo "Done: Run modprobe zfs and lsmod.             "
+echo "=============================================="
+echo ''
+
+sleep 5
+
+clear
+
+echo ''
+echo "=============================================="
+echo "List ZFS unit files...                        "
+echo "=============================================="
+echo ''
+
 sudo systemctl list-unit-files | grep zfs
 
 echo ''
 echo "=============================================="
-echo "Done: Finish OpenZFS configuration.           "
+echo "Done: List ZFS unit files.                    "
 echo "=============================================="
 echo ''
 
