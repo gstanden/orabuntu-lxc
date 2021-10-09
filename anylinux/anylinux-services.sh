@@ -347,6 +347,37 @@ then
 	clear
 fi
 
+if [ $LinuxFlavor = 'Red' ] && [ $Release -eq 7 ]
+then
+	echo ''
+	echo "=============================================="
+	echo "Enable RedHat OPTIONAL and EXTRA repos...     "
+	echo "=============================================="
+	echo ''
+
+	sudo subscription-manager repos --enable rhel-7-server-optional-rpms --enable rhel-7-server-extras-rpms
+	OpEx1=`echo $?`
+	if [ $OpEx1 -ne 0 ]
+	then
+		echo 'There appears to be an issue with your RedHat subscription configuration.'
+		echo ''
+		echo 'Read README.redhat in ../zfsutils/redhat/README.redhat FIRST!!'
+		echo ''
+		echo 'Then run ../zfsutils/redhat/redhat-subscription-fixit-script.sh'
+		echo ''
+		echo 'Then run anylinux-services.[HUB|GRE].host.sh again ...'
+		echo ''
+		echo 'Exiting anylinux-services.[HUB|GRE].host.sh script ...'
+		exit
+	fi
+
+	echo ''
+	echo "=============================================="
+	echo "Done: Enable RedHat OPTIONAL and EXTRA repos. "
+	echo "=============================================="
+	echo ''
+fi
+
 # Check if firewalld service is running.
 
 function GetFwd3 {

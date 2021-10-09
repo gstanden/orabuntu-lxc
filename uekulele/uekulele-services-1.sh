@@ -1502,27 +1502,8 @@ then
 	do
 		if [ $Release -ge 7 ]
 		then
-
 			if [ $LinuxFlavor = 'Red' ] && [ $Release -eq 7 ]
 			then
-				echo ''
-				echo "=============================================="
-				echo "Enable Required Repos (give it a minute)...   "
-				echo "=============================================="
-				echo ''
-
-				sudo subscription-manager repos --enable rhel-7-server-optional-rpms
-				
-				echo ''
-				echo "=============================================="
-				echo "Done: Enable Required Repos.                  "
-				echo "=============================================="
-				echo ''
-
-				sleep 5
-
-				clear
-
 				echo ''
 				echo "=============================================="
 				echo "Install packages...                           "
