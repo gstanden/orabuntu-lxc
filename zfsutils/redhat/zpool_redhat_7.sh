@@ -68,11 +68,29 @@ clear
 
 echo ''
 echo "=============================================="
+echo "Get EPEL latest ...                           "
+echo "=============================================="
+echo ''
+
+sudo rpm -ivh https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+
+echo ''
+echo "=============================================="
+echo "Done: Get EPEL latest.                        "
+echo "=============================================="
+echo ''
+
+sleep 5
+
+clear
+
+echo ''
+echo "=============================================="
 echo "EPEL install python-packaging & dkms ...      "
 echo "=============================================="
 echo ''
 
-sudo yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm --enablerepo=epel python-packaging dkms
+sudo yum -y install --enablerepo=epel python-packaging dkms
 
 echo ''
 echo "=============================================="

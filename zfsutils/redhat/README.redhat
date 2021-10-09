@@ -13,30 +13,36 @@
 #
 # If instead it fails with messages which might include the one shown below:
 #
-# CORRECT COMMAND WRONG OUTPUT:
-
+# CORRECT COMMAND WRONG OUTPUT(s) EXAMPLES (3):
+#
+# Wrong Output Example 1
+#
 # [ubuntu@r79sv3 ~]$ sudo subscription-manager repos --enable rhel-7-server-optional-rpms --enable rhel-7-server-extras-rpms
 # Error: 'rhel-7-server-optional-rpms' does not match a valid repository ID. Use "subscription-manager repos --list" to see valid repositories.
 # Error: 'rhel-7-server-extras-rpms' does not match a valid repository ID. Use "subscription-manager repos --list" to see valid repositories.
 # 
 # OR: 
 #
+# Wrong Output Example 2
+#
 # [ubuntu@r79sv3 ~]$ sudo subscription-manager repos --enable rhel-7-server-optional-rpms --enable rhel-7-server-extras-rpms
 # Consumer profile "c813030a-0a20-44fd-b591-4cbf1c238280" has been deleted from the server. You can use command clean or unregister to remove local profile.
 #
 # OR:
 #
+# Wrong Output Example 3
+#
 # [ubuntu@r79sv3 ~]$  sudo subscription-manager repos --enable rhel-7-server-optional-rpms --enable rhel-7-server-extras-rpms
 # This system has no repositories available through subscriptions.
 #
-# OR any other unspecified error not listed here, then that issue will need to be resolved before running this script.
+# OR any other unspecified error not listed here, then that issue will need to be resolved before running the zpool_redhat_7.sh script.
 #
 # Orabuntu-LXC does not in general provide advice about registration issues for RedHat servers.
 # That being said, the command shown below often resolves registration issues and restores proper access to repos:
 #
 # RUN THIS:
 #
-# sudo subscription-manager register --auto-attach --force
+# [ubuntu@r79sv3 redhat]$ sudo subscription-manager register --auto-attach --force
 #
 # THEN TRY REPO COMMAND AGAIN.
 #
@@ -45,4 +51,52 @@
 # https://access.redhat.com/discussions/4603661
 # https://access.redhat.com
 #
-# Orabuntu-LXC St. Louis, MO October 9, 2021.
+# CHECK TO SEE WHAT SUBSCRIPTION LOOKS LIKE AFTER THE "--auto-attach --force" step:
+#
+# If it is similar to as shown below,  then it is PROBABLY CORRECT (again here at Orabuntu-LXC we are not RedHat Subscription experts!).
+#
+# [ubuntu@r79sv3 redhat]$ sudo subscription-manager list --available
+#
+# +-------------------------------------------+
+#     Available Subscriptions
+# +-------------------------------------------+
+# Subscription Name:   Red Hat Beta Access
+# Provides:            Red Hat CodeReady Linux Builder for x86_64 Beta
+#                      Red Hat Enterprise Linux for IBM z Systems Beta
+#                      Red Hat Enterprise Linux Fast Datapath Beta for Power, little endian
+#                      Red Hat Enterprise Linux Resilient Storage Beta
+#                      Red Hat Enterprise Linux for x86_64 Beta
+#                      Red Hat Enterprise Linux for Real Time for NFV Beta
+#                      Red Hat Enterprise Linux for Real Time Beta
+#                      Red Hat Enterprise Linux for SAP HANA for x86_64 Beta
+#                      Red Hat Directory Server Beta
+#                      Red Hat Enterprise Linux Advanced Virtualization Beta (for RHEL Server for IBM System Z)
+#                      Red Hat Enterprise Linux for SAP Applications for x86_64 Beta
+#                      Red Hat Enterprise Linux for SAP Applications for IBM z Systems Beta
+#                      Red Hat CodeReady Linux Builder for ARM 64 Beta
+#                      Red Hat Enterprise Linux for SAP Applications for Power, little endian Beta
+#                      Red Hat Enterprise Linux Fast Datapath Beta for x86_64
+#                      Red Hat Enterprise Linux Advanced Virtualization (for RHEL Server for IBM System Z)
+#                      Red Hat CodeReady Linux Builder for Power, little endian Beta
+#                      Red Hat CodeReady Linux Builder for IBM z Systems Beta
+#                      Red Hat Enterprise Linux High Availability Beta
+#                      Red Hat Enterprise Linux for Power, little endian Beta
+#                      Red Hat Enterprise Linux for ARM 64 Beta
+#                      Red Hat Certificate System Beta
+#                      Red Hat Enterprise Linux for SAP HANA for Power, little endian Beta
+# SKU:                 RH00069
+# Contract:            
+# Pool ID:             xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+# Provides Management: No
+# Available:           Unlimited
+# Suggested:           1
+# Service Type:        L1-L3
+# Roles:               
+# Service Level:       Self-Support
+# Usage:               
+# Add-ons:             
+# Subscription Type:   Standard
+# Starts:              12/20/2020
+# Ends:                12/20/2021
+# Entitlement Type:    Physical
+
