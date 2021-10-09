@@ -210,7 +210,7 @@ To add other flavors of LXD container to the Orabuntu-LXC DHCP OpenvSwitch netwo
 [ubuntu@o83sv2 uekulele]$ lxc launch -p olxc_sx1a images:fedora/34 fed34d10
 Creating fed34d10
 Starting fed34d10                           
-[ubuntu@o83sv2 uekulele]$ lxc listlxc config device add ora79d17 asm disk source=/dev/lxc_luns path=/dev/lxc_luns
+[ubuntu@o83sv2 uekulele]$ lxc list
 +----------+---------+----------------------+------+-----------+-----------+----------+
 |   NAME   |  STATE  |         IPV4         | IPV6 |   TYPE    | SNAPSHOTS | LOCATION |
 +----------+---------+----------------------+------+-----------+-----------+----------+
