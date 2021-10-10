@@ -6324,6 +6324,10 @@ then
 	
 		sudo ovs-vsctl show | grep -A1 -B2 'type: gre' | grep -B4 "$MultiHostVar5" | sed 's/^[ \t]*//;s/[ \t]*$//'
 
+		sleep 5
+
+		clear
+
                 echo ''
                 echo "=============================================="
                 echo "Done: Show local GRE endpoint.                "

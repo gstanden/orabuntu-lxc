@@ -376,6 +376,10 @@ then
 	echo "Done: Enable RedHat OPTIONAL and EXTRA repos. "
 	echo "=============================================="
 	echo ''
+
+	sleep 5
+
+	clear
 fi
 
 # Check if firewalld service is running.
@@ -533,13 +537,12 @@ then
 	
 	echo ''
 	echo "=============================================="
-	echo "List all for zone=$Zone...                    "
+	echo "List Zone for zone=$Zone...                    "
 	echo "=============================================="
 	echo ''
 
 	sudo firewall-cmd --zone=$Zone --list-all
 	
-	echo ''
 	echo "=============================================="
 	echo "Done: List all for zone=$Zone.                "
 	echo "=============================================="
