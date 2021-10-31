@@ -398,7 +398,9 @@ then
         Product=workspaces
 	Product=oracle-db
 	Product=oracle-gi-18c
-	Product=no-product
+	Product=no-producta
+	Product=$(source "$DistDir"/anylinux/CONFIG; echo $Product)
+
 else
         Product=$2
 fi
@@ -431,7 +433,7 @@ fi
 
 if [ ! -f /etc/sudoers.d/orabuntu-lxc ]
 then
-	sudo sh -c "echo 'Defaults      logfile=\"/opt/olxc/installs/logs/$USER.log\"'				>> /etc/sudoers.d/orabuntu-lxc"
+	sudo sh -c "echo 'Defaults      logfile=\"/opt/olxc/installs/logs/$USER.log\"'					>> /etc/sudoers.d/orabuntu-lxc"
 	sudo sh -c "echo 'Defaults      log_input,log_output'								>> /etc/sudoers.d/orabuntu-lxc"
 	sudo sh -c "echo 'Defaults      iolog_dir=/var/log/sudo-io/%{user}'						>> /etc/sudoers.d/orabuntu-lxc"
 	sudo chmod 0440 /etc/sudoers.d/orabuntu-lxc
