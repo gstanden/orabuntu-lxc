@@ -417,12 +417,12 @@ echo "=============================================="
 echo ''
 
 echo "Product = "$Product
-
+sudo dnf -y install wget unzip
 cd "$DistDir"/products/k8s
 wget -4 https://github.com/gstanden/kubernetes/archive/refs/heads/master.zip
 unzip master.zip
-cd ./kubernetes-maste/lxd-provisioning
-
+cd ./kubernetes-master/lxd-provisioning
+chmod +x *.sh
 ./cont-centos8-create.sh
 ./host-oracle8.sh
 ./cont-centos8-push.sh
