@@ -398,7 +398,8 @@ then
         Product=workspaces
 	Product=oracle-db
 	Product=oracle-gi-18c
-	Product=no-producta
+	Product=no-product
+	# Get product from CONFIG file
 	Product=$(source "$DistDir"/anylinux/CONFIG; echo $Product)
 
 else
