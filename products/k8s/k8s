@@ -35,10 +35,6 @@ function GetMultiHostVar4 {
 }
 MultiHostVar4=$(GetMultiHostVar4)
 
-DistDir="/home/ubuntu/Downloads/orabuntu-lxc-master"
-SubDirName=orabuntu
-MultiHostVar4=ubuntu
-
 echo ''
 echo "=============================================="
 echo "Script: k8s                                   "
