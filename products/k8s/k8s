@@ -422,34 +422,25 @@ cd "$DistDir"/products/k8s
 wget -4 https://github.com/gstanden/kubernetes/archive/refs/heads/master.zip
 unzip master.zip
 cd ./kubernetes-master/lxd-provisioning
+cp -p ~/kube* .
 chmod +x *.sh
-./cont-centos8-create.sh
-./host-oracle8.sh
-./cont-centos8-push.sh
-./cont-centos8-exec-kmaster.sh
-./cont-centos8-exec-kworker1.sh
-./cont-centos8-exec-kworker2.sh
+./cont-centos8-create.sh $CGROUP_SUFFIX
+./host-oracle8.sh $CGROUP_SUFFIX
+./cont-centos8-push.sh $CGROUP_SUFFIX
+./cont-centos8-exec-kmaster.sh $CGROUP_SUFFIX
+./cont-centos8-exec-kworker1.sh $CGROUP_SUFFIX
+./cont-centos8-exec-kworker2.sh $CGROUP_SUFFIX
+./cont-centos8-push-kube.sh
 
 #######################################
 # To be executed only on master nodes #
 #######################################
 
-# if [[ $(hostname) =~ .*master.* ]]
-# then
-# 	lxc exec kmaster -- /root/cont-centos8-5.sh
-# fi
+eval echo "'/var/lib/snapd/snap/bin/lxc exec kmaster -- /root/cont-centos8-5.sh' | sg lxd $CGROUP_SUFFIX"
 
 #######################################
 # To be executed only on worker nodes #
 #######################################
-# 
-# if [[ $(hostname) =~ .*worker.* ]]
-# then
-#   echo "[TASK 7] Join node to Kubernetes Cluster"
-#   apt install -qq -y sshpass >/dev/null 2>&1
-#   sshpass -p "kubeadmin" scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no kmaster.lxd:/joincluster.sh /joincluster.sh 2>/tmp/joincluster.log
-#   bash /joincluster.sh >> /tmp/joincluster.log 2>&1
-# fi
 
 echo ''
 echo "=============================================="
