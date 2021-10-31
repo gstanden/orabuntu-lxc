@@ -418,11 +418,16 @@ echo ''
 
 echo "Product = "$Product
 sudo dnf -y install wget unzip
-cd "$DistDir"/products/k8s
+cd /opt/olxc/"$DistDir"/products/k8s
 wget -4 https://github.com/gstanden/kubernetes/archive/refs/heads/master.zip
 unzip master.zip
-cd ./kubernetes-master/lxd-provisioning
+tar -xvf /opt/olxc/"$DistDir"/"$SubDirName"/archives/product.tar -C /opt/olxc/"$DistDir"/products/$Product/kubernetes-master/lxd-provisioning --touch
+sleep 120 #debug
+cd kubernetes-master/lxd-provisioning
+
+# Temporary workaround until kubernetes v1.23 is released on December 7,2021
 cp -p ~/kube* .
+
 chmod +x *.sh
 ./cont-centos8-create.sh $CGROUP_SUFFIX
 ./host-oracle8.sh $CGROUP_SUFFIX
@@ -430,7 +435,7 @@ chmod +x *.sh
 ./cont-centos8-exec-kmaster.sh $CGROUP_SUFFIX
 ./cont-centos8-exec-kworker1.sh $CGROUP_SUFFIX
 ./cont-centos8-exec-kworker2.sh $CGROUP_SUFFIX
-./cont-centos8-push-kube.sh
+./cont-centos8-push-kube.sh $CGROUP_SUFFIX
 
 #######################################
 # To be executed only on master nodes #
