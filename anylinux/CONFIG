@@ -14,11 +14,11 @@ OSMemRes=1024				#							Amount of reserved memory.  Often used with Oracle Ente
 LXD=Y					# [Y|N]							Create LXD containers flag. Currently used only with Ubuntu Linux 20.04 but other distros coming soon.
 LXDCluster=Y				# [Y|N]							Create LXD Cluster automatically flag.  Currently used only with Ubuntu Linux 20.04 but other distros coming soon.
 LXDStorageDriver=zfs			# [btrfs|zfs]						Storage for LXD Cluster and LXD containers.
-LXDStoragePoolName=olxc-002		# [olxc-001|olxc-002|olxc-003|...]			User-settables ZFS storage pool name. Suggested naming scheme shown.  Any naming convention can be used.
+LXDStoragePoolName=olxc-003		# [olxc-001|olxc-002|olxc-003|...]			User-settables ZFS storage pool name. Suggested naming scheme shown.  Any naming convention can be used.
 Docker=Y				# [Y|N]	 						Docker install from Canonical Snap.
 K8S=N					# [Y|N]							Kubernetes install K8S snap from Canonical Snap. Ubuntu Linux 20.04 only for now.
 BtrfsLun="\/dev\/sdb1"			#							LUN partition for LXD cluster where "X={b,c,d...z}. Auto-system-set to "unused" for some Linux distros, see below.
-Product=no-product			# [no-product|workspaces|oracle-db|oracle-gi-18c]	Product to be configured in the seed container. Use products subdirectory to see how to configure new products and add them.
+Product=k8s				# [no-product|workspaces|oracle-db|oracle-gi-18c]	Product to be configured in the seed container. Use products subdirectory to see how to configure new products and add them.
 TunType=geneve				# [geneve|gre|vxlan]					Tunnel type for GRE-interconnected Orabuntu-LXC hosts.
 SeedNet1='SeedNet1Fwd:172.29.108'	#							Container network for seed container. Any ipv4 address triplet.
 BaseNet1='BaseNet1Fwd:10.209.53'	#							Container network for cloned copies of the seed container. Any ipv4 address triplet.
@@ -31,7 +31,7 @@ ExtrNet4='192.168.20'			#							Auxiliary network 4. Any ipv4 address triplet.
 ExtrNet5='192.168.21'			#							Auxiliary network 5. Any ipv4 address triplet.
 ExtrNet6='192.168.22'			#							Auxiliary network 6. Any ipv4 address triplet.
 SPOKEIP=192.168.1.242			#							IP address of HUB   Orabuntu-LXC host server. Example:  192.168.1.143
-HUBIP=192.168.1.241			#							IP address of SPOKE Orabuntu-LXC host server. Example:  192.168.1.144
+HUBIP=192.168.1.216			#							IP address of SPOKE Orabuntu-LXC host server. Example:  192.168.1.144
 HubUserAct=ubuntu			#							Linux user account          used to install Orabuntu-LXC.  Example: ubuntu. Must have sudo all privilege which can be revoked after install.
 HubSudoPwd=ubuntu			#							Linux user account password used to install Orabuntu-LXC.  Can be changed after Orabuntu-LXC install.
 
