@@ -4184,13 +4184,13 @@ then
 
 		if   [ $LinuxFlavor = 'CentOS' ] && [ $Release -eq 7 ]
 		then
-                	wget -4 -q https://us.images.linuxcontainers.org/images/ubuntu/hirsute/amd64/default/ -P /opt/olxc/"$DistDir"/lxcimage/nsa
+                	wget -4 -q https://us.lxd.images.canonical.com/images/ubuntu/hirsute/amd64/default/ -P /opt/olxc/"$DistDir"/lxcimage/nsa
 		
 		elif [ $LinuxFlavor = 'Red' ] && [ $Release -eq 7 ]
 		then
-                	wget -4 -q https://us.images.linuxcontainers.org/images/ubuntu/hirsute/amd64/default/ -P /opt/olxc/"$DistDir"/lxcimage/nsa
+                	wget -4 -q https://us.lxd.images.canonical.com/images/ubuntu/hirsute/amd64/default/ -P /opt/olxc/"$DistDir"/lxcimage/nsa
 		else
-                	wget -4 -q https://us.images.linuxcontainers.org/images/ubuntu/focal/amd64/default/ -P /opt/olxc/"$DistDir"/lxcimage/nsa
+                	wget -4 -q https://us.lxd.images.canonical.com/images/ubuntu/focal/amd64/default/ -P /opt/olxc/"$DistDir"/lxcimage/nsa
 		fi
 
                 function GetBuildDate {
@@ -4200,13 +4200,13 @@ then
 
 		if   [ $LinuxFlavor = 'CentOS' ] && [ $Release -eq 7 ]
 		then
-                	wget -4 -q https://us.images.linuxcontainers.org/images/ubuntu/hirsute/amd64/default/"$BuildDate"/SHA256SUMS -P /opt/olxc/"$DistDir"/lxcimage/nsa
+                	wget -4 -q https://us.lxd.images.canonical.com/images/ubuntu/hirsute/amd64/default/"$BuildDate"/SHA256SUMS -P /opt/olxc/"$DistDir"/lxcimage/nsa
 		
 		elif [ $LinuxFlavor = 'Red' ] && [ $Release -eq 7 ]
 		then
-                	wget -4 -q https://us.images.linuxcontainers.org/images/ubuntu/hirsute/amd64/default/"$BuildDate"/SHA256SUMS -P /opt/olxc/"$DistDir"/lxcimage/nsa
+                	wget -4 -q https://us.lxd.images.canonical.com/images/ubuntu/hirsute/amd64/default/"$BuildDate"/SHA256SUMS -P /opt/olxc/"$DistDir"/lxcimage/nsa
 		else
-                	wget -4 -q https://us.images.linuxcontainers.org/images/ubuntu/focal/amd64/default/"$BuildDate"/SHA256SUMS -P /opt/olxc/"$DistDir"/lxcimage/nsa
+                	wget -4 -q https://us.lxd.images.canonical.com/images/ubuntu/focal/amd64/default/"$BuildDate"/SHA256SUMS -P /opt/olxc/"$DistDir"/lxcimage/nsa
 		fi
 
                 for i in rootfs.tar.xz meta.tar.xz
@@ -4222,16 +4222,16 @@ then
 
 			if   [ $LinuxFlavor = 'CentOS' ] && [ $Release -eq 7 ]
 			then
-                        	wget -4 --no-verbose --progress=bar https://us.images.linuxcontainers.org/images/ubuntu/hirsute/amd64/default/"$BuildDate"/$i -P /opt/olxc/"$DistDir"/lxcimage/nsa
+                        	wget -4 --no-verbose --progress=bar https://us.lxd.images.canonical.com/images/ubuntu/hirsute/amd64/default/"$BuildDate"/$i -P /opt/olxc/"$DistDir"/lxcimage/nsa
 				diff <(shasum -a 256 /opt/olxc/"$DistDir"/lxcimage/nsa/$i | cut -f1,11 -d'/' | sed 's/  */ /g' | sed 's/\///' | sed 's/  */ /g') <(grep $i /opt/olxc/"$DistDir"/lxcimage/nsa/SHA256SUMS)
 			
 			elif [ $LinuxFlavor = 'Red' ] && [ $Release -eq 7 ]
 			then
-                        	wget -4 --no-verbose --progress=bar https://us.images.linuxcontainers.org/images/ubuntu/hirsute/amd64/default/"$BuildDate"/$i -P /opt/olxc/"$DistDir"/lxcimage/nsa
+                        	wget -4 --no-verbose --progress=bar https://us.lxd.images.canonical.com/images/ubuntu/hirsute/amd64/default/"$BuildDate"/$i -P /opt/olxc/"$DistDir"/lxcimage/nsa
 				diff <(shasum -a 256 /opt/olxc/"$DistDir"/lxcimage/nsa/$i | cut -f1,11 -d'/' | sed 's/  */ /g' | sed 's/\///' | sed 's/  */ /g') <(grep $i /opt/olxc/"$DistDir"/lxcimage/nsa/SHA256SUMS)
 		
 			else
-                        	wget -4 --no-verbose --progress=bar https://us.images.linuxcontainers.org/images/ubuntu/focal/amd64/default/"$BuildDate"/$i -P /opt/olxc/"$DistDir"/lxcimage/nsa
+                        	wget -4 --no-verbose --progress=bar https://us.lxd.images.canonical.com/images/ubuntu/focal/amd64/default/"$BuildDate"/$i -P /opt/olxc/"$DistDir"/lxcimage/nsa
 				diff <(shasum -a 256 /opt/olxc/"$DistDir"/lxcimage/nsa/$i | cut -f1,11 -d'/' | sed 's/  */ /g' | sed 's/\///' | sed 's/  */ /g') <(grep $i /opt/olxc/"$DistDir"/lxcimage/nsa/SHA256SUMS)
 			fi
                 done
