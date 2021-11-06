@@ -187,6 +187,12 @@ function GetMultiHostVar20 {
 MultiHostVar20=$(GetMultiHostVar20)
 TunType=$MultiHostVar20
 
+function GetMultiHostVar21 {
+        echo $MultiHost | cut -f21 -d':'
+}
+MultiHostVar21=$(GetMultiHostVar21)
+Scst=$MultiHostVar21
+
 function CheckSystemdResolvedInstalled {
         sudo netstat -ulnp | grep 53 | sed 's/  */ /g' | rev | cut -f1 -d'/' | rev | sort -u | grep systemd- | wc -l
 }
@@ -5881,8 +5887,60 @@ then
 
         sudo tar -xvf /opt/olxc/"$DistDir"/uekulele/archives/scst-files.tar -C / --touch
 
+	if [ $LinuxFlavor = 'Oracle' ] && [ $Release -eq 8 ] && [ $Scst = 'Y' ]
+	then
+		echo ''
+		echo "=============================================="
+		echo "Configure ZFS Storage ...                     "
+		echo "                                              "
+		echo "(some steps take awhile ... patience)         " 
+		echo "=============================================="
+		echo ''
+
+		sleep 5
+
+		clear
+
+		echo ''
+		echo "=============================================="
+		echo "Install packages ...                          "
+		echo "=============================================="
+		echo ''
+
+		sudo yum -y install kernel-uek-devel-$(uname -r) kernel-devel yum-utils
+		sleep 5
+		sudo rpm -Uvh https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
+		sudo yum-config-manager --enable epel 
+		sudo yum repolist
+		sudo yum -y install dkms
+		sudo rpm -Uvh http://download.zfsonlinux.org/epel/zfs-release.el`cat /etc/oracle-release | cut -f5 -d' ' | sed 's/\./_/'`.noarch.rpm
+
+		sleep 5
+
+		sudo yum -y install -y zfs
+		sudo modprobe zfs
+		sudo systemctl list-unit-files | grep zfs
+	
+		echo ''
+		echo "=============================================="
+		echo "Done: Install packages.                       "
+		echo "=============================================="
+		echo ''
+	fi
+
 	sudo chown -R $Owner:$Group		        /opt/olxc/home/scst-files/.
         sudo sed -i "s/\"SWITCH_IP\"/$Sw1Index/g"	/opt/olxc/home/scst-files/create-scst-target.sh
+        sudo sed -i "s/POOL/$StoragePoolName/g"		/opt/olxc/home/scst-files/create-scst-target.sh
+
+	CurrentDir=`pwd`
+	cd /opt/olxc/home/scst-files
+	./create-scst.sh $LXDStorageDriver
+
+	sleep 5
+
+	sudo zpool create $StoragePoolName mirror /dev/k8s_luns/k8s_zfsa_1_00 /dev/k8s_luns/k8s_zfsm_1_00
+
+	cd $CurrentDir
 
 	echo ''
 	echo "=============================================="
