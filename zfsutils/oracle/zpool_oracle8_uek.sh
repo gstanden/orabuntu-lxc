@@ -1,8 +1,12 @@
 #!/bin/bash
 
-# Usage:  ./zpool_oracle8_uek.sh [olxc-001|olxc-002|olxc-003|...]
+# Usage:  ./zpool_oracle8_uek.sh [olxc-001|olxc-002|olxc-003|...] lun1 lun2
 
 clear
+
+PoolName=$1
+Lun1Name=$2
+Lun2Name=$3
 
 echo ''
 echo "=============================================="
@@ -69,7 +73,7 @@ echo "Create ZFS Storage...                         "
 echo "=============================================="
 echo ''
 
-sudo zpool create $1 mirror /dev/sdb /dev/sdc
+sudo zpool create $PoolName mirror $Lun1Name $Lun2Name
 
 sudo zpool list
 sudo zpool status

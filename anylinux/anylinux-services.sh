@@ -1382,9 +1382,14 @@ function GetMultiHostVar20 {
 MultiHostVar20=$(GetMultiHostVar20)
 TunType=$MultiHostVar20
 
+function GetMultiHostVar21 {
+        echo $MultiHost | cut -f21 -d':'
+}
+MultiHostVar21=$(GetMultiHostVar21)
+Scst=$MultiHostVar21
+
 	echo 'Docker			  = '$Docker
 	echo 'K8S                  	  = '$K8S
-
 
 if [ $LinuxFlavor = 'Oracle' ] && [ $LXDCluster = 'Y' ]
 then
@@ -1505,6 +1510,14 @@ then
 	echo 'Tunnel Type		  = '$TunType
 else
 	echo 'Tunnel Type		  = '$MultiHostVar20
+fi
+
+if [ -z $Scst ]
+then
+	Scst=N
+	echo 'SCST			  = '$Scst
+else
+	echo 'SCST			  = '$MultiHostVar21
 fi
 
 echo ''

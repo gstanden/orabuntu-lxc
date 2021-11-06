@@ -227,6 +227,9 @@ LOGEXT=`date +"%Y-%m-%d.%R:%S"`
 
 TunType=$(source "$DistDir"/anylinux/CONFIG; echo $TunType)
 
+# SCST setting
+Scst=$(source "$DistDir"/anylinux/CONFIG; echo $Scst)
+
 ################e Kubernetes Install Flag  ######################
 
 K8S=N
@@ -291,36 +294,39 @@ then
 
 			clear
 
-			echo ''
-			echo "=============================================="
-			echo "Check ZFS Storage Pool Exists...              "
-			echo "=============================================="
-			echo ''
-
-			function CheckZpoolExist {
-				sudo zpool list $StoragePoolName | grep ONLINE | wc -l
-			}
-			ZpoolExist=$(CheckZpoolExist)
-
-			if [ $ZpoolExist -eq 1 ]
+			if [ $Scst = 'N' ]
 			then
-				echo "ZFS $StoragePoolName exists."
-			else
-				echo "ZFS $StoragePoolName does not exist."
-				echo "ZFS $StoragePoolName must be created before running Orabuntu-LXC in LXD Cluster Mode."
-				echo "Orabuntu-LXC Exiting."
-				exit
-			fi
+				echo ''
+				echo "=============================================="
+				echo "Check ZFS Storage Pool Exists...              "
+				echo "=============================================="
+				echo ''
+
+				function CheckZpoolExist {
+					sudo zpool list $StoragePoolName | grep ONLINE | wc -l
+				}
+				ZpoolExist=$(CheckZpoolExist)
+
+				if [ $ZpoolExist -eq 1 ]
+				then
+					echo "ZFS $StoragePoolName exists."
+				else
+					echo "ZFS $StoragePoolName does not exist."
+					echo "ZFS $StoragePoolName must be created before running Orabuntu-LXC in LXD Cluster Mode."
+					echo "Orabuntu-LXC Exiting."
+					exit
+				fi
 	
-			echo ''
-			echo "=============================================="
-			echo "Done: Check ZFS Storage Pool Exists.          "
-			echo "=============================================="
-			echo ''
+				echo ''
+				echo "=============================================="
+				echo "Done: Check ZFS Storage Pool Exists.          "
+				echo "=============================================="
+				echo ''
 
-			sleep 5
+				sleep 5
 
-			clear
+				clear
+			fi
 		else
 			PreSeed=Unused
        		 	BtrfsLun=Unused
@@ -469,7 +475,7 @@ then
 	fi
 
 else
-	MultiHost="$Operation:N:1:X:X:X:$MTU:X:X:$GRE:$Product:$LXD:$K8S:$PreSeed:$LXDCluster:$LXDStorageDriver:$StoragePoolName:$BtrfsLun:$Docker:$TunType"
+	MultiHost="$Operation:N:1:X:X:X:$MTU:X:X:$GRE:$Product:$LXD:$K8S:$PreSeed:$LXDCluster:$LXDStorageDriver:$StoragePoolName:$BtrfsLun:$Docker:$TunType:$Scst"
 fi
 
 ./anylinux-services.sh $MultiHost 
