@@ -298,15 +298,15 @@ if [ $LinuxFlavor = 'Red' ] || [ $LinuxFlavor = 'CentOS' ] || [ $LinuxFlavor = '
 then
 	echo ''
 	echo "==============================================" 
-	echo "Install libvirt ...                           "
+	echo "Install required packages ...                 "
 	echo "=============================================="
 	echo ''
 
-	sudo yum -y install libvirt
+	sudo yum -y install libvirt wget unzip tar 
 
 	echo ''
 	echo "==============================================" 
-	echo "Done: Install libvirt                         "
+	echo "Done: Install required packages.              "
 	echo "=============================================="
 	echo ''
 

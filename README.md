@@ -5,7 +5,7 @@ Announcing Orabuntu-LXC/D v7.0.0-alpha ELENA ("**E**nterprise **L**XD **E**ditio
 New features of Orabuntu-LXC/D v7.0.0-alpha ELENA:
 
 * Automated LXD N-node clusters on OVS VLAN's on CentOS, Fedora, RedHat, Ubuntu & Oracle Linux.
-* Optional Kubernetes LXD-containerized maestro and two musician nodes *(under development in master branch)
+* Optional Kubernetes LXD-containerized controller and two worker nodes *(under development in master branch)
 * User-selectable tunnel-type for multi-host deployments [ gre | geneve | vxlan ]. 
 * New /anylinux/CONFIG file which centralizes deployment configuration parameters.
 * Adds support for nftables and firewalld for LXD clusters and LXC multi-host "spanned" networks.
@@ -86,11 +86,11 @@ Step 2
 Install manually the following packages (if on Debian-family Linux):
 
 ```
-sudo apt-get -y install unzip wget tar openssh-server net-tools bind9utils
+sudo apt-get -y install unzip wget openssh-server net-tools bind9utils
 ```
 Install manually the following packages (if on RedHat-family Linux):
 ```
-sudo [yum|dnf] -y install unzip wget tar openssh-server net-tools bind-utils
+sudo [yum|dnf] -y install unzip wget openssh-server net-tools bind-utils
 ```
 
 Step 3a
