@@ -5938,7 +5938,69 @@ then
 
 	sleep 5
 
-	sudo zpool create $StoragePoolName mirror /dev/k8s_luns/k8s_zfsa_1_00 /dev/k8s_luns/k8s_zfsm_1_00
+	sudo zpool create $StoragePoolName mirror /dev/zpool_luns/zpool_zfsa_"$SWITCH_IP"_00 /dev/zpool_luns/zpool_zfsm_"$SWITCH_IP"_00
+
+	echo ''
+	echo "=============================================="
+	echo "Update strt_scst.sh file if it exists...      "
+	echo "=============================================="
+	echo ''
+
+	if [ -f /etc/network/openvswitch/strt_scst.sh ]
+	then
+		function WhichModprobe {
+		        which modprobe
+		}
+		ModProbe=$(WhichModprobe)
+
+		function WhichZpool {
+		        which zpool
+		}
+		Zpool=$(WhichZpool)
+
+		function WhichSleep {
+		        which sleep
+		}
+		Sleep=$(WhichSleep)
+
+		sudo sh -c "echo '$Sleep 10'                    >> /etc/network/openvswitch/strt_scst.sh"
+		sudo sh -c "echo '$ModProbe zfs'                >> /etc/network/openvswitch/strt_scst.sh"
+		sudo sh -c "echo '$Zpool import $PoolName'      >> /etc/network/openvswitch/strt_scst.sh"
+		sudo cat /etc/network/openvswitch/strt_scst.sh
+	fi
+
+	echo ''
+	echo "=============================================="
+	echo "Done: Update strt_scst.sh file if it exists.  "
+	echo "=============================================="
+	echo ''
+
+	sleep 5
+
+	clear
+
+	echo ''
+	echo "=============================================="
+	echo "Update stop_scst.sh file if it exists.        "
+	echo "=============================================="
+	echo ''
+
+	if [ -f /etc/network/openvswitch/stop_scst.sh ]
+	then
+		function GetZpool2 {
+		echo $Zpool | sed 's/\//\\\//g'
+		}
+		Zpool2=$(GetZpool2)
+
+		sudo sed -i "s/bash/&\nzpool export $POOL/"     /etc/network/openvswitch/stop_scst.sh
+		sudo sed -i "s/zpool/$Zpool2/"                  /etc/network/openvswitch/stop_scst.sh
+	fi
+
+	echo ''
+	echo "=============================================="
+	echo "Done: Update stop_scst.sh file if it exists.  "
+	echo "=============================================="
+	echo ''
 
 	cd $CurrentDir
 
