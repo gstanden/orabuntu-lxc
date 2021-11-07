@@ -86,11 +86,11 @@ Step 2
 Install manually the following packages (if on Debian-family Linux):
 
 ```
-sudo apt-get -y install unzip wget openssh-server net-tools bind9utils
+sudo apt-get -y install unzip wget tar openssh-server net-tools bind9utils
 ```
 Install manually the following packages (if on RedHat-family Linux):
 ```
-sudo [yum|dnf] -y install unzip wget openssh-server net-tools bind-utils
+sudo [yum|dnf] -y install unzip wget tar openssh-server net-tools bind-utils
 ```
 
 Step 3a
