@@ -5932,9 +5932,15 @@ then
         sudo sed -i "s/\"SWITCH_IP\"/$Sw1Index/g"	/opt/olxc/home/scst-files/create-scst-target.sh
         sudo sed -i "s/POOL/$StoragePoolName/g"		/opt/olxc/home/scst-files/create-scst-target.sh
 
+	function GetRevDomain1 {
+		echo "$Domain1" | awk -F. '{for (i=NF; i>0; --i) printf "%s%s", (i<NF ? "." : ""), $i; printf "\n"}'
+	}
+	RevDomain1=$(GetRevDomain1)
+
 	CurrentDir=`pwd`
+
 	cd /opt/olxc/home/scst-files
-	./create-scst.sh $LXDStorageDriver
+	./create-scst.sh $LXDStorageDriver $RevDomain1
 
 	sleep 5
 
@@ -5963,9 +5969,9 @@ then
 		}
 		Sleep=$(WhichSleep)
 
-		sudo sh -c "echo '$Sleep 10'                    >> /etc/network/openvswitch/strt_scst.sh"
-		sudo sh -c "echo '$ModProbe zfs'                >> /etc/network/openvswitch/strt_scst.sh"
-		sudo sh -c "echo '$Zpool import $PoolName'      >> /etc/network/openvswitch/strt_scst.sh"
+		sudo sh -c "echo '$Sleep 10'                    	>> /etc/network/openvswitch/strt_scst.sh"
+		sudo sh -c "echo '$ModProbe zfs'                	>> /etc/network/openvswitch/strt_scst.sh"
+		sudo sh -c "echo '$Zpool import $StoragePoolName'      	>> /etc/network/openvswitch/strt_scst.sh"
 		sudo cat /etc/network/openvswitch/strt_scst.sh
 	fi
 
@@ -5992,8 +5998,8 @@ then
 		}
 		Zpool2=$(GetZpool2)
 
-		sudo sed -i "s/bash/&\nzpool export $POOL/"     /etc/network/openvswitch/stop_scst.sh
-		sudo sed -i "s/zpool/$Zpool2/"                  /etc/network/openvswitch/stop_scst.sh
+		sudo sed -i "s/bash/&\nzpool export $StoragePoolName/"  /etc/network/openvswitch/stop_scst.sh
+		sudo sed -i "s/zpool export/$Zpool2 export/"            /etc/network/openvswitch/stop_scst.sh
 	fi
 
 	echo ''
