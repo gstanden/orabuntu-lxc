@@ -5938,7 +5938,7 @@ then
 
 	sleep 5
 
-	sudo zpool create $StoragePoolName mirror /dev/zpool_luns/zpool_zfsa_"$SWITCH_IP"_00 /dev/zpool_luns/zpool_zfsm_"$SWITCH_IP"_00
+	sudo zpool create $StoragePoolName mirror /dev/zpool_luns/zpool_zfsa_"$Sw1Index"_00 /dev/zpool_luns/zpool_zfsm_"$Sw1Index"_00
 
 	echo ''
 	echo "=============================================="
