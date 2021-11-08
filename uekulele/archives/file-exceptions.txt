@@ -12,3 +12,4 @@ rootfs/config.asm.flex.cluster
 /var/lib/lxc/nsa/rootfs/var/lib/bind/fwd.orabuntu-lxc.com
 /var/lib/lxc/nsa/rootfs/var/lib/bind/rev.orabuntu-lxc.com
 /var/lib/lxc/nsa/rootfs/root/ns_backup_update.lst
+/opt/olxc/home/scst-files/99-StorageOwner.rules.template
