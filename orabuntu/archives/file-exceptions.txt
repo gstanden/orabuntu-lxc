@@ -12,4 +12,14 @@ rootfs/config.asm.flex.cluster
 /var/lib/lxc/nsa/rootfs/root/ns_backup_update.lst
 /home/OWNER/Downloads/orabuntu-lxc-master/orabuntu/archives/GNU3
 /home/OWNER/Downloads/orabuntu-lxc-master/orabuntu/archives/COPYING
+/opt/olxc/home/scst-files/99-StorageOwner.rules.template
+/opt/olxc/home/scst-files/create-scst-dkms.sh
+/opt/olxc/home/scst-files/create-scst-dpkg.sh
+/opt/olxc/home/scst-files/create-scst-install.sh
+/opt/olxc/home/scst-files/create-scst-linux6.sh
+/opt/olxc/home/scst-files/create-scst-multipath.sh
+/opt/olxc/home/scst-files/create-scst.sh 
+/opt/olxc/home/scst-files/create-scst-target.sh
+/opt/olxc/home/scst-files/create-scst-uninstall-dkms.sh
+/opt/olxc/home/scst-files/create-scst-uninstall.sh
 

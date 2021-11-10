@@ -5862,6 +5862,176 @@ clear
 
 echo ''
 echo "=============================================="
+echo "Unpack SCST Linux SAN Files...                "
+echo "=============================================="
+echo ''
+
+sudo tar -xvf /opt/olxc/"$DistDir"/uekulele/archives/scst-files.tar -C / --touch
+	
+sudo chown -R $Owner:$Group		        /opt/olxc/home/scst-files/.
+sudo sed -i "s/\"SWITCH_IP\"/$Sw1Index/g"	/opt/olxc/home/scst-files/create-scst-target.sh
+
+echo ''
+echo "=============================================="
+echo "Done: Unpack SCST Linux SAN Files.            "
+echo "=============================================="
+echo ''
+
+sleep 5
+
+clear
+
+echo ''
+echo "=============================================="
+echo "Unpack TGT Linux SAN Files...                "
+echo "=============================================="
+echo ''
+
+sudo tar -xvf /opt/olxc/"$DistDir"/uekulele/archives/tgt-files.tar  -C / --touch
+	
+echo ''
+echo "=============================================="
+echo "Done: Unpack TGT Linux SAN Files.            "
+echo "=============================================="
+echo ''
+
+sleep 5
+
+clear
+
+if [ $Scst = 'Y' ]
+then
+	if [ $LinuxFlavor = 'Oracle' ]
+	then
+		if [ $Release -eq 8 ]
+		then
+			echo ''
+			echo "=============================================="
+			echo "Configure ZFS Storage ...                     "
+			echo "                                              "
+			echo "(some steps take awhile ... patience)         " 
+			echo "=============================================="
+			echo ''
+
+			sleep 5
+
+			clear
+
+			echo ''
+			echo "=============================================="
+			echo "Install packages ...                          "
+			echo "=============================================="
+			echo ''
+
+			sudo yum -y install kernel-uek-devel-$(uname -r) kernel-devel yum-utils
+			sleep 5
+			sudo rpm -Uvh https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
+			sudo yum-config-manager --enable epel 
+			sudo yum repolist
+			sudo yum -y install dkms
+			sudo rpm -Uvh http://download.zfsonlinux.org/epel/zfs-release.el`cat /etc/oracle-release | cut -f5 -d' ' | sed 's/\./_/'`.noarch.rpm
+
+			sleep 5
+
+			sudo yum -y install -y zfs
+			sudo modprobe zfs
+			sudo systemctl list-unit-files | grep zfs
+
+			echo ''
+			echo "=============================================="
+			echo "Done: Install packages.                       "
+			echo "=============================================="
+			echo ''
+
+		#	sudo sed -i "s/POOL/$StoragePoolName/g"		/opt/olxc/home/scst-files/create-scst-target.sh
+
+			function GetRevDomain1 {
+				echo "$Domain1" | awk -F. '{for (i=NF; i>0; --i) printf "%s%s", (i<NF ? "." : ""), $i; printf "\n"}'
+			}
+			RevDomain1=$(GetRevDomain1)
+
+			CurrentDir=`pwd`
+
+			cd /opt/olxc/home/scst-files
+			./create-scst.sh $LXDStorageDriver $RevDomain1 
+
+			sleep 5
+
+			sudo zpool create $StoragePoolName mirror /dev/zpool_luns/lxd_zfsa_"$Sw1Index"_00 /dev/zpool_luns/lxd_zfsm_"$Sw1Index"_00
+
+			echo ''
+			echo "=============================================="
+			echo "Update strt_scst.sh file if it exists...      "
+			echo "=============================================="
+			echo ''
+
+			if [ -f /etc/network/openvswitch/strt_scst.sh ]
+			then
+				function WhichModprobe {
+					which modprobe
+				}
+				ModProbe=$(WhichModprobe)
+
+				function WhichZpool {
+					which zpool
+				}
+				Zpool=$(WhichZpool)
+
+				function WhichSleep {
+				        which sleep
+				}
+				Sleep=$(WhichSleep)
+
+				sudo sh -c "echo '$Sleep 10'                    	>> /etc/network/openvswitch/strt_scst.sh"
+				sudo sh -c "echo '$ModProbe zfs'                	>> /etc/network/openvswitch/strt_scst.sh"
+				sudo sh -c "echo '$Zpool import $StoragePoolName'      	>> /etc/network/openvswitch/strt_scst.sh"
+				sudo cat /etc/network/openvswitch/strt_scst.sh
+			fi
+
+			echo ''
+			echo "=============================================="
+			echo "Done: Update strt_scst.sh file if it exists.  "
+			echo "=============================================="
+			echo ''
+
+			sleep 5
+
+			clear
+
+			echo ''
+			echo "=============================================="
+			echo "Update stop_scst.sh file if it exists.        "
+			echo "=============================================="
+			echo ''
+
+			if [ -f /etc/network/openvswitch/stop_scst.sh ]
+			then
+				function GetZpool2 {
+					echo $Zpool | sed 's/\//\\\//g'
+				}
+				Zpool2=$(GetZpool2)
+
+				sudo sed -i "s/bash/&\nzpool export $StoragePoolName/"  /etc/network/openvswitch/stop_scst.sh
+				sudo sed -i "s/zpool export/$Zpool2 export/"            /etc/network/openvswitch/stop_scst.sh
+			fi
+
+			echo ''
+			echo "=============================================="
+			echo "Done: Update stop_scst.sh file if it exists.  "
+			echo "=============================================="
+			echo ''
+
+			cd $CurrentDir
+		fi
+	fi
+fi
+
+sleep 5
+
+clear
+
+echo ''
+echo "=============================================="
 echo "Checking and Configuring MultiHost Settings..."
 echo "=============================================="
 echo ''
@@ -5878,165 +6048,6 @@ then
 	sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw7.sh
 	sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw8.sh
 	sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw9.sh
-
-	echo ''
-	echo "=============================================="
-	echo "Unpack SCST Linux SAN Files...                "
-	echo "=============================================="
-	echo ''
-
-        sudo tar -xvf /opt/olxc/"$DistDir"/uekulele/archives/scst-files.tar -C / --touch
-
-	if [ $LinuxFlavor = 'Oracle' ] && [ $Release -eq 8 ] && [ $Scst = 'Y' ]
-	then
-		echo ''
-		echo "=============================================="
-		echo "Configure ZFS Storage ...                     "
-		echo "                                              "
-		echo "(some steps take awhile ... patience)         " 
-		echo "=============================================="
-		echo ''
-
-		sleep 5
-
-		clear
-
-		echo ''
-		echo "=============================================="
-		echo "Install packages ...                          "
-		echo "=============================================="
-		echo ''
-
-		sudo yum -y install kernel-uek-devel-$(uname -r) kernel-devel yum-utils
-		sleep 5
-		sudo rpm -Uvh https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
-		sudo yum-config-manager --enable epel 
-		sudo yum repolist
-		sudo yum -y install dkms
-		sudo rpm -Uvh http://download.zfsonlinux.org/epel/zfs-release.el`cat /etc/oracle-release | cut -f5 -d' ' | sed 's/\./_/'`.noarch.rpm
-
-		sleep 5
-
-		sudo yum -y install -y zfs
-		sudo modprobe zfs
-		sudo systemctl list-unit-files | grep zfs
-	
-		echo ''
-		echo "=============================================="
-		echo "Done: Install packages.                       "
-		echo "=============================================="
-		echo ''
-	fi
-
-	sudo chown -R $Owner:$Group		        /opt/olxc/home/scst-files/.
-        sudo sed -i "s/\"SWITCH_IP\"/$Sw1Index/g"	/opt/olxc/home/scst-files/create-scst-target.sh
-        sudo sed -i "s/POOL/$StoragePoolName/g"		/opt/olxc/home/scst-files/create-scst-target.sh
-
-	function GetRevDomain1 {
-		echo "$Domain1" | awk -F. '{for (i=NF; i>0; --i) printf "%s%s", (i<NF ? "." : ""), $i; printf "\n"}'
-	}
-	RevDomain1=$(GetRevDomain1)
-
-	CurrentDir=`pwd`
-
-	cd /opt/olxc/home/scst-files
-	./create-scst.sh $LXDStorageDriver $RevDomain1
-
-	sleep 5
-
-	sudo zpool create $StoragePoolName mirror /dev/zpool_luns/zpool_zfsa_"$Sw1Index"_00 /dev/zpool_luns/zpool_zfsm_"$Sw1Index"_00
-
-	echo ''
-	echo "=============================================="
-	echo "Update strt_scst.sh file if it exists...      "
-	echo "=============================================="
-	echo ''
-
-	if [ -f /etc/network/openvswitch/strt_scst.sh ]
-	then
-		function WhichModprobe {
-		        which modprobe
-		}
-		ModProbe=$(WhichModprobe)
-
-		function WhichZpool {
-		        which zpool
-		}
-		Zpool=$(WhichZpool)
-
-		function WhichSleep {
-		        which sleep
-		}
-		Sleep=$(WhichSleep)
-
-		sudo sh -c "echo '$Sleep 10'                    	>> /etc/network/openvswitch/strt_scst.sh"
-		sudo sh -c "echo '$ModProbe zfs'                	>> /etc/network/openvswitch/strt_scst.sh"
-		sudo sh -c "echo '$Zpool import $StoragePoolName'      	>> /etc/network/openvswitch/strt_scst.sh"
-		sudo cat /etc/network/openvswitch/strt_scst.sh
-	fi
-
-	echo ''
-	echo "=============================================="
-	echo "Done: Update strt_scst.sh file if it exists.  "
-	echo "=============================================="
-	echo ''
-
-	sleep 5
-
-	clear
-
-	echo ''
-	echo "=============================================="
-	echo "Update stop_scst.sh file if it exists.        "
-	echo "=============================================="
-	echo ''
-
-	if [ -f /etc/network/openvswitch/stop_scst.sh ]
-	then
-		function GetZpool2 {
-		echo $Zpool | sed 's/\//\\\//g'
-		}
-		Zpool2=$(GetZpool2)
-
-		sudo sed -i "s/bash/&\nzpool export $StoragePoolName/"  /etc/network/openvswitch/stop_scst.sh
-		sudo sed -i "s/zpool export/$Zpool2 export/"            /etc/network/openvswitch/stop_scst.sh
-	fi
-
-	echo ''
-	echo "=============================================="
-	echo "Done: Update stop_scst.sh file if it exists.  "
-	echo "=============================================="
-	echo ''
-
-	cd $CurrentDir
-
-	echo ''
-	echo "=============================================="
-	echo "Done: Unpack SCST Linux SAN Files.            "
-	echo "=============================================="
-	echo ''
-
-	sleep 5
-
-	clear
-
-	echo ''
-	echo "=============================================="
-	echo "Unpack TGT Linux SAN Files...                "
-	echo "=============================================="
-	echo ''
-
-        sudo tar -xvf /opt/olxc/"$DistDir"/uekulele/archives/tgt-files.tar  -C / --touch
-	
-	echo ''
-	echo "=============================================="
-	echo "Done: Unpack TGT Linux SAN Files.            "
-	echo "=============================================="
-	echo ''
-
-	sleep 5
-
-	clear
 
 	echo ''
 	echo "=============================================="
@@ -6274,45 +6285,6 @@ then
 	sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw8.sh
 	sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw9.sh
 	
-	echo ''
-	echo "=============================================="
-	echo "Unpack SCST Linux SAN Files...                "
-	echo "=============================================="
-	echo ''
-
-        sudo tar -xvf /opt/olxc/"$DistDir"/uekulele/archives/scst-files.tar -C / --touch
-
-	sudo chown -R $Owner:$Group		        /opt/olxc/home/scst-files/.
-        sudo sed -i "s/\"SWITCH_IP\"/$Sw1Index/g"	/opt/olxc/home/scst-files/create-scst-target.sh
-
-	echo ''
-	echo "=============================================="
-	echo "Done: Unpack SCST Linux SAN Files.            "
-	echo "=============================================="
-	echo ''
-
-	sleep 5
-
-	clear
-
-	echo ''
-	echo "=============================================="
-	echo "Unpack TGT Linux SAN Files...                "
-	echo "=============================================="
-	echo ''
-
-        sudo tar -xvf /opt/olxc/"$DistDir"/uekulele/archives/tgt-files.tar  -C / --touch
-	
-	echo ''
-	echo "=============================================="
-	echo "Done: Unpack TGT Linux SAN Files.            "
-	echo "=============================================="
-	echo ''
-
-	sleep 5
-
-	clear
-
 	echo ''
 	echo "=============================================="
 	echo "Configure NS Replication Account...           "

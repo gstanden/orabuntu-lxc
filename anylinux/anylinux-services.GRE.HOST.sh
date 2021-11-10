@@ -217,9 +217,17 @@ then
         clear
 fi
 
+##################### Tunnel install Flag  ######################
+
 # TunType values [geneve|gre|vxlan]
 
 TunType=$(source "$DistDir"/anylinux/CONFIG; echo $TunType)
+
+##################### SCST install Flag  ########################
+
+# Scst setting [Y|N] 
+
+Scst=$(source "$DistDir"/anylinux/CONFIG; echo $Scst)
 
 ################# Kubernetes Install Flag  ######################
 
@@ -305,36 +313,39 @@ then
 
                         clear
 
-                        echo ''
-                        echo "=============================================="
-                        echo "Check ZFS Storage Pool Exists...              "
-                        echo "=============================================="
-                        echo ''
-
-                        function CheckZpoolExist {
-                                sudo zpool list $StoragePoolName | grep ONLINE | wc -l
-                        }
-                        ZpoolExist=$(CheckZpoolExist)
-
-                        if [ $ZpoolExist -eq 1 ]
+			if [ $Scst = 'N' ]
                         then
-                                echo "ZFS $StoragePoolName exists."
-                        else
-                                echo "ZFS $StoragePoolName does not exist."
-                                echo "ZFS $StoragePoolName must be created before running Orabuntu-LXC in LXD Cluster Mode."
-                                echo "Orabuntu-LXC Exiting."
-                                exit
+                                echo ''
+                                echo "=============================================="
+                                echo "Check ZFS Storage Pool Exists...              "
+                                echo "=============================================="
+                                echo ''
+
+                                function CheckZpoolExist {
+                                        sudo zpool list $StoragePoolName | grep ONLINE | wc -l
+                                }
+                                ZpoolExist=$(CheckZpoolExist)
+
+                                if [ $ZpoolExist -eq 1 ]
+                                then
+                                        echo "ZFS $StoragePoolName exists."
+                                else
+                                        echo "ZFS $StoragePoolName does not exist."
+                                        echo "ZFS $StoragePoolName must be created before running Orabuntu-LXC in LXD Cluster Mode."
+                                        echo "Orabuntu-LXC Exiting."
+                                        exit
+                                fi
+
+                                echo ''
+                                echo "=============================================="
+                                echo "Done: Check ZFS Storage Pool Exists.          "
+                                echo "=============================================="
+                                echo ''
+
+                                sleep 5
+
+                                clear
                         fi
-
-                        echo ''
-                        echo "=============================================="
-                        echo "Done: Check ZFS Storage Pool Exists.          "
-                        echo "=============================================="
-                        echo ''
-
-                        sleep 5
-
-                        clear
                 else
                         PreSeed=Unused
                         BtrfsLun=Unused
@@ -817,9 +828,9 @@ then
 
 	elif [ $UbuntuMajorVersion -ge 16 ]
 	then
-		MultiHost="$Operation:Y:X:X:$HUBIP:$SPOKEIP:$MTU:$HubUserAct:$HubSudoPwd:$GRE:$Product:$LXD:$K8S:$PreSeed:$LXDCluster:$LXDStorageDriver:$StoragePoolName:$BtrfsLun:$Docker:$TunType"
+		MultiHost="$Operation:Y:X:X:$HUBIP:$SPOKEIP:$MTU:$HubUserAct:$HubSudoPwd:$GRE:$Product:$LXD:$K8S:$PreSeed:$LXDCluster:$LXDStorageDriver:$StoragePoolName:$BtrfsLun:$Docker:$TunType:$Scst"
 	else
-		MultiHost="$Operation:Y:X:X:$HUBIP:$SPOKEIP:$MTU:$HubUserAct:$HubSudoPwd:$GRE:$Product:$LXD:$K8S:$PreSeed:$LXDCluster:$LXDStorageDriver:$StoragePoolName:$BtrfsLun:$Docker:$TunType"
+		MultiHost="$Operation:Y:X:X:$HUBIP:$SPOKEIP:$MTU:$HubUserAct:$HubSudoPwd:$GRE:$Product:$LXD:$K8S:$PreSeed:$LXDCluster:$LXDStorageDriver:$StoragePoolName:$BtrfsLun:$Docker:$TunType:$Scst"
         fi
 
 	sleep 5
