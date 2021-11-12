@@ -14,7 +14,7 @@ OSMemRes=1024				#							Amount of reserved memory.  Often used with Oracle Ente
 LXD=Y					# [Y|N]							Create LXD containers flag. Currently used only with Ubuntu Linux 20.04 but other distros coming soon.
 LXDCluster=Y				# [Y|N]							Create LXD Cluster automatically flag.  Currently used only with Ubuntu Linux 20.04 but other distros coming soon.
 LXDStorageDriver=zfs			# [btrfs|zfs]						Storage for LXD Cluster and LXD containers.
-LXDStoragePoolName=olxd-003		# [olxc-001|olxc-002|olxc-003|...]			User-settables ZFS storage pool name. Suggested naming scheme shown.  Any naming convention can be used.
+LXDStoragePoolName=olxd-001		# [olxc-001|olxc-002|olxc-003|...]			User-settables ZFS storage pool name. Suggested naming scheme shown.  Any naming convention can be used.
 Docker=Y				# [Y|N]	 						Docker install from Canonical Snap.
 K8S=N					# [Y|N]							Kubernetes install K8S snap from Canonical Snap. Ubuntu Linux 20.04 only for now.
 BtrfsLun="\/dev\/sdb1"			#							LUN partition for LXD cluster where "X={b,c,d...z}. Auto-system-set to "unused" for some Linux distros, see below.
