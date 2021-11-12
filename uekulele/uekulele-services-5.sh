@@ -1185,7 +1185,7 @@ then
 		clear
 
                 function GetLXDContainerNames {
-                        echo "/var/lib/snapd/snap/bin/lxc list --columns n --format csv | grep -v oel | sed 's/$/ /g' | tr -d '\n' |  sed 's/[ \t]*$//'" | sg lxd 2>/dev/null 
+			echo "/var/lib/snapd/snap/bin/lxc list --columns n,L --format csv | grep -v oel | grep $HOSTNAME | cut -f1 -d',' | sed 's/$/ /g' | tr -d '\n' |  sed 's/[ \t]*$//'" | sg lxd
                 }
                 LXDContainerNames=$(GetLXDContainerNames)
 
@@ -1205,7 +1205,7 @@ then
                 do
                         echo ''
                         echo "=============================================="
-                        echo "Test SSH to LXD Container $i ...              "
+                        echo "Test SSH to Local LXD Container $i ...        "
                         echo "=============================================="
                         echo ''
 
@@ -1226,7 +1226,7 @@ then
 
                         echo ''
                         echo "=============================================="
-                        echo "Done: Test SSH to LXD Container $i.           "
+                        echo "Done: Test SSH to Locla LXD Container $i.     "
                         echo "=============================================="
                         echo ''
 

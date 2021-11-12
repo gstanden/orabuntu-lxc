@@ -4143,6 +4143,322 @@ sleep 5
 
 clear
 
+echo ''
+echo "=============================================="
+echo "Unpack G2 files for $LF Linux $RHV...         "
+echo "=============================================="
+echo ''
+
+sudo tar -xvf /opt/olxc/"$DistDir"/uekulele/archives/dns-dhcp-host.tar -C / --touch
+sudo chmod +x /etc/network/openvswitch/crt_ovs_s*.sh
+
+echo ''
+echo "=============================================="
+echo "Done: Unpack G2 files for $LF Linux $RHV.     "
+echo "=============================================="
+
+sleep 5
+
+clear
+
+sudo chmod 755 /etc/network/openvswitch/*.sh
+
+if   [ $MultiHostVar3 = 'X' ] && [ $GRE = 'Y' ] && [ $MultiHostVar2 = 'Y' ]
+then
+ 	echo ''
+ 	echo "=============================================="
+ 	echo "Get sx1 IP address...                         "
+ 	echo "=============================================="
+ 	echo ''
+
+	ssh-keygen -R $MultiHostVar5 > /dev/null 2>&1
+	sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service systemd-resolved restart > /dev/null 2>&1"
+	sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service lxc-net restart > /dev/null 2>&1"
+	sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service dnsmasq restart > /dev/null 2>&1"
+
+	Sx1Index=201
+	function CheckHighestSx1IndexHit {
+		sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" nslookup -timeout=1 $Sx1Net.$Sx1Index" | grep -c 'name ='
+	}
+	HighestSx1IndexHit=$(CheckHighestSx1IndexHit)
+
+	while [ $HighestSx1IndexHit = 1 ]
+	do
+       	 	Sx1Index=$((Sx1Index+1))
+       	 	HighestSx1IndexHit=$(CheckHighestSx1IndexHit)
+	done
+
+	echo "Sx1 Index = "$Sx1Index
+
+ 	echo ''
+ 	echo "=============================================="
+ 	echo "Done: Get sx1 IP address.                     "
+ 	echo "=============================================="
+ 	echo ''
+
+	sleep 5
+
+	clear
+
+ 	echo ''
+ 	echo "=============================================="
+ 	echo "Get sw1 IP address.                           "
+ 	echo "=============================================="
+ 	echo ''
+
+	sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service systemd-resolved restart > /dev/null 2>&1"
+	sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service lxc-net restart > /dev/null 2>&1"
+	sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service dnsmasq restart > /dev/null 2>&1"
+
+	Sw1Index=201
+	function CheckHighestSw1IndexHit {
+		sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" nslookup -timeout=1 $Sw1Net.$Sw1Index" | grep -c 'name ='
+	}
+	HighestSw1IndexHit=$(CheckHighestSw1IndexHit)
+
+	while [ $HighestSw1IndexHit = 1 ]
+	do
+       	 	Sw1Index=$((Sw1Index+1))
+       	 	HighestSw1IndexHit=$(CheckHighestSw1IndexHit)
+	done
+ 	
+	echo "Sw1 Index = "$Sw1Index
+	
+	echo ''
+ 	echo "=============================================="
+ 	echo "Done: Get sw1 IP address.                     "
+ 	echo "=============================================="
+ 	echo ''
+
+	sleep 5
+
+	clear
+
+elif [ $MultiHostVar3 = 'X' ]  && [ $GRE = 'N' ] && [ $MultiHostVar2 = 'Y' ] && [ -f /etc/network/openvswitch/sx1.info ] && [ -f /etc/network/openvswitch/sw1.info ]
+then
+	if   [ $Release -eq 7 ] || [ $Release -eq 8 ]
+	then
+		function GetSx1Index {
+			sudo cat /etc/network/openvswitch/sx1.info | cut -f2 -d':' | cut -f4 -d'.'
+		}
+
+	elif [ $Release -eq 6 ]
+	then
+		function GetSx1Index {
+			sudo cat /etc/network/openvswitch/sx1.info | cut -f3 -d':' | cut -f4 -d'.'
+		}
+	fi
+	Sx1Index=$(GetSx1Index)
+
+	if   [ $Release -eq 7 ] || [ $Release -eq 8 ]
+	then
+		function GetSw1Index {
+			sudo cat /etc/network/openvswitch/sw1.info | cut -f2 -d':' | cut -f4 -d'.'
+		}
+
+	elif [ $Release -eq 6 ]
+	then
+		function GetSw1Index {
+			sudo cat /etc/network/openvswitch/sw1.info | cut -f3 -d':' | cut -f4 -d'.'
+		}
+	fi
+	Sw1Index=$(GetSw1Index)
+else
+	Sw1Index=$MultiHostVar3
+	Sx1Index=$MultiHostVar3
+fi
+
+sudo sed -i "s/SWITCH_IP/$Sx1Index/g" /etc/network/openvswitch/crt_ovs_sx1.sh
+sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw1.sh
+sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw2.sh
+sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw3.sh
+sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw4.sh
+sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw5.sh
+sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw6.sh
+sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw7.sh
+sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw8.sh
+sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw9.sh
+
+
+echo ''
+echo "=============================================="
+echo "Unpack SCST Linux SAN Files...                "
+echo "=============================================="
+echo ''
+
+sudo tar -xvf /opt/olxc/"$DistDir"/uekulele/archives/scst-files.tar -C / --touch
+	
+sudo chown -R $Owner:$Group		        /opt/olxc/home/scst-files/.
+sudo sed -i "s/\"SWITCH_IP\"/$Sw1Index/g"	/opt/olxc/home/scst-files/create-scst-target.sh
+
+echo ''
+echo "=============================================="
+echo "Done: Unpack SCST Linux SAN Files.            "
+echo "=============================================="
+echo ''
+
+sleep 5
+
+clear
+
+echo ''
+echo "=============================================="
+echo "Unpack TGT Linux SAN Files...                "
+echo "=============================================="
+echo ''
+
+sudo tar -xvf /opt/olxc/"$DistDir"/uekulele/archives/tgt-files.tar  -C / --touch
+	
+echo ''
+echo "=============================================="
+echo "Done: Unpack TGT Linux SAN Files.            "
+echo "=============================================="
+echo ''
+
+sleep 5
+
+clear
+
+if [ $Scst = 'Y' ]
+then
+	if [ $LinuxFlavor = 'Oracle' ]
+	then
+		if [ $Release -eq 8 ]
+		then
+			echo ''
+			echo "=============================================="
+			echo "Configure ZFS Storage ...                     "
+			echo "                                              "
+			echo "(some steps take awhile ... patience)         " 
+			echo "=============================================="
+			echo ''
+
+			sleep 5
+
+			clear
+
+			echo ''
+			echo "=============================================="
+			echo "Install packages ...                          "
+			echo "=============================================="
+			echo ''
+
+			sudo yum -y install kernel-uek-devel-$(uname -r) kernel-devel yum-utils
+			sleep 5
+			sudo rpm -Uvh https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
+			sudo yum-config-manager --enable epel 
+			sudo yum repolist
+			sudo yum -y install dkms
+			sudo rpm -Uvh http://download.zfsonlinux.org/epel/zfs-release.el`cat /etc/oracle-release | cut -f5 -d' ' | sed 's/\./_/'`.noarch.rpm
+
+			sleep 5
+
+			sudo yum -y install -y zfs
+			sudo modprobe zfs
+			sudo systemctl list-unit-files | grep zfs
+
+			echo ''
+			echo "=============================================="
+			echo "Done: Install packages.                       "
+			echo "=============================================="
+			echo ''
+
+		#	sudo sed -i "s/POOL/$StoragePoolName/g"		/opt/olxc/home/scst-files/create-scst-target.sh
+
+			function GetRevDomain1 {
+				echo "$Domain1" | awk -F. '{for (i=NF; i>0; --i) printf "%s%s", (i<NF ? "." : ""), $i; printf "\n"}'
+			}
+			RevDomain1=$(GetRevDomain1)
+
+			CurrentDir=`pwd`
+
+			cd /opt/olxc/home/scst-files
+			./create-scst.sh $LXDStorageDriver $RevDomain1 
+
+			sleep 5
+
+			sudo zpool create $StoragePoolName mirror /dev/zfs_luns/lxd_zfsa_"$Sw1Index"_00 /dev/zfs_luns/lxd_zfsm_"$Sw1Index"_00
+
+			sudo mkfs.xfs /dev/zfs_luns/lxd_zfsb_"$Sw1Index"_00 -f
+			sudo mount /dev/zfs_luns/lxd_zfsb_"$Sw1Index"_00 /var/lib/lxc
+
+			echo ''
+			echo "=============================================="
+			echo "Update strt_scst.sh file if it exists...      "
+			echo "=============================================="
+			echo ''
+
+			if [ -f /etc/network/openvswitch/strt_scst.sh ]
+			then
+				function WhichModprobe {
+					which modprobe
+				}
+				ModProbe=$(WhichModprobe)
+
+				function WhichZpool {
+					which zpool
+				}
+				Zpool=$(WhichZpool)
+
+				function WhichSleep {
+				        which sleep
+				}
+				Sleep=$(WhichSleep)
+				
+				function WhichMount {
+				        which mount 
+				}
+				Mount=$(WhichMount)
+
+				sudo sh -c "echo '$Sleep 10'                    				>> /etc/network/openvswitch/strt_scst.sh"
+				sudo sh -c "echo '$ModProbe zfs'                				>> /etc/network/openvswitch/strt_scst.sh"
+				sudo sh -c "echo '$Zpool import $StoragePoolName'      				>> /etc/network/openvswitch/strt_scst.sh"
+				sudo sh -c "echo '$Mount /dev/zfs_luns/lxd_zfsb_"$Sw1Index"_00 /var/lib/lxc	>> /etc/network/openvswitch/strt_scst.sh"
+				sudo cat /etc/network/openvswitch/strt_scst.sh
+			fi
+
+			echo ''
+			echo "=============================================="
+			echo "Done: Update strt_scst.sh file if it exists.  "
+			echo "=============================================="
+			echo ''
+
+			sleep 5
+
+			clear
+
+			echo ''
+			echo "=============================================="
+			echo "Update stop_scst.sh file if it exists.        "
+			echo "=============================================="
+			echo ''
+
+			if [ -f /etc/network/openvswitch/stop_scst.sh ]
+			then
+				function GetZpool2 {
+					echo $Zpool | sed 's/\//\\\//g'
+				}
+				Zpool2=$(GetZpool2)
+
+				sudo sed -i "s/bash/&\nzpool export $StoragePoolName/"  /etc/network/openvswitch/stop_scst.sh
+				sudo sed -i "s/zpool export/$Zpool2 export/"            /etc/network/openvswitch/stop_scst.sh
+			fi
+
+			echo ''
+			echo "=============================================="
+			echo "Done: Update stop_scst.sh file if it exists.  "
+			echo "=============================================="
+			echo ''
+
+			cd $CurrentDir
+		fi
+	fi
+fi
+
+sleep 5
+
+clear
+
 function CheckNameServerExists {
 	sudo lxc-ls -f | egrep -c "$NameServer|nsa"
 }
@@ -4244,7 +4560,7 @@ then
                 if [ $? -eq 0 ]
                 then
                         echo ''
-                        sudo lxc-create -t local -n nsa -- -m /opt/olxc/"$DistDir"/lxcimage/nsa/meta.tar.xz -f /opt/olxc/"$DistDir"/lxcimage/nsa/rootfs.tar.xz
+                        sudo lxc-create -t local --name nsa -- -m /opt/olxc/"$DistDir"/lxcimage/nsa/meta.tar.xz -f /opt/olxc/"$DistDir"/lxcimage/nsa/rootfs.tar.xz
                 else
                         m=$((m+1))
                 fi
@@ -4259,19 +4575,19 @@ then
 		echo "=============================================="
 		echo ''
 	
-		sudo lxc-create -t download -n nsa -- --dist ubuntu --release focal --arch amd64 --keyserver hkp://keyserver.ubuntu.com:80
+		sudo lxc-create -t download --name nsa -- --dist ubuntu --release focal --arch amd64 --keyserver hkp://keyserver.ubuntu.com:80
 		if [ $? -ne 0 ]
 		then
 			sudo lxc-stop -n nsa -k
 			sudo lxc-destroy -n nsa
 			sudo rm -rf /var/lib/lxc/nsa
-			sudo lxc-create -t download -n nsa -- --dist ubuntu --release focal --arch amd64 --keyserver hkp://p80.pool.sks-keyservers.net:80
+			sudo lxc-create -t download --name nsa -- --dist ubuntu --release focal --arch amd64 --keyserver hkp://p80.pool.sks-keyservers.net:80
 			if [ $? -ne 0 ]
 			then
 				sudo lxc-stop -n nsa -k
 				sudo lxc-destroy -n nsa
 				sudo rm -rf /var/lib/lxc/nsa
-                                sudo lxc-create -t download -n nsa -- --dist ubuntu --release focal --arch amd64 --no-validate
+                                sudo lxc-create -t download --name nsa -- --dist ubuntu --release focal --arch amd64 --no-validate
 			fi
 		fi
 
@@ -4457,21 +4773,22 @@ clear
 
 echo ''
 echo "=============================================="
-echo "Unpack G2 files for $LF Linux $RHV...         "
+echo "Delete /var/lib/lxc/nsa/config file...        "
 echo "=============================================="
 echo ''
-
-sudo tar -xvf /opt/olxc/"$DistDir"/uekulele/archives/dns-dhcp-host.tar -C / --touch
-sudo chmod +x /etc/network/openvswitch/crt_ovs_s*.sh
 
 if [ $MultiHostVar2 = 'Y' ] && [ -f /var/lib/lxc/nsa/config ]
 then
 	sudo rm /var/lib/lxc/nsa/config
 fi
 
+sleep 5
+
+clear
+
 echo ''
 echo "=============================================="
-echo "Done: Unpack G2 files for $LF Linux $RHV.     "
+echo "Done: Delete /var/lib/lxc/nsa/config file.    "
 echo "=============================================="
 
 sleep 5
@@ -4942,124 +5259,6 @@ fi
 sleep 5
 
 clear
-
-sudo chmod 755 /etc/network/openvswitch/*.sh
-
-if   [ $MultiHostVar3 = 'X' ] && [ $GRE = 'Y' ] && [ $MultiHostVar2 = 'Y' ]
-then
- 	echo ''
- 	echo "=============================================="
- 	echo "Get sx1 IP address...                         "
- 	echo "=============================================="
- 	echo ''
-
-	ssh-keygen -R $MultiHostVar5 > /dev/null 2>&1
-	sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service systemd-resolved restart > /dev/null 2>&1"
-	sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service lxc-net restart > /dev/null 2>&1"
-	sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service dnsmasq restart > /dev/null 2>&1"
-
-	Sx1Index=201
-	function CheckHighestSx1IndexHit {
-		sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" nslookup -timeout=1 $Sx1Net.$Sx1Index" | grep -c 'name ='
-	}
-	HighestSx1IndexHit=$(CheckHighestSx1IndexHit)
-
-	while [ $HighestSx1IndexHit = 1 ]
-	do
-       	 	Sx1Index=$((Sx1Index+1))
-       	 	HighestSx1IndexHit=$(CheckHighestSx1IndexHit)
-	done
-
-	echo "Sx1 Index = "$Sx1Index
-
- 	echo ''
- 	echo "=============================================="
- 	echo "Done: Get sx1 IP address.                     "
- 	echo "=============================================="
- 	echo ''
-
-	sleep 5
-
-	clear
-
- 	echo ''
- 	echo "=============================================="
- 	echo "Get sw1 IP address.                           "
- 	echo "=============================================="
- 	echo ''
-
-	sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service systemd-resolved restart > /dev/null 2>&1"
-	sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service lxc-net restart > /dev/null 2>&1"
-	sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service dnsmasq restart > /dev/null 2>&1"
-
-	Sw1Index=201
-	function CheckHighestSw1IndexHit {
-		sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" nslookup -timeout=1 $Sw1Net.$Sw1Index" | grep -c 'name ='
-	}
-	HighestSw1IndexHit=$(CheckHighestSw1IndexHit)
-
-	while [ $HighestSw1IndexHit = 1 ]
-	do
-       	 	Sw1Index=$((Sw1Index+1))
-       	 	HighestSw1IndexHit=$(CheckHighestSw1IndexHit)
-	done
- 	
-	echo "Sw1 Index = "$Sw1Index
-	
-	echo ''
- 	echo "=============================================="
- 	echo "Done: Get sw1 IP address.                     "
- 	echo "=============================================="
- 	echo ''
-
-	sleep 5
-
-	clear
-
-elif [ $MultiHostVar3 = 'X' ]  && [ $GRE = 'N' ] && [ $MultiHostVar2 = 'Y' ] && [ -f /etc/network/openvswitch/sx1.info ] && [ -f /etc/network/openvswitch/sw1.info ]
-then
-	if   [ $Release -eq 7 ] || [ $Release -eq 8 ]
-	then
-		function GetSx1Index {
-			sudo cat /etc/network/openvswitch/sx1.info | cut -f2 -d':' | cut -f4 -d'.'
-		}
-
-	elif [ $Release -eq 6 ]
-	then
-		function GetSx1Index {
-			sudo cat /etc/network/openvswitch/sx1.info | cut -f3 -d':' | cut -f4 -d'.'
-		}
-	fi
-	Sx1Index=$(GetSx1Index)
-
-	if   [ $Release -eq 7 ] || [ $Release -eq 8 ]
-	then
-		function GetSw1Index {
-			sudo cat /etc/network/openvswitch/sw1.info | cut -f2 -d':' | cut -f4 -d'.'
-		}
-
-	elif [ $Release -eq 6 ]
-	then
-		function GetSw1Index {
-			sudo cat /etc/network/openvswitch/sw1.info | cut -f3 -d':' | cut -f4 -d'.'
-		}
-	fi
-	Sw1Index=$(GetSw1Index)
-else
-	Sw1Index=$MultiHostVar3
-	Sx1Index=$MultiHostVar3
-fi
-
-sudo sed -i "s/SWITCH_IP/$Sx1Index/g" /etc/network/openvswitch/crt_ovs_sx1.sh
-sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw1.sh
-sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw2.sh
-sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw3.sh
-sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw4.sh
-sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw5.sh
-sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw6.sh
-sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw7.sh
-sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw8.sh
-sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw9.sh
 
 if [ $GRE = 'Y' ]
 then
@@ -5543,6 +5742,11 @@ then
        		}
         	FileSystemTypeBtrfs=$(CheckFileSystemTypeBtrfs)
 
+	        function CheckFileSystemTypeZfs {
+			stat --file-system --format=%T /var/lib/lxc | grep -c zfs
+       		}
+        	FileSystemTypeZfs=$(CheckFileSystemTypeZfs)
+
 		function GetNameServerBase {
 			echo $NameServer | cut -f1 -d'-'
 		}
@@ -5551,7 +5755,7 @@ then
 		if [ $FileSystemTypeXfs -eq 1 ]
 		then
         		function GetFtype {
-                		xfs_info / | grep -c ftype=1
+                		xfs_info /var/lib/lxc | grep -c ftype=1
         		}
         		Ftype=$(GetFtype)
 
@@ -5564,18 +5768,10 @@ then
 
 			elif [ $Ftype -eq 1 ]
 			then
-				if [ $LinuxFlavor = 'Fedora' ] && [ $Release -eq 8 ]
-				then				
-	                		sudo lxc-stop -n $NameServer > /dev/null 2>&1
-					sudo lxc-copy -n $NameServer -N $NameServerBase -B overlayfs -s
-					NameServer=$NameServerBase
-					sudo lxc-start -n $NameServer
-				else
-	                		sudo lxc-stop -n $NameServer > /dev/null 2>&1
-					sudo lxc-copy -n $NameServer -N $NameServerBase -B overlayfs -s
-					NameServer=$NameServerBase
-					sudo lxc-start -n $NameServer
-				fi	
+	                	sudo lxc-stop -n $NameServer > /dev/null 2>&1
+				sudo lxc-copy -n $NameServer -N $NameServerBase -B overlayfs -s
+				NameServer=$NameServerBase
+				sudo lxc-start -n $NameServer
 			fi
 		fi
 
@@ -5598,6 +5794,7 @@ then
 					NameServer=$NameServerBase
 					sudo lxc-start -n $NameServer
 				fi
+
 			elif [ $LinuxFlavor = 'Oracle' ] 
 			then
 				if   [ $Release -eq 6 ] && [ $RHMV -eq 10 ]
@@ -5633,8 +5830,6 @@ then
 		if [ $FileSystemTypeBtrfs -eq 1 ]
 		then
 			sudo lxc-copy  -n $NameServer -N $NameServerBase -B overlayfs -s
- 		#	sudo lxc-copy  -n $NameServer -N $NameServerBase
-		#	sudo lxc-copy  -n $NameServer -n afns1
 			sleep 5
 			NameServer=$NameServerBase
 			sudo lxc-start -n $NameServer
@@ -5854,176 +6049,6 @@ then
         fi
 
         sudo lxc-ls -f
-fi
-
-sleep 5
-
-clear
-
-echo ''
-echo "=============================================="
-echo "Unpack SCST Linux SAN Files...                "
-echo "=============================================="
-echo ''
-
-sudo tar -xvf /opt/olxc/"$DistDir"/uekulele/archives/scst-files.tar -C / --touch
-	
-sudo chown -R $Owner:$Group		        /opt/olxc/home/scst-files/.
-sudo sed -i "s/\"SWITCH_IP\"/$Sw1Index/g"	/opt/olxc/home/scst-files/create-scst-target.sh
-
-echo ''
-echo "=============================================="
-echo "Done: Unpack SCST Linux SAN Files.            "
-echo "=============================================="
-echo ''
-
-sleep 5
-
-clear
-
-echo ''
-echo "=============================================="
-echo "Unpack TGT Linux SAN Files...                "
-echo "=============================================="
-echo ''
-
-sudo tar -xvf /opt/olxc/"$DistDir"/uekulele/archives/tgt-files.tar  -C / --touch
-	
-echo ''
-echo "=============================================="
-echo "Done: Unpack TGT Linux SAN Files.            "
-echo "=============================================="
-echo ''
-
-sleep 5
-
-clear
-
-if [ $Scst = 'Y' ]
-then
-	if [ $LinuxFlavor = 'Oracle' ]
-	then
-		if [ $Release -eq 8 ]
-		then
-			echo ''
-			echo "=============================================="
-			echo "Configure ZFS Storage ...                     "
-			echo "                                              "
-			echo "(some steps take awhile ... patience)         " 
-			echo "=============================================="
-			echo ''
-
-			sleep 5
-
-			clear
-
-			echo ''
-			echo "=============================================="
-			echo "Install packages ...                          "
-			echo "=============================================="
-			echo ''
-
-			sudo yum -y install kernel-uek-devel-$(uname -r) kernel-devel yum-utils
-			sleep 5
-			sudo rpm -Uvh https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
-			sudo yum-config-manager --enable epel 
-			sudo yum repolist
-			sudo yum -y install dkms
-			sudo rpm -Uvh http://download.zfsonlinux.org/epel/zfs-release.el`cat /etc/oracle-release | cut -f5 -d' ' | sed 's/\./_/'`.noarch.rpm
-
-			sleep 5
-
-			sudo yum -y install -y zfs
-			sudo modprobe zfs
-			sudo systemctl list-unit-files | grep zfs
-
-			echo ''
-			echo "=============================================="
-			echo "Done: Install packages.                       "
-			echo "=============================================="
-			echo ''
-
-		#	sudo sed -i "s/POOL/$StoragePoolName/g"		/opt/olxc/home/scst-files/create-scst-target.sh
-
-			function GetRevDomain1 {
-				echo "$Domain1" | awk -F. '{for (i=NF; i>0; --i) printf "%s%s", (i<NF ? "." : ""), $i; printf "\n"}'
-			}
-			RevDomain1=$(GetRevDomain1)
-
-			CurrentDir=`pwd`
-
-			cd /opt/olxc/home/scst-files
-			./create-scst.sh $LXDStorageDriver $RevDomain1 
-
-			sleep 5
-
-			sudo zpool create $StoragePoolName mirror /dev/zpool_luns/lxd_zfsa_"$Sw1Index"_00 /dev/zpool_luns/lxd_zfsm_"$Sw1Index"_00
-
-			echo ''
-			echo "=============================================="
-			echo "Update strt_scst.sh file if it exists...      "
-			echo "=============================================="
-			echo ''
-
-			if [ -f /etc/network/openvswitch/strt_scst.sh ]
-			then
-				function WhichModprobe {
-					which modprobe
-				}
-				ModProbe=$(WhichModprobe)
-
-				function WhichZpool {
-					which zpool
-				}
-				Zpool=$(WhichZpool)
-
-				function WhichSleep {
-				        which sleep
-				}
-				Sleep=$(WhichSleep)
-
-				sudo sh -c "echo '$Sleep 10'                    	>> /etc/network/openvswitch/strt_scst.sh"
-				sudo sh -c "echo '$ModProbe zfs'                	>> /etc/network/openvswitch/strt_scst.sh"
-				sudo sh -c "echo '$Zpool import $StoragePoolName'      	>> /etc/network/openvswitch/strt_scst.sh"
-				sudo cat /etc/network/openvswitch/strt_scst.sh
-			fi
-
-			echo ''
-			echo "=============================================="
-			echo "Done: Update strt_scst.sh file if it exists.  "
-			echo "=============================================="
-			echo ''
-
-			sleep 5
-
-			clear
-
-			echo ''
-			echo "=============================================="
-			echo "Update stop_scst.sh file if it exists.        "
-			echo "=============================================="
-			echo ''
-
-			if [ -f /etc/network/openvswitch/stop_scst.sh ]
-			then
-				function GetZpool2 {
-					echo $Zpool | sed 's/\//\\\//g'
-				}
-				Zpool2=$(GetZpool2)
-
-				sudo sed -i "s/bash/&\nzpool export $StoragePoolName/"  /etc/network/openvswitch/stop_scst.sh
-				sudo sed -i "s/zpool export/$Zpool2 export/"            /etc/network/openvswitch/stop_scst.sh
-			fi
-
-			echo ''
-			echo "=============================================="
-			echo "Done: Update stop_scst.sh file if it exists.  "
-			echo "=============================================="
-			echo ''
-
-			cd $CurrentDir
-		fi
-	fi
 fi
 
 sleep 5
