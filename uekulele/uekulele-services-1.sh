@@ -4419,7 +4419,7 @@ then
 
 				sleep 5
 
-				sudo zpool create $StoragePoolName mirror /dev/zfs_luns/lxd_zfsa_"$Sw1Index"_00 /dev/zfs_luns/lxd_zfsm_"$Sw1Index"_00
+				sudo zpool create $StoragePoolName mirror /dev/olx_luns/olx_"$Lun1Name"_"$Sw1Index"_00 /dev/olx_luns/olx_"$Lun2Name"_"$Sw1Index"_00
 
 				echo ''
 				echo "=============================================="
@@ -4452,7 +4452,7 @@ then
 					sudo sh -c "echo '$Sleep 10'                    				>> /etc/network/openvswitch/strt_scst.sh"
 					sudo sh -c "echo '$ModProbe zfs'                				>> /etc/network/openvswitch/strt_scst.sh"
 					sudo sh -c "echo '$Zpool import $StoragePoolName'      				>> /etc/network/openvswitch/strt_scst.sh"
-					sudo sh -c "echo '$Mount /dev/zfs_luns/lxd_zfsb_$Sw1Index_00 /var/lib/lxc'	>> /etc/network/openvswitch/strt_scst.sh"
+					sudo sh -c "echo '$Mount /dev/olx_luns/olx_$Lun3Name_$Sw1Index_00 /var/lib/lxc'	>> /etc/network/openvswitch/strt_scst.sh"
 					sudo cat /etc/network/openvswitch/strt_scst.sh
 				fi
 
@@ -4491,12 +4491,25 @@ then
 			
 			elif [ $LXDStorageDriver = 'btrfs' ]
 			then
-				sudo mkfs.xfs /dev/zfs_luns/lxd_zfsb_"$Sw1Index"_00 -f
-				sudo mount /dev/zfs_luns/lxd_zfsb_"$Sw1Index"_00 /var/lib/lxc
+				if   [ BtrfsRaid = 'raid0' ]
+				then
+					sudo mkfs.btrfs -d raid0 /dev/olx_luns/olx_"$Lun1Name"_"$Sw1Index"_00 /dev/olx_luns/olx_"$Lun2Name"_"$Sw1Index"_00
+
+				elif [ BtrfsRaid = 'raid10' ]
+				then
+					sudo mkfs.btrfs -m raid10 /dev/olx_luns/olx_"$Lun1Name"_"$Sw1Index"_00 /dev/olx_luns/olx_"$Lun2Name"_"$Sw1Index"_00
+				
+				elif [ BtrfsRaid = 'linear' ]
+				then
+					sudo mkfs.btrfs -d single /dev/olx_luns/olx_"$Lun1Name"_"$Sw1Index"_00 /dev/olx_luns/olx_"$Lun2Name"_"$Sw1Index"_00
+				fi
+
+			# edit	sudo mount /dev/olx_luns/olx_"$Lun3Name"_"$Sw1Index"_00 /var/lib/lxc
+
 			fi
 			
-			sudo mkfs.xfs /dev/zfs_luns/lxd_zfsb_"$Sw1Index"_00 -f
-			sudo mount /dev/zfs_luns/lxd_zfsb_"$Sw1Index"_00 /var/lib/lxc
+			sudo mkfs.xfs /dev/olx_luns/olx_"$Lun3Name"_"$Sw1Index"_00 -f
+			sudo mount /dev/olx_luns/olx_"$Lun3Name"_"$Sw1Index"_00 /var/lib/lxc
 
 			cd $CurrentDir
 		fi

@@ -1388,6 +1388,49 @@ function GetMultiHostVar21 {
 MultiHostVar21=$(GetMultiHostVar21)
 Scst=$MultiHostVar21
 
+function GetMultiHostVar22 {
+        echo $MultiHost | cut -f22 -d':'
+}
+MultiHostVar22=$(GetMultiHostVar22)
+Lun1Name=$MultiHostVar22
+
+function GetMultiHostVar23 {
+        echo $MultiHost | cut -f23 -d':'
+}
+MultiHostVar23=$(GetMultiHostVar23)
+Lun2Name=$MultiHostVar23
+
+function GetMultiHostVar24 {
+        echo $MultiHost | cut -f24 -d':'
+}
+MultiHostVar24=$(GetMultiHostVar24)
+Lun3Name=$MultiHostVar24
+
+function GetMultiHostVar25 {
+        echo $MultiHost | cut -f25 -d':'
+}
+MultiHostVar25=$(GetMultiHostVar25)
+Lun1Size=$MultiHostVar25
+
+function GetMultiHostVar26 {
+        echo $MultiHost | cut -f26 -d':'
+}
+MultiHostVar26=$(GetMultiHostVar26)
+Lun2Size=$MultiHostVar26
+
+function GetMultiHostVar27 {
+        echo $MultiHost | cut -f27 -d':'
+}
+MultiHostVar27=$(GetMultiHostVar27)
+Lun3Size=$MultiHostVar27
+
+function GetMultiHostVar28 {
+        echo $MultiHost | cut -f28 -d':'
+}
+MultiHostVar28=$(GetMultiHostVar28)
+LogBlkSz=$MultiHostVar28
+
+
 	echo 'Docker			  = '$Docker
 	echo 'K8S                  	  = '$K8S
 
@@ -1518,6 +1561,62 @@ then
 	echo 'SCST			  = '$Scst
 else
 	echo 'SCST			  = '$MultiHostVar21
+fi
+
+if [ -z $Lun1Name ]
+then
+	Lun1Name=lun1
+	echo 'Lun1Name			  = '$Lun1Name
+else
+	echo 'Lun1Name			  = '$Lun1Name
+fi
+
+if [ -z $Lun2Name ]
+then
+	Lun2Name=lun2
+	echo 'Lun2Name			  = '$Lun2Name
+else
+	echo 'Lun2Name			  = '$Lun2Name
+fi
+
+if [ -z $Lun3Name ]
+then
+	Lun3Name=lun3
+	echo 'Lun3Name			  = '$Lun3Name
+else
+	echo 'Lun3Name			  = '$Lun3Name
+fi
+
+if [ -z $Lun1Size ]
+then
+	Lun1Size=1G
+	echo 'Lun1Size			  = '$Lun1Size
+else
+	echo 'Lun1Size			  = '$Lun1Size
+fi
+
+if [ -z $Lun2Size ]
+then
+	Lun2Size=1G
+	echo 'Lun2Size			  = '$Lun2Size
+else
+	echo 'Lun2Size			  = '$Lun2Size
+fi
+
+if [ -z $Lun3Size ]
+then
+	Lun3Size=1G
+	echo 'Lun3Size			  = '$Lun3Size
+else
+	echo 'Lun3Size			  = '$Lun3Size
+fi
+
+if [ -z $LogBlkSz ]
+then
+	LogBlkSz=512
+	echo 'LogBlkSz			  = '$LogBlkSz
+else
+	echo 'LogBlkSz			  = '$LogBlkSz
 fi
 
 echo ''
