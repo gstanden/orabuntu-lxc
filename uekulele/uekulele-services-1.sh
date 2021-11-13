@@ -193,6 +193,48 @@ function GetMultiHostVar21 {
 MultiHostVar21=$(GetMultiHostVar21)
 Scst=$MultiHostVar21
 
+function GetMultiHostVar22 {
+        echo $MultiHost | cut -f22 -d':'
+}
+MultiHostVar22=$(GetMultiHostVar22)
+Lun1Name=$MultiHostVar22
+
+function GetMultiHostVar23 {
+        echo $MultiHost | cut -f23 -d':'
+}
+MultiHostVar23=$(GetMultiHostVar23)
+Lun2Name=$MultiHostVar23
+
+function GetMultiHostVar24 {
+        echo $MultiHost | cut -f24 -d':'
+}
+MultiHostVar24=$(GetMultiHostVar24)
+Lun3Name=$MultiHostVar24
+
+function GetMultiHostVar25 {
+        echo $MultiHost | cut -f25 -d':'
+}
+MultiHostVar25=$(GetMultiHostVar25)
+Lun1Size=$MultiHostVar25
+
+function GetMultiHostVar26 {
+        echo $MultiHost | cut -f26 -d':'
+}
+MultiHostVar26=$(GetMultiHostVar26)
+Lun2Size=$MultiHostVar26
+
+function GetMultiHostVar27 {
+        echo $MultiHost | cut -f27 -d':'
+}
+MultiHostVar27=$(GetMultiHostVar27)
+Lun3Size=$MultiHostVar27
+
+function GetMultiHostVar28 {
+        echo $MultiHost | cut -f28 -d':'
+}
+MultiHostVar28=$(GetMultiHostVar28)
+LogBlkSz=$MultiHostVar28
+
 function CheckSystemdResolvedInstalled {
         sudo netstat -ulnp | grep 53 | sed 's/  */ /g' | rev | cut -f1 -d'/' | rev | sort -u | grep systemd- | wc -l
 }
@@ -4325,130 +4367,136 @@ then
 	then
 		if [ $Release -eq 8 ]
 		then
-			echo ''
-			echo "=============================================="
-			echo "Configure ZFS Storage ...                     "
-			echo "                                              "
-			echo "(some steps take awhile ... patience)         " 
-			echo "=============================================="
-			echo ''
+			if [ $LXDStorageDriver = 'zfs' ]
+			then
+				echo ''
+				echo "=============================================="
+				echo "Configure ZFS Storage ...                     "
+				echo "                                              "
+				echo "(some steps take awhile ... patience)         " 
+				echo "=============================================="
+				echo ''
 
-			sleep 5
+				sleep 5
 
-			clear
+				clear
 
-			echo ''
-			echo "=============================================="
-			echo "Install packages ...                          "
-			echo "=============================================="
-			echo ''
+				echo ''
+				echo "=============================================="
+				echo "Install packages ...                          "
+				echo "=============================================="
+				echo ''
 
-			sudo yum -y install kernel-uek-devel-$(uname -r) kernel-devel yum-utils
-			sleep 5
-			sudo rpm -Uvh https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
-			sudo yum-config-manager --enable epel 
-			sudo yum repolist
-			sudo yum -y install dkms
-			sudo rpm -Uvh http://download.zfsonlinux.org/epel/zfs-release.el`cat /etc/oracle-release | cut -f5 -d' ' | sed 's/\./_/'`.noarch.rpm
+				sudo yum -y install kernel-uek-devel-$(uname -r) kernel-devel yum-utils
+				sleep 5
+				sudo rpm -Uvh https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
+				sudo yum-config-manager --enable epel 
+				sudo yum repolist
+				sudo yum -y install dkms
+				sudo rpm -Uvh http://download.zfsonlinux.org/epel/zfs-release.el`cat /etc/oracle-release | cut -f5 -d' ' | sed 's/\./_/'`.noarch.rpm
 
-			sleep 5
+				sleep 5
 
-			sudo yum -y install -y zfs
-			sudo modprobe zfs
-			sudo systemctl list-unit-files | grep zfs
+				sudo yum -y install -y zfs
+				sudo modprobe zfs
+				sudo systemctl list-unit-files | grep zfs
 
-			echo ''
-			echo "=============================================="
-			echo "Done: Install packages.                       "
-			echo "=============================================="
-			echo ''
+				echo ''
+				echo "=============================================="
+				echo "Done: Install packages.                       "
+				echo "=============================================="
+				echo ''
 
-		#	sudo sed -i "s/POOL/$StoragePoolName/g"		/opt/olxc/home/scst-files/create-scst-target.sh
+				function GetRevDomain1 {
+					echo "$Domain1" | awk -F. '{for (i=NF; i>0; --i) printf "%s%s", (i<NF ? "." : ""), $i; printf "\n"}'
+				}
+				RevDomain1=$(GetRevDomain1)
 
-			function GetRevDomain1 {
-				echo "$Domain1" | awk -F. '{for (i=NF; i>0; --i) printf "%s%s", (i<NF ? "." : ""), $i; printf "\n"}'
-			}
-			RevDomain1=$(GetRevDomain1)
+				CurrentDir=`pwd`
 
-			CurrentDir=`pwd`
+				cd /opt/olxc/home/scst-files
+				./create-scst.sh $LXDStorageDriver $RevDomain1 $Lun1name $Lun2Name $Lun3Name $Lun1Size $Lun2Size $Lun3Size $LogBlkSz
 
-			cd /opt/olxc/home/scst-files
-			./create-scst.sh $LXDStorageDriver $RevDomain1 
+				sleep 5
 
-			sleep 5
+				sudo zpool create $StoragePoolName mirror /dev/zfs_luns/lxd_zfsa_"$Sw1Index"_00 /dev/zfs_luns/lxd_zfsm_"$Sw1Index"_00
 
-			sudo zpool create $StoragePoolName mirror /dev/zfs_luns/lxd_zfsa_"$Sw1Index"_00 /dev/zfs_luns/lxd_zfsm_"$Sw1Index"_00
+				echo ''
+				echo "=============================================="
+				echo "Update strt_scst.sh file if it exists...      "
+				echo "=============================================="
+				echo ''
 
+				if [ -f /etc/network/openvswitch/strt_scst.sh ]
+				then
+					function WhichModprobe {
+						which modprobe
+					}
+					ModProbe=$(WhichModprobe)
+	
+					function WhichZpool {
+						which zpool
+					}
+					Zpool=$(WhichZpool)
+	
+					function WhichSleep {
+					        which sleep
+					}
+					Sleep=$(WhichSleep)
+					
+					function WhichMount {
+					        which mount 
+					}
+					Mount=$(WhichMount)
+	
+					sudo sh -c "echo '$Sleep 10'                    				>> /etc/network/openvswitch/strt_scst.sh"
+					sudo sh -c "echo '$ModProbe zfs'                				>> /etc/network/openvswitch/strt_scst.sh"
+					sudo sh -c "echo '$Zpool import $StoragePoolName'      				>> /etc/network/openvswitch/strt_scst.sh"
+					sudo sh -c "echo '$Mount /dev/zfs_luns/lxd_zfsb_$Sw1Index_00 /var/lib/lxc'	>> /etc/network/openvswitch/strt_scst.sh"
+					sudo cat /etc/network/openvswitch/strt_scst.sh
+				fi
+
+				echo ''
+				echo "=============================================="
+				echo "Done: Update strt_scst.sh file if it exists.  "
+				echo "=============================================="
+				echo ''
+	
+				sleep 5
+	
+				clear
+	
+				echo ''
+				echo "=============================================="
+				echo "Update stop_scst.sh file if it exists.        "
+				echo "=============================================="
+				echo ''
+	
+				if [ -f /etc/network/openvswitch/stop_scst.sh ]
+				then
+					function GetZpool2 {
+						echo $Zpool | sed 's/\//\\\//g'
+					}
+					Zpool2=$(GetZpool2)
+	
+					sudo sed -i "s/bash/&\nzpool export $StoragePoolName/"  /etc/network/openvswitch/stop_scst.sh
+					sudo sed -i "s/zpool export/$Zpool2 export/"            /etc/network/openvswitch/stop_scst.sh
+				fi
+
+				echo ''
+				echo "=============================================="
+				echo "Done: Update stop_scst.sh file if it exists.  "
+				echo "=============================================="
+				echo ''
+			
+			elif [ $LXDStorageDriver = 'btrfs' ]
+			then
+				sudo mkfs.xfs /dev/zfs_luns/lxd_zfsb_"$Sw1Index"_00 -f
+				sudo mount /dev/zfs_luns/lxd_zfsb_"$Sw1Index"_00 /var/lib/lxc
+			fi
+			
 			sudo mkfs.xfs /dev/zfs_luns/lxd_zfsb_"$Sw1Index"_00 -f
 			sudo mount /dev/zfs_luns/lxd_zfsb_"$Sw1Index"_00 /var/lib/lxc
-
-			echo ''
-			echo "=============================================="
-			echo "Update strt_scst.sh file if it exists...      "
-			echo "=============================================="
-			echo ''
-
-			if [ -f /etc/network/openvswitch/strt_scst.sh ]
-			then
-				function WhichModprobe {
-					which modprobe
-				}
-				ModProbe=$(WhichModprobe)
-
-				function WhichZpool {
-					which zpool
-				}
-				Zpool=$(WhichZpool)
-
-				function WhichSleep {
-				        which sleep
-				}
-				Sleep=$(WhichSleep)
-				
-				function WhichMount {
-				        which mount 
-				}
-				Mount=$(WhichMount)
-
-				sudo sh -c "echo '$Sleep 10'                    				>> /etc/network/openvswitch/strt_scst.sh"
-				sudo sh -c "echo '$ModProbe zfs'                				>> /etc/network/openvswitch/strt_scst.sh"
-				sudo sh -c "echo '$Zpool import $StoragePoolName'      				>> /etc/network/openvswitch/strt_scst.sh"
-				sudo sh -c "echo '$Mount /dev/zfs_luns/lxd_zfsb_"$Sw1Index"_00 /var/lib/lxc	>> /etc/network/openvswitch/strt_scst.sh"
-				sudo cat /etc/network/openvswitch/strt_scst.sh
-			fi
-
-			echo ''
-			echo "=============================================="
-			echo "Done: Update strt_scst.sh file if it exists.  "
-			echo "=============================================="
-			echo ''
-
-			sleep 5
-
-			clear
-
-			echo ''
-			echo "=============================================="
-			echo "Update stop_scst.sh file if it exists.        "
-			echo "=============================================="
-			echo ''
-
-			if [ -f /etc/network/openvswitch/stop_scst.sh ]
-			then
-				function GetZpool2 {
-					echo $Zpool | sed 's/\//\\\//g'
-				}
-				Zpool2=$(GetZpool2)
-
-				sudo sed -i "s/bash/&\nzpool export $StoragePoolName/"  /etc/network/openvswitch/stop_scst.sh
-				sudo sed -i "s/zpool export/$Zpool2 export/"            /etc/network/openvswitch/stop_scst.sh
-			fi
-
-			echo ''
-			echo "=============================================="
-			echo "Done: Update stop_scst.sh file if it exists.  "
-			echo "=============================================="
-			echo ''
 
 			cd $CurrentDir
 		fi

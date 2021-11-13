@@ -227,8 +227,16 @@ LOGEXT=`date +"%Y-%m-%d.%R:%S"`
 
 TunType=$(source "$DistDir"/anylinux/CONFIG; echo $TunType)
 
-# SCST setting
+###################### SCST settings ###########################
+
 Scst=$(source "$DistDir"/anylinux/CONFIG; echo $Scst)
+Lun1Name=$(source "$DistDir"/anylinux/CONFIG; echo $Lun1Name)
+Lun2Name=$(source "$DistDir"/anylinux/CONFIG; echo $Lun2Name)
+Lun3Name=$(source "$DistDir"/anylinux/CONFIG; echo $Lun3Name)
+Lun1Size=$(source "$DistDir"/anylinux/CONFIG; echo $Lun1Size)
+Lun2Size=$(source "$DistDir"/anylinux/CONFIG; echo $Lun2Size)
+Lun3Size=$(source "$DistDir"/anylinux/CONFIG; echo $Lun3Size)
+LogBlkSz=$(source "$DistDir"/anylinux/CONFIG; echo $LogBlkSz)
 
 ################e Kubernetes Install Flag  ######################
 
@@ -475,7 +483,7 @@ then
 	fi
 
 else
-	MultiHost="$Operation:N:1:X:X:X:$MTU:X:X:$GRE:$Product:$LXD:$K8S:$PreSeed:$LXDCluster:$LXDStorageDriver:$StoragePoolName:$BtrfsLun:$Docker:$TunType:$Scst"
+	MultiHost="$Operation:N:1:X:X:X:$MTU:X:X:$GRE:$Product:$LXD:$K8S:$PreSeed:$LXDCluster:$LXDStorageDriver:$StoragePoolName:$BtrfsLun:$Docker:$TunType:$Scst:$Lun1Name:$Lun2Name:$Lun3Name:$Lun1Size:$Lun2Size:$Lun3Size:$LogBlkSz"
 fi
 
 ./anylinux-services.sh $MultiHost 

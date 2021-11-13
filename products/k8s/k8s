@@ -410,16 +410,16 @@ chmod +x *.sh
 ./cont-centos8-create.sh $CGROUP_SUFFIX
 ./host-oracle8.sh $CGROUP_SUFFIX
 ./cont-centos8-push.sh $CGROUP_SUFFIX
-./cont-centos8-exec-kmaster.sh $CGROUP_SUFFIX
-./cont-centos8-exec-kworker1.sh $CGROUP_SUFFIX
-./cont-centos8-exec-kworker2.sh $CGROUP_SUFFIX
+./cont-centos8-exec-maestro.sh $CGROUP_SUFFIX
+./cont-centos8-exec-violin1.sh $CGROUP_SUFFIX
+./cont-centos8-exec-violin2.sh $CGROUP_SUFFIX
 ./cont-centos8-push-kube.sh $CGROUP_SUFFIX
 
 #######################################
 # To be executed only on master nodes #
 #######################################
 
-eval echo "'/var/lib/snapd/snap/bin/lxc exec kmaster -- /root/cont-centos8-5.sh' | sg lxd $CGROUP_SUFFIX"
+eval echo "'/var/lib/snapd/snap/bin/lxc exec maestro -- /root/cont-centos8-5.sh' | sg lxd $CGROUP_SUFFIX"
 
 #######################################
 # To be executed only on worker nodes #
