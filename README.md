@@ -5,6 +5,7 @@ Announcing Orabuntu-LXC/D v7.0.0-alpha ELENA ("**E**nterprise **L**XD **E**ditio
 New features of Orabuntu-LXC/D v7.0.0-alpha ELENA:
 
 * Automated LXD N-node clusters on OVS VLAN's on CentOS, Fedora, RedHat, Ubuntu & Oracle Linux.
+* Integrated SCST Linux SAN storage layer for LXD ZFS storage pool and LXC filesystem.
 * Optional YACK ("Yet Another Containerized Kubernetes") LXD-containerized k-maestro and two k-violins.
 * User-selectable tunnel-type for multi-host deployments [ gre | geneve | vxlan ]. 
 * New /anylinux/CONFIG file which centralizes deployment configuration parameters.
