@@ -543,6 +543,7 @@ then
 
 	sudo firewall-cmd --zone=$Zone --list-all
 	
+	echo ''
 	echo "=============================================="
 	echo "Done: List all for zone=$Zone.                "
 	echo "=============================================="
@@ -793,7 +794,8 @@ then
 	echo "21. 'Run process under group on solaris (StackExchange)' meuh https://unix.stackexchange.com/questions/402996/run-process-under-group-on-solaris"
 	echo "22. 'Fedora 32: Error Could not resolve host' Humble https://www.humblec.com/fedora-32-error-could-not-resolve-host-while-building-docker-containers/"
 	echo "23. 'Bug 1454584 - firewall-cmd generates bad iptables rule for GRE' gorshkov https://bugzilla.redhat.com/show_bug.cgi?id=1454584"
-	echo "23. 'nohup as background task does NOT return prompt' Devon https://stackoverflow.com/questions/23024850/nohup-as-background-task-does-not-return-prompt"
+	echo "24. 'nohup as background task does NOT return prompt' Devon https://stackoverflow.com/questions/23024850/nohup-as-background-task-does-not-return-prompt"
+	echo "25. 'How to ignore a set of Mac addresses in dhcpd.conf?' Dusty Campbell https://serverfault.com/questions/91643/how-to-ignore-a-set-of-mac-addresses-in-dhcpd-conf"
 	echo ''
 	echo "Acknowledgements"
 	echo ''
@@ -1326,9 +1328,9 @@ function GetMultiHostVar14 {
         echo $MultiHost | cut -f14 -d':'
 }
 MultiHostVar14=$(GetMultiHostVar14)
-PreSeed=$MultiHostVar14
+LXDPreSeed=$MultiHostVar14
 
-	echo 'LXD Cluster PreSeed       = '$PreSeed
+	echo 'LXD Cluster PreSeed       = '$LXDPreSeed
 
 function GetMultiHostVar15 {
         echo $MultiHost | cut -f15 -d':'
@@ -1355,13 +1357,13 @@ function GetMultiHostVar17 {
         echo $MultiHost | cut -f17 -d':'
 }
 MultiHostVar17=$(GetMultiHostVar17)
-StoragePoolName=$MultiHostVar17
+LXDStoragePoolName=$MultiHostVar17
 
 if [ $LXDCluster = 'Y' ]
 then
-	echo 'StoragePoolName           = '$StoragePoolName
+	echo 'LXDStoragePoolName        = '$LXDStoragePoolName
 else
-	echo 'StoragePoolName           = Unused'
+	echo 'LXDStoragePoolName        = Unused'
 fi
 
 function GetMultiHostVar18 {
@@ -1430,15 +1432,89 @@ function GetMultiHostVar28 {
 MultiHostVar28=$(GetMultiHostVar28)
 LogBlkSz=$MultiHostVar28
 
+function GetMultiHostVar29 {
+        echo $MultiHost | cut -f29 -d':'
+}
+MultiHostVar29=$(GetMultiHostVar29)
+BtrfsRaid=$MultiHostVar29
+
+function GetMultiHostVar30 {
+        echo $MultiHost | cut -f30 -d':'
+}
+MultiHostVar30=$(GetMultiHostVar30)
+ZfsMirror=$MultiHostVar30
+
+function GetMultiHostVar31 {
+        echo $MultiHost | cut -f31 -d':'
+}
+MultiHostVar31=$(GetMultiHostVar31)
+BtrfsLun2=$MultiHostVar31
+
+function GetMultiHostVar32 {
+        echo $MultiHost | cut -f32 -d':'
+}
+MultiHostVar32=$(GetMultiHostVar32)
+ZfsLun1=$MultiHostVar32
+
+function GetMultiHostVar33 {
+        echo $MultiHost | cut -f33 -d':'
+}
+MultiHostVar33=$(GetMultiHostVar33)
+ZfsLun2=$MultiHostVar33
+
+function GetMultiHostVar34 {
+        echo $MultiHost | cut -f34 -d':'
+}
+MultiHostVar34=$(GetMultiHostVar34)
+LxcLun1=$MultiHostVar34
+
+function GetMultiHostVar35 {
+        echo $MultiHost | cut -f35 -d':'
+}
+MultiHostVar35=$(GetMultiHostVar35)
+ScstLunPrefix=$MultiHostVar35
 
 	echo 'Docker			  = '$Docker
 	echo 'K8S                  	  = '$K8S
 
-if [ $LinuxFlavor = 'Oracle' ] && [ $LXDCluster = 'Y' ]
+if [ -z $BtrfsLun1 ]
 then
-	echo 'BtrfsLun                  = '$BtrfsLun
+	BtrfsLun1=Unused	
+	echo 'BtrfsLun1		  = '$BtrfsLun1
 else
-	echo 'BtrfsLun		  = Unused'
+	echo 'BtrfsLun1		  = '$BtrfsLun1
+fi
+
+if [ -z $BtrfsLun2 ]
+then
+	BtrfsLun2=Unused	
+	echo 'BtrfsLun2		  = '$BtrfsLun2
+else
+	echo 'BtrfsLun2		  = '$BtrfsLun2
+fi
+
+if [ -z $ZfsLun1 ]
+then
+	ZfsLun1=Unused	
+	echo 'ZfsLun1		  	  = '$ZfsLun1
+else
+	echo 'ZfsLun1		  	  = '$ZfsLun1
+fi
+
+if [ -z $ZfsLun2 ]
+then
+	ZfsLun2=Unused	
+	echo 'ZfsLun2		  	  = '$ZfsLun2
+else
+	echo 'ZfsLun2		  	  = '$ZfsLun2
+fi
+
+if [ -z $LxcLun1 ]
+then
+	LxcLun1=Unused	
+	echo 'LxcLun1	  	  	  = '$LxcLun1
+else
+	echo 'LxcLun1		  	  = '$LxcLun1
 fi
 
 if   [ $MultiHostVar3 = 'X' ] && [ $GREValue = 'Y' ]
@@ -1563,60 +1639,84 @@ else
 	echo 'SCST			  = '$MultiHostVar21
 fi
 
+if [ -z $ScstLunPrefix ]
+then
+	ScstLunPrefix=lxc
+	echo 'ScstLunPrefix		  = '$ScstLunPrefix
+else
+	echo 'ScstLunPrefix		  = '$ScstLunPrefix
+fi
+
 if [ -z $Lun1Name ]
 then
 	Lun1Name=lun1
-	echo 'Lun1Name			  = '$Lun1Name
+	echo 'Lun1Name		  = '$Lun1Name
 else
-	echo 'Lun1Name			  = '$Lun1Name
+	echo 'Lun1Name		  = '$Lun1Name
 fi
 
 if [ -z $Lun2Name ]
 then
 	Lun2Name=lun2
-	echo 'Lun2Name			  = '$Lun2Name
+	echo 'Lun2Name		  = '$Lun2Name
 else
-	echo 'Lun2Name			  = '$Lun2Name
+	echo 'Lun2Name		  = '$Lun2Name
 fi
 
 if [ -z $Lun3Name ]
 then
 	Lun3Name=lun3
-	echo 'Lun3Name			  = '$Lun3Name
+	echo 'Lun3Name		  = '$Lun3Name
 else
-	echo 'Lun3Name			  = '$Lun3Name
+	echo 'Lun3Name		  = '$Lun3Name
 fi
 
 if [ -z $Lun1Size ]
 then
 	Lun1Size=1G
-	echo 'Lun1Size			  = '$Lun1Size
+	echo 'Lun1Size		  = '$Lun1Size
 else
-	echo 'Lun1Size			  = '$Lun1Size
+	echo 'Lun1Size		  = '$Lun1Size
 fi
 
 if [ -z $Lun2Size ]
 then
 	Lun2Size=1G
-	echo 'Lun2Size			  = '$Lun2Size
+	echo 'Lun2Size		  = '$Lun2Size
 else
-	echo 'Lun2Size			  = '$Lun2Size
+	echo 'Lun2Size		  = '$Lun2Size
 fi
 
 if [ -z $Lun3Size ]
 then
 	Lun3Size=1G
-	echo 'Lun3Size			  = '$Lun3Size
+	echo 'Lun3Size		  = '$Lun3Size
 else
-	echo 'Lun3Size			  = '$Lun3Size
+	echo 'Lun3Size		  = '$Lun3Size
 fi
 
 if [ -z $LogBlkSz ]
 then
 	LogBlkSz=512
-	echo 'LogBlkSz			  = '$LogBlkSz
+	echo 'LogBlkSz		  = '$LogBlkSz
 else
-	echo 'LogBlkSz			  = '$LogBlkSz
+	echo 'LogBlkSz		  = '$LogBlkSz
+fi
+
+if [ -z $BtrfsRaid ]
+then
+	BtrfsRaid=none
+	echo 'BtrfsRaid		  = '$BtrfsRaid
+else
+	echo 'BtrfsRaid		  = '$BtrfsRaid
+fi
+
+if [ -z $ZfsMirror ]
+then
+	ZfsMirror=mirror
+	echo 'ZfsMirror		  = '$ZfsMirror
+else
+	echo 'ZfsMirror		  = '$ZfsMirror
 fi
 
 echo ''

@@ -5,8 +5,7 @@ Announcing Orabuntu-LXC/D v7.0.0-alpha ELENA ("**E**nterprise **L**XD **E**ditio
 New features of Orabuntu-LXC/D v7.0.0-alpha ELENA:
 
 * Automated LXD N-node clusters on OVS VLAN's on CentOS, Fedora, RedHat, Ubuntu & Oracle Linux.
-* Integrated SCST Linux SAN storage layer for LXD ZFS storage pool and LXC filesystem.
-* Optional YACK ("Yet Another Containerized Kubernetes") LXD-containerized k-maestro and two k-violins.
+* Optional Kubernetes LXD-containerized controller and two worker nodes *(under development in master branch)
 * User-selectable tunnel-type for multi-host deployments [ gre | geneve | vxlan ]. 
 * New /anylinux/CONFIG file which centralizes deployment configuration parameters.
 * Adds support for nftables and firewalld for LXD clusters and LXC multi-host "spanned" networks.
@@ -21,7 +20,7 @@ Orabuntu-LXC/D ELENA BUILDS EVERYTHING itself for the currently supported distro
 * Fedora 22-35+ (tested on 22, 24, 29, 33 and 34)
 * RedHat 6.x, 7.x, 8.x
 
-**Note 1**:  Linux 6 being de-supported by major Linux vendors. Orabuntu-LXC support for Linux 6 is "best effort."
+**Note 1**:  Linux 6 being de-supported by major Linux vendors. Orabuntu-LXC support for Linux 6 is "best effort" basis only.
 
 **Note 2**:  Orabuntu-LXC SCST: de-support pending for kernels older than 2.6 (notified by SCST maintainers).
 

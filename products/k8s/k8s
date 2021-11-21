@@ -389,7 +389,7 @@ tar -xvf /opt/olxc/"$DistDir"/"$SubDirName"/archives/product.tar -C /opt/olxc/"$
 cd kubernetes-master/lxd-provisioning
 
 # Temporary workaround until kubernetes v1.23 is released on December 7,2021
-cp -p ~/kube* .
+# cp -p ~/kube* .
 
 chmod +x *.sh
 ./cont-centos8-create.sh $NameServer
@@ -398,13 +398,19 @@ chmod +x *.sh
 ./cont-centos8-exec-maestro.sh 
 ./cont-centos8-exec-violin1.sh 
 ./cont-centos8-exec-violin2.sh 
-./cont-centos8-push-kube.sh 
+./cont-centos8-push-ingress-nginx-examples.sh
+./cont-centos8-push-configmap.sh
+./cont-centos8-push-ingress-nginx-yaml.sh
 
 #######################################
 # Run only on maestro nodes           #
 #######################################
 
 eval echo "'/var/lib/snapd/snap/bin/lxc exec maestro -- /root/cont-centos8-5.sh' | sg lxd"
+# metallb load balancer deployment
+eval echo "'/var/lib/snapd/snap/bin/lxc exec maestro -- /root/cont-centos8-6.sh' | sg lxd"
+# ingress-nginx deployment
+eval echo "'/var/lib/snapd/snap/bin/lxc exec maestro -- /root/cont-centos8-7.sh' | sg lxd"
 
 #######################################
 # Run only on violin nodes            #

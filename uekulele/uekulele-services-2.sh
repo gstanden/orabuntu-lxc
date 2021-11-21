@@ -867,7 +867,7 @@ then
 		sleep 5
 
 		sudo chmod 775  	/opt/olxc/"$DistDir"/uekulele/archives/lxd_install_uekulele.sh
-		sudo su - ubuntu 	/opt/olxc/"$DistDir"/uekulele/archives/lxd_install_uekulele.sh $PreSeed $LXDCluster $GREValue $Release $MultiHost
+		sudo su - ubuntu 	/opt/olxc/"$DistDir"/uekulele/archives/lxd_install_uekulele.sh $PreSeed $LXDCluster $GREValue $Release $MultiHost $LXDStorageDriver
 
 		echo ''
 		echo "=============================================="

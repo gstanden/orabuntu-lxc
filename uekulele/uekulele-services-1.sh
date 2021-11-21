@@ -72,9 +72,6 @@ function GetOvsVersion {
 }
 OvsVersion=$(GetOvsVersion)
 
-# MultiHost for reference
-# MultiHost="$Operation:Y:X:X:$HUBIP:$SPOKEIP:$MTU:$HubUserAct:$HubSudoPwd:$GRE:$Product:$LXD:$K8S:$PreSeed:$LXDCluster:$LXDStorageDriver:$StoragePoolName:$BtrfsLun"
-
 function GetMultiHostVar1 {
 	echo $MultiHost | cut -f1 -d':'
 }
@@ -149,7 +146,7 @@ function GetMultiHostVar14 {
         echo $MultiHost | cut -f14 -d':'
 }
 MultiHostVar14=$(GetMultiHostVar14)
-PreSeed=$MultiHostVar14
+LXDPreSeed=$MultiHostVar14
 
 function GetMultiHostVar15 {
         echo $MultiHost | cut -f15 -d':'
@@ -234,6 +231,48 @@ function GetMultiHostVar28 {
 }
 MultiHostVar28=$(GetMultiHostVar28)
 LogBlkSz=$MultiHostVar28
+
+function GetMultiHostVar29 {
+        echo $MultiHost | cut -f29 -d':'
+}
+MultiHostVar29=$(GetMultiHostVar29)
+BtrfsRaid=$MultiHostVar29
+
+function GetMultiHostVar30 {
+        echo $MultiHost | cut -f30 -d':'
+}
+MultiHostVar30=$(GetMultiHostVar30)
+ZfsMirror=$MultiHostVar30
+
+function GetMultiHostVar31 {
+        echo $MultiHost | cut -f31 -d':'
+}
+MultiHostVar31=$(GetMultiHostVar31)
+BtrfsLun2=$MultiHostVar31
+
+function GetMultiHostVar32 {
+        echo $MultiHost | cut -f32 -d':'
+}
+MultiHostVar32=$(GetMultiHostVar32)
+ZfsLun1=$MultiHostVar32
+
+function GetMultiHostVar33 {
+        echo $MultiHost | cut -f33 -d':'
+}
+MultiHostVar33=$(GetMultiHostVar33)
+ZfsLun2=$MultiHostVar33
+
+function GetMultiHostVar34 {
+        echo $MultiHost | cut -f34 -d':'
+}
+MultiHostVar34=$(GetMultiHostVar34)
+LxcLun1=$MultiHostVar34
+
+function GetMultiHostVar35 {
+        echo $MultiHost | cut -f35 -d':'
+}
+MultiHostVar35=$(GetMultiHostVar35)
+ScstLunPrefix=$MultiHostVar35
 
 function CheckSystemdResolvedInstalled {
         sudo netstat -ulnp | grep 53 | sed 's/  */ /g' | rev | cut -f1 -d'/' | rev | sort -u | grep systemd- | wc -l
@@ -4361,52 +4400,72 @@ sleep 5
 
 clear
 
-if [ $Scst = 'Y' ]
+function CheckZfsInstalled {
+	rpm -qa | egrep -c 'zfs-dkms|zfs|zfs-release|libzfs'
+}
+ZfsInstalled=$(CheckZfsInstalled)
+
+if [ $LinuxFlavor = 'Oracle' ] && [ $ZfsInstalled -lt 4 ]
 then
-	if [ $LinuxFlavor = 'Oracle' ]
+	if [ $Release -eq 8 ]
 	then
-		if [ $Release -eq 8 ]
+		if [ $LXDStorageDriver = 'zfs' ]
 		then
-			if [ $LXDStorageDriver = 'zfs' ]
+			echo ''
+			echo "=============================================="
+			echo "Install ZFS ...                               "
+			echo "                                              "
+			echo "(some steps take awhile ... patience)         " 
+			echo "=============================================="
+			echo ''
+
+			sleep 5
+
+			clear
+
+			echo ''
+			echo "=============================================="
+			echo "Install packages ...                          "
+			echo "=============================================="
+			echo ''
+
+			sudo yum -y install kernel-uek-devel-$(uname -r) kernel-devel yum-utils
+			sleep 5
+			sudo rpm -Uvh https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
+			sudo yum-config-manager --enable epel 
+			sudo yum repolist
+			sudo yum -y install dkms
+			sudo rpm -Uvh http://download.zfsonlinux.org/epel/zfs-release.el`cat /etc/oracle-release | cut -f5 -d' ' | sed 's/\./_/'`.noarch.rpm
+
+			sleep 5
+
+			sudo yum -y install -y zfs
+			sudo modprobe zfs
+			sudo systemctl list-unit-files | grep zfs
+
+			echo ''
+			echo "=============================================="
+			echo "Done: Install packages.                       "
+			echo "=============================================="
+			echo ''
+
+			sleep 5
+
+			clear
+
+			echo ''
+			echo "=============================================="
+			echo "Done: Install ZFS.                            "
+			echo "=============================================="
+			echo ''
+
+			function CheckScstInstalled {
+				rpm -qa | grep -c scst
+			}
+			ScstInstalled=$(CheckScstInstalled)
+
+			if [ $Scst = 'Y' ] && [ $ScstInstalled -lt 4 ]
 			then
-				echo ''
-				echo "=============================================="
-				echo "Configure ZFS Storage ...                     "
-				echo "                                              "
-				echo "(some steps take awhile ... patience)         " 
-				echo "=============================================="
-				echo ''
-
-				sleep 5
-
-				clear
-
-				echo ''
-				echo "=============================================="
-				echo "Install packages ...                          "
-				echo "=============================================="
-				echo ''
-
-				sudo yum -y install kernel-uek-devel-$(uname -r) kernel-devel yum-utils
-				sleep 5
-				sudo rpm -Uvh https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
-				sudo yum-config-manager --enable epel 
-				sudo yum repolist
-				sudo yum -y install dkms
-				sudo rpm -Uvh http://download.zfsonlinux.org/epel/zfs-release.el`cat /etc/oracle-release | cut -f5 -d' ' | sed 's/\./_/'`.noarch.rpm
-
-				sleep 5
-
-				sudo yum -y install -y zfs
-				sudo modprobe zfs
-				sudo systemctl list-unit-files | grep zfs
-
-				echo ''
-				echo "=============================================="
-				echo "Done: Install packages.                       "
-				echo "=============================================="
-				echo ''
-
 				function GetRevDomain1 {
 					echo "$Domain1" | awk -F. '{for (i=NF; i>0; --i) printf "%s%s", (i<NF ? "." : ""), $i; printf "\n"}'
 				}
@@ -4415,105 +4474,386 @@ then
 				CurrentDir=`pwd`
 
 				cd /opt/olxc/home/scst-files
-				./create-scst.sh $LXDStorageDriver $RevDomain1 $Lun1name $Lun2Name $Lun3Name $Lun1Size $Lun2Size $Lun3Size $LogBlkSz
+				./create-scst.sh $LXDStorageDriver $RevDomain1 $Lun1Name $Lun2Name $Lun3Name $Lun1Size $Lun2Size $Lun3Size $LogBlkSz $ScstLunPrefix
 
 				sleep 5
 
-				sudo zpool create $StoragePoolName mirror /dev/olx_luns/olx_"$Lun1Name"_"$Sw1Index"_00 /dev/olx_luns/olx_"$Lun2Name"_"$Sw1Index"_00
+				sudo zpool create $StoragePoolName $ZfsMirror /dev/"$ScstLunPrefix"_luns/"$ScstLunPrefix"_"$Lun1Name"_"$Sw1Index"_00 /dev/"$ScstLunPrefix"_luns/"$ScstLunPrefix"_"$Lun2Name"_"$Sw1Index"_00
 
-				echo ''
-				echo "=============================================="
-				echo "Update strt_scst.sh file if it exists...      "
-				echo "=============================================="
-				echo ''
-
-				if [ -f /etc/network/openvswitch/strt_scst.sh ]
-				then
-					function WhichModprobe {
-						which modprobe
-					}
-					ModProbe=$(WhichModprobe)
-	
-					function WhichZpool {
-						which zpool
-					}
-					Zpool=$(WhichZpool)
-	
-					function WhichSleep {
-					        which sleep
-					}
-					Sleep=$(WhichSleep)
-					
-					function WhichMount {
-					        which mount 
-					}
-					Mount=$(WhichMount)
-	
-					sudo sh -c "echo '$Sleep 10'                    				>> /etc/network/openvswitch/strt_scst.sh"
-					sudo sh -c "echo '$ModProbe zfs'                				>> /etc/network/openvswitch/strt_scst.sh"
-					sudo sh -c "echo '$Zpool import $StoragePoolName'      				>> /etc/network/openvswitch/strt_scst.sh"
-					sudo sh -c "echo '$Mount /dev/olx_luns/olx_$Lun3Name_$Sw1Index_00 /var/lib/lxc'	>> /etc/network/openvswitch/strt_scst.sh"
-					sudo cat /etc/network/openvswitch/strt_scst.sh
-				fi
-
-				echo ''
-				echo "=============================================="
-				echo "Done: Update strt_scst.sh file if it exists.  "
-				echo "=============================================="
-				echo ''
-	
-				sleep 5
-	
-				clear
-	
-				echo ''
-				echo "=============================================="
-				echo "Update stop_scst.sh file if it exists.        "
-				echo "=============================================="
-				echo ''
-	
-				if [ -f /etc/network/openvswitch/stop_scst.sh ]
-				then
-					function GetZpool2 {
-						echo $Zpool | sed 's/\//\\\//g'
-					}
-					Zpool2=$(GetZpool2)
-	
-					sudo sed -i "s/bash/&\nzpool export $StoragePoolName/"  /etc/network/openvswitch/stop_scst.sh
-					sudo sed -i "s/zpool export/$Zpool2 export/"            /etc/network/openvswitch/stop_scst.sh
-				fi
-
-				echo ''
-				echo "=============================================="
-				echo "Done: Update stop_scst.sh file if it exists.  "
-				echo "=============================================="
-				echo ''
-			
-			elif [ $LXDStorageDriver = 'btrfs' ]
+			elif [ $Scst = 'N' ]
 			then
-				if   [ BtrfsRaid = 'raid0' ]
-				then
-					sudo mkfs.btrfs -d raid0 /dev/olx_luns/olx_"$Lun1Name"_"$Sw1Index"_00 /dev/olx_luns/olx_"$Lun2Name"_"$Sw1Index"_00
+				sudo zpool create $StoragePoolName $ZfsMirror $ZfsLun1 $ZfsLun2
+			fi
 
-				elif [ BtrfsRaid = 'raid10' ]
+			echo ''
+			echo "=============================================="
+			echo "Update strt_scst.sh file if it exists...      "
+			echo "=============================================="
+			echo ''
+
+			if [ -f /etc/network/openvswitch/strt_scst.sh ]
+			then
+				function WhichModprobe {
+					which modprobe
+				}
+				ModProbe=$(WhichModprobe)
+	
+				function WhichZpool {
+					which zpool
+				}
+				Zpool=$(WhichZpool)
+	
+				function WhichSleep {
+				        which sleep
+				}
+				Sleep=$(WhichSleep)
+					
+				function WhichMount {
+				        which mount 
+				}
+				Mount=$(WhichMount)
+	
+				sudo sh -c "echo '$Sleep 10'         		           								>> /etc/network/openvswitch/strt_scst.sh"
+				sudo sh -c "echo '$ModProbe zfs'                									>> /etc/network/openvswitch/strt_scst.sh"
+				sudo sh -c "echo '$Zpool import $StoragePoolName'      									>> /etc/network/openvswitch/strt_scst.sh"
+
+				if   [ $Scst = 'Y' ]
+				then
+					sudo sh -c "echo '$Mount /dev/"$ScstLunPrefix"_luns/"$ScstLunPrefix"_"$Lun3Name"_"$Sw1Index"_00 /var/lib/lxc'	>> /etc/network/openvswitch/strt_scst.sh"
+				
+				elif [ $Scst = 'N' ]
+				then
+					sudo sh -c "echo '$Mount $LxcLun1'										>> /etc/network/openvswitch/strt_scst.sh"
+				fi
+
+				sudo cat /etc/network/openvswitch/strt_scst.sh
+			fi
+
+			echo ''
+			echo "=============================================="
+			echo "Done: Update strt_scst.sh file if it exists.  "
+			echo "=============================================="
+			echo ''
+	
+			sleep 5
+	
+			clear
+	
+			echo ''
+			echo "=============================================="
+			echo "Update stop_scst.sh file if it exists.        "
+			echo "=============================================="
+			echo ''
+	
+			if [ -f /etc/network/openvswitch/stop_scst.sh ]
+			then
+				function GetZpool2 {
+					echo $Zpool | sed 's/\//\\\//g'
+				}
+				Zpool2=$(GetZpool2)
+	
+				sudo sed -i "s/bash/&\nzpool export $StoragePoolName/"  /etc/network/openvswitch/stop_scst.sh
+				sudo sed -i "s/zpool export/$Zpool2 export/"            /etc/network/openvswitch/stop_scst.sh
+				sudo cat /etc/network/openvswitch/stop_scst.sh
+			fi
+
+			echo ''
+			echo "=============================================="
+			echo "Done: Update stop_scst.sh file if it exists.  "
+			echo "=============================================="
+			echo ''
+			
+		elif [ $LXDStorageDriver = 'btrfs' ]
+		then
+			echo ''
+			echo "=============================================="
+			echo "Install btrfs-progs ...                       "
+			echo "=============================================="
+			echo ''
+
+			sudo dnf -y install btrfs-progs
+			
+			echo ''
+			echo "=============================================="
+			echo "Done: Install btrfs-progs.                    "
+			echo "=============================================="
+			echo ''
+			
+			if [ $Scst = 'Y' ]
+			then
+				function GetRevDomain1 {
+					echo "$Domain1" | awk -F. '{for (i=NF; i>0; --i) printf "%s%s", (i<NF ? "." : ""), $i; printf "\n"}'
+				}
+				RevDomain1=$(GetRevDomain1)
+
+				CurrentDir=`pwd`
+
+				cd /opt/olxc/home/scst-files
+				./create-scst.sh $LXDStorageDriver $RevDomain1 $Lun1Name $Lun2Name $Lun3Name $Lun1Size $Lun2Size $Lun3Size $LogBlkSz
+				
+				cd $CurrentDir
+
+				sleep 5
+
+			elif [ $Scst = 'N' ]
+			then
+				ls -l $BtrfsLun1 $BtrfsLun2
+			fi
+
+			if   [ $BtrfsRaid = 'raid0' ]
+			then
+				if   [ $Scst = 'Y' ]
+				then
+					sudo mkfs.btrfs -d raid0  /dev/olx_luns/olx_"$Lun1Name"_"$Sw1Index"_00 /dev/olx_luns/olx_"$Lun2Name"_"$Sw1Index"_00
+
+				elif [ $Scst = 'N' ]
+				then
+					sudo mkfs.btrfs -d raid0 $BtrfsLun1 $BtrfsLun2
+				fi
+
+			elif [ $BtrfsRaid = 'raid10' ]
+			then
+				if   [ $Scst = 'Y' ]
 				then
 					sudo mkfs.btrfs -m raid10 /dev/olx_luns/olx_"$Lun1Name"_"$Sw1Index"_00 /dev/olx_luns/olx_"$Lun2Name"_"$Sw1Index"_00
+
+				elif [ $Scst = 'N' ]
+				then
+					sudo mkfs.btrfs -m raid10 $BtrfsLun1 $BtrfsLun2
+				fi
 				
-				elif [ BtrfsRaid = 'linear' ]
+			elif [ $BtrfsRaid = 'linear' ]
+			then
+				if   [ $Scst = 'Y' ]
 				then
 					sudo mkfs.btrfs -d single /dev/olx_luns/olx_"$Lun1Name"_"$Sw1Index"_00 /dev/olx_luns/olx_"$Lun2Name"_"$Sw1Index"_00
+
+				elif [ $Scst = 'N' ]
+				then
+					sudo mkfs.btrfs -d single $BtrfsLun1 $BtrfsLun2
 				fi
-
-			# edit	sudo mount /dev/olx_luns/olx_"$Lun3Name"_"$Sw1Index"_00 /var/lib/lxc
-
+				
+			elif [ $BtrfsRaid = 'none' ]
+			then
+				if [ $Scst = 'Y' ]
+				then
+					echo "LXD init will use /dev/olx_luns/olx_$Lun1Name_$Sw1Index_00 for btrfs."	
+				
+				elif [ $Scst = 'N' ]
+				then
+					echo "LXD init will use /dev/olx_luns/olx_$Lun1Name_$Sw1Index_00 for btrfs."	
+				fi
 			fi
-			
-			sudo mkfs.xfs /dev/olx_luns/olx_"$Lun3Name"_"$Sw1Index"_00 -f
-			sudo mount /dev/olx_luns/olx_"$Lun3Name"_"$Sw1Index"_00 /var/lib/lxc
-
-			cd $CurrentDir
 		fi
 	fi
+fi
+
+if [ $Scst = 'Y' ]
+then
+	sudo mkfs.xfs /dev/"$ScstLunPrefix"_luns/"$ScstLunPrefix"_"$Lun3Name"_"$Sw1Index"_00 -f
+	sudo mount /dev/"$ScstLunPrefix"_luns/"$ScstLunPrefix"_"$Lun3Name"_"$Sw1Index"_00 /var/lib/lxc
+fi
+
+sleep 5
+
+clear
+
+if [ $LXDCluster = 'Y' ] && [ $LXDStorageDriver = 'btrfs' ]
+then
+        echo ''
+        echo "=============================================="
+        echo "Install packages...                           "
+        echo "=============================================="
+        echo ''
+
+        sudo yum -y install dos2unix
+
+	echo ''
+        echo "=============================================="
+        echo "Done: Install packages.                       "
+        echo "=============================================="
+        echo ''
+
+	sleep 5
+
+	clear
+
+#	sudo sed -i "s/HOSTNAME/$HOSTNAME/g"    /etc/network/openvswitch/lxd-init-node1.sh
+
+        if   [ $LXDPreSeed = 'Y' ]
+        then
+                function GetShortHostName {
+                        hostname -s
+                }
+                ShortHostName=$(GetShortHostName)
+
+                if   [ $GRE = 'N' ]
+                then
+                        sudo sed -i "s/SWITCH_IP/$Sw1Index/g"                                                   /etc/network/openvswitch/preseed.sw1a.btr.001.lxd.cluster
+                        sudo sed -i "s/HOSTNAME/$ShortHostName/g"                                               /etc/network/openvswitch/preseed.sw1a.btr.001.lxd.cluster
+			
+			if   [ $Scst = 'Y' ]
+			then
+                        	sudo sed -i "s/BTRFSLUN/\/dev\/olx_luns\/olx_"$Lun1Name"_"$Sw1Index"_00/g" 	/etc/network/openvswitch/preseed.sw1a.btr.001.lxd.cluster
+			
+			elif [ $Scst = 'N' ]
+			then
+				sudo sed -i "s/BTRFSLUN/$BtrfsLun/g"						/etc/network/openvswitch/preseed.sw1a.btr.001.lxd.cluster
+			fi
+
+		 	sudo sed -i "s/STORAGE-DRIVER/$LXDStorageDriver/g"                                      /etc/network/openvswitch/preseed.sw1a.btr.001.lxd.cluster
+
+                elif [ $GRE = 'Y' ]
+                then
+                        sshpass -p $MultiHostVar8 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S --prompt='' <<< "$MultiHostVar8" /var/lib/snapd/snap/bin/lxc info 2>/dev/null | sed -n '/BEGIN.*-/,/END.*-/p'" > /tmp/cert.txt
+			rm /tmp/cert.txt
+                        sshpass -p $MultiHostVar8 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S --prompt='' <<< "$MultiHostVar8" /var/lib/snapd/snap/bin/lxc info 2>/dev/null | sed -n '/BEGIN.*-/,/END.*-/p'" > /tmp/cert.txt
+
+			echo ''
+			echo "=============================================="
+			echo "Display /tmp/cert.txt ...                     "
+			echo "=============================================="
+			echo ''
+
+			cat /tmp/cert.txt | grep -v WARNING
+
+			echo ''
+			echo "=============================================="
+			echo "Done: Display /tmp/cert.txt.                  "
+			echo "=============================================="
+			echo ''
+
+			sleep 5
+
+			clear
+
+                        sudo sed -i "s/SWITCH_IP/$Sw1Index/g"                                                   /etc/network/openvswitch/preseed.sw1a.btr.002.lxd.cluster
+                        sudo sed -i "s/HOSTNAME/$ShortHostName/g"                                               /etc/network/openvswitch/preseed.sw1a.btr.002.lxd.cluster
+			
+			if   [ $Scst = 'Y' ]
+			then
+                        	sudo sed -i "s/BTRFSLUN/\/dev\/olx_luns\/olx_"$Lun1Name"_"$Sw1Index"_00/g" 	/etc/network/openvswitch/preseed.sw1a.btr.002.lxd.cluster
+			
+			elif [ $Scst = 'N' ]
+			then
+				sudo sed -i "s/BTRFSLUN/$BtrfsLun/g"						/etc/network/openvswitch/preseed.sw1a.btr.002.lxd.cluster
+			fi
+
+		 	sudo sed -i "s/STORAGE-DRIVER/$LXDStorageDriver/g"                                      /etc/network/openvswitch/preseed.sw1a.btr.002.lxd.cluster
+                        sudo sed -i -e '/-----BEGIN/,/-----END/!b' -e '/-----END/!d;r /tmp/cert.txt' -e 'd'     /etc/network/openvswitch/preseed.sw1a.btr.002.lxd.cluster
+			sudo sed -i '/WARNING/d'								/etc/network/openvswitch/preseed.sw1a.btr.002.lxd.cluster
+			sudo dos2unix										/etc/network/openvswitch/preseed.sw1a.btr.002.lxd.cluster
+
+			echo ''
+			echo "=============================================="
+			echo "Display LXD Preseed...                        "
+			echo "=============================================="
+			echo ''
+
+			sudo cat /etc/network/openvswitch/preseed.sw1a.btrfs.linux.002.lxd.cluster
+
+			echo ''
+			echo "=============================================="
+			echo "Done: Display LXD Preseed.                    "
+			echo "=============================================="
+			echo ''
+
+			sleep 5
+
+			clear
+                fi
+        fi
+fi
+
+sleep 5
+
+if [ $LXDCluster = 'Y' ] && [ $LXDStorageDriver = 'zfs' ]
+then
+        echo ''
+        echo "=============================================="
+        echo "Install packages...                           "
+        echo "=============================================="
+        echo ''
+
+        sudo yum -y install expect dos2unix
+
+        echo ''
+        echo "=============================================="
+        echo "Done: Install packages.                       "
+        echo "=============================================="
+        echo ''
+
+        sleep 5
+
+        clear
+
+        sudo sed -i "s/HOSTNAME/$HOSTNAME/g"    /etc/network/openvswitch/lxd-init-node1.sh
+
+        if   [ $LXDPreSeed = 'Y' ]
+        then
+                function GetShortHostName {
+                        hostname -s
+                }
+                ShortHostName=$(GetShortHostName)
+
+                if   [ $GRE = 'N' ]
+                then
+                        sudo sed -i "s/SWITCH_IP/$Sw1Index/g"                                                   /etc/network/openvswitch/preseed.sw1a.zfs.001.lxd.cluster
+                        sudo sed -i "s/HOSTNAME/$ShortHostName/g"                                               /etc/network/openvswitch/preseed.sw1a.zfs.001.lxd.cluster
+                        sudo sed -i "s/STORAGE-DRIVER/$LXDStorageDriver/g"                                      /etc/network/openvswitch/preseed.sw1a.zfs.001.lxd.cluster
+                        sudo sed -i "s/POOL/$StoragePoolName/g"                                                 /etc/network/openvswitch/preseed.sw1a.zfs.001.lxd.cluster
+
+                elif [ $GRE = 'Y' ]
+                then
+                        sshpass -p $MultiHostVar8 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S --prompt='' <<< "$MultiHostVar8" /var/lib/snapd/snap/bin/lxc info | sed -n '/BEGIN.*-/,/END.*-/p'" > /tmp/cert.txt
+                        rm /tmp/cert.txt
+                        sshpass -p $MultiHostVar8 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S --prompt='' <<< "$MultiHostVar8" /var/lib/snapd/snap/bin/lxc info | sed -n '/BEGIN.*-/,/END.*-/p'" > /tmp/cert.txt
+
+                        echo ''
+                        echo "=============================================="
+                        echo "Display /tmp/cert.txt ...                     "
+                        echo "=============================================="
+                        echo ''
+
+                        cat /tmp/cert.txt | grep -v WARNING
+
+                        echo ''
+                        echo "=============================================="
+                        echo "Done: Display /tmp/cert.txt.                  "
+                        echo "=============================================="
+                        echo ''
+
+                        sleep 5
+
+                        clear
+
+                        sudo sed -i "s/SWITCH_IP/$Sw1Index/g"                                                   /etc/network/openvswitch/preseed.sw1a.zfs.002.lxd.cluster
+                        sudo sed -i "s/HOSTNAME/$ShortHostName/g"                                               /etc/network/openvswitch/preseed.sw1a.zfs.002.lxd.cluster
+                        sudo sed -i "s/STORAGE-DRIVER/$LXDStorageDriver/g"                                      /etc/network/openvswitch/preseed.sw1a.zfs.002.lxd.cluster
+                        sudo sed -i "s/POOL/$StoragePoolName/g"                                                 /etc/network/openvswitch/preseed.sw1a.zfs.002.lxd.cluster
+                        sudo sed -i -e '/-----BEGIN/,/-----END/!b' -e '/-----END/!d;r /tmp/cert.txt' -e 'd'     /etc/network/openvswitch/preseed.sw1a.zfs.002.lxd.cluster
+			sudo sed -i '/WARNING/d'								/etc/network/openvswitch/preseed.sw1a.zfs.002.lxd.cluster
+                        sudo dos2unix                                                                           /etc/network/openvswitch/preseed.sw1a.zfs.002.lxd.cluster
+
+                        echo ''
+                        echo "=============================================="
+                        echo "Display LXD Preseed...                        "
+                        echo "=============================================="
+                        echo ''
+
+                        sudo cat /etc/network/openvswitch/preseed.sw1a.olxc.002.lxd.cluster
+
+                        echo ''
+                        echo "=============================================="
+                        echo "Done: Display LXD Preseed.                    "
+                        echo "=============================================="
+                        echo ''
+
+                        sleep 5
+
+                        clear
+                fi
+        fi
 fi
 
 sleep 5
@@ -5326,190 +5666,6 @@ then
 	sudo sed -i "s/mtu_request=1500/mtu_request=$MultiHostVar7/g" /etc/network/openvswitch/crt_ovs_sw1.sh
 	sudo sed -i "s/mtu_request=1500/mtu_request=$MultiHostVar7/g" /etc/network/openvswitch/crt_ovs_sx1.sh
 fi
-
-if [ $LXDCluster = 'Y' ] && [ $LXDStorageDriver = 'btrfs' ]
-then
-        echo ''
-        echo "=============================================="
-        echo "Install packages...                           "
-        echo "=============================================="
-        echo ''
-
-        sudo yum -y install dos2unix
-
-	echo ''
-        echo "=============================================="
-        echo "Done: Install packages.                       "
-        echo "=============================================="
-        echo ''
-
-	sleep 5
-
-	clear
-
-#	sudo sed -i "s/HOSTNAME/$HOSTNAME/g"    /etc/network/openvswitch/lxd-init-node1.sh
-
-        if   [ $PreSeed = 'Y' ]
-        then
-                function GetShortHostName {
-                        hostname -s
-                }
-                ShortHostName=$(GetShortHostName)
-
-                if   [ $GRE = 'N' ]
-                then
-                        sudo sed -i "s/SWITCH_IP/$Sw1Index/g"                                                   /etc/network/openvswitch/preseed.sw1a.oracle8.linux.001.lxd.cluster
-                        sudo sed -i "s/HOSTNAME/$ShortHostName/g"                                               /etc/network/openvswitch/preseed.sw1a.oracle8.linux.001.lxd.cluster
-                        sudo sed -i "s/BTRFSLUN/$BtrfsLun/g"                                               	/etc/network/openvswitch/preseed.sw1a.oracle8.linux.001.lxd.cluster
-		#	sudo sed -i "s/STORAGE-DRIVER/$LXDStorageDriver/g"                                      /etc/network/openvswitch/preseed.sw1a.oracle8.linux.001.lxd.cluster
-		#	sudo sed -i "s/POOL/$StoragePoolName/g"                                                 /etc/network/openvswitch/preseed.sw1a.oracle8.linux.001.lxd.cluster
-
-                elif [ $GRE = 'Y' ]
-                then
-                        sshpass -p $MultiHostVar8 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S --prompt='' <<< "$MultiHostVar8" /var/lib/snapd/snap/bin/lxc info 2>/dev/null | sed -n '/BEGIN.*-/,/END.*-/p'" > /tmp/cert.txt
-			rm /tmp/cert.txt
-                        sshpass -p $MultiHostVar8 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S --prompt='' <<< "$MultiHostVar8" /var/lib/snapd/snap/bin/lxc info 2>/dev/null | sed -n '/BEGIN.*-/,/END.*-/p'" > /tmp/cert.txt
-
-			echo ''
-			echo "=============================================="
-			echo "Display /tmp/cert.txt ...                     "
-			echo "=============================================="
-			echo ''
-
-			cat /tmp/cert.txt | grep -v WARNING
-
-			echo ''
-			echo "=============================================="
-			echo "Done: Display /tmp/cert.txt.                  "
-			echo "=============================================="
-			echo ''
-
-			sleep 5
-
-			clear
-
-                        sudo sed -i "s/SWITCH_IP/$Sw1Index/g"                                                   /etc/network/openvswitch/preseed.sw1a.oracle8.linux.002.lxd.cluster
-                        sudo sed -i "s/HOSTNAME/$ShortHostName/g"                                               /etc/network/openvswitch/preseed.sw1a.oracle8.linux.002.lxd.cluster
-                        sudo sed -i "s/BTRFSLUN/$BtrfsLun/g"                                               	/etc/network/openvswitch/preseed.sw1a.oracle8.linux.002.lxd.cluster
-		#	sudo sed -i "s/STORAGE-DRIVER/$LXDStorageDriver/g"                                      /etc/network/openvswitch/preseed.sw1a.oracle8.linux.002.lxd.cluster
-		#	sudo sed -i "s/POOL/$StoragePoolName/g"                                                 /etc/network/openvswitch/preseed.sw1a.oracle8.linux.002.lxd.cluster
-                        sudo sed -i -e '/-----BEGIN/,/-----END/!b' -e '/-----END/!d;r /tmp/cert.txt' -e 'd'     /etc/network/openvswitch/preseed.sw1a.oracle8.linux.002.lxd.cluster
-			sudo sed -i '/WARNING/d'								/etc/network/openvswitch/preseed.sw1a.oracle8.linux.002.lxd.cluster
-			sudo dos2unix										/etc/network/openvswitch/preseed.sw1a.oracle8.linux.002.lxd.cluster
-
-			echo ''
-			echo "=============================================="
-			echo "Display LXD Preseed...                        "
-			echo "=============================================="
-			echo ''
-
-			sudo cat /etc/network/openvswitch/preseed.sw1a.oracle8.linux.002.lxd.cluster
-
-			echo ''
-			echo "=============================================="
-			echo "Done: Display LXD Preseed.                    "
-			echo "=============================================="
-			echo ''
-
-			sleep 5
-
-			clear
-                fi
-        fi
-fi
-
-if [ $LXDCluster = 'Y' ] && [ $LXDStorageDriver = 'zfs' ]
-then
-        echo ''
-        echo "=============================================="
-        echo "Install packages...                           "
-        echo "=============================================="
-        echo ''
-
-        sudo yum -y install expect dos2unix
-
-        echo ''
-        echo "=============================================="
-        echo "Done: Install packages.                       "
-        echo "=============================================="
-        echo ''
-
-        sleep 5
-
-        clear
-
-        sudo sed -i "s/HOSTNAME/$HOSTNAME/g"    /etc/network/openvswitch/lxd-init-node1.sh
-
-        if   [ $PreSeed = 'Y' ]
-        then
-                function GetShortHostName {
-                        hostname -s
-                }
-                ShortHostName=$(GetShortHostName)
-
-                if   [ $GRE = 'N' ]
-                then
-                        sudo sed -i "s/SWITCH_IP/$Sw1Index/g"                                                   /etc/network/openvswitch/preseed.sw1a.olxc.001.lxd.cluster
-                        sudo sed -i "s/HOSTNAME/$ShortHostName/g"                                               /etc/network/openvswitch/preseed.sw1a.olxc.001.lxd.cluster
-                        sudo sed -i "s/STORAGE-DRIVER/$LXDStorageDriver/g"                                      /etc/network/openvswitch/preseed.sw1a.olxc.001.lxd.cluster
-                        sudo sed -i "s/POOL/$StoragePoolName/g"                                                 /etc/network/openvswitch/preseed.sw1a.olxc.001.lxd.cluster
-
-                elif [ $GRE = 'Y' ]
-                then
-                        sshpass -p $MultiHostVar8 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S --prompt='' <<< "$MultiHostVar8" /var/lib/snapd/snap/bin/lxc info | sed -n '/BEGIN.*-/,/END.*-/p'" > /tmp/cert.txt
-                        rm /tmp/cert.txt
-                        sshpass -p $MultiHostVar8 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S --prompt='' <<< "$MultiHostVar8" /var/lib/snapd/snap/bin/lxc info | sed -n '/BEGIN.*-/,/END.*-/p'" > /tmp/cert.txt
-
-                        echo ''
-                        echo "=============================================="
-                        echo "Display /tmp/cert.txt ...                     "
-                        echo "=============================================="
-                        echo ''
-
-                        cat /tmp/cert.txt | grep -v WARNING
-
-                        echo ''
-                        echo "=============================================="
-                        echo "Done: Display /tmp/cert.txt.                  "
-                        echo "=============================================="
-                        echo ''
-
-                        sleep 5
-
-                        clear
-
-                        sudo sed -i "s/SWITCH_IP/$Sw1Index/g"                                                   /etc/network/openvswitch/preseed.sw1a.olxc.002.lxd.cluster
-                        sudo sed -i "s/HOSTNAME/$ShortHostName/g"                                               /etc/network/openvswitch/preseed.sw1a.olxc.002.lxd.cluster
-                        sudo sed -i "s/STORAGE-DRIVER/$LXDStorageDriver/g"                                      /etc/network/openvswitch/preseed.sw1a.olxc.002.lxd.cluster
-                        sudo sed -i "s/POOL/$StoragePoolName/g"                                                 /etc/network/openvswitch/preseed.sw1a.olxc.002.lxd.cluster
-                        sudo sed -i -e '/-----BEGIN/,/-----END/!b' -e '/-----END/!d;r /tmp/cert.txt' -e 'd'     /etc/network/openvswitch/preseed.sw1a.olxc.002.lxd.cluster
-			sudo sed -i '/WARNING/d'								/etc/network/openvswitch/preseed.sw1a.olxc.002.lxd.cluster
-                        sudo dos2unix                                                                           /etc/network/openvswitch/preseed.sw1a.olxc.002.lxd.cluster
-
-                        echo ''
-                        echo "=============================================="
-                        echo "Display LXD Preseed...                        "
-                        echo "=============================================="
-                        echo ''
-
-                        sudo cat /etc/network/openvswitch/preseed.sw1a.olxc.002.lxd.cluster
-
-                        echo ''
-                        echo "=============================================="
-                        echo "Done: Display LXD Preseed.                    "
-                        echo "=============================================="
-                        echo ''
-
-                        sleep 5
-
-                        clear
-                fi
-        fi
-fi
-
-sleep 5
-
-clear
 
 SwitchList='sw1 sx1'
 for k in $SwitchList

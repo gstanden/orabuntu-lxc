@@ -24,16 +24,24 @@ echo "Display Install Settings...                   "
 echo "=============================================="
 echo ''
 
-   PreSeed=$1
-LXDCluster=$2
-       GRE=$3
-   Release=$4
- MultiHost=$5
+         PreSeed=$1
+      LXDCluster=$2
+             GRE=$3
+         Release=$4
+       MultiHost=$5
+LXDStorageDriver=$6
 
-echo "PreSeed    = "$1
-echo "LXDCluster = "$2
-echo "GRE        = "$3
-echo "Release    = "$4
+echo "PreSeed       = "$1
+echo "LXDCluster    = "$2
+echo "GRE           = "$3
+echo "Release       = "$4
+echo "StorageDriver = "$6
+
+# Reference
+# /etc/network/openvswitch/preseed.sw1a.zfs.001.lxd.cluster
+# /etc/network/openvswitch/preseed.sw1a.zfs.002.lxd.cluster
+# /etc/network/openvswitch/preseed.sw1a.btr.001.lxd.cluster
+# /etc/network/openvswitch/preseed.sw1a.btr.002.lxd.cluster
 
 echo ''
 echo "=============================================="
@@ -71,19 +79,9 @@ then
 		then
 			if   [ $GRE = 'N' ]
 			then
-				cat /etc/network/openvswitch/preseed.sw1a.olxc.001.lxd.cluster | lxd init --preseed
-				if [ $? -ne 0 ]
+				if [ $LXDStorageDriver = 'zfs' ]
 				then
-					m=1
-				else
-					m=0
-				fi
-
-			elif [ $GRE = 'Y' ]
-			then
-				if [ $n -le 10 ]
-				then
-					cat /etc/network/openvswitch/preseed.sw1a.olxc.002.lxd.cluster | lxd init --preseed
+					cat /etc/network/openvswitch/preseed.sw1a.zfs.001.lxd.cluster | lxd init --preseed
 					if [ $? -ne 0 ]
 					then
 						m=1
@@ -91,7 +89,43 @@ then
 						m=0
 					fi
 
-					n=$((n+1))
+				elif [ $LXDStorageDriver = 'btrfs' ]
+				then
+					cat /etc/network/openvswitch/preseed.sw1a.btr.001.lxd.cluster | lxd init --preseed
+					if [ $? -ne 0 ]
+					then
+						m=1
+					else
+						m=0
+					fi
+				fi
+
+			elif [ $GRE = 'Y' ]
+			then
+				if [ $n -le 10 ]
+				then
+					if [ $LXDStorageDriver = 'zfs' ]
+					then
+						cat /etc/network/openvswitch/preseed.sw1a.zfs.002.lxd.cluster | lxd init --preseed
+						if [ $? -ne 0 ]
+						then
+							m=1
+						else
+							m=0
+						fi
+						n=$((n+1))
+
+					elif [ $LXDStorageDriver = 'btrfs' ]
+					then
+						cat /etc/network/openvswitch/preseed.sw1a.btr.002.lxd.cluster | lxd init --preseed
+						if [ $? -ne 0 ]
+						then
+							m=1
+						else
+							m=0
+						fi
+						n=$((n+1))
+					fi
 				else
 					sudo lxd init
 					
@@ -102,7 +136,7 @@ then
 						m=0
 					fi
 				fi
-				sleep 60
+			sleep 60
 			fi
 		fi
 	done
