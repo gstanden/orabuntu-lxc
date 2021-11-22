@@ -16,25 +16,6 @@ clear
 
 echo ''
 echo "=============================================="
-echo "Establish sudo...                             "
-echo "=============================================="
-echo ''
-
-trap "exit" INT TERM; trap "kill 0" EXIT; sudo -v || exit $?; sleep 1; while true; do sleep 60; sudo -nv; done 2>/dev/null &
-sudo date
-
-echo ''
-echo "=============================================="
-echo "Done: Establish sudo.                         "
-echo "=============================================="
-echo ''
-
-sleep 5
-
-clear
-
-echo ''
-echo "=============================================="
 echo "Install packages ...                          "
 echo "=============================================="
 echo ''
@@ -45,13 +26,11 @@ sudo rpm -Uvh https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch
 sudo yum-config-manager --enable epel 
 sudo yum repolist
 sudo yum -y install dkms
-sudo rpm -Uvh http://download.zfsonlinux.org/epel/zfs-release.el`cat /etc/oracle-release | cut -f5 -d' ' | sed 's/\./_/'`.noarch.rpm
+sudo rpm -Uvh http://download.zfsonlinux.org/epel/zfs-release.el`cat /etc/oracle-release | cut -f5 -d' ' | sed 's/\./_/'`.noarch.rpm 2>/dev/null
 
 sleep 5
 
-sudo yum -y install -y zfs
-sudo modprobe zfs
-sudo systemctl list-unit-files | grep zfs
+sudo yum -y install zfs
 
 echo ''
 echo "=============================================="
@@ -65,8 +44,43 @@ clear
 
 echo ''
 echo "=============================================="
-echo "Done: Install ZFS.                            "
+echo "Verify packages ...                           "
 echo "=============================================="
 echo ''
 
+sudo rpm -qa | grep zfs
 
+echo ''
+echo "=============================================="
+echo "Done: Verify packages.                        "
+echo "=============================================="
+echo ''
+
+sleep 5
+
+clear
+
+echo ''
+echo "=============================================="
+echo "modprobe zfs and list-unit-files...           "
+echo "=============================================="
+echo ''
+
+sudo modprobe zfs
+sudo systemctl list-unit-files | grep zfs
+
+echo ''
+echo "=============================================="
+echo "Done: modprobe zfs and list-unit-files.       "
+echo "=============================================="
+echo ''
+
+sleep 5
+
+clear
+
+echo ''
+echo "=============================================="
+echo "Done: Install ZFS.                            "
+echo "=============================================="
+echo ''
