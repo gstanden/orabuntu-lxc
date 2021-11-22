@@ -4405,59 +4405,13 @@ function CheckZfsInstalled {
 }
 ZfsInstalled=$(CheckZfsInstalled)
 
-if [ $LinuxFlavor = 'Oracle' ] && [ $ZfsInstalled -lt 4 ]
+if [ $ZfsInstalled -lt 4 ]
 then
-	if [ $Release -eq 8 ]
+	if [ $Release -ge 7 ]
 	then
 		if [ $LXDStorageDriver = 'zfs' ]
 		then
-			echo ''
-			echo "=============================================="
-			echo "Install ZFS ...                               "
-			echo "                                              "
-			echo "(some steps take awhile ... patience)         " 
-			echo "=============================================="
-			echo ''
-
-			sleep 5
-
-			clear
-
-			echo ''
-			echo "=============================================="
-			echo "Install packages ...                          "
-			echo "=============================================="
-			echo ''
-
-			sudo yum -y install kernel-uek-devel-$(uname -r) kernel-devel yum-utils
-			sleep 5
-			sudo rpm -Uvh https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
-			sudo yum-config-manager --enable epel 
-			sudo yum repolist
-			sudo yum -y install dkms
-			sudo rpm -Uvh http://download.zfsonlinux.org/epel/zfs-release.el`cat /etc/oracle-release | cut -f5 -d' ' | sed 's/\./_/'`.noarch.rpm
-
-			sleep 5
-
-			sudo yum -y install -y zfs
-			sudo modprobe zfs
-			sudo systemctl list-unit-files | grep zfs
-
-			echo ''
-			echo "=============================================="
-			echo "Done: Install packages.                       "
-			echo "=============================================="
-			echo ''
-
-			sleep 5
-
-			clear
-
-			echo ''
-			echo "=============================================="
-			echo "Done: Install ZFS.                            "
-			echo "=============================================="
-			echo ''
+			$DistDir/zfsutils/$LinuxFlavor/zfs_$LinuxFlavor$Release.sh
 
 			function CheckScstInstalled {
 				rpm -qa | grep -c scst
