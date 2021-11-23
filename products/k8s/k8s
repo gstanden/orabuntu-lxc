@@ -390,8 +390,10 @@ echo "Wget and Unzip Kubernetes github...           "
 echo "=============================================="
 echo ''
 
+sleep 5
+
 wget -4 https://github.com/gstanden/kubernetes/archive/refs/heads/master.zip
-unzip -q master.zip
+unzip  master.zip
 
 echo ''
 echo "=============================================="
