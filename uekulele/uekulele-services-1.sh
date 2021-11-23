@@ -4400,203 +4400,195 @@ sleep 5
 
 clear
 
-function CheckZfsInstalled {
-	rpm -qa | egrep -c 'zfs-dkms|zfs|zfs-release|libzfs'
-}
-ZfsInstalled=$(CheckZfsInstalled)
-
-if [ $ZfsInstalled -lt 4 ]
+if [ $Release -ge 7 ]
 then
-	if [ $Release -ge 7 ]
+	if [ $LXDStorageDriver = 'zfs' ]
 	then
-		if [ $LXDStorageDriver = 'zfs' ]
+		$DistDir/zfsutils/$LinuxFlavor/zfs_$LinuxFlavor$Release.sh
+
+		function CheckScstInstalled {
+			rpm -qa | grep -c scst
+		}
+		ScstInstalled=$(CheckScstInstalled)
+
+		if [ $Scst = 'Y' ] && [ $ScstInstalled -lt 4 ]
 		then
-			$DistDir/zfsutils/$LinuxFlavor/zfs_$LinuxFlavor$Release.sh
-
-			function CheckScstInstalled {
-				rpm -qa | grep -c scst
+			function GetRevDomain1 {
+				echo "$Domain1" | awk -F. '{for (i=NF; i>0; --i) printf "%s%s", (i<NF ? "." : ""), $i; printf "\n"}'
 			}
-			ScstInstalled=$(CheckScstInstalled)
+			RevDomain1=$(GetRevDomain1)
 
-			if [ $Scst = 'Y' ] && [ $ScstInstalled -lt 4 ]
+			CurrentDir=`pwd`
+
+			cd /opt/olxc/home/scst-files
+			./create-scst.sh $LXDStorageDriver $RevDomain1 $Lun1Name $Lun2Name $Lun3Name $Lun1Size $Lun2Size $Lun3Size $LogBlkSz $ScstLunPrefix
+
+			sleep 5
+
+			sudo zpool create $StoragePoolName $ZfsMirror /dev/"$ScstLunPrefix"_luns/"$ScstLunPrefix"_"$Lun1Name"_"$Sw1Index"_00 /dev/"$ScstLunPrefix"_luns/"$ScstLunPrefix"_"$Lun2Name"_"$Sw1Index"_00
+
+		elif [ $Scst = 'N' ]
+		then
+			sudo zpool create $StoragePoolName $ZfsMirror $ZfsLun1 $ZfsLun2
+		fi
+
+		echo ''
+		echo "=============================================="
+		echo "Update strt_scst.sh file if it exists...      "
+		echo "=============================================="
+		echo ''
+
+		if [ -f /etc/network/openvswitch/strt_scst.sh ]
+		then
+			function WhichModprobe {
+				which modprobe
+			}
+			ModProbe=$(WhichModprobe)
+
+			function WhichZpool {
+				which zpool
+			}
+			Zpool=$(WhichZpool)
+
+			function WhichSleep {
+			        which sleep
+			}
+			Sleep=$(WhichSleep)
+				
+			function WhichMount {
+			        which mount 
+			}
+			Mount=$(WhichMount)
+
+			sudo sh -c "echo '$Sleep 10'         		           								>> /etc/network/openvswitch/strt_scst.sh"
+			sudo sh -c "echo '$ModProbe zfs'                									>> /etc/network/openvswitch/strt_scst.sh"
+			sudo sh -c "echo '$Zpool import $StoragePoolName'      									>> /etc/network/openvswitch/strt_scst.sh"
+
+			if   [ $Scst = 'Y' ]
 			then
-				function GetRevDomain1 {
-					echo "$Domain1" | awk -F. '{for (i=NF; i>0; --i) printf "%s%s", (i<NF ? "." : ""), $i; printf "\n"}'
-				}
-				RevDomain1=$(GetRevDomain1)
+				sudo sh -c "echo '$Mount /dev/"$ScstLunPrefix"_luns/"$ScstLunPrefix"_"$Lun3Name"_"$Sw1Index"_00 /var/lib/lxc'	>> /etc/network/openvswitch/strt_scst.sh"
+			
+			elif [ $Scst = 'N' ]
+			then
+				sudo sh -c "echo '$Mount $LxcLun1'										>> /etc/network/openvswitch/strt_scst.sh"
+			fi
 
-				CurrentDir=`pwd`
+			sudo cat /etc/network/openvswitch/strt_scst.sh
+		fi
 
-				cd /opt/olxc/home/scst-files
-				./create-scst.sh $LXDStorageDriver $RevDomain1 $Lun1Name $Lun2Name $Lun3Name $Lun1Size $Lun2Size $Lun3Size $LogBlkSz $ScstLunPrefix
+		echo ''
+		echo "=============================================="
+		echo "Done: Update strt_scst.sh file if it exists.  "
+		echo "=============================================="
+		echo ''
 
-				sleep 5
+		sleep 5
 
-				sudo zpool create $StoragePoolName $ZfsMirror /dev/"$ScstLunPrefix"_luns/"$ScstLunPrefix"_"$Lun1Name"_"$Sw1Index"_00 /dev/"$ScstLunPrefix"_luns/"$ScstLunPrefix"_"$Lun2Name"_"$Sw1Index"_00
+		clear
+
+		echo ''
+		echo "=============================================="
+		echo "Update stop_scst.sh file if it exists.        "
+		echo "=============================================="
+		echo ''
+	
+		if [ -f /etc/network/openvswitch/stop_scst.sh ]
+		then
+			function GetZpool2 {
+				echo $Zpool | sed 's/\//\\\//g'
+			}
+			Zpool2=$(GetZpool2)
+
+			sudo sed -i "s/bash/&\nzpool export $StoragePoolName/"  /etc/network/openvswitch/stop_scst.sh
+			sudo sed -i "s/zpool export/$Zpool2 export/"            /etc/network/openvswitch/stop_scst.sh
+			sudo cat /etc/network/openvswitch/stop_scst.sh
+		fi
+
+		echo ''
+		echo "=============================================="
+		echo "Done: Update stop_scst.sh file if it exists.  "
+		echo "=============================================="
+		echo ''
+		
+	elif [ $LXDStorageDriver = 'btrfs' ]
+	then
+		echo ''
+		echo "=============================================="
+		echo "Install btrfs-progs ...                       "
+		echo "=============================================="
+		echo ''
+
+		sudo dnf -y install btrfs-progs
+		
+		echo ''
+		echo "=============================================="
+		echo "Done: Install btrfs-progs.                    "
+		echo "=============================================="
+		echo ''
+		
+		if [ $Scst = 'Y' ]
+		then
+			function GetRevDomain1 {
+				echo "$Domain1" | awk -F. '{for (i=NF; i>0; --i) printf "%s%s", (i<NF ? "." : ""), $i; printf "\n"}'
+			}
+			RevDomain1=$(GetRevDomain1)
+
+			CurrentDir=`pwd`
+
+			cd /opt/olxc/home/scst-files
+			./create-scst.sh $LXDStorageDriver $RevDomain1 $Lun1Name $Lun2Name $Lun3Name $Lun1Size $Lun2Size $Lun3Size $LogBlkSz
+			
+			cd $CurrentDir
+
+			sleep 5
+
+		elif [ $Scst = 'N' ]
+		then
+			ls -l $BtrfsLun1 $BtrfsLun2
+		fi
+
+		if   [ $BtrfsRaid = 'raid0' ]
+		then
+			if   [ $Scst = 'Y' ]
+			then
+				sudo mkfs.btrfs -d raid0  /dev/olx_luns/olx_"$Lun1Name"_"$Sw1Index"_00 /dev/olx_luns/olx_"$Lun2Name"_"$Sw1Index"_00
 
 			elif [ $Scst = 'N' ]
 			then
-				sudo zpool create $StoragePoolName $ZfsMirror $ZfsLun1 $ZfsLun2
+				sudo mkfs.btrfs -d raid0 $BtrfsLun1 $BtrfsLun2
 			fi
 
-			echo ''
-			echo "=============================================="
-			echo "Update strt_scst.sh file if it exists...      "
-			echo "=============================================="
-			echo ''
-
-			if [ -f /etc/network/openvswitch/strt_scst.sh ]
-			then
-				function WhichModprobe {
-					which modprobe
-				}
-				ModProbe=$(WhichModprobe)
-	
-				function WhichZpool {
-					which zpool
-				}
-				Zpool=$(WhichZpool)
-	
-				function WhichSleep {
-				        which sleep
-				}
-				Sleep=$(WhichSleep)
-					
-				function WhichMount {
-				        which mount 
-				}
-				Mount=$(WhichMount)
-	
-				sudo sh -c "echo '$Sleep 10'         		           								>> /etc/network/openvswitch/strt_scst.sh"
-				sudo sh -c "echo '$ModProbe zfs'                									>> /etc/network/openvswitch/strt_scst.sh"
-				sudo sh -c "echo '$Zpool import $StoragePoolName'      									>> /etc/network/openvswitch/strt_scst.sh"
-
-				if   [ $Scst = 'Y' ]
-				then
-					sudo sh -c "echo '$Mount /dev/"$ScstLunPrefix"_luns/"$ScstLunPrefix"_"$Lun3Name"_"$Sw1Index"_00 /var/lib/lxc'	>> /etc/network/openvswitch/strt_scst.sh"
-				
-				elif [ $Scst = 'N' ]
-				then
-					sudo sh -c "echo '$Mount $LxcLun1'										>> /etc/network/openvswitch/strt_scst.sh"
-				fi
-
-				sudo cat /etc/network/openvswitch/strt_scst.sh
-			fi
-
-			echo ''
-			echo "=============================================="
-			echo "Done: Update strt_scst.sh file if it exists.  "
-			echo "=============================================="
-			echo ''
-	
-			sleep 5
-	
-			clear
-	
-			echo ''
-			echo "=============================================="
-			echo "Update stop_scst.sh file if it exists.        "
-			echo "=============================================="
-			echo ''
-	
-			if [ -f /etc/network/openvswitch/stop_scst.sh ]
-			then
-				function GetZpool2 {
-					echo $Zpool | sed 's/\//\\\//g'
-				}
-				Zpool2=$(GetZpool2)
-	
-				sudo sed -i "s/bash/&\nzpool export $StoragePoolName/"  /etc/network/openvswitch/stop_scst.sh
-				sudo sed -i "s/zpool export/$Zpool2 export/"            /etc/network/openvswitch/stop_scst.sh
-				sudo cat /etc/network/openvswitch/stop_scst.sh
-			fi
-
-			echo ''
-			echo "=============================================="
-			echo "Done: Update stop_scst.sh file if it exists.  "
-			echo "=============================================="
-			echo ''
-			
-		elif [ $LXDStorageDriver = 'btrfs' ]
+		elif [ $BtrfsRaid = 'raid10' ]
 		then
-			echo ''
-			echo "=============================================="
-			echo "Install btrfs-progs ...                       "
-			echo "=============================================="
-			echo ''
+			if   [ $Scst = 'Y' ]
+			then
+				sudo mkfs.btrfs -m raid10 /dev/olx_luns/olx_"$Lun1Name"_"$Sw1Index"_00 /dev/olx_luns/olx_"$Lun2Name"_"$Sw1Index"_00
 
-			sudo dnf -y install btrfs-progs
+			elif [ $Scst = 'N' ]
+			then
+				sudo mkfs.btrfs -m raid10 $BtrfsLun1 $BtrfsLun2
+			fi
 			
-			echo ''
-			echo "=============================================="
-			echo "Done: Install btrfs-progs.                    "
-			echo "=============================================="
-			echo ''
+		elif [ $BtrfsRaid = 'linear' ]
+		then
+			if   [ $Scst = 'Y' ]
+			then
+				sudo mkfs.btrfs -d single /dev/olx_luns/olx_"$Lun1Name"_"$Sw1Index"_00 /dev/olx_luns/olx_"$Lun2Name"_"$Sw1Index"_00
+
+			elif [ $Scst = 'N' ]
+			then
+				sudo mkfs.btrfs -d single $BtrfsLun1 $BtrfsLun2
+			fi
 			
+		elif [ $BtrfsRaid = 'none' ]
+		then
 			if [ $Scst = 'Y' ]
 			then
-				function GetRevDomain1 {
-					echo "$Domain1" | awk -F. '{for (i=NF; i>0; --i) printf "%s%s", (i<NF ? "." : ""), $i; printf "\n"}'
-				}
-				RevDomain1=$(GetRevDomain1)
-
-				CurrentDir=`pwd`
-
-				cd /opt/olxc/home/scst-files
-				./create-scst.sh $LXDStorageDriver $RevDomain1 $Lun1Name $Lun2Name $Lun3Name $Lun1Size $Lun2Size $Lun3Size $LogBlkSz
-				
-				cd $CurrentDir
-
-				sleep 5
-
+				echo "LXD init will use /dev/olx_luns/olx_$Lun1Name_$Sw1Index_00 for btrfs."	
+			
 			elif [ $Scst = 'N' ]
 			then
-				ls -l $BtrfsLun1 $BtrfsLun2
-			fi
-
-			if   [ $BtrfsRaid = 'raid0' ]
-			then
-				if   [ $Scst = 'Y' ]
-				then
-					sudo mkfs.btrfs -d raid0  /dev/olx_luns/olx_"$Lun1Name"_"$Sw1Index"_00 /dev/olx_luns/olx_"$Lun2Name"_"$Sw1Index"_00
-
-				elif [ $Scst = 'N' ]
-				then
-					sudo mkfs.btrfs -d raid0 $BtrfsLun1 $BtrfsLun2
-				fi
-
-			elif [ $BtrfsRaid = 'raid10' ]
-			then
-				if   [ $Scst = 'Y' ]
-				then
-					sudo mkfs.btrfs -m raid10 /dev/olx_luns/olx_"$Lun1Name"_"$Sw1Index"_00 /dev/olx_luns/olx_"$Lun2Name"_"$Sw1Index"_00
-
-				elif [ $Scst = 'N' ]
-				then
-					sudo mkfs.btrfs -m raid10 $BtrfsLun1 $BtrfsLun2
-				fi
-				
-			elif [ $BtrfsRaid = 'linear' ]
-			then
-				if   [ $Scst = 'Y' ]
-				then
-					sudo mkfs.btrfs -d single /dev/olx_luns/olx_"$Lun1Name"_"$Sw1Index"_00 /dev/olx_luns/olx_"$Lun2Name"_"$Sw1Index"_00
-
-				elif [ $Scst = 'N' ]
-				then
-					sudo mkfs.btrfs -d single $BtrfsLun1 $BtrfsLun2
-				fi
-				
-			elif [ $BtrfsRaid = 'none' ]
-			then
-				if [ $Scst = 'Y' ]
-				then
-					echo "LXD init will use /dev/olx_luns/olx_$Lun1Name_$Sw1Index_00 for btrfs."	
-				
-				elif [ $Scst = 'N' ]
-				then
-					echo "LXD init will use /dev/olx_luns/olx_$Lun1Name_$Sw1Index_00 for btrfs."	
-				fi
+				echo "LXD init will use /dev/olx_luns/olx_$Lun1Name_$Sw1Index_00 for btrfs."	
 			fi
 		fi
 	fi

@@ -383,38 +383,270 @@ echo ''
 echo "Product = "$Product
 sudo dnf install -y wget unzip
 cd /opt/olxc/"$DistDir"/products/k8s
+
+echo ''
+echo "=============================================="
+echo "Wget and Unzip Kubernetes github...           "
+echo "=============================================="
+echo ''
+
 wget -4 https://github.com/gstanden/kubernetes/archive/refs/heads/master.zip
-unzip master.zip
+unzip -q master.zip
+
+echo ''
+echo "=============================================="
+echo "Done: Wget and Unzip Kubernetes github.       "
+echo "=============================================="
+echo ''
+
+sleep 5
+
+clear
+
+echo ''
+echo "=============================================="
+echo "Untar Orabuntu product.tar file...            "
+echo "=============================================="
+echo ''
+
 tar -xvf /opt/olxc/"$DistDir"/"$SubDirName"/archives/product.tar -C /opt/olxc/"$DistDir"/products/$Product --touch
+
+echo ''
+echo "=============================================="
+echo "Done: Untar Orabuntu product.tar file.        "
+echo "=============================================="
+echo ''
+
+sleep 5
+
+clear
+
 cd kubernetes-master/lxd-provisioning
 
 # Temporary workaround until kubernetes v1.23 is released on December 7,2021
 # cp -p ~/kube* .
 
 chmod +x *.sh
+
+echo ''
+echo "=============================================="
+echo "Run cont-centos8-create.sh script...          "
+echo "=============================================="
+echo ''
+
 ./cont-centos8-create.sh $NameServer
+
+echo ''
+echo "=============================================="
+echo "Done: Run cont-centos8-create.sh script.      "
+echo "=============================================="
+echo ''
+
+sleep 5
+
+clear
+
+echo ''
+echo "=============================================="
+echo "Run host-oracle8.sh script...          "
+echo "=============================================="
+echo ''
+
 ./host-oracle8.sh 
+
+echo ''
+echo "=============================================="
+echo "Done: Run host-oracle8.sh script.             "
+echo "=============================================="
+echo ''
+
+sleep 5
+
+clear
+
+echo ''
+echo "=============================================="
+echo "Run cont-centos8-push.sh script...            "
+echo "=============================================="
+echo ''
+
 ./cont-centos8-push.sh 
+
+echo ''
+echo "=============================================="
+echo "Done: Run cont-centos8-push.sh script.        "
+echo "=============================================="
+echo ''
+
+sleep 5
+
+clear
+
+echo ''
+echo "=============================================="
+echo "Run cont-centos8-exec-maestro.sh script...    "
+echo "=============================================="
+echo ''
+
 ./cont-centos8-exec-maestro.sh 
+
+echo ''
+echo "=============================================="
+echo "Done: Run cont-centos8-exec-maestro.sh script "
+echo "=============================================="
+echo ''
+
+sleep 5
+
+clear
+
+echo ''
+echo "=============================================="
+echo "Run cont-centos8-exec-violin1.sh script...    "
+echo "=============================================="
+echo ''
+
 ./cont-centos8-exec-violin1.sh 
+
+echo ''
+echo "=============================================="
+echo "Done: Run cont-centos8-exec-violin1.sh script "
+echo "=============================================="
+echo ''
+
+sleep 5
+
+clear
+
+echo ''
+echo "=============================================="
+echo "Run cont-centos8-exec-violin2.sh script...    "
+echo "=============================================="
+echo ''
+
 ./cont-centos8-exec-violin2.sh 
+
+echo ''
+echo "=============================================="
+echo "Done: Run cont-centos8-exec-violin2.sh script "
+echo "=============================================="
+echo ''
+
+sleep 5
+
+clear
+
+echo ''
+echo "=============================================="
+echo "Run cont-centos8-push-ingress-nginx-examples  "
+echo "=============================================="
+echo ''
+
 ./cont-centos8-push-ingress-nginx-examples.sh
+
+echo ''
+echo "=============================================="
+echo "Done: cont-centos8-push-ingress-nginx-example "
+echo "=============================================="
+echo ''
+
+sleep 5
+
+clear
+
+echo ''
+echo "=============================================="
+echo "Run cont-centos8-push-configmap...            "
+echo "=============================================="
+echo ''
+
 ./cont-centos8-push-configmap.sh
+
+echo ''
+echo "=============================================="
+echo "Done: Run cont-centos8-push-configmap.        "
+echo "=============================================="
+echo ''
+
+sleep 5
+
+clear
+
+echo ''
+echo "=============================================="
+echo "Run cont-centos8-push-ingress-nginx-yaml...   "
+echo "=============================================="
+echo ''
+
 ./cont-centos8-push-ingress-nginx-yaml.sh
 
-#######################################
-# Run only on maestro nodes           #
-#######################################
+echo ''
+echo "=============================================="
+echo "Done: Run cont-centos8-push-ingress-nginx-yaml"
+echo "=============================================="
+echo ''
+
+sleep 5
+
+clear
+
+echo '#######################################'
+echo '# Following run only on maestro nodes:#'
+echo '#######################################'
+
+sleep 5
+
+clear
+
+echo ''
+echo "=============================================="
+echo "Run cont-centos8-5...                         "
+echo "=============================================="
+echo ''
 
 eval echo "'/var/lib/snapd/snap/bin/lxc exec maestro -- /root/cont-centos8-5.sh' | sg lxd"
+
+echo ''
+echo "=============================================="
+echo "Done: Run cont-centos8-5.                     "
+echo "=============================================="
+echo ''
+
 # metallb load balancer deployment
+
+echo ''
+echo "=============================================="
+echo "Run cont-centos8-6...                         "
+echo "=============================================="
+echo ''
+
 eval echo "'/var/lib/snapd/snap/bin/lxc exec maestro -- /root/cont-centos8-6.sh' | sg lxd"
+
+echo ''
+echo "=============================================="
+echo "Done: Run cont-centos8-6.                     "
+echo "=============================================="
+echo ''
+
 # ingress-nginx deployment
+
+echo ''
+echo "=============================================="
+echo "Run cont-centos8-7...                         "
+echo "=============================================="
+echo ''
+
 eval echo "'/var/lib/snapd/snap/bin/lxc exec maestro -- /root/cont-centos8-7.sh' | sg lxd"
 
-#######################################
-# Run only on violin nodes            #
-#######################################
+echo ''
+echo "=============================================="
+echo "Done: Run cont-centos8-7.                     "
+echo "=============================================="
+echo ''
+
+sleep 5
+
+clear
 
 echo ''
 echo "=============================================="
