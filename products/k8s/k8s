@@ -456,6 +456,10 @@ echo ''
 
 ./host-oracle8.sh 
 
+sleep 5
+
+clear
+
 echo ''
 echo "=============================================="
 echo "Done: Run host-oracle8.sh script.             "
@@ -474,6 +478,10 @@ echo ''
 
 ./cont-centos8-push.sh 
 
+sleep 5
+
+clear
+
 echo ''
 echo "=============================================="
 echo "Done: Run cont-centos8-push.sh script.        "
@@ -489,6 +497,10 @@ echo "=============================================="
 echo "Run cont-centos8-exec-maestro.sh script...    "
 echo "=============================================="
 echo ''
+
+sleep 5
+
+clear
 
 ./cont-centos8-exec-maestro.sh 
 
