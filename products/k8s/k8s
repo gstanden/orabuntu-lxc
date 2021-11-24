@@ -376,28 +376,49 @@ clear
 
 echo ''
 echo "=============================================="
-echo "Create K8S cluster...                         "
+echo "Create Kubernetes cluster...                  "
 echo "=============================================="
 echo ''
 
 echo "Product = "$Product
-sudo dnf install -y wget unzip
-cd /opt/olxc/"$DistDir"/products/k8s
+
+sleep 5
+
+clear
 
 echo ''
 echo "=============================================="
-echo "Wget and Unzip Kubernetes github...           "
+echo "Install wget and unzip...                     "
+echo "=============================================="
+echo ''
+
+sudo dnf install -y wget unzip
+
+echo ''
+echo "=============================================="
+echo "Done: Install wget and unzip.                 "
 echo "=============================================="
 echo ''
 
 sleep 5
 
+clear
+
+echo ''
+echo "=============================================="
+echo "Unzip Kubernetes github ...                   "
+echo "=============================================="
+echo ''
+
+sleep 5
+
+cd /opt/olxc/"$DistDir"/products/k8s
 wget -4 https://github.com/gstanden/kubernetes/archive/refs/heads/master.zip
 unzip  master.zip
 
 echo ''
 echo "=============================================="
-echo "Done: Wget and Unzip Kubernetes github.       "
+echo "Done: Unzip Kubernetes github.                "
 echo "=============================================="
 echo ''
 
@@ -435,6 +456,10 @@ echo "=============================================="
 echo "Run cont-centos8-create.sh script...          "
 echo "=============================================="
 echo ''
+
+sleep 5
+
+clear
 
 ./cont-centos8-create.sh $NameServer
 
