@@ -1,0 +1,5 @@
+If you just want to build the SCST RPM files and install them, pass in the "exit" variable, e.g.:
+
+./create-scst.sh exit
+
+Thanks.
