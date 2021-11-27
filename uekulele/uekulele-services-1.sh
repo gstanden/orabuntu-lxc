@@ -188,7 +188,7 @@ function GetMultiHostVar21 {
         echo $MultiHost | cut -f21 -d':'
 }
 MultiHostVar21=$(GetMultiHostVar21)
-Scst=$MultiHostVar21
+IscsiTarget=$MultiHostVar21
 
 function GetMultiHostVar22 {
         echo $MultiHost | cut -f22 -d':'
@@ -272,7 +272,13 @@ function GetMultiHostVar35 {
         echo $MultiHost | cut -f35 -d':'
 }
 MultiHostVar35=$(GetMultiHostVar35)
-ScstLunPrefix=$MultiHostVar35
+IscsiTargetLunPrefix=$MultiHostVar35
+
+function GetMultiHostVar36 {
+        echo $MultiHost | cut -f36 -d':'
+}
+MultiHostVar36=$(GetMultiHostVar36)
+IscsiVendor=$MultiHostVar36
 
 function CheckSystemdResolvedInstalled {
         sudo netstat -ulnp | grep 53 | sed 's/  */ /g' | rev | cut -f1 -d'/' | rev | sort -u | grep systemd- | wc -l
@@ -4360,7 +4366,6 @@ sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw7.sh
 sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw8.sh
 sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw9.sh
 
-
 echo ''
 echo "=============================================="
 echo "Unpack SCST Linux SAN Files...                "
@@ -4399,6 +4404,26 @@ echo ''
 sleep 5
 
 clear
+echo ''
+echo "=============================================="
+echo "Unpack LIO Linux SAN Files...                 "
+echo "=============================================="
+echo ''
+
+sudo tar -xvf /opt/olxc/"$DistDir"/uekulele/archives/lio-files.tar -C / --touch
+	
+sudo chown -R $Owner:$Group		        /opt/olxc/home/lio-files/.
+sudo sed -i "s/\"SWITCH_IP\"/$Sw1Index/g"	/opt/olxc/home/lio-files/create-scst-target.sh
+
+echo ''
+echo "=============================================="
+echo "Done: Unpack LIO Linux SAN Files.             "
+echo "=============================================="
+echo ''
+
+sleep 5
+
+clear
 
 if [ $Release -ge 7 ]
 then
@@ -4406,13 +4431,14 @@ then
 	then
 		$DistDir/zfsutils/$LinuxFlavor/zfs_$LinuxFlavor$Release.sh
 
-		function CheckScstInstalled {
+		function CheckIscsiTargetInstalled {
 			rpm -qa | grep -c scst
 		}
-		ScstInstalled=$(CheckScstInstalled)
+		IscsiTargetInstalled=$(CheckIscsiTargetInstalled)
 
-		if [ $Scst = 'Y' ] && [ $ScstInstalled -lt 4 ]
+		if [ $IscsiTarget = 'Y' ]
 		then
+			if [ 
 			function GetRevDomain1 {
 				echo "$Domain1" | awk -F. '{for (i=NF; i>0; --i) printf "%s%s", (i<NF ? "." : ""), $i; printf "\n"}'
 			}
@@ -4420,95 +4446,106 @@ then
 
 			CurrentDir=`pwd`
 
-			cd /opt/olxc/home/scst-files
-			./create-scst.sh $LXDStorageDriver $RevDomain1 $Lun1Name $Lun2Name $Lun3Name $Lun1Size $Lun2Size $Lun3Size $LogBlkSz $ScstLunPrefix
+			if [ $IscsiVendor = 'scst' ]
+			then
+				cd /opt/olxc/home/scst-files
+				./create-scst.sh $LXDStorageDriver $RevDomain1 $Lun1Name $Lun2Name $Lun3Name $Lun1Size $Lun2Size $Lun3Size $LogBlkSz $IscsiTargetLunPrefix
+
+			elif [ $IscsiVendor = 'lio' ]
+			then
+				cd /opt/olxc/home/lio-files
+				./create-lio.sh $LXDStorageDriver $RevDomain1 $Lun1Name $Lun2Name $Lun3Name $Lun1Size $Lun2Size $Lun3Size $LogBlkSz $IscsiTargetLunPrefix
+			fi
 
 			sleep 5
 
-			sudo zpool create $StoragePoolName $ZfsMirror /dev/"$ScstLunPrefix"_luns/"$ScstLunPrefix"_"$Lun1Name"_"$Sw1Index"_00 /dev/"$ScstLunPrefix"_luns/"$ScstLunPrefix"_"$Lun2Name"_"$Sw1Index"_00
+			sudo zpool create $StoragePoolName $ZfsMirror /dev/"$IscsiTargetLunPrefix"_luns/"$IscsiTargetLunPrefix"_"$Lun1Name"_"$Sw1Index"_00 /dev/"$IscsiTargetLunPrefix"_luns/"$IscsiTargetLunPrefix"_"$Lun2Name"_"$Sw1Index"_00
 
-		elif [ $Scst = 'N' ]
+		elif [ $IscsiTarget = 'N' ]
 		then
 			sudo zpool create $StoragePoolName $ZfsMirror $ZfsLun1 $ZfsLun2
 		fi
 
-		echo ''
-		echo "=============================================="
-		echo "Update strt_scst.sh file if it exists...      "
-		echo "=============================================="
-		echo ''
-
-		if [ -f /etc/network/openvswitch/strt_scst.sh ]
+		if [ $IscsiVendor = 'scst' ]
 		then
-			function WhichModprobe {
-				which modprobe
-			}
-			ModProbe=$(WhichModprobe)
+			echo ''
+			echo "=============================================="
+			echo "Update strt_scst.sh file if it exists...      "
+			echo "=============================================="
+			echo ''
 
-			function WhichZpool {
-				which zpool
-			}
-			Zpool=$(WhichZpool)
+			if [ -f /etc/network/openvswitch/strt_scst.sh ]
+			then
+				function WhichModprobe {
+					which modprobe
+				}
+				ModProbe=$(WhichModprobe)
 
-			function WhichSleep {
-			        which sleep
-			}
-			Sleep=$(WhichSleep)
+				function WhichZpool {
+					which zpool
+				}
+				Zpool=$(WhichZpool)
+
+				function WhichSleep {
+				        which sleep
+				}
+				Sleep=$(WhichSleep)
 				
-			function WhichMount {
-			        which mount 
-			}
-			Mount=$(WhichMount)
+				function WhichMount {
+				        which mount 
+				}
+				Mount=$(WhichMount)
 
-			sudo sh -c "echo '$Sleep 10'         		           								>> /etc/network/openvswitch/strt_scst.sh"
-			sudo sh -c "echo '$ModProbe zfs'                									>> /etc/network/openvswitch/strt_scst.sh"
-			sudo sh -c "echo '$Zpool import $StoragePoolName'      									>> /etc/network/openvswitch/strt_scst.sh"
+				sudo sh -c "echo '$Sleep 10'         		           								>> /etc/network/openvswitch/strt_scst.sh"
+				sudo sh -c "echo '$ModProbe zfs'                									>> /etc/network/openvswitch/strt_scst.sh"
+				sudo sh -c "echo '$Zpool import $StoragePoolName'      									>> /etc/network/openvswitch/strt_scst.sh"
 
-			if   [ $Scst = 'Y' ]
-			then
-				sudo sh -c "echo '$Mount /dev/"$ScstLunPrefix"_luns/"$ScstLunPrefix"_"$Lun3Name"_"$Sw1Index"_00 /var/lib/lxc'	>> /etc/network/openvswitch/strt_scst.sh"
-			
-			elif [ $Scst = 'N' ]
-			then
-				sudo sh -c "echo '$Mount $LxcLun1'										>> /etc/network/openvswitch/strt_scst.sh"
+				if   [ $IscsiTarget = 'Y' ]
+				then
+					sudo sh -c "echo '$Mount /dev/"$IscsiTargetLunPrefix"_luns/"$IscsiTargetLunPrefix"_"$Lun3Name"_"$Sw1Index"_00 /var/lib/lxc'	>> /etc/network/openvswitch/strt_scst.sh"
+				
+				elif [ $IscsiTarget = 'N' ]
+				then
+					sudo sh -c "echo '$Mount $LxcLun1'										>> /etc/network/openvswitch/strt_scst.sh"
+				fi
+	
+				sudo cat /etc/network/openvswitch/strt_scst.sh
 			fi
 
-			sudo cat /etc/network/openvswitch/strt_scst.sh
-		fi
-
-		echo ''
-		echo "=============================================="
-		echo "Done: Update strt_scst.sh file if it exists.  "
-		echo "=============================================="
-		echo ''
-
-		sleep 5
-
-		clear
-
-		echo ''
-		echo "=============================================="
-		echo "Update stop_scst.sh file if it exists.        "
-		echo "=============================================="
-		echo ''
+			echo ''
+			echo "=============================================="
+			echo "Done: Update strt_scst.sh file if it exists.  "
+			echo "=============================================="
+			echo ''
 	
-		if [ -f /etc/network/openvswitch/stop_scst.sh ]
-		then
-			function GetZpool2 {
-				echo $Zpool | sed 's/\//\\\//g'
-			}
-			Zpool2=$(GetZpool2)
+			sleep 5
+	
+			clear
 
-			sudo sed -i "s/bash/&\nzpool export $StoragePoolName/"  /etc/network/openvswitch/stop_scst.sh
-			sudo sed -i "s/zpool export/$Zpool2 export/"            /etc/network/openvswitch/stop_scst.sh
-			sudo cat /etc/network/openvswitch/stop_scst.sh
+			echo ''
+			echo "=============================================="
+			echo "Update stop_scst.sh file if it exists.        "
+			echo "=============================================="
+			echo ''
+	
+			if [ -f /etc/network/openvswitch/stop_scst.sh ]
+			then
+				function GetZpool2 {
+					echo $Zpool | sed 's/\//\\\//g'
+				}
+				Zpool2=$(GetZpool2)
+	
+				sudo sed -i "s/bash/&\nzpool export $StoragePoolName/"  /etc/network/openvswitch/stop_scst.sh
+				sudo sed -i "s/zpool export/$Zpool2 export/"            /etc/network/openvswitch/stop_scst.sh
+				sudo cat /etc/network/openvswitch/stop_scst.sh
+			fi
+
+			echo ''
+			echo "=============================================="
+			echo "Done: Update stop_scst.sh file if it exists.  "
+			echo "=============================================="
+			echo ''
 		fi
-
-		echo ''
-		echo "=============================================="
-		echo "Done: Update stop_scst.sh file if it exists.  "
-		echo "=============================================="
-		echo ''
 		
 	elif [ $LXDStorageDriver = 'btrfs' ]
 	then
@@ -4526,7 +4563,7 @@ then
 		echo "=============================================="
 		echo ''
 		
-		if [ $Scst = 'Y' ]
+		if [ $IscsiTarget = 'Y' ]
 		then
 			function GetRevDomain1 {
 				echo "$Domain1" | awk -F. '{for (i=NF; i>0; --i) printf "%s%s", (i<NF ? "." : ""), $i; printf "\n"}'
@@ -4542,51 +4579,51 @@ then
 
 			sleep 5
 
-		elif [ $Scst = 'N' ]
+		elif [ $IscsiTarget = 'N' ]
 		then
 			ls -l $BtrfsLun1 $BtrfsLun2
 		fi
 
 		if   [ $BtrfsRaid = 'raid0' ]
 		then
-			if   [ $Scst = 'Y' ]
+			if   [ $IscsiTarget = 'Y' ]
 			then
 				sudo mkfs.btrfs -d raid0  /dev/olx_luns/olx_"$Lun1Name"_"$Sw1Index"_00 /dev/olx_luns/olx_"$Lun2Name"_"$Sw1Index"_00
 
-			elif [ $Scst = 'N' ]
+			elif [ $IscsiTarget = 'N' ]
 			then
 				sudo mkfs.btrfs -d raid0 $BtrfsLun1 $BtrfsLun2
 			fi
 
 		elif [ $BtrfsRaid = 'raid10' ]
 		then
-			if   [ $Scst = 'Y' ]
+			if   [ $IscsiTarget = 'Y' ]
 			then
 				sudo mkfs.btrfs -m raid10 /dev/olx_luns/olx_"$Lun1Name"_"$Sw1Index"_00 /dev/olx_luns/olx_"$Lun2Name"_"$Sw1Index"_00
 
-			elif [ $Scst = 'N' ]
+			elif [ $IscsiTarget = 'N' ]
 			then
 				sudo mkfs.btrfs -m raid10 $BtrfsLun1 $BtrfsLun2
 			fi
 			
 		elif [ $BtrfsRaid = 'linear' ]
 		then
-			if   [ $Scst = 'Y' ]
+			if   [ $IscsiTarget = 'Y' ]
 			then
 				sudo mkfs.btrfs -d single /dev/olx_luns/olx_"$Lun1Name"_"$Sw1Index"_00 /dev/olx_luns/olx_"$Lun2Name"_"$Sw1Index"_00
 
-			elif [ $Scst = 'N' ]
+			elif [ $IscsiTarget = 'N' ]
 			then
 				sudo mkfs.btrfs -d single $BtrfsLun1 $BtrfsLun2
 			fi
 			
 		elif [ $BtrfsRaid = 'none' ]
 		then
-			if [ $Scst = 'Y' ]
+			if [ $IscsiTarget = 'Y' ]
 			then
 				echo "LXD init will use /dev/olx_luns/olx_$Lun1Name_$Sw1Index_00 for btrfs."	
 			
-			elif [ $Scst = 'N' ]
+			elif [ $IscsiTarget = 'N' ]
 			then
 				echo "LXD init will use /dev/olx_luns/olx_$Lun1Name_$Sw1Index_00 for btrfs."	
 			fi
@@ -4594,10 +4631,10 @@ then
 	fi
 fi
 
-if [ $Scst = 'Y' ]
+if [ $IscsiTarget = 'Y' ]
 then
-	sudo mkfs.xfs /dev/"$ScstLunPrefix"_luns/"$ScstLunPrefix"_"$Lun3Name"_"$Sw1Index"_00 -f
-	sudo mount /dev/"$ScstLunPrefix"_luns/"$ScstLunPrefix"_"$Lun3Name"_"$Sw1Index"_00 /var/lib/lxc
+	sudo mkfs.xfs /dev/"$IscsiTargetLunPrefix"_luns/"$IscsiTargetLunPrefix"_"$Lun3Name"_"$Sw1Index"_00 -f
+	sudo mount /dev/"$IscsiTargetLunPrefix"_luns/"$IscsiTargetLunPrefix"_"$Lun3Name"_"$Sw1Index"_00 /var/lib/lxc
 fi
 
 sleep 5
@@ -4638,11 +4675,11 @@ then
                         sudo sed -i "s/SWITCH_IP/$Sw1Index/g"                                                   /etc/network/openvswitch/preseed.sw1a.btr.001.lxd.cluster
                         sudo sed -i "s/HOSTNAME/$ShortHostName/g"                                               /etc/network/openvswitch/preseed.sw1a.btr.001.lxd.cluster
 			
-			if   [ $Scst = 'Y' ]
+			if   [ $IscsiTarget = 'Y' ]
 			then
                         	sudo sed -i "s/BTRFSLUN/\/dev\/olx_luns\/olx_"$Lun1Name"_"$Sw1Index"_00/g" 	/etc/network/openvswitch/preseed.sw1a.btr.001.lxd.cluster
 			
-			elif [ $Scst = 'N' ]
+			elif [ $IscsiTarget = 'N' ]
 			then
 				sudo sed -i "s/BTRFSLUN/$BtrfsLun/g"						/etc/network/openvswitch/preseed.sw1a.btr.001.lxd.cluster
 			fi
@@ -4676,11 +4713,11 @@ then
                         sudo sed -i "s/SWITCH_IP/$Sw1Index/g"                                                   /etc/network/openvswitch/preseed.sw1a.btr.002.lxd.cluster
                         sudo sed -i "s/HOSTNAME/$ShortHostName/g"                                               /etc/network/openvswitch/preseed.sw1a.btr.002.lxd.cluster
 			
-			if   [ $Scst = 'Y' ]
+			if   [ $IscsiTarget = 'Y' ]
 			then
                         	sudo sed -i "s/BTRFSLUN/\/dev\/olx_luns\/olx_"$Lun1Name"_"$Sw1Index"_00/g" 	/etc/network/openvswitch/preseed.sw1a.btr.002.lxd.cluster
 			
-			elif [ $Scst = 'N' ]
+			elif [ $IscsiTarget = 'N' ]
 			then
 				sudo sed -i "s/BTRFSLUN/$BtrfsLun/g"						/etc/network/openvswitch/preseed.sw1a.btr.002.lxd.cluster
 			fi

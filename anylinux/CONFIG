@@ -41,14 +41,15 @@ ZfsLun2="\/dev\/sdc"			#							User-provided LUN if not using built-in SCST stor
 LxcLun1="\/dev\/sdd"			#							User-provided LUN if not using built-in SCST storage
 BtrfsRaid=raid0				# [none|raid0|raid10|linear]				Btrfs Raid Options.
 ZfsMirror=mirror			# [mirror|'']						Flag to mirror or not-mirror ZFS across two SCST luns.
-Scst=Y					# [Y|N]							Use SCST file-backed LUNS for ZFS storage for LXD containers
-ScstLunPrefix=lxc			# 							Can be any 3-character prefix.  The prefix lxc is recommended. 
-Lun1Name=zfsa				# [btra|zfsa]						Name of Lun1. Only used if Scst=Y. For example for btrfs recommended is btra. Do not exceed four characters.
-Lun2Name=zfsm				# [btrm|zfsm]						Name of Lun2. Only used if Scst=Y. For example for btrfs recommended is btrm. Do not exceed four characters.
-Lun3Name=xfsa				# [xfsa]						Name of Lun3. Only used if Scst=Y. This lun is used for the xfs filesystem for the lxc (non-lxd) nameserver which is a legacy lxc containers. Do not exceed four characters.
-Lun1Size=10G				#							Size of Lun1. Only used if Scst=Y. Use 5G minimum if Product=k8s (10G is recommended)
-Lun2Size=10G				#							Size of Lun2. Only used if Scst=Y. Use 5G minimum if Product=k8s (10G is recommended)
-Lun3Size=5G				#							Size of Lun3. Only used if Scst=Y.
+IscsiTarget=Y				# [Y|N]							Use SCST file-backed LUNS for ZFS storage for LXD containers
+IscsiProduct				# [lio|scst]						Target subsystem vendor
+IscsiTargetLunPrefix=lxc		# 							Can be any 3-character prefix.  The prefix lxc is recommended. 
+Lun1Name=zfsa				# [btra|zfsa]						Name of Lun1. Only used if IscsiTarget=Y. For example for btrfs recommended is btra. Do not exceed four characters.
+Lun2Name=zfsm				# [btrm|zfsm]						Name of Lun2. Only used if IscsiTarget=Y. For example for btrfs recommended is btrm. Do not exceed four characters.
+Lun3Name=xfsa				# [xfsa]						Name of Lun3. Only used if IscsiTarget=Y. This lun is used for the xfs filesystem for the lxc (non-lxd) nameserver which is a legacy lxc containers. Do not exceed four characters.
+Lun1Size=10G				#							Size of Lun1. Only used if IscsiTarget=Y. Use 5G minimum if Product=k8s (10G is recommended)
+Lun2Size=10G				#							Size of Lun2. Only used if IscsiTarget=Y. Use 5G minimum if Product=k8s (10G is recommended)
+Lun3Size=5G				#							Size of Lun3. Only used if IscsiTarget=Y.
 LogBlkSz=512				#							Logical block size of Luns. Can be 512 or 4096 (even if physical block size is 512)
 
 # =============================================================================================

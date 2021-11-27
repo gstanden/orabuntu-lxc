@@ -232,8 +232,9 @@ TunType=$(source "$DistDir"/anylinux/CONFIG; echo $TunType)
 
 ###################### SCST settings ###########################
 
-Scst=$(source "$DistDir"/anylinux/CONFIG; echo $Scst)
-ScstLunPrefix=$(source "$DistDir"/anylinux/CONFIG; echo $ScstLunPrefix)
+IscsiTarget=$(source "$DistDir"/anylinux/CONFIG; echo $IscsiTarget)
+IscsiVendor=$(source "$DistDir"/anylinux/CONFIG; echo $IscsiVendor)
+IscsiTargetLunPrefix=$(source "$DistDir"/anylinux/CONFIG; echo $IscsiTargetLunPrefix)
 Lun1Name=$(source "$DistDir"/anylinux/CONFIG; echo $Lun1Name)
 Lun2Name=$(source "$DistDir"/anylinux/CONFIG; echo $Lun2Name)
 Lun3Name=$(source "$DistDir"/anylinux/CONFIG; echo $Lun3Name)
@@ -294,7 +295,7 @@ then
 		then
 			if [ $LXDStorageDriver = 'zfs' ]
 			then
-				if [ $Scst = 'Y' ]
+				if [ $IscsiTarget = 'Y' ]
 				then
        		 			BtrfsLun1=Unused
        		 			BtrfsLun2=Unused
@@ -302,7 +303,7 @@ then
 					ZfsLun2=Unused
 					LxcLun1=Unused
 
-				elif [ $Scst = 'N' ]
+				elif [ $IscsiTarget = 'N' ]
 				then
        		 			BtrfsLun1=Unused
        		 			BtrfsLun2=Unused
@@ -316,7 +317,7 @@ then
 
 			elif [ $LXDStorageDriver = 'btrfs' ]
 			then
-				if [ $Scst = 'Y' ]
+				if [ $IscsiTarget = 'Y' ]
 				then
        		 			BtrfsLun1=Unused
        		 			BtrfsLun2=Unused
@@ -324,7 +325,7 @@ then
 					ZfsLun2=Unused
 					LxcLun1=Unused
 
-				elif [ $Scst = 'N' ]
+				elif [ $IscsiTarget = 'N' ]
 				then
        		 			ZfsLun1=Unused
        		 			ZfsLun2=Unused
@@ -346,8 +347,8 @@ echo "Show LXD & LXD Cluster Values...     "
 echo "=============================================="
 echo ''
 
-echo 'SCST			= '$Scst
-echo 'ScstLunPrefix		= '$ScstLunPrefix
+echo 'SCST			= '$IscsiTarget
+echo 'IscsiTargetLunPrefix		= '$IscsiTargetLunPrefix
 echo 'LXDCluster 		= '$LXDCluster
 echo 'LXDPreSeed 		= '$LXDPreSeed
 echo 'LXD			= '$LXD
@@ -386,17 +387,17 @@ function GetLXDStorageDriverPrefix {
 }
 LXDStorageDriverPrefix=$(GetLXDStorageDriverPrefix)
 
-function CheckScstLunName1 {
+function CheckIscsiTargetLunName1 {
 	echo $Lun1Name | grep -c $LXDStorageDriverPrefix
 }
-ScstLunName1=$(CheckScstLunName1)
+IscsiTargetLunName1=$(CheckIscsiTargetLunName1)
 
-function CheckScstLunName2 {
+function CheckIscsiTargetLunName2 {
 	echo $Lun2Name | grep -c $LXDStorageDriverPrefix
 }
-ScstLunName2=$(CheckScstLunName2)
+IscsiTargetLunName2=$(CheckIscsiTargetLunName2)
 
-if [ $ScstLunName1 -eq 0 ] || [ $ScstLunName2 -eq 0 ]
+if [ $IscsiTargetLunName1 -eq 0 ] || [ $IscsiTargetLunName2 -eq 0 ]
 then
 	echo "SCST LUNs $Lun1Name $Lun2Name mismatch $LXDStorageDriver driver."
 	echo ''
@@ -533,7 +534,7 @@ then
 	fi
 
 else
-	MultiHost="$Operation:N:1:X:X:X:$MTU:X:X:$GRE:$Product:$LXD:$K8S:$LXDPreSeed:$LXDCluster:$LXDStorageDriver:$LXDStoragePoolName:$BtrfsLun1:$Docker:$TunType:$Scst:$Lun1Name:$Lun2Name:$Lun3Name:$Lun1Size:$Lun2Size:$Lun3Size:$LogBlkSz:$BtrfsRaid:$ZfsMirror:$BtrfsLun2:$ZfsLun1:$ZfsLun2:$LxcLun1:$ScstLunPrefix"
+	MultiHost="$Operation:N:1:X:X:X:$MTU:X:X:$GRE:$Product:$LXD:$K8S:$LXDPreSeed:$LXDCluster:$LXDStorageDriver:$LXDStoragePoolName:$BtrfsLun1:$Docker:$TunType:$IscsiTarget:$Lun1Name:$Lun2Name:$Lun3Name:$Lun1Size:$Lun2Size:$Lun3Size:$LogBlkSz:$BtrfsRaid:$ZfsMirror:$BtrfsLun2:$ZfsLun1:$ZfsLun2:$LxcLun1:$IscsiTargetLunPrefix:$IscsiVendor"
 fi
 
 ./anylinux-services.sh $MultiHost 

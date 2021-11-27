@@ -1,8 +1,0 @@
-kubernetes-master/lxd-provisioning/cont-centos8-5.sh
-kubernetes-master/lxd-provisioning/cont-centos8-7.sh
-kubernetes-master/lxd-provisioning/ifcfg-eth0-kmaster
-kubernetes-master/lxd-provisioning/ifcfg-eth0-kworker1
-kubernetes-master/lxd-provisioning/ifcfg-eth0-kworker2
-kubernetes-master/lxd-provisioning/network-config-kmaster.yaml
-rootfs/GNU3
-rootfs/COPYING

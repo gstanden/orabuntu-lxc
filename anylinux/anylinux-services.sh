@@ -1388,7 +1388,7 @@ function GetMultiHostVar21 {
         echo $MultiHost | cut -f21 -d':'
 }
 MultiHostVar21=$(GetMultiHostVar21)
-Scst=$MultiHostVar21
+IscsiTarget=$MultiHostVar21
 
 function GetMultiHostVar22 {
         echo $MultiHost | cut -f22 -d':'
@@ -1472,7 +1472,13 @@ function GetMultiHostVar35 {
         echo $MultiHost | cut -f35 -d':'
 }
 MultiHostVar35=$(GetMultiHostVar35)
-ScstLunPrefix=$MultiHostVar35
+IscsiTargetLunPrefix=$MultiHostVar35
+
+function GetMultiHostVar36 {
+        echo $MultiHost | cut -f36 -d':'
+}
+MultiHostVar36=$(GetMultiHostVar36)
+IscsiVendor=$MultiHostVar36
 
 	echo 'Docker			  = '$Docker
 	echo 'K8S                  	  = '$K8S
@@ -1631,20 +1637,28 @@ else
 	echo 'Tunnel Type		  = '$MultiHostVar20
 fi
 
-if [ -z $Scst ]
+if [ -z $IscsiTarget ]
 then
-	Scst=N
-	echo 'SCST			  = '$Scst
+	IscsiTarget=N
+	echo 'iSCSI			  = '$IscsiTarget
 else
-	echo 'SCST			  = '$MultiHostVar21
+	echo 'iSCSI			  = '$MultiHostVar21
 fi
 
-if [ -z $ScstLunPrefix ]
+if [ -z $IscsiVendor ]
 then
-	ScstLunPrefix=lxc
-	echo 'ScstLunPrefix		  = '$ScstLunPrefix
+	IscsiVendor=lio
+	echo 'iSCSI Vendor		  = '$IscsiVendor
 else
-	echo 'ScstLunPrefix		  = '$ScstLunPrefix
+	echo 'iSCSI Vendor		  = '$MultiHostVar36
+fi
+
+if [ -z $IscsiTargetLunPrefix ]
+then
+	IscsiTargetLunPrefix=lxc
+	echo 'IscsiTargetLunPrefix		  = '$IscsiTargetLunPrefix
+else
+	echo 'IscsiTargetLunPrefix		  = '$IscsiTargetLunPrefix
 fi
 
 if [ -z $Lun1Name ]

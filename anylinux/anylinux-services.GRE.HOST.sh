@@ -225,9 +225,9 @@ TunType=$(source "$DistDir"/anylinux/CONFIG; echo $TunType)
 
 ##################### SCST install Flag  ########################
 
-# Scst setting [Y|N] 
+# IscsiTarget setting [Y|N] 
 
-Scst=$(source "$DistDir"/anylinux/CONFIG; echo $Scst)
+IscsiTarget=$(source "$DistDir"/anylinux/CONFIG; echo $IscsiTarget)
 
 ################# Kubernetes Install Flag  ######################
 
@@ -313,7 +313,7 @@ then
 
                         clear
 
-			if [ $Scst = 'N' ]
+			if [ $IscsiTarget = 'N' ]
                         then
                                 echo ''
                                 echo "=============================================="
@@ -828,9 +828,9 @@ then
 
 	elif [ $UbuntuMajorVersion -ge 16 ]
 	then
-		MultiHost="$Operation:Y:X:X:$HUBIP:$SPOKEIP:$MTU:$HubUserAct:$HubSudoPwd:$GRE:$Product:$LXD:$K8S:$PreSeed:$LXDCluster:$LXDStorageDriver:$StoragePoolName:$BtrfsLun:$Docker:$TunType:$Scst"
+		MultiHost="$Operation:Y:X:X:$HUBIP:$SPOKEIP:$MTU:$HubUserAct:$HubSudoPwd:$GRE:$Product:$LXD:$K8S:$PreSeed:$LXDCluster:$LXDStorageDriver:$StoragePoolName:$BtrfsLun:$Docker:$TunType:$IscsiTarget"
 	else
-		MultiHost="$Operation:Y:X:X:$HUBIP:$SPOKEIP:$MTU:$HubUserAct:$HubSudoPwd:$GRE:$Product:$LXD:$K8S:$PreSeed:$LXDCluster:$LXDStorageDriver:$StoragePoolName:$BtrfsLun:$Docker:$TunType:$Scst"
+		MultiHost="$Operation:Y:X:X:$HUBIP:$SPOKEIP:$MTU:$HubUserAct:$HubSudoPwd:$GRE:$Product:$LXD:$K8S:$PreSeed:$LXDCluster:$LXDStorageDriver:$StoragePoolName:$BtrfsLun:$Docker:$TunType:$IscsiTarget"
         fi
 
 	sleep 5
