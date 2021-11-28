@@ -26,7 +26,8 @@ sudo rpm -Uvh https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch
 sudo yum-config-manager --enable epel 
 sudo yum repolist
 sudo yum -y install dkms
-sudo rpm -Uvh http://download.zfsonlinux.org/epel/zfs-release.el`cat /etc/oracle-release | cut -f5 -d' ' | sed 's/\./_/'`.noarch.rpm 2>/dev/null
+# sudo rpm -Uvh http://download.zfsonlinux.org/epel/zfs-release.el`cat /etc/oracle-release | cut -f5 -d' ' | sed 's/\./_/'`.noarch.rpm 2>/dev/null
+sudo rpm -Uvh http://download.zfsonlinux.org/epel/zfs-release.el8_4.noarch.rpm
 
 sleep 5
 
