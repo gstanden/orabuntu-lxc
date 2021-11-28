@@ -13,6 +13,7 @@ rootfs/config.asm.flex.cluster
 /var/lib/lxc/nsa/rootfs/var/lib/bind/rev.orabuntu-lxc.com
 /var/lib/lxc/nsa/rootfs/root/ns_backup_update.lst
 /opt/olxc/home/scst-files/99-StorageOwner.rules.template
+/opt/olxc/home/lio-files/99-StorageOwner.rules.template
 /opt/olxc/home/scst-files/create-scst-dkms.sh
 /opt/olxc/home/scst-files/create-scst-dpkg.sh
 /opt/olxc/home/scst-files/create-scst-install.sh
