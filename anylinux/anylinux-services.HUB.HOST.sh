@@ -348,7 +348,7 @@ echo "=============================================="
 echo ''
 
 echo 'SCST			= '$IscsiTarget
-echo 'IscsiTargetLunPrefix		= '$IscsiTargetLunPrefix
+echo 'IscsiTargetLunPrefix	= '$IscsiTargetLunPrefix
 echo 'LXDCluster 		= '$LXDCluster
 echo 'LXDPreSeed 		= '$LXDPreSeed
 echo 'LXD			= '$LXD

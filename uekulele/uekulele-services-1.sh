@@ -279,6 +279,7 @@ function GetMultiHostVar36 {
 }
 MultiHostVar36=$(GetMultiHostVar36)
 IscsiVendor=$MultiHostVar36
+echo $IscsiVendor
 
 function CheckSystemdResolvedInstalled {
         sudo netstat -ulnp | grep 53 | sed 's/  */ /g' | rev | cut -f1 -d'/' | rev | sort -u | grep systemd- | wc -l
@@ -4413,7 +4414,7 @@ echo ''
 sudo tar -xvf /opt/olxc/"$DistDir"/uekulele/archives/lio-files.tar -C / --touch
 	
 sudo chown -R $Owner:$Group		        /opt/olxc/home/lio-files/.
-sudo sed -i "s/\"SWITCH_IP\"/$Sw1Index/g"	/opt/olxc/home/lio-files/create-scst-target.sh
+sudo sed -i "s/\"SWITCH_IP\"/$Sw1Index/g"	/opt/olxc/home/lio-files/create-lio-target.sh
 
 echo ''
 echo "=============================================="
@@ -4432,13 +4433,12 @@ then
 		$DistDir/zfsutils/$LinuxFlavor/zfs_$LinuxFlavor$Release.sh
 
 		function CheckIscsiTargetInstalled {
-			rpm -qa | grep -c scst
+			rpm -qa | grep -c $IscsiTarget
 		}
 		IscsiTargetInstalled=$(CheckIscsiTargetInstalled)
 
 		if [ $IscsiTarget = 'Y' ]
 		then
-			if [ 
 			function GetRevDomain1 {
 				echo "$Domain1" | awk -F. '{for (i=NF; i>0; --i) printf "%s%s", (i<NF ? "." : ""), $i; printf "\n"}'
 			}
@@ -4446,7 +4446,7 @@ then
 
 			CurrentDir=`pwd`
 
-			if [ $IscsiVendor = 'scst' ]
+			if   [ $IscsiVendor = 'scst' ]
 			then
 				cd /opt/olxc/home/scst-files
 				./create-scst.sh $LXDStorageDriver $RevDomain1 $Lun1Name $Lun2Name $Lun3Name $Lun1Size $Lun2Size $Lun3Size $LogBlkSz $IscsiTargetLunPrefix
@@ -4890,15 +4890,15 @@ then
 
 		if   [ $LinuxFlavor = 'CentOS' ] && [ $Release -eq 7 ]
 		then
-                	curl -O --remote-name https://us.lxd.images.canonical.com/images/ubuntu/hirsute/amd64/default/index.html --output /opt/olxc/"$DistDir"/lxcimage/nsa
+                	curl -O -4 --remote-name https://us.lxd.images.canonical.com/images/ubuntu/hirsute/amd64/default/index.html --output /opt/olxc/"$DistDir"/lxcimage/nsa
 		
 		elif [ $LinuxFlavor = 'Red' ] && [ $Release -eq 7 ]
 		then
-                	curl -O --remote-name https://us.lxd.images.canonical.com/images/ubuntu/hirsute/amd64/default/index.html --output /opt/olxc/"$DistDir"/lxcimage/nsa
+                	curl -O -4 --remote-name https://us.lxd.images.canonical.com/images/ubuntu/hirsute/amd64/default/index.html --output /opt/olxc/"$DistDir"/lxcimage/nsa
 		
 		elif [ $LinuxFlavor = 'Oracle' ] && [ $Release -eq 7 ]
 		then
-                	curl -O --remote-name https://us.lxd.images.canonical.com/images/ubuntu/hirsute/amd64/default/index.html --output /opt/olxc/"$DistDir"/lxcimage/nsa
+                	curl -O -4 --remote-name https://us.lxd.images.canonical.com/images/ubuntu/hirsute/amd64/default/index.html --output /opt/olxc/"$DistDir"/lxcimage/nsa
 		else
                 	wget -4 -q https://us.lxd.images.canonical.com/images/ubuntu/focal/amd64/default/ -P /opt/olxc/"$DistDir"/lxcimage/nsa
 		fi
@@ -4910,15 +4910,15 @@ then
 
 		if   [ $LinuxFlavor = 'CentOS' ] && [ $Release -eq 7 ]
 		then
-                	curl -O --remote-name https://us.lxd.images.canonical.com/images/ubuntu/hirsute/amd64/default/"$BuildDate"/SHA256SUMS --output /opt/olxc/"$DistDir"/lxcimage/nsa
+                	curl -O -4 --remote-name https://us.lxd.images.canonical.com/images/ubuntu/hirsute/amd64/default/"$BuildDate"/SHA256SUMS --output /opt/olxc/"$DistDir"/lxcimage/nsa
 		
 		elif [ $LinuxFlavor = 'Red' ] && [ $Release -eq 7 ]
 		then
-                	curl -O --remote-name https://us.lxd.images.canonical.com/images/ubuntu/hirsute/amd64/default/"$BuildDate"/SHA256SUMS --output /opt/olxc/"$DistDir"/lxcimage/nsa
+                	curl -O -4 --remote-name https://us.lxd.images.canonical.com/images/ubuntu/hirsute/amd64/default/"$BuildDate"/SHA256SUMS --output /opt/olxc/"$DistDir"/lxcimage/nsa
 		
 		elif [ $LinuxFlavor = 'Oracle' ] && [ $Release -eq 7 ]
 		then
-                	curl -O --remote-name https://us.lxd.images.canonical.com/images/ubuntu/hirsute/amd64/default/"$BuildDate"/SHA256SUMS --output /opt/olxc/"$DistDir"/lxcimage/nsa
+                	curl -O -4 --remote-name https://us.lxd.images.canonical.com/images/ubuntu/hirsute/amd64/default/"$BuildDate"/SHA256SUMS --output /opt/olxc/"$DistDir"/lxcimage/nsa
 		else
                 	wget -4 -q https://us.lxd.images.canonical.com/images/ubuntu/focal/amd64/default/"$BuildDate"/SHA256SUMS -P /opt/olxc/"$DistDir"/lxcimage/nsa
 		fi
@@ -4936,17 +4936,17 @@ then
 
 			if   [ $LinuxFlavor = 'CentOS' ] && [ $Release -eq 7 ]
 			then
-                        	curl -O --remote-name https://us.lxd.images.canonical.com/images/ubuntu/hirsute/amd64/default/"$BuildDate"/$i --output /opt/olxc/"$DistDir"/lxcimage/nsa
+                        	curl -O -4 --remote-name https://us.lxd.images.canonical.com/images/ubuntu/hirsute/amd64/default/"$BuildDate"/$i --output /opt/olxc/"$DistDir"/lxcimage/nsa
 				diff <(shasum -a 256 /opt/olxc/"$DistDir"/lxcimage/nsa/$i | cut -f1,11 -d'/' | sed 's/  */ /g' | sed 's/\///' | sed 's/  */ /g') <(grep $i /opt/olxc/"$DistDir"/lxcimage/nsa/SHA256SUMS)
 			
 			elif [ $LinuxFlavor = 'Red' ] && [ $Release -eq 7 ]
 			then
-                        	curl -O --remote-name https://us.lxd.images.canonical.com/images/ubuntu/hirsute/amd64/default/"$BuildDate"/$i --output /opt/olxc/"$DistDir"/lxcimage/nsa
+                        	curl -O -4 --remote-name https://us.lxd.images.canonical.com/images/ubuntu/hirsute/amd64/default/"$BuildDate"/$i --output /opt/olxc/"$DistDir"/lxcimage/nsa
 				diff <(shasum -a 256 /opt/olxc/"$DistDir"/lxcimage/nsa/$i | cut -f1,11 -d'/' | sed 's/  */ /g' | sed 's/\///' | sed 's/  */ /g') <(grep $i /opt/olxc/"$DistDir"/lxcimage/nsa/SHA256SUMS)
 			
 			elif [ $LinuxFlavor = 'Oracle' ] && [ $Release -eq 7 ]
 			then
-                        	curl -O --remote-name https://us.lxd.images.canonical.com/images/ubuntu/hirsute/amd64/default/"$BuildDate"/$i --output /opt/olxc/"$DistDir"/lxcimage/nsa
+                        	curl -O -4 --remote-name https://us.lxd.images.canonical.com/images/ubuntu/hirsute/amd64/default/"$BuildDate"/$i --output /opt/olxc/"$DistDir"/lxcimage/nsa
 				diff <(shasum -a 256 /opt/olxc/"$DistDir"/lxcimage/nsa/$i | cut -f1,11 -d'/' | sed 's/  */ /g' | sed 's/\///' | sed 's/  */ /g') <(grep $i /opt/olxc/"$DistDir"/lxcimage/nsa/SHA256SUMS)
 			else
                         	wget -4 --no-verbose --progress=bar https://us.lxd.images.canonical.com/images/ubuntu/focal/amd64/default/"$BuildDate"/$i -P /opt/olxc/"$DistDir"/lxcimage/nsa

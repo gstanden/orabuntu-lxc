@@ -1,0 +1,10 @@
+/opt/olxc/home/lio-files/README
+/opt/olxc/home/lio-files/create-lio.sh
+/opt/olxc/home/lio-files/create-lio-install.sh
+/opt/olxc/home/lio-files/create-lio-target.sh
+/opt/olxc/home/lio-files/create-lio-multipath.sh
+/opt/olxc/home/lio-files/create-lio-linux6.sh
+/opt/olxc/home/lio-files/99-StorageOwner.rules.template
+/opt/olxc/home/lio-files/vercomp
+/opt/olxc/home/lio-files/GNU3
+/opt/olxc/home/lio-files/COPYING

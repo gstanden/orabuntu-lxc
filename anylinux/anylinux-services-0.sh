@@ -54,17 +54,21 @@ sudo cp -p GNU3    		"$DistDir"/"$SubDirName"/archives/.
 
 sudo mkdir -p			/opt/olxc/home/scst-files
 sudo mkdir -p			/opt/olxc/home/tgt-files
+sudo mkdir -p			/opt/olxc/home/lio-files
 sudo chown -R $Owner:$Group 	/opt/olxc/home/scst-files
 sudo chown -R $Owner:$Group	/opt/olxc/home/tgt-files
+sudo chown -R $Owner:$Group	/opt/olxc/home/lio-files
 sudo chown -R $Owner:$Group	/opt/olxc/
 sudo cp -p COPYING		/opt/olxc/.
 sudo cp -p COPYING		/opt/olxc/home/.
 sudo cp -p COPYING		/opt/olxc/home/tgt-files/.
 sudo cp -p COPYING		/opt/olxc/home/scst-files/.
+sudo cp -p COPYING		/opt/olxc/home/lio-files/.
 sudo cp -p GNU3			/opt/olxc/.
 sudo cp -p GNU3			/opt/olxc/home/.
 sudo cp -p GNU3			/opt/olxc/home/tgt-files/.
 sudo cp -p GNU3			/opt/olxc/home/scst-files/.
+sudo cp -p GNU3			/opt/olxc/home/lio-files/.
 
 cd "$DistDir"/"$SubDirName"/archives
 
@@ -74,8 +78,10 @@ cp -p "$DistDir"/linuxsan/scst/scst-files.tar       "$DistDir"/"$SubDirName"/arc
 cp -p "$DistDir"/linuxsan/scst/scst-files.lst       "$DistDir"/"$SubDirName"/archives/scst-files.lst
 cp -p "$DistDir"/linuxsan/tgt/tgt-files.tar         "$DistDir"/"$SubDirName"/archives/tgt-files.tar
 cp -p "$DistDir"/linuxsan/tgt/tgt-files.lst         "$DistDir"/"$SubDirName"/archives/tgt-files.lst
+cp -p "$DistDir"/linuxsan/lio/lio-files.tar         "$DistDir"/"$SubDirName"/archives/lio-files.tar
+cp -p "$DistDir"/linuxsan/lio/lio-files.lst         "$DistDir"/"$SubDirName"/archives/lio-files.lst
 
-ArchiveList="dns-dhcp-cont.tar dns-dhcp-host.tar lxc-oracle-files.tar product.tar $SubDirName-files.tar scst-files.tar tgt-files.tar ubuntu-host.tar"
+ArchiveList="dns-dhcp-cont.tar dns-dhcp-host.tar lxc-oracle-files.tar product.tar $SubDirName-files.tar scst-files.tar tgt-files.tar lio-files.tar ubuntu-host.tar"
 
 for i in $ArchiveList
 do
@@ -112,6 +118,10 @@ do
 	then
 		tar -vP --append --file=$i /opt/olxc/home/tgt-files/GNU3    --numeric-owner
 		tar -vP --append --file=$i /opt/olxc/home/tgt-files/COPYING --numeric-owner
+	elif [ $i = 'lio-files.tar' ]
+	then
+		tar -vP --append --file=$i /opt/olxc/home/lio-files/GNU3    --numeric-owner
+		tar -vP --append --file=$i /opt/olxc/home/lio-files/COPYING --numeric-owner
 	elif [ $i = 'dns-dhcp-cont.tar' ]
 	then
 		sudo chown root:root /var/GNU3 > /dev/null 2>&1

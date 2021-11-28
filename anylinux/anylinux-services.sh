@@ -1656,9 +1656,9 @@ fi
 if [ -z $IscsiTargetLunPrefix ]
 then
 	IscsiTargetLunPrefix=lxc
-	echo 'IscsiTargetLunPrefix		  = '$IscsiTargetLunPrefix
+	echo 'IscsiTargetLunPrefix	  = '$IscsiTargetLunPrefix
 else
-	echo 'IscsiTargetLunPrefix		  = '$IscsiTargetLunPrefix
+	echo 'IscsiTargetLunPrefix	  = '$IscsiTargetLunPrefix
 fi
 
 if [ -z $Lun1Name ]
@@ -2156,6 +2156,9 @@ fi
 sudo mkdir -p /opt/olxc/home/scst-files
 sudo cp -p "$DistDir"/anylinux/vercomp /opt/olxc/home/scst-files/.
 sudo chmod +x "$DistDir"/anylinux/vercomp /opt/olxc/home/scst-files/vercomp
+sudo mkdir -p /opt/olxc/home/lio-files
+sudo cp -p "$DistDir"/anylinux/vercomp /opt/olxc/home/lio-files/.
+sudo chmod +x "$DistDir"/anylinux/vercomp /opt/olxc/home/lio-files/vercomp
 
 cp -p $DistDir/anylinux/GNU3 /opt/olxc/GNU3
 
@@ -2204,7 +2207,7 @@ echo "=============================================="
 echo ''
 
 # GLS 20180204 Replaced by function GetArchiveNames
-# ArchiveNames="dns-dhcp-cont.tar dns-dhcp-host.tar lxc-oracle-files.tar product.tar ubuntu-host.tar scst-files.tar tgt-files.tar $SubDirName-services.tar"
+# ArchiveNames="dns-dhcp-cont.tar dns-dhcp-host.tar lxc-oracle-files.tar product.tar ubuntu-host.tar scst-files.tar tgt-files.tar lio-files.tar $SubDirName-services.tar"
 
 function GetArchiveNames {
 	ls *.tar | more | sed 's/$/ /' | tr -d '\n' | sed 's/^[ \t]*//;s/[ \t]*$//'
@@ -2337,7 +2340,7 @@ do
 
 	cd /opt/olxc
 
-	if [ $i != 'scst-files.tar' ] && [ $i != 'tgt-files.tar' ]
+	if [ $i != 'scst-files.tar' ] && [ $i != 'tgt-files.tar' ] && [ $i != 'lio-files.tar' ]
 	then
 #		if [ $i = 'dns-dhcp-host.tar' ]
 #		then

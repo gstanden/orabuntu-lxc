@@ -1,7 +1,6 @@
 /opt/olxc/home/scst-files/README
 /opt/olxc/home/scst-files/create-scst-dkms.sh
 /opt/olxc/home/scst-files/create-scst-dpkg.sh
-/opt/olxc/home/scst-files/create-scst-install.sh
 /opt/olxc/home/scst-files/create-scst-multipath.sh
 /opt/olxc/home/scst-files/create-scst-linux6.sh
 /opt/olxc/home/scst-files/create-scst-uninstall-dkms.sh
@@ -10,5 +9,6 @@
 /opt/olxc/home/scst-files/vercomp
 /opt/olxc/home/scst-files/create-scst-target.sh
 /opt/olxc/home/scst-files/create-scst.sh
+/opt/olxc/home/scst-files/create-scst-install.sh
 /opt/olxc/home/scst-files/GNU3
 /opt/olxc/home/scst-files/COPYING

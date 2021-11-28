@@ -42,7 +42,7 @@ LxcLun1="\/dev\/sdd"			#							User-provided LUN if not using built-in SCST stor
 BtrfsRaid=raid0				# [none|raid0|raid10|linear]				Btrfs Raid Options.
 ZfsMirror=mirror			# [mirror|'']						Flag to mirror or not-mirror ZFS across two SCST luns.
 IscsiTarget=Y				# [Y|N]							Use SCST file-backed LUNS for ZFS storage for LXD containers
-IscsiProduct				# [lio|scst]						Target subsystem vendor
+IscsiVendor=lio				# [lio|scst]						Target subsystem vendor
 IscsiTargetLunPrefix=lxc		# 							Can be any 3-character prefix.  The prefix lxc is recommended. 
 Lun1Name=zfsa				# [btra|zfsa]						Name of Lun1. Only used if IscsiTarget=Y. For example for btrfs recommended is btra. Do not exceed four characters.
 Lun2Name=zfsm				# [btrm|zfsm]						Name of Lun2. Only used if IscsiTarget=Y. For example for btrfs recommended is btrm. Do not exceed four characters.
