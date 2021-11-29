@@ -4430,7 +4430,13 @@ if [ $Release -ge 7 ]
 then
 	if [ $LXDStorageDriver = 'zfs' ]
 	then
-		$DistDir/zfsutils/$LinuxFlavor/zfs_$LinuxFlavor$Release.sh
+                CurrentDir=`pwd`
+                sudo mkdir -p /opt/olxc/"$DistDir"/zfsutils/Oracle
+                sudo chown $Owner:$Group /opt/olxc/"$DistDir"/zfsutils/Oracle
+                sudo cp -p $DistDir/zfsutils/$LinuxFlavor/zfs_$LinuxFlavor$Release.sh /opt/olxc/"$DistDir"/zfsutils/Oracle/.
+                cd /opt/olxc/"$DistDir"/zfsutils/Oracle
+                ./zfs_$LinuxFlavor$Release.sh
+                cd $CurrentDir
 
 		function CheckIscsiTargetInstalled {
 			rpm -qa | grep -c $IscsiTarget
