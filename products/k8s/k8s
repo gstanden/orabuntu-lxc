@@ -30,7 +30,6 @@
 #    There are two domains and two networks because the "seed" LXC containers are on a separate network from the production LXC containers.
 #    If the domain is an actual domain, you will need to change the subnet using the subnets feature of Orabuntu-LXC
 
-
 clear
 MajorRelease=$1
 PointRelease=$2
@@ -392,7 +391,7 @@ echo "Install wget and unzip...                     "
 echo "=============================================="
 echo ''
 
-sudo dnf install -y wget unzip
+sudo yum -y install wget unzip
 
 echo ''
 echo "=============================================="
