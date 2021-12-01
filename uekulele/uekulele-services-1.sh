@@ -4476,11 +4476,11 @@ then
 		then
 			echo ''
 			echo "=============================================="
-			echo "Update strt_scst.sh file if it exists...      "
+			echo "Update strt_$LXDStorageDriver.sh file         "
 			echo "=============================================="
 			echo ''
 
-			if [ -f /etc/network/openvswitch/strt_scst.sh ]
+			if [ -f /etc/network/openvswitch/strt_$LXDStorageDriver.sh ]
 			then
 				function WhichModprobe {
 					which modprobe
@@ -4502,25 +4502,25 @@ then
 				}
 				Mount=$(WhichMount)
 
-				sudo sh -c "echo '$Sleep 10'         		           								>> /etc/network/openvswitch/strt_scst.sh"
-				sudo sh -c "echo '$ModProbe zfs'                									>> /etc/network/openvswitch/strt_scst.sh"
-				sudo sh -c "echo '$Zpool import $StoragePoolName'      									>> /etc/network/openvswitch/strt_scst.sh"
+				sudo sh -c "echo '$Sleep 10'         		           										>> /etc/network/openvswitch/strt_$LXDStorageDriver.sh"
+				sudo sh -c "echo '$ModProbe zfs'                											>> /etc/network/openvswitch/strt_$LXDStorageDriver.sh"
+				sudo sh -c "echo '$Zpool import $StoragePoolName'      											>> /etc/network/openvswitch/strt_$LXDStorageDriver.sh"
 
 				if   [ $IscsiTarget = 'Y' ]
 				then
-					sudo sh -c "echo '$Mount /dev/"$IscsiTargetLunPrefix"_luns/"$IscsiTargetLunPrefix"_"$Lun3Name"_"$Sw1Index"_00 /var/lib/lxc'	>> /etc/network/openvswitch/strt_scst.sh"
+					sudo sh -c "echo '$Mount /dev/"$IscsiTargetLunPrefix"_luns/"$IscsiTargetLunPrefix"_"$Lun3Name"_"$Sw1Index"_00 /var/lib/lxc'	>> /etc/network/openvswitch/strt_$LXDStorageDriver.sh"
 				
 				elif [ $IscsiTarget = 'N' ]
 				then
-					sudo sh -c "echo '$Mount $LxcLun1'										>> /etc/network/openvswitch/strt_scst.sh"
+					sudo sh -c "echo '$Mount $LxcLun1'												>> /etc/network/openvswitch/strt_$LXDStorageDriver.sh"
 				fi
 	
-				sudo cat /etc/network/openvswitch/strt_scst.sh
+				sudo cat /etc/network/openvswitch/strt_$LXDStorageDriver.sh
 			fi
 
 			echo ''
 			echo "=============================================="
-			echo "Done: Update strt_scst.sh file if it exists.  "
+			echo "Done: Update strt_$LXDStorageDriver.sh        "
 			echo "=============================================="
 			echo ''
 	
@@ -4530,25 +4530,25 @@ then
 
 			echo ''
 			echo "=============================================="
-			echo "Update stop_scst.sh file if it exists.        "
+			echo "Update stop_$LXDStorageDriver.sh file         "
 			echo "=============================================="
 			echo ''
 	
-			if [ -f /etc/network/openvswitch/stop_scst.sh ]
+			if [ -f /etc/network/openvswitch/stop_$LXDStorageDriver.sh ]
 			then
 				function GetZpool2 {
 					echo $Zpool | sed 's/\//\\\//g'
 				}
 				Zpool2=$(GetZpool2)
 	
-				sudo sed -i "s/bash/&\nzpool export $StoragePoolName/"  /etc/network/openvswitch/stop_scst.sh
-				sudo sed -i "s/zpool export/$Zpool2 export/"            /etc/network/openvswitch/stop_scst.sh
-				sudo cat /etc/network/openvswitch/stop_scst.sh
+				sudo sed -i "s/bash/&\nzpool export $StoragePoolName/"  /etc/network/openvswitch/stop_$LXDStorageDriver.sh
+				sudo sed -i "s/zpool export/$Zpool2 export/"            /etc/network/openvswitch/stop_$LXDStorageDriver.sh
+				sudo cat /etc/network/openvswitch/stop_$LXDStorageDriver.sh
 			fi
 
 			echo ''
 			echo "=============================================="
-			echo "Done: Update stop_scst.sh file if it exists.  "
+			echo "Done: Update stop_$LXDStorageDriver.sh file if it exists.  "
 			echo "=============================================="
 			echo ''
 		fi
@@ -4866,16 +4866,16 @@ ContainerCreated=$(ConfirmContainerCreated)
 
 if [ $NameServerExists -eq 0 ] && [ $MultiHostVar2 = 'N' ]
 then
-	echo ''
-	echo "=============================================="
-	echo "Create LXC DNS DHCP container...              "
-	echo "=============================================="
-	echo ''
+        echo ''
+        echo "=============================================="
+        echo "Create LXC DNS DHCP container...              "
+        echo "=============================================="
+        echo ''
 
-	m=1; n=1; p=1
-	while [ $ContainerCreated -eq 0 ] && [ $m -le 3 ] && [ $Release -ge 7 ]
-	do
-	        echo "=============================================="
+        m=1; n=1; p=1
+        while [ $ContainerCreated -eq 0 ] && [ $m -le 3 ] && [ $Release -ge 7 ]
+        do
+                echo "=============================================="
                 echo "Trying Method 1 ...                           "
                 echo "=============================================="
                 echo ''
@@ -4887,47 +4887,50 @@ then
                         sudo mkdir -p /opt/olxc/"$DistDir"/lxcimage/nsa
                 else
                         echo "Directory already exists: /opt/olxc/"$DistDir"/lxcimage/nsa"
-                        echo ''
                 fi
 
                 sudo rm -f                /opt/olxc/"$DistDir"/lxcimage/nsa/*
                 cd                        /opt/olxc/"$DistDir"/lxcimage/nsa
                 sudo chown $Owner:$Group  /opt/olxc/"$DistDir"/lxcimage/nsa
 
-		if   [ $LinuxFlavor = 'CentOS' ] && [ $Release -eq 7 ]
-		then
-                	curl -O -4 --remote-name https://us.lxd.images.canonical.com/images/ubuntu/hirsute/amd64/default/index.html --output /opt/olxc/"$DistDir"/lxcimage/nsa
-		
-		elif [ $LinuxFlavor = 'Red' ] && [ $Release -eq 7 ]
-		then
-                	curl -O -4 --remote-name https://us.lxd.images.canonical.com/images/ubuntu/hirsute/amd64/default/index.html --output /opt/olxc/"$DistDir"/lxcimage/nsa
-		
-		elif [ $LinuxFlavor = 'Oracle' ] && [ $Release -eq 7 ]
-		then
-                	curl -O -4 --remote-name https://us.lxd.images.canonical.com/images/ubuntu/hirsute/amd64/default/index.html --output /opt/olxc/"$DistDir"/lxcimage/nsa
-		else
-                	wget -4 -q https://us.lxd.images.canonical.com/images/ubuntu/focal/amd64/default/ -P /opt/olxc/"$DistDir"/lxcimage/nsa
-		fi
+                if   [ $LinuxFlavor = 'CentOS' ] && [ $Release -eq 7 ]
+                then
+                        wget -4 -q https://us.lxd.images.canonical.com/images/ubuntu/hirsute/amd64/default/ -P /opt/olxc/"$DistDir"/lxcimage/nsa
+
+                elif [ $LinuxFlavor = 'Red' ] && [ $Release -eq 7 ]
+                then
+                        wget -4 -q https://us.lxd.images.canonical.com/images/ubuntu/hirsute/amd64/default/ -P /opt/olxc/"$DistDir"/lxcimage/nsa
+
+                elif [ $LinuxFlavor = 'Oracle' ] && [ $Release -eq 7 ]
+                then
+                        wget -4 -q https://us.lxd.images.canonical.com/images/ubuntu/hirsute/amd64/default/ -P /opt/olxc/"$DistDir"/lxcimage/nsa
+                else
+                        wget -4 -q https://us.lxd.images.canonical.com/images/ubuntu/focal/amd64/default/ -P /opt/olxc/"$DistDir"/lxcimage/nsa
+                fi
 
                 function GetBuildDate {
                         grep folder.gif index.html | tail -1 | awk -F "\"" '{print $8}' | sed 's/\///g' | sed 's/\.//g'
                 }
                 BuildDate=$(GetBuildDate)
 
-		if   [ $LinuxFlavor = 'CentOS' ] && [ $Release -eq 7 ]
-		then
-                	curl -O -4 --remote-name https://us.lxd.images.canonical.com/images/ubuntu/hirsute/amd64/default/"$BuildDate"/SHA256SUMS --output /opt/olxc/"$DistDir"/lxcimage/nsa
-		
-		elif [ $LinuxFlavor = 'Red' ] && [ $Release -eq 7 ]
-		then
-                	curl -O -4 --remote-name https://us.lxd.images.canonical.com/images/ubuntu/hirsute/amd64/default/"$BuildDate"/SHA256SUMS --output /opt/olxc/"$DistDir"/lxcimage/nsa
-		
-		elif [ $LinuxFlavor = 'Oracle' ] && [ $Release -eq 7 ]
-		then
-                	curl -O -4 --remote-name https://us.lxd.images.canonical.com/images/ubuntu/hirsute/amd64/default/"$BuildDate"/SHA256SUMS --output /opt/olxc/"$DistDir"/lxcimage/nsa
-		else
-                	wget -4 -q https://us.lxd.images.canonical.com/images/ubuntu/focal/amd64/default/"$BuildDate"/SHA256SUMS -P /opt/olxc/"$DistDir"/lxcimage/nsa
-		fi
+                echo ''
+                echo "+++++ Downloading checksum SHA256SUMS +++++"
+                echo ''
+
+                if   [ $LinuxFlavor = 'CentOS' ] && [ $Release -eq 7 ]
+                then
+                        curl -4 --progress-bar --remote-name https://us.lxd.images.canonical.com/images/ubuntu/hirsute/amd64/default/"$BuildDate"/SHA256SUMS --o /opt/olxc/"$DistDir"/lxcimage/nsa
+
+                elif [ $LinuxFlavor = 'Red' ] && [ $Release -eq 7 ]
+                then
+                        curl -4 --progress-bar --remote-name https://us.lxd.images.canonical.com/images/ubuntu/hirsute/amd64/default/"$BuildDate"/SHA256SUMS --o /opt/olxc/"$DistDir"/lxcimage/nsa
+
+                elif [ $LinuxFlavor = 'Oracle' ] && [ $Release -eq 7 ]
+                then
+                        curl -4 --progress-bar --remote-name https://us.lxd.images.canonical.com/images/ubuntu/hirsute/amd64/default/"$BuildDate"/SHA256SUMS --o /opt/olxc/"$DistDir"/lxcimage/nsa
+                else
+                        wget -4 -q https://us.lxd.images.canonical.com/images/ubuntu/focal/amd64/default/"$BuildDate"/SHA256SUMS -P /opt/olxc/"$DistDir"/lxcimage/nsa
+                fi
 
                 for i in rootfs.tar.xz meta.tar.xz
                 do
@@ -4937,38 +4940,75 @@ then
                         fi
 
                         echo ''
-                        echo "Downloading $i ..."
+                        echo "+++++ Downloading $i +++++"
                         echo ''
 
-			if   [ $LinuxFlavor = 'CentOS' ] && [ $Release -eq 7 ]
-			then
-                        	curl -O -4 --remote-name https://us.lxd.images.canonical.com/images/ubuntu/hirsute/amd64/default/"$BuildDate"/$i --output /opt/olxc/"$DistDir"/lxcimage/nsa
-				diff <(shasum -a 256 /opt/olxc/"$DistDir"/lxcimage/nsa/$i | cut -f1,11 -d'/' | sed 's/  */ /g' | sed 's/\///' | sed 's/  */ /g') <(grep $i /opt/olxc/"$DistDir"/lxcimage/nsa/SHA256SUMS)
-			
-			elif [ $LinuxFlavor = 'Red' ] && [ $Release -eq 7 ]
-			then
-                        	curl -O -4 --remote-name https://us.lxd.images.canonical.com/images/ubuntu/hirsute/amd64/default/"$BuildDate"/$i --output /opt/olxc/"$DistDir"/lxcimage/nsa
-				diff <(shasum -a 256 /opt/olxc/"$DistDir"/lxcimage/nsa/$i | cut -f1,11 -d'/' | sed 's/  */ /g' | sed 's/\///' | sed 's/  */ /g') <(grep $i /opt/olxc/"$DistDir"/lxcimage/nsa/SHA256SUMS)
-			
-			elif [ $LinuxFlavor = 'Oracle' ] && [ $Release -eq 7 ]
-			then
-                        	curl -O -4 --remote-name https://us.lxd.images.canonical.com/images/ubuntu/hirsute/amd64/default/"$BuildDate"/$i --output /opt/olxc/"$DistDir"/lxcimage/nsa
-				diff <(shasum -a 256 /opt/olxc/"$DistDir"/lxcimage/nsa/$i | cut -f1,11 -d'/' | sed 's/  */ /g' | sed 's/\///' | sed 's/  */ /g') <(grep $i /opt/olxc/"$DistDir"/lxcimage/nsa/SHA256SUMS)
-			else
-                        	wget -4 --no-verbose --progress=bar https://us.lxd.images.canonical.com/images/ubuntu/focal/amd64/default/"$BuildDate"/$i -P /opt/olxc/"$DistDir"/lxcimage/nsa
-				diff <(shasum -a 256 /opt/olxc/"$DistDir"/lxcimage/nsa/$i | cut -f1,11 -d'/' | sed 's/  */ /g' | sed 's/\///' | sed 's/  */ /g') <(grep $i /opt/olxc/"$DistDir"/lxcimage/nsa/SHA256SUMS)
-			fi
+                        if   [ $LinuxFlavor = 'CentOS' ] && [ $Release -eq 7 ]
+                        then
+                                curl -4 --progress-bar --remote-name https://us.lxd.images.canonical.com/images/ubuntu/hirsute/amd64/default/"$BuildDate"/$i -o /opt/olxc/"$DistDir"/lxcimage/nsa
+
+                                echo ''
+                                echo "+++++ Checksum SHA256SUMS +++++"
+                                echo ''
+
+                                diff <(shasum -a 256 /opt/olxc/"$DistDir"/lxcimage/nsa/$i | cut -f1,11 -d'/' | sed 's/  */ /g' | sed 's/\///' | sed 's/  */ /g') <(grep $i /opt/olxc/"$DistDir"/lxcimage/nsa/SHA256SUMS)
+
+                                echo ''
+                                echo '######################################################################## 100.0%'
+
+                        elif [ $LinuxFlavor = 'Red' ] && [ $Release -eq 7 ]
+                        then
+                                curl -4 --progress-bar --remote-name https://us.lxd.images.canonical.com/images/ubuntu/hirsute/amd64/default/"$BuildDate"/$i -o /opt/olxc/"$DistDir"/lxcimage/nsa
+
+                                echo ''
+                                echo "+++++ Checksum SHA256SUMS +++++"
+                                echo ''
+
+                                diff <(shasum -a 256 /opt/olxc/"$DistDir"/lxcimage/nsa/$i | cut -f1,11 -d'/' | sed 's/  */ /g' | sed 's/\///' | sed 's/  */ /g') <(grep $i /opt/olxc/"$DistDir"/lxcimage/nsa/SHA256SUMS)
+
+                                echo ''
+                                echo '######################################################################## 100.0%'
+
+                        elif [ $LinuxFlavor = 'Oracle' ] && [ $Release -eq 7 ]
+                        then
+                                curl -4 --progress-bar --remote-name https://us.lxd.images.canonical.com/images/ubuntu/hirsute/amd64/default/"$BuildDate"/$i -o /opt/olxc/"$DistDir"/lxcimage/nsa
+
+                                echo ''
+                                echo "+++++ Checksum SHA256SUMS +++++"
+                                echo ''
+
+                                diff <(shasum -a 256 /opt/olxc/"$DistDir"/lxcimage/nsa/$i | cut -f1,11 -d'/' | sed 's/  */ /g' | sed 's/\///' | sed 's/  */ /g') <(grep $i /opt/olxc/"$DistDir"/lxcimage/nsa/SHA256SUMS)
+
+                                echo ''
+                                echo '######################################################################## 100.0%'
+                        else
+                                curl -4 --progress-bar --remote-name https://us.lxd.images.canonical.com/images/ubuntu/hirsute/amd64/default/"$BuildDate"/$i -o /opt/olxc/"$DistDir"/lxcimage/nsa
+
+                                echo ''
+                                echo "+++++ Checksum SHA256SUMS +++++"
+                                echo ''
+
+                                diff <(shasum -a 256 /opt/olxc/"$DistDir"/lxcimage/nsa/$i | cut -f1,11 -d'/' | sed 's/  */ /g' | sed 's/\///' | sed 's/  */ /g') <(grep $i /opt/olxc/"$DistDir"/lxcimage/nsa/SHA256SUMS)
+
+                                echo ''
+                                echo '######################################################################## 100.0%'
+                        fi
                 done
-                if [ $? -eq 0 ]
+
+                echo ''
+
+                ContainerCreated=$(ConfirmContainerCreated)
+
+                if [ $ContainerCreated -eq 0 ]
                 then
-                        echo ''
                         sudo lxc-create -t local --name nsa -- -m /opt/olxc/"$DistDir"/lxcimage/nsa/meta.tar.xz -f /opt/olxc/"$DistDir"/lxcimage/nsa/rootfs.tar.xz
+                        echo ''
+                        echo '######################################################################## 100.0%'
+                        echo ''
                 else
                         m=$((m+1))
                 fi
-
-        	ContainerCreated=$(ConfirmContainerCreated)
-	done
+        done
 	
 	while [ $ContainerCreated -eq 0 ] && [ $n -le 3 ]
 	do
