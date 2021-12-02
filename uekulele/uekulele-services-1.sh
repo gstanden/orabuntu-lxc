@@ -4997,8 +4997,6 @@ then
 
                 echo ''
 
-                ContainerCreated=$(ConfirmContainerCreated)
-
                 if [ $ContainerCreated -eq 0 ]
                 then
                         sudo lxc-create -t local --name nsa -- -m /opt/olxc/"$DistDir"/lxcimage/nsa/meta.tar.xz -f /opt/olxc/"$DistDir"/lxcimage/nsa/rootfs.tar.xz
@@ -5008,6 +5006,8 @@ then
                 else
                         m=$((m+1))
                 fi
+                
+		ContainerCreated=$(ConfirmContainerCreated)
         done
 	
 	while [ $ContainerCreated -eq 0 ] && [ $n -le 3 ]
