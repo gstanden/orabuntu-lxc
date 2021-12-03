@@ -4472,16 +4472,14 @@ then
 			sudo zpool create $StoragePoolName $ZfsMirror $ZfsLun1 $ZfsLun2
 		fi
 
-		if [ $IscsiVendor = 'scst' ]
+		if [ $IscsiVendor = 'scst' ] || [ $IscsiVendor = 'lio' ]
 		then
 			echo ''
 			echo "=============================================="
-			echo "Update strt_$LXDStorageDriver.sh file         "
+			echo "Update strt_$IscsiVendor.sh file         "
 			echo "=============================================="
 			echo ''
 
-			if [ -f /etc/network/openvswitch/strt_$LXDStorageDriver.sh ]
-			then
 				function WhichModprobe {
 					which modprobe
 				}
@@ -4502,25 +4500,24 @@ then
 				}
 				Mount=$(WhichMount)
 
-				sudo sh -c "echo '$Sleep 10'         		           										>> /etc/network/openvswitch/strt_$LXDStorageDriver.sh"
-				sudo sh -c "echo '$ModProbe zfs'                											>> /etc/network/openvswitch/strt_$LXDStorageDriver.sh"
-				sudo sh -c "echo '$Zpool import $StoragePoolName'      											>> /etc/network/openvswitch/strt_$LXDStorageDriver.sh"
+				sudo sh -c "echo '$Sleep 10'         		           										>> /etc/network/openvswitch/strt_$IscsiVendor.sh"
+				sudo sh -c "echo '$ModProbe zfs'                											>> /etc/network/openvswitch/strt_$IscsiVendor.sh"
+				sudo sh -c "echo '$Zpool import $StoragePoolName'      											>> /etc/network/openvswitch/strt_$IscsiVendor.sh"
 
 				if   [ $IscsiTarget = 'Y' ]
 				then
-					sudo sh -c "echo '$Mount /dev/"$IscsiTargetLunPrefix"_luns/"$IscsiTargetLunPrefix"_"$Lun3Name"_"$Sw1Index"_00 /var/lib/lxc'	>> /etc/network/openvswitch/strt_$LXDStorageDriver.sh"
+					sudo sh -c "echo '$Mount /dev/"$IscsiTargetLunPrefix"_luns/"$IscsiTargetLunPrefix"_"$Lun3Name"_"$Sw1Index"_00 /var/lib/lxc'	>> /etc/network/openvswitch/strt_$IscsiVendor.sh"
 				
 				elif [ $IscsiTarget = 'N' ]
 				then
-					sudo sh -c "echo '$Mount $LxcLun1'												>> /etc/network/openvswitch/strt_$LXDStorageDriver.sh"
+					sudo sh -c "echo '$Mount $LxcLun1'												>> /etc/network/openvswitch/strt_$IscsiVendor.sh"
 				fi
 	
-				sudo cat /etc/network/openvswitch/strt_$LXDStorageDriver.sh
-			fi
+				sudo cat /etc/network/openvswitch/strt_$IscsiVendor.sh
 
 			echo ''
 			echo "=============================================="
-			echo "Done: Update strt_$LXDStorageDriver.sh        "
+			echo "Done: Update strt_$IscsiVendor.sh        "
 			echo "=============================================="
 			echo ''
 	
@@ -4530,25 +4527,22 @@ then
 
 			echo ''
 			echo "=============================================="
-			echo "Update stop_$LXDStorageDriver.sh file         "
+			echo "Update stop_$IscsiVendor.sh file         "
 			echo "=============================================="
 			echo ''
 	
-			if [ -f /etc/network/openvswitch/stop_$LXDStorageDriver.sh ]
-			then
 				function GetZpool2 {
 					echo $Zpool | sed 's/\//\\\//g'
 				}
 				Zpool2=$(GetZpool2)
 	
-				sudo sed -i "s/bash/&\nzpool export $StoragePoolName/"  /etc/network/openvswitch/stop_$LXDStorageDriver.sh
-				sudo sed -i "s/zpool export/$Zpool2 export/"            /etc/network/openvswitch/stop_$LXDStorageDriver.sh
-				sudo cat /etc/network/openvswitch/stop_$LXDStorageDriver.sh
-			fi
+				sudo sed -i "s/bash/&\nzpool export $StoragePoolName/"  /etc/network/openvswitch/stop_$IscsiVendor.sh
+				sudo sed -i "s/zpool export/$Zpool2 export/"            /etc/network/openvswitch/stop_$IscsiVendor.sh
+				sudo cat /etc/network/openvswitch/stop_$IscsiVendor.sh
 
 			echo ''
 			echo "=============================================="
-			echo "Done: Update stop_$LXDStorageDriver.sh file if it exists.  "
+			echo "Done: Update stop_$IscsiVendor.sh file if it exists.  "
 			echo "=============================================="
 			echo ''
 		fi
