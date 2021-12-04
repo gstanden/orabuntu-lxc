@@ -4480,40 +4480,40 @@ then
 			echo "=============================================="
 			echo ''
 
-				function WhichModprobe {
-					which modprobe
-				}
-				ModProbe=$(WhichModprobe)
+			function WhichModprobe {
+				which modprobe
+			}
+			ModProbe=$(WhichModprobe)
 
-				function WhichZpool {
-					which zpool
-				}
-				Zpool=$(WhichZpool)
+			function WhichZpool {
+				which zpool
+			}
+			Zpool=$(WhichZpool)
 
-				function WhichSleep {
-				        which sleep
-				}
-				Sleep=$(WhichSleep)
-				
-				function WhichMount {
-				        which mount 
-				}
-				Mount=$(WhichMount)
+			function WhichSleep {
+			        which sleep
+			}
+			Sleep=$(WhichSleep)
+			
+			function WhichMount {
+			        which mount 
+			}
+			Mount=$(WhichMount)
 
-				sudo sh -c "echo '$Sleep 10'         		           										>> /etc/network/openvswitch/strt_$IscsiVendor.sh"
-				sudo sh -c "echo '$ModProbe zfs'                											>> /etc/network/openvswitch/strt_$IscsiVendor.sh"
-				sudo sh -c "echo '$Zpool import $StoragePoolName'      											>> /etc/network/openvswitch/strt_$IscsiVendor.sh"
+			sudo sh -c "echo '$Sleep 10'         		           										>> /etc/network/openvswitch/strt_$IscsiVendor.sh"
+			sudo sh -c "echo '$ModProbe zfs'                											>> /etc/network/openvswitch/strt_$IscsiVendor.sh"
 
-				if   [ $IscsiTarget = 'Y' ]
-				then
-					sudo sh -c "echo '$Mount /dev/"$IscsiTargetLunPrefix"_luns/"$IscsiTargetLunPrefix"_"$Lun3Name"_"$Sw1Index"_00 /var/lib/lxc'	>> /etc/network/openvswitch/strt_$IscsiVendor.sh"
-				
-				elif [ $IscsiTarget = 'N' ]
-				then
-					sudo sh -c "echo '$Mount $LxcLun1'												>> /etc/network/openvswitch/strt_$IscsiVendor.sh"
-				fi
-	
-				sudo cat /etc/network/openvswitch/strt_$IscsiVendor.sh
+			if   [ $IscsiTarget = 'Y' ]
+			then
+				sudo sh -c "echo '$Mount /dev/"$IscsiTargetLunPrefix"_luns/"$IscsiTargetLunPrefix"_"$Lun3Name"_"$Sw1Index"_00 /var/lib/lxc'	>> /etc/network/openvswitch/strt_$IscsiVendor.sh"
+				sudo sh -c "echo '/var/lib/snapd/snap/bin/lxc start --all'									>> /etc/network/openvswitch/strt_$IscsiVendor.sh"
+			
+			elif [ $IscsiTarget = 'N' ]
+			then
+				sudo sh -c "echo '$Mount $LxcLun1'												>> /etc/network/openvswitch/strt_$IscsiVendor.sh"
+			fi
+
+			sudo cat /etc/network/openvswitch/strt_$IscsiVendor.sh
 
 			echo ''
 			echo "=============================================="
@@ -4530,15 +4530,19 @@ then
 			echo "Update stop_$IscsiVendor.sh file         "
 			echo "=============================================="
 			echo ''
-	
-				function GetZpool2 {
-					echo $Zpool | sed 's/\//\\\//g'
-				}
-				Zpool2=$(GetZpool2)
-	
-				sudo sed -i "s/bash/&\nzpool export $StoragePoolName/"  /etc/network/openvswitch/stop_$IscsiVendor.sh
-				sudo sed -i "s/zpool export/$Zpool2 export/"            /etc/network/openvswitch/stop_$IscsiVendor.sh
-				sudo cat /etc/network/openvswitch/stop_$IscsiVendor.sh
+
+			sudo sed -i '2,4{s/^/#/}' 					   /etc/network/openvswitch/stop_$IscsiVendor.sh
+			sudo sh -c "echo '/var/lib/snapd/snap/bin/lxc stop -f --all'	>> /etc/network/openvswitch/stop_$IscsiVendor.sh"
+			sudo sh -c "echo 'sudo lxc-stop -n $NameServerBase'		>> /etc/network/openvswitch/stop_$IscsiVendor.sh"
+			sudo sh -c "echo 'sudo umount /var/lib/lxc'			>> /etc/network/openvswitch/stop_$IscsiVendor.sh"
+			sudo sh -c "echo 'sudo snap stop lxd'				>> /etc/network/openvswitch/stop_$IscsiVendor.sh"
+			sudo sh -c "echo 'sudo service multipathd stop'			>> /etc/network/openvswitch/stop_$IscsiVendor.sh"
+			sudo sh -c "echo 'sudo iscsiadm -m node --logout'		>> /etc/network/openvswitch/stop_$IscsiVendor.sh"
+			sudo sh -c "echo 'sudo service scst stop'			>> /etc/network/openvswitch/stop_$IscsiVendor.sh"
+			sudo sh -c "echo 'sudo rm -f /dev/lxc_luns/*'			>> /etc/network/openvswitch/stop_$IscsiVendor.sh"
+			sudo sh -c "echo 'sudo multipath -F'				>> /etc/network/openvswitch/stop_$IscsiVendor.sh"
+			
+			sudo cat /etc/network/openvswitch/stop_$IscsiVendor.sh
 
 			echo ''
 			echo "=============================================="
