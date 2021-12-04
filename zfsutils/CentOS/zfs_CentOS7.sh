@@ -54,7 +54,7 @@ echo "=============================================="
 echo ''
 
 sudo yum -y install unzip wget openssh-server net-tools bind-utils
-sudo yum -y install epel-release gcc make autoconf automake libtool rpm-build libtirpc-devel libblkid-devel libuuid-devel libudev-devel openssl-devel zlib-devel libaio-devel libattr-devel elfutils-libelf-devel kernel-devel-$(uname -r) python python2-devel python-setuptools python-cffi libffi-devel git ncompress
+sudo yum -y install epel-release gcc make autoconf automake libtool rpm-build libtirpc-devel libblkid-devel libuuid-devel libudev-devel openssl-devel zlib-devel libaio-devel libattr-devel elfutils-libelf-devel kernel-devel-$(uname -r) python python2-devel python-setuptools python-cffi libffi-devel git ncompress perl bc cpio sysstat mdadm ksh fio
 
 echo ''
 

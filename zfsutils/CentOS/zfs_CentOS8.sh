@@ -30,15 +30,16 @@
 #    There are two domains and two networks because the "seed" LXC containers are on a separate network from the production LXC containers.
 #    If the domain is an actual domain, you will need to change the subnet using the subnets feature of Orabuntu-LXC
 
-# Usage:  ./zpool_centos_8.sh [olxc-001|olxc-002|olxc-003|...] (or use your own ZFS pool naming scheme)
+# Usage:  ./zpool_centos_7.sh [olxc-001|olxc-002|olxc-003|...] (or use your own ZFS pool naming scheme)
 
 clear
 
 echo ''
 echo "=============================================="
 echo "Configure ZFS Storage ...                     "
+echo "CentOS7 OpenZFS build/install rpm from source."
 echo "                                              "
-echo "(some steps take awhile ... patience)         " 
+echo "(rpm build takes awhile ... patience)         " 
 echo "=============================================="
 echo ''
 
@@ -52,14 +53,101 @@ echo "Install packages ...                          "
 echo "=============================================="
 echo ''
 
-sudo yum -y install yum-utils
+sudo yum -y update
+sudo yum -y install net-tools wget unzip tar
 sudo yum -y install epel-release
-sudo yum config-manager --enable epel
-sudo dnf install http://download.zfsonlinux.org/epel/zfs-release$(rpm -E %dist)_`cat /etc/centos-release | rev | cut -f2,3 -d'.' | cut -f1 -d' ' | rev | cut -f2 -d'.'`.noarch.rpm
-rpm -qa | grep zfs
-sudo yum install -y kernel-devel zfs
-sudo modprobe zfs
-sudo systemctl list-unit-files | grep zfs
+sudo dnf -y --enablerepo=powertools install python3-packaging
+sudo yum -y update
+sudo yum -y install epel-release gcc make autoconf automake libtool rpm-build libtirpc-devel libblkid-devel libuuid-devel libudev-devel openssl-devel zlib-devel libaio-devel libattr-devel elfutils-libelf-devel kernel-devel-$(uname -r) python3 python3-devel python3-setuptools python3-cffi libffi-devel git ncompress perl bc cpio sysstat mdadm ksh fio
+
+echo ''
+
+sleep 5
+
+clear
+
+echo ''
+echo "=============================================="
+echo "Enable required repos ...                     "
+echo "=============================================="
+echo ''
+
+sudo yum -y install --enablerepo=epel python3-packaging dkms
+
+echo ''
+echo "=============================================="
+echo "Done: Enable required repos.                  "
+echo "=============================================="
+echo ''
+
+sleep 5
+
+clear
+ 
+echo ''
+echo "=============================================="
+echo "Clone OpenZFS git repo...                     "
+echo "=============================================="
+echo ''
+
+git clone https://github.com/openzfs/zfs
+cd ./zfs
+git checkout master
+
+echo ''
+echo "=============================================="
+echo "Done: Clone OpenZFS git repo.                 "
+echo "=============================================="
+echo ''
+
+sleep 5
+
+clear
+
+echo ''
+echo "=============================================="
+echo "Run autogen and configure...                  "
+echo "=============================================="
+echo ''
+
+sh autogen.sh
+./configure
+
+echo ''
+echo "=============================================="
+echo "Done: Run autogen and configure.              "
+echo "=============================================="
+echo ''
+
+sleep 5
+
+clear
+
+echo ''
+echo "=============================================="
+echo "make rpm ...                                  "
+echo "=============================================="
+echo ''
+
+make rpm
+
+echo ''
+echo "=============================================="
+echo "Done: make rpm.                               "
+echo "=============================================="
+echo ''
+
+sleep 5
+
+clear
+
+echo ''
+echo "=============================================="
+echo "Install packages ...                          "
+echo "=============================================="
+echo ''
+
+sudo yum -y install sysstat mdadm ksh fio
 
 echo ''
 echo "=============================================="
@@ -69,19 +157,59 @@ echo ''
 
 sleep 5
 
-echo ''
-echo "=============================================="
-echo "Create ZFS Storage...                         "
-echo "=============================================="
-echo ''
-
-sudo zpool create $1 mirror /dev/sdb /dev/sdc
-
-sudo zpool list
-sudo zpool status
+clear
 
 echo ''
 echo "=============================================="
-echo "Done: Create ZFS Storage.                     "
+echo "Install OpenZFS packages...                   "
 echo "=============================================="
 echo ''
+
+sudo rpm -ivh *.rpm
+
+echo ''
+echo "=============================================="
+echo "Done: Install OpenZFS packages.               "
+echo "=============================================="
+echo ''
+
+sleep 5
+
+clear
+
+echo ''
+echo "=============================================="
+echo "Finish OpenZFS configuration...               "
+echo "=============================================="
+echo ''
+
+sudo modprobe zfs
+sudo lsmod | grep zfs
+sudo systemctl list-unit-files | grep zfs
+
+echo ''
+echo "=============================================="
+echo "Done: Finish OpenZFS configuration.           "
+echo "=============================================="
+echo ''
+
+sleep 5
+
+clear
+
+# echo ''
+# echo "=============================================="
+# echo "Create zpool...                               "
+# echo "=============================================="
+# echo ''
+
+# sudo zpool create $1 mirror /dev/sdb /dev/sdc
+# sudo zpool list
+
+# echo ''
+# echo "=============================================="
+# echo "Done: Create zpool.                           "
+# echo "=============================================="
+# echo ''
+
+
