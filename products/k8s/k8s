@@ -83,7 +83,6 @@ echo "Display DistDir...                            "
 echo "=============================================="
 echo ''
 
-DistDir="/home/ubuntu/Downloads/orabuntu-lxc-master"
 echo $DistDir
 
 echo ''
