@@ -6223,7 +6223,9 @@ then
 	echo "=============================================="
 	echo ''
 	echo "=============================================="
-	echo "Show isc-dhcp-server status ...               "
+	echo "Reconfigure isc-dhcp-server ...               "
+	echo "                                              "
+	echo "Patience ... takes a minute or two ...        "
 	echo "=============================================="
 	echo ''
 
