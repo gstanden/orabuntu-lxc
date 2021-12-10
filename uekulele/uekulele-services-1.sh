@@ -279,7 +279,6 @@ function GetMultiHostVar36 {
 }
 MultiHostVar36=$(GetMultiHostVar36)
 IscsiVendor=$MultiHostVar36
-echo $IscsiVendor
 
 function CheckSystemdResolvedInstalled {
         sudo netstat -ulnp | grep 53 | sed 's/  */ /g' | rev | cut -f1 -d'/' | rev | sort -u | grep systemd- | wc -l
@@ -4426,7 +4425,18 @@ sleep 5
 
 clear
 
-if [ $Release -ge 7 ]
+which zpool > /dev/null 2>&1
+if [ $? -eq 0 ]
+then
+	function StoragePoolExist {
+		sudo zpool list | grep -c $StoragePoolName
+	}
+	PoolExist=$(StoragePoolExist)
+else
+	PoolExist=0
+fi
+
+if [ $Release -ge 7 ] && [ $PoolExist -eq 0 ]
 then
 	if [ $LXDStorageDriver = 'zfs' ]
 	then
@@ -4635,7 +4645,12 @@ then
 	fi
 fi
 
-if [ $IscsiTarget = 'Y' ]
+function CheckXfsInstalled {
+	df -TH | grep '/var/lib/lxc' | grep -c $Lun3Name
+}
+XfsInstalled=$(CheckXfsInstalled)
+
+if [ $IscsiTarget = 'Y' ] && [ $XfsInstalled -eq 0 ]
 then
 	sudo mkfs.xfs /dev/"$IscsiTargetLunPrefix"_luns/"$IscsiTargetLunPrefix"_"$Lun3Name"_"$Sw1Index"_00 -f
 	sudo mount /dev/"$IscsiTargetLunPrefix"_luns/"$IscsiTargetLunPrefix"_"$Lun3Name"_"$Sw1Index"_00 /var/lib/lxc
@@ -4903,7 +4918,7 @@ then
                 then
                         wget -4 -q https://us.lxd.images.canonical.com/images/ubuntu/hirsute/amd64/default/ -P /opt/olxc/"$DistDir"/lxcimage/nsa
                 else
-                        wget -4 -q https://us.lxd.images.canonical.com/images/ubuntu/focal/amd64/default/ -P /opt/olxc/"$DistDir"/lxcimage/nsa
+                        wget -4 -q https://us.lxd.images.canonical.com/images/ubuntu/hirsute/amd64/default/ -P /opt/olxc/"$DistDir"/lxcimage/nsa
                 fi
 
                 function GetBuildDate {
@@ -4917,17 +4932,17 @@ then
 
                 if   [ $LinuxFlavor = 'CentOS' ] && [ $Release -eq 7 ]
                 then
-                        curl -4 --progress-bar --remote-name https://us.lxd.images.canonical.com/images/ubuntu/hirsute/amd64/default/"$BuildDate"/SHA256SUMS --o /opt/olxc/"$DistDir"/lxcimage/nsa
+                        curl -4 --progress-bar --remote-name https://us.lxd.images.canonical.com/images/ubuntu/hirsute/amd64/default/"$BuildDate"/SHA256SUMS --output /opt/olxc/"$DistDir"/lxcimage/nsa
 
                 elif [ $LinuxFlavor = 'Red' ] && [ $Release -eq 7 ]
                 then
-                        curl -4 --progress-bar --remote-name https://us.lxd.images.canonical.com/images/ubuntu/hirsute/amd64/default/"$BuildDate"/SHA256SUMS --o /opt/olxc/"$DistDir"/lxcimage/nsa
+                        curl -4 --progress-bar --remote-name https://us.lxd.images.canonical.com/images/ubuntu/hirsute/amd64/default/"$BuildDate"/SHA256SUMS --output /opt/olxc/"$DistDir"/lxcimage/nsa
 
                 elif [ $LinuxFlavor = 'Oracle' ] && [ $Release -eq 7 ]
                 then
-                        curl -4 --progress-bar --remote-name https://us.lxd.images.canonical.com/images/ubuntu/hirsute/amd64/default/"$BuildDate"/SHA256SUMS --o /opt/olxc/"$DistDir"/lxcimage/nsa
+                        curl -4 --progress-bar --remote-name https://us.lxd.images.canonical.com/images/ubuntu/hirsute/amd64/default/"$BuildDate"/SHA256SUMS --output /opt/olxc/"$DistDir"/lxcimage/nsa
                 else
-                        wget -4 -q https://us.lxd.images.canonical.com/images/ubuntu/focal/amd64/default/"$BuildDate"/SHA256SUMS -P /opt/olxc/"$DistDir"/lxcimage/nsa
+                        curl -4 --progress-bar --remote-name https://us.lxd.images.canonical.com/images/ubuntu/hirsute/amd64/default/"$BuildDate"/SHA256SUMS --output /opt/olxc/"$DistDir"/lxcimage/nsa
                 fi
 
                 for i in rootfs.tar.xz meta.tar.xz
@@ -5015,19 +5030,19 @@ then
 		echo "=============================================="
 		echo ''
 	
-		sudo lxc-create -t download --name nsa -- --dist ubuntu --release focal --arch amd64 --keyserver hkp://keyserver.ubuntu.com:80
+		sudo lxc-create -t download --name nsa -- --dist ubuntu --release hirsute --arch amd64 --keyserver hkp://keyserver.ubuntu.com:80
 		if [ $? -ne 0 ]
 		then
 			sudo lxc-stop -n nsa -k
 			sudo lxc-destroy -n nsa
 			sudo rm -rf /var/lib/lxc/nsa
-			sudo lxc-create -t download --name nsa -- --dist ubuntu --release focal --arch amd64 --keyserver hkp://p80.pool.sks-keyservers.net:80
+			sudo lxc-create -t download --name nsa -- --dist ubuntu --release hirsute --arch amd64 --keyserver hkp://p80.pool.sks-keyservers.net:80
 			if [ $? -ne 0 ]
 			then
 				sudo lxc-stop -n nsa -k
 				sudo lxc-destroy -n nsa
 				sudo rm -rf /var/lib/lxc/nsa
-                                sudo lxc-create -t download --name nsa -- --dist ubuntu --release focal --arch amd64 --no-validate
+                                sudo lxc-create -t download --name nsa -- --dist ubuntu --release hirsute --arch amd64 --no-validate
 			fi
 		fi
 
@@ -5042,7 +5057,7 @@ then
 		echo "=============================================="
 		echo ''
 
-		sudo lxc-create -n nsa -t ubuntu -- --release focal --arch amd64
+		sudo lxc-create -n nsa -t ubuntu -- --release hirsute --arch amd64
 		sleep 5
 		p=$((p+1))
 		ContainerCreated=$(ConfirmContainerCreated)
