@@ -1424,15 +1424,15 @@ then
 	then
 		echo ''
 		echo "=============================================="
-		echo "Enable and Start LXC and Libvirt...           "
+		echo "Enable and Start Services...                  "
 		echo "=============================================="
 		echo ''
 
 		sudo systemctl daemon-reload
-		sudo systemctl enable lxc
+		sudo systemctl enable lxc > /dev/null 2>&1
 		echo ''
-		sudo systemctl start  lxc
-		sudo systemctl status lxc
+		sudo systemctl start  lxc > /dev/null 2>&1
+		sudo systemctl status lxc > /dev/null 2>&1
 
 		
 		sudo setenforce permissive
@@ -1866,7 +1866,7 @@ then
 			echo ''
 	
 			ping -c 5 linuxcontainers.org -4 2>/dev/null
-			ping -c 5 linuxcontainers.org  2>/dev/null
+		#	ping -c 5 linuxcontainers.org  2>/dev/null
 			echo ''
 			
 			echo ''
@@ -4559,6 +4559,10 @@ then
 			echo "Done: Update stop_$IscsiVendor.sh file if it exists.  "
 			echo "=============================================="
 			echo ''
+
+			sleep 5
+
+			clear
 		fi
 		
 	elif [ $LXDStorageDriver = 'btrfs' ]
@@ -4645,6 +4649,12 @@ then
 	fi
 fi
 
+echo ''
+echo "=============================================="
+echo "Create /var/lib/lxc storage mount ...         "
+echo "=============================================="
+echo ''
+
 function CheckXfsInstalled {
 	df -TH | grep '/var/lib/lxc' | grep -c $Lun3Name
 }
@@ -4655,6 +4665,12 @@ then
 	sudo mkfs.xfs /dev/"$IscsiTargetLunPrefix"_luns/"$IscsiTargetLunPrefix"_"$Lun3Name"_"$Sw1Index"_00 -f
 	sudo mount /dev/"$IscsiTargetLunPrefix"_luns/"$IscsiTargetLunPrefix"_"$Lun3Name"_"$Sw1Index"_00 /var/lib/lxc
 fi
+
+echo ''
+echo "=============================================="
+echo "Done: Create /var/lib/lxc storage mount.      "
+echo "=============================================="
+echo ''
 
 sleep 5
 

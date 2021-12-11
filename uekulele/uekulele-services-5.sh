@@ -1216,13 +1216,13 @@ then
 			SshTest=1
 			while [ $SshTest -ne 0 ] && [ $n -le 5 ]
 			do
-                        	sshpass -p root ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no root@$i "uname -a; cat /etc/oracle-release" >/dev/null 2>&1
+                        	sshpass -p root ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no root@$i "uname -a; cat /etc/redhat-release" >/dev/null 2>&1
 				SshTest=`echo $?`
 				n=$((n+1))
 				sleep 5
 			done
                         	
-			sshpass -p root ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no root@$i "uname -a; cat /etc/oracle-release"
+			sshpass -p root ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no root@$i "uname -a; cat /etc/redhat-release"
 
                         echo ''
                         echo "=============================================="

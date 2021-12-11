@@ -302,7 +302,7 @@ then
 	echo "=============================================="
 	echo ''
 
-	sudo yum -y install libvirt wget unzip tar 
+	sudo yum -y install libvirt wget unzip tar rsync 
 
 	echo ''
 	echo "==============================================" 
