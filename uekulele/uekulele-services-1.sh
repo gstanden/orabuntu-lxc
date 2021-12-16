@@ -4893,6 +4893,32 @@ function ConfirmContainerCreated {
 }
 ContainerCreated=$(ConfirmContainerCreated)
 
+if [ $LinuxFlavor = 'Fedora' ] && [ $Release -eq 8 ]
+then
+        echo ''
+        echo "=============================================="
+        echo "Reinstall libvirt ...                         "
+        echo "=============================================="
+        echo ''
+
+	sudo yum -y install libvirt
+	sleep 5
+	sudo systemctl enable libvirtd
+	sudo systemctl start libvirtd
+	sleep 5
+	sudo systemctl stop libvirtd
+	sleep 5
+	sudo systemctl start libvirtd
+	sleep 5
+	sudo systemctl status libvirtd
+
+        echo ''
+        echo "=============================================="
+        echo "Done: Reinstall libvirt.                      "
+        echo "=============================================="
+        echo ''
+fi
+
 if [ $NameServerExists -eq 0 ] && [ $MultiHostVar2 = 'N' ]
 then
         echo ''
