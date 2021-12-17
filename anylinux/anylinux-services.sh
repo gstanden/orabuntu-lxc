@@ -1488,6 +1488,7 @@ ContainerRuntime=$MultiHostVar37
 
 	echo 'Docker			  = '$Docker
 	echo 'K8S                  	  = '$K8S
+	echo 'ContainerRuntime	  = '$ContainerRuntime
 
 if [ -z $BtrfsLun1 ]
 then
