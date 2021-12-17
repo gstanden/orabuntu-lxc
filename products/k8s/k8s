@@ -238,11 +238,11 @@ function GetMultiHostVar20 {
 MultiHostVar20=$(GetMultiHostVar20)
 TunType=$MultiHostVar20
 
-function GetMultiHostVar21 {
-        echo $MultiHost | cut -f21 -d':'
+function GetMultiHostVar37 {
+        echo $MultiHost | cut -f37 -d':'
 }
-MultiHostVar20=$(GetMultiHostVar21)
-TunType=$MultiHostVar20
+MultiHostVar37=$(GetMultiHostVar37)
+ContainerRuntime=$MultiHostVar37
 
 function CheckSystemdResolvedInstalled {
         sudo netstat -ulnp | grep 53 | sed 's/  */ /g' | rev | cut -f1 -d'/' | rev | sort -u | grep systemd- | wc -l
@@ -444,9 +444,6 @@ clear
 
 cd kubernetes-master/lxd-provisioning
 
-# Temporary workaround until kubernetes v1.23 is released on December 7,2021
-# cp -p ~/kube* .
-
 chmod +x *.sh
 
 echo ''
@@ -517,6 +514,24 @@ clear
 
 echo ''
 echo "=============================================="
+echo "Run cont-centos8-push-crio.sh script...       "
+echo "=============================================="
+echo ''
+
+./cont-centos8-push-crio_conf.sh
+
+echo ''
+echo "=============================================="
+echo "Done: Run cont-centos8-push-crio.sh script.   "
+echo "=============================================="
+echo ''
+
+sleep 5
+
+clear
+
+echo ''
+echo "=============================================="
 echo "Run cont-centos8-exec-maestro.sh script...    "
 echo "=============================================="
 echo ''
@@ -525,7 +540,7 @@ sleep 5
 
 clear
 
-./cont-centos8-exec-maestro.sh 
+./cont-centos8-exec-maestro.sh $ContainerRuntime
 
 echo ''
 echo "=============================================="
@@ -543,7 +558,7 @@ echo "Run cont-centos8-exec-violin1.sh script...    "
 echo "=============================================="
 echo ''
 
-./cont-centos8-exec-violin1.sh 
+./cont-centos8-exec-violin1.sh $ContainerRuntime
 
 echo ''
 echo "=============================================="
@@ -561,7 +576,7 @@ echo "Run cont-centos8-exec-violin2.sh script...    "
 echo "=============================================="
 echo ''
 
-./cont-centos8-exec-violin2.sh 
+./cont-centos8-exec-violin2.sh $ContainerRuntime
 
 echo ''
 echo "=============================================="
@@ -641,7 +656,7 @@ echo "Run cont-centos8-5...                         "
 echo "=============================================="
 echo ''
 
-eval echo "'/var/lib/snapd/snap/bin/lxc exec maestro -- /root/cont-centos8-5.sh' | sg lxd"
+eval echo "'/var/lib/snapd/snap/bin/lxc exec maestro -- /root/cont-centos8-5.sh $ContainerRuntime' | sg lxd"
 
 echo ''
 echo "=============================================="

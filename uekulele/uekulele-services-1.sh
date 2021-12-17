@@ -280,6 +280,12 @@ function GetMultiHostVar36 {
 MultiHostVar36=$(GetMultiHostVar36)
 IscsiVendor=$MultiHostVar36
 
+function GetMultiHostVar37 {
+        echo $MultiHost | cut -f37 -d':'
+}
+MultiHostVar37=$(GetMultiHostVar37)
+ContainerRuntime=$MultiHostVar37
+
 function CheckSystemdResolvedInstalled {
         sudo netstat -ulnp | grep 53 | sed 's/  */ /g' | rev | cut -f1 -d'/' | rev | sort -u | grep systemd- | wc -l
 }

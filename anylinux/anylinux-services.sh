@@ -1480,6 +1480,12 @@ function GetMultiHostVar36 {
 MultiHostVar36=$(GetMultiHostVar36)
 IscsiVendor=$MultiHostVar36
 
+function GetMultiHostVar37 {
+        echo $MultiHost | cut -f37 -d':'
+}
+MultiHostVar37=$(GetMultiHostVar37)
+ContainerRuntime=$MultiHostVar37
+
 	echo 'Docker			  = '$Docker
 	echo 'K8S                  	  = '$K8S
 
@@ -1623,6 +1629,7 @@ fi
 	echo 'DistDir                   = '$DistDir
 	echo 'SubDirName                = '$SubDirName
 	echo 'Product                   = '$Product
+	echo 'ContainerRuntime          = '$ContainerRuntime
 
 if [ $LinuxFlavor != 'Ubuntu' ] && [ $LinuxFlavor != 'Pop_OS' ]
 then

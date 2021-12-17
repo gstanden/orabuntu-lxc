@@ -19,6 +19,7 @@ LXDStoragePoolName=olxd-001		# [olxd-001|olxd-002|olxd-003|...]			User-settables
 Docker=Y				# [Y|N]	 						Docker install from Canonical Snap.
 K8S=N					# [Y|N]							Kubernetes install K8S snap from Canonical Snap. Ubuntu Linux 20.04 only for now.
 Product=k8s				# [no-product|workspaces|oracle-db|oracle-gi-18c]	Product to be configured in the seed container. Use products subdirectory to see how to configure new products and add them.
+ContainerRuntime=docker			# [docker|crio]						Container runtime.  Only used if Product=k8s.
 TunType=geneve				# [geneve|gre|vxlan]					Tunnel type for GRE-interconnected Orabuntu-LXC hosts.
 SeedNet1='SeedNet1Fwd:172.29.108'	#							Container network for seed container. Any ipv4 address triplet.
 BaseNet1='BaseNet1Fwd:10.209.53'	#							Container network for cloned copies of the seed container. Any ipv4 address triplet.
