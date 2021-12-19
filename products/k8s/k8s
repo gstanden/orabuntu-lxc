@@ -514,21 +514,40 @@ clear
 
 echo ''
 echo "=============================================="
-echo "Run cont-centos8-push-crio.sh script...       "
+echo "Run cont-centos8-push-crio.sh...              "
 echo "=============================================="
 echo ''
 
-./cont-centos8-push-crio_conf.sh
+./cont-centos8-push-crio.sh
 
 echo ''
 echo "=============================================="
-echo "Done: Run cont-centos8-push-crio.sh script.   "
+echo "Done: Run cont-centos8-push-crio.sh           "
 echo "=============================================="
 echo ''
 
 sleep 5
 
 clear
+
+echo ''
+echo "=============================================="
+echo "Run cont-centos8-push-containerd.sh ...       "
+echo "=============================================="
+echo ''
+
+./cont-centos8-push-containerd.sh
+
+echo ''
+echo "=============================================="
+echo "Done: Run cont-centos8-push-containerd.sh     "
+echo "=============================================="
+echo ''
+
+sleep 5
+
+clear
+
 
 echo ''
 echo "=============================================="
