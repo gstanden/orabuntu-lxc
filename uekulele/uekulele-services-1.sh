@@ -4434,25 +4434,25 @@ clear
 which zpool > /dev/null 2>&1
 if [ $? -eq 0 ]
 then
-	function StoragePoolExist {
-		sudo zpool list | grep -c $StoragePoolName
-	}
-	PoolExist=$(StoragePoolExist)
+        ZpoolCmdExist=1
 else
-	PoolExist=0
+        ZpoolCmdExist=0
 fi
 
-if [ $Release -ge 7 ] && [ $PoolExist -eq 0 ]
+if [ $Release -ge 7 ]
 then
-	if [ $LXDStorageDriver = 'zfs' ]
-	then
-                CurrentDir=`pwd`
-                sudo mkdir -p /opt/olxc/"$DistDir"/zfsutils/Oracle
-                sudo chown $Owner:$Group /opt/olxc/"$DistDir"/zfsutils/Oracle
-                sudo cp -p $DistDir/zfsutils/$LinuxFlavor/zfs_$LinuxFlavor$Release.sh /opt/olxc/"$DistDir"/zfsutils/Oracle/.
-                cd /opt/olxc/"$DistDir"/zfsutils/Oracle
-                ./zfs_$LinuxFlavor$Release.sh
-                cd $CurrentDir
+        if [ $LXDStorageDriver = 'zfs' ]
+        then
+                if [ $ZpoolCmdExist = 0 ]
+                then
+                        CurrentDir=`pwd`
+                        sudo mkdir -p /opt/olxc/"$DistDir"/zfsutils/"$LinuxFlavor"
+                        sudo chown "$Owner":"$Group" /opt/olxc/"$DistDir"/zfsutils/"$LinuxFlavor"
+                        sudo cp -p "$DistDir"/zfsutils/"$LinuxFlavor"/"$LXDStorageDriver"_"$LinuxFlavor"_"$RedHatVersion".sh /opt/olxc/"$DistDir"/zfsutils/"$LinuxFlavor"/.
+                        cd /opt/olxc/"$DistDir"/zfsutils/"$LinuxFlavor"
+                        ./"$LXDStorageDriver"_"$LinuxFlavor"_"$RedHatVersion".sh
+                        cd $CurrentDir
+		fi
 
 		function CheckIscsiTargetInstalled {
 			rpm -qa | grep -c $IscsiTarget
