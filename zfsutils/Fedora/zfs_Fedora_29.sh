@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Usage:  	./zpool_fedora_22.sh [olxc-001|olxc-002|olxc-003|...]
+# Usage:  	./zpool_fedora_22.sh  (versions up to 29)
 
 # Credits:	https://medium.com/@AndrzejRehmann/preparing-fedora-26-laptop-with-zfs-and-encryption-zfs-part-5-1e17820b40a4
 
@@ -107,43 +107,6 @@ sudo systemctl list-unit-files | grep zfs
 echo ''
 echo "=============================================="
 echo "Done: Configure ZFS.                          "
-echo "=============================================="
-echo ''
-
-sleep 5
-
-clear
-
-echo ''
-echo "=============================================="
-echo "Create ZFS Storage...                         "
-echo "=============================================="
-echo ''
-
-sudo zpool create $1 mirror /dev/sdb /dev/sdc
-
-echo ''
-echo "=============================================="
-echo "Done: Create ZFS Storage.                     "
-echo "=============================================="
-echo ''
-
-sleep 5
-
-clear
-
-echo ''
-echo "=============================================="
-echo "Verify ZFS Storage...                         "
-echo "=============================================="
-echo ''
-
-sudo zpool list
-sudo zpool status
-
-echo ''
-echo "=============================================="
-echo "Done: Verify ZFS Storage.                     "
 echo "=============================================="
 echo ''
 

@@ -30,7 +30,7 @@
 #    There are two domains and two networks because the "seed" LXC containers are on a separate network from the production LXC containers.
 #    If the domain is an actual domain, you will need to change the subnet using the subnets feature of Orabuntu-LXC
 
-# Usage:  ./zpool_centos_7.sh [olxc-001|olxc-002|olxc-003|...] (or use your own ZFS pool naming scheme)
+# Usage:  ./zpool_centos_7.sh 
 
 clear
 
@@ -192,20 +192,4 @@ echo ''
 sleep 5
 
 clear
-
-# echo ''
-# echo "=============================================="
-# echo "Create zpool...                               "
-# echo "=============================================="
-# echo ''
-
-# sudo zpool create $1 mirror /dev/sdb /dev/sdc
-# sudo zpool list
-
-# echo ''
-# echo "=============================================="
-# echo "Done: Create zpool.                           "
-# echo "=============================================="
-# echo ''
-
 

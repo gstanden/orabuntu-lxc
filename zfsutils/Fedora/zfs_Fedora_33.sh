@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Usage:  ./zpool_fedora_33.sh [olxc-001|olxc-002|olxc-003|...]
+# Usage:  ./zpool_fedora_33.sh 
 
 clear
 
@@ -50,24 +50,5 @@ sudo systemctl list-unit-files | grep zfs
 echo ''
 echo "=============================================="
 echo "Done: Install packages.                       "
-echo "=============================================="
-echo ''
-
-sleep 5
-
-echo ''
-echo "=============================================="
-echo "Create ZFS Storage...                         "
-echo "=============================================="
-echo ''
-
-sudo zpool create $1 mirror /dev/sdb /dev/sdc
-
-sudo zpool list
-sudo zpool status
-
-echo ''
-echo "=============================================="
-echo "Done: Create ZFS Storage.                     "
 echo "=============================================="
 echo ''
