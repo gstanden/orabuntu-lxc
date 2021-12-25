@@ -4431,6 +4431,7 @@ sleep 5
 
 clear
 
+sudo modprobe zfs
 which zpool > /dev/null 2>&1
 if [ $? -eq 0 ]
 then
@@ -4550,8 +4551,9 @@ then
 			sudo sed -i '2,4{s/^/#/}' 					   /etc/network/openvswitch/stop_$IscsiVendor.sh
 			sudo sh -c "echo '/var/lib/snapd/snap/bin/lxc stop -f --all'	>> /etc/network/openvswitch/stop_$IscsiVendor.sh"
 			sudo sh -c "echo 'sudo lxc-stop -n $NameServerBase'		>> /etc/network/openvswitch/stop_$IscsiVendor.sh"
-			sudo sh -c "echo 'sudo umount /var/lib/lxc'			>> /etc/network/openvswitch/stop_$IscsiVendor.sh"
 			sudo sh -c "echo 'sudo snap stop lxd'				>> /etc/network/openvswitch/stop_$IscsiVendor.sh"
+			sudo sh -c "echo 'sudo umount /var/lib/lxc'			>> /etc/network/openvswitch/stop_$IscsiVendor.sh"
+			sudo sh -c "echo 'sudo umount /$StoragePoolName'		>> /etc/network/openvswitch/stop_$IscsiVendor.sh"
 			sudo sh -c "echo 'sudo service multipathd stop'			>> /etc/network/openvswitch/stop_$IscsiVendor.sh"
 			sudo sh -c "echo 'sudo iscsiadm -m node --logout'		>> /etc/network/openvswitch/stop_$IscsiVendor.sh"
 			sudo sh -c "echo 'sudo service scst stop'			>> /etc/network/openvswitch/stop_$IscsiVendor.sh"
