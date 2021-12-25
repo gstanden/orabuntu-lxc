@@ -699,9 +699,9 @@ then
 	for Node in violin1 violin2 maestro
 	do
 		echo 'Convert to containerd...'
-		echo ' '
-		eval echo "'/var/lib/snapd/snap/bin/lxc exec maestro -- kubectl cordon $Node' | sg lxd"
-		eval echo "'/var/lib/snapd/snap/bin/lxc exec maestro -- kubectl drain  $Node --delete-emptydir-data --ignore-daemonsets' | sg lxd"
+		echo ''
+		sshpass -p root ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@maestro "export KUBECONFIG=/etc/kubernetes/admin.conf; kubectl cordon $Node"
+		sshpass -p root ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@maestro "export KUBECONFIG=/etc/kubernetes/admin.conf; kubectl drain  $Node"
 		eval echo "'/var/lib/snapd/snap/bin/lxc exec $Node -- systemctl stop kubelet' | sg lxd"
 		eval echo "'/var/lib/snapd/snap/bin/lxc exec $Node -- systemctl stop docker' | sg lxd"
 		eval echo "'/var/lib/snapd/snap/bin/lxc exec $Node -- dnf remove docker-ce docker-ce-cli -y' | sg lxd"
@@ -711,8 +711,8 @@ then
 		eval echo "'/var/lib/snapd/snap/bin/lxc exec $Node -- systemctl enable containerd' | sg lxd"
 		eval echo "'/var/lib/snapd/snap/bin/lxc exec $Node -- systemctl start  containerd' | sg lxd"
 		eval echo "'/var/lib/snapd/snap/bin/lxc exec $Node -- systemctl start kubelet' | sg lxd"
-		eval echo "'/var/lib/snapd/snap/bin/lxc exec maestro -- kubectl uncordon $Node' | sg lxd"
-		eval echo "'/var/lib/snapd/snap/bin/lxc exec maestro -- kubectl get -A nodes -o wide' | sg lxd"
+		sshpass -p root ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@maestro "export KUBECONFIG=/etc/kubernetes/admin.conf; kubectl uncordon $Node"
+		sshpass -p root ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@maestro "export KUBECONFIG=/etc/kubernetes/admin.conf; kubectl get -A nodes -o wide"
 	done
 
 	echo ''
@@ -727,29 +727,62 @@ then
 
 	echo ''
 	echo "=============================================="
+	echo "Restart k8s containers ...  .                 "
+	echo "=============================================="
+	echo ''
+
+	lxc stop -f maestro
+	lxc stop -f violin1
+	lxc stop -f violin2
+
+	./host-oracle8-modules-remove.sh
+
+	lxc start maestro
+	lxc start violin1
+	lxc start violin2
+
+	echo ''
+	echo "=============================================="
+	echo "Done: Restart k8s containers.                 "
+	echo "=============================================="
+	echo ''
+
+	sleep 5
+
+	clear
+
+	echo ''
+	echo "=============================================="
 	echo "Wait for all kube-system Running  ...         "
 	echo "=============================================="
 	echo ''
 
-	function GetCountKubeSystem {
-		kubectl get -A pods -o wide | grep -c kube-system
-	}
-	CountKubeSystem=$(GetCountKubeSystem)
+        function GetCountKubeSystem {
+                sshpass -p root ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@maestro "export KUBECONFIG=/etc/kubernetes/admin.conf; kubectl get -A pods -o wide | grep -c Running"
+        }
+        CountKubeSystem=$(GetCountKubeSystem)
 
-	function GetCountKubeSystemRunning {
-		kubectl get -A pods -o wide | grep kube-system | grep -c Running
-	}
-	CountKubeSystemRunning=$(GetCountKubeSystemRunning)
+        function GetCountKubeSystemRunning {
+                sshpass -p root ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@maestro "export KUBECONFIG=/etc/kubernetes/admin.conf; kubectl get -A pods -o wide | grep -c kube-system"
+        }
+        CountKubeSystemRunning=$(GetCountKubeSystemRunning)
 
-	n=1
-	while [ $CountKubeSystemRunning -lt $CountKubeSystem ] && [ $n -le 5 ]
-	do
-		eval echo "'/var/lib/snapd/snap/bin/lxc exec maestro -- kubectl get -A pods -o wide' | sg lxd"
-		CountKubeSystem=$(GetCountKubeSystem)
-		CountKubeSystemRunning=$(GetCountKubeSystemRunning)
-		n=$((n+1))	
-		sleep 60
-	done
+        echo 'CountKubeSystemRunning = '$CountKubeSystemRunning
+        echo 'CountKubeSystem        = '$CountKubeSystem
+
+        n=1
+        while [ $CountKubeSystemRunning = $CountKubeSystem ] && [ $n -le 20 ]
+        do
+                sshpass -p root ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@maestro "export KUBECONFIG=/etc/kubernetes/admin.conf; kubectl get -A pods -o wide"
+                CountKubeSystem=$(GetCountKubeSystem)
+                CountKubeSystemRunning=$(GetCountKubeSystemRunning)
+                echo ''
+                echo 'CountKubeSystemRunning = '$CountKubeSystemRunning
+                echo 'CountKubeSystem        = '$CountKubeSystem
+                echo ''
+                n=$((n+1))
+                sleep 15
+        done
 
 	echo ''
 	echo "=============================================="
