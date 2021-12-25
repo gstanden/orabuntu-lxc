@@ -690,16 +690,14 @@ clear
 
 if [ $ContainerRuntime = 'containerd' ]
 then
-	echo ''
-	echo "=============================================="
-	echo "Run cont-centos8-6 ...                        "
-	echo "=============================================="
-	echo ''
-
 	for Node in violin1 violin2 maestro
 	do
-		echo 'Convert to containerd...'
 		echo ''
+		echo "=============================================="
+		echo "Convert $Node to containerd runtime...        "
+		echo "=============================================="
+		echo ''
+
 		sshpass -p root ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@maestro "export KUBECONFIG=/etc/kubernetes/admin.conf; kubectl cordon $Node"
 		sshpass -p root ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@maestro "export KUBECONFIG=/etc/kubernetes/admin.conf; kubectl drain  $Node"
 		eval echo "'/var/lib/snapd/snap/bin/lxc exec $Node -- systemctl stop kubelet' | sg lxd"
@@ -708,11 +706,35 @@ then
 		eval echo "'/var/lib/snapd/snap/bin/lxc exec $Node -- systemctl stop containerd' | sg lxd"
 		eval echo "'/var/lib/snapd/snap/bin/lxc exec $Node -- containerd config default > /etc/containerd/config.toml' | sg lxd"
 		eval echo "'/var/lib/snapd/snap/bin/lxc exec $Node -- /root/cont-centos8-6.sh $ContainerRuntime $Node' | sg lxd"
+
+		echo ''
+		echo "=============================================="
+		echo "Enable and start containerd on $Node...       "
+		echo "=============================================="
+		echo ''
+
 		eval echo "'/var/lib/snapd/snap/bin/lxc exec $Node -- systemctl enable containerd' | sg lxd"
 		eval echo "'/var/lib/snapd/snap/bin/lxc exec $Node -- systemctl start  containerd' | sg lxd"
+
+		echo ''
+		echo "=============================================="
+		echo "Done: Enable and start containerd on $Node.   "
+		echo "=============================================="
+		echo ''
+
+		sleep 5
+
+		clear
+
 		eval echo "'/var/lib/snapd/snap/bin/lxc exec $Node -- systemctl start kubelet' | sg lxd"
 		sshpass -p root ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@maestro "export KUBECONFIG=/etc/kubernetes/admin.conf; kubectl uncordon $Node"
 		sshpass -p root ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@maestro "export KUBECONFIG=/etc/kubernetes/admin.conf; kubectl get -A nodes -o wide"
+		
+		echo ''
+		echo "=============================================="
+		echo "Done: Convert $Node to containerd runtime.    "
+		echo "=============================================="
+		echo ''
 	done
 
 	echo ''
