@@ -614,6 +614,7 @@ echo "=============================================="
 echo ''
 
 ./cont-centos8-push-ingress-nginx-examples.sh
+cat cont-centos8-push-ingress-nginx-examples.sh
 
 echo ''
 echo "=============================================="
@@ -632,6 +633,7 @@ echo "=============================================="
 echo ''
 
 ./cont-centos8-push-configmap.sh
+cat cont-centos8-push-configmap.sh
 
 echo ''
 echo "=============================================="
@@ -650,6 +652,7 @@ echo "=============================================="
 echo ''
 
 ./cont-centos8-push-ingress-nginx-yaml.sh
+cat cont-centos8-push-ingress-nginx-yaml.sh
 
 echo ''
 echo "=============================================="
@@ -672,15 +675,17 @@ clear
 
 echo ''
 echo "=============================================="
-echo "Run cont-centos8-5...                         "
+echo "Run cont-centos8-5 (run kubeadm init) ...     "
 echo "=============================================="
 echo ''
+
+sleep 5
 
 eval echo "'/var/lib/snapd/snap/bin/lxc exec maestro -- /root/cont-centos8-5.sh $ContainerRuntime' | sg lxd"
 
 echo ''
 echo "=============================================="
-echo "Done: Run cont-centos8-5.                     "
+echo "Done: Run cont-centos8-5 (run kubeadm init)   "
 echo "=============================================="
 echo ''
 
@@ -698,13 +703,34 @@ then
 		echo "=============================================="
 		echo ''
 
+		sleep 5
+
+		clear
+		
+		echo ''
+		echo "=============================================="
+		echo "Cordon and drain $Node ...                    "
+		echo "=============================================="
+		echo ''
+
 sshpass -p root ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@maestro "export KUBECONFIG=/etc/kubernetes/admin.conf; kubectl cordon $Node"
 sshpass -p root ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@maestro "export KUBECONFIG=/etc/kubernetes/admin.conf; kubectl drain  $Node --delete-emptydir-data --ignore-daemonsets"
+		
+		echo ''
+		echo "=============================================="
+		echo "Done: Cordon and drain $Node.                 "
+		echo "=============================================="
+		echo ''
+
+		sleep 5
+
+		clear
+
 		eval echo "'/var/lib/snapd/snap/bin/lxc exec $Node -- systemctl stop kubelet' | sg lxd"
 		eval echo "'/var/lib/snapd/snap/bin/lxc exec $Node -- systemctl stop docker' | sg lxd"
 		eval echo "'/var/lib/snapd/snap/bin/lxc exec $Node -- dnf remove docker-ce docker-ce-cli -y' | sg lxd"
 		eval echo "'/var/lib/snapd/snap/bin/lxc exec $Node -- systemctl stop containerd' | sg lxd"
-		eval echo "'/var/lib/snapd/snap/bin/lxc exec $Node -- containerd config default > /etc/containerd/config.toml' | sg lxd"
+	 	eval echo "'/var/lib/snapd/snap/bin/lxc exec $Node -- containerd config default > /etc/containerd/config.toml' | sg lxd" > /dev/null 2>&1
 		eval echo "'/var/lib/snapd/snap/bin/lxc exec $Node -- /root/cont-centos8-6.sh $ContainerRuntime $Node' | sg lxd"
 
 		echo ''
@@ -727,14 +753,52 @@ sshpass -p root ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no -o UserKnow
 		clear
 
 		eval echo "'/var/lib/snapd/snap/bin/lxc exec $Node -- systemctl start kubelet' | sg lxd"
+		
+		echo ''
+		echo "=============================================="
+		echo "Uncordon $Node ...                            "
+		echo "=============================================="
+		echo ''
+
 		sshpass -p root ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@maestro "export KUBECONFIG=/etc/kubernetes/admin.conf; kubectl uncordon $Node"
+		
+		echo ''
+		echo "=============================================="
+		echo "Done: Uncordon $Node.                         "
+		echo "=============================================="
+		echo ''
+
+		sleep 5
+
+		clear
+		
+		echo ''
+		echo "=============================================="
+		echo "Display status of nodes ...                   "
+		echo "=============================================="
+		echo ''
+		
 		sshpass -p root ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@maestro "export KUBECONFIG=/etc/kubernetes/admin.conf; kubectl get -A nodes -o wide"
+		
+		echo ''
+		echo "=============================================="
+		echo "Done: Display status of nodes.                "
+		echo "=============================================="
+		echo ''
+
+		sleep 5
+
+		clear
 		
 		echo ''
 		echo "=============================================="
 		echo "Done: Convert $Node to containerd runtime.    "
 		echo "=============================================="
 		echo ''
+
+		sleep 5
+
+		clear
 	done
 
 	echo ''
@@ -753,15 +817,7 @@ sshpass -p root ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no -o UserKnow
 	echo "=============================================="
 	echo ''
 
-	lxc stop -f maestro
-	lxc stop -f violin1
-	lxc stop -f violin2
-
 	./host-oracle8-modules-remove.sh
-
-	lxc start maestro
-	lxc start violin1
-	lxc start violin2
 
 	echo ''
 	echo "=============================================="
@@ -778,6 +834,9 @@ sshpass -p root ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no -o UserKnow
 	echo "Wait for all kube-system Running  ...         "
 	echo "=============================================="
 	echo ''
+
+	echo 'sleeping 60 seconds as kubernetes starts ...  '
+	sleep 60
 
         function GetCountKubeSystem {
                 sshpass -p root ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@maestro "export KUBECONFIG=/etc/kubernetes/admin.conf; kubectl get -A pods -o wide | grep -c Running"
