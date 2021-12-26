@@ -729,7 +729,6 @@ sshpass -p root ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no -o UserKnow
 		clear
 
 		eval echo "'/var/lib/snapd/snap/bin/lxc exec $Node -- systemctl stop kubelet' | sg lxd"
-		eval echo "'/var/lib/snapd/snap/bin/lxc exec $Node -- systemctl stop docker' | sg lxd"
 
 		echo ''
 		echo "=============================================="
@@ -739,6 +738,7 @@ sshpass -p root ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no -o UserKnow
 
 		sleep 5
 
+		eval echo "'/var/lib/snapd/snap/bin/lxc exec $Node -- systemctl stop docker' | sg lxd"
 		eval echo "'/var/lib/snapd/snap/bin/lxc exec $Node -- dnf remove docker-ce docker-ce-cli -y' | sg lxd"
 
 		echo ''
@@ -776,26 +776,26 @@ sshpass -p root ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no -o UserKnow
 
 		eval echo "'/var/lib/snapd/snap/bin/lxc exec $Node -- systemctl start kubelet' | sg lxd"
 		
-		echo ''
-		echo "=============================================="
-		echo "Uncordon $Node ...                            "
-		echo "=============================================="
-		echo ''
-
-		sshpass -p root ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@maestro "export KUBECONFIG=/etc/kubernetes/admin.conf; kubectl uncordon $Node"
-		
-		echo ''
-		echo "=============================================="
-		echo "Done: Uncordon $Node.                         "
-		echo "=============================================="
-		echo ''
-
-		sleep 5
-
-		clear
-		
 		if [ $Node != 'maestro' ]
 		then	
+			echo ''
+			echo "=============================================="
+			echo "Uncordon $Node ...                            "
+			echo "=============================================="
+			echo ''
+
+			sshpass -p root ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@maestro "export KUBECONFIG=/etc/kubernetes/admin.conf; kubectl uncordon $Node"
+		
+			echo ''
+			echo "=============================================="
+			echo "Done: Uncordon $Node.                         "
+			echo "=============================================="
+			echo ''
+
+			sleep 5
+
+			clear
+		
 			echo ''
 			echo "=============================================="
 			echo "Display status of nodes ...                   "
@@ -838,11 +838,11 @@ sshpass -p root ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no -o UserKnow
 
 	echo ''
 	echo "=============================================="
-	echo "Sleep 2 minutes before containers restart...  "
+	echo "Sleep 1 minute before containers restart...   "
 	echo "=============================================="
 	echo ''
 
-	sleep 120
+	sleep 60
 
 	clear
 
@@ -884,11 +884,11 @@ sshpass -p root ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no -o UserKnow
 
 	echo ''
 	echo "=============================================="
-	echo "Sleep 10 mins while kube-system restarts ...  "
+	echo "Sleep 2 mins during kube-system startup ...   "
 	echo "=============================================="
 	echo ''
 
-	sleep 600
+	sleep 120
 
 	clear
 
@@ -912,15 +912,15 @@ sshpass -p root ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no -o UserKnow
         echo 'CountKubeSystem        = '$CountKubeSystem
 
         n=1
-        while [ $CountKubeSystemRunning = $CountKubeSystem ] && [ $n -le 20 ]
+        while [ $CountKubeSystemRunning != $CountKubeSystem ] && [ $n -le 5 ]
         do
                 sshpass -p root ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@maestro "export KUBECONFIG=/etc/kubernetes/admin.conf; kubectl get -A pods -o wide"
+		echo ''
                 CountKubeSystem=$(GetCountKubeSystem)
                 CountKubeSystemRunning=$(GetCountKubeSystemRunning)
-                echo ''
                 echo 'CountKubeSystemRunning = '$CountKubeSystemRunning
                 echo 'CountKubeSystem        = '$CountKubeSystem
-                echo ''
+		echo ''
                 n=$((n+1))
                 sleep 15
         done
@@ -930,6 +930,29 @@ sshpass -p root ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no -o UserKnow
 	echo "Done: Wait for all kube-system Running  ...   "
 	echo "=============================================="
 	echo ''
+
+	sleep 5
+
+	clear
+
+	echo ''
+	echo "=============================================="
+	echo "Uncordon maestro ...                          "
+	echo "=============================================="
+	echo ''
+
+	sshpass -p root ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@maestro "export KUBECONFIG=/etc/kubernetes/admin.conf; kubectl uncordon maestro"
+	
+	echo ''
+	echo "=============================================="
+	echo "Done: Uncordon maestro                        "
+	echo "=============================================="
+	echo ''
+
+	sleep 5
+
+	clear
+		
 fi
 
 # metallb load balancer deployment
