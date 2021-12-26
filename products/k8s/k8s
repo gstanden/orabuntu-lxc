@@ -519,6 +519,7 @@ echo "=============================================="
 echo ''
 
 ./cont-centos8-push-crio.sh
+cat cont-centos8-push-crio.sh
 
 echo ''
 echo "=============================================="
@@ -537,6 +538,7 @@ echo "=============================================="
 echo ''
 
 ./cont-centos8-push-containerd.sh
+cat cont-centos8-push-containerd.sh 
 
 echo ''
 echo "=============================================="
@@ -728,7 +730,27 @@ sshpass -p root ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no -o UserKnow
 
 		eval echo "'/var/lib/snapd/snap/bin/lxc exec $Node -- systemctl stop kubelet' | sg lxd"
 		eval echo "'/var/lib/snapd/snap/bin/lxc exec $Node -- systemctl stop docker' | sg lxd"
+
+		echo ''
+		echo "=============================================="
+		echo "Uninstall docker on $Node...                  "
+		echo "=============================================="
+		echo ''
+
+		sleep 5
+
 		eval echo "'/var/lib/snapd/snap/bin/lxc exec $Node -- dnf remove docker-ce docker-ce-cli -y' | sg lxd"
+
+		echo ''
+		echo "=============================================="
+		echo "Done: Uninstall docker on $Node.              "
+		echo "=============================================="
+		echo ''
+
+		sleep 5
+
+		clear
+
 		eval echo "'/var/lib/snapd/snap/bin/lxc exec $Node -- systemctl stop containerd' | sg lxd"
 	 	eval echo "'/var/lib/snapd/snap/bin/lxc exec $Node -- containerd config default > /etc/containerd/config.toml' | sg lxd" > /dev/null 2>&1
 		eval echo "'/var/lib/snapd/snap/bin/lxc exec $Node -- /root/cont-centos8-6.sh $ContainerRuntime $Node' | sg lxd"
@@ -772,23 +794,26 @@ sshpass -p root ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no -o UserKnow
 
 		clear
 		
-		echo ''
-		echo "=============================================="
-		echo "Display status of nodes ...                   "
-		echo "=============================================="
-		echo ''
+		if [ $Node != 'maestro' ]
+		then	
+			echo ''
+			echo "=============================================="
+			echo "Display status of nodes ...                   "
+			echo "=============================================="
+			echo ''
+	
+			sshpass -p root ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@maestro "export KUBECONFIG=/etc/kubernetes/admin.conf; kubectl get -A nodes -o wide"
 		
-		sshpass -p root ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@maestro "export KUBECONFIG=/etc/kubernetes/admin.conf; kubectl get -A nodes -o wide"
-		
-		echo ''
-		echo "=============================================="
-		echo "Done: Display status of nodes.                "
-		echo "=============================================="
-		echo ''
+			echo ''
+			echo "=============================================="
+			echo "Done: Display status of nodes.                "
+			echo "=============================================="
+			echo ''
 
-		sleep 5
+			sleep 5
 
-		clear
+			clear
+		fi
 		
 		echo ''
 		echo "=============================================="
@@ -813,6 +838,16 @@ sshpass -p root ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no -o UserKnow
 
 	echo ''
 	echo "=============================================="
+	echo "Sleeping 2 minutes before container restart..."
+	echo "=============================================="
+	echo ''
+
+	sleep 120
+
+	clear
+
+	echo ''
+	echo "=============================================="
 	echo "Restart k8s containers ...  .                 "
 	echo "=============================================="
 	echo ''
@@ -831,12 +866,37 @@ sshpass -p root ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no -o UserKnow
 
 	echo ''
 	echo "=============================================="
-	echo "Wait for all kube-system Running  ...         "
+	echo "List containers ...                           "
 	echo "=============================================="
 	echo ''
 
-	echo 'sleeping 60 seconds as kubernetes starts ...  '
-	sleep 60
+	eval echo "'/var/lib/snapd/snap/bin/lxc list' | sg lxd"
+
+	echo ''
+	echo "=============================================="
+	echo "Done: List containers.                        "
+	echo "=============================================="
+	echo ''
+
+	sleep 5
+
+	clear
+
+	echo ''
+	echo "=============================================="
+	echo "Sleep 10 mins while kube-system restarts ...  "
+	echo "=============================================="
+	echo ''
+
+	sleep 600
+
+	clear
+
+	echo ''
+	echo "=============================================="
+	echo "Wait for all kube-system Running  ...         "
+	echo "=============================================="
+	echo ''
 
         function GetCountKubeSystem {
                 sshpass -p root ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@maestro "export KUBECONFIG=/etc/kubernetes/admin.conf; kubectl get -A pods -o wide | grep -c Running"
