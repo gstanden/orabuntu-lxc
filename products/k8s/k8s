@@ -411,8 +411,9 @@ echo ''
 sleep 5
 
 cd /opt/olxc/"$DistDir"/products/k8s
-wget -4 https://github.com/gstanden/kubernetes/archive/refs/heads/master.zip
-unzip  master.zip
+wget https://github.com/gstanden/kubernetes/archive/refs/tags/v1.0.4-alpha.zip 
+unzip v1.0.4-alpha.zip 
+mv kubernetes-1.0.4-alpha kubernetes-master
 
 echo ''
 echo "=============================================="
