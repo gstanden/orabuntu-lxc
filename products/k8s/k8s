@@ -958,39 +958,42 @@ fi
 
 # metallb load balancer deployment
 
-echo ''
-echo "=============================================="
-echo "Run cont-centos8-7...                         "
-echo "=============================================="
-echo ''
+if [ $ContainerRuntime = 'docker' ] || [ $ContainerRuntime = 'containerd' ]
+then
+	echo ''
+	echo "=============================================="
+	echo "Run cont-centos8-7...                         "
+	echo "=============================================="
+	echo ''
 
-eval echo "'/var/lib/snapd/snap/bin/lxc exec maestro -- /root/cont-centos8-7.sh' | sg lxd"
+	# eval echo "'/var/lib/snapd/snap/bin/lxc exec maestro -- /root/cont-centos8-7.sh' | sg lxd"
 
-echo ''
-echo "=============================================="
-echo "Done: Run cont-centos8-7.                     "
-echo "=============================================="
-echo ''
+	echo ''
+	echo "=============================================="
+	echo "Done: Run cont-centos8-7.                     "
+	echo "=============================================="
+	echo ''
 
-# ingress-nginx deployment
+	# ingress-nginx deployment
 
-echo ''
-echo "=============================================="
-echo "Run cont-centos8-8...                         "
-echo "=============================================="
-echo ''
+	echo ''
+	echo "=============================================="
+	echo "Run cont-centos8-8...                         "
+	echo "=============================================="
+	echo ''
 
-eval echo "'/var/lib/snapd/snap/bin/lxc exec maestro -- /root/cont-centos8-8.sh' | sg lxd"
+	eval echo "'/var/lib/snapd/snap/bin/lxc exec maestro -- /root/cont-centos8-8.sh' | sg lxd"
 
-echo ''
-echo "=============================================="
-echo "Done: Run cont-centos8-8.                     "
-echo "=============================================="
-echo ''
+	echo ''
+	echo "=============================================="
+	echo "Done: Run cont-centos8-8.                     "
+	echo "=============================================="
+	echo ''
 
-sleep 5
+	sleep 5
 
-clear
+	clear
+fi
 
 echo ''
 echo "=============================================="
