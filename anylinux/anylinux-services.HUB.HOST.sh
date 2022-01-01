@@ -279,6 +279,7 @@ LXDPreSeed=$(source "$DistDir"/anylinux/CONFIG; echo $LXDPreSeed)
 ################## ContainerRuntime Setting ########################
 
 ContainerRuntime=$(source "$DistDir"/anylinux/CONFIG; echo $ContainerRuntime)
+k8sCNI=$(source "$DistDir"/anylinux/CONFIG; echo $k8sCNI)
 
 if [ $LinuxFlavor = 'Fedora' ] && [ $RedHatVersion -le 28 ]
 then
@@ -537,7 +538,7 @@ then
 	fi
 
 else
-	MultiHost="$Operation:N:1:X:X:X:$MTU:X:X:$GRE:$Product:$LXD:$K8S:$LXDPreSeed:$LXDCluster:$LXDStorageDriver:$LXDStoragePoolName:$BtrfsLun1:$Docker:$TunType:$IscsiTarget:$Lun1Name:$Lun2Name:$Lun3Name:$Lun1Size:$Lun2Size:$Lun3Size:$LogBlkSz:$BtrfsRaid:$ZfsMirror:$BtrfsLun2:$ZfsLun1:$ZfsLun2:$LxcLun1:$IscsiTargetLunPrefix:$IscsiVendor:$ContainerRuntime"
+	MultiHost="$Operation:N:1:X:X:X:$MTU:X:X:$GRE:$Product:$LXD:$K8S:$LXDPreSeed:$LXDCluster:$LXDStorageDriver:$LXDStoragePoolName:$BtrfsLun1:$Docker:$TunType:$IscsiTarget:$Lun1Name:$Lun2Name:$Lun3Name:$Lun1Size:$Lun2Size:$Lun3Size:$LogBlkSz:$BtrfsRaid:$ZfsMirror:$BtrfsLun2:$ZfsLun1:$ZfsLun2:$LxcLun1:$IscsiTargetLunPrefix:$IscsiVendor:$ContainerRuntime:$k8sCNI"
 fi
 
 ./anylinux-services.sh $MultiHost 
