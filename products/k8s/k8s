@@ -690,6 +690,8 @@ echo ''
 
 sleep 5
 
+clear
+
 eval echo "'/var/lib/snapd/snap/bin/lxc exec maestro -- /root/cont-centos8-5.sh $ContainerRuntime $k8sCNI' | sg lxd"
 
 echo ''
@@ -966,13 +968,15 @@ fi
 
 if [ $ContainerRuntime = 'docker' ] || [ $ContainerRuntime = 'containerd' ]
 then
+	# metallb deployment
+
 	echo ''
 	echo "=============================================="
 	echo "Run cont-centos8-7...                         "
 	echo "=============================================="
 	echo ''
 
-	# eval echo "'/var/lib/snapd/snap/bin/lxc exec maestro -- /root/cont-centos8-7.sh' | sg lxd"
+	eval echo "'/var/lib/snapd/snap/bin/lxc exec maestro -- /root/cont-centos8-7.sh' | sg lxd"
 
 	echo ''
 	echo "=============================================="
