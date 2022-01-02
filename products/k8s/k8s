@@ -966,7 +966,7 @@ fi
 
 # metallb load balancer deployment
 
-if [ $ContainerRuntime = 'docker' ] || [ $ContainerRuntime = 'containerd' ]
+if [ $ContainerRuntime = 'docker' ] || [ $ContainerRuntime = 'containerd' ] || [ $ContainerRuntime = 'crio' ]
 then
 	# metallb deployment
 
