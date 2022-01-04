@@ -250,6 +250,18 @@ function GetMultiHostVar38 {
 MultiHostVar38=$(GetMultiHostVar38)
 k8sCNI=$MultiHostVar38
 
+function GetMultiHostVar39 {
+        echo $MultiHost | cut -f39 -d':'
+}
+MultiHostVar39=$(GetMultiHostVar39)
+k8sLoadBalancer=$MultiHostVar39
+
+function GetMultiHostVar40 {
+        echo $MultiHost | cut -f40 -d':'
+}
+MultiHostVar40=$(GetMultiHostVar40)
+k8sIngressController=$MultiHostVar40
+
 function CheckSystemdResolvedInstalled {
         sudo netstat -ulnp | grep 53 | sed 's/  */ /g' | rev | cut -f1 -d'/' | rev | sort -u | grep systemd- | wc -l
 }
@@ -968,41 +980,49 @@ fi
 
 if [ $ContainerRuntime = 'docker' ] || [ $ContainerRuntime = 'containerd' ] || [ $ContainerRuntime = 'crio' ]
 then
-	# metallb deployment
+	if [ $k8sLoadBalancer = 'metallb' ]
+	then
+		echo ''
+		echo "=============================================="
+		echo "Run cont-centos8-7...                         "
+		echo "=============================================="
+		echo ''
 
-	echo ''
-	echo "=============================================="
-	echo "Run cont-centos8-7...                         "
-	echo "=============================================="
-	echo ''
+  		metallb install
 
-	eval echo "'/var/lib/snapd/snap/bin/lxc exec maestro -- /root/cont-centos8-7.sh' | sg lxd"
+ 		eval echo "'/var/lib/snapd/snap/bin/lxc exec maestro -- /root/cont-centos8-7.sh' | sg lxd"
 
-	echo ''
-	echo "=============================================="
-	echo "Done: Run cont-centos8-7.                     "
-	echo "=============================================="
-	echo ''
+		echo ''
+		echo "=============================================="
+		echo "Done: Run cont-centos8-7.                     "
+		echo "=============================================="
+		echo ''
 
-	# ingress-nginx deployment
+		sleep 5
 
-	echo ''
-	echo "=============================================="
-	echo "Run cont-centos8-8...                         "
-	echo "=============================================="
-	echo ''
+		clear
+	fi
 
-	eval echo "'/var/lib/snapd/snap/bin/lxc exec maestro -- /root/cont-centos8-8.sh' | sg lxd"
+	if [ $k8sIngressController = 'IngressNginx' ]
+	then
+		echo ''
+		echo "=============================================="
+		echo "Run cont-centos8-8...                         "
+		echo "=============================================="
+		echo ''
 
-	echo ''
-	echo "=============================================="
-	echo "Done: Run cont-centos8-8.                     "
-	echo "=============================================="
-	echo ''
+		eval echo "'/var/lib/snapd/snap/bin/lxc exec maestro -- /root/cont-centos8-8.sh' | sg lxd"
 
-	sleep 5
+		echo ''
+		echo "=============================================="
+		echo "Done: Run cont-centos8-8.                     "
+		echo "=============================================="
+		echo ''
 
-	clear
+		sleep 5
+
+		clear
+	fi
 fi
 
 echo ''

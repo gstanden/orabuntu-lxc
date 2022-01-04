@@ -20,7 +20,9 @@ Docker=Y				# [Y|N]	 						Docker install from Canonical Snap.
 K8S=N					# [Y|N]							Kubernetes install K8S snap from Canonical Snap. Ubuntu Linux 20.04 only for now.
 Product=k8s				# [k8s|no-product|workspaces|oracle-db|oracle-gi-18c]	Product to be configured in the seed container. Use products subdirectory to see how to configure new products and add them.
 ContainerRuntime=crio			# [docker|crio|containerd]				Container runtime.  Only used if Product=k8s.
-k8sCNI=flannel				# [weavenet|flannel]					Kubernetes CniPlugin
+k8sCNI=flannel				# [weavenet|flannel]					Kubernetes CNI plugin
+k8sLoadBalancer				# [none|metallb]					Kubernetes load balancer
+k8sIngressController			# [none|IngressNginx]					Kubernetes ingress controller.
 TunType=geneve				# [geneve|gre|vxlan]					Tunnel type for GRE-interconnected Orabuntu-LXC hosts.
 SeedNet1='SeedNet1Fwd:172.29.108'	#							Container network for seed container. Any ipv4 address triplet.
 BaseNet1='BaseNet1Fwd:10.209.53'	#							Container network for cloned copies of the seed container. Any ipv4 address triplet.
@@ -33,7 +35,7 @@ ExtrNet4='192.168.20'			#							Auxiliary network 4. Any ipv4 address triplet.
 ExtrNet5='192.168.21'			#							Auxiliary network 5. Any ipv4 address triplet.
 ExtrNet6='192.168.22'			#							Auxiliary network 6. Any ipv4 address triplet.
 SPOKEIP=192.168.1.246			#							IP address of HUB   Orabuntu-LXC host server. Example:  192.168.1.143
-HUBIP=192.168.1.150			#							IP address of SPOKE Orabuntu-LXC host server. Example:  192.168.1.144
+HUBIP=192.168.1.154			#							IP address of SPOKE Orabuntu-LXC host server. Example:  192.168.1.144
 HubUserAct=orabuntu			#							Linux user account          used to install Orabuntu-LXC.  Example: ubuntu. Must have sudo all privilege which can be revoked after install.
 HubSudoPwd=rz7uHxTB			#							Linux user account password used to install Orabuntu-LXC.  Can be changed after Orabuntu-LXC install.
 BtrfsLun1="\/dev\/sdb"			#							User-provided LUN if not using built-in SCST storage
