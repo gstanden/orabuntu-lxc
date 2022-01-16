@@ -976,7 +976,8 @@ sshpass -p root ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no -o UserKnow
 		
 fi
 
-# metallb load balancer deployment
+eval echo "'/var/lib/snapd/snap/bin/lxc exec maestro -- cp -p /root/cont-centos8-7.sh /root/install-metallb.sh' | sg lxd"
+eval echo "'/var/lib/snapd/snap/bin/lxc exec maestro -- cp -p /root/cont-centos8-8.sh /root/install-ingress-nginx.sh' | sg lxd"
 
 if [ $ContainerRuntime = 'docker' ] || [ $ContainerRuntime = 'containerd' ] || [ $ContainerRuntime = 'crio' ]
 then
@@ -991,7 +992,6 @@ then
   		metallb install
 
  		eval echo "'/var/lib/snapd/snap/bin/lxc exec maestro -- /root/cont-centos8-7.sh' | sg lxd"
- 		eval echo "'/var/lib/snapd/snap/bin/lxc exec maestro -- cp -p /root/cont-centos8-7.sh /root/install-metallb.sh' | sg lxd"
 
 		echo ''
 		echo "=============================================="
@@ -1013,7 +1013,6 @@ then
 		echo ''
 
 		eval echo "'/var/lib/snapd/snap/bin/lxc exec maestro -- /root/cont-centos8-8.sh' | sg lxd"
-		eval echo "'/var/lib/snapd/snap/bin/lxc exec maestro -- cp -p /root/cont-centos8-8.sh /root/install-ingress-nginx.sh' | sg lxd"
 
 		echo ''
 		echo "=============================================="
