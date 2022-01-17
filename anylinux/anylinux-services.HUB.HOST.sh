@@ -67,6 +67,16 @@ function GetDistDir {
 }
 DistDir=$(GetDistDir)
 
+function GetGroup {
+        id | cut -f2 -d' ' | cut -f2 -d'(' | cut -f1 -d')'
+}
+Group=$(GetGroup)
+
+function GetOwner {
+        id | cut -f1 -d' ' | cut -f2 -d'(' | cut -f1 -d')'
+}
+Owner=$(GetOwner)
+
 GetLinuxFlavors(){
 if   [[ -e /etc/oracle-release ]]
 then
@@ -302,6 +312,26 @@ then
 		then
 			if [ $LXDStorageDriver = 'zfs' ]
 			then
+				sudo modprobe zfs
+				which zpool > /dev/null 2>&1
+				if [ $? -eq 0 ]
+				then
+				        ZpoolCmdExist=1
+				else
+				        ZpoolCmdExist=0
+				fi
+
+                		if [ $ZpoolCmdExist = 0 ]
+                		then
+                        		CurrentDir=`pwd`
+                        		sudo mkdir -p /opt/olxc/"$DistDir"/zfsutils/"$LinuxFlavor"
+                        		sudo chown "$Owner":"$Group" /opt/olxc/"$DistDir"/zfsutils/"$LinuxFlavor"
+                        		sudo cp -p "$DistDir"/zfsutils/"$LinuxFlavor"/"$LXDStorageDriver"_"$LinuxFlavor"_"$RedHatVersion".sh /opt/olxc/"$DistDir"/zfsutils/"$LinuxFlavor"/.
+                        		cd /opt/olxc/"$DistDir"/zfsutils/"$LinuxFlavor"
+                        		./"$LXDStorageDriver"_"$LinuxFlavor"_"$RedHatVersion".sh
+                        		cd $CurrentDir
+				fi
+
 				if [ $IscsiTarget = 'Y' ]
 				then
        		 			BtrfsLun1=Unused

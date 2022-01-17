@@ -1146,6 +1146,7 @@ then
 
 		if [ $Cgroupv2Warning1 -eq 1 ]
 		then
+			echo ''
 		        echo "=============================================="
 		        echo "On $LinuxFlavor $RedHatVersion the WARNING:   "
 		        echo "                                              "
