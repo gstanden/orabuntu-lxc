@@ -57,7 +57,7 @@ sudo yum -y update
 sudo yum -y remove zfs-fuse
 sudo yum -y install net-tools wget unzip tar
 sudo subscription-manager repos --enable codeready-builder-for-rhel-8-x86_64-rpms
-sudo dnf install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
+sudo dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
 sudo dnf config-manager --enable epel
 sudo yum -y update
 sudo yum -y install gcc make autoconf automake libtool rpm-build libtirpc-devel libblkid-devel libuuid-devel libudev-devel openssl-devel zlib-devel libaio-devel libattr-devel elfutils-libelf-devel kernel-devel-$(uname -r) python3 python3-packaging python3-devel python3-setuptools python3-cffi libffi-devel git ncompress perl bc cpio sysstat mdadm ksh fio dkms lsscsi
