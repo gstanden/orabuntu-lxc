@@ -312,7 +312,7 @@ then
 		then
 			if [ $LXDStorageDriver = 'zfs' ]
 			then
-				sudo modprobe zfs
+				sudo modprobe zfs > /dev/null 2>&1
 				which zpool > /dev/null 2>&1
 				if [ $? -eq 0 ]
 				then
