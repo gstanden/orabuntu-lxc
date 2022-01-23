@@ -28,10 +28,10 @@
 /etc/network/openvswitch/crt_ovs_sx1.sh
 /etc/network/openvswitch/setup_gre_and_routes.sh
 /etc/network/openvswitch/olxc_sx1a
-/etc/network/openvswitch/crt_ovs_sw1.sh
 /etc/network/openvswitch/preseed.sw1a.zfs.001.lxd.cluster
 /etc/network/openvswitch/preseed.sw1a.zfs.002.lxd.cluster
 /etc/network/openvswitch/preseed.sw1a.btr.001.lxd.cluster
 /etc/network/openvswitch/preseed.sw1a.btr.002.lxd.cluster
+/etc/network/openvswitch/crt_ovs_sw1.sh
 /etc/GNU3
 /etc/COPYING

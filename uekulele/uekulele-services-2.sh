@@ -785,14 +785,14 @@ then
 
 		while [ $LxdSnapInstalled -ne 0 ]
 		do
-			sudo snap install lxd
+			sudo snap install lxd --edge
 			LxdSnapInstalled=$(CheckLxdSnapInstalled)
 			LxdSnapInstalled=`echo $?`
 			sleep 15
 			echo ''
 		done
 
-		sudo snap install lxd
+		sudo snap install lxd --edge
 		sudo snap refresh lxd
 
 		echo ''
@@ -865,6 +865,12 @@ then
 		echo ''
 
 		sleep 5
+
+		if [ $GREValue = 'Y' ]
+		then
+			sudo ovs-vsctl set int sw1  mtu_request=1420
+			sudo ovs-vsctl set int sw1a mtu_request=1420
+		fi
 
 		sudo chmod 775  	/opt/olxc/"$DistDir"/uekulele/archives/lxd_install_uekulele.sh
 		sudo su - $Owner 	/opt/olxc/"$DistDir"/uekulele/archives/lxd_install_uekulele.sh $PreSeed $LXDCluster $GREValue $Release $MultiHost $LXDStorageDriver

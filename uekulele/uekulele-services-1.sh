@@ -4472,7 +4472,7 @@ then
 			if   [ $IscsiVendor = 'scst' ]
 			then
 				cd /opt/olxc/home/scst-files
-				./create-scst.sh $LXDStorageDriver $RevDomain1 $Lun1Name $Lun2Name $Lun3Name $Lun1Size $Lun2Size $Lun3Size $LogBlkSz $IscsiTargetLunPrefix
+				./create-scst.sh $LXDStorageDriver $RevDomain1 $Lun1Name $Lun2Name $Lun3Name $Lun1Size $Lun2Size $Lun3Size $LogBlkSz $IscsiTargetLunPrefix $Sw1Index
 
 			elif [ $IscsiVendor = 'lio' ]
 			then
@@ -4731,9 +4731,9 @@ then
 
                 elif [ $GRE = 'Y' ]
                 then
-                        sshpass -p $MultiHostVar8 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S --prompt='' <<< "$MultiHostVar8" /var/lib/snapd/snap/bin/lxc info 2>/dev/null | sed -n '/BEGIN.*-/,/END.*-/p'" > /tmp/cert.txt
+                        sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S --prompt='' <<< "$MultiHostVar9" /var/lib/snapd/snap/bin/lxc info 2>/dev/null | sed -n '/BEGIN.*-/,/END.*-/p'" > /tmp/cert.txt
 			rm /tmp/cert.txt
-                        sshpass -p $MultiHostVar8 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S --prompt='' <<< "$MultiHostVar8" /var/lib/snapd/snap/bin/lxc info 2>/dev/null | sed -n '/BEGIN.*-/,/END.*-/p'" > /tmp/cert.txt
+                        sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S --prompt='' <<< "$MultiHostVar9" /var/lib/snapd/snap/bin/lxc info 2>/dev/null | sed -n '/BEGIN.*-/,/END.*-/p'" > /tmp/cert.txt
 
 			echo ''
 			echo "=============================================="
@@ -4831,9 +4831,9 @@ then
 
                 elif [ $GRE = 'Y' ]
                 then
-                        sshpass -p $MultiHostVar8 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S --prompt='' <<< "$MultiHostVar8" /var/lib/snapd/snap/bin/lxc info | sed -n '/BEGIN.*-/,/END.*-/p'" > /tmp/cert.txt
+                        sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S --prompt='' <<< "$MultiHostVar9" /var/lib/snapd/snap/bin/lxc info | sed -n '/BEGIN.*-/,/END.*-/p'" > /tmp/cert.txt
                         rm /tmp/cert.txt
-                        sshpass -p $MultiHostVar8 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S --prompt='' <<< "$MultiHostVar8" /var/lib/snapd/snap/bin/lxc info | sed -n '/BEGIN.*-/,/END.*-/p'" > /tmp/cert.txt
+                        sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S --prompt='' <<< "$MultiHostVar9" /var/lib/snapd/snap/bin/lxc info | sed -n '/BEGIN.*-/,/END.*-/p'" > /tmp/cert.txt
 
                         echo ''
                         echo "=============================================="

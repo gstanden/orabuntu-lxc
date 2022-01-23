@@ -446,7 +446,9 @@ then
  			sudo firewall-cmd --zone=$Zone --permanent --add-interface=sx1a
  			sudo firewall-cmd --zone=$Zone --permanent --add-interface=lxcbr0
  			sudo firewall-cmd --zone=$Zone --permanent --add-interface=lxdbr0
-		else
+
+		elif [ $Release -eq 8 ]
+		then
 			Zone=trusted
 			sudo firewall-cmd --permanent --zone=$Zone --set-target=ACCEPT
 		fi
@@ -472,9 +474,12 @@ then
   	sudo firewall-cmd --zone=$Zone --permanent --add-service=dns
   	sudo firewall-cmd --zone=$Zone --permanent --add-service=dhcp
  	sudo firewall-cmd --zone=$Zone --permanent --add-service=https 
-	sudo firewall-cmd --zone=$Zone --permanent --add-masquerade
+  	sudo firewall-cmd --zone=$Zone --permanent --add-port=8443/tcp
   	sudo firewall-cmd --zone=$Zone --permanent --add-port=443/tcp
   	sudo firewall-cmd --zone=$Zone --permanent --add-port=587/tcp
+ 	sudo firewall-cmd --zone=$Zone --permanent --add-interface=sw1
+ 	sudo firewall-cmd --zone=$Zone --permanent --add-interface=sw1a
+	sudo firewall-cmd --zone=$Zone --permanent --add-masquerade
 
 	if [ $GRE = 'Y' ]
 	then	

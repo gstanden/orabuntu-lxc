@@ -22,7 +22,7 @@
 #    v4.0               GLS 20161025 DNS DHCP services moved into an LXC container
 #    v5.0               GLS 20170909 Orabuntu-LXC Multi-Host
 #    v6.0-AMIDE-beta    GLS 20180106 Orabuntu-LXC AmazonS3 Multi-Host Docker Enterprise Edition (AMIDE)
-#    v7.0-AMIDE-beta    GLS 20210428 Orabuntu-LXC AmazonS3 Multi-Host LXD Docker Enterprise Edition (AMIDE)
+#    v7.0-ELENA-beta    GLS 20210428 Orabuntu-LXC AmazonS3 Multi-Host LXD Docker Enterprise Edition (AMIDE)
 
 #    Note that this software builds a containerized DNS DHCP solution (bind9 / isc-dhcp-server).
 #    The nameserver should NOT be the name of an EXISTING nameserver but an arbitrary name because this software is CREATING a new LXC-containerized nameserver.
@@ -66,6 +66,16 @@ function GetDistDir {
         pwd | rev | cut -f2-20 -d'/' | rev
 }
 DistDir=$(GetDistDir)
+
+function GetGroup {
+        id | cut -f2 -d' ' | cut -f2 -d'(' | cut -f1 -d')'
+}
+Group=$(GetGroup)
+
+function GetOwner {
+        id | cut -f1 -d' ' | cut -f2 -d'(' | cut -f1 -d')'
+}
+Owner=$(GetOwner)
 
 GetLinuxFlavors(){
 if   [[ -e /etc/oracle-release ]]
@@ -217,41 +227,50 @@ then
         clear
 fi
 
-##################### Tunnel install Flag  ######################
+################ MultiHost Settings for HUB host ########################
 
-# TunType values [geneve|gre|vxlan]
-
-TunType=$(source "$DistDir"/anylinux/CONFIG; echo $TunType)
-
-##################### SCST install Flag  ########################
-
-# IscsiTarget setting [Y|N] 
-
-IscsiTarget=$(source "$DistDir"/anylinux/CONFIG; echo $IscsiTarget)
-
-################# Kubernetes Install Flag  ######################
-
-K8S=$(source "$DistDir"/anylinux/CONFIG; echo $K8S)
-
-################### Docker Install Flag  ########################
-
-Docker=$(source "$DistDir"/anylinux/CONFIG; echo $Docker)
-
-################ LXD Cluster Settings ######################
-
-# These values are set hard-coded in this script because this is the HUB host install script.
+# These values are set hard-coded in this script.
+# MTU 9000 has not been developed into Orabuntu-LXC yet but is on roadmap.
 
 GRE=Y
 MTU=1420
 LOGEXT=`date +"%Y-%m-%d.%R:%S"`
 
+#################### Tunnel settings ###########################
+
 # TunType values [geneve|gre|vxlan]
 
 TunType=$(source "$DistDir"/anylinux/CONFIG; echo $TunType)
 
-################e Kubernetes Install Flag  ######################
+###################### SCST settings ###########################
 
-K8S=N
+IscsiTarget=$(source "$DistDir"/anylinux/CONFIG; echo $IscsiTarget)
+IscsiVendor=$(source "$DistDir"/anylinux/CONFIG; echo $IscsiVendor)
+IscsiTargetLunPrefix=$(source "$DistDir"/anylinux/CONFIG; echo $IscsiTargetLunPrefix)
+Lun1Name=$(source "$DistDir"/anylinux/CONFIG; echo $Lun1Name)
+Lun2Name=$(source "$DistDir"/anylinux/CONFIG; echo $Lun2Name)
+Lun3Name=$(source "$DistDir"/anylinux/CONFIG; echo $Lun3Name)
+Lun1Size=$(source "$DistDir"/anylinux/CONFIG; echo $Lun1Size)
+Lun2Size=$(source "$DistDir"/anylinux/CONFIG; echo $Lun2Size)
+Lun3Size=$(source "$DistDir"/anylinux/CONFIG; echo $Lun3Size)
+LogBlkSz=$(source "$DistDir"/anylinux/CONFIG; echo $LogBlkSz)
+
+BtrfsRaid=$(source "$DistDir"/anylinux/CONFIG; echo $BtrfsRaid)
+ZfsMirror=$(source "$DistDir"/anylinux/CONFIG; echo $ZfsMirror)
+
+############ User-configured non-SCST storage ###################
+
+ZfsLun1=$(source "$DistDir"/anylinux/CONFIG; echo $ZfsLun1)
+ZfsLun2=$(source "$DistDir"/anylinux/CONFIG; echo $ZfsLun2)
+
+BtrfsLun1=$(source "$DistDir"/anylinux/CONFIG; echo $BtrfsLun1)
+BtrfsLun2=$(source "$DistDir"/anylinux/CONFIG; echo $BtrfsLun2)
+
+LxcLun1=$(source "$DistDir"/anylinux/CONFIG; echo $LxcLun1)
+
+############## Kubernetes Snap Install Flag  ###################
+
+K8S=$(source "$DistDir"/anylinux/CONFIG; echo $K8S)
 
 ################### Docker Install Flag  ########################
 
@@ -262,10 +281,19 @@ Docker=$(source "$DistDir"/anylinux/CONFIG; echo $Docker)
 LXD=$(source "$DistDir"/anylinux/CONFIG; echo $LXD)
 LXDCluster=$(source "$DistDir"/anylinux/CONFIG; echo $LXDCluster)
 LXDStorageDriver=$(source "$DistDir"/anylinux/CONFIG; echo $LXDStorageDriver)
+LXDStoragePoolName=$(source "$DistDir"/anylinux/CONFIG; echo $LXDStoragePoolName)
+LXDPreSeed=$(source "$DistDir"/anylinux/CONFIG; echo $LXDPreSeed)
 
 # GLS 20210818 Support for snapd starts with Fedora 24
 # GLS 20210818 Orabuntu-LXC supports LXD and LXD Clusters starting with Fedora 24
 # GLS 20210818 Reference: https://www.omgubuntu.co.uk/2017/04/use-snap-fedora
+
+################## ContainerRuntime Setting ########################
+
+ContainerRuntime=$(source "$DistDir"/anylinux/CONFIG; echo $ContainerRuntime)
+k8sCNI=$(source "$DistDir"/anylinux/CONFIG; echo $k8sCNI)
+k8sLoadBalancer=$(source "$DistDir"/anylinux/CONFIG; echo $k8sLoadBalancer)
+k8sIngressController=$(source "$DistDir"/anylinux/CONFIG; echo $k8sIngressController)
 
 if [ $LinuxFlavor = 'Fedora' ] && [ $RedHatVersion -le 28 ]
 then
@@ -282,111 +310,162 @@ if   [ $LinuxFlavor = 'Ubuntu' ] || [ $LinuxFlavor = 'Oracle' ] || [ $LinuxFlavo
 then
         if [ $UbuntuMajorVersion -ge 20 ] || [ $Release -ge 7 ]
         then
-                if [ $LXDCluster = 'Y' ] && [ $LXDStorageDriver = 'zfs' ]
+                if [ $LXDCluster = 'Y' ]
                 then
-                        echo ''
-                        echo "=============================================="
-                        echo "Show Optional LXD & LXD Cluster Values...     "
-                        echo "=============================================="
-                        echo ''
-
-                        LXD=Y
-                        PreSeed=Y
-                        BtrfsLun=Unused
-                        StoragePoolName=$(source "$DistDir"/anylinux/CONFIG; echo $LXDStoragePoolName)
-                        LXDStorageDriver=zfs
-
-                        echo 'LXDCluster       = '$LXDCluster
-                        echo 'PreSeed          = '$PreSeed
-                        echo 'LXD              = '$LXD
-                        echo 'LXDStorageDriver = '$LXDStorageDriver
-                        echo 'StoragePool      = '$StoragePoolName
-                        echo 'BtrfsLun         = '$BtrfsLun
-
-                        echo ''
-                        echo "=============================================="
-                        echo "Done: Show Optional LXD & LXD Cluster Values. "
-                        echo "=============================================="
-                        echo ''
-
-                        sleep 5
-
-                        clear
-
-			if [ $IscsiTarget = 'N' ]
+                        if [ $LXDStorageDriver = 'zfs' ]
                         then
-                                echo ''
-                                echo "=============================================="
-                                echo "Check ZFS Storage Pool Exists...              "
-                                echo "=============================================="
-                                echo ''
-
-                                function CheckZpoolExist {
-                                        sudo zpool list $StoragePoolName | grep ONLINE | wc -l
-                                }
-                                ZpoolExist=$(CheckZpoolExist)
-
-                                if [ $ZpoolExist -eq 1 ]
+                                sudo modprobe zfs > /dev/null 2>&1
+                                which zpool > /dev/null 2>&1
+                                if [ $? -eq 0 ]
                                 then
-                                        echo "ZFS $StoragePoolName exists."
+                                        ZpoolCmdExist=1
                                 else
-                                        echo "ZFS $StoragePoolName does not exist."
-                                        echo "ZFS $StoragePoolName must be created before running Orabuntu-LXC in LXD Cluster Mode."
-                                        echo "Orabuntu-LXC Exiting."
-                                        exit
+                                        ZpoolCmdExist=0
                                 fi
 
-                                echo ''
-                                echo "=============================================="
-                                echo "Done: Check ZFS Storage Pool Exists.          "
-                                echo "=============================================="
-                                echo ''
+                                if [ $ZpoolCmdExist = 0 ]
+                                then
+                                        CurrentDir=`pwd`
+                                        sudo mkdir -p /opt/olxc/"$DistDir"/zfsutils/"$LinuxFlavor"
+                                        sudo chown "$Owner":"$Group" /opt/olxc/"$DistDir"/zfsutils/"$LinuxFlavor"
+                                        sudo cp -p "$DistDir"/zfsutils/"$LinuxFlavor"/"$LXDStorageDriver"_"$LinuxFlavor"_"$RedHatVersion".sh /opt/olxc/"$DistDir"/zfsutils/"$LinuxFlavor"/.
+                                        cd /opt/olxc/"$DistDir"/zfsutils/"$LinuxFlavor"
+                                        ./"$LXDStorageDriver"_"$LinuxFlavor"_"$RedHatVersion".sh
+                                        cd $CurrentDir
+                                fi
 
-                                sleep 5
+                                if [ $IscsiTarget = 'Y' ]
+                                then
+                                        BtrfsLun1=Unused
+                                        BtrfsLun2=Unused
+                                        ZfsLun1=Unused
+                                        ZfsLun2=Unused
+                                        LxcLun1=Unused
 
-                                clear
+                                elif [ $IscsiTarget = 'N' ]
+                                then
+                                        BtrfsLun1=Unused
+                                        BtrfsLun2=Unused
+                                        Lun1Name=unused
+                                        Lun2Name=unused
+                                        Lun3Name=unused
+                                        Lun1Size=0
+                                        Lun2Size=0
+                                        Lun3Size=0
+                                fi
+
+                        elif [ $LXDStorageDriver = 'btrfs' ]
+                        then
+                                if [ $IscsiTarget = 'Y' ]
+                                then
+                                        BtrfsLun1=Unused
+                                        BtrfsLun2=Unused
+                                        ZfsLun1=Unused
+                                        ZfsLun2=Unused
+                                        LxcLun1=Unused
+
+                                elif [ $IscsiTarget = 'N' ]
+                                then
+                                        ZfsLun1=Unused
+                                        ZfsLun2=Unused
+                                        Lun1Name=unused
+                                        Lun2Name=unused
+                                        Lun3Name=unused
+                                        Lun1Size=0
+                                        Lun2Size=0
+                                        Lun3Size=0
+                                fi
                         fi
-                else
-                        PreSeed=Unused
-                        BtrfsLun=Unused
-                        StoragePoolName=Unused
-                        LXDStorageDriver=Unused
                 fi
         fi
 fi
 
-# if [ $LinuxFlavor = 'Oracle' ] && [ $Release -eq 8 ]
-# then
-#       if [ $LXDCluster = 'Y' ]
-#       then
-#               LXD=Y
-#               PreSeed=Y
-#               BtrfsLun=$(source "$DistDir"/anylinux/CONFIG; echo $BtrfsLun)
-#               StoragePoolName=Unused
-#               LXDStorageDriver=Unused
-#
-#               echo ''
-#               echo "=============================================="
-#               echo "                WARNING !!                    "
-#               echo "=============================================="
-#               echo ''
-#               echo "=============================================="
-#               echo "LXD Cluster will RE-FORMAT $BtrfsLun as a     "
-#               echo "BTRFS file system for LXD.                    "
-#               echo "                                              "
-#               echo "If you do NOT want to use $BtrfsLun for this  "
-#               echo "purpose, hit CTRL+c now to exit.              "
-#               echo "=============================================="
-#               echo ''
-#
-#               sleep 20
-#       else
-#               PreSeed=Unused
-#               BtrfsLun=Unused
-#               StoragePoolName=Unused
-#               LXDStorageDriver=Unused
-#       fi
-#fi
+echo ''
+echo "=============================================="
+echo "Show LXD & LXD Cluster Values...     "
+echo "=============================================="
+echo ''
+
+echo 'SCST                      = '$IscsiTarget
+echo 'IscsiTargetLunPrefix      = '$IscsiTargetLunPrefix
+echo 'LXDCluster                = '$LXDCluster
+echo 'LXDPreSeed                = '$LXDPreSeed
+echo 'LXD                       = '$LXD
+echo 'LXDStorageDriver  = '$LXDStorageDriver
+echo 'LXDStoragePoolName        = '$LXDStoragePoolName
+echo 'Lun1Name          = '$Lun1Name
+echo 'Lun2Name          = '$Lun2Name
+echo 'Lun3Name          = '$Lun3Name
+echo 'Lun1Size          = '$Lun1Size
+echo 'Lun2Size          = '$Lun2Size
+echo 'Lun3Size          = '$Lun3Size
+echo 'ZfsLun1                   = '$ZfsLun1
+echo 'ZfsLun2                   = '$ZfsLun2
+echo 'BtrfsLun1         = '$BtrfsLun1
+echo 'BtrfsLun2         = '$BtrfsLun2
+echo 'LxcLun1                   = '$LxcLun1
+
+echo ''
+echo "=============================================="
+echo "Done: Show LXD & LXD Cluster Values.          "
+echo "=============================================="
+echo ''
+
+sleep 5
+
+clear
+
+echo ''
+echo "=============================================="
+echo "Check LUN naming matches Storage Driver...    "
+echo "=============================================="
+echo ''
+
+function GetLXDStorageDriverPrefix {
+        echo $LXDStorageDriver | cut -c1-3
+}
+LXDStorageDriverPrefix=$(GetLXDStorageDriverPrefix)
+
+function CheckIscsiTargetLunName1 {
+        echo $Lun1Name | grep -c $LXDStorageDriverPrefix
+}
+IscsiTargetLunName1=$(CheckIscsiTargetLunName1)
+
+function CheckIscsiTargetLunName2 {
+        echo $Lun2Name | grep -c $LXDStorageDriverPrefix
+}
+IscsiTargetLunName2=$(CheckIscsiTargetLunName2)
+
+if [ $IscsiTargetLunName1 -eq 0 ] || [ $IscsiTargetLunName2 -eq 0 ]
+then
+        echo "SCST LUNs $Lun1Name $Lun2Name mismatch $LXDStorageDriver driver."
+        echo ''
+        echo "$LXDStorageDriver"
+        echo "$Lun1Name"
+        echo "$Lun2Name"
+        echo ''
+        echo "Please edit CONFIG file and restart script."
+        echo ''
+        echo "=============================================="
+        echo "Done: Check LUN naming matches Storage Driver."
+        echo "=============================================="
+        echo ''
+        exit
+else
+        sleep 5
+
+        clear
+
+        echo ''
+        echo "=============================================="
+        echo "Done: Check LUN naming matches Storage Driver."
+        echo "=============================================="
+        echo ''
+fi
+
+sleep 5
+
+clear
 
 ################## LXD Cluster Settings END #########################
 
@@ -828,9 +907,9 @@ then
 
 	elif [ $UbuntuMajorVersion -ge 16 ]
 	then
-		MultiHost="$Operation:Y:X:X:$HUBIP:$SPOKEIP:$MTU:$HubUserAct:$HubSudoPwd:$GRE:$Product:$LXD:$K8S:$PreSeed:$LXDCluster:$LXDStorageDriver:$StoragePoolName:$BtrfsLun:$Docker:$TunType:$IscsiTarget"
+		MultiHost="$Operation:Y:X:X:$HUBIP:$SPOKEIP:$MTU:$HubUserAct:$HubSudoPwd:$GRE:$Product:$LXD:$K8S:$LXDPreSeed:$LXDCluster:$LXDStorageDriver:$LXDStoragePoolName:$BtrfsLun1:$Docker:$TunType:$IscsiTarget:$Lun1Name:$Lun2Name:$Lun3Name:$Lun1Size:$Lun2Size:$Lun3Size:$LogBlkSz:$BtrfsRaid:$ZfsMirror:$BtrfsLun2:$ZfsLun1:$ZfsLun2:$LxcLun1:$IscsiTargetLunPrefix:$IscsiVendor:$ContainerRuntime:$k8sCNI:$k8sLoadBalancer:$k8sIngressController"
 	else
-		MultiHost="$Operation:Y:X:X:$HUBIP:$SPOKEIP:$MTU:$HubUserAct:$HubSudoPwd:$GRE:$Product:$LXD:$K8S:$PreSeed:$LXDCluster:$LXDStorageDriver:$StoragePoolName:$BtrfsLun:$Docker:$TunType:$IscsiTarget"
+		MultiHost="$Operation:Y:X:X:$HUBIP:$SPOKEIP:$MTU:$HubUserAct:$HubSudoPwd:$GRE:$Product:$LXD:$K8S:$LXDPreSeed:$LXDCluster:$LXDStorageDriver:$LXDStoragePoolName:$BtrfsLun1:$Docker:$TunType:$IscsiTarget:$Lun1Name:$Lun2Name:$Lun3Name:$Lun1Size:$Lun2Size:$Lun3Size:$LogBlkSz:$BtrfsRaid:$ZfsMirror:$BtrfsLun2:$ZfsLun1:$ZfsLun2:$LxcLun1:$IscsiTargetLunPrefix:$IscsiVendor:$ContainerRuntime:$k8sCNI:$k8sLoadBalancer:$k8sIngressController"
         fi
 
 	sleep 5
