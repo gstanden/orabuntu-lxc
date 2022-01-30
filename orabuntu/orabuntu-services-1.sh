@@ -31,8 +31,6 @@ DistDir=$8
 Sx1Net=$9
 Sw1Net=${10}
 
-RSA=Y
-
 if [ -e /sys/hypervisor/uuid ]
 then
         function CheckAWS {
@@ -42,6 +40,9 @@ then
 else
         AWS=0
 fi
+
+# GLS 20170927 credit yairchu
+function SoftwareVersion { echo "$@" | awk -F. '{ printf("%d%03d%03d%03d\n", $1,$2,$3,$4); }'; }
 
 function GetNameServerBase {
 	echo $NameServer | cut -f1 -d'-'
@@ -58,35 +59,33 @@ function GetOwner {
 }
 Owner=$(GetOwner)
 
-function SoftwareVersion { echo "$@" | awk -F. '{ printf("%d%03d%03d%03d\n", $1,$2,$3,$4); }'; }
-
 function GetMultiHostVar1 {
-echo $MultiHost | cut -f1 -d':'
+	echo $MultiHost | cut -f1 -d':'
 }
 MultiHostVar1=$(GetMultiHostVar1)
 
 function GetMultiHostVar2 {
-echo $MultiHost | cut -f2 -d':'
+	echo $MultiHost | cut -f2 -d':'
 }
 MultiHostVar2=$(GetMultiHostVar2)
 
 function GetMultiHostVar3 {
-echo $MultiHost | cut -f3 -d':'
+	echo $MultiHost | cut -f3 -d':'
 }
 MultiHostVar3=$(GetMultiHostVar3)
 
 function GetMultiHostVar4 {
-echo $MultiHost | cut -f4 -d':'
+	echo $MultiHost | cut -f4 -d':'
 }
 MultiHostVar4=$(GetMultiHostVar4)
 
 function GetMultiHostVar5 {
-echo $MultiHost | cut -f5 -d':'
+	echo $MultiHost | cut -f5 -d':'
 }
 MultiHostVar5=$(GetMultiHostVar5)
 
 function GetMultiHostVar6 {
-echo $MultiHost | cut -f6 -d':'
+	echo $MultiHost | cut -f6 -d':'
 }
 MultiHostVar6=$(GetMultiHostVar6)
 
@@ -110,6 +109,7 @@ function GetMultiHostVar10 {
 }
 MultiHostVar10=$(GetMultiHostVar10)
 GRE=$MultiHostVar10
+GREValue=$MultiHostVar10
 
 function GetMultiHostVar11 {
         echo $MultiHost | cut -f11 -d':'
@@ -135,6 +135,7 @@ function GetMultiHostVar14 {
 }
 MultiHostVar14=$(GetMultiHostVar14)
 PreSeed=$MultiHostVar14
+LXDPreSeed=$MultiHostVar14
 
 function GetMultiHostVar15 {
         echo $MultiHost | cut -f15 -d':'
@@ -172,6 +173,110 @@ function GetMultiHostVar20 {
 MultiHostVar20=$(GetMultiHostVar20)
 TunType=$MultiHostVar20
 
+function GetMultiHostVar21 {
+        echo $MultiHost | cut -f21 -d':'
+}
+MultiHostVar21=$(GetMultiHostVar21)
+IscsiTarget=$MultiHostVar21
+
+function GetMultiHostVar22 {
+        echo $MultiHost | cut -f22 -d':'
+}
+MultiHostVar22=$(GetMultiHostVar22)
+Lun1Name=$MultiHostVar22
+
+function GetMultiHostVar23 {
+        echo $MultiHost | cut -f23 -d':'
+}
+MultiHostVar23=$(GetMultiHostVar23)
+Lun2Name=$MultiHostVar23
+
+function GetMultiHostVar24 {
+        echo $MultiHost | cut -f24 -d':'
+}
+MultiHostVar24=$(GetMultiHostVar24)
+Lun3Name=$MultiHostVar24
+
+function GetMultiHostVar25 {
+        echo $MultiHost | cut -f25 -d':'
+}
+MultiHostVar25=$(GetMultiHostVar25)
+Lun1Size=$MultiHostVar25
+
+function GetMultiHostVar26 {
+        echo $MultiHost | cut -f26 -d':'
+}
+MultiHostVar26=$(GetMultiHostVar26)
+Lun2Size=$MultiHostVar26
+
+function GetMultiHostVar27 {
+        echo $MultiHost | cut -f27 -d':'
+}
+MultiHostVar27=$(GetMultiHostVar27)
+Lun3Size=$MultiHostVar27
+
+function GetMultiHostVar28 {
+        echo $MultiHost | cut -f28 -d':'
+}
+MultiHostVar28=$(GetMultiHostVar28)
+LogBlkSz=$MultiHostVar28
+
+function GetMultiHostVar29 {
+        echo $MultiHost | cut -f29 -d':'
+}
+MultiHostVar29=$(GetMultiHostVar29)
+BtrfsRaid=$MultiHostVar29
+
+function GetMultiHostVar30 {
+        echo $MultiHost | cut -f30 -d':'
+}
+MultiHostVar30=$(GetMultiHostVar30)
+ZfsMirror=$MultiHostVar30
+
+function GetMultiHostVar31 {
+        echo $MultiHost | cut -f31 -d':'
+}
+MultiHostVar31=$(GetMultiHostVar31)
+BtrfsLun2=$MultiHostVar31
+
+function GetMultiHostVar32 {
+        echo $MultiHost | cut -f32 -d':'
+}
+MultiHostVar32=$(GetMultiHostVar32)
+ZfsLun1=$MultiHostVar32
+
+function GetMultiHostVar33 {
+        echo $MultiHost | cut -f33 -d':'
+}
+MultiHostVar33=$(GetMultiHostVar33)
+ZfsLun2=$MultiHostVar33
+
+function GetMultiHostVar34 {
+        echo $MultiHost | cut -f34 -d':'
+}
+MultiHostVar34=$(GetMultiHostVar34)
+LxcLun1=$MultiHostVar34
+
+function GetMultiHostVar35 {
+        echo $MultiHost | cut -f35 -d':'
+}
+MultiHostVar35=$(GetMultiHostVar35)
+IscsiTargetLunPrefix=$MultiHostVar35
+
+function GetMultiHostVar36 {
+        echo $MultiHost | cut -f36 -d':'
+}
+MultiHostVar36=$(GetMultiHostVar36)
+IscsiVendor=$MultiHostVar36
+
+function GetMultiHostVar37 {
+        echo $MultiHost | cut -f37 -d':'
+}
+MultiHostVar37=$(GetMultiHostVar37)
+ContainerRuntime=$MultiHostVar37
+
+SubDirName=orabuntu
+
 function CheckNetworkManagerInstalled {
 	sudo dpkg -l | grep -v  network-manager- | grep network-manager | wc -l
 }
@@ -184,15 +289,15 @@ LxcNetRunning=$(CheckLxcNetRunning)
 
 echo ''
 echo "=============================================="
-echo "Install package net-tools ...                 "
+echo "Install required packages ...                 "
 echo "=============================================="
 echo ''
 
-sudo apt-get -y install net-tools
+sudo apt-get -y install openssh-server net-tools bind9utils
 
 echo ''
 echo "=============================================="
-echo "Done: Install package net-tools.              "
+echo "Done: Install required packages.              "
 echo "=============================================="
 echo ''
 
@@ -220,30 +325,26 @@ fi
 GetLinuxFlavors
 
 function TrimLinuxFlavors {
-echo $LinuxFlavors | sed 's/^[ \t]//;s/[ \t]$//' | sed 's/\!//'
+	echo $LinuxFlavors | sed 's/^[ \t]//;s/[ \t]$//' | sed 's/\!//'
 }
 LinuxFlavor=$(TrimLinuxFlavors)
-LF=$LinuxFlavor
 
-if [ -f /etc/lsb-release ]
+if [ $LinuxFlavor = 'Ubuntu' ]
 then
-	function GetUbuntuVersion {
-		cat /etc/lsb-release | grep DISTRIB_RELEASE | cut -f2 -d'='
-	}
-	UbuntuVersion=$(GetUbuntuVersion)
-fi
-RL=$UbuntuVersion
-
-if [ -f /etc/lsb-release ]
-then
-	function GetUbuntuMajorVersion {
-		cat /etc/lsb-release | grep DISTRIB_RELEASE | cut -f2 -d'=' | cut -f1 -d'.'
-	}
-	UbuntuMajorVersion=$(GetUbuntuMajorVersion)
+        function GetUbuntuVersion {
+                cat /etc/lsb-release | grep DISTRIB_RELEASE | cut -f2 -d'='
+        }
+        UbuntuVersion=$(GetUbuntuVersion)
+        LF=$LinuxFlavor
+        RL=$UbuntuVersion
+        function GetUbuntuMajorVersion {
+                cat /etc/lsb-release | grep DISTRIB_RELEASE | cut -f2 -d'=' | cut -f1 -d'.'
+        }
+        UbuntuMajorVersion=$(GetUbuntuMajorVersion)
 fi
 
 function GetOperation {
-echo $MultiHost | cut -f1 -d':'
+	echo $MultiHost | cut -f1 -d':'
 }
 Operation=$(GetOperation)
 
@@ -303,6 +404,7 @@ echo ''
 echo "=============================================="
 echo "Script:  orabuntu-services-1.sh               "
 echo "=============================================="
+echo ''
 
 sleep 5
 
@@ -318,69 +420,12 @@ sudo date
 
 echo ''
 echo "=============================================="
-echo "Establish sudo privileges completed.          "
+echo "Done: Establish sudo privileges.              "
 echo "=============================================="
 
 sleep 5 
 
 clear
-
-# if [ $LXD = 'Y' ]
-# then
-# 	sudo tar -vP --extract --file=/opt/olxc/"$DistDir"/orabuntu/archives/ubuntu-host.tar -C / etc/orabuntu-lxc-scripts/get-images.sh --touch
-# fi
-
-if [ $RSA = 'Y' ]
-then
-	echo ''
-	echo "=============================================="
-	echo "Create RSA key if it does not already exist   "
-	echo "=============================================="
-	echo ''
-
-	if [ ! -e ~/.ssh/id_rsa.pub ]
-	then
-		ssh-keygen -f ~/.ssh/id_rsa -t rsa -N ''
-	fi
-
-	if [ -e ~/.ssh/authorized_keys ]
-	then
-		cp -p ~/.ssh/authorized_keys ~/.ssh/authorized_keys.pre.olxc
-	fi
-
-	touch ~/.ssh/authorized_keys
-
-	if [ -e ~/.ssh/id_rsa.pub ]
-	then
-		function GetAuthorizedKey {
-			cat ~/.ssh/id_rsa.pub
-		}
-		AuthorizedKey=$(GetAuthorizedKey)
-	fi
-
-	function CheckAuthorizedKeys {
-		grep -c "$AuthorizedKey" ~/.ssh/authorized_keys
-	}
-	AuthorizedKeys=$(CheckAuthorizedKeys)
-
-	if [ "$AuthorizedKeys" -eq 0 ]
-	then
-		cat  ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
-	fi
-
-	sleep 5
-
-	clear
-
-	echo ''
-	echo "=============================================="
-	echo "Done: Create RSA key completed                "
-	echo "=============================================="
-
-	sleep 5
-
-	clear
-fi
 
 echo ''
 echo "=============================================="
@@ -412,14 +457,12 @@ echo ''
 
 sleep 5
 
-sudo apt-get install -y openssh-server >/dev/null 2>&1
-
+sudo cp -p /etc/ssh/sshd_config						     /etc/ssh/sshd_config.olxc
 sudo sed -i '/GSSAPIAuthentication/s/yes/no/'                                /etc/ssh/sshd_config
 sudo sed -i '/UseDNS/s/yes/no/'                                              /etc/ssh/sshd_config
 sudo sed -i '/GSSAPIAuthentication/s/#//'                                    /etc/ssh/sshd_config
 sudo sed -i '/UseDNS/s/#//'                                                  /etc/ssh/sshd_config
-sudo egrep 'GSSAPIAuthentication|UseDNS'                                     /etc/ssh/sshd_config
-sudo service sshd restart
+sudo egrep 'GSSAPIAuthentication|UseDNS'                                     /etc/ssh/sshd_config | sort -u
 
 echo ''
 echo "=============================================="
@@ -428,6 +471,72 @@ echo "=============================================="
 echo ''
 
 sleep 5 
+
+clear
+
+echo ''
+echo "=============================================="
+echo "Restart sshd...                               "
+echo "=============================================="
+echo ''
+
+sudo service sshd restart
+
+echo ''
+echo "=============================================="
+echo "Done: Restart sshd.                           "
+echo "=============================================="
+
+sleep 5
+
+clear
+
+echo ''
+echo "=============================================="
+echo "Create RSA key if it does not already exist   "
+echo "=============================================="
+echo ''
+
+if [ ! -e ~/.ssh/id_rsa.pub ]
+then
+	ssh-keygen -f ~/.ssh/id_rsa -t rsa -N ''
+fi
+
+if [ -e ~/.ssh/authorized_keys ]
+then
+	cp -p ~/.ssh/authorized_keys ~/.ssh/authorized_keys.pre.olxc
+fi
+
+touch ~/.ssh/authorized_keys
+
+if [ -e ~/.ssh/id_rsa.pub ]
+then
+	function GetAuthorizedKey {
+		cat ~/.ssh/id_rsa.pub
+	}
+	AuthorizedKey=$(GetAuthorizedKey)
+fi
+
+function CheckAuthorizedKeys {
+	grep -c "$AuthorizedKey" ~/.ssh/authorized_keys
+}
+AuthorizedKeys=$(CheckAuthorizedKeys)
+
+if [ "$AuthorizedKeys" -eq 0 ]
+then
+	cat  ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
+fi
+
+sleep 5
+
+clear
+
+echo ''
+echo "=============================================="
+echo "Done: Create RSA key completed                "
+echo "=============================================="
+
+sleep 5
 
 clear
 
@@ -1060,245 +1169,6 @@ function ConfirmContainerCreated {
 }
 ContainerCreated=$(ConfirmContainerCreated)
 
-m=1; p=1; q=1
-if [ $NameServerExists -eq 0 ] && [ $MultiHostVar2 = 'N' ]
-then
-	echo ''
-	echo "=============================================="
-	echo "Create LXC DNS DHCP container...              "
-	echo "=============================================="
-	echo ''
-
-	while [ $ContainerCreated -eq 0 ] && [ $m -le 3 ] && [ $UbuntuMajorVersion -gt 16 ]
-	do
-                echo "=============================================="
-                echo "Trying Method 1 ...                           "
-                echo "=============================================="
-                echo ''
-
-                dig +short us.images.linuxcontainers.org
-
-                if [ ! -d /opt/olxc/"$DistDir"/lxcimage/nsa ]
-                then
-                        sudo mkdir -p /opt/olxc/"$DistDir"/lxcimage/nsa
-                else
-                        echo "Directory already exists: /opt/olxc/"$DistDir"/lxcimage/nsa"
-                        echo ''
-                fi
-
-                sudo rm -f                /opt/olxc/"$DistDir"/lxcimage/nsa/*
-                cd                        /opt/olxc/"$DistDir"/lxcimage/nsa
-		sudo chown $Owner:$Group  /opt/olxc/"$DistDir"/lxcimage/nsa
-
-                wget -4 -q https://us.images.linuxcontainers.org/images/ubuntu/focal/amd64/default/ -P /opt/olxc/"$DistDir"/lxcimage/nsa
-
-                function GetBuildDate {
-                        grep folder.gif index.html | tail -1 | awk -F "\"" '{print $8}' | sed 's/\///g' | sed 's/\.//g'
-                }
-                BuildDate=$(GetBuildDate)
-
-                wget -4 -q https://us.images.linuxcontainers.org/images/ubuntu/focal/amd64/default/"$BuildDate"/SHA256SUMS -P /opt/olxc/"$DistDir"/lxcimage/nsa
-
-                for i in rootfs.tar.xz meta.tar.xz
-                do
-                        if [ -f /opt/olxc/"$DistDir"/lxcimage/nsa/$i ]
-                        then
-                                rm -f /opt/olxc/"$DistDir"/lxcimage/nsa/$i
-                        fi
-
-                        echo ''
-                        echo "Downloading $i ..."
-                        echo ''
-
-                        wget -4 -q --show-progress https://us.images.linuxcontainers.org/images/ubuntu/focal/amd64/default/"$BuildDate"/$i -P /opt/olxc/"$DistDir"/lxcimage/nsa
-                        diff <(shasum -a 256 /opt/olxc/"$DistDir"/lxcimage/nsa/$i | cut -f1,11 -d'/' | sed 's/  */ /g' | sed 's/\///' | sed 's/  */ /g') <(grep $i /opt/olxc/"$DistDir"/lxcimage/nsa/SHA256SUMS)
-                done
-                if [ $? -eq 0 ]
-                then
-                        echo ''
-                        sudo lxc-create -t local -n nsa -- -m /opt/olxc/"$DistDir"/lxcimage/nsa/meta.tar.xz -f /opt/olxc/"$DistDir"/lxcimage/nsa/rootfs.tar.xz
-                else
-                        m=$((m+1))
-                fi
-
-        	ContainerCreated=$(ConfirmContainerCreated)
-        done
-
-	while [ $ContainerCreated -eq 0 ] && [ $p -le 3 ]
-	do
-		echo ''
-		echo "=============================================="
-		echo "Trying Method 2...                            "
-		echo "=============================================="
-		echo ''
-	
-		sudo lxc-create -t download -n nsa -- --dist ubuntu --release focal --arch amd64 --keyserver hkp://keyserver.ubuntu.com:80
-		if [ $? -ne 0 ]
-		then
-			sudo lxc-stop -n nsa -k
-			sudo lxc-destroy -n nsa
-			sudo rm -rf /var/lib/lxc/nsa
-			sudo lxc-create -t download -n nsa -- --dist ubuntu --release focal --arch amd64 --keyserver hkp://p80.pool.sks-keyservers.net:80
-			if [ $? -ne 0 ]
-			then
-				sudo lxc-stop -n nsa -k
-				sudo lxc-destroy -n nsa
-				sudo rm -rf /var/lib/lxc/nsa
-                                sudo lxc-create -t download -n nsa -- --dist ubuntu --release focal --arch amd64 --no-validate
-			fi
-		fi
-
-		p=$((p+1))
-		ContainerCreated=$(ConfirmContainerCreated)
-	done
-	
-	q=1
-	while [ $ContainerCreated -eq 0 ] && [ $q -le 3 ]
-	do
-		echo ''
-		echo "=============================================="
-		echo "Trying Method 3...                            "
-		echo "=============================================="
-		echo ''
-
-		sudo lxc-create -n nsa -t ubuntu -- --release focal --arch amd64
-		sleep 5
-		q=$((q+1))
-		ContainerCreated=$(ConfirmContainerCreated)
-	done
-
-	if [ $(SoftwareVersion $LXCVersion) -ge $(SoftwareVersion "2.1.0") ]
-	then
-		sudo lxc-update-config -c /var/lib/lxc/nsa/config
-	else
-                sudo sed -i 's/lxc.net.0/lxc.network/g'         	/var/lib/lxc/nsa/config
-                sudo sed -i 's/lxc.net.1/lxc.network/g'         	/var/lib/lxc/nsa/config
-                sudo sed -i 's/lxc.uts.name/lxc.utsname/g'      	/var/lib/lxc/nsa/config
-		sudo sed -i 's/lxc.apparmor.profile/lxc.aa_profile/g'	/var/lib/lxc/nsa/config
-	fi
-
-	echo ''
-	echo "=============================================="
-	echo "Create LXC DNS DHCP container complete.       "
-	echo "=============================================="
-
-	sleep 5
-
-	clear
-
-	echo ''
-	echo "=============================================="
-	echo "Install & configure DNS DHCP LXC container... "
-	echo "=============================================="
-
-	echo ''
-	sudo touch /var/lib/lxc/nsa/rootfs/etc/resolv.conf > /dev/null 2>&1
-	sudo sed -i '0,/.*nameserver.*/s/.*nameserver.*/nameserver 8.8.8.8\n&/' /var/lib/lxc/nsa/rootfs/etc/resolv.conf > /dev/null 2>&1
-	sudo lxc-start -n nsa
-	echo ''
-
-	sleep 5 
-
-	clear
-
-	echo ''
-	echo "=============================================="
-	echo "Testing lxc-attach for ubuntu user...         "
-	echo "=============================================="
-	echo ''
-
-	sudo lxc-attach -n nsa -- uname -a
-	if [ $? -ne 0 ]
-	then
-		echo ''
-		echo "=============================================="
-		echo "lxc-attach has issue(s).                      "
-		echo "=============================================="
-	else
-		echo ''
-		echo "=============================================="
-		echo "lxc-attach successful.                        "
-		echo "=============================================="
-
-		sleep 5 
-	fi
-
-	sleep 5
-
-	clear
-
-	echo ''
-	echo "=============================================="
-	echo "Install bind9 & isc-dhcp-server in container. "
-	echo "Install openssh-server in container.          "
-	echo "=============================================="
-	echo ''
-
-	sudo lxc-attach -n nsa -- sudo apt-get -y update
-	sudo lxc-attach -n nsa -- sudo apt-get -y -o Dpkg::Options::=--force-confdef install bind9 isc-dhcp-server bind9utils dnsutils openssh-server man awscli sshpass tcpdump nmap net-tools
-
-	sleep 2
-
-	sudo lxc-attach -n nsa -- sudo service isc-dhcp-server start
-	sudo lxc-attach -n nsa -- sudo service bind9 start
-
-	echo ''
-	echo "=============================================="
-	echo "Install bind9 & isc-dhcp-server complete.     "
-	echo "Install openssh-server complete.              "
-	echo "=============================================="
-
-	sleep 5
-
-	clear
-
-#	echo ''
-#	echo "=============================================="
-#	echo "Create DNS Replication Landing Zone ...       "
-#	echo "=============================================="
-#	echo ''
-
-#	sudo lxc-attach -n nsa -- sudo mkdir -p /root/backup-lxc-container/$NameServerBase/updates
-
-#	echo ''
-#	echo "=============================================="
-#	echo "Done: Create DNS Replication Landing Zone.    "
-#	echo "=============================================="
-#	echo ''
-
-#	sleep 5
-
-#	clear
-
-	echo ''
-	echo "=============================================="
-	echo "DNS DHCP installed in LXC container.          "
-	echo "=============================================="
-
-	sleep 5
-
-	clear
-
-	echo ''
-	echo "=============================================="
-	echo "Stopping DNS DHCP LXC container...            "
-	echo "=============================================="
-	echo ''
-
-	sudo lxc-stop -n nsa
-	sudo lxc-info -n nsa
-
-	echo ''
-	echo "=============================================="
-	echo "DNS DHCP LXC container stopped.               "
-	echo "=============================================="
-	echo ''
-
-	sleep 5 
-
-	clear
-fi
-
 # Unpack customized OS host files for Oracle Linux LXC containers on LXC host server
 
 function CheckNsaExists {
@@ -1617,225 +1487,6 @@ clear
 
 # clear
 
-if [ $NameServerExists -eq 0  ]
-then
-	if [ $MultiHostVar2 = 'N' ]
-	then
-		echo ''
-		echo "=============================================="
-		echo "Unpacking LXC nameserver custom files...      "
-		echo "=============================================="
-		echo ''
-	
-		sudo tar -xvf /opt/olxc/"$DistDir"/orabuntu/archives/dns-dhcp-cont.tar -C / --touch
-
-                function GetNameServerShortName {
-                        echo $NameServer | cut -f1 -d'-'
-                }
-                NameServerShortName=$(GetNameServerShortName)
-
-                sudo sed -i "s/NAMESERVER/$NameServerShortName/" /var/lib/lxc/nsa/rootfs/etc/dhcp/dhcpd.conf
-
-		echo ''
-		echo "=============================================="
-		echo "Custom files unpack complete                  "
-		echo "=============================================="
-	fi
-
-	sleep 10
-
-	clear
-
-	echo ''
-	echo "=============================================="
-	echo "Customize domains and display /etc/resolv.conf"
-	echo "=============================================="
-	echo ''
-
-	function GetHostName {
-		echo $HOSTNAME | cut -f1 -d'.'
-	}
-	HostName=$(GetHostName)
-
-	if [ -n $Domain1 ] 
-	then
-		if [ $NetworkManagerInstalled -eq 1 ]
-		then
-			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /etc/NetworkManager/dnsmasq.d/orabuntu-local
-		fi
-		sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /etc/network/openvswitch/crt_ovs_sw1.sh
-	fi
-		
-	if [ -n $Domain2 ] 
-	then
-		if [ $NetworkManagerInstalled -eq 1 ]
-		then
-			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /etc/NetworkManager/dnsmasq.d/orabuntu-local
-		fi
-		sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /etc/network/openvswitch/crt_ovs_sw1.sh
-	fi
-
-	if [ $MultiHostVar2 = 'N' ]
-	then
-		# Remove the extra nameserver line used for DNS DHCP setup and add the required nameservers.
-
-		sudo sed -i '/8.8.8.8/d' /var/lib/lxc/nsa/rootfs/etc/resolv.conf								> /dev/null 2>&1
-		sudo sed -i '/nameserver/c\nameserver 10.207.39.2' /var/lib/lxc/nsa/rootfs/etc/resolv.conf					> /dev/null 2>&1
-		sudo sh -c "echo 'nameserver 10.207.29.2' >> /var/lib/lxc/nsa/rootfs/etc/resolv.conf"						> /dev/null 2>&1
-		sudo sh -c "echo 'search orabuntu-lxc.com consultingcommandos.us' >> /var/lib/lxc/nsa/rootfs/etc/resolv.conf"			> /dev/null 2>&1
-
-		if [ ! -z $HostName ]
-		then
-			sudo sed -i "/baremetal/s/baremetal/$HostName/g" /var/lib/lxc/nsa/rootfs/var/lib/bind/fwd.orabuntu-lxc.com
-			sudo sed -i "/baremetal/s/baremetal/$HostName/g" /var/lib/lxc/nsa/rootfs/var/lib/bind/rev.orabuntu-lxc.com
-			sudo sed -i "/baremetal/s/baremetal/$HostName/g" /var/lib/lxc/nsa/rootfs/var/lib/bind/fwd.consultingcommandos.us
-			sudo sed -i "/baremetal/s/baremetal/$HostName/g" /var/lib/lxc/nsa/rootfs/var/lib/bind/rev.consultingcommandos.us
-		fi
-
-		if [ -n $NameServer ]
-		then
-			# GLS 20151223 Settable Nameserver feature added
-			# GLS 20161022 Settable Nameserver feature moved into DNS DHCP LXC container.
-			# GLS 20162011 Settable Nameserver feature expanded to include nameserver and both domains.
-			sudo sed -i "/nsa/s/nsa/$NameServerBase/g" 	/var/lib/lxc/nsa/rootfs/var/lib/bind/fwd.orabuntu-lxc.com
-			sudo sed -i "/nsa/s/nsa/$NameServerBase/g" 	/var/lib/lxc/nsa/rootfs/var/lib/bind/rev.orabuntu-lxc.com
-			sudo sed -i "/nsa/s/nsa/$NameServerBase/g" 	/var/lib/lxc/nsa/rootfs/var/lib/bind/fwd.consultingcommandos.us
-			sudo sed -i "/nsa/s/nsa/$NameServerBase/g" 	/var/lib/lxc/nsa/rootfs/var/lib/bind/rev.consultingcommandos.us
-			sudo sed -i "/nsa/s/nsa/$NameServer/g" 		/var/lib/lxc/nsa/config
-			sudo sed -i "/nsa/s/nsa/$NameServer/g" 		/var/lib/lxc/nsa/rootfs/etc/hostname
-			sudo sed -i "/nsa/s/nsa/$NameServer/g" 		/var/lib/lxc/nsa/rootfs/etc/hosts
-			sudo sed -i "/nsa/s/nsa/$NameServer/g" 		/var/lib/lxc/nsa/rootfs/root/crontab.txt
-			sudo sed -i "/nsa/s/nsa/$NameServer/g" 		/var/lib/lxc/nsa/rootfs/root/ns_backup_update.lst
-			sudo sed -i "/nsa/s/nsa/$NameServerBase/g" 	/var/lib/lxc/nsa/rootfs/root/ns_backup_update.sh
-			sudo sed -i "/nsa/s/nsa/$NameServerBase/g" 	/var/lib/lxc/nsa/rootfs/root/ns_backup.start.sh
-			sudo sed -i "/nsa/s/nsa/$NameServerBase/g" 	/var/lib/lxc/nsa/rootfs/root/dns-sync.sh
-
-		#	function GetNameServerShortName {
-		#		echo $NameServer | cut -f1 -d'-'
-		#	}
-		#	NameServerShortName=$(GetNameServerShortName)
-
-			sudo sed -i "/nsa/s/nsa/$NameServerShortName/g" /var/lib/lxc/nsa/rootfs/root/ns_backup_update.sh
-			sudo sed -i "/nsa/s/nsa/$NameServerShortName/g" /var/lib/lxc/nsa/rootfs/root/ns_backup.start.sh
-			sudo sed -i "/nsa/s/nsa/$NameServerShortName/g" /var/lib/lxc/nsa/rootfs/root/dns-sync.sh
-
-
-			sudo sed -i "/nsa/s/nsa/$NameServer/g" /etc/network/openvswitch/strt_nsa.sh
-			sudo mv /var/lib/lxc/nsa /var/lib/lxc/$NameServer
-
-			sudo cp -p /etc/network/if-up.d/openvswitch/nsa-pub-ifup-sw1 		/etc/network/if-up.d/openvswitch/$NameServer-pub-ifup-sw1
-			sudo cp -p /etc/network/if-down.d/openvswitch/nsa-pub-ifdown-sw1 	/etc/network/if-down.d/openvswitch/$NameServer-pub-ifdown-sw1
-			sudo cp -p /etc/network/if-up.d/openvswitch/nsa-pub-ifup-sx1 		/etc/network/if-up.d/openvswitch/$NameServer-pub-ifup-sx1
-			sudo cp -p /etc/network/if-down.d/openvswitch/nsa-pub-ifdown-sx1 	/etc/network/if-down.d/openvswitch/$NameServer-pub-ifdown-sx1
-			sudo cp -p /etc/network/if-up.d/openvswitch/nsa-pub-ifup-sw1 		/etc/network/if-up.d/openvswitch/$NameServerBase-pub-ifup-sw1
-			sudo cp -p /etc/network/if-down.d/openvswitch/nsa-pub-ifdown-sw1 	/etc/network/if-down.d/openvswitch/$NameServerBase-pub-ifdown-sw1
-			sudo cp -p /etc/network/if-up.d/openvswitch/nsa-pub-ifup-sx1 		/etc/network/if-up.d/openvswitch/$NameServerBase-pub-ifup-sx1
-			sudo cp -p /etc/network/if-down.d/openvswitch/nsa-pub-ifdown-sx1 	/etc/network/if-down.d/openvswitch/$NameServerBase-pub-ifdown-sx1
-			sudo cp -p /etc/network/openvswitch/strt_nsa.sh 			/etc/network/openvswitch/strt_$NameServerBase.sh
-			sudo cp -p /etc/network/openvswitch/strt_nsa.sh 			/etc/network/openvswitch/strt_$NameServer.sh
-		
-			echo "/etc/network/if-up.d/openvswitch/$NameServerBase-pub-ifup-sw1" 		 > /opt/olxc/"$DistDir"/orabuntu/archives/nameserver.lst
-			echo "/etc/network/if-down.d/openvswitch/$NameServerBase-pub-ifdown-sw1" 	>> /opt/olxc/"$DistDir"/orabuntu/archives/nameserver.lst
-			echo "/etc/network/if-up.d/openvswitch/$NameServerBase-pub-ifup-sx1" 		>> /opt/olxc/"$DistDir"/orabuntu/archives/nameserver.lst
-			echo "/etc/network/if-down.d/openvswitch/$NameServerBase-pub-ifdown-sx1" 	>> /opt/olxc/"$DistDir"/orabuntu/archives/nameserver.lst
-			echo "/etc/network/if-up.d/openvswitch/$NameServer-pub-ifup-sw1" 		>> /opt/olxc/"$DistDir"/orabuntu/archives/nameserver.lst
-			echo "/etc/network/if-down.d/openvswitch/$NameServer-pub-ifdown-sw1" 		>> /opt/olxc/"$DistDir"/orabuntu/archives/nameserver.lst
-			echo "/etc/network/if-up.d/openvswitch/$NameServer-pub-ifup-sx1" 		>> /opt/olxc/"$DistDir"/orabuntu/archives/nameserver.lst
-			echo "/etc/network/if-down.d/openvswitch/$NameServer-pub-ifdown-sx1" 		>> /opt/olxc/"$DistDir"/orabuntu/archives/nameserver.lst
-		fi
-
-		if [ -n $Domain1 ]
-		then
-			# GLS 20151221 Settable Domain feature added
-			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/var/lib/bind/fwd.orabuntu-lxc.com
-			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/var/lib/bind/rev.orabuntu-lxc.com
-			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/etc/systemd/resolved.conf
-			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/etc/resolv.conf	> /dev/null 2>&1
-			
-			if [ $NetworkManagerInstalled -eq 1 ]
-			then
-				sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /etc/NetworkManager/dnsmasq.d/orabuntu-local
-			fi
-			
-			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /etc/network/openvswitch/crt_ovs_sw1.sh
-			
-			if [ $SystemdResolvedInstalled -ge 1 ]
-			then
-				sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /etc/systemd/resolved.conf > /dev/null 2>&1
-			fi
- 			
-		#	sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /run/systemd/resolve/stub-resolv.conf > /dev/null 2>&1
-			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/etc/bind/named.conf.local
-			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/etc/dhcp/dhcpd.conf
-		#	sudo sed -i "/##R/s/##R//g"                                     /var/lib/lxc/$NameServer/rootfs/etc/dhcp/dhcpd.conf
-		#	sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/etc/network/interfaces
-			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/root/ns_backup_update.lst
-			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/root/dns-thaw.sh
-			sudo mv /var/lib/lxc/$NameServer/rootfs/var/lib/bind/fwd.orabuntu-lxc.com /var/lib/lxc/$NameServer/rootfs/var/lib/bind/fwd.$Domain1
-			sudo mv /var/lib/lxc/$NameServer/rootfs/var/lib/bind/rev.orabuntu-lxc.com /var/lib/lxc/$NameServer/rootfs/var/lib/bind/rev.$Domain1
-		fi
-
-		if [ -n $Domain2 ]
-		then
-			# GLS 20151221 Settable Domain feature added
-			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /var/lib/lxc/$NameServer/rootfs/var/lib/bind/fwd.consultingcommandos.us
-			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /var/lib/lxc/$NameServer/rootfs/var/lib/bind/rev.consultingcommandos.us
-			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /var/lib/lxc/$NameServer/rootfs/etc/systemd/resolved.conf
-			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /var/lib/lxc/$NameServer/rootfs/etc/resolv.conf > /dev/null 2>&1
-			
-			if [ $NetworkManagerInstalled -eq 1 ]
-			then
-				sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /etc/NetworkManager/dnsmasq.d/orabuntu-local
-			fi
-			
-			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /etc/network/openvswitch/crt_ovs_sw1.sh
-			
-			if [ $SystemdResolvedInstalled -ge 1 ]
-			then
-				sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /etc/systemd/resolved.conf > /dev/null 2>&1
-			fi
-
-		#	sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /run/systemd/resolve/stub-resolv.conf
-			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /var/lib/lxc/$NameServer/rootfs/etc/bind/named.conf.local
-			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /var/lib/lxc/$NameServer/rootfs/etc/dhcp/dhcpd.conf
-		#	sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /var/lib/lxc/$NameServer/rootfs/etc/network/interfaces
-			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /var/lib/lxc/$NameServer/rootfs/root/ns_backup_update.lst
-			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /var/lib/lxc/$NameServer/rootfs/root/dns-thaw.sh
-			sudo mv /var/lib/lxc/$NameServer/rootfs/var/lib/bind/fwd.consultingcommandos.us /var/lib/lxc/$NameServer/rootfs/var/lib/bind/fwd.$Domain2
-			sudo mv /var/lib/lxc/$NameServer/rootfs/var/lib/bind/rev.consultingcommandos.us /var/lib/lxc/$NameServer/rootfs/var/lib/bind/rev.$Domain2
-		fi
-
-	elif [ $MultiHostVar2 = 'Y' ] && [ $SystemdResolvedInstalled -ge 1 ]
-	then
-			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" 		/etc/systemd/resolved.conf
-			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" 	/etc/systemd/resolved.conf
-	fi
-
-	# Cleanup duplicate search lines in /etc/resolv.conf if Orabuntu-LXC has been re-run
-	
-	if [ $NetworkManagerInstalled -eq 1 ]
-	then
-		sudo sed -i '$!N; /^\(.*\)\n\1$/!P; D'	/etc/resolv.conf				> /dev/null 2>&1
-	fi
-
-	sudo service systemd-resolved restart
-
-	sudo cat /etc/resolv.conf
-
-	sleep 5
-
-	echo ''
-	echo "=============================================="
-	echo "Done:  Customize and display.                 "
-	echo "=============================================="
-			
-	sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /etc/systemd/resolved.conf 	> /dev/null 2>&1
-fi
-
-sleep 5
-
-clear
-
 if	[ $NetworkManagerInstalled -eq 1 ] && [ $SystemdResolvedInstalled -eq 0 ]
 then
 	echo ''
@@ -2129,6 +1780,1070 @@ sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw7.sh
 sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw8.sh
 sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw9.sh
 
+echo ''
+echo "=============================================="
+echo "Unpack SCST Linux SAN Files...                "
+echo "=============================================="
+echo ''
+
+sudo tar -xvf /opt/olxc/"$DistDir"/"$SubDirName"/archives/scst-files.tar -C / --touch
+
+sudo chown -R $Owner:$Group                     /opt/olxc/home/scst-files/.
+sudo sed -i "s/\"SWITCH_IP\"/$Sw1Index/g"       /opt/olxc/home/scst-files/create-scst-target.sh
+
+echo ''
+echo "=============================================="
+echo "Done: Unpack SCST Linux SAN Files.            "
+echo "=============================================="
+echo ''
+
+sleep 5
+
+clear
+
+echo ''
+echo "=============================================="
+echo "Unpack TGT Linux SAN Files...                "
+echo "=============================================="
+echo ''
+
+sudo tar -xvf /opt/olxc/"$DistDir"/"$SubDirName"/archives/tgt-files.tar  -C / --touch
+
+echo ''
+echo "=============================================="
+echo "Done: Unpack TGT Linux SAN Files.            "
+echo "=============================================="
+echo ''
+
+sleep 5
+
+clear
+echo ''
+echo "=============================================="
+echo "Unpack LIO Linux SAN Files...                 "
+echo "=============================================="
+echo ''
+
+sudo tar -xvf /opt/olxc/"$DistDir"/"$SubDirName"/archives/lio-files.tar -C / --touch
+
+sudo chown -R $Owner:$Group                     /opt/olxc/home/lio-files/.
+sudo sed -i "s/\"SWITCH_IP\"/$Sw1Index/g"       /opt/olxc/home/lio-files/create-lio-target.sh
+
+echo ''
+echo "=============================================="
+echo "Done: Unpack LIO Linux SAN Files.             "
+echo "=============================================="
+echo ''
+
+sleep 5
+
+clear
+
+sudo modprobe zfs
+which zpool > /dev/null 2>&1
+if [ $? -eq 0 ]
+then
+        ZpoolCmdExist=1
+else
+        ZpoolCmdExist=0
+fi
+
+sudo scstadmin --list_group
+if [ $? -eq 0 ]
+then
+	ScstCmdExist=1
+else
+	ScstCmdExist=0
+fi
+
+if [ $UbuntuMajorVersion -ge 20 ]
+then
+        if [ $LXDStorageDriver = 'zfs' ]
+        then
+                if [ $ZpoolCmdExist -eq 0 ]
+                then
+                        CurrentDir=`pwd`
+                        sudo mkdir -p /opt/olxc/"$DistDir"/zfsutils/"$LinuxFlavor"
+                        sudo chown "$Owner":"$Group" /opt/olxc/"$DistDir"/zfsutils/"$LinuxFlavor"
+                        sudo cp -p "$DistDir"/zfsutils/"$LinuxFlavor"/"$LXDStorageDriver"_"$LinuxFlavor"_"$RedHatVersion".sh /opt/olxc/"$DistDir"/zfsutils/"$LinuxFlavor"/.
+                        cd /opt/olxc/"$DistDir"/zfsutils/"$LinuxFlavor"
+                        ./"$LXDStorageDriver"_"$LinuxFlavor"_"$RedHatVersion".sh
+                        cd $CurrentDir
+                fi
+
+                function CheckIscsiTargetInstalled {
+                        rpm -qa | grep -c $IscsiTarget
+                }
+                IscsiTargetInstalled=$(CheckIscsiTargetInstalled)
+
+                if [ $IscsiTarget = 'Y' ]
+                then
+                        function GetRevDomain1 {
+                                echo "$Domain1" | awk -F. '{for (i=NF; i>0; --i) printf "%s%s", (i<NF ? "." : ""), $i; printf "\n"}'
+                        }
+                        RevDomain1=$(GetRevDomain1)
+
+                        CurrentDir=`pwd`
+
+                        if   [ $IscsiVendor = 'scst' ] && [ $ScstCmdExist -eq 0 ]
+                        then
+                                cd /opt/olxc/home/scst-files
+                                ./create-scst.sh $LXDStorageDriver $RevDomain1 $Lun1Name $Lun2Name $Lun3Name $Lun1Size $Lun2Size $Lun3Size $LogBlkSz $IscsiTargetLunPrefix $Sw1Index
+
+                        elif [ $IscsiVendor = 'lio' ]
+                        then
+                                cd /opt/olxc/home/lio-files
+                                ./create-lio.sh $LXDStorageDriver $RevDomain1 $Lun1Name $Lun2Name $Lun3Name $Lun1Size $Lun2Size $Lun3Size $LogBlkSz $IscsiTargetLunPrefix
+                        fi
+
+                        sleep 5
+
+                        sudo zpool create $StoragePoolName $ZfsMirror /dev/"$IscsiTargetLunPrefix"_luns/"$IscsiTargetLunPrefix"_"$Lun1Name"_"$Sw1Index"_00 /dev/"$IscsiTargetLunPrefix"_luns/"$IscsiTargetLunPrefix"_"$Lun2Name"_"$Sw1Index"_00
+
+                elif [ $IscsiTarget = 'N' ]
+                then
+                        sudo zpool create $StoragePoolName $ZfsMirror $ZfsLun1 $ZfsLun2
+                fi
+
+                if [ $IscsiVendor = 'scst' ] || [ $IscsiVendor = 'lio' ]
+                then
+                        echo ''
+                        echo "=============================================="
+                        echo "Update strt_$IscsiVendor.sh file         "
+                        echo "=============================================="
+                        echo ''
+
+                        function WhichModprobe {
+                                which modprobe
+                        }
+                        ModProbe=$(WhichModprobe)
+
+                        function WhichZpool {
+                                which zpool
+                        }
+                        Zpool=$(WhichZpool)
+
+                        function WhichSleep {
+                                which sleep
+                        }
+                        Sleep=$(WhichSleep)
+
+                        function WhichMount {
+                                which mount
+                        }
+                        Mount=$(WhichMount)
+
+                        sudo sh -c "echo '$Sleep 10'                                                                                                            >> /etc/network/openvswitch/strt_$IscsiVendor.sh"
+                        sudo sh -c "echo '$ModProbe zfs'                                                                                                        >> /etc/network/openvswitch/strt_$IscsiVendor.sh"
+
+                        if   [ $IscsiTarget = 'Y' ]
+                        then
+                                sudo sh -c "echo '$Mount /dev/"$IscsiTargetLunPrefix"_luns/"$IscsiTargetLunPrefix"_"$Lun3Name"_"$Sw1Index"_00 /var/lib/lxc'     >> /etc/network/openvswitch/strt_$IscsiVendor.sh"
+                                sudo sh -c "echo '/var/lib/snapd/snap/bin/lxc start --all'                                                                      >> /etc/network/openvswitch/strt_$IscsiVendor.sh"
+
+                        elif [ $IscsiTarget = 'N' ]
+                        then
+                                sudo sh -c "echo '$Mount $LxcLun1'                                                                                              >> /etc/network/openvswitch/strt_$IscsiVendor.sh"
+                        fi
+
+                        sudo cat /etc/network/openvswitch/strt_$IscsiVendor.sh
+
+                        echo ''
+                        echo "=============================================="
+                        echo "Done: Update strt_$IscsiVendor.sh        "
+                        echo "=============================================="
+                        echo ''
+
+                        sleep 5
+
+                        clear
+
+                        echo ''
+                        echo "=============================================="
+                        echo "Update stop_$IscsiVendor.sh file         "
+                        echo "=============================================="
+                        echo ''
+
+                        sudo sed -i '2,4{s/^/#/}'                                          /etc/network/openvswitch/stop_$IscsiVendor.sh
+                        sudo sh -c "echo '/var/lib/snapd/snap/bin/lxc stop -f --all'    >> /etc/network/openvswitch/stop_$IscsiVendor.sh"
+                        sudo sh -c "echo 'sudo lxc-stop -n $NameServerBase'             >> /etc/network/openvswitch/stop_$IscsiVendor.sh"
+                        sudo sh -c "echo 'sudo umount /$StoragePoolName'                >> /etc/network/openvswitch/stop_$IscsiVendor.sh"
+                        sudo sh -c "echo 'sudo snap stop lxd'                           >> /etc/network/openvswitch/stop_$IscsiVendor.sh"
+                        sudo sh -c "echo 'sudo umount /var/lib/lxc'                     >> /etc/network/openvswitch/stop_$IscsiVendor.sh"
+                        sudo sh -c "echo 'sudo service multipathd stop'                 >> /etc/network/openvswitch/stop_$IscsiVendor.sh"
+                        sudo sh -c "echo 'sudo iscsiadm -m node --logout'               >> /etc/network/openvswitch/stop_$IscsiVendor.sh"
+                        sudo sh -c "echo 'sudo service scst stop'                       >> /etc/network/openvswitch/stop_$IscsiVendor.sh"
+                        sudo sh -c "echo 'sudo rm -f /dev/lxc_luns/*'                   >> /etc/network/openvswitch/stop_$IscsiVendor.sh"
+                        sudo sh -c "echo 'sudo multipath -F'                            >> /etc/network/openvswitch/stop_$IscsiVendor.sh"
+
+                        sudo cat /etc/network/openvswitch/stop_$IscsiVendor.sh
+
+                        echo ''
+                        echo "=============================================="
+                        echo "Done: Update stop_$IscsiVendor.sh file if it exists.  "
+                        echo "=============================================="
+
+                        echo ''
+
+                        sleep 5
+
+                        clear
+                fi
+
+        elif [ $LXDStorageDriver = 'btrfs' ]
+        then
+                echo ''
+                echo "=============================================="
+                echo "Install btrfs-progs ...                       "
+                echo "=============================================="
+                echo ''
+
+                sudo dnf -y install btrfs-progs
+
+                echo ''
+                echo "=============================================="
+                echo "Done: Install btrfs-progs.                    "
+                echo "=============================================="
+                echo ''
+
+                if [ $IscsiTarget = 'Y' ]
+                then
+                        function GetRevDomain1 {
+                                echo "$Domain1" | awk -F. '{for (i=NF; i>0; --i) printf "%s%s", (i<NF ? "." : ""), $i; printf "\n"}'
+                        }
+                        RevDomain1=$(GetRevDomain1)
+
+                        CurrentDir=`pwd`
+
+                        cd /opt/olxc/home/scst-files
+                        ./create-scst.sh $LXDStorageDriver $RevDomain1 $Lun1Name $Lun2Name $Lun3Name $Lun1Size $Lun2Size $Lun3Size $LogBlkSz
+
+                        cd $CurrentDir
+
+                        sleep 5
+
+                elif [ $IscsiTarget = 'N' ]
+                then
+                        ls -l $BtrfsLun1 $BtrfsLun2
+                fi
+
+                if   [ $BtrfsRaid = 'raid0' ]
+                then
+                        if   [ $IscsiTarget = 'Y' ]
+                        then
+                                sudo mkfs.btrfs -d raid0  /dev/olx_luns/olx_"$Lun1Name"_"$Sw1Index"_00 /dev/olx_luns/olx_"$Lun2Name"_"$Sw1Index"_00
+
+                        elif [ $IscsiTarget = 'N' ]
+                        then
+                                sudo mkfs.btrfs -d raid0 $BtrfsLun1 $BtrfsLun2
+                        fi
+
+                elif [ $BtrfsRaid = 'raid10' ]
+                then
+                        if   [ $IscsiTarget = 'Y' ]
+                        then
+                                sudo mkfs.btrfs -m raid10 /dev/olx_luns/olx_"$Lun1Name"_"$Sw1Index"_00 /dev/olx_luns/olx_"$Lun2Name"_"$Sw1Index"_00
+
+                        elif [ $IscsiTarget = 'N' ]
+                        then
+                                sudo mkfs.btrfs -m raid10 $BtrfsLun1 $BtrfsLun2
+                        fi
+
+                elif [ $BtrfsRaid = 'linear' ]
+                then
+                        if   [ $IscsiTarget = 'Y' ]
+                        then
+                                sudo mkfs.btrfs -d single /dev/olx_luns/olx_"$Lun1Name"_"$Sw1Index"_00 /dev/olx_luns/olx_"$Lun2Name"_"$Sw1Index"_00
+
+                        elif [ $IscsiTarget = 'N' ]
+                        then
+                                sudo mkfs.btrfs -d single $BtrfsLun1 $BtrfsLun2
+                        fi
+
+                elif [ $BtrfsRaid = 'none' ]
+                then
+                        if [ $IscsiTarget = 'Y' ]
+                        then
+                                echo "LXD init will use /dev/olx_luns/olx_$Lun1Name_$Sw1Index_00 for btrfs."    
+
+                        elif [ $IscsiTarget = 'N' ]
+                        then
+                                echo "LXD init will use /dev/olx_luns/olx_$Lun1Name_$Sw1Index_00 for btrfs."    
+                        fi
+                fi
+        fi
+fi
+
+echo ''
+echo "=============================================="
+echo "Create /var/lib/lxc storage mount ...         "
+echo "=============================================="
+echo ''
+
+function CheckXfsInstalled {
+        df -TH | grep '/var/lib/lxc' | grep -c $Lun3Name
+}
+XfsInstalled=$(CheckXfsInstalled)
+
+if [ $IscsiTarget = 'Y' ] && [ $XfsInstalled -eq 0 ]
+then
+#	sudo mkfs.xfs /dev/"$IscsiTargetLunPrefix"_luns/"$IscsiTargetLunPrefix"_"$Lun3Name"_"$Sw1Index"_00 -f
+#	sudo mount /dev/"$IscsiTargetLunPrefix"_luns/"$IscsiTargetLunPrefix"_"$Lun3Name"_"$Sw1Index"_00 /var/lib/lxc
+	echo 'xfs mount'
+fi
+
+echo ''
+echo "=============================================="
+echo "Done: Create /var/lib/lxc storage mount.      "
+echo "=============================================="
+echo ''
+
+sleep 5
+
+clear
+
+if [ $LXDCluster = 'Y' ] && [ $LXDStorageDriver = 'btrfs' ]
+then
+        echo ''
+        echo "=============================================="
+        echo "Install packages...                           "
+        echo "=============================================="
+        echo ''
+
+        sudo apt-get -y install dos2unix
+
+        echo ''
+        echo "=============================================="
+        echo "Done: Install packages.                       "
+        echo "=============================================="
+        echo ''
+
+        sleep 5
+
+        clear
+
+#       sudo sed -i "s/HOSTNAME/$HOSTNAME/g"    /etc/network/openvswitch/lxd-init-node1.sh
+
+        if   [ $LXDPreSeed = 'Y' ]
+        then
+                function GetShortHostName {
+                        hostname -s
+                }
+                ShortHostName=$(GetShortHostName)
+
+                if   [ $GRE = 'N' ]
+                then
+                        sudo sed -i "s/SWITCH_IP/$Sw1Index/g"                                                   /etc/network/openvswitch/preseed.sw1a.btr.001.lxd.cluster
+                        sudo sed -i "s/HOSTNAME/$ShortHostName/g"                                               /etc/network/openvswitch/preseed.sw1a.btr.001.lxd.cluster
+
+                        if   [ $IscsiTarget = 'Y' ]
+                        then
+                                sudo sed -i "s/BTRFSLUN/\/dev\/olx_luns\/olx_"$Lun1Name"_"$Sw1Index"_00/g"      /etc/network/openvswitch/preseed.sw1a.btr.001.lxd.cluster
+
+                        elif [ $IscsiTarget = 'N' ]
+                        then
+                                sudo sed -i "s/BTRFSLUN/$BtrfsLun/g"                                            /etc/network/openvswitch/preseed.sw1a.btr.001.lxd.cluster
+                        fi
+
+                        sudo sed -i "s/STORAGE-DRIVER/$LXDStorageDriver/g"                                      /etc/network/openvswitch/preseed.sw1a.btr.001.lxd.cluster
+
+                elif [ $GRE = 'Y' ]
+                then
+                        sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S --prompt='' <<< "$MultiHostVar9" /var/lib/snapd/snap/bin/lxc info 2>/dev/null | sed -n '/BEGIN.*-/,/END.*-/p'" > /tmp/cert.txt
+                        rm /tmp/cert.txt
+                        sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S --prompt='' <<< "$MultiHostVar9" /var/lib/snapd/snap/bin/lxc info 2>/dev/null | sed -n '/BEGIN.*-/,/END.*-/p'" > /tmp/cert.txt
+
+                        echo ''
+                        echo "=============================================="
+                        echo "Display /tmp/cert.txt ...                     "
+                        echo "=============================================="
+                        echo ''
+
+                        cat /tmp/cert.txt | grep -v WARNING
+
+                        echo ''
+                        echo "=============================================="
+                        echo "Done: Display /tmp/cert.txt.                  "
+                        echo "=============================================="
+                        echo ''
+
+                        sleep 5
+
+                        clear
+
+                        sudo sed -i "s/SWITCH_IP/$Sw1Index/g"                                                   /etc/network/openvswitch/preseed.sw1a.btr.002.lxd.cluster
+                        sudo sed -i "s/HOSTNAME/$ShortHostName/g"                                               /etc/network/openvswitch/preseed.sw1a.btr.002.lxd.cluster
+
+                        if   [ $IscsiTarget = 'Y' ]
+                        then
+                                sudo sed -i "s/BTRFSLUN/\/dev\/olx_luns\/olx_"$Lun1Name"_"$Sw1Index"_00/g"      /etc/network/openvswitch/preseed.sw1a.btr.002.lxd.cluster
+
+                        elif [ $IscsiTarget = 'N' ]
+                        then
+                                sudo sed -i "s/BTRFSLUN/$BtrfsLun/g"                                            /etc/network/openvswitch/preseed.sw1a.btr.002.lxd.cluster
+                        fi
+
+                        sudo sed -i "s/STORAGE-DRIVER/$LXDStorageDriver/g"                                      /etc/network/openvswitch/preseed.sw1a.btr.002.lxd.cluster
+                        sudo sed -i -e '/-----BEGIN/,/-----END/!b' -e '/-----END/!d;r /tmp/cert.txt' -e 'd'     /etc/network/openvswitch/preseed.sw1a.btr.002.lxd.cluster
+                        sudo sed -i '/WARNING/d'                                                                /etc/network/openvswitch/preseed.sw1a.btr.002.lxd.cluster
+                        sudo dos2unix                                                                           /etc/network/openvswitch/preseed.sw1a.btr.002.lxd.cluster
+
+                        echo ''
+                        echo "=============================================="
+                        echo "Display LXD Preseed...                        "
+                        echo "=============================================="
+                        echo ''
+
+                        sudo cat /etc/network/openvswitch/preseed.sw1a.btrfs.linux.002.lxd.cluster
+
+                        echo ''
+                        echo "=============================================="
+                        echo "Done: Display LXD Preseed.                    "
+                        echo "=============================================="
+                        echo ''
+
+                        sleep 5
+
+                        clear
+                fi
+        fi
+fi
+
+sleep 5
+
+if [ $LXDCluster = 'Y' ] && [ $LXDStorageDriver = 'zfs' ]
+then
+        echo ''
+        echo "=============================================="
+        echo "Install packages...                           "
+        echo "=============================================="
+        echo ''
+
+        sudo apt-get -y install expect dos2unix
+
+        echo ''
+        echo "=============================================="
+        echo "Done: Install packages.                       "
+        echo "=============================================="
+        echo ''
+
+        sleep 5
+
+        clear
+
+        sudo sed -i "s/HOSTNAME/$HOSTNAME/g"    /etc/network/openvswitch/lxd-init-node1.sh
+
+        if   [ $LXDPreSeed = 'Y' ]
+        then
+                function GetShortHostName {
+                        hostname -s
+                }
+                ShortHostName=$(GetShortHostName)
+
+                if   [ $GRE = 'N' ]
+                then
+                        sudo sed -i "s/SWITCH_IP/$Sw1Index/g"                                                   /etc/network/openvswitch/preseed.sw1a.zfs.001.lxd.cluster
+                        sudo sed -i "s/HOSTNAME/$ShortHostName/g"                                               /etc/network/openvswitch/preseed.sw1a.zfs.001.lxd.cluster
+                        sudo sed -i "s/STORAGE-DRIVER/$LXDStorageDriver/g"                                      /etc/network/openvswitch/preseed.sw1a.zfs.001.lxd.cluster
+                        sudo sed -i "s/POOL/$StoragePoolName/g"                                                 /etc/network/openvswitch/preseed.sw1a.zfs.001.lxd.cluster
+
+                elif [ $GRE = 'Y' ]
+                then
+                        sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S --prompt='' <<< "$MultiHostVar9" /var/lib/snapd/snap/bin/lxc info | sed -n '/BEGIN.*-/,/END.*-/p'" > /tmp/cert.txt
+                        rm /tmp/cert.txt
+                        sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S --prompt='' <<< "$MultiHostVar9" /var/lib/snapd/snap/bin/lxc info | sed -n '/BEGIN.*-/,/END.*-/p'" > /tmp/cert.txt
+
+                        echo ''
+                        echo "=============================================="
+                        echo "Display /tmp/cert.txt ...                     "
+                        echo "=============================================="
+                        echo ''
+
+                        cat /tmp/cert.txt | grep -v WARNING
+
+                        echo ''
+                        echo "=============================================="
+                        echo "Done: Display /tmp/cert.txt.                  "
+                        echo "=============================================="
+                        echo ''
+
+                        sleep 5
+
+                        clear
+
+                        sudo sed -i "s/SWITCH_IP/$Sw1Index/g"                                                   /etc/network/openvswitch/preseed.sw1a.zfs.002.lxd.cluster
+                        sudo sed -i "s/HOSTNAME/$ShortHostName/g"                                               /etc/network/openvswitch/preseed.sw1a.zfs.002.lxd.cluster
+                        sudo sed -i "s/STORAGE-DRIVER/$LXDStorageDriver/g"                                      /etc/network/openvswitch/preseed.sw1a.zfs.002.lxd.cluster
+                        sudo sed -i "s/POOL/$StoragePoolName/g"                                                 /etc/network/openvswitch/preseed.sw1a.zfs.002.lxd.cluster
+                        sudo sed -i -e '/-----BEGIN/,/-----END/!b' -e '/-----END/!d;r /tmp/cert.txt' -e 'd'     /etc/network/openvswitch/preseed.sw1a.zfs.002.lxd.cluster
+                        sudo sed -i '/WARNING/d'                                                                /etc/network/openvswitch/preseed.sw1a.zfs.002.lxd.cluster
+                        sudo dos2unix                                                                           /etc/network/openvswitch/preseed.sw1a.zfs.002.lxd.cluster
+
+                        echo ''
+                        echo "=============================================="
+                        echo "Display LXD Preseed...                        "
+                        echo "=============================================="
+                        echo ''
+
+                        sudo cat /etc/network/openvswitch/preseed.sw1a.olxc.002.lxd.cluster
+
+                        echo ''
+                        echo "=============================================="
+                        echo "Done: Display LXD Preseed.                    "
+                        echo "=============================================="
+                        echo ''
+
+                        sleep 5
+
+                        clear
+                fi
+        fi
+fi
+
+sleep 5
+
+clear
+
+if [ $NameServerExists -eq 0 ] && [ $MultiHostVar2 = 'N' ]
+then
+        echo ''
+        echo "=============================================="
+        echo "Create LXC DNS DHCP container...              "
+        echo "=============================================="
+        echo ''
+
+        m=1; n=1; p=1
+        while [ $ContainerCreated -eq 0 ] && [ $m -le 3 ] && [ $UbuntuMajorVersion -ge 20 ]
+        do
+                echo "=============================================="
+                echo "Trying Method 1 ...                           "
+                echo "=============================================="
+                echo ''
+
+                dig +short us.images.linuxcontainers.org
+
+                if [ ! -d /opt/olxc/"$DistDir"/lxcimage/nsa ]
+                then
+                        sudo mkdir -p /opt/olxc/"$DistDir"/lxcimage/nsa
+                else
+                        echo "Directory already exists: /opt/olxc/"$DistDir"/lxcimage/nsa"
+                fi
+
+                sudo rm -f                /opt/olxc/"$DistDir"/lxcimage/nsa/*
+                cd                        /opt/olxc/"$DistDir"/lxcimage/nsa
+                sudo chown $Owner:$Group  /opt/olxc/"$DistDir"/lxcimage/nsa
+
+                if   [ $LinuxFlavor = 'CentOS' ] && [ $Release -eq 7 ]
+                then
+                        wget -4 -q https://us.lxd.images.canonical.com/images/ubuntu/hirsute/amd64/default/ -P /opt/olxc/"$DistDir"/lxcimage/nsa
+
+                elif [ $LinuxFlavor = 'Red' ] && [ $Release -eq 7 ]
+                then
+                        wget -4 -q https://us.lxd.images.canonical.com/images/ubuntu/hirsute/amd64/default/ -P /opt/olxc/"$DistDir"/lxcimage/nsa
+
+                elif [ $LinuxFlavor = 'Oracle' ] && [ $Release -eq 7 ]
+                then
+                        wget -4 -q https://us.lxd.images.canonical.com/images/ubuntu/hirsute/amd64/default/ -P /opt/olxc/"$DistDir"/lxcimage/nsa
+                else
+                        wget -4 -q https://us.lxd.images.canonical.com/images/ubuntu/hirsute/amd64/default/ -P /opt/olxc/"$DistDir"/lxcimage/nsa
+                fi
+
+                function GetBuildDate {
+                        grep folder.gif index.html | tail -1 | awk -F "\"" '{print $8}' | sed 's/\///g' | sed 's/\.//g'
+                }
+                BuildDate=$(GetBuildDate)
+
+                echo ''
+                echo "+++++ Downloading checksum SHA256SUMS +++++"
+                echo ''
+
+                if   [ $LinuxFlavor = 'CentOS' ] && [ $Release -eq 7 ]
+                then
+                        curl -4 --progress-bar --remote-name https://us.lxd.images.canonical.com/images/ubuntu/hirsute/amd64/default/"$BuildDate"/SHA256SUMS --output /opt/olxc/"$DistDir"/lxcimage/nsa
+
+                elif [ $LinuxFlavor = 'Red' ] && [ $Release -eq 7 ]
+                then
+                        curl -4 --progress-bar --remote-name https://us.lxd.images.canonical.com/images/ubuntu/hirsute/amd64/default/"$BuildDate"/SHA256SUMS --output /opt/olxc/"$DistDir"/lxcimage/nsa
+
+                elif [ $LinuxFlavor = 'Oracle' ] && [ $Release -eq 7 ]
+                then
+                        curl -4 --progress-bar --remote-name https://us.lxd.images.canonical.com/images/ubuntu/hirsute/amd64/default/"$BuildDate"/SHA256SUMS --output /opt/olxc/"$DistDir"/lxcimage/nsa
+                else
+                        curl -4 --progress-bar --remote-name https://us.lxd.images.canonical.com/images/ubuntu/hirsute/amd64/default/"$BuildDate"/SHA256SUMS --output /opt/olxc/"$DistDir"/lxcimage/nsa
+                fi
+
+                for i in rootfs.tar.xz meta.tar.xz
+                do
+                        if [ -f /opt/olxc/"$DistDir"/lxcimage/nsa/$i ]
+                        then
+                                rm -f /opt/olxc/"$DistDir"/lxcimage/nsa/$i
+                        fi
+
+                        echo ''
+                        echo "+++++ Downloading $i +++++"
+                        echo ''
+
+                        if   [ $LinuxFlavor = 'CentOS' ] && [ $Release -eq 7 ]
+                        then
+                                curl -4 --progress-bar --remote-name https://us.lxd.images.canonical.com/images/ubuntu/hirsute/amd64/default/"$BuildDate"/$i -o /opt/olxc/"$DistDir"/lxcimage/nsa
+
+                                echo ''
+                                echo "+++++ Checksum SHA256SUMS +++++"
+                                echo ''
+
+                                diff <(shasum -a 256 /opt/olxc/"$DistDir"/lxcimage/nsa/$i | cut -f1,11 -d'/' | sed 's/  */ /g' | sed 's/\///' | sed 's/  */ /g') <(grep $i /opt/olxc/"$DistDir"/lxcimage/nsa/SHA256SUMS)
+
+                                echo ''
+                                echo '######################################################################## 100.0%'
+
+                        elif [ $LinuxFlavor = 'Red' ] && [ $Release -eq 7 ]
+                        then
+                                curl -4 --progress-bar --remote-name https://us.lxd.images.canonical.com/images/ubuntu/hirsute/amd64/default/"$BuildDate"/$i -o /opt/olxc/"$DistDir"/lxcimage/nsa
+
+                                echo ''
+                                echo "+++++ Checksum SHA256SUMS +++++"
+                                echo ''
+
+                                diff <(shasum -a 256 /opt/olxc/"$DistDir"/lxcimage/nsa/$i | cut -f1,11 -d'/' | sed 's/  */ /g' | sed 's/\///' | sed 's/  */ /g') <(grep $i /opt/olxc/"$DistDir"/lxcimage/nsa/SHA256SUMS)
+
+                                echo ''
+                                echo '######################################################################## 100.0%'
+
+                        elif [ $LinuxFlavor = 'Oracle' ] && [ $Release -eq 7 ]
+                        then
+                                curl -4 --progress-bar --remote-name https://us.lxd.images.canonical.com/images/ubuntu/hirsute/amd64/default/"$BuildDate"/$i -o /opt/olxc/"$DistDir"/lxcimage/nsa
+
+                                echo ''
+                                echo "+++++ Checksum SHA256SUMS +++++"
+                                echo ''
+
+                                diff <(shasum -a 256 /opt/olxc/"$DistDir"/lxcimage/nsa/$i | cut -f1,11 -d'/' | sed 's/  */ /g' | sed 's/\///' | sed 's/  */ /g') <(grep $i /opt/olxc/"$DistDir"/lxcimage/nsa/SHA256SUMS)
+
+                                echo ''
+                                echo '######################################################################## 100.0%'
+                        else
+                                curl -4 --progress-bar --remote-name https://us.lxd.images.canonical.com/images/ubuntu/hirsute/amd64/default/"$BuildDate"/$i -o /opt/olxc/"$DistDir"/lxcimage/nsa
+
+                                echo ''
+                                echo "+++++ Checksum SHA256SUMS +++++"
+                                echo ''
+
+                                diff <(shasum -a 256 /opt/olxc/"$DistDir"/lxcimage/nsa/$i | cut -f1,11 -d'/' | sed 's/  */ /g' | sed 's/\///' | sed 's/  */ /g') <(grep $i /opt/olxc/"$DistDir"/lxcimage/nsa/SHA256SUMS)
+
+                                echo ''
+                                echo '######################################################################## 100.0%'
+                        fi
+                done
+
+                echo ''
+
+                if [ $ContainerCreated -eq 0 ]
+                then
+                        sudo lxc-create -t local --name nsa -- -m /opt/olxc/"$DistDir"/lxcimage/nsa/meta.tar.xz -f /opt/olxc/"$DistDir"/lxcimage/nsa/rootfs.tar.xz
+                        echo ''
+                        echo '######################################################################## 100.0%'
+                        echo ''
+                else
+                        m=$((m+1))
+                fi
+
+                ContainerCreated=$(ConfirmContainerCreated)
+        done
+
+	while [ $ContainerCreated -eq 0 ] && [ $p -le 3 ]
+	do
+		echo ''
+		echo "=============================================="
+		echo "Trying Method 2...                            "
+		echo "=============================================="
+		echo ''
+	
+		sudo lxc-create -t download -n nsa -- --dist ubuntu --release focal --arch amd64 --keyserver hkp://keyserver.ubuntu.com:80
+		if [ $? -ne 0 ]
+		then
+			sudo lxc-stop -n nsa -k
+			sudo lxc-destroy -n nsa
+			sudo rm -rf /var/lib/lxc/nsa
+			sudo lxc-create -t download -n nsa -- --dist ubuntu --release focal --arch amd64 --keyserver hkp://p80.pool.sks-keyservers.net:80
+			if [ $? -ne 0 ]
+			then
+				sudo lxc-stop -n nsa -k
+				sudo lxc-destroy -n nsa
+				sudo rm -rf /var/lib/lxc/nsa
+                                sudo lxc-create -t download -n nsa -- --dist ubuntu --release focal --arch amd64 --no-validate
+			fi
+		fi
+
+		p=$((p+1))
+		ContainerCreated=$(ConfirmContainerCreated)
+	done
+	
+	q=1
+	while [ $ContainerCreated -eq 0 ] && [ $q -le 3 ]
+	do
+		echo ''
+		echo "=============================================="
+		echo "Trying Method 3...                            "
+		echo "=============================================="
+		echo ''
+
+		sudo lxc-create -n nsa -t ubuntu -- --release focal --arch amd64
+		sleep 5
+		q=$((q+1))
+		ContainerCreated=$(ConfirmContainerCreated)
+	done
+
+	if [ $(SoftwareVersion $LXCVersion) -ge $(SoftwareVersion "2.1.0") ]
+	then
+		sudo lxc-update-config -c /var/lib/lxc/nsa/config
+	else
+                sudo sed -i 's/lxc.net.0/lxc.network/g'         	/var/lib/lxc/nsa/config
+                sudo sed -i 's/lxc.net.1/lxc.network/g'         	/var/lib/lxc/nsa/config
+                sudo sed -i 's/lxc.uts.name/lxc.utsname/g'      	/var/lib/lxc/nsa/config
+		sudo sed -i 's/lxc.apparmor.profile/lxc.aa_profile/g'	/var/lib/lxc/nsa/config
+	fi
+
+	echo ''
+	echo "=============================================="
+	echo "Create LXC DNS DHCP container complete.       "
+	echo "=============================================="
+
+	sleep 5
+
+	clear
+
+	echo ''
+	echo "=============================================="
+	echo "Install & configure DNS DHCP LXC container... "
+	echo "=============================================="
+
+	echo ''
+	sudo touch /var/lib/lxc/nsa/rootfs/etc/resolv.conf > /dev/null 2>&1
+	sudo sed -i '0,/.*nameserver.*/s/.*nameserver.*/nameserver 8.8.8.8\n&/' /var/lib/lxc/nsa/rootfs/etc/resolv.conf > /dev/null 2>&1
+	sudo lxc-start -n nsa
+	echo ''
+
+	sleep 5 
+
+	clear
+
+	echo ''
+	echo "=============================================="
+	echo "Testing lxc-attach for ubuntu user...         "
+	echo "=============================================="
+	echo ''
+
+	sudo lxc-attach -n nsa -- uname -a
+	if [ $? -ne 0 ]
+	then
+		echo ''
+		echo "=============================================="
+		echo "lxc-attach has issue(s).                      "
+		echo "=============================================="
+	else
+		echo ''
+		echo "=============================================="
+		echo "lxc-attach successful.                        "
+		echo "=============================================="
+
+		sleep 5 
+	fi
+
+	sleep 5
+
+	clear
+
+	echo ''
+	echo "=============================================="
+	echo "Install bind9 & isc-dhcp-server in container. "
+	echo "Install openssh-server in container.          "
+	echo "=============================================="
+	echo ''
+
+	sudo lxc-attach -n nsa -- sudo apt-get -y update
+	sudo lxc-attach -n nsa -- sudo apt-get -y -o Dpkg::Options::=--force-confdef install bind9 isc-dhcp-server bind9utils dnsutils openssh-server man awscli sshpass tcpdump nmap net-tools
+
+	sleep 2
+
+	sudo lxc-attach -n nsa -- sudo service isc-dhcp-server start
+	sudo lxc-attach -n nsa -- sudo service bind9 start
+
+	echo ''
+	echo "=============================================="
+	echo "Install bind9 & isc-dhcp-server complete.     "
+	echo "Install openssh-server complete.              "
+	echo "=============================================="
+
+	sleep 5
+
+	clear
+
+#	echo ''
+#	echo "=============================================="
+#	echo "Create DNS Replication Landing Zone ...       "
+#	echo "=============================================="
+#	echo ''
+
+#	sudo lxc-attach -n nsa -- sudo mkdir -p /root/backup-lxc-container/$NameServerBase/updates
+
+#	echo ''
+#	echo "=============================================="
+#	echo "Done: Create DNS Replication Landing Zone.    "
+#	echo "=============================================="
+#	echo ''
+
+#	sleep 5
+
+#	clear
+
+	echo ''
+	echo "=============================================="
+	echo "DNS DHCP installed in LXC container.          "
+	echo "=============================================="
+
+	sleep 5
+
+	clear
+
+	echo ''
+	echo "=============================================="
+	echo "Stopping DNS DHCP LXC container...            "
+	echo "=============================================="
+	echo ''
+
+	sudo lxc-stop -n nsa
+	sudo lxc-info -n nsa
+
+	echo ''
+	echo "=============================================="
+	echo "DNS DHCP LXC container stopped.               "
+	echo "=============================================="
+	echo ''
+
+	sleep 5 
+
+	clear
+fi
+
+if [ $NameServerExists -eq 0  ]
+then
+	if [ $MultiHostVar2 = 'N' ]
+	then
+		echo ''
+		echo "=============================================="
+		echo "Unpacking LXC nameserver custom files...      "
+		echo "=============================================="
+		echo ''
+	
+		sudo tar -xvf /opt/olxc/"$DistDir"/orabuntu/archives/dns-dhcp-cont.tar -C / --touch
+
+                function GetNameServerShortName {
+                        echo $NameServer | cut -f1 -d'-'
+                }
+                NameServerShortName=$(GetNameServerShortName)
+
+                sudo sed -i "s/NAMESERVER/$NameServerShortName/" /var/lib/lxc/nsa/rootfs/etc/dhcp/dhcpd.conf
+
+		echo ''
+		echo "=============================================="
+		echo "Custom files unpack complete                  "
+		echo "=============================================="
+	fi
+
+	sleep 10
+
+	clear
+
+	echo ''
+	echo "=============================================="
+	echo "Customize domains and display /etc/resolv.conf"
+	echo "=============================================="
+	echo ''
+
+	function GetHostName {
+		echo $HOSTNAME | cut -f1 -d'.'
+	}
+	HostName=$(GetHostName)
+
+	if [ -n $Domain1 ] 
+	then
+		if [ $NetworkManagerInstalled -eq 1 ]
+		then
+			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /etc/NetworkManager/dnsmasq.d/orabuntu-local
+		fi
+		sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /etc/network/openvswitch/crt_ovs_sw1.sh
+	fi
+		
+	if [ -n $Domain2 ] 
+	then
+		if [ $NetworkManagerInstalled -eq 1 ]
+		then
+			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /etc/NetworkManager/dnsmasq.d/orabuntu-local
+		fi
+		sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /etc/network/openvswitch/crt_ovs_sw1.sh
+	fi
+
+	if [ $MultiHostVar2 = 'N' ]
+	then
+		# Remove the extra nameserver line used for DNS DHCP setup and add the required nameservers.
+
+		sudo sed -i '/8.8.8.8/d' /var/lib/lxc/nsa/rootfs/etc/resolv.conf								> /dev/null 2>&1
+		sudo sed -i '/nameserver/c\nameserver 10.207.39.2' /var/lib/lxc/nsa/rootfs/etc/resolv.conf					> /dev/null 2>&1
+		sudo sh -c "echo 'nameserver 10.207.29.2' >> /var/lib/lxc/nsa/rootfs/etc/resolv.conf"						> /dev/null 2>&1
+		sudo sh -c "echo 'search orabuntu-lxc.com consultingcommandos.us' >> /var/lib/lxc/nsa/rootfs/etc/resolv.conf"			> /dev/null 2>&1
+
+		if [ ! -z $HostName ]
+		then
+			sudo sed -i "/baremetal/s/baremetal/$HostName/g" /var/lib/lxc/nsa/rootfs/var/lib/bind/fwd.orabuntu-lxc.com
+			sudo sed -i "/baremetal/s/baremetal/$HostName/g" /var/lib/lxc/nsa/rootfs/var/lib/bind/rev.orabuntu-lxc.com
+			sudo sed -i "/baremetal/s/baremetal/$HostName/g" /var/lib/lxc/nsa/rootfs/var/lib/bind/fwd.consultingcommandos.us
+			sudo sed -i "/baremetal/s/baremetal/$HostName/g" /var/lib/lxc/nsa/rootfs/var/lib/bind/rev.consultingcommandos.us
+		fi
+
+		if [ -n $NameServer ]
+		then
+			# GLS 20151223 Settable Nameserver feature added
+			# GLS 20161022 Settable Nameserver feature moved into DNS DHCP LXC container.
+			# GLS 20162011 Settable Nameserver feature expanded to include nameserver and both domains.
+			sudo sed -i "/nsa/s/nsa/$NameServerBase/g" 	/var/lib/lxc/nsa/rootfs/var/lib/bind/fwd.orabuntu-lxc.com
+			sudo sed -i "/nsa/s/nsa/$NameServerBase/g" 	/var/lib/lxc/nsa/rootfs/var/lib/bind/rev.orabuntu-lxc.com
+			sudo sed -i "/nsa/s/nsa/$NameServerBase/g" 	/var/lib/lxc/nsa/rootfs/var/lib/bind/fwd.consultingcommandos.us
+			sudo sed -i "/nsa/s/nsa/$NameServerBase/g" 	/var/lib/lxc/nsa/rootfs/var/lib/bind/rev.consultingcommandos.us
+			sudo sed -i "/nsa/s/nsa/$NameServer/g" 		/var/lib/lxc/nsa/config
+			sudo sed -i "/nsa/s/nsa/$NameServer/g" 		/var/lib/lxc/nsa/rootfs/etc/hostname
+			sudo sed -i "/nsa/s/nsa/$NameServer/g" 		/var/lib/lxc/nsa/rootfs/etc/hosts
+			sudo sed -i "/nsa/s/nsa/$NameServer/g" 		/var/lib/lxc/nsa/rootfs/root/crontab.txt
+			sudo sed -i "/nsa/s/nsa/$NameServer/g" 		/var/lib/lxc/nsa/rootfs/root/ns_backup_update.lst
+			sudo sed -i "/nsa/s/nsa/$NameServerBase/g" 	/var/lib/lxc/nsa/rootfs/root/ns_backup_update.sh
+			sudo sed -i "/nsa/s/nsa/$NameServerBase/g" 	/var/lib/lxc/nsa/rootfs/root/ns_backup.start.sh
+			sudo sed -i "/nsa/s/nsa/$NameServerBase/g" 	/var/lib/lxc/nsa/rootfs/root/dns-sync.sh
+
+		#	function GetNameServerShortName {
+		#		echo $NameServer | cut -f1 -d'-'
+		#	}
+		#	NameServerShortName=$(GetNameServerShortName)
+
+			sudo sed -i "/nsa/s/nsa/$NameServerShortName/g" /var/lib/lxc/nsa/rootfs/root/ns_backup_update.sh
+			sudo sed -i "/nsa/s/nsa/$NameServerShortName/g" /var/lib/lxc/nsa/rootfs/root/ns_backup.start.sh
+			sudo sed -i "/nsa/s/nsa/$NameServerShortName/g" /var/lib/lxc/nsa/rootfs/root/dns-sync.sh
+
+
+			sudo sed -i "/nsa/s/nsa/$NameServer/g" /etc/network/openvswitch/strt_nsa.sh
+			sudo mv /var/lib/lxc/nsa /var/lib/lxc/$NameServer
+
+			sudo cp -p /etc/network/if-up.d/openvswitch/nsa-pub-ifup-sw1 		/etc/network/if-up.d/openvswitch/$NameServer-pub-ifup-sw1
+			sudo cp -p /etc/network/if-down.d/openvswitch/nsa-pub-ifdown-sw1 	/etc/network/if-down.d/openvswitch/$NameServer-pub-ifdown-sw1
+			sudo cp -p /etc/network/if-up.d/openvswitch/nsa-pub-ifup-sx1 		/etc/network/if-up.d/openvswitch/$NameServer-pub-ifup-sx1
+			sudo cp -p /etc/network/if-down.d/openvswitch/nsa-pub-ifdown-sx1 	/etc/network/if-down.d/openvswitch/$NameServer-pub-ifdown-sx1
+			sudo cp -p /etc/network/if-up.d/openvswitch/nsa-pub-ifup-sw1 		/etc/network/if-up.d/openvswitch/$NameServerBase-pub-ifup-sw1
+			sudo cp -p /etc/network/if-down.d/openvswitch/nsa-pub-ifdown-sw1 	/etc/network/if-down.d/openvswitch/$NameServerBase-pub-ifdown-sw1
+			sudo cp -p /etc/network/if-up.d/openvswitch/nsa-pub-ifup-sx1 		/etc/network/if-up.d/openvswitch/$NameServerBase-pub-ifup-sx1
+			sudo cp -p /etc/network/if-down.d/openvswitch/nsa-pub-ifdown-sx1 	/etc/network/if-down.d/openvswitch/$NameServerBase-pub-ifdown-sx1
+			sudo cp -p /etc/network/openvswitch/strt_nsa.sh 			/etc/network/openvswitch/strt_$NameServerBase.sh
+			sudo cp -p /etc/network/openvswitch/strt_nsa.sh 			/etc/network/openvswitch/strt_$NameServer.sh
+		
+			echo "/etc/network/if-up.d/openvswitch/$NameServerBase-pub-ifup-sw1" 		 > /opt/olxc/"$DistDir"/orabuntu/archives/nameserver.lst
+			echo "/etc/network/if-down.d/openvswitch/$NameServerBase-pub-ifdown-sw1" 	>> /opt/olxc/"$DistDir"/orabuntu/archives/nameserver.lst
+			echo "/etc/network/if-up.d/openvswitch/$NameServerBase-pub-ifup-sx1" 		>> /opt/olxc/"$DistDir"/orabuntu/archives/nameserver.lst
+			echo "/etc/network/if-down.d/openvswitch/$NameServerBase-pub-ifdown-sx1" 	>> /opt/olxc/"$DistDir"/orabuntu/archives/nameserver.lst
+			echo "/etc/network/if-up.d/openvswitch/$NameServer-pub-ifup-sw1" 		>> /opt/olxc/"$DistDir"/orabuntu/archives/nameserver.lst
+			echo "/etc/network/if-down.d/openvswitch/$NameServer-pub-ifdown-sw1" 		>> /opt/olxc/"$DistDir"/orabuntu/archives/nameserver.lst
+			echo "/etc/network/if-up.d/openvswitch/$NameServer-pub-ifup-sx1" 		>> /opt/olxc/"$DistDir"/orabuntu/archives/nameserver.lst
+			echo "/etc/network/if-down.d/openvswitch/$NameServer-pub-ifdown-sx1" 		>> /opt/olxc/"$DistDir"/orabuntu/archives/nameserver.lst
+		fi
+
+		if [ -n $Domain1 ]
+		then
+			# GLS 20151221 Settable Domain feature added
+			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/var/lib/bind/fwd.orabuntu-lxc.com
+			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/var/lib/bind/rev.orabuntu-lxc.com
+			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/etc/systemd/resolved.conf
+			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/etc/resolv.conf	> /dev/null 2>&1
+			
+			if [ $NetworkManagerInstalled -eq 1 ]
+			then
+				sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /etc/NetworkManager/dnsmasq.d/orabuntu-local
+			fi
+			
+			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /etc/network/openvswitch/crt_ovs_sw1.sh
+			
+			if [ $SystemdResolvedInstalled -ge 1 ]
+			then
+				sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /etc/systemd/resolved.conf > /dev/null 2>&1
+			fi
+ 			
+		#	sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /run/systemd/resolve/stub-resolv.conf > /dev/null 2>&1
+			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/etc/bind/named.conf.local
+			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/etc/dhcp/dhcpd.conf
+		#	sudo sed -i "/##R/s/##R//g"                                     /var/lib/lxc/$NameServer/rootfs/etc/dhcp/dhcpd.conf
+		#	sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/etc/network/interfaces
+			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/root/ns_backup_update.lst
+			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /var/lib/lxc/$NameServer/rootfs/root/dns-thaw.sh
+			sudo mv /var/lib/lxc/$NameServer/rootfs/var/lib/bind/fwd.orabuntu-lxc.com /var/lib/lxc/$NameServer/rootfs/var/lib/bind/fwd.$Domain1
+			sudo mv /var/lib/lxc/$NameServer/rootfs/var/lib/bind/rev.orabuntu-lxc.com /var/lib/lxc/$NameServer/rootfs/var/lib/bind/rev.$Domain1
+		fi
+
+		if [ -n $Domain2 ]
+		then
+			# GLS 20151221 Settable Domain feature added
+			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /var/lib/lxc/$NameServer/rootfs/var/lib/bind/fwd.consultingcommandos.us
+			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /var/lib/lxc/$NameServer/rootfs/var/lib/bind/rev.consultingcommandos.us
+			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /var/lib/lxc/$NameServer/rootfs/etc/systemd/resolved.conf
+			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /var/lib/lxc/$NameServer/rootfs/etc/resolv.conf > /dev/null 2>&1
+			
+			if [ $NetworkManagerInstalled -eq 1 ]
+			then
+				sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /etc/NetworkManager/dnsmasq.d/orabuntu-local
+			fi
+			
+			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /etc/network/openvswitch/crt_ovs_sw1.sh
+			
+			if [ $SystemdResolvedInstalled -ge 1 ]
+			then
+				sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /etc/systemd/resolved.conf > /dev/null 2>&1
+			fi
+
+		#	sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /run/systemd/resolve/stub-resolv.conf
+			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /var/lib/lxc/$NameServer/rootfs/etc/bind/named.conf.local
+			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /var/lib/lxc/$NameServer/rootfs/etc/dhcp/dhcpd.conf
+		#	sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /var/lib/lxc/$NameServer/rootfs/etc/network/interfaces
+			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /var/lib/lxc/$NameServer/rootfs/root/ns_backup_update.lst
+			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" /var/lib/lxc/$NameServer/rootfs/root/dns-thaw.sh
+			sudo mv /var/lib/lxc/$NameServer/rootfs/var/lib/bind/fwd.consultingcommandos.us /var/lib/lxc/$NameServer/rootfs/var/lib/bind/fwd.$Domain2
+			sudo mv /var/lib/lxc/$NameServer/rootfs/var/lib/bind/rev.consultingcommandos.us /var/lib/lxc/$NameServer/rootfs/var/lib/bind/rev.$Domain2
+		fi
+
+	elif [ $MultiHostVar2 = 'Y' ] && [ $SystemdResolvedInstalled -ge 1 ]
+	then
+			sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" 		/etc/systemd/resolved.conf
+			sudo sed -i "/consultingcommandos\.us/s/consultingcommandos\.us/$Domain2/g" 	/etc/systemd/resolved.conf
+	fi
+
+	# Cleanup duplicate search lines in /etc/resolv.conf if Orabuntu-LXC has been re-run
+	
+	if [ $NetworkManagerInstalled -eq 1 ]
+	then
+		sudo sed -i '$!N; /^\(.*\)\n\1$/!P; D'	/etc/resolv.conf				> /dev/null 2>&1
+	fi
+
+	sudo service systemd-resolved restart
+
+	sudo cat /etc/resolv.conf
+
+	sleep 5
+
+	echo ''
+	echo "=============================================="
+	echo "Done:  Customize and display.                 "
+	echo "=============================================="
+			
+	sudo sed -i "/orabuntu-lxc\.com/s/orabuntu-lxc\.com/$Domain1/g" /etc/systemd/resolved.conf 	> /dev/null 2>&1
+fi
+
+sleep 5
+
+clear
+
 if [ $GRE = 'Y' ]
 then
         sudo sed -i "s/mtu_request=1500/mtu_request=$MultiHostVar7/g" /etc/network/openvswitch/crt_ovs_sw1.sh
@@ -2156,71 +2871,6 @@ then
 	clear
 
         sudo sed -i "s/HOSTNAME/$HOSTNAME/g"    /etc/network/openvswitch/lxd-init-node1.sh
-
-        if   [ $PreSeed = 'Y' ]
-        then
-                function GetShortHostName {
-                        hostname -s
-                }
-                ShortHostName=$(GetShortHostName)
-
-                if   [ $GRE = 'N' ]
-                then
-                        sudo sed -i "s/SWITCH_IP/$Sw1Index/g"                                                   /etc/network/openvswitch/preseed.sw1a.olxc.001.lxd.cluster
-                        sudo sed -i "s/HOSTNAME/$ShortHostName/g"                                               /etc/network/openvswitch/preseed.sw1a.olxc.001.lxd.cluster
-                        sudo sed -i "s/STORAGE-DRIVER/$LXDStorageDriver/g"                                      /etc/network/openvswitch/preseed.sw1a.olxc.001.lxd.cluster
-                        sudo sed -i "s/POOL/$StoragePoolName/g"                                                 /etc/network/openvswitch/preseed.sw1a.olxc.001.lxd.cluster
-
-                elif [ $GRE = 'Y' ]
-                then
-                        sshpass -p $MultiHostVar8 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S --prompt='' <<< "$MultiHostVar8" lxc info | sed -n '/BEGIN.*-/,/END.*-/p'" > /tmp/cert.txt
-			rm /tmp/cert.txt
-                        sshpass -p $MultiHostVar8 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S --prompt='' <<< "$MultiHostVar8" lxc info | sed -n '/BEGIN.*-/,/END.*-/p'" > /tmp/cert.txt
-		
-			echo ''
-			echo "=============================================="
-			echo "Display /tmp/cert.txt ...                     "
-			echo "=============================================="
-			echo ''
-
-			cat /tmp/cert.txt
-
-			echo ''
-			echo "=============================================="
-			echo "Done: Display /tmp/cert.txt.                  "
-			echo "=============================================="
-			echo ''
-
-			sleep 5
-
-			clear
-
-                        sudo sed -i "s/SWITCH_IP/$Sw1Index/g"                                                   /etc/network/openvswitch/preseed.sw1a.olxc.002.lxd.cluster
-                        sudo sed -i "s/HOSTNAME/$ShortHostName/g"                                               /etc/network/openvswitch/preseed.sw1a.olxc.002.lxd.cluster
-                        sudo sed -i "s/STORAGE-DRIVER/$LXDStorageDriver/g"                                      /etc/network/openvswitch/preseed.sw1a.olxc.002.lxd.cluster
-                        sudo sed -i "s/POOL/$StoragePoolName/g"                                                 /etc/network/openvswitch/preseed.sw1a.olxc.002.lxd.cluster
-                        sudo sed -i -e '/-----BEGIN/,/-----END/!b' -e '/-----END/!d;r /tmp/cert.txt' -e 'd'     /etc/network/openvswitch/preseed.sw1a.olxc.002.lxd.cluster
-			sudo dos2unix										/etc/network/openvswitch/preseed.sw1a.olxc.002.lxd.cluster
-		
-			echo ''
-			echo "=============================================="
-			echo "Display LXD Preseed...                        "
-			echo "=============================================="
-			echo ''
-
-			sudo cat /etc/network/openvswitch/preseed.sw1a.olxc.002.lxd.cluster
-		
-			echo ''
-			echo "=============================================="
-			echo "Done: Display LXD Preseed.                    "
-			echo "=============================================="
-			echo ''
-
-			sleep 5
-
-			clear
-                fi
-        fi
 fi
 
 sudo sed -i "s/MULTIHOSTVAR7/$MultiHostVar7/g"  /etc/network/openvswitch/crt_ovs_sw1.sh
@@ -2578,7 +3228,7 @@ then
                 if [ $FileSystemTypeXfs -eq 1 ]
                 then
                         function GetFtype {
-                                xfs_info / | grep -c ftype=1
+				xfs_info / 2>/dev/null | grep -c ftype=1
                         }
                         Ftype=$(GetFtype)
 
@@ -2821,55 +3471,64 @@ sleep 5
 
 clear
 
+sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw2.sh
+sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw3.sh
+sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw4.sh
+sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw5.sh
+sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw6.sh
+sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw7.sh
+sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw8.sh
+sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw9.sh
+
+echo ''
+echo "=============================================="
+echo "Unpack SCST Linux SAN Files...                "
+echo "=============================================="
+echo ''
+
+sudo tar -xvf /opt/olxc/"$DistDir"/orabuntu/archives/scst-files.tar -C / --touch
+
+sudo chown -R $Owner:$Group             /opt/olxc/home/scst-files/.
+sudo sed -i "s/SWITCH_IP/$Sw1Index/g"   /opt/olxc/home/scst-files/create-scst-target.sh
+
+echo ''
+echo "=============================================="
+echo "Done: Unpack SCST Linux SAN Files.            "
+echo "=============================================="
+echo ''
+
+sleep 5
+
+clear
+
+echo ''
+echo "=============================================="
+echo "Unpack TGT Linux SAN Files...                "
+echo "=============================================="
+echo ''
+
+sudo tar -xvf /opt/olxc/"$DistDir"/orabuntu/archives/tgt-files.tar  -C / --touch
+
+echo ''
+echo "=============================================="
+echo "Done: Unpack TGT Linux SAN Files.            "
+echo "=============================================="
+echo ''
+
+sleep 5
+
+clear
+
 if [ $MultiHostVar2 = 'N' ]
 then
-	sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw2.sh
-	sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw3.sh
-	sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw4.sh
-	sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw5.sh
-	sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw6.sh
-	sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw7.sh
-	sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw8.sh
-	sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw9.sh
-
-        echo ''
-        echo "=============================================="
-        echo "Unpack SCST Linux SAN Files...                "
-        echo "=============================================="
-        echo ''
-
-        sudo tar -xvf /opt/olxc/"$DistDir"/orabuntu/archives/scst-files.tar -C / --touch
-
-        sudo chown -R $Owner:$Group             /opt/olxc/home/scst-files/.
-        sudo sed -i "s/SWITCH_IP/$Sw1Index/g"   /opt/olxc/home/scst-files/create-scst-target.sh
-
-        echo ''
-        echo "=============================================="
-        echo "Done: Unpack SCST Linux SAN Files.            "
-        echo "=============================================="
-        echo ''
-
-        sleep 5
-
-        clear
-
-        echo ''
-        echo "=============================================="
-        echo "Unpack TGT Linux SAN Files...                "
-        echo "=============================================="
-        echo ''
-
-        sudo tar -xvf /opt/olxc/"$DistDir"/orabuntu/archives/tgt-files.tar  -C / --touch
-
-        echo ''
-        echo "=============================================="
-        echo "Done: Unpack TGT Linux SAN Files.            "
-        echo "=============================================="
-        echo ''
-
-        sleep 5
-
-        clear
+        sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw2.sh
+        sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw3.sh
+        sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw4.sh
+        sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw5.sh
+        sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw6.sh
+        sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw7.sh
+        sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw8.sh
+        sudo sed -i "s/SWITCH_IP/$Sw1Index/g" /etc/network/openvswitch/crt_ovs_sw9.sh
 
 	echo ''
 	echo "=============================================="

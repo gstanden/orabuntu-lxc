@@ -408,7 +408,14 @@ echo "Install wget and unzip...                     "
 echo "=============================================="
 echo ''
 
-sudo yum -y install wget unzip
+if [ $LinuxFlavor != 'Ubuntu' ]
+then
+	sudo yum -y install wget unzip
+else
+	sudo apt-get -y install wget unzip
+	sudo mkdir -p /var/lib/snapd/snap/bin
+	sudo ln -s /snap/bin/lxc /var/lib/snapd/snap/bin/lxc
+fi
 
 echo ''
 echo "=============================================="

@@ -520,7 +520,7 @@ then
         sleep 5
 
         sudo chmod 775  /opt/olxc/"$DistDir"/orabuntu/archives/lxd_install_orabuntu.sh
-                        /opt/olxc/"$DistDir"/orabuntu/archives/lxd_install_orabuntu.sh $PreSeed $LXDCluster $MultiHostVar2 $MultiHostVar10
+                        /opt/olxc/"$DistDir"/orabuntu/archives/lxd_install_orabuntu.sh $PreSeed $LXDCluster $MultiHostVar2 $UbuntuMajorVersion $MultiHost $LXDStorageDriver
 
         echo ''
         echo "=============================================="
