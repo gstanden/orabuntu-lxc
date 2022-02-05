@@ -519,12 +519,12 @@ then
 
         sleep 5
 
+	sudo snap refresh lxd
         sudo chmod 775  /opt/olxc/"$DistDir"/orabuntu/archives/lxd_install_orabuntu.sh
                         /opt/olxc/"$DistDir"/orabuntu/archives/lxd_install_orabuntu.sh $PreSeed $LXDCluster $MultiHostVar2 $UbuntuMajorVersion $MultiHost $LXDStorageDriver
 
 	sudo mkdir -p /var/lib/snapd/snap/bin
 	sudo ln -s /snap/bin/lxc /var/lib/snapd/snap/bin/lxc
-	sudo snap refresh lxd
 
         echo ''
         echo "=============================================="
