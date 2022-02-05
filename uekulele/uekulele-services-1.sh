@@ -4971,6 +4971,8 @@ then
                         wget -4 -q https://us.lxd.images.canonical.com/images/ubuntu/hirsute/amd64/default/ -P /opt/olxc/"$DistDir"/lxcimage/nsa
                 fi
 
+		cp -p /opt/olxc/"$DistDir"/lxcimage/nsa/index.html .
+
                 function GetBuildDate {
                         grep folder.gif index.html | tail -1 | awk -F "\"" '{print $8}' | sed 's/\///g' | sed 's/\.//g'
                 }
