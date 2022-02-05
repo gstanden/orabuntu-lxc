@@ -524,6 +524,7 @@ then
 
 	sudo mkdir -p /var/lib/snapd/snap/bin
 	sudo ln -s /snap/bin/lxc /var/lib/snapd/snap/bin/lxc
+	sudo snap refresh lxd
 
         echo ''
         echo "=============================================="

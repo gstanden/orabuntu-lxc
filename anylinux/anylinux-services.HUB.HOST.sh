@@ -78,7 +78,7 @@ function GetOwner {
 Owner=$(GetOwner)
 
 function CheckAptProcessRunning {
-ps -ef | grep -v '_apt' | grep apt | grep -v grep | wc -l
+	ps -ef | grep -v '_apt' | grep apt | grep -v grep | wc -l
 }
 AptProcessRunning=$(CheckAptProcessRunning)
 

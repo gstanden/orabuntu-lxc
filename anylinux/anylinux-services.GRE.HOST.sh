@@ -77,6 +77,11 @@ function GetOwner {
 }
 Owner=$(GetOwner)
 
+function CheckAptProcessRunning {
+	ps -ef | grep -v '_apt' | grep apt | grep -v grep | wc -l
+}
+AptProcessRunning=$(CheckAptProcessRunning)
+
 GetLinuxFlavors(){
 if   [[ -e /etc/oracle-release ]]
 then
@@ -323,15 +328,73 @@ then
                                         ZpoolCmdExist=0
                                 fi
 
-                                if [ $ZpoolCmdExist = 0 ]
+                                if [ $ZpoolCmdExist -eq 0 ]
                                 then
-                                        CurrentDir=`pwd`
-                                        sudo mkdir -p /opt/olxc/"$DistDir"/zfsutils/"$LinuxFlavor"
-                                        sudo chown "$Owner":"$Group" /opt/olxc/"$DistDir"/zfsutils/"$LinuxFlavor"
-                                        sudo cp -p "$DistDir"/zfsutils/"$LinuxFlavor"/"$LXDStorageDriver"_"$LinuxFlavor"_"$RedHatVersion".sh /opt/olxc/"$DistDir"/zfsutils/"$LinuxFlavor"/.
-                                        cd /opt/olxc/"$DistDir"/zfsutils/"$LinuxFlavor"
-                                        ./"$LXDStorageDriver"_"$LinuxFlavor"_"$RedHatVersion".sh
-                                        cd $CurrentDir
+                                        echo ''
+                                        echo "=============================================="
+                                        echo "Install ZFS ...                               "
+                                        echo "=============================================="
+                                        echo ''
+
+                                        if [ $LinuxFlavor != 'Ubuntu' ]
+                                        then
+                                                CurrentDir=`pwd`
+                                                sudo mkdir -p /opt/olxc/"$DistDir"/zfsutils/"$LinuxFlavor"
+                                                sudo chown "$Owner":"$Group" /opt/olxc/"$DistDir"/zfsutils/"$LinuxFlavor"
+                                                sudo cp -p "$DistDir"/zfsutils/"$LinuxFlavor"/"$LXDStorageDriver"_"$LinuxFlavor"_"$RedHatVersion".sh /opt/olxc/"$DistDir"/zfsutils/"$LinuxFlavor"/.
+                                                cd /opt/olxc/"$DistDir"/zfsutils/"$LinuxFlavor"
+                                                ./"$LXDStorageDriver"_"$LinuxFlavor"_"$RedHatVersion".sh
+                                                cd $CurrentDir
+                                        else
+                                                while [ $AptProcessRunning -gt 0 ]
+                                                do
+                                                        echo 'Waiting for running apt update process(es) to finish...sleeping for 10 seconds'
+                                                        echo ''
+                                                        ps -ef | grep -v '_apt' | grep apt | grep -v grep
+                                                        sleep 10
+                                                        AptProcessRunning=$(CheckAptProcessRunning)
+                                                done
+
+                                                sudo apt-get -y install zfsutils-linux
+                                        fi
+
+                                        echo ''
+                                        echo "=============================================="
+                                        echo "Done: Install ZFS.                            "
+                                        echo "=============================================="
+                                        echo ''
+
+                                        sleep 5
+
+                                        clear
+
+                                        echo ''
+                                        echo "=============================================="
+                                        echo "Verify zpool cmd available ...                "
+                                        echo "=============================================="
+                                        echo ''
+
+                                        sudo zpool list
+                                        if [ $? -ne 0 ]
+                                        then
+                                                echo 'ZFS zpool command is not available.'
+                                                echo ''
+                                                echo 'RedHat-family:  go to ./zfsutils/$LinuxFlavor and run manually before re-running this script.'
+                                                echo 'Debian-family:  run apt-get -y install zfsutils-linux'
+                                                echo 'script exiting ... '
+                                        else
+                                                echo 'ZFS is already installed'
+                                        fi
+
+                                        echo ''
+                                        echo "=============================================="
+                                        echo "Done: Verify zpool cmd available.             "
+                                        echo "=============================================="
+                                        echo ''
+
+                                        sleep 5
+
+                                        clear
                                 fi
 
                                 if [ $IscsiTarget = 'Y' ]
@@ -391,18 +454,18 @@ echo 'IscsiTargetLunPrefix      = '$IscsiTargetLunPrefix
 echo 'LXDCluster                = '$LXDCluster
 echo 'LXDPreSeed                = '$LXDPreSeed
 echo 'LXD                       = '$LXD
-echo 'LXDStorageDriver  = '$LXDStorageDriver
+echo 'LXDStorageDriver  	  = '$LXDStorageDriver
 echo 'LXDStoragePoolName        = '$LXDStoragePoolName
-echo 'Lun1Name          = '$Lun1Name
-echo 'Lun2Name          = '$Lun2Name
-echo 'Lun3Name          = '$Lun3Name
-echo 'Lun1Size          = '$Lun1Size
-echo 'Lun2Size          = '$Lun2Size
-echo 'Lun3Size          = '$Lun3Size
+echo 'Lun1Name          	  = '$Lun1Name
+echo 'Lun2Name          	  = '$Lun2Name
+echo 'Lun3Name          	  = '$Lun3Name
+echo 'Lun1Size          	  = '$Lun1Size
+echo 'Lun2Size          	  = '$Lun2Size
+echo 'Lun3Size          	  = '$Lun3Size
 echo 'ZfsLun1                   = '$ZfsLun1
 echo 'ZfsLun2                   = '$ZfsLun2
-echo 'BtrfsLun1         = '$BtrfsLun1
-echo 'BtrfsLun2         = '$BtrfsLun2
+echo 'BtrfsLun1         	  = '$BtrfsLun1
+echo 'BtrfsLun2         	  = '$BtrfsLun2
 echo 'LxcLun1                   = '$LxcLun1
 
 echo ''
