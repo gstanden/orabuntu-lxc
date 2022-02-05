@@ -2087,9 +2087,9 @@ XfsInstalled=$(CheckXfsInstalled)
 
 if [ $IscsiTarget = 'Y' ] && [ $XfsInstalled -eq 0 ]
 then
-       # sudo mkfs.xfs /dev/"$IscsiTargetLunPrefix"_luns/"$IscsiTargetLunPrefix"_"$Lun3Name"_"$Sw1Index"_00 -f
-       # sudo mount /dev/"$IscsiTargetLunPrefix"_luns/"$IscsiTargetLunPrefix"_"$Lun3Name"_"$Sw1Index"_00 /var/lib/lxc
-       echo "mount step commented out"
+#	sudo mkfs.xfs /dev/"$IscsiTargetLunPrefix"_luns/"$IscsiTargetLunPrefix"_"$Lun3Name"_"$Sw1Index"_00 -f
+#	sudo mount /dev/"$IscsiTargetLunPrefix"_luns/"$IscsiTargetLunPrefix"_"$Lun3Name"_"$Sw1Index"_00 /var/lib/lxc
+	echo "no xfs special mount configured"
 fi
 
 echo ''

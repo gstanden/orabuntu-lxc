@@ -18,7 +18,7 @@ LXDStorageDriver=zfs			# [btrfs|zfs]						Storage for LXD Cluster and LXD contai
 LXDStoragePoolName=olxd-001		# [olxd-001|olxd-002|olxd-003|...]			User-settables ZFS storage pool name. Suggested naming scheme shown.  Any naming convention can be used.
 Docker=Y				# [Y|N]	 						Docker install from Canonical Snap.
 K8S=N					# [Y|N]							Kubernetes install K8S snap from Canonical Snap. Ubuntu Linux 20.04 only for now.
-Product=k8s				# [k8s|no-product|workspaces|oracle-db|oracle-gi-18c]	Product to be configured in the seed container. Use products subdirectory to see how to configure new products and add them.
+Products=no-product			# [k8s|no-product|workspaces|oracle-db|oracle-gi-18c]	Product to be configured in the seed container. Use products subdirectory to see how to configure new products and add them.
 ContainerRuntime=crio			# [docker|crio|containerd]				Container runtime.  Only used if Product=k8s.
 k8sCNI=flannel				# [weavenet|flannel]					Kubernetes CNI plugin
 k8sLoadBalancer=none			# [none|metallb]					Kubernetes load balancer
