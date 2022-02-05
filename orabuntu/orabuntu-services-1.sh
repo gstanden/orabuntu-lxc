@@ -1964,7 +1964,7 @@ then
                         echo "=============================================="
                         echo ''
 
-                        sudo sed -i '2,4{s/^/#/}'                                          /etc/network/openvswitch/stop_$IscsiVendor.sh
+                        sudo sed -i '2,5{s/^/#/}'                                          /etc/network/openvswitch/stop_$IscsiVendor.sh
                         sudo sh -c "echo '/var/lib/snapd/snap/bin/lxc stop -f --all'    >> /etc/network/openvswitch/stop_$IscsiVendor.sh"
                         sudo sh -c "echo 'sudo lxc-stop -n $NameServerBase'             >> /etc/network/openvswitch/stop_$IscsiVendor.sh"
                         sudo sh -c "echo 'sudo umount /$StoragePoolName'                >> /etc/network/openvswitch/stop_$IscsiVendor.sh"
