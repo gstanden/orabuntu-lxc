@@ -76,10 +76,10 @@ then
 	echo ''
 	echo "=============================================="
 	echo "Microk8s Snap Info ...                        "
-		echo "=============================================="
+	echo "=============================================="
 	echo ''
 
-	sudo snap info microk8s
+#	sudo snap info microk8s
 
 	sleep 5
 
@@ -91,8 +91,9 @@ then
 	echo "=============================================="
 	echo ''
 
-	sudo snap install  docker --edge
-	sudo snap services docker
+#	sudo snap install  docker --edge
+#	sudo snap services docker
+	echo 'Docker install disabled for now -- control from CONFIG needed.'
 
 	sleep 5
 
@@ -104,7 +105,7 @@ then
 	echo "=============================================="
 	echo ''
 
-	sudo snap info docker
+#	sudo snap info docker
 
 	sleep 5
 
