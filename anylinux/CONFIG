@@ -15,10 +15,10 @@ LXD=Y					# [Y|N]							Create LXD containers flag. Currently used only with Ubu
 LXDCluster=Y				# [Y|N]							Create LXD Cluster automatically flag.  Currently used only with Ubuntu Linux 20.04 but other distros coming soon.
 LXDPreSeed=Y				# [Y|N]
 LXDStorageDriver=zfs			# [btrfs|zfs]						Storage for LXD Cluster and LXD containers.
-LXDStoragePoolName=olxd-002		# [olxd-001|olxd-002|olxd-003|...]			User-settables ZFS storage pool name. Suggested naming scheme shown.  Any naming convention can be used.
-Docker=Y				# [Y|N]	 						Docker install from Canonical Snap.
+LXDStoragePoolName=olxd-001		# [olxd-001|olxd-002|olxd-003|...]			User-settables ZFS storage pool name. Suggested naming scheme shown.  Any naming convention can be used.
+Docker=N				# [Y|N]	 						Docker install from Canonical Snap.
 K8S=N					# [Y|N]							Kubernetes install K8S snap from Canonical Snap. Ubuntu Linux 20.04 only for now.
-Products=no-product			# [k8s|no-product|workspaces|oracle-db|oracle-gi-18c]	Product to be configured in the seed container. Use products subdirectory to see how to configure new products and add them.
+Product=no-product			# [k8s|no-product|workspaces|oracle-db|oracle-gi-18c]	Product to be configured in the seed container. Use products subdirectory to see how to configure new products and add them.
 ContainerRuntime=crio			# [docker|crio|containerd]				Container runtime.  Only used if Product=k8s.
 k8sCNI=flannel				# [weavenet|flannel]					Kubernetes CNI plugin
 k8sLoadBalancer=none			# [none|metallb]					Kubernetes load balancer
@@ -36,7 +36,7 @@ ExtrNet5='192.168.21'			#							Auxiliary network 5. Any ipv4 address triplet.
 ExtrNet6='192.168.22'			#							Auxiliary network 6. Any ipv4 address triplet.
 SPOKEIP=192.168.1.85			#							IP address of HUB   Orabuntu-LXC host server. Example:  192.168.1.143
 HUBIP=192.168.1.91			#							IP address of SPOKE Orabuntu-LXC host server. Example:  192.168.1.144
-HubUserAct=orabuntu			#							Linux user account          used to install Orabuntu-LXC.  Example: ubuntu. Must have sudo all privilege which can be revoked after install.
+HubUserAct=orabuntu			#							Linux user account used to install Orabuntu-LXC.  Example: ubuntu. Must have sudo all privilege which can be revoked after install.
 HubSudoPwd=rz7uHxTB			#							Linux user account password used to install Orabuntu-LXC.  Can be changed after Orabuntu-LXC install.
 BtrfsLun1="\/dev\/sdb"			#							User-provided LUN if not using built-in SCST storage
 BtrfsLun2="\/dev\/sdc"			#							User-provided LUN if not using built-in SCST storage
@@ -50,7 +50,7 @@ IscsiVendor=scst			# [scst|lio]						Target subsystem vendor
 IscsiTargetLunPrefix=lxc		# 							Can be any 3-character prefix.  The prefix lxc is recommended. 
 Lun1Name=zfsa				# [btra|zfsa]						Name of Lun1. Only used if IscsiTarget=Y. For example for btrfs recommended is btra. Do not exceed four characters.
 Lun2Name=zfsm				# [btrm|zfsm]						Name of Lun2. Only used if IscsiTarget=Y. For example for btrfs recommended is btrm. Do not exceed four characters.
-Lun3Name=xfsa				# [xfsa]						Name of Lun3. Only used if IscsiTarget=Y. This lun is used for the xfs filesystem for the lxc (non-lxd) nameserver which is a legacy lxc containers. Do not exceed four characters.
+Lun3Name=xfsa				# [xfsa]						Name of Lun3. Only used if IscsiTarget=Y. 
 Lun1Size=20G				#							Size of Lun1. Only used if IscsiTarget=Y. Use 5G minimum if Product=k8s (10G is recommended)
 Lun2Size=20G				#							Size of Lun2. Only used if IscsiTarget=Y. Use 5G minimum if Product=k8s (10G is recommended)
 Lun3Size=5G				#							Size of Lun3. Only used if IscsiTarget=Y.
