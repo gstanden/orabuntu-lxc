@@ -341,6 +341,7 @@ then
                 cat /etc/lsb-release | grep DISTRIB_RELEASE | cut -f2 -d'=' | cut -f1 -d'.'
         }
         UbuntuMajorVersion=$(GetUbuntuMajorVersion)
+	Release=0
 fi
 
 function GetOperation {
@@ -1709,6 +1710,11 @@ function GetNameServerShortName {
 }
 NameServerShortName=$(GetNameServerShortName)
 
+        function GetNameServerShortName {
+                echo $NameServer | cut -f1 -d'-'
+        }
+        NameServerShortName=$(GetNameServerShortName)
+
 if   [ $MultiHostVar3 = 'X' ]
 then
         echo ''
@@ -1720,17 +1726,34 @@ then
 	sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service systemd-resolved restart > /dev/null 2>&1"
 	sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service lxc-net restart > /dev/null 2>&1"
         
-	Sx1Index=201
-        function CheckHighestSx1IndexHit {
-                sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" lxc-attach -n $NameServerShortName -- nslookup $Sx1Net.$Sx1Index" | grep -c 'name ='
+        Sx1Index=201
+        function CheckDNSLookup {
+                sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" nslookup $Sx1Net.$Sx1Index"
         }
-        HighestSx1IndexHit=$(CheckHighestSx1IndexHit)
+        DNSLookup=$(CheckDNSLookup)
+        DNSHit=$?
 
-        while [ $HighestSx1IndexHit -eq 1 ]
-        do
-                Sx1Index=$((Sx1Index+1))
-                HighestSx1IndexHit=$(CheckHighestSx1IndexHit)
-        done
+        if [ $UbuntuMajorVersion -ge 16 ] || [ $Release -ge 6 ]
+        then
+                while [ $DNSHit -eq 0 ]
+                do
+                        Sx1Index=$((Sx1Index+1))
+                        DNSLookup=$(CheckDNSLookup)
+                        DNSHit=$?
+                done
+        fi
+
+#	Sx1Index=201
+#        function CheckHighestSx1IndexHit {
+#                sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" lxc-attach -n $NameServerShortName -- nslookup $Sx1Net.$Sx1Index" | grep -c 'name ='
+#        }
+#        HighestSx1IndexHit=$(CheckHighestSx1IndexHit)
+
+#        while [ $HighestSx1IndexHit -eq 1 ]
+#        do
+#                Sx1Index=$((Sx1Index+1))
+#                HighestSx1IndexHit=$(CheckHighestSx1IndexHit)
+#        done
 
         echo ''
         echo "=============================================="
@@ -1742,16 +1765,33 @@ then
 	sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" service lxc-net restart > /dev/null 2>&1"
         
         Sw1Index=201
-        function CheckHighestSw1IndexHit {
-                sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" lxc-attach -n $NameServerShortName -- nslookup $Sw1Net.$Sw1Index" | grep -c 'name ='
+        function CheckDNSLookup {
+                sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" nslookup $Sw1Net.$Sw1Index"
         }
-        HighestSw1IndexHit=$(CheckHighestSw1IndexHit)
+        DNSLookup=$(CheckDNSLookup)
+        DNSHit=$?
 
-        while [ $HighestSw1IndexHit -eq 1 ]
-        do
-                Sw1Index=$((Sw1Index+1))
-                HighestSw1IndexHit=$(CheckHighestSw1IndexHit)
-        done
+        if [ $UbuntuMajorVersion -ge 16 ] || [ $Release -ge 6 ]
+        then
+                while [ $DNSHit -eq 0 ]
+                do
+                        Sw1Index=$((Sw1Index+1))
+                        DNSLookup=$(CheckDNSLookup)
+                        DNSHit=$?
+                done
+        fi
+
+#	Sw1Index=201
+#	function CheckHighestSw1IndexHit {
+#	        sshpass -p $MultiHostVar9 ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no $MultiHostVar8@$MultiHostVar5 "sudo -S <<< "$MultiHostVar9" lxc-attach -n $NameServerShortName -- nslookup $Sw1Net.$Sw1Index" | grep -c 'name ='
+#	}
+#	HighestSw1IndexHit=$(CheckHighestSw1IndexHit)
+
+#	while [ $HighestSw1IndexHit -eq 1 ]
+#	do
+#        	Sw1Index=$((Sw1Index+1))
+#        	HighestSw1IndexHit=$(CheckHighestSw1IndexHit)
+#	done
 
 elif [ $MultiHostVar3 = 'X' ] && [ $MultiHostVar2 = 'Y' ] && [ $GRE = 'N' ]
 then
