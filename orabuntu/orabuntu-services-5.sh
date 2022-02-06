@@ -233,8 +233,9 @@ then
 
 	if [ $UbuntuMajorVersion -ge 16 ]
 	then
-		sudo chmod 775 /opt/olxc/"$DistDir"/orabuntu/archives/docker_install_orabuntu.sh
-		/opt/olxc/"$DistDir"/orabuntu/archives/docker_install_orabuntu.sh
+	#	sudo chmod 775 /opt/olxc/"$DistDir"/orabuntu/archives/docker_install_orabuntu.sh
+	#	/opt/olxc/"$DistDir"/orabuntu/archives/docker_install_orabuntu.sh
+		echo "Docker install disabled for now - needs to be added to CONFIG control file."
 	fi
 
 	echo ''
@@ -1271,3 +1272,4 @@ then
 fi
 
 cd $DistDir/anylinux
+sudo service olxc-scst start > /dev/null 2>&1

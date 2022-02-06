@@ -949,6 +949,28 @@ clear
 
 echo ''
 echo "=============================================="
+echo "Start Seed Container ...                      "
+echo "=============================================="
+echo ''
+
+lxc start $SeedContainerName
+
+sleep 5
+
+clear
+
+echo ''
+echo "=============================================="
+echo "Done: Start Seed Container.                   "
+echo "=============================================="
+echo ''
+
+sleep 5
+
+clear
+
+echo ''
+echo "=============================================="
 echo "Next script to run: orabuntu-services-5.sh    "
 echo "=============================================="
 

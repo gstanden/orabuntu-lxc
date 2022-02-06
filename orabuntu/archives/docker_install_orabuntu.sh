@@ -66,7 +66,8 @@ then
 	echo "=============================================="
 	echo ''
 
-	sudo snap install microk8s --classic
+#	sudo snap install microk8s --classic
+	echo 'Microk8s install disabled for now -- control from CONFIG needed.'
 
 	sleep 5
 
@@ -75,7 +76,7 @@ then
 	echo ''
 	echo "=============================================="
 	echo "Microk8s Snap Info ...                        "
-	echo "=============================================="
+		echo "=============================================="
 	echo ''
 
 	sudo snap info microk8s
