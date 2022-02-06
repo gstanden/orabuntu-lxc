@@ -1726,7 +1726,7 @@ then
         }
         HighestSx1IndexHit=$(CheckHighestSx1IndexHit)
 
-        while [ $HighestSx1IndexHit = 1 ]
+        while [ $HighestSx1IndexHit -eq 1 ]
         do
                 Sx1Index=$((Sx1Index+1))
                 HighestSx1IndexHit=$(CheckHighestSx1IndexHit)
@@ -1747,7 +1747,7 @@ then
         }
         HighestSw1IndexHit=$(CheckHighestSw1IndexHit)
 
-        while [ $HighestSw1IndexHit = 1 ]
+        while [ $HighestSw1IndexHit -eq 1 ]
         do
                 Sw1Index=$((Sw1Index+1))
                 HighestSw1IndexHit=$(CheckHighestSw1IndexHit)
