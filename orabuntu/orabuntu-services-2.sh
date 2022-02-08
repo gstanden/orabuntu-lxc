@@ -376,7 +376,7 @@ then
        		echo "=============================================="
         	echo ''
 
-        	dig +short us.images.linuxcontainers.org
+        	dig +short us.lxd.images.canonical.com
 		echo ''
 
         	if [ -d /opt/olxc/"$DistDir"/lxcimage/oracle"$MajorRelease" ]
@@ -392,14 +392,14 @@ then
 		sudo chown -R $Owner:$Group  	/opt/olxc/"$DistDir"/lxcimage/oracle"$MajorRelease"
         	cd 				/opt/olxc/"$DistDir"/lxcimage/oracle"$MajorRelease"
 
-        	wget -4 -q https://us.images.linuxcontainers.org/images/oracle/"$MajorRelease"/amd64/default/ -P /opt/olxc/"$DistDir"/lxcimage/oracle"$MajorRelease"
+        	wget -4 -q https://us.lxd.images.canonical.com/images/oracle/"$MajorRelease"/amd64/default/ -P /opt/olxc/"$DistDir"/lxcimage/oracle"$MajorRelease"
 
         	function GetBuildDate {
                 	grep folder.gif index.html | tail -1 | awk -F "\"" '{print $8}' | sed 's/\///g' | sed 's/\.//g'
         	}
         	BuildDate=$(GetBuildDate)
 
-        	wget -4 -q https://us.images.linuxcontainers.org/images/oracle/"$MajorRelease"/amd64/default/"$BuildDate"/SHA256SUMS -P /opt/olxc/"$DistDir"/lxcimage/oracle"$MajorRelease"
+        	wget -4 -q https://us.lxd.images.canonical.com/images/oracle/"$MajorRelease"/amd64/default/"$BuildDate"/SHA256SUMS -P /opt/olxc/"$DistDir"/lxcimage/oracle"$MajorRelease"
 
         	for i in rootfs.tar.xz meta.tar.xz
         	do
@@ -412,7 +412,7 @@ then
                 	echo "Downloading $i ..."
                 	echo ''
 
-                	wget -4 -q --show-progress https://us.images.linuxcontainers.org/images/oracle/"$MajorRelease"/amd64/default/"$BuildDate"/$i -P /opt/olxc/"$DistDir"/lxcimage/oracle"$MajorRelease"
+                	wget -4 -q --show-progress https://us.lxd.images.canonical.com/images/oracle/"$MajorRelease"/amd64/default/"$BuildDate"/$i -P /opt/olxc/"$DistDir"/lxcimage/oracle"$MajorRelease"
                 	diff <(shasum -a 256 /opt/olxc/"$DistDir"/lxcimage/oracle"$MajorRelease"/$i | cut -f1,11 -d'/' | sed 's/  */ /g' | sed 's/\///' | sed 's/  */ /g') <(grep $i /opt/olxc/"$DistDir"/lxcimage/oracle"$MajorRelease"/SHA256SUMS)
         	done
         	if [ $? -eq 0 ]

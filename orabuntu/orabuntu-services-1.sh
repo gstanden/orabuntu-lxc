@@ -483,6 +483,10 @@ echo ''
 
 sudo service sshd restart
 
+sleep 5
+
+clear
+
 echo ''
 echo "=============================================="
 echo "Done: Restart sshd.                           "
@@ -1896,7 +1900,7 @@ else
 	ScstCmdExist=0
 fi
 
-if [ $UbuntuMajorVersion -ge 20 ]
+if [ $UbuntuMajorVersion -ge 20 ] && [ $LXD = 'Y' ] 
 then
         if [ $LXDStorageDriver = 'zfs' ]
         then
