@@ -1892,7 +1892,7 @@ else
         ZpoolCmdExist=0
 fi
 
-sudo scstadmin --list_group
+sudo scstadmin --list_group > /dev/null 2>&1
 if [ $? -eq 0 ]
 then
 	ScstCmdExist=1
