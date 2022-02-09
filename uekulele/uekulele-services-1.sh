@@ -4431,7 +4431,7 @@ sleep 5
 
 clear
 
-sudo modprobe zfs
+sudo modprobe zfs > /dev/null 2>&1
 which zpool > /dev/null 2>&1
 if [ $? -eq 0 ]
 then
@@ -4440,7 +4440,7 @@ else
         ZpoolCmdExist=0
 fi
 
-if [ $Release -ge 7 ]
+if [ $Release -ge 7 ] && [ $LXD = 'Y' ]
 then
         if [ $LXDStorageDriver = 'zfs' ]
         then
@@ -4925,6 +4925,10 @@ then
         echo "Done: Reinstall libvirt.                      "
         echo "=============================================="
         echo ''
+
+	sleep 5
+
+	clear
 fi
 
 if [ $NameServerExists -eq 0 ] && [ $MultiHostVar2 = 'N' ]
@@ -6078,7 +6082,7 @@ then
 		if [ $FileSystemTypeXfs -eq 1 ]
 		then
         		function GetFtype {
-                		xfs_info /var/lib/lxc | grep -c ftype=1
+                		xfs_info /var/lib/lxc > /dev/null 2>&1 | grep -c ftype=1
         		}
         		Ftype=$(GetFtype)
 
@@ -6158,6 +6162,10 @@ then
 			sudo lxc-start -n $NameServer
 		fi
 	fi
+
+	sleep 5
+
+	clear
 
 	echo ''
 	echo "=============================================="

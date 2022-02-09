@@ -1398,6 +1398,7 @@ then
 	echo "so that the newgrp lxd takes effect and is    "
 	echo "applied to profile.                           "
 	echo "=============================================="
+	echo ''
 
 	if [ $LinuxFlavor = 'Fedora' ] && [ $RedHatVersion -ge 33 ]
 	then

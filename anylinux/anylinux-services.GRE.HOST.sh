@@ -43,6 +43,47 @@ sleep 5
 
 clear
 
+if [ -z $2 ]
+then
+        echo ''
+        echo "=============================================="
+        echo "                                              "
+        echo "If you are doing a fresh Orabuntu-LXD install "
+        echo "for LXD containers select 'lxd' (default)     "
+        echo "                                              "
+        echo "If you are doing a fresh Orabuntu-LXC install "
+        echo "for LXC containers select 'lxc' (alternative) "
+        echo "                                              "
+        echo "=============================================="
+        echo "                                              "
+        read -e -p "Install Type lxd or lxc [lxd/lxc]  " -i "lxd" ConType
+        echo "                                              "
+        echo "=============================================="
+        echo ''
+else
+        ConType=$2
+fi
+
+if   [ $ConType = 'lxd' ]
+then
+        cp -p CONFIG.LXD CONFIG
+
+elif [ $ConType = 'lxc' ]
+then
+        cp -p CONFIG.LXC CONFIG
+fi
+
+echo ''
+echo "=============================================="
+echo ''
+echo "Container deployment type:         $ConType   "
+echo ''
+echo "=============================================="
+
+sleep 5
+
+clear
+
 echo ''
 echo "=============================================="
 echo "Establish sudo...                             "
