@@ -43,6 +43,58 @@ sleep 5
 
 clear
 
+echo ''
+echo "=============================================="
+echo "Establish sudo...                             "
+echo "=============================================="
+echo ''
+
+trap "exit" INT TERM; trap "kill 0" EXIT; sudo -v || exit $?; sleep 1; while true; do sleep 60; sudo -nv; done 2>/dev/null &
+sudo date
+
+echo ''
+echo "=============================================="
+echo "Done: Establish sudo.                         "
+echo "=============================================="
+echo ''
+
+sleep 5
+
+clear
+
+if [ -z $1 ]
+then	
+	echo ''
+	echo "=============================================="
+	echo "                                              "
+	echo "If you doing a fresh Orabuntu-LXC install     "
+	echo "on this host then take default 'new'          "
+	echo "                                              "
+	echo "If you are doing a complete Orabuntu-LXC      "
+	echo "reinstall then answer 'reinstall'             "
+	echo "                                              "
+	echo "=============================================="
+	echo "                                              "
+	read -e -p "Install Type New or Reinstall [new/rei] " -i "new" OpType
+	echo "                                              "
+	echo "=============================================="
+else
+	OpType=$1
+fi
+
+if   [ $OpType = 'rei' ]
+then
+	Operation=reinstall
+
+elif [ $OpType = 'new' ]
+then
+	Operation=new
+fi
+
+sleep 5
+
+clear
+
 if [ -z $2 ]
 then	
 	echo ''
@@ -79,25 +131,6 @@ echo ''
 echo "Container deployment type:         $ConType   "
 echo ''
 echo "=============================================="
-
-sleep 5
-
-clear
-
-echo ''
-echo "=============================================="
-echo "Establish sudo...                             "
-echo "=============================================="
-echo ''
-
-trap "exit" INT TERM; trap "kill 0" EXIT; sudo -v || exit $?; sleep 1; while true; do sleep 60; sudo -nv; done 2>/dev/null &
-sudo date
-
-echo ''
-echo "=============================================="
-echo "Done: Establish sudo.                         "
-echo "=============================================="
-echo ''
 
 sleep 5
 
@@ -571,35 +604,7 @@ clear
 
 ################## LXD Cluster Settings END #########################
 
-if [ -z $1 ]
-then	
-	echo ''
-	echo "=============================================="
-	echo "                                              "
-	echo "If you doing a fresh Orabuntu-LXC install     "
-	echo "on this host then take default 'new'          "
-	echo "                                              "
-	echo "If you are doing a complete Orabuntu-LXC      "
-	echo "reinstall then answer 'reinstall'             "
-	echo "                                              "
-	echo "=============================================="
-	echo "                                              "
-	read -e -p "Install Type New or Reinstall [new/rei] " -i "new" OpType
-	echo "                                              "
-	echo "=============================================="
-else
-	OpType=$1
-fi
-
-if   [ $OpType = 'rei' ]
-then
-	Operation=reinstall
-elif [ $OpType = 'new' ]
-then
-	Operation=new
-fi
-
-if [ -z $2 ]
+if [ -z $3 ]
 then
         Product=workspaces
 	Product=oracle-db
@@ -608,7 +613,7 @@ then
 	# Get product from CONFIG file
 	Product=$(source "$DistDir"/anylinux/CONFIG; echo $Product)
 else
-        Product=$2
+        Product=$3
 fi
 
 function GetDistDir {
