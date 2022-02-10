@@ -53,14 +53,15 @@ echo "Install packages ...                          "
 echo "=============================================="
 echo ''
 
+sudo yum -y install git
 sudo yum -y update
 sudo yum -y remove zfs-fuse
 sudo yum -y install net-tools wget unzip tar
 # sudo yum -y install epel-release
 # sudo dnf -y --enablerepo=powertools install python3-packaging
 sudo yum -y update
-sudo yum -y install gcc make autoconf automake libtool rpm-build libtirpc-devel libblkid-devel libuuid-devel libudev-devel openssl-devel zlib-devel libaio-devel libattr-devel elfutils-libelf-devel kernel-devel-$(uname -r) python3 python3-devel python3-setuptools python3-cffi libffi-devel git ncompress perl bc cpio sysstat mdadm ksh fio dkms lsscsi
-
+sudo yum -y install gcc make autoconf automake libtool rpm-build libtirpc-devel libblkid-devel libuuid-devel libudev-devel openssl-devel zlib-devel libaio-devel libattr-devel elfutils-libelf-devel python3 python3-devel python3-setuptools python3-cffi libffi-devel git ncompress perl bc cpio sysstat mdadm ksh fio dkms lsscsi
+sudo yum -y install kernel-devel-$(uname -r)
 echo ''
 
 sleep 5
