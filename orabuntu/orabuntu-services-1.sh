@@ -3394,12 +3394,12 @@ then
 	echo "=============================================="
 	echo ''
 	echo "=============================================="	
-	echo "Show isc-dhcp-server status ...               "
+	echo "Restart isc-dhcp-server ...                   "
+	echo "(Patience ... can take a minute or two ...)   "
 	echo "=============================================="
 	echo ''
 
 	sudo lxc-attach -n $NameServer -- service isc-dhcp-server restart
-	sudo lxc-attach -n $NameServer -- service isc-dhcp-server status
 	
 	echo ''
 	echo "=============================================="	
