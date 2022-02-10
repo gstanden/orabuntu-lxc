@@ -43,6 +43,58 @@ sleep 5
 
 clear
 
+echo ''
+echo "=============================================="
+echo "Establish sudo...                             "
+echo "=============================================="
+echo ''
+
+trap "exit" INT TERM; trap "kill 0" EXIT; sudo -v || exit $?; sleep 1; while true; do sleep 60; sudo -nv; done 2>/dev/null &
+sudo date
+
+echo ''
+echo "=============================================="
+echo "Done: Establish sudo.                         "
+echo "=============================================="
+echo ''
+
+sleep 5
+
+clear
+
+if [ -z $1 ]
+then
+        echo ''
+        echo "=============================================="
+        echo "                                              "
+        echo "If you doing a fresh Orabuntu-LXC install     "
+        echo "on this host then take default 'new'          "
+        echo "                                              "
+        echo "If you are doing a complete Orabuntu-LXC      "
+        echo "reinstall then answer 'reinstall'             "
+        echo "                                              "
+        echo "=============================================="
+        echo "                                              "
+        read -e -p "Install Type New or Reinstall [new/rei] " -i "new" OpType
+        echo "                                              "
+        echo "=============================================="
+else
+        OpType=$1
+fi
+
+if   [ $OpType = 'rei' ]
+then
+        Operation=reinstall
+
+elif [ $OpType = 'new' ]
+then
+        Operation=new
+fi
+
+sleep 5
+
+clear
+
 if [ -z $2 ]
 then
         echo ''
@@ -72,32 +124,6 @@ elif [ $ConType = 'lxc' ]
 then
         cp -p CONFIG.LXC CONFIG
 fi
-
-echo ''
-echo "=============================================="
-echo ''
-echo "Container deployment type:         $ConType   "
-echo ''
-echo "=============================================="
-
-sleep 5
-
-clear
-
-echo ''
-echo "=============================================="
-echo "Establish sudo...                             "
-echo "=============================================="
-echo ''
-
-trap "exit" INT TERM; trap "kill 0" EXIT; sudo -v || exit $?; sleep 1; while true; do sleep 60; sudo -nv; done 2>/dev/null &
-sudo date
-
-echo ''
-echo "=============================================="
-echo "Done: Establish sudo.                         "
-echo "=============================================="
-echo ''
 
 sleep 5
 
@@ -573,72 +599,39 @@ clear
 
 ################## LXD Cluster Settings END #########################
 
-if [ -z $1 ]
-then	
-	echo ''
-	echo "=============================================="
-	echo "                                              "
-	echo "If you doing a fresh Orabuntu-LXC install     "
-	echo "on this host then take default 'new'          "
-	echo "                                              "
-	echo "If you are doing a complete Orabuntu-LXC      "
-	echo "reinstall then answer 'reinstall'             "
-	echo "                                              "
-	echo "=============================================="
-	echo "                                              "
-	read -e -p "Install Type New or Reinstall [new/rei] " -i "new" OpType
-	echo "                                              "
-	echo "=============================================="
-
-	sleep 5
-
-	clear
-else
-        OpType=$1
-fi
-
-if   [ $OpType = 'rei' ]
-then
-	Operation=reinstall
-
-elif [ $OpType = 'new' ]
-then
-	Operation=new
-fi
-
-if [ -z $2 ]
+if [ -z $3 ]
 then
 	SPOKEIP=$(source "$DistDir"/anylinux/CONFIG; echo $SPOKEIP)
 else
-	SPOKEIP=$2
-fi
-
-if [ -z $3 ]
-then
-	HUBIP=$(source "$DistDir"/anylinux/CONFIG; echo $HUBIP)
-else
-	HUBIP=$3
+	SPOKEIP=$3
 fi
 
 if [ -z $4 ]
 then
-	HubUserAct=$(source "$DistDir"/anylinux/CONFIG; echo $HubUserAct)
+	HUBIP=$(source "$DistDir"/anylinux/CONFIG; echo $HUBIP)
 else
-	HubUserAct=$4
+	HUBIP=$4
 fi
 
 if [ -z $5 ]
 then
-	HubSudoPwd=$(source "$DistDir"/anylinux/CONFIG; echo $HubSudoPwd)
+	HubUserAct=$(source "$DistDir"/anylinux/CONFIG; echo $HubUserAct)
 else
-	HubSudoPwd=$5
+	HubUserAct=$5
 fi
 
 if [ -z $6 ]
 then
+	HubSudoPwd=$(source "$DistDir"/anylinux/CONFIG; echo $HubSudoPwd)
+else
+	HubSudoPwd=$6
+fi
+
+if [ -z $7 ]
+then
 	Product=$(source "$DistDir"/anylinux/CONFIG; echo $Product)
 else
-	Product=$6
+	Product=$7
 fi
 
 if [ $SPOKEIP = 'lan.ip.gre.host' ] || [ $HUBIP = 'lan.ip.hub.host' ] || [ $HubUserAct = 'username' ] || [ $HubSudoPwd = 'password' ]
