@@ -125,13 +125,6 @@ then
 	cp -p CONFIG.LXC CONFIG
 fi
 
-echo ''
-echo "=============================================="
-echo ''
-echo "Container deployment type:         $ConType   "
-echo ''
-echo "=============================================="
-
 sleep 5
 
 clear
