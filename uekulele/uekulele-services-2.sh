@@ -785,14 +785,14 @@ then
 
 		while [ $LxdSnapInstalled -ne 0 ]
 		do
-			sudo snap install lxd --edge
+			sudo snap install lxd
 			LxdSnapInstalled=$(CheckLxdSnapInstalled)
 			LxdSnapInstalled=`echo $?`
 			sleep 15
 			echo ''
 		done
 
-		sudo snap install lxd --edge
+		sudo snap install lxd
 		sudo snap refresh lxd
 
 		echo ''
