@@ -861,6 +861,8 @@ then
 		echo ''
 		echo "=============================================="
 		echo "Configure LXD Cluster...                      "
+		echo "Re-tries cluster formation if needed ...      "
+		echo "If error WAIT it will retry 10 times ...      "
 		echo "=============================================="
 		echo ''
 

@@ -4,13 +4,13 @@
 
 # User-settable variables
 
-SPOKEIP=192.168.1.72			#							IP address of HUB   Orabuntu-LXC host server. Example:  192.168.1.143
-HUBIP=192.168.1.82			#							IP address of SPOKE Orabuntu-LXC host server. Example:  192.168.1.144
+SPOKEIP=192.168.1.75			#							IP address of HUB   Orabuntu-LXC host server. Example:  192.168.1.143
+HUBIP=192.168.1.67			#							IP address of SPOKE Orabuntu-LXC host server. Example:  192.168.1.144
 HubUserAct=orabuntu			#							Linux user account used to install Orabuntu-LXC.  Example: ubuntu. Must have sudo all privilege which can be revoked after install.
 HubSudoPwd=rz7uHxTB			#							Linux user account password used to install Orabuntu-LXC.  Can be changed after Orabuntu-LXC install.
 MajorRelease=8				# [8|7]							Oracle Linux containers major release version. Reset automatically to specific values for some Linux distros.  See anylinux-services.sh search "pgroup1"
 PointRelease=4				# [4|9]	 						Oracle Linux containers minor release version. Reset automatically to specific values for some Linux distros.  See anylinux-services.sh search "pgroup1"
-NumCon=4				#							Number of clones of the seed container.
+NumCon=1				#							Number of clones of the seed container.
 Domain1=urdomain1.com			#							Domain name of the clone containers network.
 Domain2=urdomain2.com			#							Domain name of the seed  containers network.
 NameServer=afns1			#							Name of the nameserver.

@@ -64,7 +64,6 @@ then
 	m=1; n=1
 	while [ $m -eq 1 ]
 	do
-		sleep 120
 		if   [ $LXDCluster = 'N' ]
 		then
 			cat /etc/network/openvswitch/preseed.sw1a.olxc.001.lxd | lxd init --preseed
@@ -79,19 +78,36 @@ then
 		then
 			if   [ $GRE = 'N' ]
 			then
-				if [ $LXDStorageDriver = 'zfs' ]
+				if [ $n -le 10 ]
 				then
-					cat /etc/network/openvswitch/preseed.sw1a.zfs.001.lxd.cluster | lxd init --preseed
-					if [ $? -ne 0 ]
+					if [ $LXDStorageDriver = 'zfs' ]
 					then
-						m=1
-					else
-						m=0
-					fi
+						cat /etc/network/openvswitch/preseed.sw1a.zfs.001.lxd.cluster | lxd init --preseed
+						if [ $? -ne 0 ]
+						then
+							m=1
+							echo ''
+							echo 'Re-trying LXD cluster formation ...'
+							echo 'Sleeping 2 minutes if you need to edit the preseed cluster file or diagnose other cluster errors before next cluster formation attempt.'
+							sleep 120
+						else
+							m=0
+						fi
+						n=$((n+1))
 
-				elif [ $LXDStorageDriver = 'btrfs' ]
-				then
-					cat /etc/network/openvswitch/preseed.sw1a.btr.001.lxd.cluster | lxd init --preseed
+					elif [ $LXDStorageDriver = 'btrfs' ]
+					then
+						cat /etc/network/openvswitch/preseed.sw1a.btr.001.lxd.cluster | lxd init --preseed
+						if [ $? -ne 0 ]
+						then
+							m=1
+						else
+							m=0
+						fi
+					fi
+				else
+					sudo lxd init
+					
 					if [ $? -ne 0 ]
 					then
 						m=1
@@ -110,6 +126,11 @@ then
 						if [ $? -ne 0 ]
 						then
 							m=1
+							echo ''
+							echo 'Re-trying LXD cluster formation ...'
+							echo 'Sleeping 2 minutes if you need to edit the preseed cluster file or diagnose other cluster errors before next cluster formation attempt.'
+							echo ''
+							sleep 120
 						else
 							m=0
 						fi
@@ -136,7 +157,6 @@ then
 						m=0
 					fi
 				fi
-			sleep 60
 			fi
 		fi
 	done
