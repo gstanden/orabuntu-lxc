@@ -133,6 +133,11 @@ If a non-root user with "sudo ALL" privilege is not available on the host, creat
 
 Step 4
 
+NEW in Orabuntu-LXC ELENA edition are the CONFIG.LXD and the CONFIG.LXC files:
+
+Use the CONFIG.LXD for deploying LXD clusters.
+Use the CONFIG.LXC for deploying LXC multi-host "spans"
+
 Edit the **/anylinux/CONFIG** file to select either LXC or LXD. For example, to select LXD clusters, set the following parameters in the CONFIG file as shown below. It's highly-recommended to set both of these parameters to "Y" as a set because even if deploying a single LXD node, this creates the single server as a "one-node LXD cluster" which makes the single-node LXD "cluster-ready" so that another node can be easily added later if desired, since the clustering is already setup. In the case of HUB HOST the "LXDCluster=Y" switch creates a "single-node" LXD cluster, and in the case of GRE HOST an "N-node" LXD cluster depending on how many GRE hosts have been added to the cluster.
 ```
 LXD=Y
@@ -165,11 +170,16 @@ The user-settable ip address subnets are set in the ./anylinux/CONFIG file.  Set
 
 Other than pre-creating the olxc-001 on the HUB host and the olxc-00[2,3,4,...N] on the N-th GRE host, the Orabuntu-LXC main scripts
 ```
-anylinux-services.HUB.HOST.sh new
-anylinux-services.GRE.HOST.sh new
+anylinux-services.HUB.HOST.sh new [lxc|lxd]
+anylinux-services.GRE.HOST.sh new [lxc|lxd]
 ```
-are still totally automated as just as they have always been, and the scripts are a "one-button push" fully-automated way to create the containers and networks just the same as the way they work for LXC deployments.
+are still totally automated as just as they have always been, and the scripts are a "one-button push" fully-automated way to create the containers and networks just the same as the way they work for LXC deployments. For example, for a deployment of lxd clusters:
 
+```
+anylinux-services.HUB.HOST.sh new lxd
+anylinux-services.GRE.HOST.sh new lxd
+```
+The settings details are described below.  However, the CONFIG.LXD and the CONFIG.LXD are intended to simplify running the desired LXD multi-host cluster, or alternatively, an LXC network span across multiple hosts.
 If LXC containers are preferred, then set these two parameters as a set to "N" shown below. 
 ```
 LXD=N
