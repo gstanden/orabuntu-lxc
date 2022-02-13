@@ -572,7 +572,7 @@ then
 		sudo lxc-start  -n $j > /dev/null 2>&1
 		sleep 10
 		ssh-keygen -R $j
-       		sshpass -p root ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no root@$j "uname -a; cat /etc/oracle-release"
+       		sshpass -p root ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no root@$j "uname -a; cat /etc/redhat-release"
 
        		echo ''
 		echo "=============================================="
@@ -1096,7 +1096,7 @@ then
 
 			ssh-keygen -R $i
 			sleep 5
-       			sshpass -p root ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no root@$i "uname -a; cat /etc/oracle-release"
+       			sshpass -p root ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no root@$i "uname -a; cat /etc/redhat-release"
 
 			echo ''
 			echo "=============================================="
@@ -1242,10 +1242,10 @@ fi
 
 cd "$DistDir"/orabuntu/archives
 rm -f orabuntu-services.lst orabuntu-files.lst product.lst orabuntu-services.tar orabuntu-files.tar product.tar
-cd "$DistDir"/installs/logs
+cd "$DistDir"/installs/logs > /dev/null 2>&1
 LOGEXT=`date +"%Y-%m-%d.%R:%S"`
-sudo cp -p $USER.log $USER.orabuntu-lxc.install.$LOGEXT
-sudo rm -f /etc/sudoers.d/orabuntu-lxc
+sudo cp -p $USER.log $USER.orabuntu-lxc.install.$LOGEXT > /dev/null 2>&1
+sudo rm -f /etc/sudoers.d/orabuntu-lxc > /dev/null 2>&1
 
 if [ $UbuntuMajorVersion -eq 16 ]
 then
