@@ -482,7 +482,7 @@ sleep 5
 
 clear
 
-./cont-centos8-create.sh $NameServer
+./cont-centos8-create.sh $NameServer $Domain1
 
 echo ''
 echo "=============================================="
