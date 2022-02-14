@@ -3630,8 +3630,8 @@ then
 	sudo chown -R ${USERNAME}:${USERNAME} /home/${USERNAME}/Manage-Orabuntu
 	sudo chmod -R 777 /home/${USERNAME}/Manage-Orabuntu
 
-	sudo sed -i "/lxc\.mount\.entry/s/#/ /"              /var/lib/lxc/$NameServer/config
-	sudo sed -i "/Manage\-Orabuntu/s/afns1\-base/afns1/" /var/lib/lxc/$NameServer/config
+	sudo sed -i "/lxc\.mount\.entry/s/#/ /"                          /var/lib/lxc/$NameServer/config
+	sudo sed -i "/Manage\-Orabuntu/s/$NameServer\-base/$NameServer/" /var/lib/lxc/$NameServer/config
 
 	sudo lxc-stop -n $NameServer
 	sleep 5
