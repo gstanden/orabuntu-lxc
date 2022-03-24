@@ -7079,6 +7079,11 @@ NetworkManagerRunning=$(CheckNetworkManagerRunning)
 
 # sleep 10
 
+if [ $LinuxFlavor = 'Oracle' ] && [ $Release -ge 8 ]
+then
+	sudo sed -i '0,/.*nameserver.*/s/.*nameserver.*/nameserver 10.207.39.2\n&/' /etc/resolv.conf
+fi
+
 if [ $SystemdResolvedInstalled -eq 0 ] && [ $RedHatVersion -ne 29 ]
 then
 	if [ $GRE = 'Y' ] || [ $MultiHostVar2 = 'N' ]
