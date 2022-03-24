@@ -11,8 +11,8 @@ HubSudoPwd=rz7uHxTB			#							Linux user account password used to install Orabun
 MajorRelease=8				# [8|7]							Oracle Linux containers major release version. Reset automatically to specific values for some Linux distros.  See anylinux-services.sh search "pgroup1"
 PointRelease=4				# [4|9]	 						Oracle Linux containers minor release version. Reset automatically to specific values for some Linux distros.  See anylinux-services.sh search "pgroup1"
 NumCon=2				#							Number of clones of the seed container.
-Domain1=urdomaina.com			#							Domain name of the clone containers network.
-Domain2=urdomainb.com			#							Domain name of the seed  containers network.
+Domain1=urdomain1.com			#							Domain name of the clone containers network.
+Domain2=urdomain2.com			#							Domain name of the seed  containers network.
 NameServer=afns1			#							Name of the nameserver.
 OSMemRes=1024				#							Amount of reserved memory.  Often used with Oracle Enteprise software installations.
 LXDPreSeed=Y				# [Y|N]							Only used if LXD=Y and LXDCluster=Y

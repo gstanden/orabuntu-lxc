@@ -4962,17 +4962,17 @@ then
 
                 if   [ $LinuxFlavor = 'CentOS' ] && [ $Release -eq 7 ]
                 then
-                        wget -4 -q https://us.lxd.images.canonical.com/images/ubuntu/hirsute/amd64/default/ -P /opt/olxc/"$DistDir"/lxcimage/nsa
+                        wget -4 -q https://us.lxd.images.canonical.com/images/ubuntu/jammy/amd64/default/ -P /opt/olxc/"$DistDir"/lxcimage/nsa
 
                 elif [ $LinuxFlavor = 'Red' ] && [ $Release -eq 7 ]
                 then
-                        wget -4 -q https://us.lxd.images.canonical.com/images/ubuntu/hirsute/amd64/default/ -P /opt/olxc/"$DistDir"/lxcimage/nsa
+                        wget -4 -q https://us.lxd.images.canonical.com/images/ubuntu/jammy/amd64/default/ -P /opt/olxc/"$DistDir"/lxcimage/nsa
 
                 elif [ $LinuxFlavor = 'Oracle' ] && [ $Release -eq 7 ]
                 then
-                        wget -4 -q https://us.lxd.images.canonical.com/images/ubuntu/hirsute/amd64/default/ -P /opt/olxc/"$DistDir"/lxcimage/nsa
+                        wget -4 -q https://us.lxd.images.canonical.com/images/ubuntu/jammy/amd64/default/ -P /opt/olxc/"$DistDir"/lxcimage/nsa
                 else
-                        wget -4 -q https://us.lxd.images.canonical.com/images/ubuntu/hirsute/amd64/default/ -P /opt/olxc/"$DistDir"/lxcimage/nsa
+                        wget -4 -q https://us.lxd.images.canonical.com/images/ubuntu/jammy/amd64/default/ -P /opt/olxc/"$DistDir"/lxcimage/nsa
                 fi
 
 		cp -p /opt/olxc/"$DistDir"/lxcimage/nsa/index.html .
@@ -4988,17 +4988,17 @@ then
 
                 if   [ $LinuxFlavor = 'CentOS' ] && [ $Release -eq 7 ]
                 then
-                        curl -4 --progress-bar --remote-name https://us.lxd.images.canonical.com/images/ubuntu/hirsute/amd64/default/"$BuildDate"/SHA256SUMS --output /opt/olxc/"$DistDir"/lxcimage/nsa
+                        curl -4 --progress-bar --remote-name https://us.lxd.images.canonical.com/images/ubuntu/jammy/amd64/default/"$BuildDate"/SHA256SUMS --output /opt/olxc/"$DistDir"/lxcimage/nsa
 
                 elif [ $LinuxFlavor = 'Red' ] && [ $Release -eq 7 ]
                 then
-                        curl -4 --progress-bar --remote-name https://us.lxd.images.canonical.com/images/ubuntu/hirsute/amd64/default/"$BuildDate"/SHA256SUMS --output /opt/olxc/"$DistDir"/lxcimage/nsa
+                        curl -4 --progress-bar --remote-name https://us.lxd.images.canonical.com/images/ubuntu/jammy/amd64/default/"$BuildDate"/SHA256SUMS --output /opt/olxc/"$DistDir"/lxcimage/nsa
 
                 elif [ $LinuxFlavor = 'Oracle' ] && [ $Release -eq 7 ]
                 then
-                        curl -4 --progress-bar --remote-name https://us.lxd.images.canonical.com/images/ubuntu/hirsute/amd64/default/"$BuildDate"/SHA256SUMS --output /opt/olxc/"$DistDir"/lxcimage/nsa
+                        curl -4 --progress-bar --remote-name https://us.lxd.images.canonical.com/images/ubuntu/jammy/amd64/default/"$BuildDate"/SHA256SUMS --output /opt/olxc/"$DistDir"/lxcimage/nsa
                 else
-                        curl -4 --progress-bar --remote-name https://us.lxd.images.canonical.com/images/ubuntu/hirsute/amd64/default/"$BuildDate"/SHA256SUMS --output /opt/olxc/"$DistDir"/lxcimage/nsa
+                        curl -4 --progress-bar --remote-name https://us.lxd.images.canonical.com/images/ubuntu/jammy/amd64/default/"$BuildDate"/SHA256SUMS --output /opt/olxc/"$DistDir"/lxcimage/nsa
                 fi
 
                 for i in rootfs.tar.xz meta.tar.xz
@@ -5014,7 +5014,7 @@ then
 
                         if   [ $LinuxFlavor = 'CentOS' ] && [ $Release -eq 7 ]
                         then
-                                curl -4 --progress-bar --remote-name https://us.lxd.images.canonical.com/images/ubuntu/hirsute/amd64/default/"$BuildDate"/$i -o /opt/olxc/"$DistDir"/lxcimage/nsa
+                                curl -4 --progress-bar --remote-name https://us.lxd.images.canonical.com/images/ubuntu/jammy/amd64/default/"$BuildDate"/$i -o /opt/olxc/"$DistDir"/lxcimage/nsa
 
                                 echo ''
                                 echo "+++++ Checksum SHA256SUMS +++++"
@@ -5027,7 +5027,7 @@ then
 
                         elif [ $LinuxFlavor = 'Red' ] && [ $Release -eq 7 ]
                         then
-                                curl -4 --progress-bar --remote-name https://us.lxd.images.canonical.com/images/ubuntu/hirsute/amd64/default/"$BuildDate"/$i -o /opt/olxc/"$DistDir"/lxcimage/nsa
+                                curl -4 --progress-bar --remote-name https://us.lxd.images.canonical.com/images/ubuntu/jammy/amd64/default/"$BuildDate"/$i -o /opt/olxc/"$DistDir"/lxcimage/nsa
 
                                 echo ''
                                 echo "+++++ Checksum SHA256SUMS +++++"
@@ -5040,7 +5040,7 @@ then
 
                         elif [ $LinuxFlavor = 'Oracle' ] && [ $Release -eq 7 ]
                         then
-                                curl -4 --progress-bar --remote-name https://us.lxd.images.canonical.com/images/ubuntu/hirsute/amd64/default/"$BuildDate"/$i -o /opt/olxc/"$DistDir"/lxcimage/nsa
+                                curl -4 --progress-bar --remote-name https://us.lxd.images.canonical.com/images/ubuntu/jammy/amd64/default/"$BuildDate"/$i -o /opt/olxc/"$DistDir"/lxcimage/nsa
 
                                 echo ''
                                 echo "+++++ Checksum SHA256SUMS +++++"
@@ -5051,7 +5051,7 @@ then
                                 echo ''
                                 echo '######################################################################## 100.0%'
                         else
-                                curl -4 --progress-bar --remote-name https://us.lxd.images.canonical.com/images/ubuntu/hirsute/amd64/default/"$BuildDate"/$i -o /opt/olxc/"$DistDir"/lxcimage/nsa
+                                curl -4 --progress-bar --remote-name https://us.lxd.images.canonical.com/images/ubuntu/jammy/amd64/default/"$BuildDate"/$i -o /opt/olxc/"$DistDir"/lxcimage/nsa
 
                                 echo ''
                                 echo "+++++ Checksum SHA256SUMS +++++"
@@ -5086,19 +5086,19 @@ then
 		echo "=============================================="
 		echo ''
 	
-		sudo lxc-create -t download --name nsa -- --dist ubuntu --release hirsute --arch amd64 --keyserver hkp://keyserver.ubuntu.com:80
+		sudo lxc-create -t download --name nsa -- --dist ubuntu --release jammy --arch amd64 --keyserver hkp://keyserver.ubuntu.com:80
 		if [ $? -ne 0 ]
 		then
 			sudo lxc-stop -n nsa -k
 			sudo lxc-destroy -n nsa
 			sudo rm -rf /var/lib/lxc/nsa
-			sudo lxc-create -t download --name nsa -- --dist ubuntu --release hirsute --arch amd64 --keyserver hkp://p80.pool.sks-keyservers.net:80
+			sudo lxc-create -t download --name nsa -- --dist ubuntu --release jammy --arch amd64 --keyserver hkp://p80.pool.sks-keyservers.net:80
 			if [ $? -ne 0 ]
 			then
 				sudo lxc-stop -n nsa -k
 				sudo lxc-destroy -n nsa
 				sudo rm -rf /var/lib/lxc/nsa
-                                sudo lxc-create -t download --name nsa -- --dist ubuntu --release hirsute --arch amd64 --no-validate
+                                sudo lxc-create -t download --name nsa -- --dist ubuntu --release jammy --arch amd64 --no-validate
 			fi
 		fi
 
@@ -5113,7 +5113,7 @@ then
 		echo "=============================================="
 		echo ''
 
-		sudo lxc-create -n nsa -t ubuntu -- --release hirsute --arch amd64
+		sudo lxc-create -n nsa -t ubuntu -- --release jammy --arch amd64
 		sleep 5
 		p=$((p+1))
 		ContainerCreated=$(ConfirmContainerCreated)
