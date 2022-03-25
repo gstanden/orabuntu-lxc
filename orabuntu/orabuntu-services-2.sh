@@ -1052,25 +1052,6 @@ sleep 5
 clear
 
 echo ''
-echo "=============================================="
-echo "Convert DHCP Address to Static Address...     "
-echo "=============================================="
-echo ''
-
-sshpass -p ubuntu ssh -q -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$NameServer "sudo -S <<< "ubuntu" ./dhcp-fixed.sh oel$OracleRelease$SeedPostfix; tail -4 /etc/dhcp/dhcpd.conf"
-
-echo ''   
-echo "=============================================="
-echo "Done: Convert DHCP Address to Static Address. "
-echo "=============================================="
-echo ''
-
-sleep 5
-
-clear
-
-
-echo ''
 echo "==============================================" 
 echo "Next script to run: orabuntu-services-3.sh    "
 echo "=============================================="

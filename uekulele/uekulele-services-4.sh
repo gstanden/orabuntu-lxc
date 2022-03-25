@@ -971,41 +971,6 @@ do
                 echo "=============================================="
                 echo ''
 
-	#	sleep 10
-
-	#	clear
-
-	#	echo ''
-	#	echo "=============================================="
-	#	echo "nslookup $ContainerPrefixLXD$CI...            "
-	#	echo "=============================================="
-	#	echo ''
-
-	#	nslookup $ContainerPrefixLXD$CloneIndex
-
-	#	echo "=============================================="
-	#	echo "Done: nslookup $ContainerPrefixLXD$CI.        "
-	#	echo "=============================================="
-	#	echo ''
-
-		sleep 5
-
-		clear
-
-                echo ''
-                echo "=============================================="
-                echo "Convert DHCP Address to Static Address...     "
-                echo "=============================================="
-                echo ''
-
-		sshpass -p ubuntu ssh -q -t -o CheckHostIP=no -o StrictHostKeyChecking=no ubuntu@$NameServer "sudo -S <<< "ubuntu" ./dhcp-fixed.sh $ContainerPrefixLXD$CloneIndex; tail -4 /etc/dhcp/dhcpd.conf"
-
-                echo ''
-                echo "=============================================="
-                echo "Done: Convert DHCP Address to Static Address. "
-                echo "=============================================="
-                echo ''
-
 		sleep 5
 
 		clear
