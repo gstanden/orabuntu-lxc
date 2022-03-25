@@ -2016,11 +2016,8 @@ then
                         sudo sh -c "echo 'sudo umount /var/lib/lxc'                     >> /etc/network/openvswitch/stop_$IscsiVendor.sh"
                         sudo sh -c "echo 'sudo service multipathd stop'                 >> /etc/network/openvswitch/stop_$IscsiVendor.sh"
                         sudo sh -c "echo 'sudo iscsiadm -m node --logout'               >> /etc/network/openvswitch/stop_$IscsiVendor.sh"
-                        sudo sh -c "echo 'sudo service scst stop'                       >> /etc/network/openvswitch/stop_$IscsiVendor.sh"
+                        sudo sh -c "echo '# sudo service scst stop'                     >> /etc/network/openvswitch/stop_$IscsiVendor.sh"
                         sudo sh -c "echo 'sudo rm -f /dev/lxc_luns/*'                   >> /etc/network/openvswitch/stop_$IscsiVendor.sh"
-                        sudo sh -c "echo 'sleep 15'                   			>> /etc/network/openvswitch/stop_$IscsiVendor.sh"
-                        sudo sh -c "echo 'sudo multipath -F'                            >> /etc/network/openvswitch/stop_$IscsiVendor.sh"
-                        sudo sh -c "echo 'sleep 15'                   			>> /etc/network/openvswitch/stop_$IscsiVendor.sh"
                         sudo sh -c "echo 'sudo multipath -F'                            >> /etc/network/openvswitch/stop_$IscsiVendor.sh"
 
                         sudo cat /etc/network/openvswitch/stop_$IscsiVendor.sh
