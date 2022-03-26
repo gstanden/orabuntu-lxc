@@ -128,10 +128,6 @@ If a non-root user with "sudo ALL" privilege is not available on the host, creat
 ```
 Creation of a user "orabuntu" with sudo ALL privilege is recommended.
 
-**Note 1:** The linux user account used to install Orabuntu-LXC must have "sudo ALL" privilege.  On Ubuntu Linux this is typically the "ubuntu" user.  For CentOS, Fedora, RedHat and Oracle Linux, use the "./uekulele/uekulele-services-0.sh" script.  The script by default creates the "orabuntu" user with all required sudo privileges and required directories, but the script can be edited to use any arbitrary user-settable username. I typically edit the file and create "ubuntu" user on the RedHat-family linuxes as my installer account because I develop Orabuntu-LXC on an Ubuntu physical host running CentOS, Fedora, RedHat and Oracle Linux VM's in VirtualBox, so using an "ubuntu" linux user throughout simplifies interoperability between the Ubuntu host and the VM guests, but you can create an install user with any username.  
-
-**Note 2:** the uekulele-services-0.sh script by default sets the linux install user password to the same as username ("ubuntu/ubuntu") but there is a random password generator in the uekulele-services-0.sh script so edit the script to use the random password generator for security if desired.
-
 Step 4
 
 NEW in Orabuntu-LXC ELENA edition are the CONFIG.LXD and the CONFIG.LXC files:
@@ -139,9 +135,11 @@ NEW in Orabuntu-LXC ELENA edition are the CONFIG.LXD and the CONFIG.LXC files:
 Use the CONFIG.LXD for deploying LXD clusters.
 Use the CONFIG.LXC for deploying LXC multi-host "spans"
 
-Edit the **/anylinux/CONFIG** file to select either LXC or LXD. 
+Edit the relevant CONFIG file to select either LXC or LXD. 
+
 When installing on the first cluster host, it is only necessary to be sure the HubUserAcct and the HubSudoPwd are correct. 
 When installing on GRE additional hosts, just be sure to edit the HUBIP and SPOKEIP values, and be sure that Product=no-product if you have already installed Product=k8s on the HUB host.
+
 There are of course many "expert" install parameters you can change such as TunType, ContainerRuntime, etc.
 
 If instead LXC containers (not LXD) multi-host span is desired, use the CONFIG.LXC file.
@@ -154,13 +152,13 @@ Step 6
 
 The ZFS storage pool required for LXD cluster can be precreated, but the main scripts create them automatically if they do not already exist.
 
-The scripts can be edited to use other than (/dev/sdb + /dev/sdc) for example (/dev/sdg + /dev/sdk).  
+Bring your own LUN (BYOL) is not yet developed, even though the settings are already in the CONFIG file. 
 
 There are scripts in distro subdirectories to create the required ZFS storage pools for all supported Orabuntu-LXC distros (CentOS, Fedora, RedHat, Ubuntu and Oracle Linux). For RedHat 7 and CentOS 7 the scripts build ZFS from source which takes a few minutes to complete.
 
 Step 7
 
-The user-settable ip address subnets are set in the ./anylinux/CONFIG file.  Settings for SeedNet1 and BaseNet1 are required (default is 172.29.108 and 10.209.53) and they can be reset to arbitrary ipv4 subnets by editing the CONFIG file.  The StorNet# nets are optional but should have a value in them.  They are also set to defaults but can be set to any arbitrary value.  The StorNet# are used when dedicated storage networks are desired, for example for the SCST Linux SAN traffic. The ExtrNet# network are used when additional networks are needed, such as for Oracle Database RAC interconnect. The StorNet# and the ExtrNet# are only deployed if $Product is set to products other than the default product setting of "Product=no-product".
+The user-settable ip address subnets are set in the ./anylinux/CONFIG files.  Settings for SeedNet1 and BaseNet1 are required (default is 172.29.108 and 10.209.53) and they can be reset to arbitrary ipv4 subnets by editing the CONFIG file.  The StorNet# nets are optional but should have a value in them.  They are also set to defaults but can be set to any arbitrary value.  The StorNet# are used when dedicated storage networks are desired, for example for the SCST Linux SAN traffic. The ExtrNet# network are used when additional networks are needed, such as for Oracle Database RAC interconnect. The StorNet# and the ExtrNet# are only deployed if $Product is set to products other than the default product setting of "Product=no-product".
 
 Other than pre-creating the olxc-001 on the HUB host and the olxc-00[2,3,4,...N] on the N-th GRE host, the Orabuntu-LXC main scripts
 ```
@@ -174,11 +172,7 @@ anylinux-services.HUB.HOST.sh new lxd
 anylinux-services.GRE.HOST.sh new lxd
 ```
 The settings details are described below.  However, the CONFIG.LXD and the CONFIG.LXD are intended to simplify running the desired LXD multi-host cluster, or alternatively, an LXC network span across multiple hosts.
-If LXC containers are preferred, then set these two parameters as a set to "N" shown below. 
-```
-LXD=N
-LXDCluster=N
-```
+
 Also in the /anylinux/CONFIG file select whether Oracle Linux 8.4 or Oracle Linux 7.9 containers as shown below.
 ```
 MajorRelease=8
@@ -189,8 +183,9 @@ Step 8
 Run the HUB HOST script (as a **NON-root** "administrative" user with "SUDO ALL" privilege or "wheel" privilege) the following script:
 
 ```
-./anylinux-services.HUB.HOST.sh new
+./anylinux-services.HUB.HOST.sh new [lxd|lxc]
 ```
+If you forget to specify [lxd|lxc] the script will prompt you to choose.
 
 **Note**: After the script finishes, if you have set LXD=Y and LXDCluster=Y then **you will need to log out/log back in again to host server to have access to commands like "lxc list" "lxc cluster list" etc.**
 
