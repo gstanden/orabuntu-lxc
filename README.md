@@ -138,7 +138,7 @@ Use the CONFIG.LXC for deploying LXC multi-host "spans"
 Edit the relevant CONFIG file to select either LXC or LXD. 
 
 When installing on the first cluster host, it is only necessary to be sure the HubUserAcct and the HubSudoPwd are correct. 
-When installing on GRE additional hosts, just be sure to edit the HUBIP and SPOKEIP values, and be sure that Product=no-product if you have already installed Product=k8s on the HUB host.
+When installing on GRE additional hosts, just be sure to edit in addition to the HubUserAcct and the HubSudoPwd also the HUBIP and SPOKEIP values, and be sure that Product=no-product if you have already installed Product=k8s on the HUB host.
 
 There are of course many "expert" install parameters you can change such as TunType, ContainerRuntime, etc.
 
