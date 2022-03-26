@@ -95,7 +95,7 @@ sudo [yum|dnf] -y install unzip wget tar openssh-server net-tools bind-utils
 
 Step 3a
 
-Download the latest Orabuntu-LXC 7.0.0-alpha ELENA release (as of September 26, 2021 this is in MASTER branch only) to 
+Download the latest Orabuntu-LXC 7.0.0-alpha ELENA release (or download Master Branch) to
 
 "/home/username/Downloads" 
 
@@ -126,6 +126,7 @@ If a non-root user with "sudo ALL" privilege is not available on the host, creat
 ./uekulele/uekulele-services-0.sh (RedHat-family linuxes)
 ./orabuntu/orabuntu-services-0.sh (Ubuntu-family linuxes)
 ```
+Creation of a user "orabuntu" with sudo ALL privilege is recommended.
 
 **Note 1:** The linux user account used to install Orabuntu-LXC must have "sudo ALL" privilege.  On Ubuntu Linux this is typically the "ubuntu" user.  For CentOS, Fedora, RedHat and Oracle Linux, use the "./uekulele/uekulele-services-0.sh" script.  The script by default creates the "orabuntu" user with all required sudo privileges and required directories, but the script can be edited to use any arbitrary user-settable username. I typically edit the file and create "ubuntu" user on the RedHat-family linuxes as my installer account because I develop Orabuntu-LXC on an Ubuntu physical host running CentOS, Fedora, RedHat and Oracle Linux VM's in VirtualBox, so using an "ubuntu" linux user throughout simplifies interoperability between the Ubuntu host and the VM guests, but you can create an install user with any username.  
 
@@ -138,12 +139,12 @@ NEW in Orabuntu-LXC ELENA edition are the CONFIG.LXD and the CONFIG.LXC files:
 Use the CONFIG.LXD for deploying LXD clusters.
 Use the CONFIG.LXC for deploying LXC multi-host "spans"
 
-Edit the **/anylinux/CONFIG** file to select either LXC or LXD. For example, to select LXD clusters, set the following parameters in the CONFIG file as shown below. It's highly-recommended to set both of these parameters to "Y" as a set because even if deploying a single LXD node, this creates the single server as a "one-node LXD cluster" which makes the single-node LXD "cluster-ready" so that another node can be easily added later if desired, since the clustering is already setup. In the case of HUB HOST the "LXDCluster=Y" switch creates a "single-node" LXD cluster, and in the case of GRE HOST an "N-node" LXD cluster depending on how many GRE hosts have been added to the cluster.
-```
-LXD=Y
-LXDCluster=Y
-```
-If instead LXC containers (not LXD) multi-host span is desired, set all of these parameters to "N".
+Edit the **/anylinux/CONFIG** file to select either LXC or LXD. 
+When installing on the first cluster host, it is only necessary to be sure the HubUserAcct and the HubSudoPwd are correct. 
+When installing on GRE additional hosts, just be sure to edit the HUBIP and SPOKEIP values, and be sure that Product=no-product if you have already installed Product=k8s on the HUB host.
+There are of course many "expert" install parameters you can change such as TunType, ContainerRuntime, etc.
+
+If instead LXC containers (not LXD) multi-host span is desired, use the CONFIG.LXC file.
 
 Step 5
 
@@ -151,15 +152,8 @@ Edit other install parameters in the **/anylinux/CONFIG** file as desired or req
 
 Step 6
 
-**Note 1:** if "LXD=Y" and "LXDCluster=Y" are selected, it will be necessary to first create the required ZFS storage pool for the LXD cluster.  The naming convention olxc-001 (for HUB node) and optionally olxc-00[2,3,4 ...] (for GRE node if creating N-node LXD Cluster) etc is suggested, but any arbitrary user-settable naming scheme can be used in the ./anylinux/CONFIG file for naming the ZFS storage pools.
+The ZFS storage pool required for LXD cluster can be precreated, but the main scripts create them automatically if they do not already exist.
 
-**Note 2:** When clustering with v7.0.0-**alpha** ELENA it is strongly recommended to REBOOT each node after Orabuntu-LXC has completed before moving on to the next LXD cluster node or LXC multi-host node to be installed with Orabuntu-LXC. For example the first node for Fedora 34 needs a reboot to assign ip addresses to the clone containers.  These requirement to reboot the first cluster node before installing additional nodes will be REMOVED before the actual release of v7.0.0-**beta** ELENA but for now when using this **alpha** in the master branch, reboot of first node before moving on to install LXD cluster nodes is strongly recommended to ensure the first node remains and/or is fully configured across reboots.
-
-To create the ZFS storage pools, add /dev/sdb and /dev/sdc storage, and then create the ZFS storage pool.  For Oracle Linux, scripts to fully automate the creation of the required olxc-001 zfs pool are located as shown below.  The script takes a single command line parameter which is the name of the ZFS storage pool to be created.  For example if the name of the storage pool is "olxc-001" the script to install ZFS and create the storage pool would be as shown below.
-```
-zfsutils/oracle/zpool_oracle7_uek.sh olxc-001
-zfsutils/oracle/zpool_oracle8_uek.sh olxc-001
-```
 The scripts can be edited to use other than (/dev/sdb + /dev/sdc) for example (/dev/sdg + /dev/sdk).  
 
 There are scripts in distro subdirectories to create the required ZFS storage pools for all supported Orabuntu-LXC distros (CentOS, Fedora, RedHat, Ubuntu and Oracle Linux). For RedHat 7 and CentOS 7 the scripts build ZFS from source which takes a few minutes to complete.
