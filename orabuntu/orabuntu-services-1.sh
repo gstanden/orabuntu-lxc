@@ -1979,6 +1979,7 @@ then
 
                         sudo sh -c "echo '$Sleep 10'                                                                                                            >> /etc/network/openvswitch/strt_$IscsiVendor.sh"
                         sudo sh -c "echo '$ModProbe zfs'                                                                                                        >> /etc/network/openvswitch/strt_$IscsiVendor.sh"
+			sudo sh -c "echo '$Zpool import $StoragePoolName'                                                                                       >> /etc/network/openvswitch/strt_$IscsiVendor.sh"
 
                         if   [ $IscsiTarget = 'Y' ]
                         then
