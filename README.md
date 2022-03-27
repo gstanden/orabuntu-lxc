@@ -223,7 +223,7 @@ Starting fed34d10
 
 Step 10
 
-If using the optional SCST Linux SAN fully-automated deployer which is found in "/opt/olxc/home/scst-files" (absolute path may differ based on location of the original Orabuntu-LXC install stage) AFTER Orabuntu-LXC deployment has finished, then first run "/opt/olxc/home/scst-files/create-scst.sh"  and then when that completes successfully, use the following command to expose local host SCST Linux SAN LUNs to any given container on that SAME host. This would for example when creating an LXD containerized database such as an Oracle database using ASM that required storage LUNs. An example command is shown below.
+The deployment of the SCST Linux SAN fully-automated deployer which is found in "/opt/olxc/home/scst-files" (absolute path may differ based on location of the original Orabuntu-LXC install stage) is now integrated into the LXD install flow (the ZFS pools run ontop of SCST LUNs), but after install you can add additional SCST LUNs for any purpose, such as for ASM for an Oracle Database. This would for example when creating an LXD-containerized RAC database such as an Oracle database using ASM that required storage LUNs. An example command is shown below.  Orabuntu-LXC/D includes Product=Oracle options for Oracle containerized standalone DB as well as Oracle containerized RAC databases.
 
 ```
 lxc config device add ora84d10 asm disk source=/dev/lxc_luns path=/dev/lxc_luns
