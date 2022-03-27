@@ -1,6 +1,6 @@
 # What is Orabuntu-LXC/D 7.0.0-alpha ELENA ?
 
-Announcing Orabuntu-LXC/D v7.0.0-alpha ELENA ("**E**nterprise **L**XD **E**dition **N**ew **A**MIDE") (available now in the latest 6.13.25.x-beta releases and in Master Branch) introducing support for fully-automated N-node LXD cluster creation on all Orabuntu-LXC/D supported distros (CentOS, Fedora, RedHat, Ubuntu, and Oracle Linux). The github will continue to be known as "Orabuntu-LXC" but the [logo](https://github.com/gstanden) has been updated with "Orabuntu-LXD" to communicate LXD cluster support.
+Announcing Orabuntu-LXC/D v7.0.0-alpha ELENA ("**E**nterprise **L**XD **E**dition **N**ew **A**MIDE") (available now in the latest 6.13.25.x-beta releases and in Master Branch) introducing support for fully-automated N-node LXD cluster creation on all Orabuntu-LXC/D supported distros (CentOS, Fedora, RedHat, Ubuntu, and Oracle Linux). The github will continue to be known as "Orabuntu-LXC" but the [logo](https://avatars.githubusercontent.com/u/9966817?v=4) has been updated with "Orabuntu-LXD" to communicate LXD cluster support.
 
 New features of Orabuntu-LXC/D v7.0.0-alpha ELENA:
 
