@@ -241,7 +241,7 @@ and that the /dev/lxc_luns location is specially-designed so that the LUNs are "
 
 #  More Detailed: Install Orabuntu-LXC v7.0.0-alpha ELENA 
 
-Note:  This "More Detailed" documentation section still needs update for v7.0.0-alpha ELENA.  The above "Quick Start" sections are already updated.
+Note:  This "More Detailed" documentation section below still needs update for v7.0.0-alpha ELENA.  The preceding above "Quick Start" sections are already updated for v7.0.0-alpha ELENA.
 
 An administrative non-root user account is required (such as the install account). The non-root user needs to have "sudo ALL" privilege.
 
