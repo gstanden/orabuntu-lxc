@@ -239,7 +239,9 @@ and that the /dev/lxc_luns location is specially-designed so that the LUNs are "
 
 **Note 2** This is one of the reasons creating a "single-node" LXD cluster is strongly-recommended when only deploying Orabuntu-LXC on a single node.  The profiles (olxc_sw1a and olxc_sx1a) used in the "-p" switch of the "lxc config device add" statement are part of the LXD init cluster config preseed script and are built in to the LXD deployment when selecting "LXD=Y" AND "LXDCluster = Y" setting BOTH to "Y".  By also setting "LXDCluster = Y" the system will get the olxc_sw1a and olxc_sx1a scripts built-in ready to use for any additional non-Oracle Linux containers added to the networks, and, the single-node is built "cluster-ready" as previously noted in an earlier section above.
 
-#  More Detailed: Install Orabuntu-LXC v7.0.0-alpha ELENA (this section needs update still - the Quick Start section about already updated)
+#  More Detailed: Install Orabuntu-LXC v7.0.0-alpha ELENA 
+
+Note:  This "More Detailed" documentation section still needs update for v7.0.0-alpha ELENA.  The above "Quick Start" sections are already updated.
 
 An administrative non-root user account is required (such as the install account). The non-root user needs to have "sudo ALL" privilege.
 
