@@ -132,8 +132,8 @@ Step 4
 
 NEW in Orabuntu-LXC ELENA edition are the CONFIG.LXD and the CONFIG.LXC files:
 
-Use the CONFIG.LXD for deploying LXD clusters.
-Use the CONFIG.LXC for deploying LXC multi-host "spans"
+* Use the CONFIG.LXD for deploying LXD clusters.
+* Use the CONFIG.LXC for deploying LXC multi-host "spans"
 
 Edit the relevant CONFIG file to select either LXC or LXD. 
 
