@@ -126,7 +126,7 @@ If a non-root user with "sudo ALL" privilege is not available on the host, creat
 ./uekulele/uekulele-services-0.sh (RedHat-family linuxes)
 ./orabuntu/orabuntu-services-0.sh (Ubuntu-family linuxes)
 ```
-Creation of a user "orabuntu" with sudo ALL privilege is recommended.
+Creation of a user "orabuntu" with sudo ALL privilege is recommended. By default the above scripts create a user "orabuntu" with password "orabuntu" but they include a password generator in the scripts, which you can easily turn on to create a random complex password if preferred.
 
 Step 4
 
