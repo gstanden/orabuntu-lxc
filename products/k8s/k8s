@@ -482,7 +482,7 @@ sleep 5
 
 clear
 
-./cont-centos8-create.sh $NameServer $Domain1
+./cont-centos8-create.sh $NameServer $Domain1 $GRE
 
 echo ''
 echo "=============================================="
@@ -500,7 +500,7 @@ echo "Run host-oracle8.sh script...          "
 echo "=============================================="
 echo ''
 
-./host-oracle8.sh 
+./host-oracle8.sh $GRE $LinuxFlavor
 
 sleep 5
 
@@ -522,7 +522,7 @@ echo "Run cont-centos8-push.sh script...            "
 echo "=============================================="
 echo ''
 
-./cont-centos8-push.sh 
+./cont-centos8-push.sh $GRE
 
 sleep 5
 
@@ -544,7 +544,7 @@ echo "Run cont-centos8-push-crio.sh...              "
 echo "=============================================="
 echo ''
 
-./cont-centos8-push-crio.sh
+./cont-centos8-push-crio.sh $GRE
 cat cont-centos8-push-crio.sh
 
 echo ''
@@ -557,266 +557,203 @@ sleep 5
 
 clear
 
-echo ''
-echo "=============================================="
-echo "Run cont-centos8-push-containerd.sh ...       "
-echo "=============================================="
-echo ''
+# echo ''
+# echo "=============================================="
+# echo "Run cont-centos8-push-containerd.sh ...       "
+# echo "=============================================="
+# echo ''
 
-./cont-centos8-push-containerd.sh
-cat cont-centos8-push-containerd.sh 
+# ./cont-centos8-push-containerd.sh 
+# cat cont-centos8-push-containerd.sh 
 
-echo ''
-echo "=============================================="
-echo "Done: Run cont-centos8-push-containerd.sh     "
-echo "=============================================="
-echo ''
+# echo ''
+# echo "=============================================="
+# echo "Done: Run cont-centos8-push-containerd.sh     "
+# echo "=============================================="
+# echo ''
 
-sleep 5
+# sleep 5
 
-clear
+# clear
 
-
-echo ''
-echo "=============================================="
-echo "Run cont-centos8-exec-maestro.sh script...    "
-echo "=============================================="
-echo ''
-
-sleep 5
-
-clear
-
-./cont-centos8-exec-maestro.sh $ContainerRuntime
-
-echo ''
-echo "=============================================="
-echo "Done: Run cont-centos8-exec-maestro.sh script "
-echo "=============================================="
-echo ''
-
-sleep 5
-
-clear
-
-echo ''
-echo "=============================================="
-echo "Run cont-centos8-exec-violin1.sh script...    "
-echo "=============================================="
-echo ''
-
-./cont-centos8-exec-violin1.sh $ContainerRuntime
-
-echo ''
-echo "=============================================="
-echo "Done: Run cont-centos8-exec-violin1.sh script "
-echo "=============================================="
-echo ''
-
-sleep 5
-
-clear
-
-echo ''
-echo "=============================================="
-echo "Run cont-centos8-exec-violin2.sh script...    "
-echo "=============================================="
-echo ''
-
-./cont-centos8-exec-violin2.sh $ContainerRuntime
-
-echo ''
-echo "=============================================="
-echo "Done: Run cont-centos8-exec-violin2.sh script "
-echo "=============================================="
-echo ''
-
-sleep 5
-
-clear
-
-echo ''
-echo "=============================================="
-echo "Run cont-centos8-push-ingress-nginx-examples  "
-echo "=============================================="
-echo ''
-
-./cont-centos8-push-ingress-nginx-examples.sh
-cat cont-centos8-push-ingress-nginx-examples.sh
-
-echo ''
-echo "=============================================="
-echo "Done: cont-centos8-push-ingress-nginx-example "
-echo "=============================================="
-echo ''
-
-sleep 5
-
-clear
-
-echo ''
-echo "=============================================="
-echo "Run cont-centos8-push-configmap...            "
-echo "=============================================="
-echo ''
-
-./cont-centos8-push-configmap.sh
-cat cont-centos8-push-configmap.sh
-
-echo ''
-echo "=============================================="
-echo "Done: Run cont-centos8-push-configmap.        "
-echo "=============================================="
-echo ''
-
-sleep 5
-
-clear
-
-echo ''
-echo "=============================================="
-echo "Run cont-centos8-push-ingress-nginx-yaml...   "
-echo "=============================================="
-echo ''
-
-./cont-centos8-push-ingress-nginx-yaml.sh
-cat cont-centos8-push-ingress-nginx-yaml.sh
-
-echo ''
-echo "=============================================="
-echo "Done: Run cont-centos8-push-ingress-nginx-yaml"
-echo "=============================================="
-echo ''
-
-sleep 5
-
-clear
-
-echo ''
-echo '#######################################'
-echo '# Following run only on maestro nodes:#'
-echo '#######################################'
-
-sleep 5
-
-clear
-
-echo ''
-echo "=============================================="
-echo "Run cont-centos8-5 (run kubeadm init) ...     "
-echo "=============================================="
-echo ''
-
-sleep 5
-
-clear
-
-eval echo "'/var/lib/snapd/snap/bin/lxc exec maestro -- /root/cont-centos8-5.sh $ContainerRuntime $k8sCNI' | sg lxd"
-
-echo ''
-echo "=============================================="
-echo "Done: Run cont-centos8-5 (run kubeadm init)   "
-echo "=============================================="
-echo ''
-
-sleep 5
-
-clear
-
-if [ $ContainerRuntime = 'containerd' ]
+if   [ $GRE = 'N' ]
 then
-	for Node in violin1 violin2 maestro
-	do
-		echo ''
-		echo "=============================================="
-		echo "Convert $Node to containerd runtime...        "
-		echo "=============================================="
-		echo ''
+	echo ''
+	echo "=============================================="
+	echo "Run cont-centos8-exec-maestro.sh script...    "
+	echo "=============================================="
+	echo ''
 
-		sleep 5
+	sleep 5
 
-		clear
-		
-		echo ''
-		echo "=============================================="
-		echo "Cordon and drain $Node ...                    "
-		echo "=============================================="
-		echo ''
+	clear
 
-sshpass -p root ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@maestro "export KUBECONFIG=/etc/kubernetes/admin.conf; kubectl cordon $Node"
-sshpass -p root ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@maestro "export KUBECONFIG=/etc/kubernetes/admin.conf; kubectl drain  $Node --delete-emptydir-data --ignore-daemonsets"
-		
-		echo ''
-		echo "=============================================="
-		echo "Done: Cordon and drain $Node.                 "
-		echo "=============================================="
-		echo ''
+	./cont-centos8-exec-maestro.sh $ContainerRuntime
 
-		sleep 5
+	echo ''
+	echo "=============================================="
+	echo "Done: Run cont-centos8-exec-maestro.sh script "
+	echo "=============================================="
+	echo ''
 
-		clear
+	sleep 5
 
-		eval echo "'/var/lib/snapd/snap/bin/lxc exec $Node -- systemctl stop kubelet' | sg lxd"
+	clear
 
-		echo ''
-		echo "=============================================="
-		echo "Uninstall docker on $Node...                  "
-		echo "=============================================="
-		echo ''
+	echo ''
+	echo "=============================================="
+	echo "Run cont-centos8-exec-violin1.sh script...    "
+	echo "=============================================="
+	echo ''
 
-		sleep 5
+	./cont-centos8-exec-violin1.sh $ContainerRuntime
 
-		eval echo "'/var/lib/snapd/snap/bin/lxc exec $Node -- systemctl stop docker' | sg lxd"
-		eval echo "'/var/lib/snapd/snap/bin/lxc exec $Node -- dnf remove docker-ce docker-ce-cli -y' | sg lxd"
+	echo ''
+	echo "=============================================="
+	echo "Done: Run cont-centos8-exec-violin1.sh script "
+	echo "=============================================="
+	echo ''
 
-		echo ''
-		echo "=============================================="
-		echo "Done: Uninstall docker on $Node.              "
-		echo "=============================================="
-		echo ''
+	sleep 5
 
-		sleep 5
+	clear
 
-		clear
+	echo ''
+	echo "=============================================="
+	echo "Run cont-centos8-exec-violin2.sh script...    "
+	echo "=============================================="
+	echo ''
 
-		eval echo "'/var/lib/snapd/snap/bin/lxc exec $Node -- systemctl stop containerd' | sg lxd"
-	 	eval echo "'/var/lib/snapd/snap/bin/lxc exec $Node -- containerd config default > /etc/containerd/config.toml' | sg lxd" > /dev/null 2>&1
-		eval echo "'/var/lib/snapd/snap/bin/lxc exec $Node -- /root/cont-centos8-6.sh $ContainerRuntime $Node' | sg lxd"
+	./cont-centos8-exec-violin2.sh $ContainerRuntime
 
-		echo ''
-		echo "=============================================="
-		echo "Enable and start containerd on $Node...       "
-		echo "=============================================="
-		echo ''
+	echo ''
+	echo "=============================================="
+	echo "Done: Run cont-centos8-exec-violin2.sh script "
+	echo "=============================================="
+	echo ''
 
-		eval echo "'/var/lib/snapd/snap/bin/lxc exec $Node -- systemctl enable containerd' | sg lxd"
-		eval echo "'/var/lib/snapd/snap/bin/lxc exec $Node -- systemctl start  containerd' | sg lxd"
+	sleep 5
 
-		echo ''
-		echo "=============================================="
-		echo "Done: Enable and start containerd on $Node.   "
-		echo "=============================================="
-		echo ''
+	clear
 
-		sleep 5
+	echo ''
+	echo "=============================================="
+	echo "Run cont-centos8-push-ingress-nginx-examples  "
+	echo "=============================================="
+	echo ''
 
-		clear
+elif [ $GRE = 'Y' ]
+then
+	echo ''
+	echo "=============================================="
+	echo "Run cont-centos8-exec-violinX.sh script...    "
+	echo "=============================================="
+	echo ''
 
-		eval echo "'/var/lib/snapd/snap/bin/lxc exec $Node -- systemctl start kubelet' | sg lxd"
-		
-		if [ $Node != 'maestro' ]
-		then	
+	./cont-centos8-exec-violinX.sh $ContainerRuntime $NameServer
+
+	echo ''
+	echo "=============================================="
+	echo "Done: Run cont-centos8-exec-violinX.sh script "
+	echo "=============================================="
+	echo ''
+
+	sleep 5
+
+	clear
+fi
+
+if [ $GRE = 'N' ]
+then
+	./cont-centos8-push-ingress-nginx-examples.sh
+	cat cont-centos8-push-ingress-nginx-examples.sh
+
+	echo ''
+	echo "=============================================="
+	echo "Done: cont-centos8-push-ingress-nginx-example "
+	echo "=============================================="
+	echo ''
+
+	sleep 5
+
+	clear
+
+	echo ''
+	echo "=============================================="
+	echo "Run cont-centos8-push-configmap...            "
+	echo "=============================================="
+	echo ''
+
+	./cont-centos8-push-configmap.sh
+	cat cont-centos8-push-configmap.sh
+
+	echo ''
+	echo "=============================================="
+	echo "Done: Run cont-centos8-push-configmap.        "
+	echo "=============================================="
+	echo ''
+
+	sleep 5
+
+	clear
+
+	echo ''
+	echo "=============================================="
+	echo "Run cont-centos8-push-ingress-nginx-yaml...   "
+	echo "=============================================="
+	echo ''
+
+	./cont-centos8-push-ingress-nginx-yaml.sh
+	cat cont-centos8-push-ingress-nginx-yaml.sh
+
+	echo ''
+	echo "=============================================="
+	echo "Done: Run cont-centos8-push-ingress-nginx-yaml"
+	echo "=============================================="
+	echo ''
+
+	sleep 5
+
+	clear
+
+	echo ''
+	echo '#######################################'
+	echo '# Following run only on maestro nodes:#'
+	echo '#######################################'
+
+	sleep 5
+
+	clear
+
+	echo ''
+	echo "=============================================="
+	echo "Run cont-centos8-5 (run kubeadm init) ...     "
+	echo "=============================================="
+	echo ''
+
+	sleep 5
+
+	clear
+
+	eval echo "'/var/lib/snapd/snap/bin/lxc exec maestro -- /root/cont-centos8-5.sh $ContainerRuntime $k8sCNI' | sg lxd"
+
+	echo ''
+	echo "=============================================="
+	echo "Done: Run cont-centos8-5 (run kubeadm init)   "
+	echo "=============================================="
+	echo ''
+
+	sleep 5
+
+	clear
+
+	if [ $ContainerRuntime = 'containerd' ]
+	then
+		for Node in violin1 violin2 maestro
+		do
 			echo ''
 			echo "=============================================="
-			echo "Uncordon $Node ...                            "
-			echo "=============================================="
-			echo ''
-
-			sshpass -p root ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@maestro "export KUBECONFIG=/etc/kubernetes/admin.conf; kubectl uncordon $Node"
-		
-			echo ''
-			echo "=============================================="
-			echo "Done: Uncordon $Node.                         "
+			echo "Convert $Node to containerd runtime...        "
 			echo "=============================================="
 			echo ''
 
@@ -826,15 +763,269 @@ sshpass -p root ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no -o UserKnow
 		
 			echo ''
 			echo "=============================================="
-			echo "Display status of nodes ...                   "
+			echo "Cordon and drain $Node ...                    "
 			echo "=============================================="
 			echo ''
-	
-			sshpass -p root ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@maestro "export KUBECONFIG=/etc/kubernetes/admin.conf; kubectl get -A nodes -o wide"
+
+			sshpass -p root ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@maestro "export KUBECONFIG=/etc/kubernetes/admin.conf; kubectl cordon $Node"
+			sshpass -p root ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@maestro "export KUBECONFIG=/etc/kubernetes/admin.conf; kubectl drain  $Node --delete-emptydir-data --ignore-daemonsets"
 		
 			echo ''
 			echo "=============================================="
-			echo "Done: Display status of nodes.                "
+			echo "Done: Cordon and drain $Node.                 "
+			echo "=============================================="
+			echo ''
+
+			sleep 5
+
+			clear
+
+			eval echo "'/var/lib/snapd/snap/bin/lxc exec $Node -- systemctl stop kubelet' | sg lxd"
+
+			echo ''
+			echo "=============================================="
+			echo "Uninstall docker on $Node...                  "
+			echo "=============================================="
+			echo ''
+
+			sleep 5
+
+			eval echo "'/var/lib/snapd/snap/bin/lxc exec $Node -- systemctl stop docker' | sg lxd"
+			eval echo "'/var/lib/snapd/snap/bin/lxc exec $Node -- dnf remove docker-ce docker-ce-cli -y' | sg lxd"
+
+			echo ''
+			echo "=============================================="
+			echo "Done: Uninstall docker on $Node.              "
+			echo "=============================================="
+			echo ''
+
+			sleep 5
+
+			clear
+
+			eval echo "'/var/lib/snapd/snap/bin/lxc exec $Node -- systemctl stop containerd' | sg lxd"
+		 	eval echo "'/var/lib/snapd/snap/bin/lxc exec $Node -- containerd config default > /etc/containerd/config.toml' | sg lxd" > /dev/null 2>&1
+			eval echo "'/var/lib/snapd/snap/bin/lxc exec $Node -- /root/cont-centos8-6.sh $ContainerRuntime $Node' | sg lxd"
+
+			echo ''
+			echo "=============================================="
+			echo "Enable and start containerd on $Node...       "
+			echo "=============================================="
+			echo ''
+
+			eval echo "'/var/lib/snapd/snap/bin/lxc exec $Node -- systemctl enable containerd' | sg lxd"
+			eval echo "'/var/lib/snapd/snap/bin/lxc exec $Node -- systemctl start  containerd' | sg lxd"
+
+			echo ''
+			echo "=============================================="
+			echo "Done: Enable and start containerd on $Node.   "
+			echo "=============================================="
+			echo ''
+
+			sleep 5
+
+			clear
+
+			eval echo "'/var/lib/snapd/snap/bin/lxc exec $Node -- systemctl start kubelet' | sg lxd"
+		
+			if [ $Node != 'maestro' ]
+			then	
+				echo ''
+				echo "=============================================="
+				echo "Uncordon $Node ...                            "
+				echo "=============================================="
+				echo ''
+
+				sshpass -p root ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@maestro "export KUBECONFIG=/etc/kubernetes/admin.conf; kubectl uncordon $Node"
+		
+				echo ''
+				echo "=============================================="
+				echo "Done: Uncordon $Node.                         "
+				echo "=============================================="
+				echo ''
+	
+				sleep 5
+
+				clear
+		
+				echo ''
+				echo "=============================================="
+				echo "Display status of nodes ...                   "
+				echo "=============================================="
+				echo ''
+		
+				sshpass -p root ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@maestro "export KUBECONFIG=/etc/kubernetes/admin.conf; kubectl get -A nodes -o wide"
+		
+				echo ''
+				echo "=============================================="
+				echo "Done: Display status of nodes.                "
+				echo "=============================================="
+				echo ''
+
+				sleep 5
+
+				clear
+			fi
+			
+			echo ''
+			echo "=============================================="
+			echo "Done: Convert $Node to containerd runtime.    "
+			echo "=============================================="
+			echo ''
+
+			sleep 5
+	
+			clear
+		done
+
+		echo ''
+		echo "=============================================="
+		echo "Done: Run cont-centos8-6.                     "
+		echo "=============================================="
+		echo ''
+
+		sleep 5
+
+		clear
+
+		echo ''
+		echo "=============================================="
+		echo "Sleep 1 minute before containers restart...   "
+		echo "=============================================="
+		echo ''
+
+		sleep 60
+
+		clear
+
+		echo ''
+		echo "=============================================="
+		echo "Restart k8s containers ...  .                 "
+		echo "=============================================="
+		echo ''
+
+		./host-oracle8-modules-remove.sh
+
+		echo ''
+		echo "=============================================="
+		echo "Done: Restart k8s containers.                 "
+		echo "=============================================="
+		echo ''
+
+		sleep 5
+
+		clear
+
+		echo ''
+		echo "=============================================="
+		echo "List containers ...                           "
+		echo "=============================================="
+		echo ''
+
+		eval echo "'/var/lib/snapd/snap/bin/lxc list' | sg lxd"
+
+		echo ''
+		echo "=============================================="
+		echo "Done: List containers.                        "
+		echo "=============================================="
+		echo ''
+
+		sleep 5
+
+		clear
+
+		echo ''
+		echo "=============================================="
+		echo "Sleep 2 mins during kube-system startup ...   "
+		echo "=============================================="
+		echo ''
+	
+		sleep 120
+
+		clear
+
+		echo ''
+		echo "=============================================="
+		echo "Check for all kube-system Running  ...        "
+		echo "=============================================="
+		echo ''
+
+		function GetCountKubeSystem {
+		        sshpass -p root ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@maestro "export KUBECONFIG=/etc/kubernetes/admin.conf; kubectl get -A pods -o wide | grep -c Running"
+		}
+		CountKubeSystem=$(GetCountKubeSystem)
+
+		function GetCountKubeSystemRunning {
+		        sshpass -p root ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@maestro "export KUBECONFIG=/etc/kubernetes/admin.conf; kubectl get -A pods -o wide | grep -c kube-system"
+		}
+		CountKubeSystemRunning=$(GetCountKubeSystemRunning)
+
+		echo 'CountKubeSystemRunning = '$CountKubeSystemRunning
+		echo 'CountKubeSystem        = '$CountKubeSystem
+
+		n=1
+		while [ $CountKubeSystemRunning != $CountKubeSystem ] && [ $n -le 5 ]
+		do
+		        sshpass -p root ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@maestro "export KUBECONFIG=/etc/kubernetes/admin.conf; kubectl get -A pods -o wide"
+			echo ''
+			CountKubeSystem=$(GetCountKubeSystem)
+			CountKubeSystemRunning=$(GetCountKubeSystemRunning)
+			echo 'CountKubeSystemRunning = '$CountKubeSystemRunning
+			echo 'CountKubeSystem        = '$CountKubeSystem
+			echo ''
+			n=$((n+1))
+			sleep 15
+        	done
+
+		echo ''
+		echo "=============================================="
+		echo "Done: Wait for all kube-system Running  ...   "
+		echo "=============================================="
+		echo ''
+
+		sleep 5
+
+		clear
+
+		echo ''
+		echo "=============================================="
+		echo "Uncordon maestro ...                          "
+		echo "=============================================="
+		echo ''
+
+		sshpass -p root ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@maestro "export KUBECONFIG=/etc/kubernetes/admin.conf; kubectl uncordon maestro"
+	
+		echo ''
+		echo "=============================================="
+		echo "Done: Uncordon maestro                        "
+		echo "=============================================="
+		echo ''
+
+		sleep 5
+
+		clear
+	fi
+
+	eval echo "'/var/lib/snapd/snap/bin/lxc exec maestro -- cp -p /root/cont-centos8-7.sh /root/install-metallb.sh' | sg lxd"
+	eval echo "'/var/lib/snapd/snap/bin/lxc exec maestro -- cp -p /root/cont-centos8-8.sh /root/install-ingress-nginx.sh' | sg lxd"
+
+	if [ $ContainerRuntime = 'docker' ] || [ $ContainerRuntime = 'containerd' ] || [ $ContainerRuntime = 'crio' ]
+	then
+		if [ $k8sLoadBalancer = 'metallb' ]
+		then
+			echo ''
+			echo "=============================================="
+			echo "Run cont-centos8-7...                         "
+			echo "=============================================="
+			echo ''
+
+  			metallb install
+
+ 			eval echo "'/var/lib/snapd/snap/bin/lxc exec maestro -- /root/cont-centos8-7.sh' | sg lxd"
+
+			echo ''
+			echo "=============================================="
+			echo "Done: Run cont-centos8-7.                     "
 			echo "=============================================="
 			echo ''
 
@@ -842,21 +1033,32 @@ sshpass -p root ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no -o UserKnow
 
 			clear
 		fi
-		
-		echo ''
-		echo "=============================================="
-		echo "Done: Convert $Node to containerd runtime.    "
-		echo "=============================================="
-		echo ''
 
-		sleep 5
+		if [ $k8sIngressController = 'IngressNginx' ]
+		then
+			echo ''
+			echo "=============================================="
+			echo "Run cont-centos8-8...                         "
+			echo "=============================================="
+			echo ''
 
-		clear
-	done
+			eval echo "'/var/lib/snapd/snap/bin/lxc exec maestro -- /root/cont-centos8-8.sh' | sg lxd"
+
+			echo ''
+			echo "=============================================="
+			echo "Done: Run cont-centos8-8.                     "
+			echo "=============================================="
+			echo ''
+
+			sleep 5
+
+			clear
+		fi
+	fi
 
 	echo ''
 	echo "=============================================="
-	echo "Done: Run cont-centos8-6.                     "
+	echo "Done: Create K8S cluster.                     "
 	echo "=============================================="
 	echo ''
 
@@ -866,17 +1068,7 @@ sshpass -p root ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no -o UserKnow
 
 	echo ''
 	echo "=============================================="
-	echo "Sleep 1 minute before containers restart...   "
-	echo "=============================================="
-	echo ''
-
-	sleep 60
-
-	clear
-
-	echo ''
-	echo "=============================================="
-	echo "Restart k8s containers ...  .                 "
+	echo "Remove lib/modules mount...                   "
 	echo "=============================================="
 	echo ''
 
@@ -884,181 +1076,13 @@ sshpass -p root ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no -o UserKnow
 
 	echo ''
 	echo "=============================================="
-	echo "Done: Restart k8s containers.                 "
+	echo "Done: Remove lib/modules mount.               "
 	echo "=============================================="
 	echo ''
 
 	sleep 5
 
 	clear
-
-	echo ''
-	echo "=============================================="
-	echo "List containers ...                           "
-	echo "=============================================="
-	echo ''
-
-	eval echo "'/var/lib/snapd/snap/bin/lxc list' | sg lxd"
-
-	echo ''
-	echo "=============================================="
-	echo "Done: List containers.                        "
-	echo "=============================================="
-	echo ''
-
-	sleep 5
-
-	clear
-
-	echo ''
-	echo "=============================================="
-	echo "Sleep 2 mins during kube-system startup ...   "
-	echo "=============================================="
-	echo ''
-
-	sleep 120
-
-	clear
-
-	echo ''
-	echo "=============================================="
-	echo "Check for all kube-system Running  ...        "
-	echo "=============================================="
-	echo ''
-
-        function GetCountKubeSystem {
-                sshpass -p root ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@maestro "export KUBECONFIG=/etc/kubernetes/admin.conf; kubectl get -A pods -o wide | grep -c Running"
-        }
-        CountKubeSystem=$(GetCountKubeSystem)
-
-        function GetCountKubeSystemRunning {
-                sshpass -p root ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@maestro "export KUBECONFIG=/etc/kubernetes/admin.conf; kubectl get -A pods -o wide | grep -c kube-system"
-        }
-        CountKubeSystemRunning=$(GetCountKubeSystemRunning)
-
-        echo 'CountKubeSystemRunning = '$CountKubeSystemRunning
-        echo 'CountKubeSystem        = '$CountKubeSystem
-
-        n=1
-        while [ $CountKubeSystemRunning != $CountKubeSystem ] && [ $n -le 5 ]
-        do
-                sshpass -p root ssh -qt -o CheckHostIP=no -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@maestro "export KUBECONFIG=/etc/kubernetes/admin.conf; kubectl get -A pods -o wide"
-		echo ''
-                CountKubeSystem=$(GetCountKubeSystem)
-                CountKubeSystemRunning=$(GetCountKubeSystemRunning)
-                echo 'CountKubeSystemRunning = '$CountKubeSystemRunning
-                echo 'CountKubeSystem        = '$CountKubeSystem
-		echo ''
-                n=$((n+1))
-                sleep 15
-        done
-
-	echo ''
-	echo "=============================================="
-	echo "Done: Wait for all kube-system Running  ...   "
-	echo "=============================================="
-	echo ''
-
-	sleep 5
-
-	clear
-
-	echo ''
-	echo "=============================================="
-	echo "Uncordon maestro ...                          "
-	echo "=============================================="
-	echo ''
-
-	sshpass -p root ssh -t -o CheckHostIP=no -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@maestro "export KUBECONFIG=/etc/kubernetes/admin.conf; kubectl uncordon maestro"
-	
-	echo ''
-	echo "=============================================="
-	echo "Done: Uncordon maestro                        "
-	echo "=============================================="
-	echo ''
-
-	sleep 5
-
-	clear
-		
 fi
-
-eval echo "'/var/lib/snapd/snap/bin/lxc exec maestro -- cp -p /root/cont-centos8-7.sh /root/install-metallb.sh' | sg lxd"
-eval echo "'/var/lib/snapd/snap/bin/lxc exec maestro -- cp -p /root/cont-centos8-8.sh /root/install-ingress-nginx.sh' | sg lxd"
-
-if [ $ContainerRuntime = 'docker' ] || [ $ContainerRuntime = 'containerd' ] || [ $ContainerRuntime = 'crio' ]
-then
-	if [ $k8sLoadBalancer = 'metallb' ]
-	then
-		echo ''
-		echo "=============================================="
-		echo "Run cont-centos8-7...                         "
-		echo "=============================================="
-		echo ''
-
-  		metallb install
-
- 		eval echo "'/var/lib/snapd/snap/bin/lxc exec maestro -- /root/cont-centos8-7.sh' | sg lxd"
-
-		echo ''
-		echo "=============================================="
-		echo "Done: Run cont-centos8-7.                     "
-		echo "=============================================="
-		echo ''
-
-		sleep 5
-
-		clear
-	fi
-
-	if [ $k8sIngressController = 'IngressNginx' ]
-	then
-		echo ''
-		echo "=============================================="
-		echo "Run cont-centos8-8...                         "
-		echo "=============================================="
-		echo ''
-
-		eval echo "'/var/lib/snapd/snap/bin/lxc exec maestro -- /root/cont-centos8-8.sh' | sg lxd"
-
-		echo ''
-		echo "=============================================="
-		echo "Done: Run cont-centos8-8.                     "
-		echo "=============================================="
-		echo ''
-
-		sleep 5
-
-		clear
-	fi
-fi
-
-echo ''
-echo "=============================================="
-echo "Done: Create K8S cluster.                     "
-echo "=============================================="
-echo ''
-
-sleep 5
-
-clear
-
-echo ''
-echo "=============================================="
-echo "Remove lib/modules mount...                   "
-echo "=============================================="
-echo ''
-
-./host-oracle8-modules-remove.sh
-
-echo ''
-echo "=============================================="
-echo "Done: Remove lib/modules mount.               "
-echo "=============================================="
-echo ''
-
-sleep 5
-
-clear
 
 
