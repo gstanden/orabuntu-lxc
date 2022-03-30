@@ -156,6 +156,132 @@ function GetMultiHostVar20 {
 MultiHostVar20=$(GetMultiHostVar20)
 TunType=$MultiHostVar20
 
+function GetMultiHostVar21 {
+        echo $MultiHost | cut -f21 -d':'
+}
+MultiHostVar21=$(GetMultiHostVar21)
+IscsiTarget=$MultiHostVar21
+
+function GetMultiHostVar22 {
+        echo $MultiHost | cut -f22 -d':'
+}
+MultiHostVar22=$(GetMultiHostVar22)
+Lun1Name=$MultiHostVar22
+
+function GetMultiHostVar23 {
+        echo $MultiHost | cut -f23 -d':'
+}
+MultiHostVar23=$(GetMultiHostVar23)
+Lun2Name=$MultiHostVar23
+
+function GetMultiHostVar24 {
+        echo $MultiHost | cut -f24 -d':'
+}
+MultiHostVar24=$(GetMultiHostVar24)
+Lun3Name=$MultiHostVar24
+
+function GetMultiHostVar25 {
+        echo $MultiHost | cut -f25 -d':'
+}
+MultiHostVar25=$(GetMultiHostVar25)
+Lun1Size=$MultiHostVar25
+
+function GetMultiHostVar26 {
+        echo $MultiHost | cut -f26 -d':'
+}
+MultiHostVar26=$(GetMultiHostVar26)
+Lun2Size=$MultiHostVar26
+
+function GetMultiHostVar27 {
+        echo $MultiHost | cut -f27 -d':'
+}
+MultiHostVar27=$(GetMultiHostVar27)
+Lun3Size=$MultiHostVar27
+
+function GetMultiHostVar28 {
+        echo $MultiHost | cut -f28 -d':'
+}
+MultiHostVar28=$(GetMultiHostVar28)
+LogBlkSz=$MultiHostVar28
+
+function GetMultiHostVar29 {
+        echo $MultiHost | cut -f29 -d':'
+}
+MultiHostVar29=$(GetMultiHostVar29)
+BtrfsRaid=$MultiHostVar29
+
+function GetMultiHostVar30 {
+        echo $MultiHost | cut -f30 -d':'
+}
+MultiHostVar30=$(GetMultiHostVar30)
+ZfsMirror=$MultiHostVar30
+
+function GetMultiHostVar31 {
+        echo $MultiHost | cut -f31 -d':'
+}
+MultiHostVar31=$(GetMultiHostVar31)
+BtrfsLun2=$MultiHostVar31
+
+function GetMultiHostVar32 {
+        echo $MultiHost | cut -f32 -d':'
+}
+MultiHostVar32=$(GetMultiHostVar32)
+ZfsLun1=$MultiHostVar32
+
+function GetMultiHostVar33 {
+        echo $MultiHost | cut -f33 -d':'
+}
+MultiHostVar33=$(GetMultiHostVar33)
+ZfsLun2=$MultiHostVar33
+
+function GetMultiHostVar34 {
+        echo $MultiHost | cut -f34 -d':'
+}
+MultiHostVar34=$(GetMultiHostVar34)
+LxcLun1=$MultiHostVar34
+
+function GetMultiHostVar35 {
+        echo $MultiHost | cut -f35 -d':'
+}
+MultiHostVar35=$(GetMultiHostVar35)
+IscsiTargetLunPrefix=$MultiHostVar35
+
+function GetMultiHostVar36 {
+        echo $MultiHost | cut -f36 -d':'
+}
+MultiHostVar36=$(GetMultiHostVar36)
+IscsiVendor=$MultiHostVar36
+
+function GetMultiHostVar37 {
+        echo $MultiHost | cut -f37 -d':'
+}
+MultiHostVar37=$(GetMultiHostVar37)
+ContainerRuntime=$MultiHostVar37
+
+function GetMultiHostVar38 {
+        echo $MultiHost | cut -f38 -d':'
+}
+MultiHostVar38=$(GetMultiHostVar38)
+ContainerRuntime=$MultiHostVar38
+
+function GetMultiHostVar39 {
+        echo $MultiHost | cut -f39 -d':'
+}
+MultiHostVar39=$(GetMultiHostVar39)
+ContainerRuntime=$MultiHostVar39
+
+function GetMultiHostVar40 {
+        echo $MultiHost | cut -f40 -d':'
+}
+MultiHostVar40=$(GetMultiHostVar40)
+ContainerRuntime=$MultiHostVar40
+
+function GetMultiHostVar41 {
+        echo $MultiHost | cut -f41 -d':'
+}
+MultiHostVar41=$(GetMultiHostVar41)
+BaseNet=$MultiHostVar41
+
 if [ -f /etc/lsb-release ]
 then
         function GetUbuntuVersion {
@@ -461,7 +587,7 @@ do
 	elif [ $LXD = 'Y' ]
 	then	
        		function CheckDNSLookup {
-               		timeout 5 nslookup $ContainerPrefixLXD$CloneIndex
+               		timeout 5 nslookup $BaseNet.$CloneIndex
        		}
        		DNSLookup=$(CheckDNSLookup)
 		DNSLookup=`echo $?`
