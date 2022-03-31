@@ -367,6 +367,15 @@ k8sCNI=$(source "$DistDir"/anylinux/CONFIG; echo $k8sCNI)
 k8sLoadBalancer=$(source "$DistDir"/anylinux/CONFIG; echo $k8sLoadBalancer)
 k8sIngressController=$(source "$DistDir"/anylinux/CONFIG; echo $k8sIngressController)
 
+################## ContainerRuntime Setting ########################
+
+BaseNet1=$(source "$DistDir"/anylinux/CONFIG; echo $BaseNet1)
+
+function GetBaseNet {
+	echo $BaseNet1 | cut -f2 -d':'
+}
+BaseNet=$(GetBaseNet)
+
 if [ $LinuxFlavor = 'Fedora' ] && [ $RedHatVersion -le 28 ]
 then
         LXD='N'
@@ -1004,9 +1013,9 @@ then
 
 	elif [ $UbuntuMajorVersion -ge 16 ]
 	then
-		MultiHost="$Operation:Y:X:X:$HUBIP:$SPOKEIP:$MTU:$HubUserAct:$HubSudoPwd:$GRE:$Product:$LXD:$K8S:$LXDPreSeed:$LXDCluster:$LXDStorageDriver:$LXDStoragePoolName:$BtrfsLun1:$Docker:$TunType:$IscsiTarget:$Lun1Name:$Lun2Name:$Lun3Name:$Lun1Size:$Lun2Size:$Lun3Size:$LogBlkSz:$BtrfsRaid:$ZfsMirror:$BtrfsLun2:$ZfsLun1:$ZfsLun2:$LxcLun1:$IscsiTargetLunPrefix:$IscsiVendor:$ContainerRuntime:$k8sCNI:$k8sLoadBalancer:$k8sIngressController"
+		MultiHost="$Operation:Y:X:X:$HUBIP:$SPOKEIP:$MTU:$HubUserAct:$HubSudoPwd:$GRE:$Product:$LXD:$K8S:$LXDPreSeed:$LXDCluster:$LXDStorageDriver:$LXDStoragePoolName:$BtrfsLun1:$Docker:$TunType:$IscsiTarget:$Lun1Name:$Lun2Name:$Lun3Name:$Lun1Size:$Lun2Size:$Lun3Size:$LogBlkSz:$BtrfsRaid:$ZfsMirror:$BtrfsLun2:$ZfsLun1:$ZfsLun2:$LxcLun1:$IscsiTargetLunPrefix:$IscsiVendor:$ContainerRuntime:$k8sCNI:$k8sLoadBalancer:$k8sIngressController:$BaseNet"
 	else
-		MultiHost="$Operation:Y:X:X:$HUBIP:$SPOKEIP:$MTU:$HubUserAct:$HubSudoPwd:$GRE:$Product:$LXD:$K8S:$LXDPreSeed:$LXDCluster:$LXDStorageDriver:$LXDStoragePoolName:$BtrfsLun1:$Docker:$TunType:$IscsiTarget:$Lun1Name:$Lun2Name:$Lun3Name:$Lun1Size:$Lun2Size:$Lun3Size:$LogBlkSz:$BtrfsRaid:$ZfsMirror:$BtrfsLun2:$ZfsLun1:$ZfsLun2:$LxcLun1:$IscsiTargetLunPrefix:$IscsiVendor:$ContainerRuntime:$k8sCNI:$k8sLoadBalancer:$k8sIngressController"
+		MultiHost="$Operation:Y:X:X:$HUBIP:$SPOKEIP:$MTU:$HubUserAct:$HubSudoPwd:$GRE:$Product:$LXD:$K8S:$LXDPreSeed:$LXDCluster:$LXDStorageDriver:$LXDStoragePoolName:$BtrfsLun1:$Docker:$TunType:$IscsiTarget:$Lun1Name:$Lun2Name:$Lun3Name:$Lun1Size:$Lun2Size:$Lun3Size:$LogBlkSz:$BtrfsRaid:$ZfsMirror:$BtrfsLun2:$ZfsLun1:$ZfsLun2:$LxcLun1:$IscsiTargetLunPrefix:$IscsiVendor:$ContainerRuntime:$k8sCNI:$k8sLoadBalancer:$k8sIngressController:$BaseNet"
         fi
 
 	sleep 5
