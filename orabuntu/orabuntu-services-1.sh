@@ -293,7 +293,7 @@ echo "Install required packages ...                 "
 echo "=============================================="
 echo ''
 
-sudo apt-get -y install openssh-server net-tools bind9utils
+sudo apt-get -y install openssh-server net-tools bind9utils 
 
 echo ''
 echo "=============================================="
@@ -370,6 +370,12 @@ fi
 sleep 5
 
 clear
+
+if [ $UbuntuMajorVersion -ge 20 ] && [ $LXD = 'Y' ] && [ $LXDCluster = 'Y' ]
+then
+	sudo apt-get -y install systemd-timesyncd
+	sudo timedatectl set-ntp true
+fi
 
 if [ $UbuntuVersion = '16.04' ]
 then
