@@ -668,7 +668,7 @@ then
 	echo "=============================================="
 	echo ''
 
-	./host-oracle8-modules-remove.sh $GRE $NameServer
+	# host-oracle8-modules-remove.sh $GRE $NameServer
 
 	echo ''
 	echo "=============================================="
@@ -922,7 +922,7 @@ then
 		echo "=============================================="
 		echo ''
 
-		./host-oracle8-modules-remove.sh
+		# host-oracle8-modules-remove.sh
 
 		echo ''
 		echo "=============================================="
@@ -1072,6 +1072,24 @@ then
 
 			clear
 		fi
+	
+		echo ''
+		echo "=============================================="
+		echo "Remove lib/modules mount...                   "
+		echo "=============================================="
+		echo ''
+
+		# host-oracle8-modules-remove.sh
+
+		echo ''
+		echo "=============================================="
+		echo "Done: Remove lib/modules mount.               "
+		echo "=============================================="
+		echo ''
+
+		sleep 5
+
+		clear
 	fi
 
 	echo ''
@@ -1090,7 +1108,7 @@ then
 	echo "=============================================="
 	echo ''
 
-	./host-oracle8-modules-remove.sh
+	# host-oracle8-modules-remove.sh
 
 	echo ''
 	echo "=============================================="
