@@ -668,7 +668,7 @@ then
 	echo "=============================================="
 	echo ''
 
-	# host-oracle8-modules-remove.sh $GRE $NameServer
+	host-oracle8-modules-remove.sh $GRE $NameServer
 
 	echo ''
 	echo "=============================================="
@@ -922,7 +922,7 @@ then
 		echo "=============================================="
 		echo ''
 
-		# host-oracle8-modules-remove.sh
+		host-oracle8-modules-remove.sh
 
 		echo ''
 		echo "=============================================="
@@ -1079,7 +1079,7 @@ then
 		echo "=============================================="
 		echo ''
 
-		# host-oracle8-modules-remove.sh
+		host-oracle8-modules-remove.sh
 
 		echo ''
 		echo "=============================================="
@@ -1108,7 +1108,7 @@ then
 	echo "=============================================="
 	echo ''
 
-	# host-oracle8-modules-remove.sh
+	host-oracle8-modules-remove.sh
 
 	echo ''
 	echo "=============================================="
