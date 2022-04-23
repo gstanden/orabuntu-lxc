@@ -2016,7 +2016,7 @@ then
                         echo ''
 
                         sudo sed -i '2,5{s/^/#/}'                                          /etc/network/openvswitch/stop_$IscsiVendor.sh
-                        sudo sed -i '9,10{s/^/#/}'                                         /etc/network/openvswitch/stop_$IscsiVendor.sh
+                        sudo sed -i '8,10{s/^/#/}'                                         /etc/network/openvswitch/stop_$IscsiVendor.sh
                         sudo sed -i '13{s/^/#/}'                                           /etc/network/openvswitch/stop_$IscsiVendor.sh
                         sudo sed -i '15{s/^/#/}'                                           /etc/network/openvswitch/stop_$IscsiVendor.sh
                         sudo sh -c "echo '/var/lib/snapd/snap/bin/lxc stop -f --all'    >> /etc/network/openvswitch/stop_$IscsiVendor.sh"
