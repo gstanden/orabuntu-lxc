@@ -2015,10 +2015,6 @@ then
                         echo "=============================================="
                         echo ''
 
-                        sudo sed -i '2,5{s/^/#/}'                                          /etc/network/openvswitch/stop_$IscsiVendor.sh
-                        sudo sed -i '8,10{s/^/#/}'                                         /etc/network/openvswitch/stop_$IscsiVendor.sh
-                        sudo sed -i '13{s/^/#/}'                                           /etc/network/openvswitch/stop_$IscsiVendor.sh
-                        sudo sed -i '15{s/^/#/}'                                           /etc/network/openvswitch/stop_$IscsiVendor.sh
                         sudo sh -c "echo '/var/lib/snapd/snap/bin/lxc stop -f --all'    >> /etc/network/openvswitch/stop_$IscsiVendor.sh"
                         sudo sh -c "echo 'sudo lxc-stop -n $NameServerBase'             >> /etc/network/openvswitch/stop_$IscsiVendor.sh"
                         sudo sh -c "echo 'sudo umount /$StoragePoolName'                >> /etc/network/openvswitch/stop_$IscsiVendor.sh"
@@ -2029,6 +2025,10 @@ then
                         sudo sh -c "echo '# sudo service scst stop'                     >> /etc/network/openvswitch/stop_$IscsiVendor.sh"
                         sudo sh -c "echo 'sudo rm -f /dev/lxc_luns/*'                   >> /etc/network/openvswitch/stop_$IscsiVendor.sh"
                         sudo sh -c "echo 'sudo multipath -F'                            >> /etc/network/openvswitch/stop_$IscsiVendor.sh"
+                        sudo sed -i '2,5{s/^/#/}'                                          /etc/network/openvswitch/stop_$IscsiVendor.sh
+                        sudo sed -i '8,10{s/^/#/}'                                         /etc/network/openvswitch/stop_$IscsiVendor.sh
+                        sudo sed -i '13{s/^/#/}'                                           /etc/network/openvswitch/stop_$IscsiVendor.sh
+                        sudo sed -i '15{s/^/#/}'                                           /etc/network/openvswitch/stop_$IscsiVendor.sh
 
                         sudo cat /etc/network/openvswitch/stop_$IscsiVendor.sh
 
