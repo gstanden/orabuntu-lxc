@@ -2504,6 +2504,10 @@ then
                 ContainerCreated=$(ConfirmContainerCreated)
         done
 
+	# debug
+	# add netplan
+	sleep 30
+
 	while [ $ContainerCreated -eq 0 ] && [ $p -le 3 ]
 	do
 		echo ''

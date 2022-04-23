@@ -1,5 +1,4 @@
 /var/lib/lxc/nsa/rootfs/etc/bind/named.conf.local
-/var/lib/lxc/nsa/rootfs/etc/bind/named.conf.options
 /var/lib/lxc/nsa/rootfs/etc/default/isc-dhcp-server
 /var/lib/lxc/nsa/rootfs/var/lib/bind/fwd.consultingcommandos.us
 /var/lib/lxc/nsa/rootfs/var/lib/bind/rev.consultingcommandos.us
@@ -14,10 +13,11 @@
 /var/lib/lxc/nsa/rootfs/etc/systemd/resolved.conf
 /var/lib/lxc/nsa/config
 /var/lib/lxc/nsa/rootfs/root/ns_backup.start.sh
-/var/lib/lxc/nsa/rootfs/etc/netplan/01-netcfg.yaml
-/var/lib/lxc/nsa/rootfs/etc/netplan/02-netcfg.yaml
 /var/lib/lxc/nsa/rootfs/etc/dhcp/dhcpd.conf
 /var/lib/lxc/nsa/rootfs/var/lib/bind/fwd.orabuntu-lxc.com
 /var/lib/lxc/nsa/rootfs/var/lib/bind/rev.orabuntu-lxc.com
+/var/lib/lxc/nsa/rootfs/etc/bind/named.conf.options
+/var/lib/lxc/nsa/rootfs/etc/netplan/01-netcfg.yaml
+/var/lib/lxc/nsa/rootfs/etc/netplan/02-netcfg.yaml
 /var/GNU3
 /var/COPYING
