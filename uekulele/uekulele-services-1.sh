@@ -4522,7 +4522,7 @@ then
 
 			if   [ $IscsiTarget = 'Y' ]
 			then
-				sudo sh -c "echo '$Mount /dev/"$IscsiTargetLunPrefix"_luns/"$IscsiTargetLunPrefix"_"$Lun3Name"_"$Sw1Index"_00 /var/lib/lxc'	>> /etc/network/openvswitch/strt_$IscsiVendor.sh"
+			#	sudo sh -c "echo '$Mount /dev/"$IscsiTargetLunPrefix"_luns/"$IscsiTargetLunPrefix"_"$Lun3Name"_"$Sw1Index"_00 /var/lib/lxc'	>> /etc/network/openvswitch/strt_$IscsiVendor.sh"
 				sudo sh -c "echo '/var/lib/snapd/snap/bin/lxc start --all'									>> /etc/network/openvswitch/strt_$IscsiVendor.sh"
 			
 			elif [ $IscsiTarget = 'N' ]
