@@ -1983,7 +1983,7 @@ then
                         }
                         Mount=$(WhichMount)
 
-			sudo sed -i '/bash/a \/usr\/bin\/sudo service scst start' 										   /etc/network/openvswitch/strt_$IscsiVendor.sh
+			sudo sed -i '/trigger/a \/usr\/bin\/sudo service scst start' 										   /etc/network/openvswitch/strt_$IscsiVendor.sh
                         sudo sh -c "echo '$Sleep 10'                                                                                                            >> /etc/network/openvswitch/strt_$IscsiVendor.sh"
                         sudo sh -c "echo '$ModProbe zfs'                                                                                                        >> /etc/network/openvswitch/strt_$IscsiVendor.sh"
 
