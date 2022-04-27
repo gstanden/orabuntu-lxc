@@ -801,6 +801,8 @@ then
 	echo "23. 'Bug 1454584 - firewall-cmd generates bad iptables rule for GRE' gorshkov https://bugzilla.redhat.com/show_bug.cgi?id=1454584"
 	echo "24. 'nohup as background task does NOT return prompt' Devon https://stackoverflow.com/questions/23024850/nohup-as-background-task-does-not-return-prompt"
 	echo "25. 'How to ignore a set of Mac addresses in dhcpd.conf?' Dusty Campbell https://serverfault.com/questions/91643/how-to-ignore-a-set-of-mac-addresses-in-dhcpd-conf"
+	echo "26. 'Kubernetes in LXD containers' Venkat Nagappan https://github.com/justmeandopensource/kubernetes"
+	echo "27. 'Reverse Lookups to Local DNS Server Failing on Ubuntu 18.04' Ayell https://unix.stackexchange.com/questions/584307/reverse-lookups-to-local-dns-server-failing-on-ubuntu-18-04"
 	echo ''
 	echo "Acknowledgements"
 	echo ''
@@ -811,6 +813,8 @@ then
 	echo ''
 	echo "For their patience and support during the long hours worked in the past and the long hours to be worked in the future for Orabuntu-LXC."
 	echo "Mary Standen my mother always raised me to put mission first and work first."
+	echo ""
+	echo "The work by Vengkat Nagappan at JustMeAndOpensource made the LXD-containerized k8s in Orabuntu-LXC possible, as I was able to build upon his many youtubes on LXD-containerization of kubernetes."
 	echo ''
 	echo "=============================================="
 	echo "References and Acknowledgements End           "
