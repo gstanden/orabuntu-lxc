@@ -1189,8 +1189,6 @@ then
         done
 
 	echo ''
-
-	echo ''
 	echo "=============================================="
 	echo "Done: Install Packages in Seed Container.     "
 	echo "=============================================="
@@ -1202,22 +1200,30 @@ then
 
 	echo ''
 	echo "=============================================="
-	echo "Restart SSHD in Seed Container...             "
+	echo "Edit ssh_config and start sshd...           "
 	echo "=============================================="
 	echo ''
+
+	eval echo "'/var/lib/snapd/snap/bin/lxc exec $oel$OracleRelease$SeedPostfix -- sed -i "/GSSAPIAuthentication/s/#//"     /etc/ssh/sshd_config'   | sg lxd $CGROUP_SUFFIX"
+	eval echo "'/var/lib/snapd/snap/bin/lxc exec $oel$OracleRelease$SeedPostfix -- sed -i "/GSSAPIAuthentication/s/yes/no/" /etc/ssh/sshd_config'   | sg lxd $CGROUP_SUFFIX"
+	eval echo "'/var/lib/snapd/snap/bin/lxc exec $oel$OracleRelease$SeedPostfix -- sed -i "/UseDNS/s/#//"                   /etc/ssh/sshd_config'   | sg lxd $CGROUP_SUFFIX"
+	eval echo "'/var/lib/snapd/snap/bin/lxc exec $oel$OracleRelease$SeedPostfix -- sed -i "/UseDNS/s/yes/no/"               /etc/ssh/sshd_config'   | sg lxd $CGROUP_SUFFIX"
+        eval echo "'/var/lib/snapd/snap/bin/lxc exec $oel$OracleRelease$SeedPostfix -- systemctl enable sshd' 					    	| sg lxd $CGROUP_SUFFIX"
+
+	sleep 5
 
 	Status=1
         n=1
 	while [ $Status -ne 0 ] && [ $n -le 10 ]
 	do
-		eval echo "'/var/lib/snapd/snap/bin/lxc exec oel$OracleRelease$SeedPostfix -- service sshd restart' | sg lxd $CGROUP_SUFFIX" 
+		eval echo "'/var/lib/snapd/snap/bin/lxc exec oel$OracleRelease$SeedPostfix -- service sshd start' | sg lxd $CGROUP_SUFFIX" 
 		Status=`echo $?`
                 n=$((n+1))
 	done
 
 	echo ''
 	echo "=============================================="
-	echo "Done: Restart SSHD in Seed Container.         "
+	echo "Done: Edit ssh_config and restart sshd.       "
 	echo "=============================================="
 	echo ''
 
