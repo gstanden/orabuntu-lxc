@@ -1452,4 +1452,4 @@ then
 fi
 sudo rm -f  /etc/sudoers.d/orabuntu-lxc
 sudo rm -rf /opt/olxc/opt 
-sudo service olxc-scst start > /dev/null 2>&1
+# sudo service olxc-scst start > /dev/null 2>&1
