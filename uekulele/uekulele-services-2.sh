@@ -1072,6 +1072,9 @@ then
                 then
                         echo 'Launch of LXD container encountered an unexpected issue.  Retrying launch ...'
                         echo ''
+                	eval echo "'/var/lib/snapd/snap/bin/lxc stop -f oel$OracleRelease$SeedPostfix' | sg lxd $CGROUP_SUFFIX"
+                	eval echo "'/var/lib/snapd/snap/bin/lxc delete  oel$OracleRelease$SeedPostfix' | sg lxd $CGROUP_SUFFIX"
+			echo''
 			if [ $n -ge 2 ]
 			then
                 		SeedIndex=$((SeedIndex+1))
