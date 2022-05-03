@@ -1075,7 +1075,7 @@ then
 			if [ $n -ge 2 ]
 			then
                 		SeedIndex=$((SeedIndex+1))
-				SeedPostfix=c$SeedIndex
+				SeedPostfix=d$SeedIndex
 			fi
 			sleep 5
                 fi
