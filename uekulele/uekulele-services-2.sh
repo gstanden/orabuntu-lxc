@@ -1067,21 +1067,12 @@ then
         do
                 eval echo "'/var/lib/snapd/snap/bin/lxc launch -p olxc_sx1a images:oracle/$MajorRelease/amd64 oel$OracleRelease$SeedPostfix' | sg lxd $CGROUP_SUFFIX"
                 LaunchCode=`echo $?`
-
-                if [ $LaunchCode -ne 0 ]
-                then
-                        echo 'Launch of LXD container encountered an unexpected issue.  Retrying launch ...'
-                        echo ''
-                	eval echo "'/var/lib/snapd/snap/bin/lxc stop -f oel$OracleRelease$SeedPostfix' | sg lxd $CGROUP_SUFFIX"
-                	eval echo "'/var/lib/snapd/snap/bin/lxc delete  oel$OracleRelease$SeedPostfix' | sg lxd $CGROUP_SUFFIX"
-			echo''
-			if [ $n -ge 2 ]
-			then
-                		SeedIndex=$((SeedIndex+1))
-				SeedPostfix=d$SeedIndex
-			fi
+		if [ $LaunchCode -ne 0 ]
+		then
+			eval echo "'/var/lib/snapd/snap/bin/lxc stop -f oel$OracleRelease$SeedPostfix' | sg lxd $CGROUP_SUFFIX"
+			eval echo "'/var/lib/snapd/snap/bin/lxc delete  oel$OracleRelease$SeedPostfix' | sg lxd $CGROUP_SUFFIX"
 			sleep 5
-                fi
+		fi
 		n=$((n+1))
         done
 
