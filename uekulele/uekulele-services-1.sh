@@ -4469,12 +4469,25 @@ then
 
 			CurrentDir=`pwd`
 
-			if   [ $IscsiVendor = 'scst' ]
-			then
-				cd /opt/olxc/home/scst-files
-				./create-scst.sh $LXDStorageDriver $RevDomain1 $Lun1Name $Lun2Name $Lun3Name $Lun1Size $Lun2Size $Lun3Size $LogBlkSz $IscsiTargetLunPrefix $Sw1Index
+			function CheckScstLuns {
+				ls -l /dev/lxc_luns/lxc* 2>&1 | wc -l
+			}
+			ScstLuns=$(CheckScstLuns)
 
-			elif [ $IscsiVendor = 'lio' ]
+			function CheckScstSvs {
+				sudo service scst status 2>&1 | grep -c OK
+			}
+			ScstSvs=$(CheckScstSvs)
+
+                        if [ $IscsiVendor = 'scst' ] && [ $ScstLuns -lt 3 ] && [ $ScstSvs -lt 1 ]
+                        then
+                                cd /opt/olxc/home/scst-files
+				./create-scst.sh $LXDStorageDriver $RevDomain1 $Lun1Name $Lun2Name $Lun3Name $Lun1Size $Lun2Size $Lun3Size $LogBlkSz $IscsiTargetLunPrefix $Sw1Index
+			else
+				echo "SCST was pre-installed"
+                        fi
+
+			if [ $IscsiVendor = 'lio' ]
 			then
 				cd /opt/olxc/home/lio-files
 				./create-lio.sh $LXDStorageDriver $RevDomain1 $Lun1Name $Lun2Name $Lun3Name $Lun1Size $Lun2Size $Lun3Size $LogBlkSz $IscsiTargetLunPrefix
