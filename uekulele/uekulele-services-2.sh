@@ -151,6 +151,7 @@ function GetMultiHostVar17 {
 }
 MultiHostVar17=$(GetMultiHostVar17)
 StoragePoolName=$MultiHostVar17
+LXDStoragePoolName=$StoragePoolName
 
 function GetMultiHostVar18 {
         echo $MultiHost | cut -f18 -d':'
@@ -1091,6 +1092,7 @@ then
 		then
 			eval echo "'/var/lib/snapd/snap/bin/lxc stop -f oel$OracleRelease$SeedPostfix' | sg lxd $CGROUP_SUFFIX"
 			eval echo "'/var/lib/snapd/snap/bin/lxc delete  oel$OracleRelease$SeedPostfix' | sg lxd $CGROUP_SUFFIX"
+			sudo zfs destroy $LXDStoragePoolName/containers/oel$OracleRelease$SeedPostfix
 			sleep 5
 		fi
 		n=$((n+1))
