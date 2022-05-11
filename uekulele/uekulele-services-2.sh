@@ -1053,6 +1053,26 @@ then
 
 	echo ''
 	echo "=============================================="
+	echo "Start lxc-monitor service...                  "
+	echo "=============================================="
+	echo ''
+
+	sudo systemctl daemon-reload
+	sudo systemctl enable lxc-monitor.service
+	sudo service lxc-monitor start
+
+	echo ''
+	echo "=============================================="
+	echo "Done: Start lxc-monitor service.              "
+	echo "=============================================="
+	echo ''
+
+	sleep 5
+
+	clear
+
+	echo ''
+	echo "=============================================="
 	echo "Launch Oracle LXD Seed Container...           "
 	echo "=============================================="
 	echo ''
@@ -1082,7 +1102,26 @@ then
 	echo "=============================================="
 	echo ''
 
-	sleep 15
+	sleep 5
+
+	clear
+
+	echo ''
+	echo "=============================================="
+	echo "Stop lxc-monitor service...                   "
+	echo "=============================================="
+	echo ''
+
+	sudo service lxc-monitor stop
+	sudo mv ~/lxc-monitor.log ~/lxc-monitor.log.seed
+
+	echo ''
+	echo "=============================================="
+	echo "Done: Stop lxc-monitor service.               "
+	echo "=============================================="
+	echo ''
+
+	sleep 5
 
 	clear
 
