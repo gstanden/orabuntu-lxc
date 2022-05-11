@@ -1086,7 +1086,7 @@ then
         n=0
         while [ $LaunchCode -ne 0 ] && [ $n -le 5 ]
         do
-                eval echo "'/var/lib/snapd/snap/bin/lxc launch -p olxc_sx1a images:oracle/$MajorRelease/amd64 oel$OracleRelease$SeedPostfix' | sg lxd $CGROUP_SUFFIX"
+                eval echo "'/var/lib/snapd/snap/bin/lxc launch -p olxc_sx1a images:oracle/$MajorRelease/amd64 oel$OracleRelease$SeedPostfix --debug' | sg lxd $CGROUP_SUFFIX"
                 LaunchCode=`echo $?`
 		if [ $LaunchCode -ne 0 ]
 		then
