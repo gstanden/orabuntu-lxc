@@ -797,8 +797,8 @@ then
 			echo ''
 		done
 
-		sudo snap install lxd
-		sudo snap refresh lxd
+		sudo snap install lxd --channel=4.0/stable
+	#	sudo snap refresh lxd
 
 		echo ''
 		echo "=============================================="
