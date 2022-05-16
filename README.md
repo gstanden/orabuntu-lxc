@@ -139,9 +139,9 @@ NEW in Orabuntu-LXC ELENA edition are the CONFIG.LXD and the CONFIG.LXC files:
 Edit the relevant CONFIG file to select either LXC or LXD. 
 
 When installing on the first cluster host, it is only necessary to be sure the HubUserAcct and the HubSudoPwd are correct. 
-When installing on GRE additional hosts, just be sure to edit in addition to the HubUserAcct and the HubSudoPwd also the HUBIP and SPOKEIP values, and be sure that Product=no-product on the GRE hostrs if you have already installed Product=k8s on the HUB host.
+When installing on GRE additional hosts, just be sure to edit in addition to the HubUserAcct and the HubSudoPwd also the HUBIP and SPOKEIP values.
 
-Note: LXD-containerized k8s workers option coming soon for GRE hosts.
+Note: LXD-containerized k8s workers now available for tunnel-connected hosts.
 
 There are of course many "expert" install parameters you can change such as TunType, ContainerRuntime, etc.
 
