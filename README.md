@@ -177,7 +177,7 @@ For example, for a deployment of lxd clusters:
 anylinux-services.HUB.HOST.sh new lxd
 anylinux-services.GRE.HOST.sh new lxd
 ```
-The settings details are described below.  However, the CONFIG.LXD and the CONFIG.LXD are intended to simplify running the desired LXD multi-host cluster, or alternatively, an LXC network span across multiple hosts.
+The settings details are described below.  However, the CONFIG.LXD and the CONFIG.LXC are intended to simplify running the desired LXD multi-host cluster, or alternatively, an LXC network span across multiple hosts.
 
 Also in the /anylinux/CONFIG file select whether Oracle Linux 8.4 or Oracle Linux 7.9 containers as shown below.
 ```
