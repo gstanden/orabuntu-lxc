@@ -155,6 +155,8 @@ Step 6
 
 The ZFS storage pool required for LXD cluster can be precreated, but the main scripts create them automatically if they do not already exist.
 
+Note:  For Fedora it's recommended to pre-build ZFS due to known issues with building ZFS on Fedora.  See https://github.com/openzfs/zfs/issues/12667 for more details.
+
 Bring your own LUN (BYOL) is not yet developed, even though the settings are already in the CONFIG file. 
 
 There are scripts in distro subdirectories to create the required ZFS storage pools for all supported Orabuntu-LXC distros (CentOS, Fedora, RedHat, Ubuntu and Oracle Linux). For RedHat 7 and CentOS 7 the scripts build ZFS from source which takes a few minutes to complete.
