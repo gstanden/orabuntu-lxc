@@ -400,7 +400,7 @@ If you run Oracle Linux as your LXC host, and Orabuntu-LXC Oracle Linux LXC cont
 
 # Kubernetes
 
-Orabuntu-LXC deploys LXD-containerized kubernetes administrative and worker nodes on each Orabuntu-LXD host be default.  This is settable as the "Product=k8s" setting in the CONFIG.LXD.  The Orabuntu-LXD HUB node gets the Kubernetes admin LXD container, plus two Kubernetes LXD worker containers, and all of them have static IP addresses.  When additional Orabuntu-LXC physical nodes are added, each node gets a single Kubernetes LXD worker container which is assigned a DHCP address.  
+Orabuntu-LXC deploys LXD-containerized kubernetes administrative and worker nodes on each Orabuntu-LXD host be default.  This is settable as the "Product=k8s" setting in the CONFIG.LXD.  The Orabuntu-LXD HUB node gets the Kubernetes admin LXD container, plus two Kubernetes LXD worker containers, and all of them have static IP addresses.  When additional Orabuntu-LXC physical nodes are added, each node gets a single Kubernetes LXD worker container which is assigned a DHCP address.  All of the LXD-containerized Kubernetes system containers run CentOS-8 Stream and run on the same ZFS pool and the same OpenvSwitch network as all the other LXD containers.
 
 # Docker
 
