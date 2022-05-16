@@ -398,6 +398,10 @@ Why is Orabuntu-LXC built around Oracle Linux?  I chose Oracle Linux because at 
 
 If you run Oracle Linux as your LXC host, and Orabuntu-LXC Oracle Linux LXC containers, you have a 100% Oracle Corporation next-generation container infrastructure solution at no cost whether in development or in production, and, which can at any time be converted to paid support from Oracle Corporation, when and if the time comes for that.
 
+# Kubernetes
+
+Orabuntu-LXC deploys LXD-containerized kubernetes administrative and worker nodes on each Orabuntu-LXD host be default.  This is settable as the "Product=k8s" setting in the CONFIG.LXD.  The Orabuntu-LXD HUB node gets the Kubernetes admin LXD container, plus two Kubernetes LXD worker containers, and all of them have static IP addresses.  When additional Orabuntu-LXC physical nodes are added, each node gets a single Kubernetes LXD worker container which is assigned a DHCP address.  
+
 # Docker
 
 Orabuntu-LXC deployes docker for all of our supported platforms (Fedora, CentOS, Ubuntu, Oracle Linux, Red Hat) and the docker containers on docker0 by default can be accessed on their ports from the LXC Linux Containers, VMs, and physical hosts.  This provides out of the box a mechanism to put multilayer products into LXC containers and connect them to services prodvided from Docker Containers.
