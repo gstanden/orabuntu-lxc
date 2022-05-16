@@ -5,6 +5,7 @@ Announcing Orabuntu-LXC/D v7.0.0-alpha ELENA ("**E**nterprise **L**XD **E**ditio
 New features of Orabuntu-LXC/D v7.0.0-alpha ELENA:
 
 * Automated LXD N-node clusters on OVS VLAN's on CentOS, Fedora, RedHat, Ubuntu & Oracle Linux.
+* LXC-containerized dynamic DNS/DHCP
 * Optional Kubernetes LXD-containerized maestro and two violin nodes (use "Product=k8s" in CONFIG.LXD only)
 * User-selectable tunnel-type for multi-host deployments [ gre | geneve | vxlan ]. 
 * New /anylinux/CONFIG.[LXD|LXC] file which centralizes deployment configuration parameters.
