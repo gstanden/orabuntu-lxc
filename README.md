@@ -122,7 +122,7 @@ cd orabuntu-lxc-master/anylinux
 
 Step 3b
 
-If a non-root user with "sudo ALL" privilege is not available on the host, create the user with the appropriate script:
+If a non-root user with "sudo ALL" privilege is not available on the host, then before navigating to the "anylinux" directory, first create the user with "sudo all" privilege using the appropriate script in the orabuntu-lxc-master/uekulele directory, or in the orabuntu-lxc-master/orabuntu directory for redhat or debian, respectively:
 ```
 ./uekulele/uekulele-services-0.sh (RedHat-family linuxes)
 ./orabuntu/orabuntu-services-0.sh (Ubuntu-family linuxes)
