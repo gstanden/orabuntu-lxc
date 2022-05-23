@@ -4533,12 +4533,13 @@ then
 			sudo sh -c "echo '$Sleep 10'         		           										>> /etc/network/openvswitch/strt_$IscsiVendor.sh"
 			sudo sh -c "echo '$ModProbe zfs'                											>> /etc/network/openvswitch/strt_$IscsiVendor.sh"
 
-			if   [ $IscsiTarget = 'Y' ]
-			then
+		#	if   [ $IscsiTarget = 'Y' ]
+		#	then
 			#	sudo sh -c "echo '$Mount /dev/"$IscsiTargetLunPrefix"_luns/"$IscsiTargetLunPrefix"_"$Lun3Name"_"$Sw1Index"_00 /var/lib/lxc'	>> /etc/network/openvswitch/strt_$IscsiVendor.sh"
-				sudo sh -c "echo '/var/lib/snapd/snap/bin/lxc start --all'									>> /etc/network/openvswitch/strt_$IscsiVendor.sh"
+			#	sudo sh -c "echo '/var/lib/snapd/snap/bin/lxc start --all'									>> /etc/network/openvswitch/strt_$IscsiVendor.sh"
+		#	fi
 			
-			elif [ $IscsiTarget = 'N' ]
+			if [ $IscsiTarget = 'N' ]
 			then
 				sudo sh -c "echo '$Mount $LxcLun1'												>> /etc/network/openvswitch/strt_$IscsiVendor.sh"
 			fi
@@ -4562,7 +4563,7 @@ then
 			echo ''
 
 			sudo sed -i '2,4{s/^/#/}' 					   /etc/network/openvswitch/stop_$IscsiVendor.sh
-			sudo sh -c "echo '/var/lib/snapd/snap/bin/lxc stop -f --all'	>> /etc/network/openvswitch/stop_$IscsiVendor.sh"
+		#	sudo sh -c "echo '/var/lib/snapd/snap/bin/lxc stop -f --all'	>> /etc/network/openvswitch/stop_$IscsiVendor.sh"
 			sudo sh -c "echo 'sudo lxc-stop -n $NameServerBase'		>> /etc/network/openvswitch/stop_$IscsiVendor.sh"
 			sudo sh -c "echo 'sudo umount /$StoragePoolName'		>> /etc/network/openvswitch/stop_$IscsiVendor.sh"
 			sudo sh -c "echo 'sudo snap stop lxd'				>> /etc/network/openvswitch/stop_$IscsiVendor.sh"
