@@ -155,7 +155,7 @@ If instead LXC containers (not LXD) multi-host span is desired, use the CONFIG.L
 
 Step 5
 
-Edit other install parameters in the **/anylinux/CONFIG** file as desired or required.
+Edit any other "expert" install parameters in the **/anylinux/CONFIG.[LXC|LXD]** file as desired or required.
 
 Step 6
 
